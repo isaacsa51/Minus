@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Disable WorkManager auto-initialization so we can provide our own custom configuration -->
+    <bool name="workmanager_init_disabled">true</bool>
+</resources>

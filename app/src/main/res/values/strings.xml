@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Minus</string>
+    <string name="today">Hoy</string>
+    <string name="new_period_title">Nuevo Periodo</string>
+    <string name="widget_description">Quick view of your expenses and add new ones</string>
+    <string name="total_expenses_preview">Total Expenses</string>
+    <string name="add_expense">+ Add Expense</string>
+
+    <!-- Widget Descriptions -->
+    <string name="widget_budget_overview_description">See spent and remaining budget at a glance</string>
+    <string name="widget_days_countdown_description">Countdown days remaining in budget period</string>
+    <string name="widget_budget_detail_description">Full budget overview with top category and days left</string>
+
+    <!-- Widget Labels -->
+    <string name="spent">Spent</string>
+    <string name="left">Left</string>
+    <string name="remaining">Remaining</string>
+    <string name="total_spent">Total Spent</string>
+    <string name="days_left">days left</string>
+    <string name="budget_overview">Budget Overview</string>
+
+    <!-- Budget period labels -->
+    <string name="budget_period_daily">Diario</string>
+    <string name="budget_period_weekly">Semanal</string>
+    <string name="budget_period_biweekly">Quincenal</string>
+    <string name="budget_period_monthly">Mensual</string>
+
+    <string name="budget_period_label_today">Para hoy</string>
+    <string name="budget_period_label_this_week">Esta semana</string>
+    <string name="budget_period_label_this_biweek">Esta quincena</string>
+    <string name="budget_period_label_this_month">Este mes</string>
+
+    <string name="period_mapping_active_budget">Modo presupuesto activo</string>
+    <string name="period_mapping_calendar_bucket">Modo calendario</string>
+</resources>
