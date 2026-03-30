@@ -39,6 +39,22 @@
         <receiver
             android:name=".presentation.notification.PeriodEndAlarmReceiver"
             android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.gms.wearable.capabilities"
+            android:resource="@array/android_wear_capabilities" />
+
+        <service
+            android:name=".wearsync.PhoneWearListenerService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.google.android.gms.permission.BIND_LISTENER">
+            <intent-filter>
+                <action
+                    android:name="com.google.android.gms.wearable.BIND_LISTENER"
+                    tools:ignore="WearableBindListener" />
+            </intent-filter>
+        </service>
         <receiver
             android:name=".presentation.notification.NotificationRescheduleReceiver"
             android:enabled="true"

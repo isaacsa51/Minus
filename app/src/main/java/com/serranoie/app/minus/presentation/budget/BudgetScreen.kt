@@ -48,6 +48,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -292,13 +293,13 @@ fun BudgetScreenWithViewModel(
             remainingAmount = uiState.remainingFromPreviousPeriod,
             currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
             onSplitEqually = {
-                viewModel.onEvent(BudgetUiEvent.OnRolloverSplitEqually(uiState.remainingFromPreviousPeriod))
+                viewModel.processIntent(BudgetUiIntent.RolloverSplitEqually(uiState.remainingFromPreviousPeriod))
             },
             onCarryToNextDay = {
-                viewModel.onEvent(BudgetUiEvent.OnRolloverCarryToNextDay(uiState.remainingFromPreviousPeriod))
+                viewModel.processIntent(BudgetUiIntent.RolloverCarryToNextDay(uiState.remainingFromPreviousPeriod))
             },
             onDismiss = {
-                viewModel.onEvent(BudgetUiEvent.OnDismissRolloverDialog)
+                viewModel.processIntent(BudgetUiIntent.DismissRolloverDialog)
             }
         )
     }
@@ -306,7 +307,7 @@ fun BudgetScreenWithViewModel(
     BudgetScreen(
         uiState = uiState,
         onDeleteTransaction = { transaction ->
-            viewModel.onEvent(BudgetUiEvent.OnDeleteTransaction(transaction))
+            viewModel.processIntent(BudgetUiIntent.DeleteTransactionTapped(transaction))
         },
         onCommentClick = {
             // TODO: Open comment input dialog/sheet

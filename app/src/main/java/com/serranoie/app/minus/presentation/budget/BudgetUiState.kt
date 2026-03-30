@@ -35,30 +35,3 @@ data class BudgetUiState(
         val INITIAL = BudgetUiState()
     }
 }
-
-sealed class BudgetUiEvent {
-    data class OnNumberInput(val digit: String) : BudgetUiEvent()
-    data object OnDotInput : BudgetUiEvent()
-    data object OnBackspace : BudgetUiEvent()
-    data object OnApply : BudgetUiEvent()
-    data class OnDeleteTransaction(val transaction: Transaction) : BudgetUiEvent()
-    data class OnEditTransaction(val updatedTransaction: Transaction) : BudgetUiEvent()
-    data class OnDateSelected(val date: LocalDate) : BudgetUiEvent()
-    data class OnUpdateSettings(val settings: BudgetSettings) : BudgetUiEvent()
-    data object OnResetInput : BudgetUiEvent()
-    data class OnSetEditMode(val mode: EditMode) : BudgetUiEvent()
-    data class OnSetAnimState(val state: AnimState) : BudgetUiEvent()
-    data class OnCommentUpdate(val comment: String) : BudgetUiEvent()
-    data class OnRolloverSplitEqually(val remaining: BigDecimal) : BudgetUiEvent()
-    data class OnRolloverCarryToNextDay(val remaining: BigDecimal) : BudgetUiEvent()
-    data object OnDismissRolloverDialog : BudgetUiEvent()
-    data object OnMarkFirstLaunchComplete : BudgetUiEvent()
-    data class OnSetRecurrentEnabled(val enabled: Boolean) : BudgetUiEvent()
-    data object OnDismissRecurrentDialog : BudgetUiEvent()
-    data class OnRecurrentExpenseApply(
-        val frequency: com.serranoie.app.minus.domain.model.RecurrentFrequency, 
-        val endDate: LocalDate,
-        val subscriptionDay: Int? = null
-    ) : BudgetUiEvent()
-    data object OnFinishBudgetEarly : BudgetUiEvent()
-}

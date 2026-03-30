@@ -3,6 +3,9 @@ package com.serranoie.app.minus.presentation.home
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -51,8 +54,8 @@ import androidx.wear.compose.material.rememberSwipeableState
 import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.LocalWindowSize
 import com.serranoie.app.minus.ONBOARDING_COMPLETED_KEY
-import com.serranoie.app.minus.presentation.budget.BudgetUiEvent
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.budget.NumpadWithViewModel
 import com.serranoie.app.minus.presentation.editor.AnimState
 import com.serranoie.app.minus.presentation.editor.EditorWithViewModel
@@ -73,6 +76,10 @@ import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.settingsDataStore
 import androidx.compose.material3.Text
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.serranoie.app.minus.presentation.ui.theme.component.DeleteUndoSnackbar
+import com.serranoie.app.minus.presentation.ui.theme.component.DeleteUndoSnackbarState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -118,6 +125,84 @@ fun MainScreen(
 	}
 
 	val isHistoryVisible = windowSizeClass != WindowWidthSizeClass.Compact || topSheetState.currentValue == TopSheetValue.Expanded
+
+	// Pending delete state - managed here so it survives History sheet dismissal
+	var pendingDeleteTransaction by remember { mutableStateOf<com.serranoie.app.minus.domain.model.Transaction?>(null) }
+	var deleteUndoState by remember { mutableStateOf<DeleteUndoSnackbarState?>(null) }
+	var snackbarAutoDismissJob by remember { mutableStateOf<Job?>(null) }
+	var pendingDeleteJob by remember { mutableStateOf<Job?>(null) }
+
+	fun executeDelete(transaction: com.serranoie.app.minus.domain.model.Transaction) {
+		budgetViewModel.processIntent(BudgetUiIntent.DeleteTransactionTapped(transaction))
+	}
+
+	fun cancelPendingDelete() {
+		pendingDeleteJob?.cancel()
+		pendingDeleteJob = null
+		snackbarAutoDismissJob?.cancel()
+		snackbarAutoDismissJob = null
+		pendingDeleteTransaction = null
+		deleteUndoState = null
+	}
+
+	fun queueDeleteWithUndo(transaction: com.serranoie.app.minus.domain.model.Transaction, message: String) {
+		// Cancel any existing pending delete
+		pendingDeleteJob?.cancel()
+		snackbarAutoDismissJob?.cancel()
+
+		pendingDeleteTransaction = transaction
+		deleteUndoState = DeleteUndoSnackbarState(
+			message = message,
+			onUndo = { cancelPendingDelete() },
+			actionLabel = "UNDO",
+			autoDismissMillis = 3800L
+		)
+
+		// Start delete timer (3.5s window for undo)
+		pendingDeleteJob = coroutineScope.launch {
+			delay(3500L)
+			pendingDeleteTransaction?.let { tx ->
+				executeDelete(tx)
+			}
+			// Auto-hide snackbar after delete completes
+			delay(300L)
+			deleteUndoState = null
+			pendingDeleteTransaction = null
+			pendingDeleteJob = null
+		}
+
+		// Auto-hide snackbar if user doesn't interact
+		snackbarAutoDismissJob = coroutineScope.launch {
+			delay(3800L)
+			if (deleteUndoState?.message == message) {
+				deleteUndoState = null
+			}
+		}
+	}
+
+	fun hideGlobalSnackbar() {
+		snackbarAutoDismissJob?.cancel()
+		snackbarAutoDismissJob = null
+		deleteUndoState = null
+	}
+
+	fun showInfoSnackbar(message: String) {
+		snackbarAutoDismissJob?.cancel()
+		deleteUndoState = DeleteUndoSnackbarState(
+			message = message,
+			onUndo = null,
+			actionLabel = null,
+			autoDismissMillis = 2200L,
+			icon = Icons.Rounded.Delete,
+			iconTintIsError = false
+		)
+		snackbarAutoDismissJob = coroutineScope.launch {
+			delay(2200L)
+			if (deleteUndoState?.message == message) {
+				deleteUndoState = null
+			}
+		}
+	}
 	val quickLogSwipeModifier = Modifier.pointerInput(isHistoryVisible) {
 		if (!isHistoryVisible) return@pointerInput
 		var totalDrag = 0f
@@ -127,7 +212,7 @@ fun MainScreen(
 			},
 			onDragEnd = {
 				if (kotlin.math.abs(totalDrag) > 120f) {
-					budgetViewModel.onEvent(BudgetUiEvent.OnSetAnimState(AnimState.EDITING))
+					budgetViewModel.processIntent(BudgetUiIntent.SetAnimState(AnimState.EDITING))
 					coroutineScope.launch {
 						runCatching { topSheetState.animateTo(TopSheetValue.HalfExpanded) }
 					}
@@ -257,7 +342,12 @@ fun MainScreen(
 								Modifier.hintTipAnchor(historyHintState)
 							} else {
 								Modifier
-							}).then(quickLogSwipeModifier)
+							}).then(quickLogSwipeModifier),
+							onQueueDeleteWithUndo = { transaction, message, _ ->
+								queueDeleteWithUndo(transaction, message)
+							},
+							onCancelPendingDelete = { cancelPendingDelete() },
+							onShowInfoSnackbar = { message -> showInfoSnackbar(message) }
 						)
 						StatusBarStub()
 					}
@@ -358,10 +448,15 @@ fun MainScreen(
 					},
 						sheetContentExpand = {
 							History(
-								modifier = (if (tutorialStage == FirstLaunchTutorialStage.HISTORY_GESTURES) {
-									Modifier.hintTipAnchor(historyHintState)
-								} else Modifier).then(quickLogSwipeModifier)
-							)
+							modifier = (if (tutorialStage == FirstLaunchTutorialStage.HISTORY_GESTURES) {
+								Modifier.hintTipAnchor(historyHintState)
+							} else Modifier).then(quickLogSwipeModifier),
+							onQueueDeleteWithUndo = { transaction, message, _ ->
+								queueDeleteWithUndo(transaction, message)
+							},
+							onCancelPendingDelete = { cancelPendingDelete() },
+							onShowInfoSnackbar = { message -> showInfoSnackbar(message) }
+						)
 						})
 
 					StatusBarStub()
@@ -435,6 +530,19 @@ fun MainScreen(
 					}
 				}
 			}
+		}
+
+		deleteUndoState?.let { state ->
+			DeleteUndoSnackbar(
+				message = state.message,
+				onUndo = state.onUndo,
+				actionLabel = state.actionLabel,
+				icon = state.icon,
+				iconTintIsError = state.iconTintIsError,
+				modifier = Modifier
+					.align(Alignment.BottomCenter)
+					.padding(horizontal = 16.dp, vertical = 20.dp)
+			)
 		}
 	}
 }

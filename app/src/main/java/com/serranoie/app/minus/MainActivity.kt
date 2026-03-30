@@ -8,6 +8,8 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.Wearable
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -53,6 +55,7 @@ import com.serranoie.app.minus.presentation.util.lockScreenOrientation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -135,6 +138,15 @@ class MainActivity : ComponentActivity() {
 
 		lifecycleScope.launch {
 			try {
+				runCatching {
+					val cap = Wearable.getCapabilityClient(this@MainActivity)
+						.getCapability("minus_wear_sender", CapabilityClient.FILTER_REACHABLE)
+						.await()
+					Log.d(tag, "wear capability minus_wear_sender reachableNodes=${cap.nodes.size} ids=${cap.nodes.joinToString { it.id }}")
+				}.onFailure {
+					Log.e(tag, "wear capability check failed", it)
+				}
+
 				val prefs = context.settingsDataStore.data.first()
 				onboardingComplete.value = prefs[ONBOARDING_COMPLETED_KEY] ?: false
 				val endDateMillis = prefs[BUDGET_END_DATE_KEY]

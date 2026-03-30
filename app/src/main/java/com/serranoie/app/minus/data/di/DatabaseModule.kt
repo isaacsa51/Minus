@@ -3,6 +3,7 @@ package com.serranoie.app.minus.data.di
 import android.content.Context
 import androidx.room.Room
 import com.serranoie.app.minus.data.local.AppDatabase
+import com.serranoie.app.minus.data.local.AppDatabaseMigrations
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import dagger.Module
@@ -29,7 +30,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
         )
-            .fallbackToDestructiveMigration()
+            .addMigrations(AppDatabaseMigrations.MIGRATION_6_7)
             .build()
     }
 

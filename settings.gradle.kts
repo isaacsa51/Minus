@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Minus"
 include(":app")
- 
+include(":wear")
+include(":sync-contract")

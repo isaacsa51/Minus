@@ -17,10 +17,14 @@ import com.serranoie.app.minus.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.EARLY_FINISH_ORIGINAL_END_DATE_KEY
 import com.serranoie.app.minus.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.NOTIFICATION_MINUTE_KEY
+import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.time.TimeProvider
+import com.serranoie.app.minus.domain.usecase.AddTransactionUseCase
+import com.serranoie.app.minus.domain.usecase.DeleteTransactionUseCase
 import com.serranoie.app.minus.presentation.editor.AnimState
 import com.serranoie.app.minus.presentation.editor.EditMode
 import com.serranoie.app.minus.presentation.notification.NotificationHelper
@@ -32,8 +36,13 @@ import com.serranoie.app.minus.presentation.widget.updateBudgetDetailWidget
 import com.serranoie.app.minus.settingsDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiEffect
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -56,12 +65,19 @@ class BudgetViewModel @Inject constructor(
 	private val budgetRepository: BudgetRepository,
 	@ApplicationContext private val context: Context,
 	private val notificationScheduler: NotificationScheduler,
-	private val notificationHelper: NotificationHelper
+	private val notificationHelper: NotificationHelper,
+	private val timeProvider: TimeProvider,
+	private val addTransactionUseCase: AddTransactionUseCase,
+	private val deleteTransactionUseCase: DeleteTransactionUseCase,
+	private val recurringExpenseCalculator: RecurringExpenseCalculator
 ) : ViewModel() {
 
 	private val _uiState = MutableStateFlow(BudgetUiState.INITIAL)
 
 	val uiState: StateFlow<BudgetUiState> = _uiState.asStateFlow()
+
+	private val _effects = MutableSharedFlow<BudgetUiEffect>()
+	val effects: SharedFlow<BudgetUiEffect> = _effects.asSharedFlow()
 
 	private val _numpadInput = MutableStateFlow("")
 	private val _currentComment = MutableStateFlow("")
@@ -340,30 +356,32 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-	fun onEvent(event: BudgetUiEvent) {
-		when (event) {
-			is BudgetUiEvent.OnNumberInput -> handleNumberInput(event.digit)
-			is BudgetUiEvent.OnDotInput -> handleDotInput()
-			is BudgetUiEvent.OnBackspace -> handleBackspace()
-			is BudgetUiEvent.OnApply -> handleApply()
-			is BudgetUiEvent.OnDeleteTransaction -> handleDeleteTransaction(event.transaction)
-			is BudgetUiEvent.OnEditTransaction -> handleEditTransaction(event)
-			is BudgetUiEvent.OnDateSelected -> handleDateSelected(event.date)
-			is BudgetUiEvent.OnUpdateSettings -> handleUpdateSettings(event.settings)
-			is BudgetUiEvent.OnResetInput -> handleResetInput()
-			is BudgetUiEvent.OnSetEditMode -> handleSetEditMode(event.mode)
-			is BudgetUiEvent.OnSetAnimState -> handleSetAnimState(event.state)
-			is BudgetUiEvent.OnCommentUpdate -> handleCommentUpdate(event.comment)
-			is BudgetUiEvent.OnRolloverSplitEqually -> handleRolloverSplitEqually(event.remaining)
-			is BudgetUiEvent.OnRolloverCarryToNextDay -> handleRolloverCarryToNextDay(event.remaining)
-			is BudgetUiEvent.OnDismissRolloverDialog -> handleDismissRolloverDialog()
-			is BudgetUiEvent.OnMarkFirstLaunchComplete -> markFirstLaunchComplete()
-			is BudgetUiEvent.OnSetRecurrentEnabled -> handleSetRecurrentEnabled(event.enabled)
-			is BudgetUiEvent.OnDismissRecurrentDialog -> handleDismissRecurrentDialog()
-			is BudgetUiEvent.OnRecurrentExpenseApply -> handleRecurrentExpenseApply(event.frequency, event.endDate, event.subscriptionDay)
-			is BudgetUiEvent.OnFinishBudgetEarly -> handleFinishBudgetEarly()
+	fun processIntent(intent: BudgetUiIntent) {
+		when (intent) {
+			is BudgetUiIntent.NumberTapped -> handleNumberInput(intent.digit)
+			is BudgetUiIntent.DotTapped -> handleDotInput()
+			is BudgetUiIntent.BackspaceTapped -> handleBackspace()
+			is BudgetUiIntent.ApplyTapped -> handleApply()
+			is BudgetUiIntent.DeleteTransactionTapped -> handleDeleteTransaction(intent.transaction)
+			is BudgetUiIntent.EditTransactionTapped -> handleEditTransaction(intent.updatedTransaction)
+			is BudgetUiIntent.DateSelected -> handleDateSelected(intent.date)
+			is BudgetUiIntent.UpdateSettings -> handleUpdateSettings(intent.settings)
+			is BudgetUiIntent.ResetInputTapped -> handleResetInput()
+			is BudgetUiIntent.SetEditMode -> handleSetEditMode(intent.mode)
+			is BudgetUiIntent.SetAnimState -> handleSetAnimState(intent.state)
+			is BudgetUiIntent.CommentUpdated -> handleCommentUpdate(intent.comment)
+			is BudgetUiIntent.RolloverSplitEqually -> handleRolloverSplitEqually(intent.remaining)
+			is BudgetUiIntent.RolloverCarryToNextDay -> handleRolloverCarryToNextDay(intent.remaining)
+			is BudgetUiIntent.DismissRolloverDialog -> handleDismissRolloverDialog()
+			is BudgetUiIntent.MarkFirstLaunchComplete -> markFirstLaunchComplete()
+			is BudgetUiIntent.SetRecurrentEnabled -> handleSetRecurrentEnabled(intent.enabled)
+			is BudgetUiIntent.DismissRecurrentDialog -> handleDismissRecurrentDialog()
+			is BudgetUiIntent.RecurrentExpenseApplied -> handleRecurrentExpenseApply(intent.frequency, intent.endDate, intent.subscriptionDay)
+			is BudgetUiIntent.FinishBudgetEarly -> handleFinishBudgetEarly()
+			is BudgetUiIntent.TriggerTestNotifications -> triggerTestNotifications()
 		}
 	}
+
 
 	private fun handleNumberInput(digit: String) {
 		val currentInput = _numpadInput.value
@@ -414,7 +432,7 @@ class BudgetViewModel @Inject constructor(
 				date = LocalDateTime.now(),
 				periodId = _uiState.value.currentPeriodId
 			)
-			budgetRepository.addTransaction(transaction)
+			addTransactionUseCase(transaction)
 			_numpadInput.value = ""
 			_currentComment.value = ""
 		}
@@ -449,7 +467,7 @@ class BudgetViewModel @Inject constructor(
 				recurrentEndDate = endDate.atStartOfDay(),
 				subscriptionDay = subscriptionDay
 			)
-			budgetRepository.addTransaction(transaction)
+			addTransactionUseCase(transaction)
 
 			// Clear pending state and input
 			_uiState.update {
@@ -473,17 +491,18 @@ class BudgetViewModel @Inject constructor(
 		Log.d(TAG, "handleDeleteTransaction called for transaction ${transaction.id}")
 		viewModelScope.launch {
 			try {
-				budgetRepository.deleteTransaction(transaction)
+				deleteTransactionUseCase(transaction)
 				Log.d(TAG, "Transaction ${transaction.id} deleted successfully")
 			} catch (e: Exception) {
 				Log.e(TAG, "Error deleting transaction ${transaction.id}", e)
+				_effects.emit(BudgetUiEffect.ShowMessage("Could not delete transaction"))
 			}
 		}
 	}
 
-	private fun handleEditTransaction(event: BudgetUiEvent.OnEditTransaction) {
+	private fun handleEditTransaction(updatedTransaction: Transaction) {
 		viewModelScope.launch {
-			budgetRepository.updateTransaction(event.updatedTransaction)
+			budgetRepository.updateTransaction(updatedTransaction)
 		}
 	}
 
@@ -610,7 +629,7 @@ class BudgetViewModel @Inject constructor(
 			previousSettings == null ||
 			previousSettings.startDate != settings.startDate
 		val periodStartMillis = if (shouldCreateNewPeriodBoundary) {
-			System.currentTimeMillis()
+			timeProvider.nowEpochMillis()
 		} else {
 			previousPrefs[CURRENT_PERIOD_STARTED_AT_KEY]
 				?: settings.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -694,7 +713,7 @@ class BudgetViewModel @Inject constructor(
 				.sumOf { it.amount }
 		
 		// Calculate recurring charges due today
-		val recurringDueToday = calculateRecurringDueToday(transactions, currentDate)
+		val recurringDueToday = recurringExpenseCalculator.calculateRecurringDueToday(transactions, currentDate)
 		
 		val spentToday = regularSpentToday.add(recurringDueToday)
 		Log.d(TAG, "spentToday=$spentToday (regular=$regularSpentToday + recurring=$recurringDueToday)")
@@ -723,50 +742,4 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 	
-	/**
-	 * Calculate the total amount of recurring expenses that are due today.
-	 * These should be counted as spent even though they were created on a different date.
-	 */
-	private fun calculateRecurringDueToday(transactions: List<Transaction>, today: LocalDate): BigDecimal {
-		val recurrentTransactions = transactions.filter { it.isRecurrent && !it.isDeleted }
-		
-		return recurrentTransactions.filter { transaction ->
-			isRecurringDueToday(transaction, today)
-		}.sumOf { it.amount }
-	}
-	
-	/**
-	 * Check if a recurring transaction is due on the given date.
-	 */
-	private fun isRecurringDueToday(transaction: Transaction, today: LocalDate): Boolean {
-		val frequency = transaction.recurrentFrequency ?: return false
-		val startDate = transaction.date?.toLocalDate() ?: return false
-		
-		// Check if within subscription period
-		val endDate = transaction.recurrentEndDate?.toLocalDate()
-		if (endDate != null && today.isAfter(endDate)) {
-			return false
-		}
-		
-		// Don't count before the start date
-		if (today.isBefore(startDate)) {
-			return false
-		}
-
-		return when (frequency) {
-			RecurrentFrequency.WEEKLY -> {
-				val daysBetween = ChronoUnit.DAYS.between(startDate, today).toInt()
-				daysBetween >= 0 && daysBetween % 7 == 0
-			}
-			RecurrentFrequency.BIWEEKLY -> {
-				val daysBetween = ChronoUnit.DAYS.between(startDate, today).toInt()
-				daysBetween >= 0 && daysBetween % 14 == 0
-			}
-			RecurrentFrequency.MONTHLY -> {
-				val billingDay = transaction.subscriptionDay ?: startDate.dayOfMonth
-				val todayDay = today.dayOfMonth
-				todayDay == billingDay
-			}
-		}
-	}
 }

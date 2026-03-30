@@ -57,8 +57,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.serranoie.app.minus.presentation.budget.BudgetUiEvent
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 
@@ -336,7 +336,7 @@ fun TaggingToolbarWithViewModel(
         currentComment = uiState.currentComment,
         stage = if (uiState.numpadInput.isNotEmpty()) EditStage.EDIT_SPENT else EditStage.IDLE,
         onCommentUpdate = { comment ->
-            viewModel.onEvent(BudgetUiEvent.OnCommentUpdate(comment))
+            viewModel.processIntent(BudgetUiIntent.CommentUpdated(comment))
         },
         editorFocusController = editorFocusController,
         modifier = modifier

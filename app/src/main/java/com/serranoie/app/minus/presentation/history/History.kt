@@ -24,7 +24,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,12 +31,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.serranoie.app.minus.domain.calculator.TransactionPeriodMapper
-import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
-import com.serranoie.app.minus.presentation.budget.BudgetUiEvent
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActions
@@ -46,7 +43,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListI
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
-import com.serranoie.app.minus.presentation.tutorial.periodMappingModeFlow
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
@@ -57,19 +53,23 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
+
+private const val SWIPE_ACTION_THRESHOLD = 0.35f
 
 @Composable
 fun History(
 	modifier: Modifier = Modifier,
 	viewModel: BudgetViewModel = hiltViewModel(),
 	readOnly: Boolean = false,
-	onClose: () -> Unit = {}
+	onClose: () -> Unit = {},
+	onQueueDeleteWithUndo: (transaction: Transaction, message: String, onUndo: () -> Unit) -> Unit = { _, _, _ -> },
+	onCancelPendingDelete: () -> Unit = {},
+	onShowInfoSnackbar: (message: String) -> Unit = {},
 ) {
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-	val context = LocalContext.current
-	val periodMappingMode by context.periodMappingModeFlow()
-		.collectAsStateWithLifecycle(initialValue = PeriodMappingMode.ACTIVE_BUDGET)
 	val scrollState = rememberLazyListState()
+	val coroutineScope = rememberCoroutineScope()
 
 	var editingTransaction by remember { mutableStateOf<Transaction?>(null) }
 	var deletingTransactionIds by remember { mutableStateOf<Set<Long>>(emptySet()) }
@@ -169,11 +169,8 @@ fun History(
 	
 	val groupedCurrentTransactions = remember(
 		currentPeriodTransactions,
-		uiState.transactions,
 		budgetStartDate,
-		budgetEndDate,
-		periodMappingMode,
-		budgetSettings
+		budgetEndDate
 	) {
 		val today = LocalDate.now()
 		
@@ -187,20 +184,8 @@ fun History(
 			}
 		}
 
-		if (budgetSettings == null) {
-			withVirtualRecurrent.groupBy { it.date?.toLocalDate() }
-				.toSortedMap(compareByDescending { it })
-		} else {
-			withVirtualRecurrent.groupBy { tx ->
-				tx.date?.toLocalDate()?.let {
-					TransactionPeriodMapper.mapDate(
-						date = it,
-						budgetSettings = budgetSettings,
-						mappingMode = periodMappingMode
-					).startDate
-				}
-			}.toSortedMap(compareByDescending { it })
-		}
+		withVirtualRecurrent.groupBy { it.date?.toLocalDate() }
+			.toSortedMap(compareByDescending { it })
 	}
 
 	val groupedPastTransactions = remember(pastPeriodTransactions) {
@@ -226,6 +211,15 @@ fun History(
 	LaunchedEffect(allTransactionIds) {
 		// Remove IDs that are no longer in the transactions list
 		deletingTransactionIds = deletingTransactionIds.filter { it in allTransactionIds }.toSet()
+	}
+
+	fun queueDeleteWithUndo(transaction: Transaction) {
+		deletingTransactionIds = deletingTransactionIds - transaction.id
+		onQueueDeleteWithUndo(
+			transaction,
+			"${transaction.comment.ifEmpty { "Gasto" }} eliminado",
+			{ onCancelPendingDelete() }
+		)
 	}
 
 	Box(modifier = modifier.fillMaxSize()) {
@@ -385,15 +379,7 @@ fun History(
 												position = position,
 												isBeingDeleted = isBeingDeleted,
 												onDelete = {
-													deletingTransactionIds = deletingTransactionIds + transaction.id
-													android.os.Handler(android.os.Looper.getMainLooper())
-														.postDelayed({
-															viewModel.onEvent(
-																BudgetUiEvent.OnDeleteTransaction(transaction)
-															)
-															// Don't reset deletingTransactionIds - let the item disappear naturally
-															// when the transactions list updates from ViewModel
-														}, 350) // Slightly longer than animation (300ms) to ensure smooth exit
+																																queueDeleteWithUndo(transaction)
 												},
 												onEdit = { editingTransaction = transaction },
 												readOnly = readOnly
@@ -569,15 +555,7 @@ fun History(
 												position = position,
 												isBeingDeleted = isBeingDeleted,
 												onDelete = {
-													deletingTransactionIds = deletingTransactionIds + transaction.id
-													android.os.Handler(android.os.Looper.getMainLooper())
-														.postDelayed({
-															viewModel.onEvent(
-																BudgetUiEvent.OnDeleteTransaction(transaction)
-															)
-															// Don't reset deletingTransactionIds - let the item disappear naturally
-															// when the transactions list updates from ViewModel
-														}, 350)
+																																queueDeleteWithUndo(transaction)
 												},
 												onEdit = { editingTransaction = transaction },
 												readOnly = readOnly
@@ -663,7 +641,8 @@ fun History(
 							recurrentEndDate = newEndDate?.atStartOfDay(),
 							subscriptionDay = newSubscriptionDay
 						)
-						viewModel.onEvent(BudgetUiEvent.OnEditTransaction(updatedTransaction))
+						viewModel.processIntent(BudgetUiIntent.EditTransactionTapped(updatedTransaction))
+						onShowInfoSnackbar("${updatedTransaction.comment.ifEmpty { "Gasto" }} ha sido modificado")
 						editingTransaction = null
 					}
 				)
@@ -696,7 +675,7 @@ fun History(
 			confirmButton = {
 				Button(
 					onClick = {
-						viewModel.onEvent(BudgetUiEvent.OnDeleteTransaction(transaction))
+						viewModel.processIntent(BudgetUiIntent.DeleteTransactionTapped(transaction))
 						showDeleteRecurrentDialog = false
 						recurrentToDelete = null
 					},
@@ -751,7 +730,8 @@ fun History(
 							recurrentEndDate = newEndDate?.atStartOfDay(),
 							subscriptionDay = newSubscriptionDay
 						)
-						viewModel.onEvent(BudgetUiEvent.OnEditTransaction(updatedTransaction))
+						viewModel.processIntent(BudgetUiIntent.EditTransactionTapped(updatedTransaction))
+						onShowInfoSnackbar("${updatedTransaction.comment.ifEmpty { "Gasto" }} ha sido modificado")
 						recurrentToEdit = null
 					}
 				)
@@ -1005,7 +985,7 @@ fun UpcomingRecurrentSwipeItem(
 			modifier = Modifier.fillMaxWidth(),
 			shape = shape,
 			startActionsConfig = SwipeActionsConfig(
-				threshold = 0.4f,
+				threshold = SWIPE_ACTION_THRESHOLD,
 				icon = Icons.Default.Edit,
 				iconTint = MaterialTheme.colorScheme.onPrimary,
 				background = MaterialTheme.colorScheme.primary,
@@ -1014,7 +994,7 @@ fun UpcomingRecurrentSwipeItem(
 				onDismiss = onEdit
 			),
 			endActionsConfig = SwipeActionsConfig(
-				threshold = 0.4f,
+				threshold = SWIPE_ACTION_THRESHOLD,
 				icon = Icons.Default.Delete,
 				iconTint = MaterialTheme.colorScheme.onError,
 				background = MaterialTheme.colorScheme.error,
@@ -1069,7 +1049,7 @@ private fun TransactionSwipeItem(
 				shape = shape,
 				enabled = !isBeingDeleted,
 				startActionsConfig = SwipeActionsConfig(
-					threshold = 0.4f,
+					threshold = SWIPE_ACTION_THRESHOLD,
 					icon = Icons.Default.Edit,
 					iconTint = MaterialTheme.colorScheme.onPrimary,
 					background = MaterialTheme.colorScheme.primary,
@@ -1078,7 +1058,7 @@ private fun TransactionSwipeItem(
 					onDismiss = onEdit
 				),
 				endActionsConfig = SwipeActionsConfig(
-					threshold = 0.4f,
+					threshold = SWIPE_ACTION_THRESHOLD,
 					icon = Icons.Default.Delete,
 					iconTint = MaterialTheme.colorScheme.onError,
 					background = MaterialTheme.colorScheme.error,

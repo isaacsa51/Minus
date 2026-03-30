@@ -63,6 +63,9 @@ interface TransactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrReplace(transaction: TransactionEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIgnore(transaction: TransactionEntity): Long
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllOrReplace(transactions: List<TransactionEntity>)
 
@@ -77,4 +80,10 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions WHERE id = :transactionId LIMIT 1")
     suspend fun getTransactionById(transactionId: Long): TransactionEntity?
+
+    @Query("SELECT EXISTS(SELECT 1 FROM transactions WHERE clientGeneratedId = :clientGeneratedId)")
+    suspend fun existsByClientGeneratedId(clientGeneratedId: String): Boolean
+
+    @Query("SELECT * FROM transactions ORDER BY date DESC LIMIT :limit")
+    suspend fun getRecentTransactions(limit: Int): List<TransactionEntity>
 }

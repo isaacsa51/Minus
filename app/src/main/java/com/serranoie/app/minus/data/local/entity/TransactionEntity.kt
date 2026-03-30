@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -9,7 +10,10 @@ import java.time.ZoneOffset
  * Room entity for storing transactions.
  * Amount is stored as String to preserve BigDecimal precision.
  */
-@Entity(tableName = "transactions")
+@Entity(
+    tableName = "transactions",
+    indices = [Index(value = ["clientGeneratedId"], unique = true)]
+)
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
@@ -17,6 +21,7 @@ data class TransactionEntity(
     val comment: String,
     val date: Long, // Epoch millis
     val createdAt: Long = System.currentTimeMillis(),
+    val clientGeneratedId: String? = null,
     val periodId: Long = 0L,
     val isRecurrent: Boolean = false,
     val recurrentFrequency: String? = null, // Stored as string name of enum

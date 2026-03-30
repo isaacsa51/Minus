@@ -7,6 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 
 /**
@@ -31,26 +32,26 @@ fun NumpadWithViewModel(
             currentSpent = uiState.value.numpadInput
         ),
         onNumberInput = { digit ->
-            viewModel.onEvent(BudgetUiEvent.OnNumberInput(digit.toString()))
+            viewModel.processIntent(BudgetUiIntent.NumberTapped(digit.toString()))
         },
         onDotInput = { 
-            viewModel.onEvent(BudgetUiEvent.OnDotInput)
+            viewModel.processIntent(BudgetUiIntent.DotTapped)
         },
         onBackspace = {
-            viewModel.onEvent(BudgetUiEvent.OnBackspace)
+            viewModel.processIntent(BudgetUiIntent.BackspaceTapped)
         },
         onBackspaceLongPress = {
-            viewModel.onEvent(BudgetUiEvent.OnResetInput)
+            viewModel.processIntent(BudgetUiIntent.ResetInputTapped)
         },
         onApply = {
-            viewModel.onEvent(BudgetUiEvent.OnApply)
+            viewModel.processIntent(BudgetUiIntent.ApplyTapped)
         },
         onDelete = { },
         onToggleDebug = null,
         onShowSnackbar = null,
         onActivateTutorial = null,
         onTestNotifications = {
-            viewModel.triggerTestNotifications()
+            viewModel.processIntent(BudgetUiIntent.TriggerTestNotifications)
         },
         numberHintAnchorModifier = numberHintAnchorModifier,
         applyHintAnchorModifier = applyHintAnchorModifier,

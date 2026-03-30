@@ -16,7 +16,7 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
         TransactionEntity::class,
         BudgetSettingsEntity::class
     ],
-    version = 6, // Added periodId field to TransactionEntity
+    version = 7, // Added clientGeneratedId field for Wear dedupe
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

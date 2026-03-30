@@ -30,6 +30,12 @@ interface BudgetRepository {
     suspend fun addTransaction(transaction: Transaction)
 
     /**
+     * Add transaction only if dedupe key does not already exist.
+     * Returns true if inserted, false if duplicate was ignored.
+     */
+    suspend fun addTransactionIfAbsent(transaction: Transaction): Boolean
+
+    /**
      * Update an existing transaction.
      */
     suspend fun updateTransaction(transaction: Transaction)
@@ -38,6 +44,16 @@ interface BudgetRepository {
      * Insert or replace transactions by ID in bulk.
      */
     suspend fun upsertTransactions(transactions: List<Transaction>)
+
+    /**
+     * True when a transaction with this dedupe key already exists.
+     */
+    suspend fun existsTransactionByClientGeneratedId(clientGeneratedId: String): Boolean
+
+    /**
+     * Recent transactions for lightweight sync/snapshot payloads.
+     */
+    suspend fun getRecentTransactions(limit: Int): List<Transaction>
 
     /**
      * Delete a transaction (soft delete or hard delete based on implementation).

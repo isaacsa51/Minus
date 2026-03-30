@@ -40,6 +40,7 @@ class BudgetRepositoryImpl @Inject constructor(
         comment = this.comment,
         date = LocalDateTime.ofEpochSecond(this.date / 1000, 0, ZoneOffset.UTC),
         createdAt = this.createdAt,
+        clientGeneratedId = this.clientGeneratedId,
         periodId = this.periodId,
         isDeleted = false,
         isRecurrent = this.isRecurrent,
@@ -62,6 +63,7 @@ class BudgetRepositoryImpl @Inject constructor(
         comment = this.comment,
         date = this.date!!.toEpochSecond(ZoneOffset.UTC) * 1000,
         createdAt = this.createdAt,
+        clientGeneratedId = this.clientGeneratedId,
         periodId = this.periodId,
         isRecurrent = this.isRecurrent,
         recurrentFrequency = this.recurrentFrequency?.name,
@@ -124,6 +126,11 @@ class BudgetRepositoryImpl @Inject constructor(
         transactionDao.insert(transaction.toEntity())
     }
 
+    override suspend fun addTransactionIfAbsent(transaction: Transaction): Boolean {
+        val rowId = transactionDao.insertIgnore(transaction.toEntity())
+        return rowId != -1L
+    }
+
     override suspend fun updateTransaction(transaction: Transaction) {
         transactionDao.update(transaction.toEntity())
     }
@@ -131,6 +138,14 @@ class BudgetRepositoryImpl @Inject constructor(
     override suspend fun upsertTransactions(transactions: List<Transaction>) {
         val entities = transactions.map { it.toEntity() }
         transactionDao.insertAllOrReplace(entities)
+    }
+
+    override suspend fun existsTransactionByClientGeneratedId(clientGeneratedId: String): Boolean {
+        return transactionDao.existsByClientGeneratedId(clientGeneratedId)
+    }
+
+    override suspend fun getRecentTransactions(limit: Int): List<Transaction> {
+        return transactionDao.getRecentTransactions(limit).map { it.toDomain() }
     }
 
     override suspend fun deleteTransaction(transaction: Transaction) {
