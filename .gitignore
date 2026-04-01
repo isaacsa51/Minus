@@ -11,6 +11,9 @@
 /build
 /capture
 /.idea
+/.kotlin
+/sync-contract/build
+
 .externalNativeBuild
 .cxx
 local.properties

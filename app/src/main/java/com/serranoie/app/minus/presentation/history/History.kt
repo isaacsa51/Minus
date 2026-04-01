@@ -9,7 +9,17 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,13 +30,23 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Repeat
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +63,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListI
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
+import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TransactionTicketPopup
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
@@ -52,11 +73,11 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Date
-import java.util.Locale
-import kotlinx.coroutines.launch
+
 
 private const val SWIPE_ACTION_THRESHOLD = 0.35f
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun History(
 	modifier: Modifier = Modifier,
@@ -69,7 +90,6 @@ fun History(
 ) {
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val scrollState = rememberLazyListState()
-	val coroutineScope = rememberCoroutineScope()
 
 	var editingTransaction by remember { mutableStateOf<Transaction?>(null) }
 	var deletingTransactionIds by remember { mutableStateOf<Set<Long>>(emptySet()) }
@@ -78,6 +98,9 @@ fun History(
 	var recurrentToDelete by remember { mutableStateOf<Transaction?>(null) }
 	var recurrentToEdit by remember { mutableStateOf<Transaction?>(null) }
 	var showDeleteRecurrentDialog by remember { mutableStateOf(false) }
+
+	// State for transaction detail dialog
+	var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
 
 	val budgetSettings = uiState.budgetSettings
 	val budgetStartDate = budgetSettings?.startDate ?: LocalDate.now().minusDays(30)
@@ -301,7 +324,8 @@ fun History(
 										},
 										onEdit = {
 											recurrentToEdit = item.transaction
-										}
+										},
+										onClick = { selectedTransaction = item.transaction }
 									)
 									
 									if (index < upcomingRecurrentInPeriod.size - 1) {
@@ -382,7 +406,8 @@ fun History(
 																																queueDeleteWithUndo(transaction)
 												},
 												onEdit = { editingTransaction = transaction },
-												readOnly = readOnly
+												readOnly = readOnly,
+												onClick = { selectedTransaction = transaction }
 											)
 										}
 
@@ -470,7 +495,8 @@ fun History(
 										},
 										onEdit = {
 											recurrentToEdit = item.transaction
-										}
+										},
+										onClick = { selectedTransaction = item.transaction }
 									)
 									
 									if (index < futureRecurrentOutOfPeriod.size - 1) {
@@ -558,7 +584,8 @@ fun History(
 																																queueDeleteWithUndo(transaction)
 												},
 												onEdit = { editingTransaction = transaction },
-												readOnly = readOnly
+												readOnly = readOnly,
+												onClick = { selectedTransaction = transaction }
 											)
 										}
 
@@ -738,6 +765,102 @@ fun History(
 			}
 		}
 	}
+
+	// Transaction Detail Popup
+	if (selectedTransaction != null) {
+		val transaction = selectedTransaction!!
+		val transactionDateText = transaction.date?.let { date ->
+			prettyDate(date, showTime = true, forceHideDate = false, human = true)
+		} ?: "Sin fecha"
+		val recurrenceLabel = when (transaction.recurrentFrequency) {
+			RecurrentFrequency.WEEKLY -> "Semanal"
+			RecurrentFrequency.BIWEEKLY -> "Quincenal"
+			RecurrentFrequency.MONTHLY -> "Mensual"
+			null -> ""
+		}
+
+		val details = buildList {
+			add("Descripción" to transaction.comment.ifEmpty { "Sin nombre" })
+			add("Fecha" to transactionDateText)
+			if (transaction.isRecurrent && recurrenceLabel.isNotEmpty()) {
+				add("Frecuencia" to recurrenceLabel)
+			}
+			transaction.subscriptionDay?.let { day ->
+				if (transaction.isRecurrent) {
+					add("Día de cobro" to "Día $day")
+				}
+			}
+			transaction.recurrentEndDate?.let { endDate ->
+				if (transaction.isRecurrent) {
+					add(
+						"Fin recurrencia" to prettyDate(
+							endDate,
+							showTime = false,
+							forceHideDate = false,
+							human = true
+						)
+					)
+				}
+			}
+		}
+
+		TransactionTicketPopup(
+			showPopup = selectedTransaction != null,
+			onClickOutside = { selectedTransaction = null },
+			isRecurrentExpense = transaction.isRecurrent,
+			operationNumber = "#${transaction.id}",
+			operationTime = transactionDateText,
+			totalAmountText = currencyFormat.format(transaction.amount),
+			details = details,
+			backgroundColor = Color.Black.copy(alpha = 0.6f),
+			ticketBackgroundColor = MaterialTheme.colorScheme.background,
+			teethWidthDp = 12f,
+			teethHeightDp = 3f,
+			onMarkAsPaid = if (transaction.isRecurrent) {
+				{
+					selectedTransaction = null
+					// Mark as paid logic here
+				}
+			} else null,
+			actions = {
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.spacedBy(8.dp)
+				) {
+					Button(
+						onClick = {
+							selectedTransaction = null
+							editingTransaction = transaction
+						},
+						modifier = Modifier.weight(1f)
+					) {
+						Text("Editar")
+					}
+
+					if (!readOnly) {
+						Button(
+							onClick = {
+								selectedTransaction = null
+								if (transaction.isRecurrent) {
+									recurrentToDelete = transaction
+									showDeleteRecurrentDialog = true
+								} else {
+									queueDeleteWithUndo(transaction)
+								}
+							},
+							modifier = Modifier.weight(1f),
+							colors = ButtonDefaults.buttonColors(
+								containerColor = MaterialTheme.colorScheme.error,
+								contentColor = MaterialTheme.colorScheme.onError
+							)
+						) {
+							Text("Eliminar")
+						}
+					}
+				}
+			}
+		)
+	}
 }
 
 data class UpcomingRecurrentItem(
@@ -867,7 +990,8 @@ fun UpcomingRecurrentItemRow(
 	item: UpcomingRecurrentItem,
 	currencyFormat: NumberFormat,
 	position: PaddedListItemPosition,
-	isOutOfPeriod: Boolean = false
+	isOutOfPeriod: Boolean = false,
+	onClick: () -> Unit = {}
 ) {
 	val transaction = item.transaction
 	val nextChargeDate = item.nextChargeDate
@@ -902,7 +1026,7 @@ fun UpcomingRecurrentItemRow(
 		modifier = Modifier.fillMaxWidth()
 	) {
 		CustomPaddedListItem(
-			onClick = { },
+			onClick = onClick,
 			position = position,
 			background = MaterialTheme.colorScheme.surface,
 			contentColor = MaterialTheme.colorScheme.onSurface
@@ -960,7 +1084,8 @@ fun UpcomingRecurrentSwipeItem(
 	position: PaddedListItemPosition,
 	isOutOfPeriod: Boolean = false,
 	onDelete: () -> Unit,
-	onEdit: () -> Unit
+	onEdit: () -> Unit,
+	onClick: () -> Unit = {}
 ) {
 	val shape = when (position) {
 		PaddedListItemPosition.First -> RoundedCornerShape(
@@ -1007,7 +1132,8 @@ fun UpcomingRecurrentSwipeItem(
 				item = item,
 				currencyFormat = currencyFormat,
 				position = position,
-				isOutOfPeriod = isOutOfPeriod
+				isOutOfPeriod = isOutOfPeriod,
+				onClick = onClick
 			)
 		}
 	}
@@ -1021,7 +1147,8 @@ private fun TransactionSwipeItem(
 	onDelete: () -> Unit,
 	onEdit: () -> Unit,
 	readOnly: Boolean,
-	isBeingDeleted: Boolean = false
+	isBeingDeleted: Boolean = false,
+	onClick: () -> Unit = {}
 ) {
 	val shape = when (position) {
 		PaddedListItemPosition.First -> RoundedCornerShape(
@@ -1039,7 +1166,8 @@ private fun TransactionSwipeItem(
 			TransactionItem(
 				transaction = transaction,
 				currencyFormat = currencyFormat,
-				position = position
+				position = position,
+				onClick = onClick
 			)
 		}
 	} else {
@@ -1070,7 +1198,8 @@ private fun TransactionSwipeItem(
 				TransactionItem(
 					transaction = transaction,
 					currencyFormat = currencyFormat,
-					position = position
+					position = position,
+					onClick = onClick
 				)
 			}
 		}
@@ -1082,10 +1211,11 @@ private fun TransactionSwipeItem(
 fun TransactionItem(
 	transaction: Transaction,
 	currencyFormat: NumberFormat,
-	position: PaddedListItemPosition = PaddedListItemPosition.Middle
+	position: PaddedListItemPosition = PaddedListItemPosition.Middle,
+	onClick: () -> Unit = {}
 ) {
 	CustomPaddedListItem(
-		onClick = { },
+		onClick = onClick,
 		position = position,
 		background = MaterialTheme.colorScheme.surface,
 		contentColor = MaterialTheme.colorScheme.onSurface

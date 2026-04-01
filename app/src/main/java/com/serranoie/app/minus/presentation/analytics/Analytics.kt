@@ -47,6 +47,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.budget.MinMaxSpen
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendsCountCard
+import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
 import java.math.BigDecimal
 import java.util.Date
 
@@ -221,6 +222,13 @@ Spacer(modifier = Modifier.height(16.dp))
 							categorySpends = categorySpends
 						)
 					}
+				)
+				Spacer(modifier = Modifier.height(16.dp))
+				SavingsRecommendationCard(
+					budget = state.wholeBudget,
+					spends = state.spends,
+					currency = state.currencyCode,
+					modifier = Modifier.padding(horizontal = 16.dp),
 				)
 				// Spacer to push content up, making room for the fixed button at bottom
 				Spacer(modifier = Modifier.height(80.dp + navigationBarHeight))

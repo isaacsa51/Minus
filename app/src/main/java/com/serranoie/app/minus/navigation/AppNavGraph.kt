@@ -19,6 +19,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -219,8 +220,24 @@ fun AppNavGraph(
             val preferences = context.settingsDataStore.data.collectAsState(initial = emptyPreferences()).value
 
             val budgetSettings = uiState.budgetSettings
-            val transactions = uiState.transactions
+            val allTransactions = uiState.transactions
             val budgetState = uiState.budgetState
+            val currentPeriodId = uiState.currentPeriodId
+
+            // Filter transactions for the current period only
+            val transactions = remember(currentPeriodId, allTransactions, budgetSettings) {
+                allTransactions.filter { transaction ->
+                    // If periodId is available, filter by it
+                    if (currentPeriodId > 0L && transaction.periodId > 0L) {
+                        return@filter transaction.periodId == currentPeriodId
+                    }
+                    // Otherwise filter by date range
+                    val txDate = transaction.date?.toLocalDate() ?: return@filter false
+                    val startDate = budgetSettings?.startDate ?: return@filter false
+                    val endDate = budgetSettings?.getPeriodEndDate() ?: return@filter false
+                    !txDate.isBefore(startDate) && !txDate.isAfter(endDate)
+                }
+            }
 
             val startDate = budgetSettings?.startDate?.atStartOfDay()?.let {
                 Date.from(it.atZone(ZoneId.systemDefault()).toInstant())
