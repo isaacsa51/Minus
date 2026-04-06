@@ -19,7 +19,13 @@ sealed class Screen(val route: String) {
     }
 
     /** Main app screen (editor + history). */
-    data object Main : Screen("main")
+    data object Main : Screen("main?openWallet={openWallet}&forceWalletSetup={forceWalletSetup}") {
+        fun createRoute(openWallet: Boolean = false, forceWalletSetup: Boolean = false) =
+            "main?openWallet=$openWallet&forceWalletSetup=$forceWalletSetup"
+
+        const val ARG_OPEN_WALLET = "openWallet"
+        const val ARG_FORCE_WALLET_SETUP = "forceWalletSetup"
+    }
 
     /** Period summary/analytics screen shown when budget period ends. */
     data object Analytics : Screen("analytics")

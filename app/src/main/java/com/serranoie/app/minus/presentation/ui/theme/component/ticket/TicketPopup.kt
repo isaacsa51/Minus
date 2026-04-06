@@ -1,8 +1,14 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.ticket
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.BoundsTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.SharedTransitionScope.OverlayClip
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.scaleToBounds
 import androidx.compose.ui.tooling.preview.Preview
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import androidx.compose.animation.core.animateFloatAsState
@@ -35,10 +41,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+
+private const val TICKET_POPUP_SHARED_TRANSITION_DURATION_MS = 700
 
 /**
  * A custom popup that displays content inside a TicketView container.
@@ -62,7 +75,9 @@ fun TicketPopup(
 	ticketBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
 	teethWidthDp: Float = 12f,
 	teethHeightDp: Float = 3f,
-	content: @Composable () -> Unit
+	sharedTransitionScope: SharedTransitionScope? = null,
+	sharedContentKey: Any? = null,
+	content: @Composable (SharedTransitionScope?, AnimatedVisibilityScope?) -> Unit
 ) {
 	var isVisible by remember { mutableStateOf(false) }
 
@@ -70,29 +85,28 @@ fun TicketPopup(
 		isVisible = showPopup
 	}
 
+	// When using shared element transitions, don't use fade animations
+	// as they conflict with the shared element morphing
+	val useSharedTransition = sharedTransitionScope != null && sharedContentKey != null
+
 	val scale by animateFloatAsState(
-		targetValue = if (isVisible) 1f else 0.85f,
-		animationSpec = tween(200),
+		targetValue = if (useSharedTransition) 1f else if (isVisible) 1f else 0.85f,
+		animationSpec = tween(if (useSharedTransition) 0 else 200),
 		label = "scale"
 	)
 
 	val backgroundAlpha by animateFloatAsState(
 		targetValue = if (isVisible) backgroundColor.alpha else 0f,
-		animationSpec = tween(200),
+		animationSpec = tween(if (useSharedTransition) 0 else 200),
 		label = "backgroundAlpha"
 	)
 
 	AnimatedVisibility(
 		visible = showPopup,
-		enter = fadeIn(animationSpec = tween(200)) + androidx.compose.animation.scaleIn(
-			initialScale = 0.85f,
-			animationSpec = tween(200)
-		),
-		exit = fadeOut(animationSpec = tween(200)) + androidx.compose.animation.scaleOut(
-			targetScale = 0.85f,
-			animationSpec = tween(200)
-		)
+		enter = if (useSharedTransition) EnterTransition.None else fadeIn(animationSpec = tween(200)),
+		exit = if (useSharedTransition) ExitTransition.None else fadeOut(animationSpec = tween(200))
 	) {
+		val animatedVisibilityScope = this
 		Box(
 			modifier = Modifier
 				.fillMaxSize()
@@ -107,17 +121,28 @@ fun TicketPopup(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(horizontal = 24.dp)
-					.graphicsLayer {
-						scaleX = scale
-						scaleY = scale
-					}) {
-				TicketView(
-					backgroundColor = ticketBackgroundColor,
-					teethWidthDp = teethWidthDp,
-					teethHeightDp = teethHeightDp,
-					modifier = Modifier.fillMaxWidth()
+			) {
+				Surface(
+					shape = RoundedCornerShape(16.dp),
+					color = ticketBackgroundColor,
+					modifier = Modifier
+						.fillMaxWidth()
+						.then(
+							if (sharedContentKey != null && sharedTransitionScope != null) {
+								ticketSharedBoundsModifier(
+									sharedTransitionScope = sharedTransitionScope,
+									sharedContentKey = sharedContentKey,
+									animatedVisibilityScope = animatedVisibilityScope
+								)
+							} else {
+								Modifier.graphicsLayer {
+									scaleX = scale
+									scaleY = scale
+								}
+							}
+						)
 				) {
-					content()
+					content(sharedTransitionScope, animatedVisibilityScope)
 				}
 			}
 		}
@@ -142,7 +167,9 @@ fun TransactionTicketPopup(
 	backgroundColor: Color = Color.Black.copy(alpha = 0.5f),
 	ticketBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
 	teethWidthDp: Float = 12f,
-	teethHeightDp: Float = 3f
+	teethHeightDp: Float = 3f,
+	sharedTransitionScope: SharedTransitionScope? = null,
+	sharedContentKey: Any? = null
 ) {
 	TicketPopup(
 		showPopup = showPopup,
@@ -151,8 +178,10 @@ fun TransactionTicketPopup(
 		ticketBackgroundColor = ticketBackgroundColor,
 		teethWidthDp = teethWidthDp,
 		teethHeightDp = teethHeightDp,
-		modifier = modifier
-	) {
+		modifier = modifier,
+		sharedTransitionScope = sharedTransitionScope,
+		sharedContentKey = sharedContentKey
+	) { sharedScope, visibilityScope ->
 		TransactionTicketContent(
 			isRecurrentExpense = isRecurrentExpense,
 			operationNumber = operationNumber,
@@ -160,9 +189,43 @@ fun TransactionTicketPopup(
 			totalAmountText = totalAmountText,
 			details = details,
 			actions = actions,
-			onMarkAsPaid = onMarkAsPaid
+			onMarkAsPaid = onMarkAsPaid,
+			sharedTransitionScope = sharedScope,
+			animatedVisibilityScope = visibilityScope,
+			sharedContentKey = sharedContentKey
 		)
 	}
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun ticketSharedBoundsModifier(
+	sharedTransitionScope: SharedTransitionScope?,
+	sharedContentKey: Any?,
+	animatedVisibilityScope: AnimatedVisibilityScope
+): Modifier {
+	if (sharedTransitionScope == null || sharedContentKey == null) {
+		return Modifier
+	}
+
+	return with(sharedTransitionScope) {
+		Modifier.sharedBounds(
+			sharedContentState = rememberSharedContentState(key = sharedContentKey),
+			animatedVisibilityScope = animatedVisibilityScope,
+			boundsTransform = ticketPopupBoundsTransform,
+			resizeMode = scaleToBounds(),
+			clipInOverlayDuringTransition = OverlayClip(
+				clipShape = RoundedCornerShape(16.dp)
+			)
+		)
+	}
+}
+
+private val ticketPopupBoundsTransform = BoundsTransform { _, _ ->
+	tween(
+		durationMillis = TICKET_POPUP_SHARED_TRANSITION_DURATION_MS,
+		easing = FastOutSlowInEasing
+	)
 }
 
 @Composable
@@ -173,7 +236,10 @@ private fun TransactionTicketContent(
 	totalAmountText: String,
 	details: List<Pair<String, String>>,
 	actions: (@Composable () -> Unit)? = null,
-	onMarkAsPaid: (() -> Unit)? = null
+	onMarkAsPaid: (() -> Unit)? = null,
+	sharedTransitionScope: SharedTransitionScope? = null,
+	animatedVisibilityScope: AnimatedVisibilityScope? = null,
+	sharedContentKey: Any? = null
 ) {
 	Column(
 		modifier = Modifier
@@ -181,10 +247,21 @@ private fun TransactionTicketContent(
 		verticalArrangement = Arrangement.spacedBy(12.dp),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
+		// Type label with shared element
 		Box(
 			modifier = Modifier
 				.background(Color.Black)
-				.padding(vertical = 8.dp, horizontal = 18.dp),
+				.padding(vertical = 8.dp, horizontal = 18.dp)
+				.then(
+					if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedContentKey != null) {
+						with(sharedTransitionScope) {
+							Modifier.sharedElement(
+								rememberSharedContentState(key = "$sharedContentKey-type"),
+								animatedVisibilityScope = animatedVisibilityScope
+							)
+						}
+					} else Modifier
+				),
 			contentAlignment = Alignment.Center
 		) {
 			Text(
@@ -217,7 +294,15 @@ private fun TransactionTicketContent(
 			style = MaterialTheme.typography.headlineLarge,
 			color = MaterialTheme.colorScheme.error,
 			fontWeight = FontWeight.Bold,
-			textAlign = TextAlign.Center
+			textAlign = TextAlign.Center,
+			modifier = if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedContentKey != null) {
+				with(sharedTransitionScope) {
+					Modifier.sharedElement(
+						rememberSharedContentState(key = "$sharedContentKey-amount"),
+						animatedVisibilityScope = animatedVisibilityScope
+					)
+				}
+			} else Modifier
 		)
 
 		HorizontalDivider()
@@ -282,12 +367,6 @@ fun TicketPopupPreview() {
 				"Approval No" to "12345478"
 			),
 			actions = {
-				Text(
-					text = "[ Edit ]   [ Delete ]",
-					style = MaterialTheme.typography.bodyMedium,
-					color = MaterialTheme.colorScheme.primary,
-					modifier = Modifier.padding(top = 6.dp)
-				)
 			},
 			onMarkAsPaid = { }
 		)

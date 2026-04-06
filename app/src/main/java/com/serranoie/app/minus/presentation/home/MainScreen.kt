@@ -60,7 +60,6 @@ import com.serranoie.app.minus.presentation.budget.NumpadWithViewModel
 import com.serranoie.app.minus.presentation.editor.AnimState
 import com.serranoie.app.minus.presentation.editor.EditorWithViewModel
 import com.serranoie.app.minus.presentation.history.History
-import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
 import com.serranoie.app.minus.presentation.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
@@ -68,10 +67,6 @@ import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.tutorial.firstLaunchTutorialStageFlow
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetLayout
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetValue
-import com.serranoie.app.minus.presentation.ui.theme.component.tooltip.AnchorPosition
-import com.serranoie.app.minus.presentation.ui.theme.component.tooltip.HintTip
-import com.serranoie.app.minus.presentation.ui.theme.component.tooltip.hintTipAnchor
-import com.serranoie.app.minus.presentation.ui.theme.component.tooltip.rememberHintTipState
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.settingsDataStore
 import androidx.compose.material3.Text
@@ -86,32 +81,28 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun MainScreen(
-    onNavigateToAnalytics: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {},
-    onNavigateToWallet: () -> Unit = {}
+	onNavigateToAnalytics: () -> Unit = {},
+	onNavigateToSettings: () -> Unit = {},
+	onNavigateToWallet: () -> Unit = {},
+	openWalletOnStart: Boolean = false,
+	forceWalletSetup: Boolean = false,
+	budgetViewModel: BudgetViewModel = hiltViewModel()
 ) {
 	val topSheetState = rememberSwipeableState(TopSheetValue.HalfExpanded)
 	var nightMode by remember { mutableStateOf(false) }
 	val context = LocalContext.current
 	val coroutineScope = rememberCoroutineScope()
-	val budgetViewModel: BudgetViewModel = hiltViewModel()
 	val budgetUiState by budgetViewModel.uiState.collectAsStateWithLifecycle()
 
 	val localDensity = LocalDensity.current
 	val windowSizeClass = LocalWindowSize.current
 	val windowInsets = LocalWindowInsets.current
 
-	val onboardingCompleted by context.settingsDataStore.data
-		.map { it[ONBOARDING_COMPLETED_KEY] ?: false }
-		.collectAsStateWithLifecycle(initialValue = false)
+	val onboardingCompleted by context.settingsDataStore.data.map {
+		it[ONBOARDING_COMPLETED_KEY] ?: false
+	}.collectAsStateWithLifecycle(initialValue = false)
 	val tutorialStage by context.firstLaunchTutorialStageFlow()
 		.collectAsStateWithLifecycle(initialValue = FirstLaunchTutorialStage.COMPLETED)
-
-	val numberHintState = rememberHintTipState("tutorial_number_hint")
-	val doneHintState = rememberHintTipState("tutorial_done_hint")
-	val budgetHintState = rememberHintTipState("tutorial_budget_hint")
-	val analyticsHintState = rememberHintTipState("tutorial_analytics_hint")
-	val historyHintState = rememberHintTipState("tutorial_history_hint")
 
 	var shownStage by remember { mutableStateOf<FirstLaunchTutorialStage?>(null) }
 
@@ -124,10 +115,15 @@ fun MainScreen(
 		}
 	}
 
-	val isHistoryVisible = windowSizeClass != WindowWidthSizeClass.Compact || topSheetState.currentValue == TopSheetValue.Expanded
+	val isHistoryVisible =
+		windowSizeClass != WindowWidthSizeClass.Compact || topSheetState.currentValue == TopSheetValue.Expanded
 
 	// Pending delete state - managed here so it survives History sheet dismissal
-	var pendingDeleteTransaction by remember { mutableStateOf<com.serranoie.app.minus.domain.model.Transaction?>(null) }
+	var pendingDeleteTransaction by remember {
+		mutableStateOf<com.serranoie.app.minus.domain.model.Transaction?>(
+			null
+		)
+	}
 	var deleteUndoState by remember { mutableStateOf<DeleteUndoSnackbarState?>(null) }
 	var snackbarAutoDismissJob by remember { mutableStateOf<Job?>(null) }
 	var pendingDeleteJob by remember { mutableStateOf<Job?>(null) }
@@ -145,7 +141,9 @@ fun MainScreen(
 		deleteUndoState = null
 	}
 
-	fun queueDeleteWithUndo(transaction: com.serranoie.app.minus.domain.model.Transaction, message: String) {
+	fun queueDeleteWithUndo(
+		transaction: com.serranoie.app.minus.domain.model.Transaction, message: String
+	) {
 		// Cancel any existing pending delete
 		pendingDeleteJob?.cancel()
 		snackbarAutoDismissJob?.cancel()
@@ -203,78 +201,28 @@ fun MainScreen(
 			}
 		}
 	}
+
 	val quickLogSwipeModifier = Modifier.pointerInput(isHistoryVisible) {
 		if (!isHistoryVisible) return@pointerInput
 		var totalDrag = 0f
-		detectHorizontalDragGestures(
-			onHorizontalDrag = { _, dragAmount ->
-				totalDrag += dragAmount
-			},
-			onDragEnd = {
-				if (kotlin.math.abs(totalDrag) > 120f) {
-					budgetViewModel.processIntent(BudgetUiIntent.SetAnimState(AnimState.EDITING))
-					coroutineScope.launch {
-						runCatching { topSheetState.animateTo(TopSheetValue.HalfExpanded) }
-					}
+		detectHorizontalDragGestures(onHorizontalDrag = { _, dragAmount ->
+			totalDrag += dragAmount
+		}, onDragEnd = {
+			if (kotlin.math.abs(totalDrag) > 120f) {
+				budgetViewModel.processIntent(BudgetUiIntent.SetAnimState(AnimState.EDITING))
+				coroutineScope.launch {
+					runCatching { topSheetState.animateTo(TopSheetValue.HalfExpanded) }
 				}
-				totalDrag = 0f
 			}
-		)
+			totalDrag = 0f
+		})
 	}
 
-	LaunchedEffect(tutorialStage, onboardingCompleted, budgetUiState.numpadInput, isHistoryVisible) {
+	LaunchedEffect(
+		tutorialStage, onboardingCompleted, budgetUiState.numpadInput, isHistoryVisible
+	) {
 		if (!onboardingCompleted || tutorialStage == FirstLaunchTutorialStage.COMPLETED) return@LaunchedEffect
 		if (shownStage == tutorialStage) return@LaunchedEffect
-
-		when (tutorialStage) {
-			FirstLaunchTutorialStage.TAP_ANY_NUMBER -> {
-				numberHintState.show {
-					HintTip(position = AnchorPosition.Center) {
-						Text("Tap any number to start adding your expense")
-					}
-				}
-				shownStage = tutorialStage
-			}
-			FirstLaunchTutorialStage.TAP_DONE_SAVE -> {
-				if (budgetUiState.numpadInput.isNotEmpty()) {
-					doneHintState.show {
-						HintTip(position = AnchorPosition.End) {
-							Text("Now tap Done to save this expense")
-						}
-					}
-					shownStage = tutorialStage
-				}
-			}
-			FirstLaunchTutorialStage.TAP_BUDGET_PILL -> {
-				budgetHintState.show {
-					HintTip(position = AnchorPosition.Start) {
-						Text("Tap here to open your budget details")
-					}
-				}
-				shownStage = tutorialStage
-			}
-			FirstLaunchTutorialStage.TAP_ANALYTICS -> {
-				analyticsHintState.show {
-					HintTip(position = AnchorPosition.End) {
-						Text("Tap Analytics to see your spending insights")
-					}
-				}
-				shownStage = tutorialStage
-			}
-			FirstLaunchTutorialStage.HISTORY_GESTURES -> {
-				if (isHistoryVisible) {
-					historyHintState.show(onClose = {
-						advanceTutorialIfCurrent(FirstLaunchTutorialStage.HISTORY_GESTURES)
-					}) {
-						HintTip(position = AnchorPosition.Center) {
-							Text("In History, swipe an item left or right to edit or delete")
-						}
-					}
-					shownStage = tutorialStage
-				}
-			}
-			FirstLaunchTutorialStage.COMPLETED -> Unit
-		}
 	}
 
 	nightMode = isNightMode()
@@ -339,7 +287,7 @@ fun MainScreen(
 					Box {
 						History(
 							modifier = (if (tutorialStage == FirstLaunchTutorialStage.HISTORY_GESTURES) {
-								Modifier.hintTipAnchor(historyHintState)
+								Modifier
 							} else {
 								Modifier
 							}).then(quickLogSwipeModifier),
@@ -347,8 +295,7 @@ fun MainScreen(
 								queueDeleteWithUndo(transaction, message)
 							},
 							onCancelPendingDelete = { cancelPendingDelete() },
-							onShowInfoSnackbar = { message -> showInfoSnackbar(message) }
-						)
+							onShowInfoSnackbar = { message -> showInfoSnackbar(message) })
 						StatusBarStub()
 					}
 				}
@@ -399,19 +346,14 @@ fun MainScreen(
 									.navigationBarsPadding()
 							) {
 								NumpadWithViewModel(
-									numberHintAnchorModifier = if (tutorialStage == FirstLaunchTutorialStage.TAP_ANY_NUMBER) {
-										Modifier.hintTipAnchor(numberHintState)
-									} else Modifier,
-									applyHintAnchorModifier = if (tutorialStage == FirstLaunchTutorialStage.TAP_DONE_SAVE) {
-										Modifier.hintTipAnchor(doneHintState)
-									} else Modifier,
+									numberHintAnchorModifier = Modifier,
+									applyHintAnchorModifier = Modifier,
 									onAnyNumberTapped = {
 										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
 									},
 									onApplyTapped = {
 										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_DONE_SAVE)
-									}
-								)
+									})
 							}
 						}
 					}
@@ -424,39 +366,34 @@ fun MainScreen(
 							// This gives a natural "close" gesture
 						},
 						sheetContentHalfExpand = {
-						EditorWithViewModel(
-							modifier = Modifier.requiredHeight(currentEditorHeight),
-							onOpenHistory = {
-								// Animate to expanded to show history
-							},
-							onOpenSettings = onNavigateToSettings,
-							onOpenAnalytics = onNavigateToAnalytics,
-							onOpenWallet = onNavigateToWallet,
-							onBudgetPillClickForTutorial = {
-								advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
-							},
-							onAnalyticsClickForTutorial = {
-								advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANALYTICS)
-							},
-							budgetPillHintAnchorModifier = if (tutorialStage == FirstLaunchTutorialStage.TAP_BUDGET_PILL) {
-								Modifier.hintTipAnchor(budgetHintState)
-							} else Modifier,
-							analyticsHintAnchorModifier = if (tutorialStage == FirstLaunchTutorialStage.TAP_ANALYTICS) {
-								Modifier.hintTipAnchor(analyticsHintState)
-							} else Modifier
-						)
-					},
+							EditorWithViewModel(
+								modifier = Modifier.requiredHeight(currentEditorHeight),
+								onOpenHistory = {
+									// Animate to expanded to show history
+								},
+								onOpenSettings = onNavigateToSettings,
+								onOpenAnalytics = onNavigateToAnalytics,
+								onOpenWallet = onNavigateToWallet,
+								openWalletOnStart = openWalletOnStart,
+								forceWalletSetup = forceWalletSetup,
+								onBudgetPillClickForTutorial = {
+									advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
+								},
+								onAnalyticsClickForTutorial = {
+									advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANALYTICS)
+								},
+								budgetPillHintAnchorModifier = Modifier,
+								analyticsHintAnchorModifier = Modifier
+							)
+						},
 						sheetContentExpand = {
 							History(
-							modifier = (if (tutorialStage == FirstLaunchTutorialStage.HISTORY_GESTURES) {
-								Modifier.hintTipAnchor(historyHintState)
-							} else Modifier).then(quickLogSwipeModifier),
-							onQueueDeleteWithUndo = { transaction, message, _ ->
-								queueDeleteWithUndo(transaction, message)
-							},
-							onCancelPendingDelete = { cancelPendingDelete() },
-							onShowInfoSnackbar = { message -> showInfoSnackbar(message) }
-						)
+								modifier = Modifier.then(quickLogSwipeModifier),
+								onQueueDeleteWithUndo = { transaction, message, _ ->
+									queueDeleteWithUndo(transaction, message)
+								},
+								onCancelPendingDelete = { cancelPendingDelete() },
+								onShowInfoSnackbar = { message -> showInfoSnackbar(message) })
 						})
 
 					StatusBarStub()
@@ -475,24 +412,22 @@ fun MainScreen(
 							modifier = Modifier.weight(1f)
 						) {
 							EditorWithViewModel(
-							modifier = Modifier.fillMaxSize(),
-							onOpenHistory = {},
-							onOpenSettings = onNavigateToSettings,
-							onOpenAnalytics = onNavigateToAnalytics,
-							onOpenWallet = onNavigateToWallet,
-							onBudgetPillClickForTutorial = {
-								advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
-							},
-							onAnalyticsClickForTutorial = {
-								advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANALYTICS)
-							},
-							budgetPillHintAnchorModifier = if (tutorialStage == FirstLaunchTutorialStage.TAP_BUDGET_PILL) {
-								Modifier.hintTipAnchor(budgetHintState)
-							} else Modifier,
-							analyticsHintAnchorModifier = if (tutorialStage == FirstLaunchTutorialStage.TAP_ANALYTICS) {
-								Modifier.hintTipAnchor(analyticsHintState)
-							} else Modifier
-						)
+								modifier = Modifier.fillMaxSize(),
+								onOpenHistory = {},
+								onOpenSettings = onNavigateToSettings,
+								onOpenAnalytics = onNavigateToAnalytics,
+								onOpenWallet = onNavigateToWallet,
+								openWalletOnStart = openWalletOnStart,
+								forceWalletSetup = forceWalletSetup,
+								onBudgetPillClickForTutorial = {
+									advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
+								},
+								onAnalyticsClickForTutorial = {
+									advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANALYTICS)
+								},
+								budgetPillHintAnchorModifier = Modifier,
+								analyticsHintAnchorModifier = Modifier
+							)
 						}
 
 						// Numpad at the bottom
@@ -512,19 +447,14 @@ fun MainScreen(
 									.navigationBarsPadding()
 							) {
 								NumpadWithViewModel(
-									numberHintAnchorModifier = if (tutorialStage == FirstLaunchTutorialStage.TAP_ANY_NUMBER) {
-										Modifier.hintTipAnchor(numberHintState)
-									} else Modifier,
-									applyHintAnchorModifier = if (tutorialStage == FirstLaunchTutorialStage.TAP_DONE_SAVE) {
-										Modifier.hintTipAnchor(doneHintState)
-									} else Modifier,
+									numberHintAnchorModifier = Modifier,
+									applyHintAnchorModifier = Modifier,
 									onAnyNumberTapped = {
 										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
 									},
 									onApplyTapped = {
 										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_DONE_SAVE)
-									}
-								)
+									})
 							}
 						}
 					}
@@ -555,19 +485,6 @@ fun StatusBarStub() {
 			.requiredHeight(
 				LocalWindowInsets.current.calculateTopPadding()
 			)
-			.background(colorEditor.copy(alpha = 0.9F))
+			.background(colorEditor)
 	)
-}
-
-@Preview(showBackground = true, device = "id:pixel_5")
-@Composable
-private fun MainScreenPreview() {
-	MinusTheme {
-		CompositionLocalProvider(
-			LocalWindowSize provides WindowWidthSizeClass.Compact,
-			LocalWindowInsets provides PaddingValues(0.dp)
-		) {
-			MainScreen()
-		}
-	}
 }

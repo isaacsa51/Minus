@@ -16,12 +16,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -84,6 +90,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisp
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
 import java.math.BigDecimal
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -103,6 +110,7 @@ fun PeriodSwitcherSheet(
 	onSaveBudget: ((BudgetSettings) -> Unit)? = null,
 	onEditBudget: (() -> Unit)? = null,
 	onFinishEarly: (() -> Unit)? = null,
+	startInEditMode: Boolean = false,
 ) {
 	val haptic = LocalHapticFeedback.current
 	val currencyFormat = remember(currencyCode) {
@@ -114,7 +122,7 @@ fun PeriodSwitcherSheet(
 	val totalBudget = budgetSettings?.totalBudget ?: BigDecimal.ZERO
 	var periodCache by remember(selectedPeriod) { mutableStateOf(selectedPeriod) }
 
-	var isEditMode by remember { mutableStateOf(false) }
+	var isEditMode by remember(startInEditMode) { mutableStateOf(startInEditMode) }
 	var showFinishConfirm by remember { mutableStateOf(false) }
 
 	val totalDays = remember(startDate, endDate) {
@@ -137,6 +145,11 @@ fun PeriodSwitcherSheet(
 		}
 	}
 
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.windowInsetsPadding(WindowInsets.statusBars)
+	) {
 	AnimatedContent(
 		targetState = isEditMode,
 		transitionSpec = {
@@ -202,6 +215,7 @@ fun PeriodSwitcherSheet(
 			)
 		}
 	}
+	}
 
 	// Finish Early Confirmation Dialog
 	if (showFinishConfirm) {
@@ -250,6 +264,7 @@ private fun ViewBudgetContent(
 			.fillMaxWidth()
 			.padding(horizontal = 20.dp)
 			.padding(top = 4.dp, bottom = 32.dp)
+			.navigationBarsPadding()
 			.verticalScroll(rememberScrollState()),
 	) {
 		Row(
@@ -443,8 +458,14 @@ fun EditBudgetContent(
 	var showStrategyPicker by remember { mutableStateOf(false) }
 	var showPreviousValues by remember { mutableStateOf(false) }
 
-	val activeCurrencySymbol = remember(currencyCache) {
-		SupportedCurrency.findByCode(currencyCache)?.symbol ?: "$"
+	// Plain number format for input display (no automatic decimals added)
+	val plainNumberFormat = remember(currencyCache) {
+		val symbol = SupportedCurrency.findByCode(currencyCache)?.symbol ?: "$"
+		(DecimalFormat.getNumberInstance(Locale.getDefault()) as DecimalFormat).apply {
+			maximumFractionDigits = 0
+			minimumFractionDigits = 0
+			positivePrefix = symbol
+		}
 	}
 
 	val parsedBudget =
@@ -465,6 +486,7 @@ fun EditBudgetContent(
 			.fillMaxWidth()
 			.padding(horizontal = 20.dp)
 			.padding(top = 4.dp, bottom = 32.dp)
+			.navigationBarsPadding()
 			.verticalScroll(rememberScrollState()),
 	) {
 		// Title
@@ -556,12 +578,26 @@ fun EditBudgetContent(
 			contentAlignment = Alignment.Center,
 		) {
 			BasicTextField(
-				value = budgetText,
+				value = if (budgetText.isBlank()) "" else plainNumberFormat.format(parsedBudget),
 				onValueChange = { newValue ->
-					val filtered = newValue.filter { it.isDigit() || it == '.' }
-					if (filtered.count { it == '.' } <= 1) {
-						budgetText = filtered
+					val normalized = newValue
+						.filter { it.isDigit() || it == '.' || it == ',' }
+						.replace(',', '.')
+					val filtered = buildString {
+						var dotSeen = false
+						normalized.forEach { c ->
+							if (c.isDigit()) append(c)
+							else if (c == '.' && !dotSeen) {
+								dotSeen = true
+								append(c)
+							}
+						}
 					}
+					val parts = filtered.split('.')
+					val limited = if (parts.size > 1) {
+						parts[0] + "." + parts[1].take(2)
+					} else filtered
+					budgetText = limited
 				},
 				textStyle = TextStyle(
 					fontSize = 48.sp,
@@ -578,22 +614,10 @@ fun EditBudgetContent(
 						horizontalArrangement = Arrangement.Center,
 						verticalAlignment = Alignment.CenterVertically,
 					) {
-						// Currency symbol prefix
-						Text(
-							text = activeCurrencySymbol,
-							style = TextStyle(
-								fontSize = 32.sp,
-								fontWeight = FontWeight.Medium,
-								color = MaterialTheme.colorScheme.onSurface.copy(
-									alpha = if (budgetText.isEmpty()) 0.3f else 0.6f
-								),
-							),
-						)
-						Spacer(modifier = Modifier.width(4.dp))
 						Box {
 							if (budgetText.isEmpty()) {
 								Text(
-									text = "0",
+									text = plainNumberFormat.format(BigDecimal.ZERO),
 									style = TextStyle(
 										fontSize = 48.sp,
 										fontWeight = FontWeight.Bold,
@@ -700,7 +724,6 @@ fun EditBudgetContent(
 
 		Spacer(modifier = Modifier.height(24.dp))
 
-		// Apply button
 		Button(
 			onClick = {
 				haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -767,8 +790,6 @@ fun EditBudgetContent(
 		)
 	}
 }
-
-// ─── Settings Row ────────────────────────────────────────────────────────────
 
 @Composable
 private fun SettingsRow(
@@ -1062,7 +1083,9 @@ private fun PeriodSwitcherSheetPreview() {
 	}
 }
 
-@Preview(showSystemUi = false, showBackground = true)
+@Preview(showSystemUi = false, showBackground = true,
+	device = "spec:width=1080px,height=2340px,dpi=440,cutout=double"
+)
 @Composable
 private fun EditModePreview() {
 	MinusTheme {

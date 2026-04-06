@@ -26,10 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.history.TransactionItem
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
+import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Currency
@@ -173,7 +173,7 @@ fun CategoryAnalytics(
 					HistoryDateDivider(date = date)
 
 					transactions.forEach { transaction ->
-						TransactionItem(
+						ExpenseItem(
 							transaction = transaction,
 							currencyFormat = currencyFormat
 						)

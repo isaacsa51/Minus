@@ -2,23 +2,15 @@
 
 package com.serranoie.app.minus.presentation.editor
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.EaseInOutQuad
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,22 +25,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,41 +49,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
-import com.serranoie.app.minus.presentation.onboarding.periodLabel
-import com.serranoie.app.minus.presentation.onboarding.toDays
 import com.serranoie.app.minus.presentation.budget.BudgetUiState
-import com.serranoie.app.minus.presentation.editor.category.FocusController
 import com.serranoie.app.minus.presentation.editor.category.CategoryToolbar
+import com.serranoie.app.minus.presentation.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.colorGood
-import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
-import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.NumberFormat
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-import java.util.Currency
-import java.util.Locale
 
-/**
- * Editor composable showing the expense input interface.
- * Matches the Buckwheat app design with pill-shaped budget indicator.
- */
+
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Editor(
@@ -105,6 +79,8 @@ fun Editor(
 	onOpenSettings: () -> Unit,
 	onOpenAnalytics: () -> Unit = {},
 	onOpenWallet: () -> Unit = {},
+	openWalletOnStart: Boolean = false,
+	forceWalletSetup: Boolean = false,
 	onCommentClick: () -> Unit,
 	onBudgetPillClickForTutorial: () -> Unit = {},
 	onAnalyticsClickForTutorial: () -> Unit = {},
@@ -122,6 +98,12 @@ fun Editor(
 	val scope = rememberCoroutineScope()
 	val sheetState = rememberModalBottomSheetState()
 	var showBottomSheet by remember { mutableStateOf(false) }
+
+	LaunchedEffect(openWalletOnStart) {
+		if (openWalletOnStart) {
+			showBottomSheet = true
+		}
+	}
 
 	// Create a focus controller for the tagging toolbar
 	val editorFocusController = remember { FocusController() }
@@ -297,6 +279,7 @@ if (uiState.showRecurrentDialog) {
 					budgetState = uiState.budgetState,
 					selectedPeriod = selectedViewPeriod,
 					currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+					startInEditMode = forceWalletSetup || uiState.budgetSettings == null,
 					onPeriodSelected = { newPeriod ->
 					selectedViewPeriod = newPeriod
 					// Also persist the period to budget settings
@@ -337,7 +320,7 @@ private fun EditingContent(
 	editorFocusController: FocusController,
 	modifier: Modifier = Modifier
 ) {
-	val currencyFormat = com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat(currencyCode)
+	val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
 
 	val formattedInput = remember(input, currencyCode) {
 		try {

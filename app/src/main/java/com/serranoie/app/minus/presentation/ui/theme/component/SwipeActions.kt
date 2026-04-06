@@ -1,7 +1,14 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
 import android.view.HapticFeedbackConstants
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.BoundsTransform
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.SharedTransitionScope.OverlayClip
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.scaleToBounds
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -10,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +40,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+
+private const val SWIPE_ACTION_SHARED_TRANSITION_DURATION_MS = 700
 
 /**
  * Configuration for swipe actions.
@@ -204,4 +214,89 @@ fun SwipeActions(
     ) {
         content()
     }
+}
+
+/**
+ * SwipeActions with shared element transition support for smooth morphing animations.
+ * Use this when the swipe action item should animate into a detail view (like TicketView).
+ *
+ * @param modifier Modifier for the swipe container
+ * @param shape Shape for the background
+ * @param enabled Whether swipe is enabled
+ * @param startActionsConfig Configuration for start (left) swipe action
+ * @param endActionsConfig Configuration for end (right) swipe action
+ * @param sharedTransitionScope The shared transition scope from SharedTransitionLayout
+ * @param animatedVisibilityScope The animated visibility scope
+ * @param sharedContentKey Unique key to identify this item for shared element transitions
+ * @param content The swipeable content
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@Composable
+fun SwipeActionsWithSharedTransition(
+    modifier: Modifier = Modifier,
+    shape: Shape = MaterialTheme.shapes.medium,
+    enabled: Boolean = true,
+    startActionsConfig: SwipeActionsConfig = DefaultSwipeActionsConfig,
+    endActionsConfig: SwipeActionsConfig = DefaultSwipeActionsConfig,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    sharedContentKey: Any? = null,
+    content: @Composable () -> Unit,
+) {
+    val wrappedContent: @Composable () -> Unit = {
+        if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedContentKey != null) {
+            with(sharedTransitionScope) {
+                Box(
+                    modifier = Modifier.swipeActionSharedBounds(
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        sharedContentKey = sharedContentKey
+                    )
+                ) {
+                    content()
+                }
+            }
+        } else {
+            content()
+        }
+    }
+
+    SwipeActions(
+        modifier = modifier,
+        shape = shape,
+        enabled = enabled,
+        startActionsConfig = startActionsConfig,
+        endActionsConfig = endActionsConfig,
+        content = wrappedContent
+    )
+}
+
+/**
+ * Applies shared element bounds transformation to enable smooth morphing animations.
+ */
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun Modifier.swipeActionSharedBounds(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    sharedContentKey: Any
+): Modifier {
+    return with(sharedTransitionScope) {
+        this@swipeActionSharedBounds.sharedBounds(
+            sharedContentState = rememberSharedContentState(key = sharedContentKey),
+            animatedVisibilityScope = animatedVisibilityScope,
+            boundsTransform = swipeActionBoundsTransform,
+            resizeMode = scaleToBounds(),
+            clipInOverlayDuringTransition = OverlayClip(
+                clipShape = RoundedCornerShape(16.dp)
+            )
+        )
+    }
+}
+
+private val swipeActionBoundsTransform = BoundsTransform { _, _ ->
+    tween(
+        durationMillis = SWIPE_ACTION_SHARED_TRANSITION_DURATION_MS,
+        easing = FastOutSlowInEasing
+    )
 }

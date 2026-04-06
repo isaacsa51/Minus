@@ -166,15 +166,16 @@ fun AppNavGraph(
         composable(Screen.Onboarding.route) {
             OnboardingScreen(
                 onSetBudget = {
-                    Log.d(tag, "onSetBudget triggered - navigating to Wallet (forceChange=true)")
-                    navController.navigate(Screen.Wallet.createRoute(forceChange = true))
+                    navController.navigate(
+                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true)
+                    ) {
+                        popUpTo(Screen.Onboarding.route) { inclusive = true }
+                    }
                 },
                 onOnboardingComplete = {
-                    Log.d(tag, "onOnboardingComplete triggered from OnboardingScreen")
                     onOnboardingComplete()
                 },
                 onClose = {
-                    Log.d(tag, "onClose triggered from OnboardingScreen - navigating to Main")
                     navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Onboarding.route) { inclusive = true }
                     }
@@ -310,9 +311,26 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.Main.route) {
+        composable(
+            route = Screen.Main.route,
+            arguments = listOf(
+                navArgument(Screen.Main.ARG_OPEN_WALLET) {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+                navArgument(Screen.Main.ARG_FORCE_WALLET_SETUP) {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
+        ) { backStackEntry ->
             Log.d(tag, "Navigating to Main")
+            val openWallet = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_OPEN_WALLET) ?: false
+            val forceWalletSetup = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_FORCE_WALLET_SETUP) ?: false
+
             MainScreen(
+                openWalletOnStart = openWallet,
+                forceWalletSetup = forceWalletSetup,
                 onNavigateToAnalytics = {
                     navController.navigate(Screen.Analytics.route)
                 },

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -145,6 +146,7 @@ fun TicketView(
 	Box(
 		modifier = modifier
 			.background(backgroundColor, shape = ticketShape)
+			.clip(ticketShape)
 			.then(clickableModifier)
 			.padding(16.dp)) {
 		content()

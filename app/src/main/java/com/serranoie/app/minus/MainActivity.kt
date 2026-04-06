@@ -50,7 +50,6 @@ import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.ui.theme.syncTheme
 import com.serranoie.app.minus.presentation.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
 import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
-import com.serranoie.app.minus.presentation.ui.theme.component.tooltip.HintTipProvider
 import com.serranoie.app.minus.presentation.util.lockScreenOrientation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -142,7 +141,10 @@ class MainActivity : ComponentActivity() {
 					val cap = Wearable.getCapabilityClient(this@MainActivity)
 						.getCapability("minus_wear_sender", CapabilityClient.FILTER_REACHABLE)
 						.await()
-					Log.d(tag, "wear capability minus_wear_sender reachableNodes=${cap.nodes.size} ids=${cap.nodes.joinToString { it.id }}")
+					Log.d(
+						tag,
+						"wear capability minus_wear_sender reachableNodes=${cap.nodes.size} ids=${cap.nodes.joinToString { it.id }}"
+					)
 				}.onFailure {
 					Log.e(tag, "wear capability check failed", it)
 				}
@@ -221,15 +223,14 @@ class MainActivity : ComponentActivity() {
 
 				MinusTheme(dynamicColor = dynamicColor) {
 					CompositionLocalProvider(
-						LocalWindowSize provides widthSizeClass,
-						LocalWindowInsets provides windowInsets,
-					) {
-						Surface(
-						color = MaterialTheme.colorScheme.background
-					) {
-							HintTipProvider {
-								// Determine start destination based on app state
-								val startDestination = when {
+							LocalWindowSize provides widthSizeClass,
+							LocalWindowInsets provides windowInsets,
+						) {
+							Surface(
+							color = MaterialTheme.colorScheme.background
+						) {
+							// Determine start destination based on app state
+							val startDestination = when {
 								// First: Check if budget period has ended or was finished early
 								periodEnded.value || earlyFinishPending.value -> {
 									Screen.Analytics.route
@@ -244,19 +245,18 @@ class MainActivity : ComponentActivity() {
 								}
 							}
 
-								AppNavGraph(
-									activityResultRegistryOwner = activityResultRegistryOwner,
-									startDestination = startDestination,
-									onOnboardingComplete = {
-										lifecycleScope.launch {
-											context.settingsDataStore.edit { prefs ->
-												prefs[ONBOARDING_COMPLETED_KEY] = true
-												prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] = FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
-											}
+							AppNavGraph(
+								activityResultRegistryOwner = activityResultRegistryOwner,
+								startDestination = startDestination,
+								onOnboardingComplete = {
+									lifecycleScope.launch {
+										context.settingsDataStore.edit { prefs ->
+											prefs[ONBOARDING_COMPLETED_KEY] = true
+											prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] =
+												FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
 										}
 									}
-								)
-							}
+								})
 						}
 					}
 				}
