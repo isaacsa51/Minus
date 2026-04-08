@@ -85,12 +85,12 @@ import com.serranoie.app.minus.presentation.onboarding.FinishDateSelector
 import com.serranoie.app.minus.presentation.onboarding.availablePeriodsFor
 import com.serranoie.app.minus.presentation.onboarding.budgetForPeriod
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.util.CurrencyAmountInputVisualTransformation
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
 import java.math.BigDecimal
-import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -238,8 +238,6 @@ fun PeriodSwitcherSheet(
 		)
 	}
 }
-
-// ─── View Mode ───────────────────────────────────────────────────────────────
 
 @Composable
 private fun ViewBudgetContent(
@@ -445,7 +443,10 @@ fun EditBudgetContent(
 
 	var budgetText by remember {
 		mutableStateOf(
-			if (currentBudget > BigDecimal.ZERO) currentBudget.toPlainString() else ""
+			if (currentBudget > BigDecimal.ZERO) {
+				// Convert to cents (multiply by 100 and round)
+				(currentBudget.multiply(BigDecimal(100)).toBigInteger()).toString()
+			} else ""
 		)
 	}
 	var startCache by remember { mutableStateOf(LocalDate.now()) }
@@ -458,18 +459,9 @@ fun EditBudgetContent(
 	var showStrategyPicker by remember { mutableStateOf(false) }
 	var showPreviousValues by remember { mutableStateOf(false) }
 
-	// Plain number format for input display (no automatic decimals added)
-	val plainNumberFormat = remember(currencyCache) {
-		val symbol = SupportedCurrency.findByCode(currencyCache)?.symbol ?: "$"
-		(DecimalFormat.getNumberInstance(Locale.getDefault()) as DecimalFormat).apply {
-			maximumFractionDigits = 0
-			minimumFractionDigits = 0
-			positivePrefix = symbol
-		}
-	}
-
+	// Convert from cents to actual amount
 	val parsedBudget =
-		budgetText.replace(Regex("[^0-9.]"), "").toBigDecimalOrNull() ?: BigDecimal.ZERO
+		budgetText.toBigDecimalOrNull()?.divide(BigDecimal(100)) ?: BigDecimal.ZERO
 	val totalDays = endCache?.let { ChronoUnit.DAYS.between(startCache, it).toInt() + 1 } ?: 0
 	val canApply = parsedBudget > BigDecimal.ZERO && totalDays > 0
 
@@ -544,7 +536,10 @@ fun EditBudgetContent(
 						Spacer(modifier = Modifier.height(8.dp))
 						AssistChip(
 							onClick = {
-								budgetText = currentBudget.toPlainString()
+								// Convert to cents
+								budgetText = if (currentBudget > BigDecimal.ZERO) {
+									(currentBudget.multiply(BigDecimal(100)).toBigInteger()).toString()
+								} else ""
 								if (previousPeriodDays > 0) {
 									startCache = LocalDate.now()
 									endCache =
@@ -578,27 +573,13 @@ fun EditBudgetContent(
 			contentAlignment = Alignment.Center,
 		) {
 			BasicTextField(
-				value = if (budgetText.isBlank()) "" else plainNumberFormat.format(parsedBudget),
+				value = budgetText,
 				onValueChange = { newValue ->
-					val normalized = newValue
-						.filter { it.isDigit() || it == '.' || it == ',' }
-						.replace(',', '.')
-					val filtered = buildString {
-						var dotSeen = false
-						normalized.forEach { c ->
-							if (c.isDigit()) append(c)
-							else if (c == '.' && !dotSeen) {
-								dotSeen = true
-								append(c)
-							}
-						}
-					}
-					val parts = filtered.split('.')
-					val limited = if (parts.size > 1) {
-						parts[0] + "." + parts[1].take(2)
-					} else filtered
-					budgetText = limited
+					// Only allow digits
+					val filtered = newValue.filter { it.isDigit() }
+					budgetText = filtered
 				},
+				visualTransformation = CurrencyAmountInputVisualTransformation(),
 				textStyle = TextStyle(
 					fontSize = 48.sp,
 					fontWeight = FontWeight.Bold,
@@ -606,7 +587,7 @@ fun EditBudgetContent(
 					textAlign = TextAlign.Center,
 				),
 				singleLine = true,
-				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
 				cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
 				decorationBox = { innerTextField ->
 					Row(
@@ -617,7 +598,7 @@ fun EditBudgetContent(
 						Box {
 							if (budgetText.isEmpty()) {
 								Text(
-									text = plainNumberFormat.format(BigDecimal.ZERO),
+									text = currencySymbol + "",
 									style = TextStyle(
 										fontSize = 48.sp,
 										fontWeight = FontWeight.Bold,
@@ -981,8 +962,6 @@ private fun StrategyPickerDialog(
 	)
 }
 
-// ─── CompactPeriodCard ───────────────────────────────────────────────────────
-
 @Composable
 private fun CompactPeriodCard(
 	period: BudgetPeriod,
@@ -1046,8 +1025,6 @@ private fun CompactPeriodCard(
 	}
 }
 
-// ─── Previews ────────────────────────────────────────────────────────────────
-
 @Preview(showSystemUi = false, showBackground = true)
 @Composable
 private fun PeriodSwitcherSheetPreview() {
@@ -1092,6 +1069,28 @@ private fun EditModePreview() {
 		EditBudgetContent(
 			budgetSettings = BudgetSettings(
 				totalBudget = BigDecimal("17725"),
+				period = BudgetPeriod.DAILY,
+				startDate = LocalDate.now().minusDays(29),
+				endDate = LocalDate.now(),
+				currencyCode = "MXN",
+				daysInPeriod = 30,
+			),
+			onBack = { },
+			onApply = { },
+		)
+	}
+}
+
+
+@Preview(showSystemUi = false, showBackground = true,
+	device = "spec:width=1080px,height=2340px,dpi=440,cutout=double"
+)
+@Composable
+private fun EditEmptyModePreview() {
+	MinusTheme {
+		EditBudgetContent(
+			budgetSettings = BudgetSettings(
+				totalBudget = BigDecimal("0"),
 				period = BudgetPeriod.DAILY,
 				startDate = LocalDate.now().minusDays(29),
 				endDate = LocalDate.now(),

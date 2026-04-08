@@ -126,6 +126,8 @@ fun TransactionEditScreen(
     // Focus controller for tagging toolbar
     val focusController = remember { FocusController() }
 
+    var isCalculation by remember { mutableStateOf(false) }
+
     // Editor state for numpad
     val editorState = remember(editedAmount) {
         EditorState(
@@ -320,9 +322,17 @@ fun TransactionEditScreen(
                 }
             },
             onDotInput = {
-                // Add decimal point if not already present
-                if (!editedAmount.contains(".")) {
-                    editedAmount = editedAmount + "."
+                val lastChar = editedAmount.lastOrNull()
+                // If empty or after operator, start decimal segment as 0.
+                if (editedAmount.isEmpty() || (lastChar != null && lastChar in "+-×÷")) {
+                    editedAmount += "0."
+                } else {
+                    // Only allow one dot in current numeric segment
+                    val lastOperatorIndex = editedAmount.indexOfLast { it in "+-×÷" }
+                    val currentSegment = editedAmount.substring(lastOperatorIndex + 1)
+                    if (!currentSegment.contains(".")) {
+                        editedAmount += "."
+                    }
                 }
             },
             onBackspace = {
@@ -351,6 +361,22 @@ fun TransactionEditScreen(
                     endDate,
                     subDay
                 )
+            },
+            isCalculation = isCalculation,
+            onCalculationModeChanged = { isCalculation = it },
+            onOperatorInput = { operator ->
+                val lastChar = editedAmount.lastOrNull()
+                // Only allow operator if last char is a number (not operator/dot)
+                if (editedAmount.isNotEmpty() && lastChar != null && lastChar !in "+-×÷" && lastChar != '.') {
+                    editedAmount += operator.toString()
+                }
+            },
+            onEqualsInput = {
+                // Evaluate the calculation and replace input with result
+                val result = evaluateCalculation(editedAmount)
+                if (result != null) {
+                    editedAmount = result
+                }
             },
             onDelete = {
                 // Just cancel in edit mode
@@ -730,5 +756,78 @@ fun TransactionEditScreenRecurringPreview() {
             onCancel = {},
             onSave = { _, _, _, _, _, _, _ -> }
         )
+    }
+}
+
+/**
+ * Calculation evaluator for chained arithmetic operations.
+ * Supports +, -, ×, ÷ operators in sequence (e.g., 85+88-42=131).
+ */
+private fun evaluateCalculation(input: String): String? {
+    // Handle empty or whitespace-only input
+    if (input.isBlank()) return null
+
+    return try {
+        // Normalize operators: × -> * and ÷ -> /
+        val normalized = input.trim()
+            .replace("×", "*")
+            .replace("÷", "/")
+
+        // If ends with an operator, it's incomplete - return null
+	    normalized.lastOrNull()?.let { if (it in "+-*/") return null }
+
+        // Check if there's any operator in the input
+        val hasOperator = normalized.any { it in "+-*/" }
+
+        // If no operator, just return the number as-is
+        if (!hasOperator) {
+            val num = normalized.toBigDecimalOrNull() ?: return null
+            return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
+                num.toBigInteger().toString()
+            } else {
+                num.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+            }
+        }
+
+        // Use a regex to split by operators
+        // This handles chained operations like "85+88-42"
+        val tokenPattern = Regex("([+-*/])")
+        val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
+        val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
+
+        if (parts.isEmpty() || parts[0].isEmpty()) return null
+
+        // If we have more operators than numbers, it's invalid
+        if (operators.size > parts.size - 1) return null
+
+        // Start with first number
+        var result = parts[0].toBigDecimalOrNull() ?: return null
+
+        // Process each operator-number pair
+        for (i in operators.indices) {
+            if (i + 1 >= parts.size) break
+            val operator = operators[i]
+            val nextNum = parts[i + 1].toBigDecimalOrNull() ?: return null
+
+            result = when (operator) {
+                "+" -> result + nextNum
+                "-" -> result - nextNum
+                "*" -> result * nextNum
+                "/" -> {
+                    if (nextNum.compareTo(java.math.BigDecimal.ZERO) == 0) return null // Division by zero
+                    result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
+                }
+                else -> return null
+            }
+        }
+
+        // Format result without decimal if whole number
+        if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
+            result.toBigInteger().toString()
+        } else {
+            result.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+        }
+    } catch (e: Exception) {
+        null
     }
 }

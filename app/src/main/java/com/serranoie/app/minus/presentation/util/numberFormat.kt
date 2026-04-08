@@ -3,9 +3,13 @@ package com.serranoie.app.minus.presentation.util
 import android.content.Context
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import java.math.BigDecimal
+import android.text.TextPaint
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.sp
 
 fun getFloatDivider(): String {
 	val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
@@ -53,12 +57,17 @@ fun symbolOnlyCurrencyFormat(
 	maximumFractionDigits: Int = 2,
 	minimumFractionDigits: Int = 0,
 ): NumberFormat {
-	val symbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
+	val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
 	return (NumberFormat.getNumberInstance(Locale.getDefault()) as DecimalFormat).apply {
 		this.maximumFractionDigits = maximumFractionDigits
 		this.minimumFractionDigits = minimumFractionDigits
-		positivePrefix = "$symbol"
-		negativePrefix = "-$symbol"
+		positivePrefix = currencySymbol + " "
+		negativePrefix = "-" + currencySymbol + " "
+		try {
+			currency = java.util.Currency.getInstance(currencyCode)
+		} catch (e: Exception) {
+			// Keep the positivePrefix set above
+		}
 	}
 }
 
@@ -79,7 +88,6 @@ fun numberFormat(
 	)
 }
 
-// Extension function for BigDecimal to check if zero
 fun BigDecimal.isZero(): Boolean = this.signum() == 0
 
 fun String.join(third: Boolean = false): String {

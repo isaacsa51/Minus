@@ -12,9 +12,11 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import java.math.BigDecimal
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Locale
+import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -82,11 +84,11 @@ private fun visualTransformationAsCurrency(
 ): TransformedText {
     val floatDivider = getFloatDivider()
     val fixed = tryConvertStringToNumber(input.text)
-    
+
     // Format as currency
     val amount = input.text.ifEmpty { "0" }.toBigDecimalOrNull() ?: BigDecimal.ZERO
     val formatted = formatCurrency(amount)
-    
+
     // Remove $ symbol for the raw number display
     val currSymbol = getCurrencySymbol()
     var output = formatted.replace(currSymbol, "").trim()
@@ -157,6 +159,184 @@ fun visualTransformationAsCurrency(
 ): ((input: AnnotatedString) -> TransformedText) {
     return {
         visualTransformationAsCurrency(context, it, hintColor)
+    }
+}
+
+/**
+ * Currency amount input visual transformation following the blog post approach.
+ * Takes raw digits as input and formats them as currency with two decimal places.
+ *
+ * Original input => Integer part + Decimal part => Output
+ * 123 => 1 + 23 => 1.23
+ * 542010 => 5420 + 10 => 5420.10
+ * 1 => 0 + 01 => 0.01
+ */
+class CurrencyAmountInputVisualTransformation : androidx.compose.ui.text.input.VisualTransformation {
+
+    override fun filter(text: AnnotatedString): TransformedText {
+        val symbols = DecimalFormat().decimalFormatSymbols
+        val thousandsSeparator = symbols.groupingSeparator
+        val decimalSeparator = symbols.decimalSeparator
+
+        val inputText = text.text
+
+        // Handle empty input - show "0.00" as placeholder
+        if (inputText.isEmpty()) {
+            val newText = AnnotatedString(
+                "0${decimalSeparator}00",
+                text.spanStyles,
+                text.paragraphStyles
+            )
+            // For empty input, use simple identity mapping
+            val offsetMapping = object : OffsetMapping {
+                override fun originalToTransformed(offset: Int) = offset.coerceIn(0, 4)
+                override fun transformedToOriginal(offset: Int) = offset.coerceIn(0, 0)
+            }
+            return TransformedText(newText, offsetMapping)
+        }
+
+        // Get integer part (all digits except last 2)
+        val intPart = if (inputText.length > 2) {
+            inputText.substring(0, inputText.length - 2)
+        } else {
+            "0"
+        }
+
+        // Get decimal part (last 2 digits)
+        var fractionPart = if (inputText.length >= 2) {
+            inputText.substring(inputText.length - 2, inputText.length)
+        } else {
+            inputText
+        }
+
+        // Add zeros if the fraction part length is not 2
+        if (fractionPart.length < 2) {
+            fractionPart = fractionPart.padStart(2, '0')
+        }
+
+        // Add thousands separators to integer part
+        val thousandsReplacementPattern = Regex("\\B(?=(?:\\d{3})+(?!\\d))")
+        val formattedIntWithThousandsSeparator = intPart.replace(
+            thousandsReplacementPattern,
+            thousandsSeparator.toString()
+        )
+
+        // Build the final formatted string
+        val newText = AnnotatedString(
+            formattedIntWithThousandsSeparator + decimalSeparator + fractionPart,
+            text.spanStyles,
+            text.paragraphStyles
+        )
+
+        // Create offset mapping with total original text length
+        val offsetMapping = CurrencyAmountOffsetMapping(
+            originalLength = inputText.length
+        )
+
+        return TransformedText(newText, offsetMapping)
+    }
+}
+
+/**
+ * Offset mapping for currency amount input.
+ * Provides bidirectional offset mapping between original and transformed text.
+ */
+class CurrencyAmountOffsetMapping(
+    private val originalLength: Int  // Total length of original input text
+) : OffsetMapping {
+
+    private fun calculateThousandsSeparatorCount(intDigitCount: Int): Int {
+        return max((intDigitCount - 1) / 3, 0)
+    }
+
+    // Number of integer digits (all digits except last 2)
+    private val integerDigits: Int = max(originalLength - 2, 0)
+
+    // Transformed length: formatted integer + decimal point + 2 decimal digits
+    private val transformedLength: Int = if (integerDigits > 0) {
+        integerDigits + calculateThousandsSeparatorCount(integerDigits) + 3
+    } else {
+        4 // "0.00" has 4 chars
+    }
+
+    override fun originalToTransformed(offset: Int): Int {
+        // Handle empty/minimal input
+        if (originalLength == 0) {
+            return offset.coerceIn(0, 4)
+        }
+        if (originalLength == 1) {
+            // "1" -> "0.01" has length 4
+            return offset.coerceIn(0, 3)
+        }
+        if (originalLength == 2) {
+            // "12" -> "0.12" has length 4
+            return offset.coerceIn(0, 3)
+        }
+
+        // Clamp offset to valid range [0, originalLength)
+        val safeOffset = offset.coerceIn(0, originalLength)
+        val sepCount = calculateThousandsSeparatorCount(integerDigits)
+
+        return if (safeOffset >= integerDigits) {
+            // Decimal part (last 2 positions)
+            val decimalPos = safeOffset - integerDigits
+            (integerDigits + sepCount + 1 + decimalPos).coerceIn(0, transformedLength - 1)
+        } else {
+            // Integer part
+            (safeOffset + (safeOffset / 3)).coerceIn(0, transformedLength - 1)
+        }
+    }
+
+    override fun transformedToOriginal(offset: Int): Int {
+        // Handle empty/minimal input
+        if (originalLength == 0) {
+            // Empty input, no valid mapping needed
+            return 0
+        }
+        if (originalLength == 1) {
+            // For single digit input like "1" -> "0.01"
+            // Transformed "0.01" has positions 0,1,2,3
+            // Original "1" has just position 0
+            return when (offset) {
+                in 0..3 -> 0
+                else -> 0
+            }
+        }
+        if (originalLength == 2) {
+            // For "12" -> "0.12" (length 4)
+            // Original positions: 0,1
+            // Transformed "0.12": 0='0', 1='.', 2='1', 3='2'
+            return when (offset) {
+                0 -> 0  // '0' in "0.12" -> original 0
+                1 -> 0  // '.' maps to last integer pos
+                2 -> 1  // '1' -> original 1 (first decimal)
+                3 -> 1  // '2' -> original 1 (second decimal)
+                else -> 0
+            }
+        }
+
+        // Clamp offset to valid range
+        val safeOffset = offset.coerceIn(0, transformedLength - 1)
+        val sepCount = calculateThousandsSeparatorCount(integerDigits)
+        val integerPartEndPos = integerDigits + sepCount // Position where decimal point starts
+
+        return when {
+            // After decimal point (positions after the decimal point)
+            safeOffset > integerPartEndPos -> {
+                val decimalPos = safeOffset - (integerPartEndPos + 1)
+                (integerDigits + decimalPos).coerceIn(0, originalLength - 1)
+            }
+            // At decimal point
+            safeOffset == integerPartEndPos -> {
+                maxOf(integerDigits - 1, 0)
+            }
+            // In integer part (before decimal point)
+            else -> {
+                // Simple mapping: each group of 4 in transformed maps to 3 in original
+                val adjusted = safeOffset - (safeOffset / 4)
+                adjusted.coerceIn(0, maxOf(integerDigits - 1, 0))
+            }
+        }
     }
 }
 

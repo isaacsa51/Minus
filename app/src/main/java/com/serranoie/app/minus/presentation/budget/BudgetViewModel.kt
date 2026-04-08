@@ -142,7 +142,9 @@ class BudgetViewModel @Inject constructor(
 					remainingFromPreviousPeriod = showRollover.second,
 					isFirstLaunch = settings == null,
 					currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
-					currentPeriodId = currentPeriodId
+					currentPeriodId = currentPeriodId,
+					isCalculation = _uiState.value.isCalculation,
+					dragProgress = _uiState.value.dragProgress
 				)
 			}.catch { error ->
 				emit(
@@ -379,37 +381,182 @@ class BudgetViewModel @Inject constructor(
 			is BudgetUiIntent.RecurrentExpenseApplied -> handleRecurrentExpenseApply(intent.frequency, intent.endDate, intent.subscriptionDay)
 			is BudgetUiIntent.FinishBudgetEarly -> handleFinishBudgetEarly()
 			is BudgetUiIntent.TriggerTestNotifications -> triggerTestNotifications()
+			is BudgetUiIntent.OperatorTapped -> handleOperatorInput(intent.operator)
+			is BudgetUiIntent.EqualsTapped -> handleEqualsInput()
+			is BudgetUiIntent.SetCalculationMode -> handleSetCalculationMode(intent.enabled)
+			is BudgetUiIntent.SetDragProgress -> handleDragProgress(intent.progress)
 		}
 	}
 
 
 	private fun handleNumberInput(digit: String) {
 		val currentInput = _numpadInput.value
-		if (currentInput.length >= 10) return
 
 		_numpadInput.value = currentInput + digit
 	}
 
 	private fun handleDotInput() {
 		val currentInput = _numpadInput.value
-		// Only add decimal point if not already present
-		if (currentInput.contains(".")) return
-		if (currentInput.length >= 10) return
-		// If input is empty, add "0." for better UX
-		_numpadInput.value = if (currentInput.isEmpty()) "0." else "$currentInput."
+
+		val lastChar = currentInput.lastOrNull()
+		val isOperator = { c: Char? -> c != null && c in "+-×÷" }
+
+		// If empty or after operator, start decimal number as 0.
+		if (currentInput.isEmpty() || isOperator(lastChar)) {
+			_numpadInput.value = "$currentInput" + "0."
+			return
+		}
+
+		// Only allow one dot in current numeric segment (after last operator)
+		val lastOperatorIndex = currentInput.indexOfLast { it in "+-×÷" }
+		val currentSegment = currentInput.substring(lastOperatorIndex + 1)
+		if (currentSegment.contains(".")) return
+
+		_numpadInput.value = "$currentInput."
 	}
 
 	private fun handleBackspace() {
-		_numpadInput.value = _numpadInput.value.dropLast(1)
+		val updatedInput = _numpadInput.value.dropLast(1)
+		_numpadInput.value = updatedInput
+		if (updatedInput.none { it in "+-×÷" } && _uiState.value.isCalculation) {
+			_uiState.update { it.copy(isCalculation = false) }
+		}
+	}
+
+	private fun handleOperatorInput(operator: Char) {
+		val currentInput = _numpadInput.value
+		if (currentInput.isEmpty()) return
+
+		val lastChar = currentInput.lastOrNull() ?: return
+		// Block consecutive operators, and block operator after dot
+		if (lastChar in "+-×÷" || lastChar == '.') return
+
+		_numpadInput.value = "$currentInput$operator"
+		// Auto-enter calculation mode when user starts building an expression via operator input.
+		if (!_uiState.value.isCalculation) {
+			_uiState.update { it.copy(isCalculation = true) }
+		}
+	}
+
+	private fun handleEqualsInput() {
+		val currentInput = _numpadInput.value
+		if (currentInput.isEmpty()) return
+		
+		// Evaluate the calculation
+		val result = evaluateCalculation(currentInput)
+		if (result != null) {
+			// Replace input with the result and stay in calculation mode for continued operations
+			_numpadInput.value = result
+			if (!_uiState.value.isCalculation) {
+				_uiState.update { it.copy(isCalculation = true) }
+			}
+		}
+	}
+
+	/**
+	 * Calculation evaluator for chained arithmetic operations.
+	 * Supports +, -, ×, ÷ operators in sequence (e.g., 85+88-42=131).
+	 */
+	private fun evaluateCalculation(input: String): String? {
+		// Handle empty or whitespace-only input
+		if (input.isBlank()) return null
+
+		return try {
+			// Normalize operators: × -> * and ÷ -> /
+			val normalized = input.trim()
+				.replace("×", "*")
+				.replace("÷", "/")
+
+			// If ends with an operator, it's incomplete - return null
+			normalized.lastOrNull()?.let { if (it in "+-*/") return null }
+
+			// Check if there's any operator in the input
+			val hasOperator = normalized.any { it in "+-*/" }
+
+			// If no operator, just return the number as-is
+			if (!hasOperator) {
+				val num = normalized.toBigDecimalOrNull() ?: return null
+				return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
+					num.toBigInteger().toString()
+				} else {
+					num.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+				}
+			}
+
+			// Use a regex to split by operators
+			// This handles chained operations like "85+88-42"
+			val tokenPattern = Regex("([+\\-*/])")
+			val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
+			val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
+
+			if (parts.isEmpty() || parts[0].isEmpty()) return null
+
+			// If we have more operators than numbers, it's invalid
+			if (operators.size > parts.size - 1) return null
+
+			// Start with first number
+			var result = parts[0].toBigDecimalOrNull() ?: return null
+
+			// Process each operator-number pair
+			for (i in operators.indices) {
+				if (i + 1 >= parts.size) break
+				val operator = operators[i]
+				val nextNum = parts[i + 1].toBigDecimalOrNull() ?: return null
+
+				result = when (operator) {
+					"+" -> result + nextNum
+					"-" -> result - nextNum
+					"*" -> result * nextNum
+					"/" -> {
+						if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null // Division by zero
+						result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
+					}
+					else -> return null
+				}
+			}
+
+			// Format result without decimal if whole number
+			if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
+				result.toBigInteger().toString()
+			} else {
+				result.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+			}
+		} catch (e: Exception) {
+			null
+		}
+	}
+
+	private fun handleSetCalculationMode(enabled: Boolean) {
+		_uiState.update { it.copy(isCalculation = enabled, dragProgress = 0f) }
+	}
+
+	private fun handleDragProgress(progress: Float) {
+		_uiState.update { it.copy(dragProgress = progress) }
 	}
 
 	private fun handleApply() {
-		val input = _numpadInput.value
+		var input = _numpadInput.value
+		
+		// If in calculation mode and input contains operators, evaluate the calculation first
+		if (_uiState.value.isCalculation && input.any { it in "+-×÷" }) {
+			val calculatedResult = evaluateCalculation(input)
+			if (calculatedResult != null) {
+				input = calculatedResult
+				_numpadInput.value = calculatedResult
+			}
+		}
+		
 		if (!validateNumpadInput(input)) return
 
 		val amount = try {
 			BigDecimal(input)
 		} catch (e: NumberFormatException) {
+			return
+		}
+
+		// Prevent negative values - cannot save negative expenses
+		if (amount < BigDecimal.ZERO) {
+			_numpadInput.value = ""
 			return
 		}
 
@@ -435,6 +582,8 @@ class BudgetViewModel @Inject constructor(
 			addTransactionUseCase(transaction)
 			_numpadInput.value = ""
 			_currentComment.value = ""
+			// Exit calculation mode after saving
+			_uiState.update { it.copy(isCalculation = false) }
 		}
 	}
 
@@ -501,6 +650,10 @@ class BudgetViewModel @Inject constructor(
 	}
 
 	private fun handleEditTransaction(updatedTransaction: Transaction) {
+		// Prevent negative values - cannot save negative expenses
+		if (updatedTransaction.amount < BigDecimal.ZERO) {
+			return
+		}
 		viewModelScope.launch {
 			budgetRepository.updateTransaction(updatedTransaction)
 		}
@@ -518,6 +671,9 @@ class BudgetViewModel @Inject constructor(
 
 	private fun handleResetInput() {
 		_numpadInput.value = ""
+		if (_uiState.value.isCalculation) {
+			_uiState.update { it.copy(isCalculation = false) }
+		}
 	}
 
 	private fun handleSetEditMode(mode: EditMode) {

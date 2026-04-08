@@ -29,7 +29,9 @@ data class BudgetUiState(
     val pendingRecurrentAmount: BigDecimal? = null,
     val pendingRecurrentComment: String = "",
     val currentPeriodStartedAtMillis: Long = 0L,
-    val currentPeriodId: Long = 0L
+    val currentPeriodId: Long = 0L,
+    val isCalculation: Boolean = false,
+    val dragProgress: Float = 0f
 ) {
     companion object {
         val INITIAL = BudgetUiState()

@@ -31,11 +31,15 @@ fun NumpadWithViewModel(
             stage = if (uiState.value.numpadInput.isNotEmpty()) EditStage.EDIT_SPENT else EditStage.IDLE,
             currentSpent = uiState.value.numpadInput
         ),
+        isCalculation = uiState.value.isCalculation,
         onNumberInput = { digit ->
             viewModel.processIntent(BudgetUiIntent.NumberTapped(digit.toString()))
         },
         onDotInput = { 
             viewModel.processIntent(BudgetUiIntent.DotTapped)
+        },
+        onEqualsInput = {
+            viewModel.processIntent(BudgetUiIntent.EqualsTapped)
         },
         onBackspace = {
             viewModel.processIntent(BudgetUiIntent.BackspaceTapped)
@@ -47,6 +51,15 @@ fun NumpadWithViewModel(
             viewModel.processIntent(BudgetUiIntent.ApplyTapped)
         },
         onDelete = { },
+        onCalculationModeChanged = { isEnabled ->
+            viewModel.processIntent(BudgetUiIntent.SetCalculationMode(isEnabled))
+        },
+        onOperatorInput = { operator ->
+            viewModel.processIntent(BudgetUiIntent.OperatorTapped(operator))
+        },
+        onDragProgressChanged = { progress ->
+            viewModel.processIntent(BudgetUiIntent.SetDragProgress(progress))
+        },
         onToggleDebug = null,
         onShowSnackbar = null,
         onActivateTutorial = null,

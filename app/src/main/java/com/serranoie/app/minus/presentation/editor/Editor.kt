@@ -4,17 +4,21 @@ package com.serranoie.app.minus.presentation.editor
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTextField
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,11 +27,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.EventRepeat
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,12 +53,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.editor.category.FocusController
@@ -62,6 +72,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
+
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -74,6 +85,7 @@ import java.time.LocalDate
 fun Editor(
 	uiState: BudgetUiState,
 	animState: AnimState,
+	onInputChange: (String) -> Unit = {},
 	onFocus: () -> Unit,
 	onOpenHistory: () -> Unit,
 	onOpenSettings: () -> Unit,
@@ -154,58 +166,52 @@ if (uiState.showRecurrentDialog) {
 				},
 				modifier = Modifier
 					.weight(1f)
-					.padding(vertical = 8.dp)
+					.animateContentSize(animationSpec = tween(200))
+					.padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
 					.then(budgetPillHintAnchorModifier)
 			)
 
-			Spacer(modifier = Modifier.width(8.dp))
+			AnimatedContent(
+				targetState = animState == AnimState.EDITING,
+				transitionSpec = {
+					slideInHorizontally(animationSpec = tween(200)) { it } + fadeIn(tween(200)) togetherWith
+						slideOutHorizontally(animationSpec = tween(200)) { -it } + fadeOut(tween(200))
+				},
+				label = "topBarTrailingSwitch"
+			) { isEditing ->
+				if (isEditing) {
+					RecurrenceModeToggle(
+						isRecurrentEnabled = uiState.isRecurrentEnabled,
+						onRecurrentToggle = onRecurrentToggle,
+					)
+				} else {
+					Row(verticalAlignment = Alignment.CenterVertically) {
+						IconButton(
+							onClick = {
+								onAnalyticsClickForTutorial()
+								onOpenAnalytics()
+							},
+							modifier = Modifier
+								.size(48.dp)
+								.then(analyticsHintAnchorModifier)
+						) {
+							Icon(
+								imageVector = Icons.Rounded.BarChart,
+								contentDescription = "Analytics",
+								tint = MaterialTheme.colorScheme.onSurface,
+								modifier = Modifier.size(28.dp),
+							)
+						}
 
-			Box(
-				modifier = Modifier.width(116.dp),
-				contentAlignment = Alignment.CenterEnd,
-			) {
-				AnimatedContent(
-					targetState = animState == AnimState.EDITING,
-					transitionSpec = {
-						fadeIn(tween(durationMillis = 120, delayMillis = 90)) togetherWith
-								fadeOut(tween(durationMillis = 90))
-					},
-					label = "topBarTrailingSwitch"
-				) { isEditing ->
-					if (isEditing) {
-						RecurrenceModeToggle(
-							isRecurrentEnabled = uiState.isRecurrentEnabled,
-							onRecurrentToggle = onRecurrentToggle,
-						)
-					} else {
-						Row(verticalAlignment = Alignment.CenterVertically) {
-							IconButton(
-								onClick = {
-									onAnalyticsClickForTutorial()
-									onOpenAnalytics()
-								},
-								modifier = Modifier
-									.size(48.dp)
-									.then(analyticsHintAnchorModifier)
-							) {
-								Icon(
-									imageVector = Icons.Rounded.BarChart,
-									contentDescription = "Analytics",
-									tint = MaterialTheme.colorScheme.onSurface,
-									modifier = Modifier.size(28.dp),
-								)
-							}
-
-							IconButton(
-								onClick = { onOpenSettings() }, modifier = Modifier.size(48.dp)
-							) {
-								Icon(
-									imageVector = Icons.Filled.Settings,
-									contentDescription = "Settings",
-									tint = MaterialTheme.colorScheme.onSurface,
-									modifier = Modifier.size(28.dp),
-								)
-							}
+						IconButton(
+							onClick = { onOpenSettings() }, modifier = Modifier.size(48.dp)
+						) {
+							Icon(
+								imageVector = Icons.Rounded.Settings,
+								contentDescription = "Settings",
+								tint = MaterialTheme.colorScheme.onSurface,
+								modifier = Modifier.size(28.dp),
+							)
 						}
 					}
 				}
@@ -225,7 +231,9 @@ if (uiState.showRecurrentDialog) {
 				AnimState.EDITING -> {
 					EditingContent(
 						input = uiState.numpadInput,
+						onInputChange = onInputChange,
 						currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+						isCalculation = uiState.isCalculation,
 						tags = uiState.tags,
 						currentComment = uiState.currentComment,
 						onCommentUpdate = onCommentUpdate,
@@ -262,13 +270,11 @@ if (uiState.showRecurrentDialog) {
 		}
 	}
 
-	// Period switcher bottom sheet (opened by tapping the pill)
 	if (showBottomSheet) {
 		ModalBottomSheet(
 			onDismissRequest = { showBottomSheet = false },
 			sheetState = sheetState,
 		) {
-			// Wrap in Box with heightIn to provide bounded constraints for the scrollable content
 			Box(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -282,7 +288,6 @@ if (uiState.showRecurrentDialog) {
 					startInEditMode = forceWalletSetup || uiState.budgetSettings == null,
 					onPeriodSelected = { newPeriod ->
 					selectedViewPeriod = newPeriod
-					// Also persist the period to budget settings
 					onChangePeriod(newPeriod)
 				},
 					onSaveBudget = { newSettings ->
@@ -313,7 +318,9 @@ if (uiState.showRecurrentDialog) {
 @Composable
 private fun EditingContent(
 	input: String,
+	onInputChange: (String) -> Unit,
 	currencyCode: String,
+	isCalculation: Boolean,
 	tags: List<String>,
 	currentComment: String,
 	onCommentUpdate: (String) -> Unit,
@@ -321,19 +328,55 @@ private fun EditingContent(
 	modifier: Modifier = Modifier
 ) {
 	val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
+	val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
 
-	val formattedInput = remember(input, currencyCode) {
-		try {
-			val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
-			currencyFormat.format(value)
-		} catch (e: Exception) {
-			input.ifEmpty { currencyFormat.format(BigDecimal.ZERO) }
+	val hasExpressionOperators = remember(input) { input.any { it in "+-×÷" } }
+	val showCalculationUi = isCalculation || hasExpressionOperators
+
+	val calculationResult = remember(input, showCalculationUi) {
+		if (!showCalculationUi || input.isEmpty()) return@remember null
+
+		// Do not attempt evaluate while expression is incomplete (trailing operator/dot)
+		val last = input.lastOrNull()
+		if (last != null && (last in "+-×÷" || last == '.')) {
+			null
+		} else {
+			evaluateCalculation(input)
 		}
 	}
 
-	Box(
+	val displayContent = if (showCalculationUi) {
+		"$currencySymbol $input"
+	} else {
+		try {
+			val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
+			" ${currencyFormat.format(value)}"
+		} catch (e: Exception) {
+			input.ifEmpty { " ${currencyFormat.format(BigDecimal.ZERO)}" }
+		}
+	}
+
+	// Base text style - AutoResizeBasicTextField handles font sizing internally
+	val baseTextStyle = MaterialTheme.typography.displayLarge.copy(
+		fontWeight = FontWeight.Bold
+	)
+
+	BoxWithConstraints(
 		modifier = modifier.fillMaxSize()
 	) {
+		// Get available dimensions for AutoResizeBasicTextField (in PX)
+		val density = LocalDensity.current
+		val availableWidth = maxWidth - 32.dp // Account for 16dp padding on each side
+		val availableHeight = maxHeight
+		val containerSizePx = remember(availableWidth, availableHeight, density) {
+			with(density) {
+				androidx.compose.ui.unit.IntSize(
+					width = availableWidth.toPx().toInt(),
+					height = availableHeight.toPx().toInt()
+				)
+			}
+		}
+
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
@@ -341,12 +384,73 @@ private fun EditingContent(
 				.align(Alignment.TopEnd),
 			contentAlignment = Alignment.TopEnd
 		) {
-			Text(
-				text = formattedInput,
-				style = MaterialTheme.typography.displayLarge,
-				color = MaterialTheme.colorScheme.onSurface,
-				textAlign = TextAlign.End
-			)
+			AnimatedContent(
+				targetState = if (showCalculationUi && calculationResult != null) "result" else "input",
+				transitionSpec = {
+					(fadeIn(animationSpec = tween(200)) + slideInHorizontally(animationSpec = tween(200)) { it / 4 }) togetherWith
+						(fadeOut(animationSpec = tween(200)) + slideOutHorizontally(animationSpec = tween(200)) { -it / 4 })
+				},
+				label = "EditorNumberTransition",
+				modifier = Modifier.fillMaxWidth()
+			) { state ->
+				if (state == "result" && showCalculationUi && calculationResult != null) {
+					// Show calculation expression and result with auto-resize on both lines
+					Column(
+					 	horizontalAlignment = Alignment.End,
+						modifier = Modifier.fillMaxWidth()
+					) {
+						AutoResizeBasicTextField(
+							value = displayContent,
+							onValueChange = {},
+							readOnly = true,
+							modifier = Modifier.fillMaxWidth(),
+							textStyle = baseTextStyle.copy(
+								color = MaterialTheme.colorScheme.onSurface,
+								textAlign = TextAlign.End
+							),
+							singleLine = true,
+							minFontSize = 20.sp,
+							maxFontSize = 57.sp,
+							containerSize = containerSizePx
+						)
+						AutoResizeBasicTextField(
+							value = "= ${currencySymbol}$calculationResult",
+							onValueChange = {},
+							readOnly = true,
+							modifier = Modifier
+								.fillMaxWidth()
+								.padding(top = 4.dp),
+							textStyle = MaterialTheme.typography.headlineMedium.copy(
+								color = MaterialTheme.colorScheme.onSurfaceVariant,
+								textAlign = TextAlign.End
+							),
+							singleLine = true,
+							minFontSize = 16.sp,
+							maxFontSize = 36.sp,
+							containerSize = containerSizePx
+						)
+					}
+				} else {
+					AutoResizeBasicTextField(
+						value = input,
+						onValueChange = onInputChange,
+						modifier = Modifier.fillMaxWidth(),
+						textStyle = baseTextStyle.copy(
+							color = MaterialTheme.colorScheme.onSurface,
+							textAlign = TextAlign.End
+						),
+						singleLine = true,
+						minFontSize = 20.sp,
+						maxFontSize = 57.sp,
+						containerSize = containerSizePx,
+						decorationBox = { innerTextField ->
+							Box {
+								innerTextField()
+							}
+						}
+					)
+				}
+			}
 		}
 
 		// Category toolbar at the bottom
@@ -365,8 +469,78 @@ private fun EditingContent(
 }
 
 /**
- * Recurrence switch styled with the same pill geometry as BudgetPill.
+ * Calculation evaluator for chained arithmetic operations.
+ * Supports +, -, ×, ÷ operators in sequence (e.g., 85+88-42=131).
  */
+private fun evaluateCalculation(input: String): String? {
+	// Handle empty or whitespace-only input
+	if (input.isBlank()) return null
+
+	return try {
+		// Normalize operators: × -> * and ÷ -> /
+		val normalized = input.trim()
+			.replace("×", "*")
+			.replace("÷", "/")
+
+		// If ends with an operator, it's incomplete - return null
+		normalized.lastOrNull()?.let { if (it in "+-*/") return null }
+
+		// Check if there's any operator in the input
+		val hasOperator = normalized.any { it in "+-*/" }
+
+		// If no operator, just return the number as-is
+		if (!hasOperator) {
+			val num = normalized.toBigDecimalOrNull() ?: return null
+			return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
+				num.toBigInteger().toString()
+			} else {
+				num.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+			}
+		}
+
+		// Use a regex to split by operators
+		// This handles chained operations like "85+88-42"
+		val tokenPattern = Regex("([+\\-*/])")
+		val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
+		val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
+
+		if (parts.isEmpty() || parts[0].isEmpty()) return null
+
+		// If we have more operators than numbers, it's invalid
+		if (operators.size > parts.size - 1) return null
+
+		// Start with first number
+		var result = parts[0].toBigDecimalOrNull() ?: return null
+
+		// Process each operator-number pair
+		for (i in operators.indices) {
+			if (i + 1 >= parts.size) break
+			val operator = operators[i]
+			val nextNum = parts[i + 1].toBigDecimalOrNull() ?: return null
+
+			result = when (operator) {
+				"+" -> result + nextNum
+				"-" -> result - nextNum
+				"*" -> result * nextNum
+				"/" -> {
+					if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null // Division by zero
+					result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
+				}
+				else -> return null
+			}
+		}
+
+		// Format result without decimal if whole number
+		if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
+			result.toBigInteger().toString()
+		} else {
+			result.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+		}
+	} catch (e: Exception) {
+		null
+	}
+}
+
 @Composable
 private fun RecurrenceModeToggle(
 	isRecurrentEnabled: Boolean,
@@ -395,10 +569,10 @@ private fun RecurrenceModeToggle(
 				.padding(horizontal = 14.dp, vertical = 8.dp),
 			contentAlignment = Alignment.Center,
 		) {
-			Text(
-				text = "Recurring",
-				style = MaterialTheme.typography.titleSmall,
-				color = contentColor,
+			Icon(
+				imageVector = Icons.Rounded.EventRepeat,
+				contentDescription = "Recurrent payment",
+				modifier = Modifier.size(24.dp)
 			)
 		}
 	}

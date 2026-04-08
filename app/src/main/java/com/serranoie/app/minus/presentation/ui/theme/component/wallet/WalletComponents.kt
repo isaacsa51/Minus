@@ -35,6 +35,7 @@ import com.serranoie.app.minus.presentation.ui.theme.colorEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorPrimary
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
+import com.serranoie.app.minus.presentation.util.CurrencyAmountInputVisualTransformation
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 import java.text.DecimalFormat
@@ -261,10 +262,12 @@ fun BudgetEditor(
 	}
 
 	// Format initial budget with currency (plain format)
+	// Store as raw digits for currency input transformation
 	var budgetText by remember(initialBudget) {
 		mutableStateOf(
 			if (initialBudget > BigDecimal.ZERO) {
-				plainNumberFormat.format(initialBudget)
+				// Convert to cents (multiply by 100 and round)
+				(initialBudget.multiply(BigDecimal(100)).toBigInteger()).toString()
 			} else ""
 		)
 	}
@@ -292,18 +295,19 @@ fun BudgetEditor(
 			modifier = Modifier.padding(bottom = 8.dp),
 		)
 
-		// Parse budget from text for display
-		val parsedBudget = budgetText.toBigDecimalOrNull() ?: BigDecimal.ZERO
-
 		OutlinedTextField(
-			value = if (budgetText.isBlank()) "" else plainNumberFormat.format(parsedBudget),
+			value = budgetText,
 			onValueChange = { newValue ->
+				// Only allow digits
 				val filtered = newValue.filter { it.isDigit() }
 				budgetText = filtered
-				filtered.toBigDecimalOrNull()?.let(onBudgetChange)
+				// Convert from cents to actual amount
+				val amount = filtered.toBigDecimalOrNull()?.divide(BigDecimal(100)) ?: BigDecimal.ZERO
+				onBudgetChange(amount)
 			},
+			visualTransformation = CurrencyAmountInputVisualTransformation(),
 			keyboardOptions = KeyboardOptions(
-				keyboardType = KeyboardType.Number,
+				keyboardType = KeyboardType.NumberPassword,
 			),
 			modifier = Modifier.fillMaxWidth(),
 			singleLine = true,

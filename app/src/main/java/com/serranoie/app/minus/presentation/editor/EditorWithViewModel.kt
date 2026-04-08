@@ -28,7 +28,11 @@ fun EditorWithViewModel(
 	Editor(
 		uiState = uiState,
 		animState = uiState.animState,
-				onFocus = {
+		onInputChange = { newInput ->
+			// For now, direct keyboard input is not supported
+			// Users can type using the numpad buttons
+		},
+		onFocus = {
 			if (uiState.numpadInput.isNotEmpty() && uiState.animState != AnimState.EDITING) {
 				viewModel.processIntent(BudgetUiIntent.SetAnimState(AnimState.EDITING))
 			}

@@ -14,6 +14,10 @@ sealed interface BudgetUiIntent {
     data object BackspaceTapped : BudgetUiIntent
     data object ApplyTapped : BudgetUiIntent
     data object ResetInputTapped : BudgetUiIntent
+    data class OperatorTapped(val operator: Char) : BudgetUiIntent
+    data object EqualsTapped : BudgetUiIntent
+    data class SetCalculationMode(val enabled: Boolean) : BudgetUiIntent
+    data class SetDragProgress(val progress: Float) : BudgetUiIntent
 
     data class DeleteTransactionTapped(val transaction: Transaction) : BudgetUiIntent
     data class EditTransactionTapped(val updatedTransaction: Transaction) : BudgetUiIntent

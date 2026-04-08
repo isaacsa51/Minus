@@ -28,6 +28,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -69,10 +73,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetLayout
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetValue
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.settingsDataStore
-import androidx.compose.material3.Text
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.serranoie.app.minus.presentation.ui.theme.component.DeleteUndoSnackbar
-import com.serranoie.app.minus.presentation.ui.theme.component.DeleteUndoSnackbarState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
@@ -98,9 +99,10 @@ fun MainScreen(
 	val windowSizeClass = LocalWindowSize.current
 	val windowInsets = LocalWindowInsets.current
 
-	val onboardingCompleted by context.settingsDataStore.data.map {
-		it[ONBOARDING_COMPLETED_KEY] ?: false
-	}.collectAsStateWithLifecycle(initialValue = false)
+	val onboardingCompletedFlow = remember(context) {
+		context.settingsDataStore.data.map { it[ONBOARDING_COMPLETED_KEY] ?: false }
+	}
+	val onboardingCompleted by onboardingCompletedFlow.collectAsStateWithLifecycle(initialValue = false)
 	val tutorialStage by context.firstLaunchTutorialStageFlow()
 		.collectAsStateWithLifecycle(initialValue = FirstLaunchTutorialStage.COMPLETED)
 
@@ -124,9 +126,9 @@ fun MainScreen(
 			null
 		)
 	}
-	var deleteUndoState by remember { mutableStateOf<DeleteUndoSnackbarState?>(null) }
 	var snackbarAutoDismissJob by remember { mutableStateOf<Job?>(null) }
 	var pendingDeleteJob by remember { mutableStateOf<Job?>(null) }
+	val snackbarHostState = remember { SnackbarHostState() }
 
 	fun executeDelete(transaction: com.serranoie.app.minus.domain.model.Transaction) {
 		budgetViewModel.processIntent(BudgetUiIntent.DeleteTransactionTapped(transaction))
@@ -138,7 +140,7 @@ fun MainScreen(
 		snackbarAutoDismissJob?.cancel()
 		snackbarAutoDismissJob = null
 		pendingDeleteTransaction = null
-		deleteUndoState = null
+		snackbarHostState.currentSnackbarData?.dismiss()
 	}
 
 	fun queueDeleteWithUndo(
@@ -149,12 +151,17 @@ fun MainScreen(
 		snackbarAutoDismissJob?.cancel()
 
 		pendingDeleteTransaction = transaction
-		deleteUndoState = DeleteUndoSnackbarState(
-			message = message,
-			onUndo = { cancelPendingDelete() },
-			actionLabel = "UNDO",
-			autoDismissMillis = 3800L
-		)
+
+		coroutineScope.launch {
+			val result = snackbarHostState.showSnackbar(
+				message = message,
+				actionLabel = "UNDO",
+				duration = androidx.compose.material3.SnackbarDuration.Short,
+			)
+			if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+				cancelPendingDelete()
+			}
+		}
 
 		// Start delete timer (3.5s window for undo)
 		pendingDeleteJob = coroutineScope.launch {
@@ -164,41 +171,23 @@ fun MainScreen(
 			}
 			// Auto-hide snackbar after delete completes
 			delay(300L)
-			deleteUndoState = null
 			pendingDeleteTransaction = null
 			pendingDeleteJob = null
-		}
-
-		// Auto-hide snackbar if user doesn't interact
-		snackbarAutoDismissJob = coroutineScope.launch {
-			delay(3800L)
-			if (deleteUndoState?.message == message) {
-				deleteUndoState = null
-			}
 		}
 	}
 
 	fun hideGlobalSnackbar() {
 		snackbarAutoDismissJob?.cancel()
 		snackbarAutoDismissJob = null
-		deleteUndoState = null
 	}
 
 	fun showInfoSnackbar(message: String) {
 		snackbarAutoDismissJob?.cancel()
-		deleteUndoState = DeleteUndoSnackbarState(
-			message = message,
-			onUndo = null,
-			actionLabel = null,
-			autoDismissMillis = 2200L,
-			icon = Icons.Rounded.Delete,
-			iconTintIsError = false
-		)
-		snackbarAutoDismissJob = coroutineScope.launch {
-			delay(2200L)
-			if (deleteUndoState?.message == message) {
-				deleteUndoState = null
-			}
+		coroutineScope.launch {
+			snackbarHostState.showSnackbar(
+				message = message,
+				duration = androidx.compose.material3.SnackbarDuration.Short,
+			)
 		}
 	}
 
@@ -240,7 +229,7 @@ fun MainScreen(
 
 		val navigationBarOffset = windowInsets.calculateBottomPadding().coerceAtLeast(16.dp)
 
-		val internalKeyboardHeight = if (windowSizeClass == WindowWidthSizeClass.Compact) {
+		val defaultInternalKeyboardHeight = if (windowSizeClass == WindowWidthSizeClass.Compact) {
 			contentWidth
 		} else {
 			contentWidth / 2f
@@ -249,18 +238,27 @@ fun MainScreen(
 		val systemKeyboardHeight = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
 		val isShowSystemKeyboard = systemKeyboardHeight != 0.dp
 
-		val currentKeyboardHeight = if (isShowSystemKeyboard) {
+		val calcModeKeyboardHeight = (contentHeight * 0.6f).coerceAtMost(contentHeight - with(localDensity) { navigationBarOffset.toPx()/* + 96.dp.toPx()*/ })
+		
+		val dragProgress = budgetUiState.dragProgress
+		val effectiveProgress = if (budgetUiState.isCalculation) {
+			1f - dragProgress
+		} else {
+			dragProgress
+		}
+		
+		val targetKeyboardHeight = if (isShowSystemKeyboard) {
 			with(localDensity) { systemKeyboardHeight.toPx() }
 		} else {
-			internalKeyboardHeight
+			defaultInternalKeyboardHeight + (calcModeKeyboardHeight - defaultInternalKeyboardHeight) * effectiveProgress
 		}
 
 		val editorHeight by remember(
-			contentHeight, currentKeyboardHeight, keyboardAdditionalOffset, navigationBarOffset
+			contentHeight, targetKeyboardHeight, keyboardAdditionalOffset, navigationBarOffset, budgetUiState.isCalculation, dragProgress
 		) {
 			derivedStateOf {
 				contentHeight.minus(
-					currentKeyboardHeight.plus(with(localDensity) {
+					targetKeyboardHeight.plus(with(localDensity) {
 						keyboardAdditionalOffset.toPx()
 					}).coerceAtLeast(0f)
 				)
@@ -271,7 +269,13 @@ fun MainScreen(
 		val editorHeightAnimated by animateFloatAsState(
 			label = "editorHeightAnimatedValue",
 			targetValue = editorHeight,
-			animationSpec = tween(durationMillis = 350),
+			animationSpec = tween(durationMillis = 120),
+		)
+
+		val keyboardHeightAnimated by animateFloatAsState(
+			label = "keyboardHeightAnimatedValue",
+			targetValue = targetKeyboardHeight,
+			animationSpec = tween(durationMillis = 50),
 		)
 
 		Row {
@@ -338,7 +342,9 @@ fun MainScreen(
 							),
 							modifier = Modifier
 								.fillMaxWidth()
-								.height(with(localDensity) { internalKeyboardHeight.toDp() })
+								.height(with(localDensity) {
+									keyboardHeightAnimated.toDp().coerceAtLeast(220.dp)
+								})
 						) {
 							Box(
 								modifier = Modifier
@@ -439,7 +445,9 @@ fun MainScreen(
 							),
 							modifier = Modifier
 								.fillMaxWidth()
-								.height(with(localDensity) { internalKeyboardHeight.toDp() })
+								.height(with(localDensity) {
+									keyboardHeightAnimated.toDp().coerceAtLeast(220.dp)
+								})
 						) {
 							Box(
 								modifier = Modifier
@@ -462,18 +470,13 @@ fun MainScreen(
 			}
 		}
 
-		deleteUndoState?.let { state ->
-			DeleteUndoSnackbar(
-				message = state.message,
-				onUndo = state.onUndo,
-				actionLabel = state.actionLabel,
-				icon = state.icon,
-				iconTintIsError = state.iconTintIsError,
-				modifier = Modifier
-					.align(Alignment.BottomCenter)
-					.padding(horizontal = 16.dp, vertical = 20.dp)
-			)
-		}
+		SnackbarHost(
+			hostState = snackbarHostState,
+			modifier = Modifier
+				.align(Alignment.BottomCenter)
+				.padding(horizontal = 16.dp, vertical = 20.dp)
+				.navigationBarsPadding()
+		)
 	}
 }
 
