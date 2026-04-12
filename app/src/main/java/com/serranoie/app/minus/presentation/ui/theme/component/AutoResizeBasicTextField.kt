@@ -48,12 +48,10 @@ fun AutoResizeBasicTextField(
 	// Optional: pass container size from parent (BoxWithConstraints) to avoid self-measurement shake
 	containerSize: IntSize = IntSize.Zero,
 ) {
-	// Get the transformed value for measurement
 	val transformedValue = remember(value, visualTransformation) {
 		visualTransformation.filter(AnnotatedString(value)).text.text
 	}
 
-	// Calculate font size using real text measurement (no shake loop because size comes from parent)
 	val adaptiveFontSize = if (
 		containerSize.width > 0 &&
 		containerSize.height > 0 &&

@@ -85,8 +85,8 @@ dependencies {
 	implementation("androidx.compose.ui:ui-util:1.8.3")
 	implementation("androidx.compose.material3:material3:1.5.0-alpha14")
 	implementation("androidx.compose.material3:material3-window-size-class:1.5.0-alpha14")
-	implementation("androidx.compose.animation:animation:1.8.3")
-	implementation("androidx.compose.ui:ui-tooling-preview:1.8.3")
+	implementation("androidx.compose.animation:animation:1.10.6")
+	implementation("androidx.compose.ui:ui-tooling-preview:1.10.6")
 	implementation("androidx.datastore:datastore-preferences:1.1.7")
 	implementation("androidx.recyclerview:recyclerview:1.4.0")
 	implementation("androidx.room:room-runtime:2.7.2")
@@ -123,6 +123,6 @@ dependencies {
 
 //	implementation("io.github.klassenkonstantin:snappyswipe:0.0.3")
 
-	debugImplementation("androidx.compose.ui:ui-tooling:1.8.3")
+	debugImplementation("androidx.compose.ui:ui-tooling:1.10.6")
 	debugImplementation("androidx.compose.ui:ui-test-manifest:1.8.3")
 }

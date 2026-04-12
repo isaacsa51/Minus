@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
@@ -15,15 +17,17 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -32,13 +36,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 
 /**
  * Dialog for configuring recurrent expense settings.
@@ -56,27 +63,15 @@ fun RecurrentExpenseDialog(
     val budgetEndDate = budgetSettings?.getPeriodEndDate() ?: today.plusDays(30)
     val budgetStartDate = budgetSettings?.startDate ?: today
 
-    // Day of month selection (1-31) - always available
+    var selectedFrequency by remember { mutableStateOf(RecurrentFrequency.MONTHLY) }
+
     var selectedDay by remember { mutableIntStateOf(today.dayOfMonth.coerceIn(1, 28)) }
     var showDayDropdown by remember { mutableStateOf(false) }
-    
-    // Calculate suggested frequency based on selected day and budget period
-    val suggestedFrequency by remember(selectedDay, budgetStartDate, budgetEndDate, today) {
-        derivedStateOf {
-            calculateSuggestedFrequency(selectedDay, budgetStartDate, budgetEndDate, today)
-        }
-    }
-    
-    // End date - extend to ensure at least one billing cycle
+
     var showDatePicker by remember { mutableStateOf(false) }
-    val defaultEndDate = remember(suggestedFrequency, selectedDay, budgetEndDate) {
-        // Always extend end date to cover at least 3 months for any subscription
-        // This ensures multiple billing cycles occur
-        budgetEndDate.plusMonths(3)
-    }
+    val defaultEndDate = remember(budgetEndDate) { budgetEndDate.plusMonths(3) }
     var selectedEndDate by remember { mutableStateOf(defaultEndDate) }
 
-    // Date picker dialog
     if (showDatePicker) {
         val maxSelectableDate = today.plusMonths(12) // Allow up to 1 year
         
@@ -117,174 +112,144 @@ fun RecurrentExpenseDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(
-                text = "Configure Recurrent Expense",
-                style = MaterialTheme.typography.headlineSmall
-            )
+            Column {
+                Text(
+                    text = "Agregar gasto recurrente",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = "Configura cómo se repetirá este gasto",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Day of month selection - always shown as primary input
-                Text(
-                    text = "Billing Day of Month:",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
-                ExposedDropdownMenuBox(
-                    expanded = showDayDropdown,
-                    onExpandedChange = { showDayDropdown = it }
+                Text("Frecuencia", style = MaterialTheme.typography.labelMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
-                        value = "$selectedDay",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Day of month") },
-                        trailingIcon = { 
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDayDropdown) 
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    )
-                    
-                    ExposedDropdownMenu(
+                    RecurrentFrequency.entries.forEach { freq ->
+                        val isSelected = selectedFrequency == freq
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { selectedFrequency = freq },
+                            label = {
+                                Text(
+                                    when (freq) {
+                                        RecurrentFrequency.WEEKLY -> "Semanal"
+                                        RecurrentFrequency.BIWEEKLY -> "Quincenal"
+                                        RecurrentFrequency.MONTHLY -> "Mensual"
+                                    }
+                                )
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                if (selectedFrequency == RecurrentFrequency.MONTHLY) {
+                    ExposedDropdownMenuBox(
                         expanded = showDayDropdown,
-                        onDismissRequest = { showDayDropdown = false }
+                        onExpandedChange = { showDayDropdown = it }
                     ) {
-                        (1..31).forEach { day ->
-                            DropdownMenuItem(
-                                text = { Text("$day") },
-                                onClick = {
-                                    selectedDay = day
-                                    showDayDropdown = false
-                                }
-                            )
+                        OutlinedTextField(
+                            value = "Día $selectedDay del mes",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Día de cobro") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDayDropdown) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = showDayDropdown,
+                            onDismissRequest = { showDayDropdown = false }
+                        ) {
+                            (1..31).forEach { day ->
+                                DropdownMenuItem(
+                                    text = { Text("$day") },
+                                    onClick = {
+                                        selectedDay = day
+                                        showDayDropdown = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
 
-                // Show calculated frequency and explanation
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                val frequency = suggestedFrequency
-                val recurrenceText = when (frequency) {
-                    RecurrentFrequency.WEEKLY -> "Weekly (every 7 days)"
-                    RecurrentFrequency.BIWEEKLY -> "Biweekly (every 14 days)"
-                    RecurrentFrequency.MONTHLY -> "Monthly"
-                }
-                
-                Text(
-                    text = "Recurrence: $recurrenceText",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                Text("Finaliza suscripción", style = MaterialTheme.typography.labelMedium)
+                OutlinedTextField(
+                    value = selectedEndDate.toString(),
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Fecha de finalización") },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = null
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 2.dp),
+                    singleLine = true,
+                    enabled = false
                 )
-                
-                // User-friendly explanation
-                val explanation = buildRecurrenceExplanation(
-                    frequency = frequency,
-                    selectedDay = selectedDay,
-                    budgetStartDate = budgetStartDate,
-                    budgetEndDate = budgetEndDate,
-                    today = today
-                )
-                
-                Text(
-                    text = explanation,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // End date selection
-                Text(
-                    text = "Subscription ends:",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Button(
+                TextButton(
                     onClick = { showDatePicker = true },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text(
-                        text = selectedEndDate.toString(),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Text("Seleccionar fecha")
                 }
 
-                Text(
-                    text = "You can extend this date for longer subscriptions",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                )
+                // Summary / explanation card
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceDim,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = "Resumen",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = buildRecurrenceExplanation(
+                                frequency = selectedFrequency,
+                                selectedDay = selectedDay,
+                                budgetStartDate = budgetSettings?.startDate ?: today,
+                                budgetEndDate = budgetEndDate,
+                                today = today
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         },
         confirmButton = {
-            Button(
-                onClick = { 
-                    val frequency = suggestedFrequency
-                    // Pass subscriptionDay for monthly, null for weekly/biweekly
-                    val subscriptionDay = if (frequency == RecurrentFrequency.MONTHLY) {
-                        selectedDay
-                    } else null
-                    onConfirm(frequency, selectedEndDate, subscriptionDay) 
-                }
-            ) {
-                Text("Save")
+            Button(onClick = { onConfirm(selectedFrequency, selectedEndDate, selectedDay) }) {
+                Text("Guardar")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Cancelar")
             }
         }
     )
 }
 
-/**
- * Calculate the suggested frequency based on the selected billing day and budget period.
- * - If selected day is within next 7 days: Weekly
- * - If selected day is within next 14 days: Biweekly  
- * - Otherwise: Monthly
- */
-private fun calculateSuggestedFrequency(
-    selectedDay: Int,
-    budgetStartDate: LocalDate,
-    budgetEndDate: LocalDate,
-    today: LocalDate
-): RecurrentFrequency {
-    // Calculate the actual date of the selected day in the current or next month
-    var targetDate = today.withDayOfMonth(selectedDay.coerceAtMost(today.lengthOfMonth()))
-    
-    // If that day has already passed this month, move to next month
-    if (targetDate.isBefore(today) || targetDate.isEqual(today)) {
-        targetDate = targetDate.plusMonths(1)
-        // Adjust for months with fewer days
-        val maxDay = targetDate.lengthOfMonth()
-        if (selectedDay > maxDay) {
-            targetDate = targetDate.withDayOfMonth(maxDay)
-        }
-    }
-    
-    // Calculate days from today to the target billing date
-    val daysUntil = ChronoUnit.DAYS.between(today, targetDate).toInt()
-    
-    return when {
-        daysUntil <= 7 -> RecurrentFrequency.WEEKLY
-        daysUntil <= 14 -> RecurrentFrequency.BIWEEKLY
-        else -> RecurrentFrequency.MONTHLY
-    }
-}
-
-/**
- * Build a user-friendly explanation of when the expense will occur.
- */
 private fun buildRecurrenceExplanation(
     frequency: RecurrentFrequency,
     selectedDay: Int,
@@ -292,7 +257,6 @@ private fun buildRecurrenceExplanation(
     budgetEndDate: LocalDate,
     today: LocalDate
 ): String {
-    // Calculate when the first charge will happen
     var firstChargeDate = today.withDayOfMonth(selectedDay.coerceAtMost(today.lengthOfMonth()))
     if (firstChargeDate.isBefore(today) || firstChargeDate.isEqual(today)) {
         firstChargeDate = firstChargeDate.plusMonths(1)
@@ -303,17 +267,34 @@ private fun buildRecurrenceExplanation(
     }
     
     val isInCurrentPeriod = !firstChargeDate.isBefore(budgetStartDate) && !firstChargeDate.isAfter(budgetEndDate)
-    val periodText = if (isInCurrentPeriod) "current" else "next"
-    
+    val periodText = if (isInCurrentPeriod) "actual" else "siguiente"
+
     return when (frequency) {
-        RecurrentFrequency.WEEKLY -> 
-            "This expense will charge every 7 days starting from day $selectedDay. " +
-            "First charge: $firstChargeDate (in the $periodText budget period)."
-        RecurrentFrequency.BIWEEKLY -> 
-            "This expense will charge every 14 days starting from day $selectedDay. " +
-            "First charge: $firstChargeDate (in the $periodText budget period)."
-        RecurrentFrequency.MONTHLY -> 
-            "This expense will charge monthly on day $selectedDay of each month. " +
-            "First charge: $firstChargeDate (in the $periodText budget period)."
+        RecurrentFrequency.WEEKLY ->
+            "Este gasto se cobrará cada 7 días comenzando desde el día $selectedDay. " +
+                "Primer cobro: $firstChargeDate (en el período presupuestario $periodText)."
+        RecurrentFrequency.BIWEEKLY ->
+            "Este gasto se cobrará cada 14 días comenzando desde el día $selectedDay. " +
+                "Primer cobro: $firstChargeDate (en el período presupuestario $periodText)."
+        RecurrentFrequency.MONTHLY ->
+            "Este gasto se cobrará mensualmente el día $selectedDay de cada mes. " +
+                "Primer cobro: $firstChargeDate (en el período presupuestario $periodText)."
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RecurrentExpenseDialogPreview() {
+    MinusTheme {
+        RecurrentExpenseDialog(
+            budgetSettings = BudgetSettings(
+                totalBudget = BigDecimal("500.00"),
+                period = BudgetPeriod.MONTHLY,
+                startDate = LocalDate.now(),
+                currencyCode = "USD"
+            ),
+            onDismiss = {},
+            onConfirm = { _, _, _ -> }
+        )
     }
 }

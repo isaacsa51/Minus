@@ -16,51 +16,50 @@ import androidx.wear.compose.material.rememberSwipeableState
 import androidx.wear.compose.material.swipeable
 
 enum class SwipeDirection {
-    Left,
-    Initial,
-    Right,
+	Left, Initial, Right,
 }
 
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun SwipeableSnackbarHost(hostState: SnackbarHostState) {
-    if (hostState.currentSnackbarData == null) { return }
-    var size by remember { mutableStateOf(Size.Zero) }
-    val swipeableState = rememberSwipeableState(SwipeDirection.Initial)
-    val width = remember(size) {
-        if (size.width == 0f) {
-            1f
-        } else {
-            size.width
-        }
-    }
-    if (swipeableState.isAnimationRunning) {
-        DisposableEffect(Unit) {
-            onDispose {
-                when (swipeableState.currentValue) {
-                    SwipeDirection.Right,
-                    SwipeDirection.Left -> {
-                        hostState.currentSnackbarData?.dismiss()
-                    }
-                    else -> {
-                        return@onDispose
-                    }
-                }
-            }
-        }
-    }
-    val offset = with(LocalDensity.current) {
-        swipeableState.offset.value.toDp()
-    }
-    SnackbarHost(
-        hostState,
-        snackbar = { snackbarData ->
-            Snackbar(
-                snackbarData,
-                modifier = Modifier.offset(x = offset)
-            )
-        },
-        modifier = Modifier
+	if (hostState.currentSnackbarData == null) {
+		return
+	}
+	var size by remember { mutableStateOf(Size.Zero) }
+	val swipeableState = rememberSwipeableState(SwipeDirection.Initial)
+	val width = remember(size) {
+		if (size.width == 0f) {
+			1f
+		} else {
+			size.width
+		}
+	}
+	if (swipeableState.isAnimationRunning) {
+		DisposableEffect(Unit) {
+			onDispose {
+				when (swipeableState.currentValue) {
+					SwipeDirection.Right, SwipeDirection.Left -> {
+						hostState.currentSnackbarData?.dismiss()
+					}
+
+					else -> {
+						return@onDispose
+					}
+				}
+			}
+		}
+	}
+	val offset = with(LocalDensity.current) {
+		swipeableState.offset.value.toDp()
+	}
+	SnackbarHost(
+		hostState,
+		snackbar = { snackbarData ->
+			Snackbar(
+				snackbarData, modifier = Modifier.offset(x = offset)
+			)
+		},
+		modifier = Modifier
             .onSizeChanged { size = Size(it.width.toFloat(), it.height.toFloat()) }
             .swipeable(
                 state = swipeableState,
@@ -72,5 +71,5 @@ fun SwipeableSnackbarHost(hostState: SnackbarHostState) {
                 thresholds = { _, _ -> FractionalThreshold(0.3f) },
                 orientation = Orientation.Horizontal
             )
-    )
+	)
 }

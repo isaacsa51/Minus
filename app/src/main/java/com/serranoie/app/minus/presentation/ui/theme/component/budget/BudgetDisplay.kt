@@ -46,12 +46,9 @@ import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.countDays
 import com.serranoie.app.minus.presentation.util.prettyDate
 import java.math.BigDecimal
-import java.text.NumberFormat
 import java.time.LocalDate
 import java.util.Calendar
-import java.util.Currency
 import java.util.Date
-import java.util.Locale
 
 const val DAY = 24 * 60 * 60 * 1000
 
@@ -72,7 +69,8 @@ fun BudgetDisplay(
 	extraDaysFromRemaining: Int = 0,
 	contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
 ) {
-	val currencyFormat = com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat(currencyCode)
+	val currencyFormat =
+		com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat(currencyCode)
 
 	val displayBudget = budgetState?.totalBudget ?: budget
 
@@ -85,7 +83,7 @@ fun BudgetDisplay(
 		),
 		label = "Presupuesto total",
 		value = currencyFormat.format(displayBudget),
-valueFontStyle = MaterialTheme.typography.displayMedium,
+		valueFontStyle = MaterialTheme.typography.displayMedium,
 		valueFontSize = if (bigVariant) MaterialTheme.typography.headlineLarge.fontSize else MaterialTheme.typography.titleLarge.fontSize,
 		content = {
 			Spacer(modifier = Modifier.height(16.dp))

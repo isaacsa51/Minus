@@ -3,14 +3,10 @@ package com.serranoie.app.minus.presentation.home
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -27,15 +23,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -48,38 +42,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.rememberSwipeableState
 import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.LocalWindowSize
 import com.serranoie.app.minus.ONBOARDING_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
-import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.budget.NumpadWithViewModel
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.editor.AnimState
 import com.serranoie.app.minus.presentation.editor.EditorWithViewModel
 import com.serranoie.app.minus.presentation.history.History
-import com.serranoie.app.minus.presentation.ui.theme.colorEditor
-import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
 import com.serranoie.app.minus.presentation.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
 import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.tutorial.firstLaunchTutorialStageFlow
+import com.serranoie.app.minus.presentation.ui.theme.colorEditor
+import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetLayout
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetValue
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.settingsDataStore
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalWearMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalWearMaterialApi::class)
 @Composable
 fun MainScreen(
 	onNavigateToAnalytics: () -> Unit = {},
@@ -120,7 +113,6 @@ fun MainScreen(
 	val isHistoryVisible =
 		windowSizeClass != WindowWidthSizeClass.Compact || topSheetState.currentValue == TopSheetValue.Expanded
 
-	// Pending delete state - managed here so it survives History sheet dismissal
 	var pendingDeleteTransaction by remember {
 		mutableStateOf<com.serranoie.app.minus.domain.model.Transaction?>(
 			null
@@ -146,7 +138,6 @@ fun MainScreen(
 	fun queueDeleteWithUndo(
 		transaction: com.serranoie.app.minus.domain.model.Transaction, message: String
 	) {
-		// Cancel any existing pending delete
 		pendingDeleteJob?.cancel()
 		snackbarAutoDismissJob?.cancel()
 
@@ -163,13 +154,11 @@ fun MainScreen(
 			}
 		}
 
-		// Start delete timer (3.5s window for undo)
 		pendingDeleteJob = coroutineScope.launch {
 			delay(3500L)
 			pendingDeleteTransaction?.let { tx ->
 				executeDelete(tx)
 			}
-			// Auto-hide snackbar after delete completes
 			delay(300L)
 			pendingDeleteTransaction = null
 			pendingDeleteJob = null
@@ -236,25 +225,46 @@ fun MainScreen(
 		}.coerceAtMost(with(localDensity) { 500.dp.toPx() }).coerceAtMost(contentHeight / 2)
 
 		val systemKeyboardHeight = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
-		val isShowSystemKeyboard = systemKeyboardHeight != 0.dp
+		val systemKeyboardHeightPx = with(localDensity) { systemKeyboardHeight.toPx() }
+		val isShowSystemKeyboard = systemKeyboardHeightPx > 0f
 
-		val calcModeKeyboardHeight = (contentHeight * 0.6f).coerceAtMost(contentHeight - with(localDensity) { navigationBarOffset.toPx()/* + 96.dp.toPx()*/ })
-		
+		var keepImeLayout by remember { mutableStateOf(false) }
+		var lastImeHeightPx by remember { mutableStateOf(0f) }
+		LaunchedEffect(systemKeyboardHeightPx) {
+			if (systemKeyboardHeightPx > 0f) {
+				lastImeHeightPx = systemKeyboardHeightPx
+				keepImeLayout = true
+			} else {
+				delay(140)
+				keepImeLayout = false
+			}
+		}
+
+		val calcModeKeyboardHeight =
+			(contentHeight * 0.6f).coerceAtMost(contentHeight - with(localDensity) { navigationBarOffset.toPx()/* + 96.dp.toPx()*/ })
+
 		val dragProgress = budgetUiState.dragProgress
 		val effectiveProgress = if (budgetUiState.isCalculation) {
 			1f - dragProgress
 		} else {
 			dragProgress
 		}
-		
-		val targetKeyboardHeight = if (isShowSystemKeyboard) {
-			with(localDensity) { systemKeyboardHeight.toPx() }
-		} else {
+
+		val internalKeyboardTarget =
 			defaultInternalKeyboardHeight + (calcModeKeyboardHeight - defaultInternalKeyboardHeight) * effectiveProgress
+		val targetKeyboardHeight = if (keepImeLayout && lastImeHeightPx > 0f) {
+			lastImeHeightPx
+		} else {
+			internalKeyboardTarget
 		}
 
 		val editorHeight by remember(
-			contentHeight, targetKeyboardHeight, keyboardAdditionalOffset, navigationBarOffset, budgetUiState.isCalculation, dragProgress
+			contentHeight,
+			targetKeyboardHeight,
+			keyboardAdditionalOffset,
+			navigationBarOffset,
+			budgetUiState.isCalculation,
+			dragProgress
 		) {
 			derivedStateOf {
 				contentHeight.minus(
@@ -279,7 +289,6 @@ fun MainScreen(
 		)
 
 		Row {
-			// Tablet/Desktop layout: History always visible on left
 			if (windowSizeClass != WindowWidthSizeClass.Compact) {
 				Surface(
 					color = colorEditor,
@@ -367,16 +376,11 @@ fun MainScreen(
 					TopSheetLayout(
 						swipeableState = topSheetState,
 						customHalfHeight = editorHeightAnimated,
-						onDismiss = {
-							// When user swipes up to dismiss, collapse to half-expanded
-							// This gives a natural "close" gesture
-						},
+						onDismiss = {},
 						sheetContentHalfExpand = {
 							EditorWithViewModel(
 								modifier = Modifier.requiredHeight(currentEditorHeight),
-								onOpenHistory = {
-									// Animate to expanded to show history
-								},
+								onOpenHistory = {},
 								onOpenSettings = onNavigateToSettings,
 								onOpenAnalytics = onNavigateToAnalytics,
 								onOpenWallet = onNavigateToWallet,
@@ -408,7 +412,6 @@ fun MainScreen(
 					Column(
 						modifier = Modifier.fillMaxSize()
 					) {
-						// Editor card
 						Card(
 							shape = RoundedCornerShape(bottomStart = 48.dp, bottomEnd = 48.dp),
 							colors = CardDefaults.cardColors(
@@ -436,7 +439,6 @@ fun MainScreen(
 							)
 						}
 
-						// Numpad at the bottom
 						Card(
 							shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
 							colors = CardDefaults.cardColors(

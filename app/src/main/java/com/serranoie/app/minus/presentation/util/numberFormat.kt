@@ -61,8 +61,8 @@ fun symbolOnlyCurrencyFormat(
 	return (NumberFormat.getNumberInstance(Locale.getDefault()) as DecimalFormat).apply {
 		this.maximumFractionDigits = maximumFractionDigits
 		this.minimumFractionDigits = minimumFractionDigits
-		positivePrefix = currencySymbol + " "
-		negativePrefix = "-" + currencySymbol + " "
+		positivePrefix = currencySymbol
+		negativePrefix = "-" + currencySymbol
 		try {
 			currency = java.util.Currency.getInstance(currencyCode)
 		} catch (e: Exception) {

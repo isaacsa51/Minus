@@ -15,7 +15,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTextField
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -53,11 +52,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,9 +67,9 @@ import com.serranoie.app.minus.presentation.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
+import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTextField
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
-
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -117,22 +114,17 @@ fun Editor(
 		}
 	}
 
-	// Create a focus controller for the tagging toolbar
 	val editorFocusController = remember { FocusController() }
 
-	// Track the selected view period separately from the actual budget period
-	// This allows the user to switch views (Daily/Weekly/etc.) without changing the actual budget
 	var selectedViewPeriod by remember {
 		mutableStateOf(uiState.budgetSettings?.period ?: BudgetPeriod.DAILY)
 	}
 
-	// Keep the selected view period in sync once settings are loaded/restored.
 	LaunchedEffect(uiState.budgetSettings?.period) {
 		uiState.budgetSettings?.period?.let { selectedViewPeriod = it }
 	}
 
-	// Recurrent expense dialog
-if (uiState.showRecurrentDialog) {
+	if (uiState.showRecurrentDialog) {
 		RecurrentExpenseDialog(
 			budgetSettings = uiState.budgetSettings,
 			onDismiss = onDismissRecurrentDialog,
@@ -172,12 +164,15 @@ if (uiState.showRecurrentDialog) {
 			)
 
 			AnimatedContent(
-				targetState = animState == AnimState.EDITING,
-				transitionSpec = {
-					slideInHorizontally(animationSpec = tween(200)) { it } + fadeIn(tween(200)) togetherWith
-						slideOutHorizontally(animationSpec = tween(200)) { -it } + fadeOut(tween(200))
-				},
-				label = "topBarTrailingSwitch"
+				targetState = animState == AnimState.EDITING, transitionSpec = {
+					slideInHorizontally(animationSpec = tween(200)) { it } + fadeIn(tween(200)) togetherWith slideOutHorizontally(
+						animationSpec = tween(200)
+					) { -it } + fadeOut(
+						tween(
+							200
+						)
+					)
+				}, label = "topBarTrailingSwitch"
 			) { isEditing ->
 				if (isEditing) {
 					RecurrenceModeToggle(
@@ -190,8 +185,7 @@ if (uiState.showRecurrentDialog) {
 							onClick = {
 								onAnalyticsClickForTutorial()
 								onOpenAnalytics()
-							},
-							modifier = Modifier
+							}, modifier = Modifier
 								.size(48.dp)
 								.then(analyticsHintAnchorModifier)
 						) {
@@ -216,7 +210,7 @@ if (uiState.showRecurrentDialog) {
 					}
 				}
 			}
-}
+		}
 
 		AnimatedContent(
 			targetState = animState, transitionSpec = {
@@ -242,7 +236,7 @@ if (uiState.showRecurrentDialog) {
 							.fillMaxWidth()
 							.weight(1f)
 					)
-}
+				}
 
 				AnimState.IDLE, AnimState.RESET -> {
 					IdleContent(
@@ -287,9 +281,9 @@ if (uiState.showRecurrentDialog) {
 					currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
 					startInEditMode = forceWalletSetup || uiState.budgetSettings == null,
 					onPeriodSelected = { newPeriod ->
-					selectedViewPeriod = newPeriod
-					onChangePeriod(newPeriod)
-				},
+						selectedViewPeriod = newPeriod
+						onChangePeriod(newPeriod)
+					},
 					onSaveBudget = { newSettings ->
 						onSaveBudget(newSettings)
 						scope.launch { sheetState.hide() }
@@ -331,12 +325,11 @@ private fun EditingContent(
 	val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
 
 	val hasExpressionOperators = remember(input) { input.any { it in "+-×÷" } }
-	val showCalculationUi = isCalculation || hasExpressionOperators
+	val showCalculationUi = hasExpressionOperators
 
 	val calculationResult = remember(input, showCalculationUi) {
 		if (!showCalculationUi || input.isEmpty()) return@remember null
 
-		// Do not attempt evaluate while expression is incomplete (trailing operator/dot)
 		val last = input.lastOrNull()
 		if (last != null && (last in "+-×÷" || last == '.')) {
 			null
@@ -350,13 +343,12 @@ private fun EditingContent(
 	} else {
 		try {
 			val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
-			" ${currencyFormat.format(value)}"
+			currencyFormat.format(value)
 		} catch (e: Exception) {
-			input.ifEmpty { " ${currencyFormat.format(BigDecimal.ZERO)}" }
+			input.ifEmpty { currencyFormat.format(BigDecimal.ZERO) }
 		}
 	}
 
-	// Base text style - AutoResizeBasicTextField handles font sizing internally
 	val baseTextStyle = MaterialTheme.typography.displayLarge.copy(
 		fontWeight = FontWeight.Bold
 	)
@@ -364,15 +356,13 @@ private fun EditingContent(
 	BoxWithConstraints(
 		modifier = modifier.fillMaxSize()
 	) {
-		// Get available dimensions for AutoResizeBasicTextField (in PX)
 		val density = LocalDensity.current
-		val availableWidth = maxWidth - 32.dp // Account for 16dp padding on each side
+		val availableWidth = maxWidth - 16.dp
 		val availableHeight = maxHeight
 		val containerSizePx = remember(availableWidth, availableHeight, density) {
 			with(density) {
 				androidx.compose.ui.unit.IntSize(
-					width = availableWidth.toPx().toInt(),
-					height = availableHeight.toPx().toInt()
+					width = availableWidth.toPx().toInt(), height = availableHeight.toPx().toInt()
 				)
 			}
 		}
@@ -380,24 +370,27 @@ private fun EditingContent(
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(16.dp)
+				.padding(start = 16.dp)
 				.align(Alignment.TopEnd),
 			contentAlignment = Alignment.TopEnd
 		) {
 			AnimatedContent(
 				targetState = if (showCalculationUi && calculationResult != null) "result" else "input",
 				transitionSpec = {
-					(fadeIn(animationSpec = tween(200)) + slideInHorizontally(animationSpec = tween(200)) { it / 4 }) togetherWith
-						(fadeOut(animationSpec = tween(200)) + slideOutHorizontally(animationSpec = tween(200)) { -it / 4 })
+					(fadeIn(animationSpec = tween(200)) + slideInHorizontally(
+						animationSpec = tween(
+							200
+						)
+					) { it / 4 }) togetherWith (fadeOut(animationSpec = tween(200)) + slideOutHorizontally(
+						animationSpec = tween(200)
+					) { -it / 4 })
 				},
 				label = "EditorNumberTransition",
 				modifier = Modifier.fillMaxWidth()
 			) { state ->
 				if (state == "result" && showCalculationUi && calculationResult != null) {
-					// Show calculation expression and result with auto-resize on both lines
 					Column(
-					 	horizontalAlignment = Alignment.End,
-						modifier = Modifier.fillMaxWidth()
+						horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()
 					) {
 						AutoResizeBasicTextField(
 							value = displayContent,
@@ -432,12 +425,12 @@ private fun EditingContent(
 					}
 				} else {
 					AutoResizeBasicTextField(
-						value = input,
-						onValueChange = onInputChange,
+						value = displayContent,
+						onValueChange = {},
+						readOnly = true,
 						modifier = Modifier.fillMaxWidth(),
 						textStyle = baseTextStyle.copy(
-							color = MaterialTheme.colorScheme.onSurface,
-							textAlign = TextAlign.End
+							color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.End
 						),
 						singleLine = true,
 						minFontSize = 20.sp,
@@ -447,13 +440,11 @@ private fun EditingContent(
 							Box {
 								innerTextField()
 							}
-						}
-					)
+						})
 				}
 			}
 		}
 
-		// Category toolbar at the bottom
 		CategoryToolbar(
 			tags = tags,
 			currentComment = currentComment,
@@ -468,27 +459,16 @@ private fun EditingContent(
 	}
 }
 
-/**
- * Calculation evaluator for chained arithmetic operations.
- * Supports +, -, ×, ÷ operators in sequence (e.g., 85+88-42=131).
- */
 private fun evaluateCalculation(input: String): String? {
-	// Handle empty or whitespace-only input
 	if (input.isBlank()) return null
 
 	return try {
-		// Normalize operators: × -> * and ÷ -> /
-		val normalized = input.trim()
-			.replace("×", "*")
-			.replace("÷", "/")
+		val normalized = input.trim().replace("×", "*").replace("÷", "/")
 
-		// If ends with an operator, it's incomplete - return null
 		normalized.lastOrNull()?.let { if (it in "+-*/") return null }
 
-		// Check if there's any operator in the input
 		val hasOperator = normalized.any { it in "+-*/" }
 
-		// If no operator, just return the number as-is
 		if (!hasOperator) {
 			val num = normalized.toBigDecimalOrNull() ?: return null
 			return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
@@ -498,21 +478,16 @@ private fun evaluateCalculation(input: String): String? {
 			}
 		}
 
-		// Use a regex to split by operators
-		// This handles chained operations like "85+88-42"
 		val tokenPattern = Regex("([+\\-*/])")
 		val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
 		val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
 
 		if (parts.isEmpty() || parts[0].isEmpty()) return null
 
-		// If we have more operators than numbers, it's invalid
 		if (operators.size > parts.size - 1) return null
 
-		// Start with first number
 		var result = parts[0].toBigDecimalOrNull() ?: return null
 
-		// Process each operator-number pair
 		for (i in operators.indices) {
 			if (i + 1 >= parts.size) break
 			val operator = operators[i]
@@ -526,11 +501,11 @@ private fun evaluateCalculation(input: String): String? {
 					if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null // Division by zero
 					result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
 				}
+
 				else -> return null
 			}
 		}
 
-		// Format result without decimal if whole number
 		if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
 			result.toBigInteger().toString()
 		} else {
@@ -552,14 +527,10 @@ private fun RecurrenceModeToggle(
 	val selectedColor = contentColor.copy(alpha = 0.22f)
 
 	Card(
-		modifier = modifier.height(50.dp),
-		shape = CircleShape,
-		colors = CardDefaults.cardColors(
+		modifier = modifier.height(50.dp), shape = CircleShape, colors = CardDefaults.cardColors(
 			containerColor = containerColor,
 			contentColor = contentColor,
-		),
-		onClick = { onRecurrentToggle(!isRecurrentEnabled) }
-	) {
+		), onClick = { onRecurrentToggle(!isRecurrentEnabled) }) {
 		Box(
 			modifier = Modifier
 				.fillMaxHeight()
@@ -582,9 +553,7 @@ private fun RecurrenceModeToggle(
 private fun IdleContent(
 	budgetState: BudgetState?, currencyCode: String, modifier: Modifier = Modifier
 ) {
-val cursorVisible = remember { mutableStateOf(true) }
-
-	// Blinking cursor animation
+	val cursorVisible = remember { mutableStateOf(true) }
 	LaunchedEffect(Unit) {
 		while (true) {
 			delay(530)
@@ -595,7 +564,7 @@ val cursorVisible = remember { mutableStateOf(true) }
 	Box(
 		modifier = modifier
 			.fillMaxWidth()
-			.padding(16.dp), contentAlignment = Alignment.CenterEnd
+			.padding(horizontal = 16.dp), contentAlignment = Alignment.CenterEnd
 	) {
 		Text(
 			text = if (cursorVisible.value) "|" else "",
@@ -611,22 +580,22 @@ fun EditorPreview_Idle() {
 	MinusTheme {
 		Editor(
 			uiState = BudgetUiState(
-			budgetSettings = BudgetSettings(
-				totalBudget = BigDecimal("500.00"),
-				period = BudgetPeriod.DAILY,
-				startDate = LocalDate.now(),
-				currencyCode = "USD"
-			), budgetState = BudgetState(
-				remainingToday = BigDecimal("110.00"),
-				totalSpentToday = BigDecimal("12.50"),
-				dailyBudget = BigDecimal("122.50"),
-				daysRemaining = 15,
-				progress = 0.1f,
-				isOverBudget = false,
-				totalBudget = BigDecimal("500.00"),
-				totalSpentInPeriod = BigDecimal("12.50")
-			), transactions = emptyList(), numpadInput = "", isNumpadValid = false
-		),
+				budgetSettings = BudgetSettings(
+					totalBudget = BigDecimal("500.00"),
+					period = BudgetPeriod.DAILY,
+					startDate = LocalDate.now(),
+					currencyCode = "USD"
+				), budgetState = BudgetState(
+					remainingToday = BigDecimal("110.00"),
+					totalSpentToday = BigDecimal("12.50"),
+					dailyBudget = BigDecimal("122.50"),
+					daysRemaining = 15,
+					progress = 0.1f,
+					isOverBudget = false,
+					totalBudget = BigDecimal("500.00"),
+					totalSpentInPeriod = BigDecimal("12.50")
+				), transactions = emptyList(), numpadInput = "", isNumpadValid = false
+			),
 			animState = AnimState.IDLE,
 			onFocus = {},
 			onOpenHistory = {},
@@ -645,22 +614,22 @@ fun EditorPreview_Editing() {
 	MinusTheme {
 		Editor(
 			uiState = BudgetUiState(
-			budgetSettings = BudgetSettings(
-				totalBudget = BigDecimal("500.00"),
-				period = BudgetPeriod.DAILY,
-				startDate = LocalDate.now(),
-				currencyCode = "USD"
-			), budgetState = BudgetState(
-				remainingToday = BigDecimal("110.00"),
-				totalSpentToday = BigDecimal("12.50"),
-				dailyBudget = BigDecimal("122.50"),
-				daysRemaining = 15,
-				progress = 0.1f,
-				isOverBudget = false,
-				totalBudget = BigDecimal("500.00"),
-				totalSpentInPeriod = BigDecimal("12.50")
-			), transactions = emptyList(), numpadInput = "25", isNumpadValid = true
-		),
+				budgetSettings = BudgetSettings(
+					totalBudget = BigDecimal("500.00"),
+					period = BudgetPeriod.DAILY,
+					startDate = LocalDate.now(),
+					currencyCode = "USD"
+				), budgetState = BudgetState(
+					remainingToday = BigDecimal("110.00"),
+					totalSpentToday = BigDecimal("12.50"),
+					dailyBudget = BigDecimal("122.50"),
+					daysRemaining = 15,
+					progress = 0.1f,
+					isOverBudget = false,
+					totalBudget = BigDecimal("500.00"),
+					totalSpentInPeriod = BigDecimal("12.50")
+				), transactions = emptyList(), numpadInput = "25", isNumpadValid = true
+			),
 			animState = AnimState.EDITING,
 			onFocus = {},
 			onOpenHistory = {},
