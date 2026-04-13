@@ -20,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -280,6 +281,9 @@ Spacer(modifier = Modifier.height(16.dp))
 		ModalBottomSheet(
 			onDismissRequest = { showHistorySheet = false },
 			sheetState = sheetState,
+			dragHandle = {
+				BottomSheetDefaults.DragHandle()
+			}
 		) {
 			History(
 				readOnly = true,

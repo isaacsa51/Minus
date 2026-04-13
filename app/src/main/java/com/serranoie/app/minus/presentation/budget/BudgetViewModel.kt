@@ -385,6 +385,8 @@ class BudgetViewModel @Inject constructor(
 			is BudgetUiIntent.EqualsTapped -> handleEqualsInput()
 			is BudgetUiIntent.SetCalculationMode -> handleSetCalculationMode(intent.enabled)
 			is BudgetUiIntent.SetDragProgress -> handleDragProgress(intent.progress)
+			is BudgetUiIntent.SetLockSwipeable -> handleSetLockSwipeable(intent.locked)
+			is BudgetUiIntent.SetLockDraggable -> handleSetLockDraggable(intent.locked)
 		}
 	}
 
@@ -532,6 +534,14 @@ class BudgetViewModel @Inject constructor(
 
 	private fun handleDragProgress(progress: Float) {
 		_uiState.update { it.copy(dragProgress = progress) }
+	}
+
+	private fun handleSetLockSwipeable(locked: Boolean) {
+		_uiState.update { it.copy(lockSwipeable = locked) }
+	}
+
+	private fun handleSetLockDraggable(locked: Boolean) {
+		_uiState.update { it.copy(lockDraggable = locked) }
 	}
 
 	private fun handleApply() {

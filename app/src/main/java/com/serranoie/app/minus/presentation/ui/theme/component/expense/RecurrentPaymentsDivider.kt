@@ -1,20 +1,29 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.expense
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Repeat
+import androidx.compose.material.icons.rounded.Replay
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,11 +46,11 @@ fun RecurrentPaymentsDivider(
 
 	Row(
 		modifier = modifier
-			.fillMaxWidth()
-			.clickable(
-				onClick = onToggleClick, interactionSource = interactionSource, indication = null
-			)
-			.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+            .fillMaxWidth()
+            .clickable(
+                onClick = onToggleClick, interactionSource = interactionSource, indication = null
+            )
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.SpaceBetween
 	) {
@@ -54,13 +63,6 @@ fun RecurrentPaymentsDivider(
 				contentDescription = if (isExpanded) "Collapse" else "Expand",
 				tint = color,
 				modifier = Modifier
-			)
-
-			Icon(
-				imageVector = Icons.Rounded.Repeat,
-				contentDescription = null,
-				tint = color,
-				modifier = Modifier.size(18.dp)
 			)
 
 			Text(

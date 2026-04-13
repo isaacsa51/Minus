@@ -51,26 +51,42 @@ fun calcAdaptiveFont(
 	text: String = "SAMPLE 1234567890",
 	style: TextStyle = MaterialTheme.typography.displayLarge,
 ): TextUnit {
-	var measureFontSize = calcMaxFont(height = height, text = text, style = style)
+	if (width <= 0f) return minFontSize
+	if (text.isEmpty()) return maxFontSize
 
-	var intrinsics = ParagraphIntrinsics(
-		text = text,
-		style = style.copy(fontSize = measureFontSize),
-		density = LocalDensity.current,
-		fontFamilyResolver = createFontFamilyResolver(LocalContext.current)
-	)
+	val density = LocalDensity.current
+	val resolver = createFontFamilyResolver(LocalContext.current)
+	val minPx = with(density) { minFontSize.toPx() }
+	val maxPx = with(density) { maxFontSize.toPx() }
 
-	while (intrinsics.maxIntrinsicWidth > width && measureFontSize > minFontSize) {
-		measureFontSize *= 0.9f
-		intrinsics = ParagraphIntrinsics(
+	fun fits(fontPx: Float): Boolean {
+		if (fontPx <= 0f) return true
+		val fontSp = with(density) { fontPx.toSp() }
+		val intrinsics = ParagraphIntrinsics(
 			text = text,
-			style = style.copy(fontSize = measureFontSize),
-			density = LocalDensity.current,
-			fontFamilyResolver = createFontFamilyResolver(LocalContext.current)
+			style = style.copy(fontSize = fontSp),
+			density = density,
+			fontFamilyResolver = resolver
 		)
+		return intrinsics.maxIntrinsicWidth <= width
 	}
 
-	return min(max(minFontSize, measureFontSize), maxFontSize)
+	var low = minPx
+	var high = maxPx
+	var best = minPx
+
+	// Binary search for the largest font that fits width.
+	repeat(14) {
+		val mid = (low + high) / 2f
+		if (fits(mid)) {
+			best = mid
+			low = mid
+		} else {
+			high = mid
+		}
+	}
+
+	return with(density) { best.toSp() }
 }
 
 @Stable

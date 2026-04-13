@@ -54,7 +54,6 @@ fun AutoResizeBasicTextField(
 
 	val adaptiveFontSize = if (
 		containerSize.width > 0 &&
-		containerSize.height > 0 &&
 		transformedValue.isNotEmpty()
 	) {
 		calcAdaptiveFont(
@@ -69,11 +68,17 @@ fun AutoResizeBasicTextField(
 		maxFontSize
 	}
 
+	val resolvedTextStyle = textStyle.copy(
+		fontSize = adaptiveFontSize,
+		// Keep line height proportional to the adaptive font to avoid extra vertical spacing
+		lineHeight = adaptiveFontSize
+	)
+
 	BasicTextField(
 		value = value,
 		onValueChange = onValueChange,
 		modifier = modifier,
-		textStyle = textStyle.copy(fontSize = adaptiveFontSize),
+		textStyle = resolvedTextStyle,
 		cursorBrush = cursorBrush,
 		singleLine = singleLine,
 		enabled = enabled,

@@ -31,7 +31,9 @@ data class BudgetUiState(
     val currentPeriodStartedAtMillis: Long = 0L,
     val currentPeriodId: Long = 0L,
     val isCalculation: Boolean = false,
-    val dragProgress: Float = 0f
+    val dragProgress: Float = 0f,
+    val lockSwipeable: Boolean = false,
+    val lockDraggable: Boolean = false
 ) {
     companion object {
         val INITIAL = BudgetUiState()

@@ -3,6 +3,7 @@ package com.serranoie.app.minus.presentation.history
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,7 +35,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -54,8 +59,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
@@ -89,6 +103,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingR
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItemRow
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
+import com.serranoie.app.minus.presentation.ui.theme.component.ticket.RecurrentTicketCard
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TicketView
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TransactionTicketPopup
 import com.serranoie.app.minus.presentation.util.prettyDate
@@ -119,6 +134,26 @@ fun History(
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val scrollState = rememberLazyListState()
 
+	val isAtEndOfList: Boolean = remember(scrollState.canScrollForward, scrollState.layoutInfo.visibleItemsInfo) {
+		!scrollState.canScrollForward && scrollState.layoutInfo.visibleItemsInfo.lastOrNull() != null
+	}
+
+	LaunchedEffect(isAtEndOfList) {
+		// When at end of list: allow swipe-down to go back to HalfExpanded (lockSwipeable = false)
+		// When not at end: prevent swipe-up to dismiss (lockSwipeable = true)
+		viewModel.processIntent(BudgetUiIntent.SetLockSwipeable(!isAtEndOfList))
+	}
+
+	// Overscroll detection: when at end and user tries to scroll further, trigger sheet collapse
+	// We use a coroutine to continuously check for overscroll condition
+	LaunchedEffect(isAtEndOfList) {
+		if (isAtEndOfList) {
+			// When at end, we could add additional handling here
+			// The lockSwipeable=false already enables swipe gestures
+			// The actual overscroll-to-dismiss is handled by the swipeable modifier
+		}
+	}
+
 	var editingTransaction by remember { mutableStateOf<Transaction?>(null) }
 	var deletingTransactionIds by remember { mutableStateOf<Set<Long>>(emptySet()) }
 
@@ -138,7 +173,8 @@ fun History(
 		symbolOnlyCurrencyFormat(currencyCode)
 	}
 
-	var expandedDates by remember { mutableStateOf<Set<LocalDate>>(emptySet()) }
+	var expandedDates by rememberSaveable { mutableStateOf<Set<LocalDate>>(emptySet()) }
+	var showPastPeriod by rememberSaveable { mutableStateOf(false) }
 
 	var expandedUpcomingRecurrent by remember { mutableStateOf(true) }
 	var expandedFutureRecurrent by remember { mutableStateOf(false) }
@@ -268,6 +304,7 @@ fun History(
 			state = scrollState,
 			modifier = Modifier
 				.fillMaxSize()
+				.animateContentSize()
 				.then(if (selectedTransaction != null) Modifier.blur(10.dp) else Modifier)
 				.statusBarsPadding()
 				.padding(horizontal = 16.dp)
@@ -315,31 +352,23 @@ fun History(
 							animationSpec = tween(300), shrinkTowards = Alignment.Top
 						) + fadeOut(animationSpec = tween(300))
 					) {
-						Column {
-							upcomingRecurrentInPeriod.forEachIndexed { index, item ->
-								val position = when {
-									upcomingRecurrentInPeriod.size == 1 -> PaddedListItemPosition.Single
-									index == 0 -> PaddedListItemPosition.First
-									index == upcomingRecurrentInPeriod.size - 1 -> PaddedListItemPosition.Last
-									else -> PaddedListItemPosition.Middle
-								}
-
-								SwipeableUpcomingRecurrentItem(
-									item = item,
-									currencyFormat = currencyFormat,
-									position = position,
-									onDelete = {
-										recurrentToDelete = item.transaction
-										showDeleteRecurrentDialog = true
-									},
-									onEdit = {
-										recurrentToEdit = item.transaction
-									},
-									onClick = { selectedTransaction = item.transaction })
-
-								if (index < upcomingRecurrentInPeriod.size - 1) {
-									Spacer(modifier = Modifier.height(2.dp))
-								}
+						LazyRow(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(8.dp),
+							contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
+						) {
+							itemsIndexed(
+								items = upcomingRecurrentInPeriod,
+								key = { _, item -> "upcoming-${item.transaction.id}" }
+							) { _, item ->
+								RecurrentTicketCard(
+									title = item.transaction.comment.ifEmpty { "Pago recurrente" },
+									amountFormatted = currencyFormat.format(item.transaction.amount),
+									nextChargeDate = prettyDate(item.nextChargeDate.atStartOfDay(), showTime = false, forceShowDate = false),
+									frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()?.replaceFirstChar { it.uppercase() },
+									onClick = { selectedTransaction = item.transaction },
+									modifier = Modifier.fillParentMaxWidth(0.45f)
+								)
 							}
 						}
 					}
@@ -351,7 +380,7 @@ fun History(
 			}
 
 			groupedCurrentTransactions.forEach { (date, transactions) ->
-				val isExpanded = date?.let { it in expandedDates } ?: false
+				val isExpanded = date?.let { expandedDates.contains(it) } ?: false
 				val dayTotal = transactions.sumOf { it.amount }
 
 				item("date-$date") {
@@ -361,9 +390,9 @@ fun History(
 						onToggleClick = {
 							date?.let { dateKey ->
 								expandedDates = if (isExpanded) {
-									expandedDates - dateKey
+									expandedDates.minus(dateKey)
 								} else {
-									expandedDates + dateKey
+									expandedDates.plus(dateKey)
 								}
 							}
 						},
@@ -468,32 +497,23 @@ fun History(
 							animationSpec = tween(300), shrinkTowards = Alignment.Top
 						) + fadeOut(animationSpec = tween(300))
 					) {
-						Column {
-							futureRecurrentOutOfPeriod.forEachIndexed { index, item ->
-								val position = when {
-									futureRecurrentOutOfPeriod.size == 1 -> PaddedListItemPosition.Single
-									index == 0 -> PaddedListItemPosition.First
-									index == futureRecurrentOutOfPeriod.size - 1 -> PaddedListItemPosition.Last
-									else -> PaddedListItemPosition.Middle
-								}
-
-								SwipeableUpcomingRecurrentItem(
-									item = item,
-									currencyFormat = currencyFormat,
-									position = position,
-									isOutOfPeriod = true,
-									onDelete = {
-										recurrentToDelete = item.transaction
-										showDeleteRecurrentDialog = true
-									},
-									onEdit = {
-										recurrentToEdit = item.transaction
-									},
-									onClick = { selectedTransaction = item.transaction })
-
-								if (index < futureRecurrentOutOfPeriod.size - 1) {
-									Spacer(modifier = Modifier.height(2.dp))
-								}
+						LazyRow(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(8.dp),
+							contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
+						) {
+							itemsIndexed(
+								items = futureRecurrentOutOfPeriod,
+								key = { _, item -> "future-${item.transaction.id}" }
+							) { _, item ->
+								RecurrentTicketCard(
+									title = item.transaction.comment.ifEmpty { "Pago recurrente" },
+									amountFormatted = currencyFormat.format(item.transaction.amount),
+									nextChargeDate = prettyDate(item.nextChargeDate.atStartOfDay(), showTime = false, forceShowDate = false),
+									frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()?.replaceFirstChar { it.uppercase() },
+									onClick = { selectedTransaction = item.transaction },
+									modifier = Modifier.fillParentMaxWidth(0.45f)
+								)
 							}
 						}
 					}
@@ -502,14 +522,29 @@ fun History(
 
 			if (groupedPastTransactions.isNotEmpty()) {
 				item("wavy-divider") {
-					WavyDivider(
-						text = "Gastos en el periodo pasado", amplitude = 4f, wavelength = 45f
-					)
+					val interactionSource = remember { MutableInteractionSource() }
+					Box(
+						modifier = Modifier
+							.fillMaxWidth()
+							.clickable(
+								interactionSource = interactionSource,
+								indication = null
+							) {
+								showPastPeriod = !showPastPeriod
+							}
+					) {
+						WavyDivider(
+							text = if (showPastPeriod) "Ocultar gastos del periodo pasado" else "Mostrar gastos del periodo pasado",
+							amplitude = 4f,
+							wavelength = 45f
+						)
+					}
 				}
 			}
 
-			groupedPastTransactions.forEach { (date, transactions) ->
-				val isExpanded = date?.let { it in expandedDates } ?: false
+			if (showPastPeriod) {
+				groupedPastTransactions.forEach { (date, transactions) ->
+				val isExpanded = date?.let { expandedDates.contains(it) } ?: false
 				val dayTotal = transactions.sumOf { it.amount }
 
 				item("past-date-$date") {
@@ -519,9 +554,9 @@ fun History(
 						onToggleClick = {
 							date?.let { dateKey ->
 								expandedDates = if (isExpanded) {
-									expandedDates - dateKey
+									expandedDates.minus(dateKey)
 								} else {
-									expandedDates + dateKey
+									expandedDates.plus(dateKey)
 								}
 							}
 						},
@@ -597,6 +632,7 @@ fun History(
 						}
 					}
 				}
+			}
 			}
 
 			// Bottom spacer for better scrolling

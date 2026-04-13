@@ -376,6 +376,8 @@ fun MainScreen(
 					TopSheetLayout(
 						swipeableState = topSheetState,
 						customHalfHeight = editorHeightAnimated,
+						isLockSwipeable = { budgetUiState.lockSwipeable },
+						isLockDraggable = { budgetUiState.lockDraggable },
 						onDismiss = {},
 						sheetContentHalfExpand = {
 							EditorWithViewModel(

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -357,46 +358,82 @@ private fun EditingContent(
 		modifier = modifier.fillMaxSize()
 	) {
 		val density = LocalDensity.current
-		val availableWidth = maxWidth - 16.dp
-		val availableHeight = maxHeight
-		val containerSizePx = remember(availableWidth, availableHeight, density) {
+		val availableWidth = maxWidth - 32.dp
+		val amountSlotHeight = 124.dp
+		val containerSizePx = remember(availableWidth, amountSlotHeight, density) {
 			with(density) {
 				androidx.compose.ui.unit.IntSize(
-					width = availableWidth.toPx().toInt(), height = availableHeight.toPx().toInt()
+					width = availableWidth.toPx().toInt(),
+					height = amountSlotHeight.toPx().toInt()
 				)
 			}
 		}
 
-		Box(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(start = 16.dp)
-				.align(Alignment.TopEnd),
-			contentAlignment = Alignment.TopEnd
+		Column(
+			modifier = Modifier.fillMaxSize()
 		) {
-			AnimatedContent(
-				targetState = if (showCalculationUi && calculationResult != null) "result" else "input",
-				transitionSpec = {
-					(fadeIn(animationSpec = tween(200)) + slideInHorizontally(
-						animationSpec = tween(
-							200
-						)
-					) { it / 4 }) togetherWith (fadeOut(animationSpec = tween(200)) + slideOutHorizontally(
-						animationSpec = tween(200)
-					) { -it / 4 })
-				},
-				label = "EditorNumberTransition",
-				modifier = Modifier.fillMaxWidth()
-			) { state ->
-				if (state == "result" && showCalculationUi && calculationResult != null) {
-					Column(
-						horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()
-					) {
+			Box(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(amountSlotHeight)
+					.padding(start = 16.dp, end = 16.dp),
+				contentAlignment = Alignment.TopEnd
+			) {
+				AnimatedContent(
+					targetState = if (showCalculationUi && calculationResult != null) "result" else "input",
+					transitionSpec = {
+						(fadeIn(animationSpec = tween(200)) + slideInHorizontally(
+							animationSpec = tween(200)
+						) { it / 4 }) togetherWith (fadeOut(animationSpec = tween(200)) + slideOutHorizontally(
+							animationSpec = tween(200)
+						) { -it / 4 })
+					},
+					label = "EditorNumberTransition",
+					modifier = Modifier.fillMaxWidth()
+				) { state ->
+					if (state == "result" && showCalculationUi && calculationResult != null) {
+						Column(
+							horizontalAlignment = Alignment.End,
+							modifier = Modifier.fillMaxWidth()
+						) {
+							AutoResizeBasicTextField(
+								value = displayContent,
+								onValueChange = {},
+								readOnly = true,
+								modifier = Modifier.fillMaxWidth(),
+								textStyle = baseTextStyle.copy(
+									color = MaterialTheme.colorScheme.onSurface,
+									textAlign = TextAlign.End
+								),
+								singleLine = true,
+								minFontSize = 20.sp,
+								maxFontSize = 57.sp,
+								containerSize = containerSizePx
+							)
+							AutoResizeBasicTextField(
+								value = "= ${currencySymbol}$calculationResult",
+								onValueChange = {},
+								readOnly = true,
+								modifier = Modifier
+									.fillMaxWidth()
+									.padding(top = 4.dp),
+								textStyle = MaterialTheme.typography.headlineMedium.copy(
+									color = MaterialTheme.colorScheme.onSurfaceVariant,
+									textAlign = TextAlign.End
+								),
+								singleLine = true,
+								minFontSize = 16.sp,
+								maxFontSize = 36.sp,
+								containerSize = containerSizePx
+							)
+						}
+					} else {
 						AutoResizeBasicTextField(
 							value = displayContent,
 							onValueChange = {},
 							readOnly = true,
-							modifier = Modifier.fillMaxWidth(),
+							modifier = Modifier
+								.fillMaxWidth(),
 							textStyle = baseTextStyle.copy(
 								color = MaterialTheme.colorScheme.onSurface,
 								textAlign = TextAlign.End
@@ -404,58 +441,28 @@ private fun EditingContent(
 							singleLine = true,
 							minFontSize = 20.sp,
 							maxFontSize = 57.sp,
-							containerSize = containerSizePx
-						)
-						AutoResizeBasicTextField(
-							value = "= ${currencySymbol}$calculationResult",
-							onValueChange = {},
-							readOnly = true,
-							modifier = Modifier
-								.fillMaxWidth()
-								.padding(top = 4.dp),
-							textStyle = MaterialTheme.typography.headlineMedium.copy(
-								color = MaterialTheme.colorScheme.onSurfaceVariant,
-								textAlign = TextAlign.End
-							),
-							singleLine = true,
-							minFontSize = 16.sp,
-							maxFontSize = 36.sp,
-							containerSize = containerSizePx
+							containerSize = containerSizePx,
+							decorationBox = { innerTextField ->
+								Box { innerTextField() }
+							}
 						)
 					}
-				} else {
-					AutoResizeBasicTextField(
-						value = displayContent,
-						onValueChange = {},
-						readOnly = true,
-						modifier = Modifier.fillMaxWidth(),
-						textStyle = baseTextStyle.copy(
-							color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.End
-						),
-						singleLine = true,
-						minFontSize = 20.sp,
-						maxFontSize = 57.sp,
-						containerSize = containerSizePx,
-						decorationBox = { innerTextField ->
-							Box {
-								innerTextField()
-							}
-						})
 				}
 			}
-		}
 
-		CategoryToolbar(
-			tags = tags,
-			currentComment = currentComment,
-			stage = EditStage.EDIT_SPENT,
-			onCommentUpdate = onCommentUpdate,
-			editorFocusController = editorFocusController,
-			modifier = Modifier
-				.fillMaxWidth()
-				.align(Alignment.BottomCenter)
-				.padding(bottom = 26.dp)
-		)
+			Spacer(modifier = Modifier.weight(1f))
+
+			CategoryToolbar(
+				tags = tags,
+				currentComment = currentComment,
+				stage = EditStage.EDIT_SPENT,
+				onCommentUpdate = onCommentUpdate,
+				editorFocusController = editorFocusController,
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(bottom = 26.dp)
+			)
+		}
 	}
 }
 
@@ -564,7 +571,8 @@ private fun IdleContent(
 	Box(
 		modifier = modifier
 			.fillMaxWidth()
-			.padding(horizontal = 16.dp), contentAlignment = Alignment.CenterEnd
+			.padding(horizontal = 16.dp),
+		contentAlignment = Alignment.CenterEnd
 	) {
 		Text(
 			text = if (cursorVisible.value) "|" else "",
@@ -608,7 +616,7 @@ fun EditorPreview_Idle() {
 	}
 }
 
-@Preview(showBackground = true, device = "id:pixel_5", backgroundColor = 0xFF121212)
+@Preview(showBackground = true, device = "id:Nexus One", backgroundColor = 0xFF121212)
 @Composable
 fun EditorPreview_Editing() {
 	MinusTheme {
@@ -628,7 +636,7 @@ fun EditorPreview_Editing() {
 					isOverBudget = false,
 					totalBudget = BigDecimal("500.00"),
 					totalSpentInPeriod = BigDecimal("12.50")
-				), transactions = emptyList(), numpadInput = "25", isNumpadValid = true
+				), transactions = emptyList(), numpadInput = "250", isNumpadValid = true
 			),
 			animState = AnimState.EDITING,
 			onFocus = {},

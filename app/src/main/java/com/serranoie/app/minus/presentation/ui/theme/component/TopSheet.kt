@@ -116,9 +116,7 @@ fun TopSheetLayout(
         }
 
         val halfExpanedOffset = (-(expandHeight - halfHeight)).coerceAtMost(0f)
-        // Dismiss offset for swiping UP from Expanded (above the expanded position)
         val dismissOffsetAbove = -expandHeight * 0.5f
-        // Keep the below offset for backward compatibility if needed
         val dismissOffsetBelow = expandHeight * 0.8f
 
         Card(
@@ -147,12 +145,11 @@ fun TopSheetLayout(
                     enabled = !isLockDraggable() && onDismiss != null,
                     state = swipeableState,
                     orientation = Orientation.Vertical,
-                    anchors = if (onDismiss != null) {
+                    anchors = if (onDismiss != null && !isLockSwipeable()) {
                         val baseAnchors = mutableMapOf(
                             halfExpanedOffset to TopSheetValue.HalfExpanded,
                             0f to TopSheetValue.Expanded
                         )
-                        // Add dismiss anchor above when swiping up is allowed
                         if (canDismissBySwipeUp()) {
                             baseAnchors[dismissOffsetAbove] = TopSheetValue.Dismissed
                         }
@@ -227,21 +224,17 @@ fun TopSheetLayout(
 
     val scope = rememberCoroutineScope()
 
-    // Handle dismiss state
     LaunchedEffect(swipeableState.currentValue) {
         if (swipeableState.currentValue == TopSheetValue.Dismissed && onDismiss != null) {
             Log.d(tag, "TopSheet dismissed via swipe, calling onDismiss")
-            // Small delay to let the animation complete
             kotlinx.coroutines.delay(300)
             onDismiss()
-            // Reset state after dismiss
             scope.launch {
                 swipeableState.animateTo(TopSheetValue.HalfExpanded)
             }
         }
     }
 
-    // Predictive back handler at TopSheetLayout level
     PredictiveBackHandler(swipeableState.currentValue === TopSheetValue.Expanded) { progress ->
         try {
             progress.collect { backEvent ->

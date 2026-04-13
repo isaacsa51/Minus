@@ -393,7 +393,7 @@ fun Settings(
 
 			item {
 				PaddedListGroup(
-					title = "Data"
+					title = "Respaldo de información"
 				) {
 					CustomPaddedListItem(
 						onClick = {
@@ -410,12 +410,12 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Export CSV",
+								text = "Respaldar información",
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Export all transactions as minus_export.csv",
+								text = "Respaldar información en minus_export.csv",
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -427,7 +427,7 @@ fun Settings(
 							onImportCsv()
 							view.toggleFeedback()
 						},
-						position = PaddedListItemPosition.Middle
+						position = PaddedListItemPosition.Last
 					) {
 						Icon(
 							imageVector = Icons.Default.Refresh,
@@ -437,49 +437,12 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Import CSV",
+								text = "Importar CSV",
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Import and upsert transactions from CSV",
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
-
-					CustomPaddedListItem(
-						onClick = {
-							onPeriodMappingModeChange(
-								if (periodMappingMode == PeriodMappingMode.ACTIVE_BUDGET) {
-									PeriodMappingMode.CALENDAR_BUCKET
-								} else {
-									PeriodMappingMode.ACTIVE_BUDGET
-								}
-							)
-							view.toggleFeedback()
-						},
-						position = PaddedListItemPosition.Last
-					) {
-						Icon(
-							imageVector = Icons.Default.Palette,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = "Period mapping",
-								style = MaterialTheme.typography.bodyLarge,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = if (periodMappingMode == PeriodMappingMode.ACTIVE_BUDGET) {
-									stringResource(R.string.period_mapping_active_budget)
-								} else {
-									stringResource(R.string.period_mapping_calendar_bucket)
-								},
+								text = "Importar información desde un archivo CSV",
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -490,7 +453,7 @@ fun Settings(
 
 			item {
 				PaddedListGroup(
-					title = "Tutorual"
+					title = "Tutorial"
 				) {
 					CustomPaddedListItem(
 						onClick = {

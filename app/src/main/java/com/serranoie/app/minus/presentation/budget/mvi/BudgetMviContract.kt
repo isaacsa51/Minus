@@ -43,6 +43,8 @@ sealed interface BudgetUiIntent {
 
     data object FinishBudgetEarly : BudgetUiIntent
     data object TriggerTestNotifications : BudgetUiIntent
+    data class SetLockSwipeable(val locked: Boolean) : BudgetUiIntent
+    data class SetLockDraggable(val locked: Boolean) : BudgetUiIntent
 }
 
 sealed interface BudgetUiEffect {
