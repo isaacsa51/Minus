@@ -91,24 +91,22 @@ fun CategoryToolbar(
 ) {
     val localDensity = LocalDensity.current
 
+    val scrollState = rememberScrollState()
+
     var showAddComment by remember { mutableStateOf(false) }
     var isEdit by remember { mutableStateOf(false) }
-
-    LaunchedEffect(stage) {
-        showAddComment = stage == EditStage.EDIT_SPENT
-    }
 
     BoxWithConstraints(
         modifier = modifier.fillMaxWidth()
     ) {
-        val width = maxWidth - 48.dp
+        val toolbarWidth = maxWidth - 48.dp
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(44.dp)
                 .horizontalScroll(
-                    state = rememberScrollState(),
+                    state = scrollState,
                     enabled = !isEdit,
                     reverseScrolling = true,
                 )
@@ -116,7 +114,6 @@ fun CategoryToolbar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End,
         ) {
-            // Show recent tags (excluding current comment to avoid duplicates)
             tags.take(5).reversed().filter { it != currentComment }.forEach { tag ->
                 AnimatedVisibility(
                     visible = showAddComment,
@@ -185,7 +182,7 @@ fun CategoryToolbar(
                     tags = tags,
                     onCommentUpdate = onCommentUpdate,
                     editorFocusController = editorFocusController,
-                    extendWidth = width,
+                    extendWidth = toolbarWidth,
                     onlyIcon = tags.isNotEmpty(),
                     onEdit = { isEdit = it },
                 )
@@ -194,9 +191,6 @@ fun CategoryToolbar(
     }
 }
 
-/**
- * Position provider for the dropdown menu popup.
- */
 internal data class DropdownMenuPositionProvider(
     val contentOffset: DpOffset,
     val density: Density,
@@ -209,14 +203,12 @@ internal data class DropdownMenuPositionProvider(
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
     ): IntOffset {
-        // The min margin above and below the menu, relative to the screen.
         val verticalMargin = with(density) { 48.dp.roundToPx() }
         val topBarHeightPx = with(density) { topBarHeight.roundToPx() }
         // The content offset specified using the dropdown offset parameter.
         val contentOffsetX = with(density) { contentOffset.x.roundToPx() }
         val contentOffsetY = with(density) { contentOffset.y.roundToPx() }
 
-        // Compute horizontal position.
         val toRight = anchorBounds.left + contentOffsetX
         val toLeft = anchorBounds.right - contentOffsetX - popupContentSize.width
         val toDisplayRight = windowSize.width - popupContentSize.width
@@ -225,23 +217,18 @@ internal data class DropdownMenuPositionProvider(
             sequenceOf(
                 toRight,
                 toLeft,
-                // If the anchor gets outside of the window on the left, we want to position
-                // toDisplayLeft for proximity to the anchor. Otherwise, toDisplayRight.
                 if (anchorBounds.left >= 0) toDisplayRight else toDisplayLeft
             )
         } else {
             sequenceOf(
                 toLeft,
                 toRight,
-                // If the anchor gets outside of the window on the right, we want to position
-                // toDisplayRight for proximity to the anchor. Otherwise, toDisplayLeft.
                 if (anchorBounds.right <= windowSize.width) toDisplayLeft else toDisplayRight
             )
         }.firstOrNull {
             it >= 0 && it + popupContentSize.width <= windowSize.width
         } ?: toLeft
 
-        // Compute vertical position.
         val yBottom = anchorBounds.top - contentOffsetY
 
         onPositionCalculated(
@@ -252,9 +239,6 @@ internal data class DropdownMenuPositionProvider(
     }
 }
 
-/**
- * Comment editor text field with focus management.
- */
 @Composable
 fun CommentEditor(
     modifier: Modifier = Modifier,
@@ -320,9 +304,6 @@ fun CommentEditor(
     }
 }
 
-/**
- * ViewModel-backed version of the tagging toolbar.
- */
 @Composable
 fun TaggingToolbarWithViewModel(
     viewModel: BudgetViewModel = hiltViewModel(),

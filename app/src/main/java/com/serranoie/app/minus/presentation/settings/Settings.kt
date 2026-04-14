@@ -113,20 +113,23 @@ fun Settings(
 		topBar = {
 			LargeTopAppBar(
 				title = {
-					Text(
-						text = "Ajustes",
-						style = MaterialTheme.typography.titleLargeEmphasized,
+				Text(
+					text = "Ajustes",
+					style = MaterialTheme.typography.titleLargeEmphasized,
+				)
+			}, navigationIcon = {
+				IconButton(
+					onClick = onBack, modifier = Modifier.testTag("SettingsBackButton")
+				) {
+					Icon(
+						imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+						contentDescription = null
 					)
-				}, navigationIcon = {
-					IconButton(onClick = onBack, modifier = Modifier.testTag("SettingsBackButton")) {
-						Icon(
-							imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null
-						)
-					}
-				}, colors = TopAppBarDefaults.topAppBarColors(
-					containerColor = MaterialTheme.colorScheme.surface,
-					titleContentColor = MaterialTheme.colorScheme.onSurface
-				), scrollBehavior = scrollBehavior
+				}
+			}, colors = TopAppBarDefaults.topAppBarColors(
+				containerColor = MaterialTheme.colorScheme.surface,
+				titleContentColor = MaterialTheme.colorScheme.onSurface
+			), scrollBehavior = scrollBehavior
 			)
 		}) { paddingValues ->
 		LazyColumn(
@@ -162,13 +165,13 @@ fun Settings(
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text ="Cambia el tipo de tema dentro de la app",
+								text = "Cambia el tipo de tema dentro de la app",
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
 						}
 						Text(
-							text = "adsf",
+							text = currentTheme,
 							style = MaterialTheme.typography.labelLarge,
 							color = MaterialTheme.colorScheme.primary
 						)
@@ -201,13 +204,12 @@ fun Settings(
 							checked = isMaterialYouEnabled, onCheckedChange = {
 								onMaterialYouToggle()
 //								view.toggleFeedback()
-							},
-							modifier = Modifier.testTag("SettingsMaterialYouSwitch")
+							}, modifier = Modifier.testTag("SettingsMaterialYouSwitch")
 						)
 					}
 				}
 			}
-			
+
 			item {
 				PaddedListGroup(
 					title = "Notificaciones"
@@ -238,12 +240,14 @@ fun Settings(
 							)
 						}
 						Text(
-							text = formatNotificationTime(context, notificationHour, notificationMinute),
+							text = formatNotificationTime(
+								context, notificationHour, notificationMinute
+							),
 							style = MaterialTheme.typography.labelLarge,
 							color = MaterialTheme.colorScheme.primary
 						)
 					}
-					
+
 					CustomPaddedListItem(
 						onClick = {
 							onOpenExactAlarmSettings()
@@ -300,35 +304,7 @@ fun Settings(
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Info de 1",
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
-
-					CustomPaddedListItem(
-						onClick = {
-							Utils.openWebLink(context, "https://www.github.com/isaacsa51/Sorter")
-							view.weakHapticFeedback()
-						},
-						position = PaddedListItemPosition.Middle,
-						modifier = Modifier.testTag("SettingsCheckUpdatesItem")
-					) {
-						Icon(
-							imageVector = Icons.Default.Policy,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = "Políticas de privacidad",
-								style = MaterialTheme.typography.bodyLarge,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = "Politicas equis",
+								text = "Conozca más a fondo sobre la app y su desarrollo",
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -382,7 +358,7 @@ fun Settings(
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "v$versionName",
+								text = "v0.5.1",
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -399,8 +375,7 @@ fun Settings(
 						onClick = {
 							onExportCsv()
 							view.toggleFeedback()
-						},
-						position = PaddedListItemPosition.First
+						}, position = PaddedListItemPosition.First
 					) {
 						Icon(
 							imageVector = Icons.Default.Info,
@@ -426,8 +401,7 @@ fun Settings(
 						onClick = {
 							onImportCsv()
 							view.toggleFeedback()
-						},
-						position = PaddedListItemPosition.Last
+						}, position = PaddedListItemPosition.Last
 					) {
 						Icon(
 							imageVector = Icons.Default.Refresh,
@@ -490,9 +464,10 @@ fun Settings(
 			ThemePickerDialog(
 				currentTheme = currentTheme,
 				onThemeSelected = onThemeChange,
-				onDismiss = dismissThemeDialog)
+				onDismiss = dismissThemeDialog
+			)
 		}
-		
+
 		if (showNotificationTimePicker) {
 			NotificationTimePickerDialog(
 				initialHour = notificationHour,
@@ -501,17 +476,14 @@ fun Settings(
 				onTimeSelected = { hour, minute ->
 					onNotificationTimeChange(hour, minute)
 					dismissNotificationTimePicker()
-				}
-			)
+				})
 		}
 	}
 }
 
 @Composable
 fun ThemePickerDialog(
-	currentTheme: String,
-	onThemeSelected: (String) -> Unit,
-	onDismiss: () -> Unit
+	currentTheme: String, onThemeSelected: (String) -> Unit, onDismiss: () -> Unit
 ) {
 	Dialog(onDismissRequest = onDismiss) {
 		Surface(
@@ -525,54 +497,47 @@ fun ThemePickerDialog(
 					.fillMaxWidth()
 					.padding(24.dp)
 			) {
-				// Dialog Title
 				Text(
-					text = "App Theme",
+					text = "Tema de la aplicación",
 					style = MaterialTheme.typography.headlineSmall,
 					fontWeight = FontWeight.Bold,
 					color = MaterialTheme.colorScheme.onSurface,
 					modifier = Modifier.padding(bottom = 16.dp)
 				)
 
-				// Light Theme Option
 				ThemeOption(
-					title = "Light",
-					subtitle = "Always use light theme",
+					title = "Claro",
+					subtitle = "Siempre usar tema claro",
 					icon = Icons.Default.LightMode,
 					isSelected = currentTheme == "Light",
 					onClick = {
 						onThemeSelected("Light")
 						onDismiss()
-					}
-				)
+					})
 
 				Spacer(modifier = Modifier.height(8.dp))
 
-				// Dark Theme Option
 				ThemeOption(
-					title = "Dark",
-					subtitle = "Always use dark theme",
+					title = "Oscuro",
+					subtitle = "Siempre usar tema oscuro",
 					icon = Icons.Default.DarkMode,
 					isSelected = currentTheme == "Dark",
 					onClick = {
 						onThemeSelected("Dark")
 						onDismiss()
-					}
-				)
+					})
 
 				Spacer(modifier = Modifier.height(8.dp))
 
-				// System Theme Option
 				ThemeOption(
-					title = "System",
-					subtitle = "Follow system settings",
+					title = "Seguir el sistema",
+					subtitle = "Sigue el mismo tema que tenga el sistema",
 					icon = Icons.Default.Brightness4,
 					isSelected = currentTheme == "System",
 					onClick = {
 						onThemeSelected("System")
 						onDismiss()
-					}
-				)
+					})
 			}
 		}
 	}
@@ -580,11 +545,7 @@ fun ThemePickerDialog(
 
 @Composable
 private fun ThemeOption(
-	title: String,
-	subtitle: String,
-	icon: ImageVector,
-	isSelected: Boolean,
-	onClick: () -> Unit
+	title: String, subtitle: String, icon: ImageVector, isSelected: Boolean, onClick: () -> Unit
 ) {
 	Row(
 		modifier = Modifier
@@ -602,14 +563,11 @@ private fun ThemeOption(
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Icon(
-			imageVector = icon,
-			contentDescription = null,
-			tint = if (isSelected) {
+			imageVector = icon, contentDescription = null, tint = if (isSelected) {
 				MaterialTheme.colorScheme.onPrimaryContainer
 			} else {
 				MaterialTheme.colorScheme.onSurfaceVariant
-			},
-			modifier = Modifier.size(24.dp)
+			}, modifier = Modifier.size(24.dp)
 		)
 
 		Spacer(modifier = Modifier.width(16.dp))
@@ -638,22 +596,17 @@ private fun ThemeOption(
 
 		if (isSelected) {
 			RadioButton(
-				selected = true,
-				onClick = null,
-				colors = RadioButtonDefaults.colors(
+				selected = true, onClick = null, colors = RadioButtonDefaults.colors(
 					selectedColor = MaterialTheme.colorScheme.primary
 				)
 			)
 		}
 	}
 }
- 
+
 @Composable
 private fun NotificationTimePickerDialog(
-	initialHour: Int,
-	initialMinute: Int,
-	onDismiss: () -> Unit,
-	onTimeSelected: (Int, Int) -> Unit
+	initialHour: Int, initialMinute: Int, onDismiss: () -> Unit, onTimeSelected: (Int, Int) -> Unit
 ) {
 	val context = LocalContext.current
 	DisposableEffect(context, initialHour, initialMinute) {
@@ -672,17 +625,15 @@ private fun NotificationTimePickerDialog(
 		}
 	}
 }
- 
+
 private fun formatNotificationTime(
-	context: android.content.Context,
-	hour: Int,
-	minute: Int
+	context: android.content.Context, hour: Int, minute: Int
 ): String {
 	val pattern = if (android.text.format.DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a"
 	return LocalTime.of(hour, minute)
 		.format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
 }
- 
+
 @Preview
 @Composable
 private fun PreviewSettings() {
@@ -698,7 +649,6 @@ private fun PreviewSettings() {
 			onNotificationTimeChange = { _, _ -> },
 			onOpenExactAlarmSettings = {},
 			periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
-			onPeriodMappingModeChange = {}
-		)
+			onPeriodMappingModeChange = {})
 	}
 }

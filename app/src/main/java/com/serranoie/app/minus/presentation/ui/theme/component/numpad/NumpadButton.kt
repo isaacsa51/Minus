@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.numpad
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,8 +52,13 @@ fun NumpadButton(
 	onLongClick: () -> Unit = {},
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
-	val isPressed = interactionSource.collectIsPressedAsState()
-	val radius = animateDpAsState(targetValue = if (isPressed.value) 20.dp else 999.dp)
+	val isPressed by interactionSource.collectIsPressedAsState()
+
+	val radius by animateDpAsState(
+		targetValue = if (isPressed) 20.dp else 999.dp,
+		animationSpec = tween(durationMillis = 100),
+		label = "cornerRadius"
+	)
 
 	val color = when (type) {
 		 NumpadButtonType.DEFAULT -> colorButton
@@ -71,17 +78,19 @@ fun NumpadButton(
 		 NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondary
 	}
 
+	val cornerShape = remember { RoundedCornerShape(999.dp) }
+
 	Surface(
 		tonalElevation = 10.dp,
 		modifier = modifier
 			.fillMaxSize()
-			.clip(RoundedCornerShape(radius.value))
+			.clip(cornerShape)
 	) {
 		BoxWithConstraints(
 			modifier = Modifier
 				.background(color = color)
 				.fillMaxSize()
-				.clip(RoundedCornerShape(radius.value))
+				.clip(RoundedCornerShape(radius))
 				.combinedClickable(
 					interactionSource = interactionSource,
 					indication = ripple(),

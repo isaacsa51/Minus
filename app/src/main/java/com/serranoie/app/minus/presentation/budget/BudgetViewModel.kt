@@ -76,6 +76,18 @@ class BudgetViewModel @Inject constructor(
 
 	val uiState: StateFlow<BudgetUiState> = _uiState.asStateFlow()
 
+	private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
+	val transactions: StateFlow<List<Transaction>> = _transactions.asStateFlow()
+
+	private val _budgetSettings = MutableStateFlow<BudgetSettings?>(null)
+	val budgetSettings: StateFlow<BudgetSettings?> = _budgetSettings.asStateFlow()
+
+	private val _budgetState = MutableStateFlow<BudgetState?>(null)
+	val budgetState: StateFlow<BudgetState?> = _budgetState.asStateFlow()
+
+	private val _tags = MutableStateFlow<List<String>>(emptyList())
+	val tags: StateFlow<List<String>> = _tags.asStateFlow()
+
 	private val _effects = MutableSharedFlow<BudgetUiEffect>()
 	val effects: SharedFlow<BudgetUiEffect> = _effects.asSharedFlow()
 
@@ -157,7 +169,11 @@ class BudgetViewModel @Inject constructor(
 			}.collect { state ->
 				_uiState.value = state
 
-				// Update all widgets when data changes
+				_transactions.value = state.transactions
+				_budgetSettings.value = state.budgetSettings
+				_budgetState.value = state.budgetState
+				_tags.value = state.tags
+
 				state.budgetState?.let { budget ->
 					val currency = state.budgetSettings?.currencyCode ?: "USD"
 					val totalSpent = budget.totalSpentInPeriod.toInt()
@@ -165,7 +181,6 @@ class BudgetViewModel @Inject constructor(
 					val remaining = budget.remainingToday.toInt()
 					val daysLeft = budget.daysRemaining
 
-					// Convert LocalDate to Date for widget
 					val startDate = state.budgetSettings?.startDate?.let {
 						java.util.Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
 					} ?: java.util.Date()
@@ -174,7 +189,6 @@ class BudgetViewModel @Inject constructor(
 					} ?: java.util.Date()
 					val budgetString = "$currency${budget.totalBudget.toInt()}"
 
-					// Update widgets
 					updateExpenseWidget(context, totalSpent, totalBudget, currency)
 					updateBudgetOverviewWidget(context, budgetString, startDate, endDate, daysLeft)
 					updateDaysCountdownWidget(context, daysLeft, budget.totalBudget.toInt(), "days left")
@@ -274,10 +288,7 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-	/**
-	 * Marks the current period as finished early.
-	 * Keeps current settings and transactions intact so Analytics can show the finished period snapshot.
-	 */
+
 	fun finishBudgetEarly() {
 		viewModelScope.launch {
 			val settings = budgetRepository.getBudgetSettingsSync() ?: return@launch
@@ -317,10 +328,7 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-	/**
-	 * Trigger test notifications - called when user presses . eight times then apply.
-	 * Shows both period end and recurrent expense notifications for testing.
-	 */
+
 	fun triggerTestNotifications() {
 		viewModelScope.launch {
 			Log.d(TAG, "=== TRIGGERING TEST NOTIFICATIONS ===")
@@ -330,7 +338,6 @@ class BudgetViewModel @Inject constructor(
 			
 			Log.d(TAG, "Currency: $currency, Settings: $settings")
 			
-			// Test period end notification
 			try {
 				notificationHelper.showPeriodEndNotification(
 					remainingBudget = "150.00",
@@ -341,7 +348,6 @@ class BudgetViewModel @Inject constructor(
 				Log.e(TAG, "✗ Error showing period end notification", e)
 			}
 			
-			// Test recurrent expense notification
 			try {
 				notificationHelper.showRecurrentExpenseNotification(
 					amount = "50.00",
@@ -365,6 +371,7 @@ class BudgetViewModel @Inject constructor(
 			is BudgetUiIntent.BackspaceTapped -> handleBackspace()
 			is BudgetUiIntent.ApplyTapped -> handleApply()
 			is BudgetUiIntent.DeleteTransactionTapped -> handleDeleteTransaction(intent.transaction)
+			is BudgetUiIntent.RestoreTransactionTapped -> handleRestoreTransaction(intent.transaction)
 			is BudgetUiIntent.EditTransactionTapped -> handleEditTransaction(intent.updatedTransaction)
 			is BudgetUiIntent.DateSelected -> handleDateSelected(intent.date)
 			is BudgetUiIntent.UpdateSettings -> handleUpdateSettings(intent.settings)
@@ -403,13 +410,11 @@ class BudgetViewModel @Inject constructor(
 		val lastChar = currentInput.lastOrNull()
 		val isOperator = { c: Char? -> c != null && c in "+-×÷" }
 
-		// If empty or after operator, start decimal number as 0.
 		if (currentInput.isEmpty() || isOperator(lastChar)) {
 			_numpadInput.value = "$currentInput" + "0."
 			return
 		}
 
-		// Only allow one dot in current numeric segment (after last operator)
 		val lastOperatorIndex = currentInput.indexOfLast { it in "+-×÷" }
 		val currentSegment = currentInput.substring(lastOperatorIndex + 1)
 		if (currentSegment.contains(".")) return
@@ -430,11 +435,9 @@ class BudgetViewModel @Inject constructor(
 		if (currentInput.isEmpty()) return
 
 		val lastChar = currentInput.lastOrNull() ?: return
-		// Block consecutive operators, and block operator after dot
 		if (lastChar in "+-×÷" || lastChar == '.') return
 
 		_numpadInput.value = "$currentInput$operator"
-		// Auto-enter calculation mode when user starts building an expression via operator input.
 		if (!_uiState.value.isCalculation) {
 			_uiState.update { it.copy(isCalculation = true) }
 		}
@@ -444,10 +447,8 @@ class BudgetViewModel @Inject constructor(
 		val currentInput = _numpadInput.value
 		if (currentInput.isEmpty()) return
 		
-		// Evaluate the calculation
 		val result = evaluateCalculation(currentInput)
 		if (result != null) {
-			// Replace input with the result and stay in calculation mode for continued operations
 			_numpadInput.value = result
 			if (!_uiState.value.isCalculation) {
 				_uiState.update { it.copy(isCalculation = true) }
@@ -455,27 +456,19 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-	/**
-	 * Calculation evaluator for chained arithmetic operations.
-	 * Supports +, -, ×, ÷ operators in sequence (e.g., 85+88-42=131).
-	 */
+
 	private fun evaluateCalculation(input: String): String? {
-		// Handle empty or whitespace-only input
 		if (input.isBlank()) return null
 
 		return try {
-			// Normalize operators: × -> * and ÷ -> /
 			val normalized = input.trim()
 				.replace("×", "*")
 				.replace("÷", "/")
 
-			// If ends with an operator, it's incomplete - return null
 			normalized.lastOrNull()?.let { if (it in "+-*/") return null }
 
-			// Check if there's any operator in the input
 			val hasOperator = normalized.any { it in "+-*/" }
 
-			// If no operator, just return the number as-is
 			if (!hasOperator) {
 				val num = normalized.toBigDecimalOrNull() ?: return null
 				return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
@@ -485,21 +478,16 @@ class BudgetViewModel @Inject constructor(
 				}
 			}
 
-			// Use a regex to split by operators
-			// This handles chained operations like "85+88-42"
 			val tokenPattern = Regex("([+\\-*/])")
 			val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
 			val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
 
 			if (parts.isEmpty() || parts[0].isEmpty()) return null
 
-			// If we have more operators than numbers, it's invalid
 			if (operators.size > parts.size - 1) return null
 
-			// Start with first number
 			var result = parts[0].toBigDecimalOrNull() ?: return null
 
-			// Process each operator-number pair
 			for (i in operators.indices) {
 				if (i + 1 >= parts.size) break
 				val operator = operators[i]
@@ -517,7 +505,6 @@ class BudgetViewModel @Inject constructor(
 				}
 			}
 
-			// Format result without decimal if whole number
 			if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
 				result.toBigInteger().toString()
 			} else {
@@ -547,7 +534,6 @@ class BudgetViewModel @Inject constructor(
 	private fun handleApply() {
 		var input = _numpadInput.value
 		
-		// If in calculation mode and input contains operators, evaluate the calculation first
 		if (_uiState.value.isCalculation && input.any { it in "+-×÷" }) {
 			val calculatedResult = evaluateCalculation(input)
 			if (calculatedResult != null) {
@@ -564,13 +550,11 @@ class BudgetViewModel @Inject constructor(
 			return
 		}
 
-		// Prevent negative values - cannot save negative expenses
 		if (amount < BigDecimal.ZERO) {
 			_numpadInput.value = ""
 			return
 		}
 
-		// Check if recurrent is enabled - if so, show dialog instead of saving immediately
 		if (_uiState.value.isRecurrentEnabled) {
 			_uiState.update {
 				it.copy(
@@ -592,7 +576,6 @@ class BudgetViewModel @Inject constructor(
 			addTransactionUseCase(transaction)
 			_numpadInput.value = ""
 			_currentComment.value = ""
-			// Exit calculation mode after saving
 			_uiState.update { it.copy(isCalculation = false) }
 		}
 	}
@@ -628,7 +611,6 @@ class BudgetViewModel @Inject constructor(
 			)
 			addTransactionUseCase(transaction)
 
-			// Clear pending state and input
 			_uiState.update {
 				it.copy(
 					showRecurrentDialog = false,
@@ -659,8 +641,19 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
+	private fun handleRestoreTransaction(transaction: Transaction) {
+		viewModelScope.launch {
+			try {
+				addTransactionUseCase(transaction)
+				Log.d(TAG, "Transaction ${transaction.id} restored successfully")
+			} catch (e: Exception) {
+				Log.e(TAG, "Error restoring transaction ${transaction.id}", e)
+				_effects.emit(BudgetUiEffect.ShowMessage("Could not restore transaction"))
+			}
+		}
+	}
+
 	private fun handleEditTransaction(updatedTransaction: Transaction) {
-		// Prevent negative values - cannot save negative expenses
 		if (updatedTransaction.amount < BigDecimal.ZERO) {
 			return
 		}
@@ -699,7 +692,6 @@ class BudgetViewModel @Inject constructor(
 	}
 
 	private fun extractTagsFromTransactions(transactions: List<Transaction>): List<String> {
-		// Extract all non-empty, unique comments from transactions
 		return transactions
 			.map { it.comment }
 			.filter { it.isNotBlank() }
@@ -873,12 +865,10 @@ class BudgetViewModel @Inject constructor(
 		}
 		Log.d(TAG, "originalDailyBudget=$originalDailyBudget (baseTotalBudget=${settings.totalBudget} / originalTotalDays=$originalTotalDays)")
 
-		// Calculate regular spent today
 		val regularSpentToday =
 			transactions.filter { !it.isDeleted && it.date?.toLocalDate() == currentDate }
 				.sumOf { it.amount }
 		
-		// Calculate recurring charges due today
 		val recurringDueToday = recurringExpenseCalculator.calculateRecurringDueToday(transactions, currentDate)
 		
 		val spentToday = regularSpentToday.add(recurringDueToday)
@@ -902,7 +892,7 @@ class BudgetViewModel @Inject constructor(
 			progress = progress,
 			isOverBudget = remainingBudget < BigDecimal.ZERO,
 			totalBudget = effectiveTotalBudget,
-			totalSpentInPeriod = totalSpentInPeriod.add(recurringDueToday) // Include recurring in period total
+			totalSpentInPeriod = totalSpentInPeriod.add(recurringDueToday)
 		).also {
 			Log.d(TAG, "BudgetState created: $it")
 		}

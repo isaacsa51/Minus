@@ -131,6 +131,9 @@ fun MainScreen(
 		pendingDeleteJob = null
 		snackbarAutoDismissJob?.cancel()
 		snackbarAutoDismissJob = null
+		pendingDeleteTransaction?.let { tx ->
+			budgetViewModel.processIntent(BudgetUiIntent.RestoreTransactionTapped(tx))
+		}
 		pendingDeleteTransaction = null
 		snackbarHostState.currentSnackbarData?.dismiss()
 	}
@@ -142,6 +145,7 @@ fun MainScreen(
 		snackbarAutoDismissJob?.cancel()
 
 		pendingDeleteTransaction = transaction
+		executeDelete(transaction)
 
 		coroutineScope.launch {
 			val result = snackbarHostState.showSnackbar(
@@ -156,10 +160,6 @@ fun MainScreen(
 
 		pendingDeleteJob = coroutineScope.launch {
 			delay(3500L)
-			pendingDeleteTransaction?.let { tx ->
-				executeDelete(tx)
-			}
-			delay(300L)
 			pendingDeleteTransaction = null
 			pendingDeleteJob = null
 		}

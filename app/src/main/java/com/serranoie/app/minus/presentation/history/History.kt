@@ -16,6 +16,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
@@ -139,13 +140,9 @@ fun History(
 	}
 
 	LaunchedEffect(isAtEndOfList) {
-		// When at end of list: allow swipe-down to go back to HalfExpanded (lockSwipeable = false)
-		// When not at end: prevent swipe-up to dismiss (lockSwipeable = true)
 		viewModel.processIntent(BudgetUiIntent.SetLockSwipeable(!isAtEndOfList))
 	}
 
-	// Overscroll detection: when at end and user tries to scroll further, trigger sheet collapse
-	// We use a coroutine to continuously check for overscroll condition
 	LaunchedEffect(isAtEndOfList) {
 		if (isAtEndOfList) {
 			// When at end, we could add additional handling here
@@ -155,7 +152,7 @@ fun History(
 	}
 
 	var editingTransaction by remember { mutableStateOf<Transaction?>(null) }
-	var deletingTransactionIds by remember { mutableStateOf<Set<Long>>(emptySet()) }
+	var pendingRemovedTransactions by remember { mutableStateOf<Map<Long, Transaction>>(emptyMap()) }
 
 	var recurrentToDelete by remember { mutableStateOf<Transaction?>(null) }
 	var recurrentToEdit by remember { mutableStateOf<Transaction?>(null) }
@@ -175,20 +172,29 @@ fun History(
 
 	var expandedDates by rememberSaveable { mutableStateOf<Set<LocalDate>>(emptySet()) }
 	var showPastPeriod by rememberSaveable { mutableStateOf(false) }
+	val deletingTransactionIds = remember(pendingRemovedTransactions) {
+		pendingRemovedTransactions.keys.toSet()
+	}
 
 	var expandedUpcomingRecurrent by remember { mutableStateOf(true) }
 	var expandedFutureRecurrent by remember { mutableStateOf(false) }
 
+	val displayTransactions = remember(uiState.transactions, pendingRemovedTransactions) {
+		uiState.transactions + pendingRemovedTransactions.values.filterNot { pending ->
+			uiState.transactions.any { it.id == pending.id }
+		}
+	}
+
 	val previousPeriodId = uiState.currentPeriodId - 1
 	val (currentPeriodTransactions, pastPeriodTransactions) = remember(
-		uiState.transactions,
+		displayTransactions,
 		budgetStartDate,
 		budgetEndDate,
 		uiState.currentPeriodStartedAtMillis,
 		uiState.currentPeriodId,
 		previousPeriodId
 	) {
-		val sorted = uiState.transactions.sortedByDescending { it.date }
+		val sorted = displayTransactions.sortedByDescending { it.date }
 		val current = sorted.filter { transaction ->
 			if (uiState.currentPeriodId > 0L && transaction.periodId > 0L) {
 				return@filter transaction.periodId == uiState.currentPeriodId
@@ -213,10 +219,10 @@ fun History(
 	}
 
 	val (upcomingRecurrentInPeriod, futureRecurrentOutOfPeriod) = remember(
-		uiState.transactions, budgetStartDate, budgetEndDate
+		displayTransactions, budgetStartDate, budgetEndDate
 	) {
 		val today = LocalDate.now()
-		val recurrentTransactions = uiState.transactions.filter { it.isRecurrent }
+		val recurrentTransactions = displayTransactions.filter { it.isRecurrent }
 
 		val upcomingInPeriod = recurrentTransactions.mapNotNull { transaction ->
 			val nextDate = calculateNextChargeDate(transaction, today)
@@ -251,7 +257,6 @@ fun History(
 	) {
 		val today = LocalDate.now()
 
-		// Add "virtual" transactions for recurring expenses due on each date
 		val withVirtualRecurrent = currentPeriodTransactions.flatMap { transaction ->
 			if (transaction.isRecurrent && !transaction.isDeleted) {
 				val charges =
@@ -271,7 +276,6 @@ fun History(
 			.toSortedMap(compareByDescending { it })
 	}
 
-	// Auto-expand date groups with a lightweight default in read-only sheet mode
 	LaunchedEffect(groupedCurrentTransactions.keys, readOnly) {
 		val sortedDates = groupedCurrentTransactions.keys.filterNotNull().sortedDescending()
 		val defaultExpanded = if (readOnly) {
@@ -282,21 +286,22 @@ fun History(
 		expandedDates = expandedDates + defaultExpanded
 	}
 
-	// Clean up deletingTransactionIds when transactions are actually removed
-	val allTransactionIds = remember(uiState.transactions) {
-		uiState.transactions.map { it.id }.toSet()
-	}
-	LaunchedEffect(allTransactionIds) {
-		// Remove IDs that are no longer in the transactions list
-		deletingTransactionIds = deletingTransactionIds.filter { it in allTransactionIds }.toSet()
+	LaunchedEffect(pendingRemovedTransactions.keys) {
+		if (pendingRemovedTransactions.isNotEmpty()) {
+			delay(330)
+			pendingRemovedTransactions = emptyMap()
+		}
 	}
 
 	fun queueDeleteWithUndo(transaction: Transaction) {
-		deletingTransactionIds = deletingTransactionIds - transaction.id
+		pendingRemovedTransactions = pendingRemovedTransactions + (transaction.id to transaction)
 		onQueueDeleteWithUndo(
 			transaction,
 			"${transaction.comment.ifEmpty { "Gasto" }} eliminado",
-			{ onCancelPendingDelete() })
+			{
+				pendingRemovedTransactions = pendingRemovedTransactions - transaction.id
+				onCancelPendingDelete()
+			})
 	}
 
 	Box(modifier = modifier.fillMaxSize()) {
@@ -423,7 +428,10 @@ fun History(
 									AnimatedVisibility(
 										visible = !isBeingDeleted,
 										enter = EnterTransition.None,
-										exit = ExitTransition.None
+										exit = slideOutHorizontally(
+											animationSpec = tween(durationMillis = 280),
+											targetOffsetX = { fullWidth -> fullWidth }
+										) + fadeOut(animationSpec = tween(durationMillis = 280))
 									) {
 										SwipeableExpenseItem(
 											transaction = transaction,
@@ -438,7 +446,7 @@ fun History(
 											onClick = { selectedTransaction = transaction })
 									}
 
-									if (index < transactions.size - 1) {
+									if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {
 										Spacer(modifier = Modifier.height(2.dp))
 									}
 								}
@@ -587,7 +595,10 @@ fun History(
 									AnimatedVisibility(
 										visible = !isBeingDeleted,
 										enter = EnterTransition.None,
-										exit = ExitTransition.None
+										exit = slideOutHorizontally(
+											animationSpec = tween(durationMillis = 280),
+											targetOffsetX = { fullWidth -> fullWidth }
+										) + fadeOut(animationSpec = tween(durationMillis = 280))
 									) {
 										SwipeableExpenseItem(
 											transaction = transaction,
@@ -602,7 +613,7 @@ fun History(
 											onClick = { selectedTransaction = transaction })
 									}
 
-									if (index < transactions.size - 1) {
+									if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {
 										Spacer(modifier = Modifier.height(2.dp))
 									}
 								}

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -85,7 +86,10 @@ fun Numpad(
 	val haptic = LocalHapticFeedback.current
 	var debugProgress by remember { mutableIntStateOf(0) }
 
-	val hasOperators = editorState.rawSpentValue.any { it in "+-×÷" }
+	// Use derivedStateOf to only recompute when rawSpentValue actually changes
+	val hasOperators by remember(editorState.rawSpentValue) {
+		derivedStateOf { editorState.rawSpentValue.any { it in "+-×÷" } }
+	}
 	val topRowWeight = if (isCalculation) 0.75f else 1f
 
 	Column(
@@ -131,19 +135,7 @@ fun Numpad(
 			targetState = isCalculation,
 			label = "TopRowModeTransition",
 			transitionSpec = {
-				if (targetState) {
-					(slideInVertically(animationSpec = tween(180)) { it / 4 } + fadeIn(tween(180))) togetherWith (slideOutVertically(
-						animationSpec = tween(140)
-					) { -it / 4 } + fadeOut(
-						tween(140)
-					))
-				} else {
-					(slideInVertically(animationSpec = tween(180)) { -it / 4 } + fadeIn(tween(180))) togetherWith (slideOutVertically(
-						animationSpec = tween(140)
-					) { it / 4 } + fadeOut(
-						tween(140)
-					))
-				}.using(SizeTransform(clip = true))
+				fadeIn(tween(durationMillis = 100)) togetherWith fadeOut(tween(durationMillis = 100))
 			}) { calcTopRow ->
 			Row(Modifier.fillMaxSize()) {
 				if (calcTopRow) {
@@ -202,16 +194,16 @@ fun Numpad(
 			label = "SwipeModeButtonsTransition",
 			transitionSpec = {
 				if (targetState) {
-					(slideInVertically(animationSpec = tween(200)) { it / 5 } + fadeIn(tween(200))) togetherWith (slideOutVertically(
-						animationSpec = tween(150)
+					(slideInVertically(animationSpec = tween(150)) { it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(
+						animationSpec = tween(100)
 					) { -it / 5 } + fadeOut(
-						tween(150)
+						tween(100)
 					))
 				} else {
-					(slideInVertically(animationSpec = tween(200)) { -it / 5 } + fadeIn(tween(200))) togetherWith (slideOutVertically(
-						animationSpec = tween(150)
+					(slideInVertically(animationSpec = tween(150)) { -it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(
+						animationSpec = tween(100)
 					) { it / 5 } + fadeOut(
-						tween(150)
+						tween(100)
 					))
 				}.using(SizeTransform(clip = true))
 			}) { calcMode ->
@@ -463,26 +455,18 @@ fun Numpad(
 							.fillMaxSize()
 							.weight(1F)
 					) {
-						val fixedSpent =
-							tryConvertStringToNumber(editorState.rawSpentValue).join(third = false)
+						val fixedSpent by remember(editorState.rawSpentValue, editorState.mode) {
+							derivedStateOf {
+								tryConvertStringToNumber(editorState.rawSpentValue).join(third = false)
+							}
+						}
 
 						AnimatedContent(
 							label = "Delete or Apply",
-							targetState = (fixedSpent == "0" || fixedSpent == "0." || fixedSpent == "0.0") && editorState.mode === EditMode.EDIT,
+							targetState = (fixedSpent == "0" || fixedSpent == "0." || fixedSpent == "0.0") && editorState.mode == EditMode.EDIT,
 							transitionSpec = {
-								if (targetState && !initialState) {
-									fadeIn(tween(durationMillis = 250)) togetherWith fadeOut(
-										tween(
-											durationMillis = 250
-										)
-									)
-								} else {
-									fadeIn(tween(durationMillis = 250)) togetherWith fadeOut(
-										tween(
-											durationMillis = 250
-										)
-									)
-								}.using(SizeTransform(clip = false))
+								(fadeIn(tween(durationMillis = 150)) togetherWith fadeOut(tween(durationMillis = 150)))
+									.using(SizeTransform(clip = false))
 							}) { targetIsDelete ->
 							if (targetIsDelete) {
 								NumpadButton(

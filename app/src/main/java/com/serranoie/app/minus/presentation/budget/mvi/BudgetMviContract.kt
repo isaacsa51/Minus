@@ -20,6 +20,7 @@ sealed interface BudgetUiIntent {
     data class SetDragProgress(val progress: Float) : BudgetUiIntent
 
     data class DeleteTransactionTapped(val transaction: Transaction) : BudgetUiIntent
+    data class RestoreTransactionTapped(val transaction: Transaction) : BudgetUiIntent
     data class EditTransactionTapped(val updatedTransaction: Transaction) : BudgetUiIntent
 
     data class DateSelected(val date: LocalDate) : BudgetUiIntent

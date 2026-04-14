@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.serranoie.app.minus.THEME_MODE_KEY
 import com.serranoie.app.minus.appTheme
 import com.serranoie.app.minus.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.theme.harmonize.palette.CorePalette
@@ -105,7 +106,7 @@ fun isNightMode(): Boolean = when (LocalContext.current.appTheme) {
 
 @Composable
 fun MinusTheme(
-	darkTheme: Boolean = isSystemInDarkTheme(),
+	darkTheme: Boolean = isNightMode(),
 	dynamicColor: Boolean = false,
 	content: @Composable () -> Unit
 ) {
@@ -130,7 +131,7 @@ fun MinusTheme(
 
 suspend fun switchTheme(context: Context, mode: ThemeMode) {
 	context.settingsDataStore.edit {
-		it[stringPreferencesKey("theme")] = mode.toString()
+		it[THEME_MODE_KEY] = mode.toString()
 	}
 
 	context.appTheme = mode
@@ -140,7 +141,7 @@ fun syncTheme(context: Context) {
 	val currentValue = runBlocking { context.settingsDataStore.data.first() }
 
 	val mode = ThemeMode.valueOf(
-		currentValue[stringPreferencesKey("theme")] ?: ThemeMode.SYSTEM.toString()
+		currentValue[THEME_MODE_KEY] ?: ThemeMode.SYSTEM.toString()
 	)
 
 	context.appTheme = mode
