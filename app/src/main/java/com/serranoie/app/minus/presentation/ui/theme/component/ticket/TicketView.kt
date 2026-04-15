@@ -148,7 +148,7 @@ fun TicketView(
 			.background(backgroundColor, shape = ticketShape)
 			.clip(ticketShape)
 			.then(clickableModifier)
-			.padding(16.dp)) {
+			.padding(horizontal = 16.dp, vertical = 22.dp)) {
 		content()
 	}
 }
@@ -157,7 +157,7 @@ fun TicketView(
 @Composable
 private fun SimpleTicketPreview() {
 	MinusTheme {
-		Column(modifier = Modifier.padding(16.dp)) {
+		Column() {
 			// Basic ticket
 			TicketView(
 				backgroundColor = MaterialTheme.colorScheme.surfaceVariant,

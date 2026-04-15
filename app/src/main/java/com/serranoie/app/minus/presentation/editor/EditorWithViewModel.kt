@@ -3,10 +3,13 @@ package com.serranoie.app.minus.presentation.editor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import android.util.Log
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
+
+private const val EDITOR_VM_TAG = "EditorWithVM - ISAAC"
 
 @Composable
 fun EditorWithViewModel(
@@ -48,10 +51,13 @@ fun EditorWithViewModel(
 		onAnalyticsClickForTutorial = onAnalyticsClickForTutorial,
 		onChangePeriod = { newPeriod ->
 			uiState.budgetSettings?.let { settings ->
-				viewModel.processIntent(BudgetUiIntent.UpdateSettings(settings.copy(period = newPeriod)))
+				val updated = settings.copy(period = newPeriod)
+				Log.d(EDITOR_VM_TAG, "onChangePeriod -> dispatch UpdateSettings with $updated")
+				viewModel.processIntent(BudgetUiIntent.UpdateSettings(updated))
 			}
 		},
 		onSaveBudget = { newSettings ->
+			Log.d(EDITOR_VM_TAG, "onSaveBudget -> call viewModel.saveBudgetSettings($newSettings)")
 			viewModel.saveBudgetSettings(newSettings)
 		},
 		onFinishBudgetEarly = {

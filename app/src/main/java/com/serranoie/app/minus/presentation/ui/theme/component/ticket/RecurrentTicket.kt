@@ -1,5 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.ticket
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +37,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
  * @param teethWidthDp Width of the ticket "teeth"
  * @param teethHeightDp Height of the ticket "teeth"
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecurrentTicketCard(
     title: String,
@@ -63,12 +66,14 @@ fun RecurrentTicketCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = title.ifEmpty { "Pago recurrente" },
+                    text = title.ifEmpty { "Subscripción sin nombre" },
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
+                    overflow = TextOverflow.Clip,
+                    modifier = Modifier
+                        .weight(1f)
+                        .basicMarquee()
                 )
 
                 // Amount
@@ -87,7 +92,7 @@ fun RecurrentTicketCard(
                     .fillMaxWidth()
                     .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = nextChargeDate,
@@ -99,8 +104,15 @@ fun RecurrentTicketCard(
                 )
 
                 frequencyLabel?.let { label ->
+                    val spanishLabel = when (label.lowercase()) {
+                        "weekly" -> "Semanal"
+                        "biweekly" -> "Quincenal"
+                        "monthly" -> "Mensual"
+                        else -> label
+                    }
+
                     Text(
-                        text = label,
+                        text = spanishLabel,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.secondary,
                         maxLines = 2,

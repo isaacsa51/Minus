@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
@@ -100,6 +101,8 @@ import java.util.Currency
 import java.util.Date
 import java.util.Locale
 
+private const val PERIOD_SWITCHER_TAG = "PeriodSwitcherSheet - ISAAC"
+
 @Composable
 fun PeriodSwitcherSheet(
 	budgetSettings: BudgetSettings?,
@@ -139,8 +142,17 @@ fun PeriodSwitcherSheet(
 		if (totalDays > 0) availablePeriodsFor(totalDays) else listOf(BudgetPeriod.DAILY)
 
 	LaunchedEffect(available, totalDays) {
+		Log.d(
+			PERIOD_SWITCHER_TAG,
+			"reconcilePeriodCache: current=$periodCache, available=$available, totalDays=$totalDays, start=$startDate, end=$endDate"
+		)
 		if (periodCache !in available && available.isNotEmpty()) {
+			val previous = periodCache
 			periodCache = available.first()
+			Log.w(
+				PERIOD_SWITCHER_TAG,
+				"periodCache auto-adjusted from $previous to $periodCache because previous is not available for totalDays=$totalDays"
+			)
 			onPeriodSelected(periodCache)
 		}
 	}
@@ -200,6 +212,7 @@ fun PeriodSwitcherSheet(
 				endDateAsDate = endDateAsDate,
 				available = available,
 				onPeriodSelected = { p ->
+					Log.d(PERIOD_SWITCHER_TAG, "User selected period chip: $p (previous=$periodCache)")
 					periodCache = p
 					onPeriodSelected(p)
 				},
@@ -441,31 +454,28 @@ fun EditBudgetContent(
 		SupportedCurrency.findByCode(currentCurrency)?.symbol ?: "$"
 	}
 
-	var budgetText by remember {
+	var budgetText by remember(currentBudget) {
 		mutableStateOf(
 			if (currentBudget > BigDecimal.ZERO) {
-				// Convert to cents (multiply by 100 and round)
 				(currentBudget.multiply(BigDecimal(100)).toBigInteger()).toString()
 			} else ""
 		)
 	}
-	var startCache by remember { mutableStateOf(LocalDate.now()) }
-	var endCache by remember { mutableStateOf<LocalDate?>(null) }
-	var currencyCache by remember { mutableStateOf(currentCurrency) }
-	var strategyCache by remember { mutableStateOf(currentStrategy) }
+	var startCache by remember(currentStart) { mutableStateOf(currentStart) }
+	var endCache by remember(currentEnd) { mutableStateOf(currentEnd) }
+	var currencyCache by remember(currentCurrency) { mutableStateOf(currentCurrency) }
+	var strategyCache by remember(currentStrategy) { mutableStateOf(currentStrategy) }
 
 	var showDateSelector by remember { mutableStateOf(false) }
 	var showCurrencyPicker by remember { mutableStateOf(false) }
 	var showStrategyPicker by remember { mutableStateOf(false) }
 	var showPreviousValues by remember { mutableStateOf(false) }
 
-	// Convert from cents to actual amount
 	val parsedBudget =
 		budgetText.toBigDecimalOrNull()?.divide(BigDecimal(100)) ?: BigDecimal.ZERO
 	val totalDays = endCache?.let { ChronoUnit.DAYS.between(startCache, it).toInt() + 1 } ?: 0
 	val canApply = parsedBudget > BigDecimal.ZERO && totalDays > 0
 
-	// Validation message
 	val validationMessage = when {
 		parsedBudget <= BigDecimal.ZERO && budgetText.isNotEmpty() -> "El presupuesto debe ser mayor a 0"
 		endCache == null -> "Sin fecha final definida"
@@ -481,7 +491,6 @@ fun EditBudgetContent(
 			.navigationBarsPadding()
 			.verticalScroll(rememberScrollState()),
 	) {
-		// Title
 		Text(
 			text = title,
 			style = MaterialTheme.typography.headlineMediumEmphasized,
@@ -492,7 +501,6 @@ fun EditBudgetContent(
 			textAlign = TextAlign.Center,
 		)
 
-		// Valores anteriores chip
 		if (showPreviousValuesChip && currentBudget > BigDecimal.ZERO) {
 			AssistChip(
 				onClick = { showPreviousValues = !showPreviousValues },
@@ -536,7 +544,6 @@ fun EditBudgetContent(
 						Spacer(modifier = Modifier.height(8.dp))
 						AssistChip(
 							onClick = {
-								// Convert to cents
 								budgetText = if (currentBudget > BigDecimal.ZERO) {
 									(currentBudget.multiply(BigDecimal(100)).toBigInteger()).toString()
 								} else ""
@@ -565,7 +572,6 @@ fun EditBudgetContent(
 
 		Spacer(modifier = Modifier.height(24.dp))
 
-		// Budget amount input - large centered text with currency symbol
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
@@ -575,7 +581,6 @@ fun EditBudgetContent(
 			BasicTextField(
 				value = budgetText,
 				onValueChange = { newValue ->
-					// Only allow digits
 					val filtered = newValue.filter { it.isDigit() }
 					budgetText = filtered
 				},
@@ -616,7 +621,6 @@ fun EditBudgetContent(
 
 		Spacer(modifier = Modifier.height(16.dp))
 
-		// Date row - formatted as "16 Marzo a 15 Abril"
 		SettingsRow(
 			icon = Icons.Outlined.DateRange,
 			label = if (endCache != null) {
@@ -627,7 +631,6 @@ fun EditBudgetContent(
 			onClick = { showDateSelector = true },
 		)
 
-		// Previous days chip
 		if (previousPeriodDays > 0 && endCache == null) {
 			Spacer(modifier = Modifier.height(4.dp))
 			Row(modifier = Modifier.fillMaxWidth()) {
@@ -654,7 +657,6 @@ fun EditBudgetContent(
 
 		Spacer(modifier = Modifier.height(8.dp))
 
-		// Sobrante (remaining budget strategy)
 		SettingsRow(
 			icon = Icons.Default.Check,
 			label = "Sobrante",
@@ -668,7 +670,6 @@ fun EditBudgetContent(
 
 		Spacer(modifier = Modifier.height(8.dp))
 
-		// Currency
 		val currencyDisplay = SupportedCurrency.findByCode(currencyCache)
 		SettingsRow(
 			icon = Icons.Default.Edit,
@@ -681,7 +682,6 @@ fun EditBudgetContent(
 			onClick = { showCurrencyPicker = true },
 		)
 
-		// Validation message
 		if (validationMessage != null) {
 			Spacer(modifier = Modifier.height(16.dp))
 			Row(
@@ -708,14 +708,25 @@ fun EditBudgetContent(
 		Button(
 			onClick = {
 				haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-				val period = budgetSettings?.period ?: BudgetPeriod.DAILY
+				val periodDays = endCache?.let { ChronoUnit.DAYS.between(startCache, it).toInt() + 1 } ?: 1
+				val period = when {
+					periodDays >= 30 -> BudgetPeriod.MONTHLY
+					periodDays >= 14 -> BudgetPeriod.BIWEEKLY
+					periodDays >= 7 -> BudgetPeriod.WEEKLY
+					else -> BudgetPeriod.DAILY
+				}
 				val newSettings = (budgetSettings ?: BudgetSettings.DEFAULT).copy(
 					totalBudget = parsedBudget,
 					startDate = startCache,
 					endDate = endCache,
+					daysInPeriod = periodDays,
 					currencyCode = currencyCache,
 					remainingBudgetStrategy = strategyCache,
 					period = period,
+				)
+				Log.d(
+					PERIOD_SWITCHER_TAG,
+					"Apply tapped: budget=$parsedBudget, start=$startCache, end=$endCache, periodDays=$periodDays, resolvedPeriod=$period, strategy=$strategyCache, currency=$currencyCache"
 				)
 				onApply(newSettings)
 			},
@@ -733,13 +744,13 @@ fun EditBudgetContent(
 		}
 	}
 
-	// Date Selector
 	if (showDateSelector) {
 		FinishDateSelector(
 			totalBudget = parsedBudget,
 			currencyCode = currencyCache,
 			onBackPressed = { showDateSelector = false },
-			onApply = { newStart, newEnd, _ ->
+			onApply = { newStart, newEnd, selectedPeriod ->
+				Log.d(PERIOD_SWITCHER_TAG, "FinishDateSelector.onApply -> start=$newStart, end=$newEnd, selectedPeriod=$selectedPeriod")
 				startCache = newStart
 				endCache = newEnd
 				showDateSelector = false
@@ -747,7 +758,6 @@ fun EditBudgetContent(
 		)
 	}
 
-	// Currency Picker Dialog
 	if (showCurrencyPicker) {
 		CurrencyPickerDialog(
 			currentCode = currencyCache,
@@ -759,7 +769,6 @@ fun EditBudgetContent(
 		)
 	}
 
-	// Strategy Picker Dialog
 	if (showStrategyPicker) {
 		StrategyPickerDialog(
 			currentStrategy = strategyCache,

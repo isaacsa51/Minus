@@ -93,8 +93,12 @@ fun CategoryToolbar(
 
     val scrollState = rememberScrollState()
 
-    var showAddComment by remember { mutableStateOf(false) }
+    var showAddComment by remember { mutableStateOf(stage == EditStage.EDIT_SPENT) }
     var isEdit by remember { mutableStateOf(false) }
+
+    LaunchedEffect(stage, isEdit) {
+        showAddComment = stage == EditStage.EDIT_SPENT || isEdit
+    }
 
     BoxWithConstraints(
         modifier = modifier.fillMaxWidth()

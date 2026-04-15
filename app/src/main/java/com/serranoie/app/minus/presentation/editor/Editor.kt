@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.util.Log
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -77,6 +78,8 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.LocalDate
 
+
+private const val EDITOR_TAG = "Editor - ISAAC"
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -122,7 +125,10 @@ fun Editor(
 	}
 
 	LaunchedEffect(uiState.budgetSettings?.period) {
-		uiState.budgetSettings?.period?.let { selectedViewPeriod = it }
+		uiState.budgetSettings?.period?.let {
+			Log.d(EDITOR_TAG, "Sync selectedViewPeriod from uiState period=$it (previous=$selectedViewPeriod)")
+			selectedViewPeriod = it
+		}
 	}
 
 	if (uiState.showRecurrentDialog) {
@@ -275,17 +281,24 @@ fun Editor(
 					.fillMaxWidth()
 					.heightIn(max = 600.dp)
 			) {
+				val shouldForceSetupMode = forceWalletSetup && uiState.budgetSettings == null
+				Log.d(
+					EDITOR_TAG,
+					"Opening PeriodSwitcherSheet: forceWalletSetup=$forceWalletSetup, hasBudgetSettings=${uiState.budgetSettings != null}, startInEditMode=$shouldForceSetupMode"
+				)
 				PeriodSwitcherSheet(
 					budgetSettings = uiState.budgetSettings,
 					budgetState = uiState.budgetState,
 					selectedPeriod = selectedViewPeriod,
 					currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-					startInEditMode = forceWalletSetup || uiState.budgetSettings == null,
+					startInEditMode = shouldForceSetupMode,
 					onPeriodSelected = { newPeriod ->
+						Log.d(EDITOR_TAG, "PeriodSwitcher onPeriodSelected -> newPeriod=$newPeriod, previousSelectedViewPeriod=$selectedViewPeriod")
 						selectedViewPeriod = newPeriod
 						onChangePeriod(newPeriod)
 					},
 					onSaveBudget = { newSettings ->
+						Log.d(EDITOR_TAG, "PeriodSwitcher onSaveBudget -> $newSettings")
 						onSaveBudget(newSettings)
 						scope.launch { sheetState.hide() }
 						showBottomSheet = false

@@ -166,9 +166,8 @@ fun AppNavGraph(
         composable(Screen.Onboarding.route) {
             OnboardingScreen(
                 onSetBudget = {
-                    navController.navigate(
-                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true)
-                    ) {
+                    onOnboardingComplete()
+                    navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Onboarding.route) { inclusive = true }
                     }
                 },
@@ -176,6 +175,7 @@ fun AppNavGraph(
                     onOnboardingComplete()
                 },
                 onClose = {
+                    onOnboardingComplete()
                     navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Onboarding.route) { inclusive = true }
                     }

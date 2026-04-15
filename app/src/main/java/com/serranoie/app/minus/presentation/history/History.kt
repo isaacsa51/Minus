@@ -26,6 +26,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Spacer
@@ -84,6 +85,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
@@ -97,7 +101,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPos
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseDetailContent
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransactionsView
-import com.serranoie.app.minus.presentation.ui.theme.component.expense.RecurrentPaymentsDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableUpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
@@ -135,9 +138,10 @@ fun History(
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val scrollState = rememberLazyListState()
 
-	val isAtEndOfList: Boolean = remember(scrollState.canScrollForward, scrollState.layoutInfo.visibleItemsInfo) {
-		!scrollState.canScrollForward && scrollState.layoutInfo.visibleItemsInfo.lastOrNull() != null
-	}
+	val isAtEndOfList: Boolean =
+		remember(scrollState.canScrollForward, scrollState.layoutInfo.visibleItemsInfo) {
+			!scrollState.canScrollForward && scrollState.layoutInfo.visibleItemsInfo.lastOrNull() != null
+		}
 
 	LaunchedEffect(isAtEndOfList) {
 		viewModel.processIntent(BudgetUiIntent.SetLockSwipeable(!isAtEndOfList))
@@ -176,8 +180,7 @@ fun History(
 		pendingRemovedTransactions.keys.toSet()
 	}
 
-	var expandedUpcomingRecurrent by remember { mutableStateOf(true) }
-	var expandedFutureRecurrent by remember { mutableStateOf(false) }
+	var showOutOfPeriodSubscriptions by rememberSaveable { mutableStateOf(false) }
 
 	val displayTransactions = remember(uiState.transactions, pendingRemovedTransactions) {
 		uiState.transactions + pendingRemovedTransactions.values.filterNot { pending ->
@@ -278,11 +281,7 @@ fun History(
 
 	LaunchedEffect(groupedCurrentTransactions.keys, readOnly) {
 		val sortedDates = groupedCurrentTransactions.keys.filterNotNull().sortedDescending()
-		val defaultExpanded = if (readOnly) {
-			sortedDates.take(3).toSet()
-		} else {
-			sortedDates.toSet()
-		}
+		val defaultExpanded = sortedDates.take(1).toSet()
 		expandedDates = expandedDates + defaultExpanded
 	}
 
@@ -339,50 +338,6 @@ fun History(
 				)
 			}
 
-			if (upcomingRecurrentInPeriod.isNotEmpty()) {
-				item("upcoming-recurrent-header") {
-					RecurrentPaymentsDivider(
-						title = "Siguientes pagos recurrentes",
-						isExpanded = expandedUpcomingRecurrent,
-						onToggleClick = { expandedUpcomingRecurrent = !expandedUpcomingRecurrent },
-						itemCount = upcomingRecurrentInPeriod.size
-					)
-				}
-
-				item("upcoming-recurrent-content") {
-					AnimatedVisibility(
-						visible = expandedUpcomingRecurrent, enter = expandVertically(
-							animationSpec = tween(300), expandFrom = Alignment.Top
-						) + fadeIn(animationSpec = tween(300)), exit = shrinkVertically(
-							animationSpec = tween(300), shrinkTowards = Alignment.Top
-						) + fadeOut(animationSpec = tween(300))
-					) {
-						LazyRow(
-							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(8.dp),
-							contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
-						) {
-							itemsIndexed(
-								items = upcomingRecurrentInPeriod,
-								key = { _, item -> "upcoming-${item.transaction.id}" }
-							) { _, item ->
-								RecurrentTicketCard(
-									title = item.transaction.comment.ifEmpty { "Pago recurrente" },
-									amountFormatted = currencyFormat.format(item.transaction.amount),
-									nextChargeDate = prettyDate(item.nextChargeDate.atStartOfDay(), showTime = false, forceShowDate = false),
-									frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()?.replaceFirstChar { it.uppercase() },
-									onClick = { selectedTransaction = item.transaction },
-									modifier = Modifier.fillParentMaxWidth(0.45f)
-								)
-							}
-						}
-					}
-				}
-
-				item("spacer-after-upcoming") {
-					Spacer(modifier = Modifier.height(16.dp))
-				}
-			}
 
 			groupedCurrentTransactions.forEach { (date, transactions) ->
 				val isExpanded = date?.let { expandedDates.contains(it) } ?: false
@@ -479,46 +434,63 @@ fun History(
 			}
 
 			if (futureRecurrentOutOfPeriod.isNotEmpty()) {
-				item("future-recurrent-divider") {
-					WavyDivider(
-						text = "Pagos recurrentes fuera del período actual",
-						amplitude = 4f,
-						wavelength = 45f
-					)
-				}
-
-				item("future-recurrent-header") {
-					RecurrentPaymentsDivider(
-						title = "Próximos pagos (fuera de período)",
-						isExpanded = expandedFutureRecurrent,
-						onToggleClick = { expandedFutureRecurrent = !expandedFutureRecurrent },
-						itemCount = futureRecurrentOutOfPeriod.size,
-						isSecondary = true
-					)
+				item("future-recurrent-toggle") {
+					val interactionSource = remember { MutableInteractionSource() }
+					Box(
+						modifier = Modifier
+							.fillMaxWidth()
+							.clickable(
+								interactionSource = interactionSource,
+								indication = null
+							) {
+								showOutOfPeriodSubscriptions = !showOutOfPeriodSubscriptions
+							}
+					) {
+						WavyDivider(
+							text = if (showOutOfPeriodSubscriptions) {
+								"Ocultar subscripciones fuera del periodo"
+							} else {
+								"Mostrar subscripciones fuera del periodo"
+							},
+							amplitude = 4f,
+							wavelength = 45f
+						)
+					}
 				}
 
 				item("future-recurrent-content") {
 					AnimatedVisibility(
-						visible = expandedFutureRecurrent, enter = expandVertically(
-							animationSpec = tween(300), expandFrom = Alignment.Top
-						) + fadeIn(animationSpec = tween(300)), exit = shrinkVertically(
-							animationSpec = tween(300), shrinkTowards = Alignment.Top
+						visible = showOutOfPeriodSubscriptions,
+						enter = expandVertically(
+							animationSpec = tween(300),
+							expandFrom = Alignment.Top
+						) + fadeIn(animationSpec = tween(300)),
+						exit = shrinkVertically(
+							animationSpec = tween(300),
+							shrinkTowards = Alignment.Top
 						) + fadeOut(animationSpec = tween(300))
 					) {
 						LazyRow(
 							modifier = Modifier.fillMaxWidth(),
 							horizontalArrangement = Arrangement.spacedBy(8.dp),
-							contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
+							contentPadding = androidx.compose.foundation.layout.PaddingValues(
+								horizontal = 16.dp
+							)
 						) {
 							itemsIndexed(
 								items = futureRecurrentOutOfPeriod,
 								key = { _, item -> "future-${item.transaction.id}" }
 							) { _, item ->
 								RecurrentTicketCard(
-									title = item.transaction.comment.ifEmpty { "Pago recurrente" },
+									title = item.transaction.comment,
 									amountFormatted = currencyFormat.format(item.transaction.amount),
-									nextChargeDate = prettyDate(item.nextChargeDate.atStartOfDay(), showTime = false, forceShowDate = false),
-									frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()?.replaceFirstChar { it.uppercase() },
+									nextChargeDate = prettyDate(
+										item.nextChargeDate.atStartOfDay(),
+										showTime = false,
+										forceShowDate = false
+									),
+									frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()
+										?.replaceFirstChar { it.uppercase() },
 									onClick = { selectedTransaction = item.transaction },
 									modifier = Modifier.fillParentMaxWidth(0.45f)
 								)
@@ -552,98 +524,99 @@ fun History(
 
 			if (showPastPeriod) {
 				groupedPastTransactions.forEach { (date, transactions) ->
-				val isExpanded = date?.let { expandedDates.contains(it) } ?: false
-				val dayTotal = transactions.sumOf { it.amount }
+					val isExpanded = date?.let { expandedDates.contains(it) } ?: false
+					val dayTotal = transactions.sumOf { it.amount }
 
-				item("past-date-$date") {
-					HistoryDateDivider(
-						date = date,
-						isExpanded = isExpanded,
-						onToggleClick = {
-							date?.let { dateKey ->
-								expandedDates = if (isExpanded) {
-									expandedDates.minus(dateKey)
-								} else {
-									expandedDates.plus(dateKey)
-								}
-							}
-						},
-						totalAmount = dayTotal.toPlainString(),
-						currencyCode = currencyFormat.currency?.symbol ?: "$"
-					)
-				}
-
-				item("past-date-content-$date") {
-					AnimatedVisibility(
-						visible = isExpanded, enter = expandVertically(
-							animationSpec = tween(300), expandFrom = Alignment.Top
-						) + fadeIn(animationSpec = tween(300)), exit = shrinkVertically(
-							animationSpec = tween(300), shrinkTowards = Alignment.Top
-						) + fadeOut(animationSpec = tween(300))
-					) {
-						Column {
-							transactions.forEachIndexed { index, transaction ->
-								key(transaction.id) {
-									val position = when {
-										transactions.size == 1 -> PaddedListItemPosition.Single
-										index == 0 -> PaddedListItemPosition.First
-										index == transactions.size - 1 -> PaddedListItemPosition.Last
-										else -> PaddedListItemPosition.Middle
-									}
-
-									val isBeingDeleted = transaction.id in deletingTransactionIds
-									AnimatedVisibility(
-										visible = !isBeingDeleted,
-										enter = EnterTransition.None,
-										exit = slideOutHorizontally(
-											animationSpec = tween(durationMillis = 280),
-											targetOffsetX = { fullWidth -> fullWidth }
-										) + fadeOut(animationSpec = tween(durationMillis = 280))
-									) {
-										SwipeableExpenseItem(
-											transaction = transaction,
-											currencyFormat = currencyFormat,
-											position = position,
-											isBeingDeleted = isBeingDeleted,
-											onDelete = {
-												queueDeleteWithUndo(transaction)
-											},
-											onEdit = { editingTransaction = transaction },
-											readOnly = readOnly,
-											onClick = { selectedTransaction = transaction })
-									}
-
-									if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {
-										Spacer(modifier = Modifier.height(2.dp))
+					item("past-date-$date") {
+						HistoryDateDivider(
+							date = date,
+							isExpanded = isExpanded,
+							onToggleClick = {
+								date?.let { dateKey ->
+									expandedDates = if (isExpanded) {
+										expandedDates.minus(dateKey)
+									} else {
+										expandedDates.plus(dateKey)
 									}
 								}
-							}
+							},
+							totalAmount = dayTotal.toPlainString(),
+							currencyCode = currencyFormat.currency?.symbol ?: "$"
+						)
+					}
 
-							val totalText = currencyFormat.format(dayTotal)
-							Row(
-								modifier = Modifier
-									.fillMaxWidth()
-									.padding(horizontal = 16.dp, vertical = 8.dp),
-								horizontalArrangement = Arrangement.End,
-								verticalAlignment = Alignment.CenterVertically
-							) {
-								Text(
-									text = "Total del día: ",
-									style = MaterialTheme.typography.labelMedium,
-									color = MaterialTheme.colorScheme.onSurfaceVariant
-								)
+					item("past-date-content-$date") {
+						AnimatedVisibility(
+							visible = isExpanded, enter = expandVertically(
+								animationSpec = tween(300), expandFrom = Alignment.Top
+							) + fadeIn(animationSpec = tween(300)), exit = shrinkVertically(
+								animationSpec = tween(300), shrinkTowards = Alignment.Top
+							) + fadeOut(animationSpec = tween(300))
+						) {
+							Column {
+								transactions.forEachIndexed { index, transaction ->
+									key(transaction.id) {
+										val position = when {
+											transactions.size == 1 -> PaddedListItemPosition.Single
+											index == 0 -> PaddedListItemPosition.First
+											index == transactions.size - 1 -> PaddedListItemPosition.Last
+											else -> PaddedListItemPosition.Middle
+										}
 
-								Text(
-									text = totalText,
-									style = MaterialTheme.typography.labelLarge,
-									color = MaterialTheme.colorScheme.primary,
-									fontWeight = FontWeight.Bold
-								)
+										val isBeingDeleted =
+											transaction.id in deletingTransactionIds
+										AnimatedVisibility(
+											visible = !isBeingDeleted,
+											enter = EnterTransition.None,
+											exit = slideOutHorizontally(
+												animationSpec = tween(durationMillis = 280),
+												targetOffsetX = { fullWidth -> fullWidth }
+											) + fadeOut(animationSpec = tween(durationMillis = 280))
+										) {
+											SwipeableExpenseItem(
+												transaction = transaction,
+												currencyFormat = currencyFormat,
+												position = position,
+												isBeingDeleted = isBeingDeleted,
+												onDelete = {
+													queueDeleteWithUndo(transaction)
+												},
+												onEdit = { editingTransaction = transaction },
+												readOnly = readOnly,
+												onClick = { selectedTransaction = transaction })
+										}
+
+										if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {
+											Spacer(modifier = Modifier.height(2.dp))
+										}
+									}
+								}
+
+								val totalText = currencyFormat.format(dayTotal)
+								Row(
+									modifier = Modifier
+										.fillMaxWidth()
+										.padding(horizontal = 16.dp, vertical = 8.dp),
+									horizontalArrangement = Arrangement.End,
+									verticalAlignment = Alignment.CenterVertically
+								) {
+									Text(
+										text = "Total del día: ",
+										style = MaterialTheme.typography.labelMedium,
+										color = MaterialTheme.colorScheme.onSurfaceVariant
+									)
+
+									Text(
+										text = totalText,
+										style = MaterialTheme.typography.labelLarge,
+										color = MaterialTheme.colorScheme.primary,
+										fontWeight = FontWeight.Bold
+									)
+								}
 							}
 						}
 					}
 				}
-			}
 			}
 
 			// Bottom spacer for better scrolling
@@ -1353,24 +1326,247 @@ fun HistoryPreview() {
 	}
 }
 
+@Preview(showBackground = true)
 @Composable
-private fun RecurrentPaymentsDividerPreview() {
+private fun HistoryFullContentPreview() {
 	MinusTheme {
-		Column {
-			RecurrentPaymentsDivider(
-				title = "Siguientes pagos recurrentes",
-				isExpanded = true,
-				onToggleClick = {},
-				itemCount = 3
+		Surface(modifier = Modifier.padding(16.dp)) {
+			val budgetSettings = BudgetSettings(
+				totalBudget = BigDecimal("800.00"),
+				period = BudgetPeriod.MONTHLY,
+				startDate = LocalDate.now().minusDays(12),
+				endDate = LocalDate.now().plusDays(18),
+				currencyCode = "EUR"
+			)
+			val budgetState = BudgetState(
+				remainingToday = BigDecimal("250.00"),
+				totalSpentToday = BigDecimal("45.00"),
+				dailyBudget = BigDecimal("26.66"),
+				daysRemaining = 18,
+				progress = 0.68f,
+				isOverBudget = false,
+				totalBudget = BigDecimal("800.00"),
+				totalSpentInPeriod = BigDecimal("550.00")
 			)
 
-			RecurrentPaymentsDivider(
-				title = "Próximos pagos (fuera de período)",
-				isExpanded = false,
-				onToggleClick = {},
-				itemCount = 2,
-				isSecondary = true
+			val currencyFormat = symbolOnlyCurrencyFormat("EUR")
+			val inPeriodRecurring = listOf(
+				UpcomingRecurrentItem(
+					transaction = Transaction(
+						id = 9001L,
+						amount = BigDecimal("8.99"),
+						comment = "Subscripción mensual sin nombre",
+						date = LocalDateTime.now().minusDays(10),
+						isRecurrent = true,
+						recurrentFrequency = RecurrentFrequency.MONTHLY,
+						subscriptionDay = 12
+					),
+					nextChargeDate = LocalDate.now().plusDays(2),
+					isInCurrentPeriod = true
+				),
+				UpcomingRecurrentItem(
+					transaction = Transaction(
+						id = 9002L,
+						amount = BigDecimal("5.00"),
+						comment = "Subscripción semanal sin nombre",
+						date = LocalDateTime.now().minusDays(6),
+						isRecurrent = true,
+						recurrentFrequency = RecurrentFrequency.WEEKLY
+					),
+					nextChargeDate = LocalDate.now().plusDays(4),
+					isInCurrentPeriod = true
+				)
 			)
+
+			val outOfPeriodRecurring = listOf(
+				UpcomingRecurrentItem(
+					transaction = Transaction(
+						id = 9010L,
+						amount = BigDecimal("49.99"),
+						comment = "Gym Premium",
+						date = LocalDateTime.now().minusDays(30),
+						isRecurrent = true,
+						recurrentFrequency = RecurrentFrequency.MONTHLY,
+						subscriptionDay = 2
+					),
+					nextChargeDate = LocalDate.now().plusDays(20),
+					isInCurrentPeriod = false
+				),
+				UpcomingRecurrentItem(
+					transaction = Transaction(
+						id = 9011L,
+						amount = BigDecimal("14.99"),
+						comment = "Music Pro",
+						date = LocalDateTime.now().minusDays(25),
+						isRecurrent = true,
+						recurrentFrequency = RecurrentFrequency.BIWEEKLY
+					),
+					nextChargeDate = LocalDate.now().plusDays(28),
+					isInCurrentPeriod = false
+				)
+			)
+
+			val currentTx = listOf(
+				Transaction(
+					id = 1001L,
+					amount = BigDecimal("23.40"),
+					comment = "Supermercado",
+					date = LocalDateTime.now().minusHours(2)
+				),
+				Transaction(
+					id = 1002L,
+					amount = BigDecimal("12.00"),
+					comment = "Café",
+					date = LocalDateTime.now().minusHours(5)
+				)
+			)
+
+			val pastTx = listOf(
+				Transaction(
+					id = 2001L,
+					amount = BigDecimal("70.00"),
+					comment = "Combustible",
+					date = LocalDateTime.now().minusDays(35)
+				),
+				Transaction(
+					id = 2002L,
+					amount = BigDecimal("31.50"),
+					comment = "Comida",
+					date = LocalDateTime.now().minusDays(36)
+				)
+			)
+
+			LazyColumn(
+				modifier = Modifier.fillMaxSize(),
+				contentPadding = PaddingValues(bottom = 24.dp)
+			) {
+				item {
+					BudgetDisplay(
+						budget = budgetState.totalBudget,
+						budgetState = budgetState,
+						budgetSettings = budgetSettings,
+						currencyCode = "EUR",
+						bigVariant = true,
+						modifier = Modifier.fillMaxWidth(),
+						startDate = Date.from(
+							budgetSettings.startDate.atStartOfDay(ZoneId.systemDefault())
+								.toInstant()
+						),
+						finishDate = Date.from(
+							budgetSettings.getPeriodEndDate().atStartOfDay(ZoneId.systemDefault())
+								.toInstant()
+						)
+					)
+				}
+
+				item {
+					LazyRow(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
+					) {
+						itemsIndexed(
+							inPeriodRecurring,
+							key = { _, item -> item.transaction.id }) { _, item ->
+							RecurrentTicketCard(
+								title = item.transaction.comment,
+								amountFormatted = currencyFormat.format(item.transaction.amount),
+								nextChargeDate = prettyDate(
+									item.nextChargeDate.atStartOfDay(),
+									showTime = false,
+									forceShowDate = false
+								),
+								frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()
+									?.replaceFirstChar { it.uppercase() },
+								modifier = Modifier.fillParentMaxWidth(0.45f)
+							)
+						}
+					}
+				}
+
+				item {
+					WavyDivider(
+						text = "Mostrar subscripciones fuera del periodo",
+						amplitude = 4f,
+						wavelength = 45f
+					)
+				}
+				item {
+					LazyRow(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
+					) {
+						itemsIndexed(
+							outOfPeriodRecurring,
+							key = { _, item -> item.transaction.id }) { _, item ->
+							RecurrentTicketCard(
+								title = item.transaction.comment,
+								amountFormatted = currencyFormat.format(item.transaction.amount),
+								nextChargeDate = prettyDate(
+									item.nextChargeDate.atStartOfDay(),
+									showTime = false,
+									forceShowDate = false
+								),
+								frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()
+									?.replaceFirstChar { it.uppercase() },
+								modifier = Modifier.fillParentMaxWidth(0.45f)
+							)
+						}
+					}
+				}
+
+				item {
+					HistoryDateDivider(
+						date = LocalDate.now(),
+						isExpanded = true,
+						onToggleClick = {},
+						totalAmount = currentTx.sumOf { it.amount }.toPlainString(),
+						currencyCode = "€"
+					)
+				}
+				itemsIndexed(currentTx, key = { _, tx -> tx.id }) { index, tx ->
+					ExpenseItem(
+						transaction = tx,
+						currencyFormat = currencyFormat,
+						position = when {
+							currentTx.size == 1 -> PaddedListItemPosition.Single
+							index == 0 -> PaddedListItemPosition.First
+							index == currentTx.lastIndex -> PaddedListItemPosition.Last
+							else -> PaddedListItemPosition.Middle
+						}
+					)
+				}
+
+				item {
+					WavyDivider(
+						text = "Mostrar gastos del periodo pasado",
+						amplitude = 4f,
+						wavelength = 45f
+					)
+				}
+				item {
+					HistoryDateDivider(
+						date = LocalDate.now().minusDays(35),
+						isExpanded = true,
+						onToggleClick = {},
+						totalAmount = pastTx.sumOf { it.amount }.toPlainString(),
+						currencyCode = "€"
+					)
+				}
+				itemsIndexed(pastTx, key = { _, tx -> tx.id }) { index, tx ->
+					ExpenseItem(
+						transaction = tx,
+						currencyFormat = currencyFormat,
+						position = when {
+							pastTx.size == 1 -> PaddedListItemPosition.Single
+							index == 0 -> PaddedListItemPosition.First
+							index == pastTx.lastIndex -> PaddedListItemPosition.Last
+							else -> PaddedListItemPosition.Middle
+						}
+					)
+				}
+			}
 		}
 	}
 }

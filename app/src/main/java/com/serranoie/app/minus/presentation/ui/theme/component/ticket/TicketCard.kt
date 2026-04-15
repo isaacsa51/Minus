@@ -59,16 +59,13 @@ fun TicketCard(
 		Column(
 			modifier = Modifier.fillMaxWidth()
 		) {
-			// Header section (optional)
 			if (header != null) {
 				header()
 				Spacer(modifier = Modifier.height(12.dp))
 			}
 
-			// Main content
 			content()
 
-			// Actions section (optional)
 			if (actions != null) {
 				Spacer(modifier = Modifier.height(12.dp))
 				actions()
@@ -112,14 +109,12 @@ fun TransactionTicketCard(
 		Column(
 			modifier = Modifier.fillMaxWidth()
 		) {
-			// Amount (prominent)
 			Row(
 				modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.SpaceBetween,
 				verticalAlignment = Alignment.Top
 			) {
 				Column(modifier = Modifier.weight(1f)) {
-					// Comment
 					CustomPaddedListItem(
 						onClick = {},
 						position = PaddedListItemPosition.Single,
@@ -155,7 +150,6 @@ fun TransactionTicketCard(
 
 			Spacer(modifier = Modifier.height(8.dp))
 
-			// Date
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -174,7 +168,6 @@ fun TransactionTicketCard(
 				)
 			}
 
-			// Recurrence badge
 			if (isRecurrent) {
 				Spacer(modifier = Modifier.height(8.dp))
 				Row(
@@ -213,7 +206,6 @@ private fun TicketCardPreview() {
 			modifier = Modifier.padding(16.dp),
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
-			// Basic TicketCard without click or actions
 			TicketCard(
 				backgroundColor = MaterialTheme.colorScheme.surfaceContainerLow,
 				teethWidthDp = 15f,
@@ -234,7 +226,6 @@ private fun TicketCardPreview() {
 				}
 			}
 
-			// TicketCard with header
 			TicketCard(
 				backgroundColor = MaterialTheme.colorScheme.primaryContainer,
 				teethWidthDp = 12f,
@@ -268,7 +259,6 @@ private fun TicketCardPreview() {
 				}
 			}
 
-			// TicketCard with header and actions
 			TicketCard(
 				backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
 				teethWidthDp = 10f,
@@ -363,7 +353,6 @@ private fun TransactionTicketCardPreview() {
 			modifier = Modifier.padding(16.dp),
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
-			// Regular transaction
 			TransactionTicketCard(
 				amountFormatted = "$45.00",
 				comment = "Supermercado",
@@ -371,7 +360,6 @@ private fun TransactionTicketCardPreview() {
 				isRecurrent = false
 			)
 
-			// Recurrent transaction
 			TransactionTicketCard(
 				amountFormatted = "$199.00",
 				comment = "Netflix",
@@ -380,7 +368,6 @@ private fun TransactionTicketCardPreview() {
 				frequencyLabel = "Mensual"
 			)
 
-			// Recurrent transaction with click
 			TransactionTicketCard(
 				amountFormatted = "$9.99",
 				comment = "Spotify",

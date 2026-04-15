@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -53,6 +54,8 @@ import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.util.lockScreenOrientation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.Instant
@@ -189,6 +192,12 @@ class MainActivity : ComponentActivity() {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
 
+		context.settingsDataStore.data
+			.onEach { preferences ->
+				Log.d(tag, "DataStore observer -> onboarding_completed=${preferences[ONBOARDING_COMPLETED_KEY]}")
+			}
+			.launchIn(lifecycleScope)
+
 		setContent {
 			val localContext = LocalContext.current
 			val activityResultRegistryOwner = LocalActivityResultRegistryOwner.current
@@ -220,6 +229,11 @@ class MainActivity : ComponentActivity() {
 
 			if (isReady.value && dataStoreLoaded.value) {
 				val dynamicColor = context.dynamicColorEnabled
+				val startDestination = when {
+					periodEnded.value || earlyFinishPending.value -> Screen.Analytics.route
+					!onboardingComplete.value -> Screen.Onboarding.route
+					else -> Screen.Main.route
+				}
 
 				MinusTheme(dynamicColor = dynamicColor) {
 					CompositionLocalProvider(
@@ -229,34 +243,24 @@ class MainActivity : ComponentActivity() {
 							Surface(
 							color = MaterialTheme.colorScheme.background
 						) {
-							// Determine start destination based on app state
-							val startDestination = when {
-								// First: Check if budget period has ended or was finished early
-								periodEnded.value || earlyFinishPending.value -> {
-									Screen.Analytics.route
-								}
-								// Second: Check if onboarding is not complete
-								!onboardingComplete.value -> {
-									Screen.Onboarding.route
-								}
-								// Otherwise: Go to main screen
-								else -> {
-									Screen.Main.route
-								}
-							}
-
-							AppNavGraph(
-								activityResultRegistryOwner = activityResultRegistryOwner,
-								startDestination = startDestination,
-								onOnboardingComplete = {
-									lifecycleScope.launch {
-										context.settingsDataStore.edit { prefs ->
-											prefs[ONBOARDING_COMPLETED_KEY] = true
-											prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] =
-												FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
+							key(startDestination) {
+								AppNavGraph(
+									activityResultRegistryOwner = activityResultRegistryOwner,
+									startDestination = startDestination,
+									onOnboardingComplete = {
+										lifecycleScope.launch {
+											Log.d(tag, "onOnboardingComplete -> writing onboarding_completed=true")
+											context.settingsDataStore.edit { prefs ->
+												prefs[ONBOARDING_COMPLETED_KEY] = true
+												prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] =
+													FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
+											}
+											val saved = context.settingsDataStore.data.first()[ONBOARDING_COMPLETED_KEY] ?: false
+											Log.d(tag, "onOnboardingComplete -> saved onboarding_completed=$saved")
 										}
 									}
-								})
+								)
+							}
 						}
 					}
 				}
