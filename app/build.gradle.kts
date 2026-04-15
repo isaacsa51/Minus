@@ -122,7 +122,7 @@ dependencies {
 	implementation("androidx.hilt:hilt-work:1.2.0")
 	ksp("androidx.hilt:hilt-compiler:1.2.0")
 
-//	implementation("io.github.klassenkonstantin:snappyswipe:0.0.3")
+
 
 	debugImplementation("androidx.compose.ui:ui-tooling:1.10.6")
 	debugImplementation("androidx.compose.ui:ui-test-manifest:1.8.3")

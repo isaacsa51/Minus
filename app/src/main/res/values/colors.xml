@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Heatmap widget colors -->
+    <color name="widget_heatmap_neutral">#40FFFFFF</color>
+    <color name="widget_heatmap_good_1">#4081C784</color>
+    <color name="widget_heatmap_good_2">#6681C784</color>
+    <color name="widget_heatmap_warn_1">#80FFB74D</color>
+    <color name="widget_heatmap_warn_2">#99FFB74D</color>
+    <color name="widget_heatmap_bad_1">#B3E57373</color>
+    <color name="widget_heatmap_bad_2">#D9E57373</color>
+    <color name="widget_heatmap_empty_light">#14000000</color>
+    <color name="widget_heatmap_empty_dark">#26FFFFFF</color>
+    <color name="widget_heatmap_day_text">#A3A6AD</color>
+    <color name="widget_heatmap_month_text">#8F949D</color>
 </resources>

@@ -11,14 +11,14 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:gravity="start"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Spent on this period"
+            android:text="Gastado"
             android:textColor="?android:attr/colorPrimary"
             android:textStyle="bold" />
     </LinearLayout>
@@ -29,7 +29,7 @@
         android:layout_marginTop="4dp"
         android:text="$1,250"
         android:textColor="?android:attr/textColorPrimary"
-        android:textSize="20sp"
+        android:textSize="32sp"
         android:textStyle="bold" />
 
 </LinearLayout>

@@ -5,6 +5,7 @@ package com.serranoie.app.minus.presentation.widget
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -36,22 +37,6 @@ import androidx.glance.preview.Preview
 
 class DaysCountdownWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = DaysCountdownWidget()
-}
-
-@Preview(widthDp = 60, heightDp = 60)
-@Composable
-fun DaysCountdownWidgetPreview() {
-    GlanceTheme {
-        DaysCountdownWidget().DaysCountdownContent(daysRemaining = 12, totalDays = 30, periodLabel = "days left")
-    }
-}
-
-@Preview(widthDp = 60, heightDp = 60)
-@Composable
-fun DaysCountdownWidgetPreviewUrgent() {
-    GlanceTheme {
-        DaysCountdownWidget().DaysCountdownContent(daysRemaining = 2, totalDays = 30, periodLabel = "days left")
-    }
 }
 
 class DaysCountdownWidget : GlanceAppWidget() {
@@ -87,7 +72,6 @@ class DaysCountdownWidget : GlanceAppWidget() {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Days remaining (large)
                 Text(
                     text = "$daysRemaining",
                     style = TextStyle(
@@ -96,13 +80,13 @@ class DaysCountdownWidget : GlanceAppWidget() {
                             GlanceTheme.colors.error 
                         else 
                             GlanceTheme.colors.primary,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontSize = 28.sp
                     )
                 )
 
                 Spacer(modifier = GlanceModifier.height(2.dp))
 
-                // Period label
                 Text(
                     text = periodLabel,
                     style = TextStyle(
@@ -131,5 +115,22 @@ suspend fun updateDaysCountdownWidget(
             prefs[stringPreferencesKey("period_label")] = periodLabel
         }
         DaysCountdownWidget().update(context, glanceId)
+    }
+}
+
+
+@Preview(widthDp = 120, heightDp = 120)
+@Composable
+fun DaysCountdownWidgetPreview() {
+    GlanceTheme {
+        DaysCountdownWidget().DaysCountdownContent(daysRemaining = 12, totalDays = 30, periodLabel = "days left")
+    }
+}
+
+@Preview(widthDp = 120, heightDp = 120)
+@Composable
+fun DaysCountdownWidgetPreviewUrgent() {
+    GlanceTheme {
+        DaysCountdownWidget().DaysCountdownContent(daysRemaining = 2, totalDays = 30, periodLabel = "days left")
     }
 }

@@ -32,7 +32,10 @@ import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.widget.updateExpenseWidget
 import com.serranoie.app.minus.presentation.widget.updateBudgetOverviewWidget
 import com.serranoie.app.minus.presentation.widget.updateDaysCountdownWidget
-import com.serranoie.app.minus.presentation.widget.updateBudgetDetailWidget
+import com.serranoie.app.minus.presentation.widget.updateHeatmapWidget
+import com.serranoie.app.minus.presentation.widget.DailySpending
+import com.serranoie.app.minus.presentation.widget.MonthHeatmapData
+import com.serranoie.app.minus.presentation.widget.updateMonthHeatmapWidget
 import com.serranoie.app.minus.settingsDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -187,12 +190,61 @@ class BudgetViewModel @Inject constructor(
 					val endDate = state.budgetSettings?.getPeriodEndDate()?.let {
 						java.util.Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
 					} ?: java.util.Date()
-					val budgetString = "$currency${budget.totalBudget.toInt()}"
+					val budgetAmount = budget.totalBudget.toInt()
+
+					val now = LocalDate.now()
+					val startMonth = now.minusMonths(3).withDayOfMonth(1)
+					val endMonth = now.withDayOfMonth(now.lengthOfMonth())
+					val groupedByDate = state.transactions
+						.filter { tx ->
+							!tx.isDeleted && tx.date != null &&
+								!tx.date!!.toLocalDate().isBefore(startMonth) &&
+								!tx.date!!.toLocalDate().isAfter(endMonth)
+						}
+						.groupBy { it.date!!.toLocalDate() }
+
+					val monthHeatmapData = (0L..3L).map { monthOffset ->
+						val month = now.minusMonths(3 - monthOffset)
+						val days = (1..month.lengthOfMonth()).map { dayOfMonth ->
+							val day = month.withDayOfMonth(dayOfMonth)
+							val txs = groupedByDate[day].orEmpty()
+							DailySpending(
+								dayOfMonth = dayOfMonth,
+								spending = txs.sumOf { it.amount },
+								budget = state.budgetSettings?.totalBudget ?: BigDecimal.ONE,
+								transactionCount = txs.size,
+							)
+						}
+						MonthHeatmapData(
+							year = month.year,
+							month = month.monthValue,
+							days = days,
+						)
+					}
+
+					val currentMonth = now
+					val currentMonthDays = (1..currentMonth.lengthOfMonth()).map { dayOfMonth ->
+						val day = currentMonth.withDayOfMonth(dayOfMonth)
+						val txs = groupedByDate[day].orEmpty()
+						DailySpending(
+							dayOfMonth = dayOfMonth,
+							spending = txs.sumOf { it.amount },
+							budget = state.budgetSettings?.totalBudget ?: BigDecimal.ONE,
+							transactionCount = txs.size,
+						)
+					}
+					val currentMonthTotalSpent = currentMonthDays.sumOf { it.spending }.toInt()
+					val currentMonthHeatmap = MonthHeatmapData(
+						year = currentMonth.year,
+						month = currentMonth.monthValue,
+						days = currentMonthDays,
+					)
 
 					updateExpenseWidget(context, totalSpent, totalBudget, currency)
-					updateBudgetOverviewWidget(context, budgetString, startDate, endDate, daysLeft)
+					updateBudgetOverviewWidget(context, budgetAmount, currency, startDate, endDate, daysLeft)
 					updateDaysCountdownWidget(context, daysLeft, budget.totalBudget.toInt(), "days left")
-					updateBudgetDetailWidget(context, totalSpent, remaining, daysLeft, currency, "Food", 0)
+					updateHeatmapWidget(context, monthHeatmapData)
+					updateMonthHeatmapWidget(context, currentMonthHeatmap, currentMonthTotalSpent)
 				}
 			}
 		}
@@ -596,17 +648,27 @@ class BudgetViewModel @Inject constructor(
 
 	private fun handleRecurrentExpenseApply(frequency: RecurrentFrequency, endDate: LocalDate, subscriptionDay: Int?) {
 		val amount = _uiState.value.pendingRecurrentAmount ?: return
-		val comment = _uiState.value.pendingRecurrentComment
+		val rawComment = _uiState.value.pendingRecurrentComment.trim()
+		val now = LocalDateTime.now()
+
+		val fallbackComment = when (frequency) {
+			RecurrentFrequency.WEEKLY -> "Subscripción semanal sin nombre"
+			RecurrentFrequency.BIWEEKLY -> "Subscripción quincenal sin nombre"
+			RecurrentFrequency.MONTHLY -> "Subscripción mensual sin nombre"
+		}
+
+		val finalComment = rawComment.ifEmpty { fallbackComment }
 
 		viewModelScope.launch {
 			val transaction = Transaction.create(
 				amount = amount,
-				comment = comment,
-				date = LocalDateTime.now(),
+				comment = finalComment,
+				date = now,
 				periodId = _uiState.value.currentPeriodId,
 				isRecurrent = true,
 				recurrentFrequency = frequency,
-				recurrentEndDate = endDate.atStartOfDay(),
+				// Preserve current hour/minute instead of forcing 00:00
+				recurrentEndDate = endDate.atTime(now.toLocalTime()),
 				subscriptionDay = subscriptionDay
 			)
 			addTransactionUseCase(transaction)
@@ -667,6 +729,7 @@ class BudgetViewModel @Inject constructor(
 	}
 
 	private fun handleUpdateSettings(settings: BudgetSettings) {
+		Log.d(TAG, "handleUpdateSettings called with settings=$settings")
 		viewModelScope.launch {
 			persistBudgetSettings(settings)
 		}
@@ -778,9 +841,12 @@ class BudgetViewModel @Inject constructor(
 		settings: BudgetSettings,
 		forceNewPeriodBoundary: Boolean = false,
 	) {
+		Log.d(TAG, "persistBudgetSettings START settings=$settings forceNewPeriodBoundary=$forceNewPeriodBoundary")
 		clearEarlyFinishStateSync()
 		val previousSettings = budgetRepository.getBudgetSettingsSync()
 		val previousPrefs = context.settingsDataStore.data.first()
+		Log.d(TAG, "persistBudgetSettings previousSettings=$previousSettings")
+		Log.d(TAG, "persistBudgetSettings previousPrefs currentPeriodStartedAt=${previousPrefs[CURRENT_PERIOD_STARTED_AT_KEY]} currentPeriodId=${previousPrefs[CURRENT_PERIOD_ID_KEY]}")
 		budgetRepository.saveBudgetSettings(settings)
 		Log.d(TAG, "Budget settings saved to repository")
 		val shouldCreateNewPeriodBoundary = forceNewPeriodBoundary ||
@@ -797,6 +863,10 @@ class BudgetViewModel @Inject constructor(
 		} else {
 			previousPrefs[CURRENT_PERIOD_ID_KEY] ?: periodStartMillis
 		}
+		Log.d(
+			TAG,
+			"persistBudgetSettings boundaryDecision shouldCreateNewPeriodBoundary=$shouldCreateNewPeriodBoundary periodStartMillis=$periodStartMillis periodId=$periodId"
+		)
 		val periodEndDate = settings.getPeriodEndDate()
 		val millis = periodEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 		Log.d(TAG, "Saving end date to DataStore: $periodEndDate -> $millis")
@@ -811,6 +881,11 @@ class BudgetViewModel @Inject constructor(
 				prefs[NOTIFICATION_MINUTE_KEY] = DEFAULT_NOTIFICATION_MINUTE
 			}
 		}
+		val afterPrefs = context.settingsDataStore.data.first()
+		Log.d(
+			TAG,
+			"persistBudgetSettings END savedSettingsPeriod=${settings.period} savedSettingsDays=${settings.daysInPeriod} savedSettingsStart=${settings.startDate} savedSettingsEnd=${settings.endDate} datastorePeriodStart=${afterPrefs[CURRENT_PERIOD_STARTED_AT_KEY]} datastorePeriodId=${afterPrefs[CURRENT_PERIOD_ID_KEY]}"
+		)
 		notificationScheduler.schedulePeriodEndNotification(periodEndDate)
 		Log.d(TAG, "Period end notification scheduled for $periodEndDate")
 	}

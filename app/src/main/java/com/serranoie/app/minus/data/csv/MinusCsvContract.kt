@@ -12,6 +12,19 @@ object MinusCsvContract {
     const val COL_SUB_DAY = "sub_day"
     const val COL_ID = "id"
 
+    // Budget metadata (repeated in a metadata row, and compatible with older exports)
+    const val COL_BUDGET_TOTAL = "budget_total"
+    const val COL_BUDGET_PERIOD = "budget_period"
+    const val COL_BUDGET_START_DATE = "budget_start_date"
+    const val COL_BUDGET_END_DATE = "budget_end_date"
+    const val COL_CURRENCY_CODE = "currency_code"
+    const val COL_DAYS_IN_PERIOD = "days_in_period"
+    const val COL_ROLLOVER_ENABLED = "rollover_enabled"
+    const val COL_ROLLOVER_CARRY_FORWARD = "rollover_carry_forward"
+    const val COL_REMAINING_BUDGET_STRATEGY = "remaining_budget_strategy"
+    const val COL_CURRENT_PERIOD_STARTED_AT = "current_period_started_at_millis"
+    const val COL_CURRENT_PERIOD_ID = "current_period_id"
+
     val HEADERS = arrayOf(
         COL_DATE,
         COL_AMOUNT,
@@ -20,6 +33,17 @@ object MinusCsvContract {
         COL_FREQUENCY,
         COL_END_DATE,
         COL_SUB_DAY,
-        COL_ID
+        COL_ID,
+        COL_BUDGET_TOTAL,
+        COL_BUDGET_PERIOD,
+        COL_BUDGET_START_DATE,
+        COL_BUDGET_END_DATE,
+        COL_CURRENCY_CODE,
+        COL_DAYS_IN_PERIOD,
+        COL_ROLLOVER_ENABLED,
+        COL_ROLLOVER_CARRY_FORWARD,
+        COL_REMAINING_BUDGET_STRATEGY,
+        COL_CURRENT_PERIOD_STARTED_AT,
+        COL_CURRENT_PERIOD_ID,
     )
 }

@@ -3,6 +3,7 @@
 package com.serranoie.app.minus.presentation.widget
 
 import android.content.Context
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -11,10 +12,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.Button
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.action.ActionParameters
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -33,6 +37,7 @@ import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
+import androidx.glance.layout.size
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
@@ -42,6 +47,7 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
+import com.serranoie.app.minus.R
 
 class ExpenseWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ExpenseWidget()
@@ -137,6 +143,7 @@ class ExpenseWidget : GlanceAppWidget() {
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(GlanceTheme.colors.surface)
+                .clickable(actionRunCallback<OpenAppAction>())
                 .padding(16.dp)
         ) {
             Column(
@@ -150,16 +157,18 @@ class ExpenseWidget : GlanceAppWidget() {
                     // Spend amount
                     Column {
                         Text(
-                            text = "Gastado",
+                            text = "Total gastado",
                             style = TextStyle(
-                                color = GlanceTheme.colors.onSurfaceVariant
+                                color = GlanceTheme.colors.onSurfaceVariant,
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
                             )
                         )
                         Spacer(modifier = GlanceModifier.height(4.dp))
                         Text(
-                            text = "$currency${formatAmount(spend)}",
+                            text = formatWidgetCurrency(currency, spend),
                             style = TextStyle(
                                 fontWeight = FontWeight.Bold,
+                                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
                                 color = GlanceTheme.colors.onSurface
                             )
                         )
@@ -175,45 +184,22 @@ class ExpenseWidget : GlanceAppWidget() {
                         modifier = GlanceModifier.size(32.dp)
                     )
                 }
+            }
 
-                Spacer(modifier = GlanceModifier.height(8.dp))
-
-                // Percentage remaining text
-                Text(
-                    text = "Disponible: $percentRemaining%",
-                    style = TextStyle(
-                        color = GlanceTheme.colors.onSurfaceVariant
-                    )
+            // Small plus icon at bottom right corner
+            Box(
+                modifier = GlanceModifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                Image(
+                    provider = ImageProvider(R.drawable.ic_plus),
+                    contentDescription = "Add expense",
+                    modifier = GlanceModifier.size(20.dp)
                 )
-
-                Spacer(modifier = GlanceModifier.height(8.dp))
-
-                // Progress bar (simplified wavy pattern as horizontal bar)
-                Box(
-                    modifier = GlanceModifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .background(GlanceTheme.colors.surfaceVariant)
-                ) {
-                    // Progress fill
-                    Box(
-                        modifier = GlanceModifier
-                            .fillMaxHeight()
-                            .width(percentSpent.coerceIn(0f, 1f) * 1000.dp / 1000f) // Will be calculated at runtime
-                            .background(progressColor)
-                    ) {}
-                }
             }
         }
     }
 
-    private fun formatAmount(amount: Int): String {
-        return amount.toString()
-            .reversed()
-            .chunked(3)
-            .joinToString(",")
-            .reversed()
-    }
 }
 
 class OpenAppAction : ActionCallback {

@@ -2,30 +2,89 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
+    android:background="?android:attr/background"
+    android:orientation="vertical"
     android:padding="12dp">
 
-    <LinearLayout
-        android:layout_width="0dp"
+    <!-- Budget Amount -->
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:text="$500"
+        android:textColor="?android:attr/colorPrimary"
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
+    <!-- Label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Budget"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="14sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <!-- Date Range Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Start Date -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="$550"
-            android:textColor="?android:attr/colorPrimary"
-            android:textSize="32sp"
-            android:textStyle="bold" />
+            android:text="06 Mar"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="12sp" />
 
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="1dp" />
+
+        <!-- Horizontal Line with Days Chip and Arrow -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Days Chip (Rounded) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16 día(s)"
+                android:textColor="?android:attr/textColorHint"
+                android:textSize="12sp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp" />
+
+            <Space
+                android:layout_width="4dp"
+                android:layout_height="1dp" />
+
+            <!-- Horizontal Line -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_weight="1"
+                android:background="?android:attr/textColorSecondary" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="1dp" />
+
+        <!-- End Date -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/left"
+            android:text="21 Mar"
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="12sp" />
 

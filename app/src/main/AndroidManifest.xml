@@ -111,15 +111,38 @@
                 android:resource="@xml/widget_days_countdown_info" />
         </receiver>
 
+
         <receiver
-            android:name=".presentation.widget.BudgetDetailWidgetReceiver"
+            android:name=".presentation.widget.HeatmapWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_budget_detail_info" />
+                android:resource="@xml/widget_heatmap_info" />
+        </receiver>
+
+        <receiver
+            android:name=".presentation.widget.MonthHeatmapWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_month_heatmap_info" />
+        </receiver>
+
+        <receiver
+            android:name=".presentation.widget.AddExpenseWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_add_expense_info" />
         </receiver>
     </application>
 

@@ -10,6 +10,11 @@
     <string name="widget_budget_overview_description">See spent and remaining budget at a glance</string>
     <string name="widget_days_countdown_description">Countdown days remaining in budget period</string>
     <string name="widget_budget_detail_description">Full budget overview with top category and days left</string>
+    <string name="widget_heatmap_description">Heatmap calendar to see spending distribution</string>
+    <string name="widget_month_heatmap_description">Current month heatmap calendar</string>
+    <string name="widget_add_expense_description">Quick shortcut to add a new expense</string>
+    <string name="widget_add_expense_label">Añadir gasto</string>
+    <string name="widget_add_expense_plus">+</string>
 
     <!-- Widget Labels -->
     <string name="spent">Spent</string>
