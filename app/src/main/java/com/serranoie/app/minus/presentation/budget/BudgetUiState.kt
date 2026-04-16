@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.budget
+﻿package com.serranoie.app.minus.presentation.budget
 
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -33,7 +33,11 @@ data class BudgetUiState(
     val isCalculation: Boolean = false,
     val dragProgress: Float = 0f,
     val lockSwipeable: Boolean = false,
-    val lockDraggable: Boolean = false
+    val lockDraggable: Boolean = false,
+    // State for period ended dialog - shown when user tries to add expense after period ended
+    val showPeriodEndedDialog: Boolean = false,
+    val pendingExpenseAfterPeriodAmount: BigDecimal? = null,
+    val pendingExpenseAfterPeriodComment: String = ""
 ) {
     companion object {
         val INITIAL = BudgetUiState()

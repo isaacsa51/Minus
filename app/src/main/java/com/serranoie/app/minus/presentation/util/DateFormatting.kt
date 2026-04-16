@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.util
+﻿package com.serranoie.app.minus.presentation.util
 
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
@@ -35,7 +35,11 @@ fun Date.toLocalDateTime(): LocalDateTime = this.toInstant()
 	.toLocalDateTime()
 
 fun countDaysToToday(fromDate: Date): Int {
-	val result = countDays(fromDate, Date())
+	val today = Date()
+	if (fromDate <= today) {
+		return 0
+	}
+	val result = countDays(fromDate, today)
 	android.util.Log.d("DateFormatting - ISAAC", "countDaysToToday: fromDate=$fromDate, today=${Date()}, result=$result")
 	return result
 }

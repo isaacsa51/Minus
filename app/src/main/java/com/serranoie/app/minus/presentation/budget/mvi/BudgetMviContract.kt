@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.budget.mvi
+﻿package com.serranoie.app.minus.presentation.budget.mvi
 
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
@@ -46,6 +46,10 @@ sealed interface BudgetUiIntent {
     data object TriggerTestNotifications : BudgetUiIntent
     data class SetLockSwipeable(val locked: Boolean) : BudgetUiIntent
     data class SetLockDraggable(val locked: Boolean) : BudgetUiIntent
+
+    // Intent for period ended dialog - shown when user tries to add expense after period ended
+    data object DismissPeriodEndedDialog : BudgetUiIntent
+    data object ConfirmExpenseAfterPeriod : BudgetUiIntent
 }
 
 sealed interface BudgetUiEffect {

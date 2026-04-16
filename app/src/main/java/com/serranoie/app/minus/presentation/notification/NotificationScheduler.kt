@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.notification
+﻿package com.serranoie.app.minus.presentation.notification
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -45,6 +45,9 @@ class NotificationScheduler @Inject constructor(
         const val ACTION_SHOW_PERIOD_END_NOTIFICATION =
             "com.serranoie.app.minus.action.SHOW_PERIOD_END_NOTIFICATION"
         private const val PERIOD_END_ALARM_REQUEST_CODE = 5001
+        private const val MIDNIGHT_ALARM_REQUEST_CODE = 5002
+        const val ACTION_MIDNIGHT_PERIOD_CHECK =
+            "com.serranoie.app.minus.action.MIDNIGHT_PERIOD_CHECK"
     }
 
     private val workManager by lazy { WorkManager.getInstance(context) }
@@ -57,6 +60,58 @@ class NotificationScheduler @Inject constructor(
     fun initializeNotifications() {
         scheduleRecurrentExpenseCheck()
         checkAndReschedulePeriodEndNotification()
+        scheduleMidnightPeriodCheck()
+    }
+
+    /**
+     * Schedule an AlarmManager alarm for midnight to check if a period transition occurred.
+     * This runs daily to detect when the user passes midnight and a budget period ends.
+     */
+    fun scheduleMidnightPeriodCheck() {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmIntent = Intent(context, MidnightPeriodTransitionReceiver::class.java).apply {
+            action = ACTION_MIDNIGHT_PERIOD_CHECK
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            MIDNIGHT_ALARM_REQUEST_CODE,
+            alarmIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        alarmManager.cancel(pendingIntent)
+
+        // Schedule for next midnight
+        val tomorrow = LocalDate.now().plusDays(1)
+        val midnight = LocalDateTime.of(tomorrow, LocalTime.MIDNIGHT)
+        val triggerTime = midnight.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms() -> {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+                )
+                Log.d(TAG, "Midnight period check scheduled for $midnight")
+            }
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+                )
+                Log.d(TAG, "Midnight period check scheduled for $midnight")
+            }
+            else -> {
+                Log.w(TAG, "Exact alarms not allowed, falling back to inexact alarm for midnight")
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+                )
+            }
+        }
     }
 
     /**
@@ -179,7 +234,25 @@ class NotificationScheduler @Inject constructor(
     fun cancelAllNotifications() {
         Log.d(TAG, "Cancelling all notification work")
         cancelPeriodEndNotification()
+        cancelMidnightPeriodCheck()
         workManager.cancelUniqueWork(RecurrentExpenseNotificationWorker.WORK_NAME)
+    }
+
+    /**
+     * Cancel the midnight period check alarm.
+     */
+    fun cancelMidnightPeriodCheck() {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            MIDNIGHT_ALARM_REQUEST_CODE,
+            Intent(context, MidnightPeriodTransitionReceiver::class.java).apply {
+                action = ACTION_MIDNIGHT_PERIOD_CHECK
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+        Log.d(TAG, "Midnight period check alarm cancelled")
     }
 
     /**

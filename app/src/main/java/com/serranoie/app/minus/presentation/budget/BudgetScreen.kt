@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.budget
+﻿package com.serranoie.app.minus.presentation.budget
 
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -23,6 +23,10 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
@@ -300,6 +304,55 @@ fun BudgetScreenWithViewModel(
             },
             onDismiss = {
                 viewModel.processIntent(BudgetUiIntent.DismissRolloverDialog)
+            }
+        )
+    }
+
+    // Show period ended dialog when user tries to add expense after period ended
+    if (uiState.showPeriodEndedDialog && uiState.pendingExpenseAfterPeriodAmount != null) {
+        val amount = uiState.pendingExpenseAfterPeriodAmount!!
+        val currencyFormat = java.text.NumberFormat.getCurrencyInstance(java.util.Locale.US)
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.processIntent(BudgetUiIntent.DismissPeriodEndedDialog)
+            },
+            title = {
+                Text(
+                    text = "Periodo finalizado",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "El gasto de ${currencyFormat.format(amount)} sera registrado en el proximo periodo presupuestal.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "El nuevo periodo comenzara cuando configures tu presupuesto.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.processIntent(BudgetUiIntent.ConfirmExpenseAfterPeriod)
+                    }
+                ) {
+                    Text("Aceptar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.processIntent(BudgetUiIntent.DismissPeriodEndedDialog)
+                    }
+                ) {
+                    Text("Cancelar")
+                }
             }
         )
     }

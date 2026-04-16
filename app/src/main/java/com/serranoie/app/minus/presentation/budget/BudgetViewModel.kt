@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.budget
+﻿package com.serranoie.app.minus.presentation.budget
 
 import android.content.Context
 import android.util.Log
@@ -446,6 +446,8 @@ class BudgetViewModel @Inject constructor(
 			is BudgetUiIntent.SetDragProgress -> handleDragProgress(intent.progress)
 			is BudgetUiIntent.SetLockSwipeable -> handleSetLockSwipeable(intent.locked)
 			is BudgetUiIntent.SetLockDraggable -> handleSetLockDraggable(intent.locked)
+			is BudgetUiIntent.DismissPeriodEndedDialog -> handleDismissPeriodEndedDialog()
+			is BudgetUiIntent.ConfirmExpenseAfterPeriod -> handleConfirmExpenseAfterPeriod()
 		}
 	}
 
@@ -618,6 +620,23 @@ class BudgetViewModel @Inject constructor(
 			return
 		}
 
+		// Check if the period has ended - if so, show dialog instead of immediately saving
+		val settings = _uiState.value.budgetSettings
+		val today = LocalDate.now()
+		if (settings != null) {
+			val periodEndDate = settings.getPeriodEndDate()
+			if (today.isAfter(periodEndDate) || today.isEqual(periodEndDate)) {
+				_uiState.update {
+					it.copy(
+						showPeriodEndedDialog = true,
+						pendingExpenseAfterPeriodAmount = amount,
+						pendingExpenseAfterPeriodComment = _currentComment.value
+					)
+				}
+				return
+			}
+		}
+
 		viewModelScope.launch {
 			val transaction = Transaction.create(
 				amount = amount,
@@ -643,6 +662,45 @@ class BudgetViewModel @Inject constructor(
 				pendingRecurrentAmount = null,
 				pendingRecurrentComment = ""
 			)
+		}
+	}
+
+	private fun handleDismissPeriodEndedDialog() {
+		_uiState.update {
+			it.copy(
+				showPeriodEndedDialog = false,
+				pendingExpenseAfterPeriodAmount = null,
+				pendingExpenseAfterPeriodComment = ""
+			)
+		}
+		_numpadInput.value = ""
+		_currentComment.value = ""
+	}
+
+	private fun handleConfirmExpenseAfterPeriod() {
+		val amount = _uiState.value.pendingExpenseAfterPeriodAmount ?: return
+		val comment = _uiState.value.pendingExpenseAfterPeriodComment
+
+		_uiState.update {
+			it.copy(
+				showPeriodEndedDialog = false,
+				pendingExpenseAfterPeriodAmount = null,
+				pendingExpenseAfterPeriodComment = ""
+			)
+		}
+
+		viewModelScope.launch {
+			val transaction = Transaction.create(
+				amount = amount,
+				comment = comment,
+				date = LocalDateTime.now(),
+				periodId = 0L
+			)
+			addTransactionUseCase(transaction)
+			_numpadInput.value = ""
+			_currentComment.value = ""
+			_uiState.update { it.copy(isCalculation = false) }
+			Log.d(TAG, "Expense saved after period ended")
 		}
 	}
 
