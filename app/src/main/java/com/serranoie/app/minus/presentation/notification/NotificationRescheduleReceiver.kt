@@ -2,7 +2,8 @@ package com.serranoie.app.minus.presentation.notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
+import logcat.asLog
+import logcat.logcat
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -21,7 +22,7 @@ class NotificationRescheduleReceiver : BroadcastReceiver() {
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                Log.d(TAG, "Rescheduling notifications after system event: ${intent.action}")
+                logcat { "Rescheduling notifications after system event: ${intent.action}" }
                 val entryPoint = EntryPointAccessors.fromApplication(
                     context.applicationContext,
                     NotificationRescheduleReceiverEntryPoint::class.java
@@ -32,13 +33,12 @@ class NotificationRescheduleReceiver : BroadcastReceiver() {
                 )
                 scheduler.initializeNotifications()
             } catch (e: Exception) {
-                Log.e(TAG, "Error rescheduling notifications", e)
+                logcat { "Error rescheduling notifications\n${e.asLog()}" }
             } finally {
                 pendingResult.finish()
             }
         }
     }
     companion object {
-        private const val TAG = "NotificationRescheduleReceiver"
     }
 }

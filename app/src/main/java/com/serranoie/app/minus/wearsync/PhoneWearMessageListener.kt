@@ -1,7 +1,7 @@
 package com.serranoie.app.minus.wearsync
 
 import android.content.Context
-import android.util.Log
+import logcat.logcat
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
@@ -33,18 +33,17 @@ class PhoneWearMessageListener @Inject constructor(
 ) : MessageClient.OnMessageReceivedListener {
 
     companion object {
-        private const val TAG = "PhoneWearForeground"
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun start() {
         Wearable.getMessageClient(context).addListener(this)
-        Log.d(TAG, "foreground listener registered")
+        logcat { "foreground listener registered" }
     }
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
-        Log.d(TAG, "onMessageReceived: path=${messageEvent.path}, sourceNode=${messageEvent.sourceNodeId}")
+        logcat { "onMessageReceived: path=${messageEvent.path}, sourceNode=${messageEvent.sourceNodeId}" }
         when (messageEvent.path) {
             WearPaths.EXPENSE_ADD -> handleExpenseAdd(messageEvent)
             WearPaths.EXPENSE_SNAPSHOT -> handleSnapshotRequest(messageEvent)
@@ -68,11 +67,11 @@ class PhoneWearMessageListener @Inject constructor(
             when (val result = ingestor.ingest(payload)) {
                 is WearExpenseIngestor.IngestResult.Ok -> {
                     sendAck(messageEvent.sourceNodeId, AckPayload(payload.clientGeneratedId, AckStatus.OK))
-                    Log.d(TAG, "handleExpenseAdd: ack sent id=${payload.clientGeneratedId}")
+                    logcat { "handleExpenseAdd: ack sent id=${payload.clientGeneratedId}" }
                 }
                 is WearExpenseIngestor.IngestResult.Error -> {
                     sendAck(messageEvent.sourceNodeId, AckPayload(payload.clientGeneratedId, AckStatus.ERROR, result.reason))
-                    Log.w(TAG, "handleExpenseAdd: error id=${payload.clientGeneratedId}, reason=${result.reason}")
+                    logcat { "handleExpenseAdd: error id=${payload.clientGeneratedId}, reason=${result.reason}" }
                 }
             }
         }

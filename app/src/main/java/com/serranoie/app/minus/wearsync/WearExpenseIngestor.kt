@@ -1,6 +1,6 @@
 package com.serranoie.app.minus.wearsync
 
-import android.util.Log
+import logcat.logcat
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.sync.contract.ExpensePayload
@@ -19,7 +19,6 @@ class WearExpenseIngestor @Inject constructor(
 ) {
 
     companion object {
-        private const val TAG = "WearExpenseIngestor"
     }
 
     private val ingestMutex = Mutex()
@@ -39,7 +38,7 @@ class WearExpenseIngestor @Inject constructor(
 
         val exists = repository.existsTransactionByClientGeneratedId(payload.clientGeneratedId)
         if (exists) {
-            Log.d(TAG, "ingest: duplicate pre-check id=${payload.clientGeneratedId}")
+            logcat { "ingest: duplicate pre-check id=${payload.clientGeneratedId}" }
             return@withLock IngestResult.Ok
         }
 
@@ -53,9 +52,9 @@ class WearExpenseIngestor @Inject constructor(
         )
         val inserted = repository.addTransactionIfAbsent(tx)
         if (!inserted) {
-            Log.d(TAG, "ingest: duplicate on insert-ignore id=${payload.clientGeneratedId}")
+            logcat { "ingest: duplicate on insert-ignore id=${payload.clientGeneratedId}" }
         } else {
-            Log.d(TAG, "ingest: inserted id=${payload.clientGeneratedId}, amount=${payload.amount}")
+            logcat { "ingest: inserted id=${payload.clientGeneratedId}, amount=${payload.amount}" }
         }
 
         IngestResult.Ok

@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import logcat.logcat
 
 @Composable
 fun DescriptionButton(
@@ -39,7 +40,7 @@ fun DescriptionButton(
 ){
 	Card(
 		onClick = {
-			android.util.Log.d("DescriptionButton", "Card clicked - invoking onClick")
+			logcat("DescriptionButton") { "Card clicked - invoking onClick" }
 			onClick()
 		},
 		modifier = modifier.fillMaxWidth(),

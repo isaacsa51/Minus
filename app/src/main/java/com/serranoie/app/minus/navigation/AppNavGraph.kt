@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings as AndroidSettings
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.contract.ActivityResultContracts
@@ -59,6 +58,7 @@ import com.serranoie.app.minus.presentation.wallet.Wallet
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
 import com.serranoie.app.minus.settingsDataStore
+import logcat.logcat
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.ZoneId
@@ -140,7 +140,7 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
 ) {
     val tag = "AppNavGraph - ISAAC"
-    Log.d(tag, "AppNavGraph created with startDestination: $startDestination")
+    logcat(tag) { "AppNavGraph created with startDestination: $startDestination" }
 
     NavHost(
         navController = navController,
@@ -201,13 +201,13 @@ fun AppNavGraph(
                     forceChange = forceChange,
                     activityResultRegistryOwner = activityResultRegistryOwner,
                     onClose = {
-                        Log.d(tag, "Wallet onClose - navigating to Main")
+                        logcat(tag) { "Wallet onClose - navigating to Main" }
                         navController.navigate(Screen.Main.route) {
                             popUpTo(0) { inclusive = true }
                         }
                     },
                     onOnboardingComplete = {
-                        Log.d(tag, "Wallet onOnboardingComplete - calling parent onOnboardingComplete")
+                        logcat(tag) { "Wallet onOnboardingComplete - calling parent onOnboardingComplete" }
                         onOnboardingComplete()
                     }
                 )
@@ -324,7 +324,7 @@ fun AppNavGraph(
                 }
             )
         ) { backStackEntry ->
-            Log.d(tag, "Navigating to Main")
+            logcat(tag) { "Navigating to Main" }
             val openWallet = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_OPEN_WALLET) ?: false
             val forceWalletSetup = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_FORCE_WALLET_SETUP) ?: false
 
@@ -344,7 +344,7 @@ fun AppNavGraph(
         }
 
         composable(Screen.Settings.route) {
-            Log.d(tag, "Navigating to Settings")
+            logcat(tag) { "Navigating to Settings" }
             val context = androidx.compose.ui.platform.LocalContext.current
             val viewModel: BudgetViewModel = hiltViewModel()
             val csvTransferManager = EntryPointAccessors
@@ -390,7 +390,7 @@ fun AppNavGraph(
                 notificationMinute = notificationMinute,
                 exactAlarmEnabled = exactAlarmEnabled,
                 onThemeChange = { themeMode ->
-                    Log.d(tag, "Theme changed to: $themeMode")
+                    logcat(tag) { "Theme changed to: $themeMode" }
                     val newThemeMode = when (themeMode) {
                         "Light" -> com.serranoie.app.minus.presentation.ui.theme.ThemeMode.LIGHT
                         "Dark" -> com.serranoie.app.minus.presentation.ui.theme.ThemeMode.NIGHT
@@ -404,7 +404,7 @@ fun AppNavGraph(
                     }
                 },
                 onMaterialYouToggle = {
-                    Log.d(tag, "Material You toggled")
+                    logcat(tag) { "Material You toggled" }
                     val newValue = !context.dynamicColorEnabled
                     context.dynamicColorEnabled = newValue
                     kotlinx.coroutines.runBlocking {

@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.numpad
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.tween
@@ -32,11 +31,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.presentation.util.getFloatDivider
 import com.serranoie.app.minus.presentation.util.tryConvertStringToNumber
 import com.serranoie.app.minus.presentation.util.join
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.domain.model.Transaction
+import logcat.logcat
 import java.util.Date
 
 val BUTTON_GAP = 3.dp
@@ -488,7 +489,7 @@ fun Numpad(
 									type = NumpadButtonType.PRIMARY,
 									icon = Icons.Default.Check,
 									onClick = {
-										if (debugProgress == -1) {
+										if (BuildConfig.DEBUG_FEATURES && debugProgress == -1) {
 											onTestNotifications?.invoke()
 											onShowSnackbar?.invoke("Test notifications triggered!")
 											debugProgress = 0
@@ -518,12 +519,12 @@ fun NumpadPreview() {
 				mode = EditMode.ADD, rawSpentValue = "123", stage = EditStage.EDIT_SPENT
 			),
 			isCalculation = false,
-			onNumberInput = { Log.d("NumpadPreview", "Number: $it") },
-			onDotInput = { Log.d("NumpadPreview", "Dot pressed") },
-			onBackspace = { Log.d("NumpadPreview", "Backspace") },
-			onBackspaceLongPress = { Log.d("NumpadPreview", "Backspace long press") },
-			onDelete = { Log.d("NumpadPreview", "Delete") },
-			onApply = { Log.d("NumpadPreview", "Apply") },
+			onNumberInput = { logcat("NumpadPreview") { "Number: $it" } },
+			onDotInput = { logcat("NumpadPreview") { "Dot pressed" } },
+			onBackspace = { logcat("NumpadPreview") { "Backspace" } },
+			onBackspaceLongPress = { logcat("NumpadPreview") { "Backspace long press" } },
+			onDelete = { logcat("NumpadPreview") { "Delete" } },
+			onApply = { logcat("NumpadPreview") { "Apply" } },
 		)
 	}
 }

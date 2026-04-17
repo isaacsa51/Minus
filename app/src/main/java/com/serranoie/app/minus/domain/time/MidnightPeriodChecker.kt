@@ -1,7 +1,7 @@
 package com.serranoie.app.minus.domain.time
 
 import android.content.Context
-import android.util.Log
+import logcat.logcat
 import androidx.datastore.preferences.core.edit
 import com.serranoie.app.minus.BUDGET_END_DATE_KEY
 import com.serranoie.app.minus.LAST_PERIOD_END_KEY
@@ -44,7 +44,6 @@ class MidnightPeriodChecker @Inject constructor(
 	val shouldShowTransitionDialog: StateFlow<Boolean> = _shouldShowTransitionDialog.asStateFlow()
 
 	companion object {
-		private const val TAG = "MidnightPeriodChecker"
 	}
 
 	suspend fun checkMidnightTransition() {
@@ -58,7 +57,7 @@ class MidnightPeriodChecker @Inject constructor(
 		} ?: false
 
 		if (!transitionOccurred && !periodEndedBasedOnDate) {
-			Log.d(TAG, "No midnight transition detected")
+			logcat { "No midnight transition detected" }
 			return
 		}
 
@@ -66,7 +65,7 @@ class MidnightPeriodChecker @Inject constructor(
 
 		val lastPeriodEndMillis = prefs[LAST_PERIOD_END_KEY] ?: endDateMillis
 		if (lastPeriodEndMillis == null) {
-			Log.d(TAG, "No period end date found")
+			logcat { "No period end date found" }
 			return
 		}
 
@@ -78,7 +77,7 @@ class MidnightPeriodChecker @Inject constructor(
 		val remaining = BigDecimal(remainingStr)
 
 		val settings = budgetRepository.getBudgetSettingsSync() ?: run {
-			Log.d(TAG, "No budget settings found")
+			logcat { "No budget settings found" }
 			return
 		}
 
@@ -104,7 +103,7 @@ class MidnightPeriodChecker @Inject constructor(
 		)
 
 		_shouldShowTransitionDialog.value = true
-		Log.d(TAG, "Midnight transition detected, showing dialog")
+		logcat { "Midnight transition detected, showing dialog" }
 	}
 
 	fun onTransitionDialogConfirmed() {

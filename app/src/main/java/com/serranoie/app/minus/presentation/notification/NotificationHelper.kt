@@ -8,7 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
+import logcat.logcat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -29,7 +29,6 @@ class NotificationHelper @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     companion object {
-        const val TAG = "NotificationHelper"
         const val CHANNEL_PERIOD_END = "budget_period_end"
         const val CHANNEL_RECURRENT = "recurrent_expenses"
 
@@ -73,7 +72,7 @@ class NotificationHelper @Inject constructor(
 
             notificationManager.createNotificationChannel(periodEndChannel)
             notificationManager.createNotificationChannel(recurrentChannel)
-            Log.d(TAG, "Notification channels created")
+            logcat { "Notification channels created" }
         }
     }
 
@@ -86,10 +85,10 @@ class NotificationHelper @Inject constructor(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
-            Log.d(TAG, "Notification permission (Android 13+): $granted")
+            logcat { "Notification permission (Android 13+): $granted" }
             granted
         } else {
-            Log.d(TAG, "Notification permission: granted (pre-Android 13)")
+            logcat { "Notification permission: granted (pre-Android 13)" }
             true
         }
     }
@@ -100,7 +99,7 @@ class NotificationHelper @Inject constructor(
     fun showPeriodEndNotification(remainingBudget: String, currency: String) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
-            Log.w(TAG, "Cannot show notification - permission not granted")
+            logcat { "Cannot show notification - permission not granted" }
             return
         }
 
@@ -130,7 +129,7 @@ class NotificationHelper @Inject constructor(
             .build()
 
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_PERIOD_END, notification)
-        Log.d(TAG, "Period end notification shown successfully")
+        logcat { "Period end notification shown successfully" }
     }
 
     /**
@@ -153,7 +152,7 @@ class NotificationHelper @Inject constructor(
     fun showRecurrentExpenseNotification(amount: String, comment: String, frequency: String, currency: String) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
-            Log.w(TAG, "Cannot show notification - permission not granted")
+            logcat { "Cannot show notification - permission not granted" }
             return
         }
 
@@ -197,7 +196,7 @@ class NotificationHelper @Inject constructor(
     fun showUpcomingSubscriptionNotification(amount: String, comment: String, daysUntil: Long, currency: String) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
-            Log.w(TAG, "Cannot show notification - permission not granted")
+            logcat { "Cannot show notification - permission not granted" }
             return
         }
 
@@ -238,7 +237,7 @@ class NotificationHelper @Inject constructor(
 
         val notificationId = NOTIFICATION_ID_RECURRENT + daysUntil.toInt()
         NotificationManagerCompat.from(context).notify(notificationId, notification)
-        Log.d(TAG, "Upcoming subscription notification shown: $message")
+        logcat { "Upcoming subscription notification shown: $message" }
     }
 
     fun cancelAllNotifications() {

@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.presentation.wallet
 
-import android.util.Log
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

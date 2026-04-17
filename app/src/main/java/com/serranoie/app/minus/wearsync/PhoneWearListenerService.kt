@@ -3,7 +3,7 @@ package com.serranoie.app.minus.wearsync
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
-import android.util.Log
+import logcat.logcat
 import com.serranoie.app.minus.sync.contract.AckPayload
 import com.serranoie.app.minus.sync.contract.AckStatus
 import com.serranoie.app.minus.sync.contract.ExpensePayload
@@ -24,28 +24,27 @@ import java.time.ZoneOffset
 class PhoneWearListenerService : WearableListenerService() {
 
     companion object {
-        private const val TAG = "PhoneWearListener"
     }
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "service created")
+        logcat { "service created" }
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "service destroyed")
+        logcat { "service destroyed" }
         super.onDestroy()
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
-        Log.d(TAG, "onMessageReceived: path=${messageEvent.path}, sourceNode=${messageEvent.sourceNodeId}")
+        logcat { "onMessageReceived: path=${messageEvent.path}, sourceNode=${messageEvent.sourceNodeId}" }
         when (messageEvent.path) {
             WearPaths.EXPENSE_ADD -> handleExpenseAdd(messageEvent)
             WearPaths.EXPENSE_SNAPSHOT -> handleSnapshotRequest(messageEvent)
             else -> {
-                Log.w(TAG, "onMessageReceived: unhandled path=${messageEvent.path}")
+                logcat { "onMessageReceived: unhandled path=${messageEvent.path}" }
                 super.onMessageReceived(messageEvent)
             }
         }
@@ -72,11 +71,11 @@ class PhoneWearListenerService : WearableListenerService() {
             when (val result = ingestor.ingest(payload)) {
                 is WearExpenseIngestor.IngestResult.Ok -> {
                     sendAck(messageEvent.sourceNodeId, AckPayload(payload.clientGeneratedId, AckStatus.OK))
-                    Log.d(TAG, "handleExpenseAdd: ack sent id=${payload.clientGeneratedId}")
+                    logcat { "handleExpenseAdd: ack sent id=${payload.clientGeneratedId}" }
                 }
                 is WearExpenseIngestor.IngestResult.Error -> {
                     sendAck(messageEvent.sourceNodeId, AckPayload(payload.clientGeneratedId, AckStatus.ERROR, result.reason))
-                    Log.w(TAG, "handleExpenseAdd: error id=${payload.clientGeneratedId}, reason=${result.reason}")
+                    logcat { "handleExpenseAdd: error id=${payload.clientGeneratedId}, reason=${result.reason}" }
                 }
             }
         }

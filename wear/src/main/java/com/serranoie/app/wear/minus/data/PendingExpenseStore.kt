@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import android.util.Log
+import logcat.logcat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -18,7 +18,6 @@ class PendingExpenseStore(private val context: Context) {
     private val key = stringPreferencesKey("pending_expenses_json")
 
     companion object {
-        private const val TAG = "WearPendingStore"
         private const val ACK_TIMEOUT_MS = 20_000L
     }
 
@@ -34,7 +33,7 @@ class PendingExpenseStore(private val context: Context) {
         val current = getAllOnce()
         val next = current + expense
         writeAll(next)
-        Log.d(TAG, "enqueue: id=${expense.clientGeneratedId}, amount=${expense.amount}, total=${next.size}")
+        logcat { "enqueue: id=${expense.clientGeneratedId}, amount=${expense.amount}, total=${next.size}" }
     }
 
     suspend fun markSentWaitingAck(clientGeneratedId: String) {
@@ -70,7 +69,8 @@ class PendingExpenseStore(private val context: Context) {
             .sortedBy { it.eventTime }
             .take(limit)
 
-        Log.d(TAG, "getRetryable: total=${getAllOnce().size}, retryable=${list.size}")
+        val total = getAllOnce().size
+        logcat { "getRetryable: total=$total, retryable=${list.size}" }
         return list
     }
 

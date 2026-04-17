@@ -1,7 +1,8 @@
 package com.serranoie.app.wear.minus.sync
 
 import android.content.Context
-import android.util.Log
+import logcat.logcat
+import logcat.asLog
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Wearable
 import com.serranoie.app.wear.minus.data.PendingExpense
@@ -14,9 +15,7 @@ import kotlinx.serialization.encodeToString
 
 class WearSyncManager(private val context: Context) {
 
-    companion object {
-        private const val TAG = "WearSyncManager"
-    }
+
 
     private val nodeClient by lazy { Wearable.getNodeClient(context) }
     private val capabilityClient by lazy { Wearable.getCapabilityClient(context) }
@@ -31,9 +30,9 @@ class WearSyncManager(private val context: Context) {
         )
         val bytes = WearJson.json.encodeToString(payload).encodeToByteArray()
         val nodes = getPhoneReceiverNodes()
-        Log.d(TAG, "sendExpense: receiverNodes=${nodes.size}, id=${expense.clientGeneratedId}")
+        logcat { "sendExpense: receiverNodes=${nodes.size}, id=${expense.clientGeneratedId}" }
         if (nodes.isEmpty()) {
-            Log.w(TAG, "sendExpense: no receiver nodes for capability minus_phone_receiver")
+            logcat { "sendExpense: no receiver nodes for capability minus_phone_receiver" }
             return false
         }
 
@@ -43,9 +42,9 @@ class WearSyncManager(private val context: Context) {
                 messageClient.sendMessage(node.id, WearPaths.EXPENSE_ADD, bytes).await()
             }.onSuccess {
                 sentAny = true
-                Log.d(TAG, "sendExpense: sent to node=${node.id}")
-            }.onFailure {
-                Log.e(TAG, "sendExpense: failed for node=${node.id}", it)
+                logcat { "sendExpense: sent to node=${node.id}" }
+            }.onFailure { e ->
+                logcat { "sendExpense: failed for node=${node.id}\n${e.asLog()}" }
             }
         }
         return sentAny
@@ -55,9 +54,9 @@ class WearSyncManager(private val context: Context) {
         val request = SnapshotRequestPayload(limit)
         val bytes = WearJson.json.encodeToString(request).encodeToByteArray()
         val nodes = getPhoneReceiverNodes()
-        Log.d(TAG, "requestSnapshot: receiverNodes=${nodes.size}")
+        logcat { "requestSnapshot: receiverNodes=${nodes.size}" }
         if (nodes.isEmpty()) {
-            Log.w(TAG, "requestSnapshot: no receiver nodes for capability minus_phone_receiver")
+            logcat { "requestSnapshot: no receiver nodes for capability minus_phone_receiver" }
             return false
         }
 
@@ -67,9 +66,9 @@ class WearSyncManager(private val context: Context) {
                 messageClient.sendMessage(node.id, WearPaths.EXPENSE_SNAPSHOT, bytes).await()
             }.onSuccess {
                 sentAny = true
-                Log.d(TAG, "requestSnapshot: sent to node=${node.id}")
-            }.onFailure {
-                Log.e(TAG, "requestSnapshot: failed for node=${node.id}", it)
+                logcat { "requestSnapshot: sent to node=${node.id}" }
+            }.onFailure { e ->
+                logcat { "requestSnapshot: failed for node=${node.id}\n${e.asLog()}" }
             }
         }
         return sentAny
@@ -83,7 +82,7 @@ class WearSyncManager(private val context: Context) {
         val nodes = capabilityInfo.nodes.toList()
         if (nodes.isEmpty()) {
             val fallbackNodes = nodeClient.connectedNodes.await()
-            Log.w(TAG, "getPhoneReceiverNodes: capability empty, fallback connectedNodes=${fallbackNodes.size}")
+            logcat { "getPhoneReceiverNodes: capability empty, fallback connectedNodes=${fallbackNodes.size}" }
             return fallbackNodes
         }
         return nodes

@@ -2,7 +2,8 @@ package com.serranoie.app.minus.presentation.notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
+import logcat.asLog
+import logcat.logcat
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -51,13 +52,12 @@ class PeriodEndAlarmReceiver : BroadcastReceiver() {
                     currency = settings.currencyCode
                 )
             } catch (e: Exception) {
-                Log.e(TAG, "Error handling period end alarm", e)
+                logcat { "Error handling period end alarm\n${e.asLog()}" }
             } finally {
                 pendingResult.finish()
             }
         }
     }
     companion object {
-        private const val TAG = "PeriodEndAlarmReceiver"
     }
 }

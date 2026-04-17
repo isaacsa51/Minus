@@ -26,8 +26,15 @@ android {
 	}
 
 	buildTypes {
-		release {
+		debug {
+			buildConfigField("Boolean", "SHOW_LOGS", "true")
+			buildConfigField("Boolean", "DEBUG_FEATURES", "true")
 			isMinifyEnabled = false
+		}
+		release {
+			buildConfigField("Boolean", "SHOW_LOGS", "false")
+			buildConfigField("Boolean", "DEBUG_FEATURES", "false")
+			isMinifyEnabled = true
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
@@ -125,6 +132,8 @@ dependencies {
 	ksp("androidx.hilt:hilt-compiler:1.2.0")
 
 
+	// Logcat from Square
+	implementation("com.squareup.logcat:logcat:0.4")
 
 	debugImplementation("androidx.compose.ui:ui-tooling:1.10.6")
 	debugImplementation("androidx.compose.ui:ui-test-manifest:1.8.3")

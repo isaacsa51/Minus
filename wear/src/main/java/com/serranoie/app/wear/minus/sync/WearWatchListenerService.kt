@@ -2,7 +2,7 @@ package com.serranoie.app.wear.minus.sync
 
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
-import android.util.Log
+import logcat.logcat
 import com.serranoie.app.wear.minus.data.CategorySuggestionStore
 import com.serranoie.app.wear.minus.data.PendingExpenseStore
 import com.serranoie.app.minus.sync.contract.AckPayload
@@ -17,9 +17,7 @@ import kotlinx.coroutines.launch
 
 class WearWatchListenerService : WearableListenerService() {
 
-    companion object {
-        private const val TAG = "WearWatchListener"
-    }
+
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -54,7 +52,7 @@ class WearWatchListenerService : WearableListenerService() {
         val comments = payload.items.map { it.comment }
         scope.launch {
             CategorySuggestionStore(applicationContext).saveFromComments(comments)
-            Log.d(TAG, "handleSnapshotResponse: cached categories=${comments.size}")
+            logcat { "handleSnapshotResponse: cached categories=${comments.size}" }
         }
     }
 }

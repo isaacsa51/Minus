@@ -1,7 +1,8 @@
 package com.serranoie.app.minus.presentation.notification
 
 import android.content.Context
-import android.util.Log
+import logcat.asLog
+import logcat.logcat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.serranoie.app.minus.data.repository.BudgetRepository
@@ -29,7 +30,6 @@ class RecurrentExpenseNotificationWorker(
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
-        const val TAG = "RecurrentExpenseNotification"
         const val WORK_NAME = "recurrent_expense_notification"
     }
     
@@ -41,7 +41,7 @@ class RecurrentExpenseNotificationWorker(
     }
 
     override suspend fun doWork(): Result {
-        Log.d(TAG, "RecurrentExpenseNotificationWorker starting...")
+        logcat { "RecurrentExpenseNotificationWorker starting..." }
         
         val entryPoint = EntryPointAccessors.fromApplication(
             applicationContext,
@@ -54,7 +54,7 @@ class RecurrentExpenseNotificationWorker(
             val settings = budgetRepository.getBudgetSettingsSync()
 
             if (settings == null) {
-                Log.d(TAG, "No budget settings found, skipping notification")
+                logcat { "No budget settings found, skipping notification" }
                 return Result.success()
             }
 
@@ -79,8 +79,8 @@ class RecurrentExpenseNotificationWorker(
                 shouldWarnUpcoming(transaction, today, budgetEndDate)
             }
 
-            Log.d(TAG, "Found ${recurrentTransactions.size} recurrent expenses due today")
-            Log.d(TAG, "Found ${upcomingSubscriptions.size} upcoming subscriptions this period")
+            logcat { "Found ${recurrentTransactions.size} recurrent expenses due today" }
+            logcat { "Found ${upcomingSubscriptions.size} upcoming subscriptions this period" }
 
             // Send notification for each recurrent expense due today
             for (transaction in recurrentTransactions) {
@@ -95,7 +95,7 @@ class RecurrentExpenseNotificationWorker(
                     currency = settings.currencyCode
                 )
 
-                Log.d(TAG, "Recurrent expense notification shown for: $amount $comment ($frequency)")
+                logcat { "Recurrent expense notification shown for: $amount $comment ($frequency)" }
             }
 
             // Send notifications for upcoming subscriptions (charging in 1-3 days)
@@ -108,14 +108,14 @@ class RecurrentExpenseNotificationWorker(
                         daysUntil = daysUntilCharge,
                         currency = settings.currencyCode
                     )
-                    Log.d(TAG, "Upcoming subscription notification: ${transaction.comment} in $daysUntilCharge days")
+                    logcat { "Upcoming subscription notification: ${transaction.comment} in $daysUntilCharge days" }
                 }
             }
 
             Result.success()
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error in RecurrentExpenseNotificationWorker", e)
+            logcat { "Error in RecurrentExpenseNotificationWorker\n${e.asLog()}" }
             Result.failure()
         }
     }

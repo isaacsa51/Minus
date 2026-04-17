@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
@@ -65,6 +64,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import logcat.asLog
+import logcat.logcat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -162,12 +163,11 @@ class MainActivity : ComponentActivity() {
 					val cap = Wearable.getCapabilityClient(this@MainActivity)
 						.getCapability("minus_wear_sender", CapabilityClient.FILTER_REACHABLE)
 						.await()
-					Log.d(
-						tag,
+					logcat(tag) {
 						"wear capability minus_wear_sender reachableNodes=${cap.nodes.size} ids=${cap.nodes.joinToString { it.id }}"
-					)
+					}
 				}.onFailure {
-					Log.e(tag, "wear capability check failed", it)
+					logcat(tag) { it.asLog() }
 				}
 
 				val prefs = applicationContext.settingsDataStore.data.first()
@@ -193,7 +193,7 @@ class MainActivity : ComponentActivity() {
 								.toLocalDate()
 						periodEnded.value = LocalDate.now().isAfter(lastPeriodEnd)
 					}
-					Log.d(tag, "Midnight transition detected on app start, routing to Analytics")
+					logcat(tag) { "Midnight transition detected on app start, routing to Analytics" }
 				}
 
 				earlyFinishPending.value = prefs[EARLY_FINISH_ACTIVE_KEY] ?: false
@@ -227,10 +227,9 @@ class MainActivity : ComponentActivity() {
 
 		applicationContext.settingsDataStore.data
 			.onEach { preferences ->
-				Log.d(
-					tag,
+				logcat(tag) {
 					"DataStore observer -> onboarding_completed=${preferences[ONBOARDING_COMPLETED_KEY]}"
-				)
+				}
 			}
 			.launchIn(lifecycleScope)
 
@@ -295,10 +294,9 @@ class MainActivity : ComponentActivity() {
 									navController = navController,
 									onOnboardingComplete = {
 										lifecycleScope.launch {
-											Log.d(
-												tag,
+											logcat(tag) {
 												"onOnboardingComplete -> writing onboarding_completed=true"
-											)
+											}
 											applicationContext.settingsDataStore.edit { prefs ->
 												prefs[ONBOARDING_COMPLETED_KEY] = true
 												prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] =
@@ -307,10 +305,9 @@ class MainActivity : ComponentActivity() {
 											val saved =
 												applicationContext.settingsDataStore.data.first()[ONBOARDING_COMPLETED_KEY]
 													?: false
-											Log.d(
-												tag,
+											logcat(tag) {
 												"onOnboardingComplete -> saved onboarding_completed=$saved"
-											)
+											}
 										}
 									}
 								)

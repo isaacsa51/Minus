@@ -1,6 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
-import android.util.Log
+import logcat.logcat
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -73,7 +73,6 @@ fun TopSheetLayout(
     sheetContentHalfExpand: @Composable () -> Unit,
     sheetContentExpand: @Composable () -> Unit,
 ) {
-    val tag = "TopSheetLayout - ISAAC"
     val localDensity = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -226,7 +225,7 @@ fun TopSheetLayout(
 
     LaunchedEffect(swipeableState.currentValue) {
         if (swipeableState.currentValue == TopSheetValue.Dismissed && onDismiss != null) {
-            Log.d(tag, "TopSheet dismissed via swipe, calling onDismiss")
+            logcat { "TopSheet dismissed via swipe, calling onDismiss" }
             kotlinx.coroutines.delay(300)
             onDismiss()
             scope.launch {

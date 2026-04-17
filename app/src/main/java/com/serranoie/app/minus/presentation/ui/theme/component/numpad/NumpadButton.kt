@@ -1,12 +1,11 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.numpad
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,11 +35,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
-import androidx.glance.preview.ExperimentalGlancePreviewApi
-import androidx.glance.preview.Preview
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.colorOnButton
@@ -61,42 +59,38 @@ fun NumpadButton(
 	onLongClick: () -> Unit = {},
 ) {
 	val localDensity = LocalDensity.current
-	var minSize by remember { mutableStateOf(999.dp) }
-	var minSizeFloat by remember { mutableFloatStateOf(999f) }
+	var minSize by remember { mutableStateOf(99.dp) }
+	var minSizeFloat by remember { mutableFloatStateOf(99f) }
 	val interactionSource = remember { MutableInteractionSource() }
 	val isPressed = interactionSource.collectIsPressedAsState()
-	// TODO: Check if the minSize / 2 is correct
 	val radius = animateDpAsState(targetValue = if (isPressed.value) 20.dp else minSize / 2)
 
 	val color = when (type) {
-		 NumpadButtonType.DEFAULT -> colorButton
-		 NumpadButtonType.PRIMARY -> MaterialTheme.colorScheme.primaryContainer
-		 NumpadButtonType.SECONDARY -> MaterialTheme.colorScheme.secondaryContainer
-		 NumpadButtonType.TERTIARY -> MaterialTheme.colorScheme.tertiaryContainer
-		 NumpadButtonType.DELETE -> MaterialTheme.colorScheme.errorContainer
-		 NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondaryContainer
+		NumpadButtonType.DEFAULT -> colorButton
+		NumpadButtonType.PRIMARY -> MaterialTheme.colorScheme.primaryContainer
+		NumpadButtonType.SECONDARY -> MaterialTheme.colorScheme.secondaryContainer
+		NumpadButtonType.TERTIARY -> MaterialTheme.colorScheme.tertiaryContainer
+		NumpadButtonType.DELETE -> MaterialTheme.colorScheme.errorContainer
+		NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondaryContainer
 	}
 
 	val contentColor = when (type) {
-		 NumpadButtonType.DEFAULT -> colorOnButton
-		 NumpadButtonType.PRIMARY -> MaterialTheme.colorScheme.onPrimaryContainer
-		 NumpadButtonType.SECONDARY -> MaterialTheme.colorScheme.onSecondaryContainer
-		 NumpadButtonType.TERTIARY -> MaterialTheme.colorScheme.onTertiaryContainer
-		 NumpadButtonType.DELETE -> MaterialTheme.colorScheme.onErrorContainer
-		 NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondary
+		NumpadButtonType.DEFAULT -> colorOnButton
+		NumpadButtonType.PRIMARY -> MaterialTheme.colorScheme.onPrimaryContainer
+		NumpadButtonType.SECONDARY -> MaterialTheme.colorScheme.onSecondaryContainer
+		NumpadButtonType.TERTIARY -> MaterialTheme.colorScheme.onTertiaryContainer
+		NumpadButtonType.DELETE -> MaterialTheme.colorScheme.onErrorContainer
+		NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondary
 	}
 
-	Surface(
-		tonalElevation = 10.dp,
-		modifier = modifier
-			.fillMaxSize()
-			.onGloballyPositioned {
-				minSize = with(localDensity) { min(it.size.height, it.size.width).toDp() }
-				minSizeFloat = min(it.size.height, it.size.width).toFloat()
-			}
-			.clip(RoundedCornerShape(radius.value))
-	) {
-		BoxWithConstraints(
+	Surface(tonalElevation = 10.dp, modifier = modifier
+		.fillMaxSize()
+		.onGloballyPositioned {
+			minSize = with(localDensity) { min(it.size.height, it.size.width).toDp() }
+			minSizeFloat = min(it.size.height, it.size.width).toFloat()
+		}
+		.clip(RoundedCornerShape(radius.value))) {
+		Box(
 			modifier = Modifier
 				.background(color = color)
 				.fillMaxSize()
@@ -106,8 +100,7 @@ fun NumpadButton(
 					indication = ripple(),
 					onClick = { onClick.invoke() },
 					onLongClick = { onLongClick.invoke() },
-				),
-			contentAlignment = Alignment.Center
+				), contentAlignment = Alignment.Center
 		) {
 			if (text !== null) {
 				val fontSize = min(
@@ -120,29 +113,27 @@ fun NumpadButton(
 					color = contentColor,
 					style = MaterialTheme.typography.displaySmall.copy(
 						fontWeight = FontWeight.Bold,
-						fontSize = 42.sp,
+						fontSize = fontSize,
 					),
 					maxLines = 1,
 				)
 			}
 			if (icon != null) {
-				val iconSize = min(maxWidth * 0.34f, 48.dp)
 				Icon(
 					imageVector = icon,
 					tint = contentColor,
-					modifier = Modifier.size(iconSize),
-					contentDescription = null,
+					modifier = Modifier.size(min(minSize * 0.34f, 154.dp)),
+					contentDescription = "Editor action",
 				)
 			}
 		}
 	}
 }
 
-@OptIn(ExperimentalGlancePreviewApi::class)
 @Preview
 @Composable
 private fun NumpadButtonPreviews() {
-	MinusTheme{
+	MinusTheme {
 		Column {
 			Row {
 				NumpadButton(type = NumpadButtonType.DEFAULT, text = "1")
@@ -153,7 +144,9 @@ private fun NumpadButtonPreviews() {
 
 			Row {
 				NumpadButton(type = NumpadButtonType.DEFAULT, icon = Icons.Default.Check)
-				NumpadButton(type = NumpadButtonType.SECONDARY, icon = Icons.AutoMirrored.Filled.ArrowBack)
+				NumpadButton(
+					type = NumpadButtonType.SECONDARY, icon = Icons.AutoMirrored.Filled.ArrowBack
+				)
 				NumpadButton(type = NumpadButtonType.TERTIARY, icon = Icons.Default.Close)
 			}
 		}

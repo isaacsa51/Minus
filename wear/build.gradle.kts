@@ -73,4 +73,7 @@ dependencies {
 	implementation("androidx.wear.compose:compose-material3:1.6.0-rc01")
 	implementation("androidx.wear.compose:compose-foundation:1.6.0-rc01")
 	implementation("androidx.wear.compose:compose-navigation:1.6.0-rc01")
+
+	// Logcat
+	implementation("com.squareup.logcat:logcat:0.4")
 }

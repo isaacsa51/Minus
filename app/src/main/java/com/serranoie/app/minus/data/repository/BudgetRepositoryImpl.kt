@@ -1,6 +1,6 @@
 package com.serranoie.app.minus.data.repository
 
-import android.util.Log
+import logcat.logcat
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
@@ -87,7 +87,7 @@ class BudgetRepositoryImpl @Inject constructor(
                 RemainingBudgetStrategy.ASK_ALWAYS
             }
         )
-        Log.d(TAG, "toDomain: entity=$this -> domain=$domain")
+        logcat { "toDomain: entity=$this -> domain=$domain" }
         return domain
     }
 
@@ -104,7 +104,7 @@ class BudgetRepositoryImpl @Inject constructor(
             rollOverCarryForward = this.rollOverCarryForward,
             remainingBudgetStrategy = this.remainingBudgetStrategy.name
         )
-        Log.d(TAG, "toEntity: domain=$this -> entity=$entity")
+        logcat { "toEntity: domain=$this -> entity=$entity" }
         return entity
     }
     //endregion
@@ -174,11 +174,11 @@ class BudgetRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveBudgetSettings(settings: BudgetSettings) {
-        Log.d(TAG, "saveBudgetSettings: settings=$settings")
+        logcat { "saveBudgetSettings: settings=$settings" }
         val entity = settings.toEntity()
-        Log.d(TAG, "saveBudgetSettings: inserting entity with endDate=${entity.endDate}")
+        logcat { "saveBudgetSettings: inserting entity with endDate=${entity.endDate}" }
         settingsDao.insert(entity)
-        Log.d(TAG, "saveBudgetSettings: insert complete")
+        logcat { "saveBudgetSettings: insert complete" }
     }
 
     override suspend fun getBudgetSettingsSync(): BudgetSettings? {

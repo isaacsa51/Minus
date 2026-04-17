@@ -17,6 +17,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.math.ceil
+import logcat.logcat
 
 const val DAY = 24 * 60 * 60 * 1000
 
@@ -40,7 +41,7 @@ fun countDaysToToday(fromDate: Date): Int {
 		return 0
 	}
 	val result = countDays(fromDate, today)
-	android.util.Log.d("DateFormatting - ISAAC", "countDaysToToday: fromDate=$fromDate, today=${Date()}, result=$result")
+	logcat("DateFormatting - ISAAC") { "countDaysToToday: fromDate=$fromDate, today=${Date()}, result=$result" }
 	return result
 }
 
@@ -52,7 +53,7 @@ fun countDays(toDate: Date, fromDate: Date): Int {
 	val daysTo = ceil(toDateRound.time / DAY.toDouble()).toInt()
 
 	val result = daysTo - daysFrom + 1
-	android.util.Log.d("DateFormatting - ISAAC", "countDays: fromDate=$fromDate (rounded=$fromDateRound, daysFrom=$daysFrom), toDate=$toDate (rounded=$toDateRound, daysTo=$daysTo), result=$result")
+	logcat("DateFormatting - ISAAC") { "countDays: fromDate=$fromDate (rounded=$fromDateRound, daysFrom=$daysFrom), toDate=$toDate (rounded=$toDateRound, daysTo=$daysTo), result=$result" }
 	return result
 }
 

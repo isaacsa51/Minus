@@ -33,7 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import android.util.Log
+import logcat.logcat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
@@ -142,17 +142,15 @@ fun PeriodSwitcherSheet(
 		if (totalDays > 0) availablePeriodsFor(totalDays) else listOf(BudgetPeriod.DAILY)
 
 	LaunchedEffect(available, totalDays) {
-		Log.d(
-			PERIOD_SWITCHER_TAG,
+		logcat {
 			"reconcilePeriodCache: current=$periodCache, available=$available, totalDays=$totalDays, start=$startDate, end=$endDate"
-		)
+		}
 		if (periodCache !in available && available.isNotEmpty()) {
 			val previous = periodCache
 			periodCache = available.first()
-			Log.w(
-				PERIOD_SWITCHER_TAG,
+			logcat {
 				"periodCache auto-adjusted from $previous to $periodCache because previous is not available for totalDays=$totalDays"
-			)
+			}
 			onPeriodSelected(periodCache)
 		}
 	}
@@ -212,7 +210,7 @@ fun PeriodSwitcherSheet(
 				endDateAsDate = endDateAsDate,
 				available = available,
 				onPeriodSelected = { p ->
-					Log.d(PERIOD_SWITCHER_TAG, "User selected period chip: $p (previous=$periodCache)")
+					logcat { "User selected period chip: $p (previous=$periodCache)" }
 					periodCache = p
 					onPeriodSelected(p)
 				},
@@ -724,10 +722,9 @@ fun EditBudgetContent(
 					remainingBudgetStrategy = strategyCache,
 					period = period,
 				)
-				Log.d(
-					PERIOD_SWITCHER_TAG,
+				logcat {
 					"Apply tapped: budget=$parsedBudget, start=$startCache, end=$endCache, periodDays=$periodDays, resolvedPeriod=$period, strategy=$strategyCache, currency=$currencyCache"
-				)
+				}
 				onApply(newSettings)
 			},
 			modifier = Modifier
@@ -750,7 +747,7 @@ fun EditBudgetContent(
 			currencyCode = currencyCache,
 			onBackPressed = { showDateSelector = false },
 			onApply = { newStart, newEnd, selectedPeriod ->
-				Log.d(PERIOD_SWITCHER_TAG, "FinishDateSelector.onApply -> start=$newStart, end=$newEnd, selectedPeriod=$selectedPeriod")
+				logcat { "FinishDateSelector.onApply -> start=$newStart, end=$newEnd, selectedPeriod=$selectedPeriod" }
 				startCache = newStart
 				endCache = newEnd
 				showDateSelector = false

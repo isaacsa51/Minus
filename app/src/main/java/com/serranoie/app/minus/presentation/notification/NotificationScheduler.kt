@@ -5,7 +5,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
+import logcat.asLog
+import logcat.logcat
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -41,7 +42,6 @@ class NotificationScheduler @Inject constructor(
     private val budgetRepository: BudgetRepository
 ) {
     companion object {
-        private const val TAG = "NotificationScheduler"
         const val ACTION_SHOW_PERIOD_END_NOTIFICATION =
             "com.serranoie.app.minus.action.SHOW_PERIOD_END_NOTIFICATION"
         private const val PERIOD_END_ALARM_REQUEST_CODE = 5001
@@ -93,7 +93,7 @@ class NotificationScheduler @Inject constructor(
                     triggerTime,
                     pendingIntent
                 )
-                Log.d(TAG, "Midnight period check scheduled for $midnight")
+                logcat { "Midnight period check scheduled for $midnight" }
             }
             Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> {
                 alarmManager.setExactAndAllowWhileIdle(
@@ -101,10 +101,10 @@ class NotificationScheduler @Inject constructor(
                     triggerTime,
                     pendingIntent
                 )
-                Log.d(TAG, "Midnight period check scheduled for $midnight")
+                logcat { "Midnight period check scheduled for $midnight" }
             }
             else -> {
-                Log.w(TAG, "Exact alarms not allowed, falling back to inexact alarm for midnight")
+                logcat { "Exact alarms not allowed, falling back to inexact alarm for midnight" }
                 alarmManager.setAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
                     triggerTime,
@@ -128,7 +128,7 @@ class NotificationScheduler @Inject constructor(
                     cancelPeriodEndNotification()
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error checking period end notification", e)
+                logcat { "Error checking period end notification\n${e.asLog()}" }
             }
         }
     }
@@ -185,7 +185,7 @@ class NotificationScheduler @Inject constructor(
                 )
             }
             else -> {
-                Log.w(TAG, "Exact alarms not allowed, falling back to inexact alarm")
+                logcat { "Exact alarms not allowed, falling back to inexact alarm" }
                 alarmManager.setAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
                     triggerDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(),
@@ -232,7 +232,7 @@ class NotificationScheduler @Inject constructor(
      * Call this when user wants to disable notifications.
      */
     fun cancelAllNotifications() {
-        Log.d(TAG, "Cancelling all notification work")
+        logcat { "Cancelling all notification work" }
         cancelPeriodEndNotification()
         cancelMidnightPeriodCheck()
         workManager.cancelUniqueWork(RecurrentExpenseNotificationWorker.WORK_NAME)
@@ -252,14 +252,14 @@ class NotificationScheduler @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         alarmManager.cancel(pendingIntent)
-        Log.d(TAG, "Midnight period check alarm cancelled")
+        logcat { "Midnight period check alarm cancelled" }
     }
 
     /**
      * Reschedule notifications when budget settings change.
      */
     fun rescheduleNotifications(periodEndDate: LocalDate?) {
-        Log.d(TAG, "Rescheduling notifications for period end: $periodEndDate")
+        logcat { "Rescheduling notifications for period end: $periodEndDate" }
         if (periodEndDate != null) {
             schedulePeriodEndNotification(periodEndDate)
         } else {

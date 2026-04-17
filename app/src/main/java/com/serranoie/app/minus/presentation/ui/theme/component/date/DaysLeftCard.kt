@@ -1,6 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.date
 
-import android.util.Log
+import logcat.logcat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -26,26 +26,24 @@ import com.serranoie.app.minus.presentation.util.countDays
 import com.serranoie.app.minus.presentation.util.countDaysToToday
 import java.util.Date
 
-private const val TAG = "DaysLeftCard - ISAAC"
-
 @Composable
 fun DaysLeftCard(
 	modifier: Modifier = Modifier,
 	startDate: Date,
 	finishDate: Date?,
 ) {
-	Log.d(TAG, "DaysLeftCard: startDate=$startDate, finishDate=$finishDate")
+	logcat { "DaysLeftCard: startDate=$startDate, finishDate=$finishDate" }
 
 	if (finishDate == null) {
-		Log.d(TAG, "finishDate is null - returning empty Box")
+		logcat { "finishDate is null - returning empty Box" }
 		Box { }
 		return
 	}
 
 	val days = countDays(finishDate, startDate)
 	val restDays = countDaysToToday(finishDate)
-	Log.d(TAG, "DaysLeftCard calculated: totalDays=$days, restDays=$restDays")
-	Log.d(TAG, "DaysLeftCard progress: ${restDays / days.toFloat()}")
+	logcat { "DaysLeftCard calculated: totalDays=$days, restDays=$restDays" }
+	logcat { "DaysLeftCard progress: ${restDays / days.toFloat()}" }
 
 	Box(
 		Modifier

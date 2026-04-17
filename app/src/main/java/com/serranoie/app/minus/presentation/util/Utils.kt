@@ -7,11 +7,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.Toast
 import androidx.core.net.toUri
+import logcat.asLog
+import logcat.logcat
 
 object Utils {
 	/**
@@ -26,7 +27,7 @@ object Utils {
 		try {
 			context.startActivity(intent)
 		} catch (exc: ActivityNotFoundException) {
-			Log.e("Utils", "Failed to open web link: $url. Exception: $exc")
+			logcat("Utils") { exc.asLog() }
 		}
 	}
 
@@ -77,7 +78,7 @@ object Utils {
 		} catch (e: Exception) {
 			// Fallback to basic haptic feedback if custom vibration fails
 			this.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-			Log.e("Utils", "Error performing haptic feedback", e)
+			logcat("Utils") { e.asLog() }
 		}
 	}
 
