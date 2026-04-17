@@ -67,7 +67,6 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditableCategoryTag(
@@ -113,18 +112,18 @@ fun EditableCategoryTag(
 				.clip(CircleShape)
 				.then(
 					if (isEdit) {
-					Modifier
-				} else {
-					Modifier.clickable {
-						editorFocusController.blur()
-						focusManager.clearFocus()
-						scope.launch {
-							delay(120)
-							isEdit = true
-							onEdit(true)
+						Modifier
+					} else {
+						Modifier.clickable {
+							editorFocusController.blur()
+							focusManager.clearFocus()
+							scope.launch {
+								delay(120)
+								isEdit = true
+								onEdit(true)
+							}
 						}
-					}
-				})) {
+					})) {
 			Row(
 				modifier = Modifier
 					.widthIn(0.dp, extendWidth)
@@ -180,7 +179,9 @@ fun EditableCategoryTag(
 					} else if (!onlyIcon || value.text.isNotEmpty()) {
 						Text(
 							modifier = Modifier
-								.padding(start = 4.dp, top = 8.dp, bottom = 8.dp, end = 12.dp)
+								.padding(
+									start = 4.dp, top = 8.dp, bottom = 8.dp, end = 12.dp
+								)
 								.heightIn(min = 28.dp)
 								.wrapContentHeight(align = Alignment.CenterVertically),
 							text = value.text.ifEmpty { "Add comment" },
@@ -220,10 +221,11 @@ fun EditableCategoryTag(
 						.fillMaxWidth()
 						.height(height.value)
 						.pointerInput(Unit) {
-							detectTapUnconsumed {
-								if (!dismissEvent.value) close()
-								dismissEvent.value = false
-							}
+							detectTapGestures(
+								onTap = {
+									if (!dismissEvent.value) close()
+									dismissEvent.value = false
+								})
 						},
 					contentAlignment = Alignment.BottomCenter,
 				) {
@@ -276,10 +278,6 @@ fun EditableCategoryTag(
 	}
 }
 
-
-/**
- * Suggestion item in the dropdown list.
- */
 fun LazyListScope.itemSuggest(
 	name: String,
 	onClick: () -> Unit,
@@ -304,10 +302,6 @@ fun LazyListScope.itemSuggest(
 	}
 }
 
-
-/**
- * Detects tap gestures that are not consumed by other components.
- */
 suspend fun PointerInputScope.detectTapUnconsumed(
 	onTap: () -> Unit
 ) {

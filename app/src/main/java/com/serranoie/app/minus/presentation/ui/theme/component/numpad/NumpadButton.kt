@@ -25,11 +25,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
@@ -38,6 +44,9 @@ import androidx.glance.preview.Preview
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.colorOnButton
+import com.serranoie.app.minus.presentation.util.calcMaxFont
+import com.serranoie.app.minus.presentation.util.min
+import kotlin.math.min
 
 
 enum class NumpadButtonType { DEFAULT, PRIMARY, SECONDARY, TERTIARY, DELETE, OPERATOR }
@@ -51,14 +60,13 @@ fun NumpadButton(
 	onClick: () -> Unit = {},
 	onLongClick: () -> Unit = {},
 ) {
+	val localDensity = LocalDensity.current
+	var minSize by remember { mutableStateOf(999.dp) }
+	var minSizeFloat by remember { mutableFloatStateOf(999f) }
 	val interactionSource = remember { MutableInteractionSource() }
-	val isPressed by interactionSource.collectIsPressedAsState()
-
-	val radius by animateDpAsState(
-		targetValue = if (isPressed) 20.dp else 999.dp,
-		animationSpec = tween(durationMillis = 100),
-		label = "cornerRadius"
-	)
+	val isPressed = interactionSource.collectIsPressedAsState()
+	// TODO: Check if the minSize / 2 is correct
+	val radius = animateDpAsState(targetValue = if (isPressed.value) 20.dp else minSize / 2)
 
 	val color = when (type) {
 		 NumpadButtonType.DEFAULT -> colorButton
@@ -78,19 +86,21 @@ fun NumpadButton(
 		 NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondary
 	}
 
-	val cornerShape = remember { RoundedCornerShape(999.dp) }
-
 	Surface(
 		tonalElevation = 10.dp,
 		modifier = modifier
 			.fillMaxSize()
-			.clip(cornerShape)
+			.onGloballyPositioned {
+				minSize = with(localDensity) { min(it.size.height, it.size.width).toDp() }
+				minSizeFloat = min(it.size.height, it.size.width).toFloat()
+			}
+			.clip(RoundedCornerShape(radius.value))
 	) {
 		BoxWithConstraints(
 			modifier = Modifier
 				.background(color = color)
 				.fillMaxSize()
-				.clip(RoundedCornerShape(radius))
+				.clip(RoundedCornerShape(radius.value))
 				.combinedClickable(
 					interactionSource = interactionSource,
 					indication = ripple(),
@@ -100,11 +110,16 @@ fun NumpadButton(
 			contentAlignment = Alignment.Center
 		) {
 			if (text !== null) {
+				val fontSize = min(
+					calcMaxFont(minSizeFloat),
+					46.sp,
+				)
+
 				Text(
 					text = text,
 					color = contentColor,
 					style = MaterialTheme.typography.displaySmall.copy(
-						fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+						fontWeight = FontWeight.Bold,
 						fontSize = 42.sp,
 					),
 					maxLines = 1,

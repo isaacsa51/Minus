@@ -1,4 +1,5 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
@@ -34,7 +35,7 @@ fun AutoResizeBasicTextField(
 	modifier: Modifier = Modifier,
 	textStyle: TextStyle = MaterialTheme.typography.displayLarge,
 	minFontSize: TextUnit = 20.sp,
-	maxFontSize: TextUnit = 80.sp,
+	maxFontSize: TextUnit = 88.sp,
 	cursorBrush: Brush = SolidColor(MaterialTheme.colorScheme.primary),
 	singleLine: Boolean = true,
 	enabled: Boolean = true,
@@ -45,17 +46,13 @@ fun AutoResizeBasicTextField(
 	decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit = { innerTextField ->
 		innerTextField()
 	},
-	// Optional: pass container size from parent (BoxWithConstraints) to avoid self-measurement shake
 	containerSize: IntSize = IntSize.Zero,
 ) {
 	val transformedValue = remember(value, visualTransformation) {
 		visualTransformation.filter(AnnotatedString(value)).text.text
 	}
 
-	val adaptiveFontSize = if (
-		containerSize.width > 0 &&
-		transformedValue.isNotEmpty()
-	) {
+	val adaptiveFontSize = if (containerSize.width > 0 && transformedValue.isNotEmpty()) {
 		calcAdaptiveFont(
 			height = containerSize.height.toFloat(),
 			width = containerSize.width.toFloat(),
@@ -69,9 +66,7 @@ fun AutoResizeBasicTextField(
 	}
 
 	val resolvedTextStyle = textStyle.copy(
-		fontSize = adaptiveFontSize,
-		// Keep line height proportional to the adaptive font to avoid extra vertical spacing
-		lineHeight = adaptiveFontSize
+		fontSize = adaptiveFontSize, lineHeight = adaptiveFontSize
 	)
 
 	BasicTextField(

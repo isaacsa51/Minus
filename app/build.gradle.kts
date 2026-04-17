@@ -57,9 +57,10 @@ android {
 
 dependencies {
 	implementation(project(":sync-contract"))
+
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.lifecycle.runtime.ktx)
-	implementation("androidx.lifecycle:lifecycle-process:2.9.2")
+	implementation("androidx.lifecycle:lifecycle-process:2.10.0")
 	implementation(libs.androidx.activity.compose)
 	implementation(platform(libs.androidx.compose.bom))
 	implementation(libs.androidx.compose.ui)
@@ -85,7 +86,7 @@ dependencies {
 	implementation("androidx.compose.foundation:foundation:1.8.3")
 	implementation("androidx.compose.foundation:foundation-layout:1.8.3")
 	implementation("androidx.compose.ui:ui-util:1.8.3")
-	implementation("androidx.compose.material3:material3:1.5.0-alpha14")
+	implementation("androidx.compose.material3:material3:1.5.0-alpha17")
 	implementation("androidx.compose.material3:material3-window-size-class:1.5.0-alpha14")
 	implementation("androidx.compose.animation:animation:1.10.6")
 	implementation("androidx.compose.ui:ui-tooling-preview:1.10.6")
