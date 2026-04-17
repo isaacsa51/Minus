@@ -489,12 +489,12 @@ fun Numpad(
 									type = NumpadButtonType.PRIMARY,
 									icon = Icons.Default.Check,
 									onClick = {
-										if (BuildConfig.DEBUG_FEATURES && debugProgress == -1) {
-											onTestNotifications?.invoke()
-											onShowSnackbar?.invoke("Test notifications triggered!")
-											debugProgress = 0
-											return@NumpadButton
-										}
+//										if (BuildConfig.DEBUG_FEATURES && debugProgress == -1) {
+//											onTestNotifications?.invoke()
+//											onShowSnackbar?.invoke("Test notifications triggered!")
+//											debugProgress = 0
+//											return@NumpadButton
+//										NumpadButton}
 
 										debugProgress = 0
 										onApplyPressedForTutorial?.invoke()

@@ -32,18 +32,13 @@ fun DaysLeftCard(
 	startDate: Date,
 	finishDate: Date?,
 ) {
-	logcat { "DaysLeftCard: startDate=$startDate, finishDate=$finishDate" }
-
 	if (finishDate == null) {
-		logcat { "finishDate is null - returning empty Box" }
 		Box { }
 		return
 	}
 
 	val days = countDays(finishDate, startDate)
 	val restDays = countDaysToToday(finishDate)
-	logcat { "DaysLeftCard calculated: totalDays=$days, restDays=$restDays" }
-	logcat { "DaysLeftCard progress: ${restDays / days.toFloat()}" }
 
 	Box(
 		Modifier

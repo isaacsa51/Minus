@@ -747,7 +747,6 @@ fun EditBudgetContent(
 			currencyCode = currencyCache,
 			onBackPressed = { showDateSelector = false },
 			onApply = { newStart, newEnd, selectedPeriod ->
-				logcat { "FinishDateSelector.onApply -> start=$newStart, end=$newEnd, selectedPeriod=$selectedPeriod" }
 				startCache = newStart
 				endCache = newEnd
 				showDateSelector = false

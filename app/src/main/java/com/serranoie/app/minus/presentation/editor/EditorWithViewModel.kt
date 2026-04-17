@@ -3,13 +3,11 @@ package com.serranoie.app.minus.presentation.editor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import logcat.logcat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
-
-
+import logcat.logcat
 
 @Composable
 fun EditorWithViewModel(
@@ -52,12 +50,11 @@ fun EditorWithViewModel(
 		onChangePeriod = { newPeriod ->
 			uiState.budgetSettings?.let { settings ->
 				val updated = settings.copy(period = newPeriod)
-				logcat { "onChangePeriod -> dispatch UpdateSettings with $updated" }
+				logcat("EditorWithViewModel") { "onChangePeriod -> dispatch UpdateSettings with $updated" }
 				viewModel.processIntent(BudgetUiIntent.UpdateSettings(updated))
 			}
 		},
 		onSaveBudget = { newSettings ->
-			logcat { "onSaveBudget -> call viewModel.saveBudgetSettings($newSettings)" }
 			viewModel.saveBudgetSettings(newSettings)
 		},
 		onFinishBudgetEarly = {
@@ -73,7 +70,11 @@ fun EditorWithViewModel(
 			viewModel.processIntent(BudgetUiIntent.DismissRecurrentDialog)
 		},
 		onRecurrentExpenseConfirm = { frequency, endDate, subscriptionDay ->
-			viewModel.processIntent(BudgetUiIntent.RecurrentExpenseApplied(frequency, endDate, subscriptionDay))
+			viewModel.processIntent(
+				BudgetUiIntent.RecurrentExpenseApplied(
+					frequency, endDate, subscriptionDay
+				)
+			)
 		},
 		budgetPillHintAnchorModifier = budgetPillHintAnchorModifier,
 		analyticsHintAnchorModifier = analyticsHintAnchorModifier,
