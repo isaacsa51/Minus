@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -58,6 +59,7 @@ import com.serranoie.app.minus.presentation.wallet.Wallet
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
 import com.serranoie.app.minus.settingsDataStore
+import kotlinx.coroutines.launch
 import logcat.logcat
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -140,6 +142,7 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
 ) {
     val tag = "AppNavGraph - ISAAC"
+    val scope = rememberCoroutineScope()
     logcat(tag) { "AppNavGraph created with startDestination: $startDestination" }
 
     NavHost(
@@ -397,7 +400,7 @@ fun AppNavGraph(
                         else -> com.serranoie.app.minus.presentation.ui.theme.ThemeMode.SYSTEM
                     }
                     context.appTheme = newThemeMode
-                    kotlinx.coroutines.runBlocking {
+                    scope.launch {
                         context.settingsDataStore.edit { prefs ->
                             prefs[com.serranoie.app.minus.THEME_MODE_KEY] = newThemeMode.toString()
                         }
@@ -407,7 +410,7 @@ fun AppNavGraph(
                     logcat(tag) { "Material You toggled" }
                     val newValue = !context.dynamicColorEnabled
                     context.dynamicColorEnabled = newValue
-                    kotlinx.coroutines.runBlocking {
+                    scope.launch {
                         context.settingsDataStore.edit { prefs ->
                             prefs[com.serranoie.app.minus.DYNAMIC_COLOR_KEY] = newValue
                         }
@@ -430,14 +433,14 @@ fun AppNavGraph(
                 },
                 periodMappingMode = periodMappingMode,
                 onPeriodMappingModeChange = { mode ->
-                    kotlinx.coroutines.runBlocking {
+                    scope.launch {
                         context.settingsDataStore.edit { prefs ->
                             prefs[PERIOD_MAPPING_MODE_KEY] = mode.name
                         }
                     }
                 },
                 onExportCsv = {
-                    kotlinx.coroutines.runBlocking {
+                    scope.launch {
                         csvTransferManager.exportAndShareCsv()
                     }
                 },
@@ -445,7 +448,7 @@ fun AppNavGraph(
                     importLauncher.launch(arrayOf("text/*", "text/csv", "application/csv"))
                 },
                 onResetTutorial = {
-                    kotlinx.coroutines.runBlocking {
+                    scope.launch {
                         context.settingsDataStore.edit { prefs ->
                             prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] = FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
                         }

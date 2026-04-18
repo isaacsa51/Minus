@@ -54,8 +54,6 @@ android {
 	}
 
 	packaging {
-		// Multiple dependency bring these files in. Exclude them to enable
-		// our test APK to build (has no effect on our AARs)
 		resources.excludes += "/META-INF/AL2.0"
 		resources.excludes += "/META-INF/LGPL2.1"
 	}
@@ -130,7 +128,6 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 	implementation("androidx.hilt:hilt-work:1.2.0")
 	ksp("androidx.hilt:hilt-compiler:1.2.0")
-
 
 	// Logcat from Square
 	implementation("com.squareup.logcat:logcat:0.4")
