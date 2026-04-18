@@ -1,11 +1,14 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -38,37 +42,51 @@ fun WavyDivider(
 	strokeWidth: Float = 3f,
 	color: Color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
 ) {
-	Row(
-		modifier = modifier
-			.fillMaxWidth()
-			.padding(horizontal = 16.dp, vertical = 8.dp),
-		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(12.dp)
+	BoxWithConstraints(
+		modifier = modifier.fillMaxWidth()
 	) {
-		// Left wavy line
-		WavyLine(
-			modifier = Modifier.weight(1f),
-			amplitude = amplitude,
-			wavelength = wavelength,
-			strokeWidth = strokeWidth,
-			color = color
-		)
+		val maxTextWidth = maxWidth * 0.7f
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(horizontal = 16.dp, vertical = 8.dp),
+			verticalAlignment = Alignment.CenterVertically,
+			horizontalArrangement = Arrangement.spacedBy(12.dp)
+		) {
+			// Left wavy line
+			WavyLine(
+				modifier = Modifier
+					.weight(1f)
+					.widthIn(min = 24.dp),
+				amplitude = amplitude,
+				wavelength = wavelength,
+				strokeWidth = strokeWidth,
+				color = color
+			)
 
-		// Center text
-		Text(
-			text = text,
-			style = MaterialTheme.typography.labelMedium,
-			color = MaterialTheme.colorScheme.outline
-		)
+			// Center text
+			Text(
+				text = text,
+				modifier = Modifier
+					.widthIn(max = maxTextWidth)
+					.basicMarquee(),
+				textAlign = TextAlign.Center,
+				style = MaterialTheme.typography.labelMedium,
+				color = MaterialTheme.colorScheme.outline,
+				maxLines = 1
+			)
 
-		// Right wavy line
-		WavyLine(
-			modifier = Modifier.weight(1f),
-			amplitude = amplitude,
-			wavelength = wavelength,
-			strokeWidth = strokeWidth,
-			color = color
-		)
+			// Right wavy line
+			WavyLine(
+				modifier = Modifier
+					.weight(1f)
+					.widthIn(min = 24.dp),
+				amplitude = amplitude,
+				wavelength = wavelength,
+				strokeWidth = strokeWidth,
+				color = color
+			)
+		}
 	}
 }
 
@@ -122,9 +140,9 @@ private fun WavyLine(
 private fun WavyDividerPreview() {
 	MinusTheme {
 		WavyDivider(
-			text = "Gastos en el periodo pasado",
-			amplitude = 6f,
-			wavelength = 16f
+			text = "Mostrar todos los gastos en el periodo pasado...",
+			amplitude = 3f,
+			wavelength = 60f
 		)
 	}
 }

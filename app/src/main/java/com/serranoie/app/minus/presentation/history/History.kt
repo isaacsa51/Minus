@@ -1,26 +1,16 @@
 package com.serranoie.app.minus.presentation.history
 
-
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.ui.draw.blur
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +18,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,22 +29,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.MoneyOffCsred
 import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -69,18 +56,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -92,26 +78,24 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActions
-import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActionsConfig
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
-import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseDetailContent
+import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActions
+import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActionsConfig
+import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransactionsView
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableExpenseItem
-import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableUpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItemRow
-import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
-import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.RecurrentTicketCard
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TicketView
-import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TransactionTicketPopup
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import kotlinx.coroutines.delay
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDate
@@ -119,10 +103,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Date
-import kotlinx.coroutines.delay
-
-
-private const val SWIPE_ACTION_THRESHOLD = 0.5f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -619,13 +599,11 @@ fun History(
 				}
 			}
 
-			// Bottom spacer for better scrolling
 			item("spacer-bottom") {
 				Spacer(modifier = Modifier.height(32.dp))
 			}
 		}
 
-		// Empty state
 		if (uiState.transactions.isEmpty()) {
 			NoTransactionsView(
 				modifier = Modifier
@@ -634,7 +612,6 @@ fun History(
 			)
 		}
 
-		// Transaction Detail Popup
 		if (selectedTransaction != null) {
 			isDismissingTransactionDialog = false
 			val transaction = selectedTransaction!!
@@ -859,10 +836,6 @@ fun History(
 	}
 }
 
-data class UpcomingRecurrentItem(
-	val transaction: Transaction, val nextChargeDate: LocalDate, val isInCurrentPeriod: Boolean
-)
-
 private fun calculateNextChargeDate(transaction: Transaction, today: LocalDate): LocalDate? {
 	if (!transaction.isRecurrent) {
 		return null
@@ -920,355 +893,6 @@ private fun calculateNextChargeDate(transaction: Transaction, today: LocalDate):
 	}
 
 	return result
-}
-
-@Composable
-fun RecurrentPaymentsDivider(
-	title: String,
-	isExpanded: Boolean,
-	onToggleClick: () -> Unit,
-	itemCount: Int,
-	isSecondary: Boolean = false
-) {
-	val interactionSource = remember { MutableInteractionSource() }
-	val color = if (isSecondary) MaterialTheme.colorScheme.onSurfaceVariant
-	else MaterialTheme.colorScheme.primary
-
-	Row(
-		modifier = Modifier
-			.fillMaxWidth()
-			.clickable(
-				onClick = onToggleClick, interactionSource = interactionSource, indication = null
-			)
-			.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
-		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.SpaceBetween
-	) {
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(8.dp)
-		) {
-			Icon(
-				imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-				contentDescription = if (isExpanded) "Collapse" else "Expand",
-				tint = color,
-				modifier = Modifier
-			)
-
-			Icon(
-				imageVector = Icons.Rounded.Repeat,
-				contentDescription = null,
-				tint = color,
-				modifier = Modifier.size(18.dp)
-			)
-
-			Text(
-				text = title, style = MaterialTheme.typography.labelMedium, color = color
-			)
-		}
-
-		Text(
-			text = "$itemCount",
-			style = MaterialTheme.typography.labelMedium,
-			color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-		)
-	}
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun UpcomingRecurrentItemRow(
-	item: UpcomingRecurrentItem,
-	currencyFormat: NumberFormat,
-	position: PaddedListItemPosition,
-	isOutOfPeriod: Boolean = false,
-	onClick: () -> Unit = {}
-) {
-	val transaction = item.transaction
-	val nextChargeDate = item.nextChargeDate
-
-	val shape = when (position) {
-		PaddedListItemPosition.First -> RoundedCornerShape(
-			topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
-		)
-
-		PaddedListItemPosition.Last -> RoundedCornerShape(
-			bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
-		)
-
-		PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
-		PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
-	}
-
-	val daysUntil = ChronoUnit.DAYS.between(LocalDate.now(), nextChargeDate)
-	val daysText = when {
-		daysUntil == 0L -> "Hoy"
-		daysUntil == 1L -> "Mañana"
-		daysUntil < 7 -> "En $daysUntil días"
-		else -> "En ${daysUntil / 7} semanas"
-	}
-
-	val alpha = if (isOutOfPeriod) 0.6f else 1f
-
-	Surface(
-		shape = shape, color = if (isOutOfPeriod) MaterialTheme.colorScheme.surfaceVariant
-		else MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()
-	) {
-		CustomPaddedListItem(
-			onClick = onClick,
-			position = position,
-			background = MaterialTheme.colorScheme.surface,
-			contentColor = MaterialTheme.colorScheme.onSurface
-		) {
-			Column(modifier = Modifier.weight(1f)) {
-				Text(
-					text = transaction.comment.ifEmpty { "Gasto recurrente sin nombre" },
-					style = MaterialTheme.typography.titleMedium,
-					color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-					fontWeight = FontWeight.Medium
-				)
-
-				val dateText = prettyDate(
-					date = nextChargeDate.atStartOfDay(),
-					showTime = false,
-					forceHideDate = false,
-					human = true
-				)
-
-				val frequencyLabel = when (transaction.recurrentFrequency) {
-					RecurrentFrequency.WEEKLY -> "Semanal"
-					RecurrentFrequency.BIWEEKLY -> "Quincenal"
-					RecurrentFrequency.MONTHLY -> {
-						if (transaction.subscriptionDay != null) {
-							"Mensual (día ${transaction.subscriptionDay})"
-						} else "Mensual"
-					}
-
-					else -> "Recurrente"
-				}
-
-				Text(
-					text = "$frequencyLabel - $dateText | $daysText",
-					style = MaterialTheme.typography.bodySmall,
-					color = if (daysUntil <= 3 && !isOutOfPeriod) MaterialTheme.colorScheme.primary
-					else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f * alpha)
-				)
-			}
-
-			Text(
-				text = currencyFormat.format(transaction.amount),
-				style = MaterialTheme.typography.titleSmallEmphasized,
-				color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-				fontWeight = FontWeight.SemiBold
-			)
-		}
-	}
-}
-
-@Composable
-fun SwipeableUpcomingRecurrentItem(
-	item: UpcomingRecurrentItem,
-	currencyFormat: NumberFormat,
-	position: PaddedListItemPosition,
-	isOutOfPeriod: Boolean = false,
-	onDelete: () -> Unit,
-	onEdit: () -> Unit,
-	onClick: () -> Unit = {}
-) {
-	val shape = when (position) {
-		PaddedListItemPosition.First -> RoundedCornerShape(
-			topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
-		)
-
-		PaddedListItemPosition.Last -> RoundedCornerShape(
-			bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
-		)
-
-		PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
-		PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
-	}
-
-	Surface(
-		shape = shape, color = if (isOutOfPeriod) MaterialTheme.colorScheme.surfaceVariant
-		else MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()
-	) {
-		SwipeActions(
-			modifier = Modifier.fillMaxWidth(),
-			shape = shape,
-			startActionsConfig = SwipeActionsConfig(
-				threshold = SWIPE_ACTION_THRESHOLD,
-				icon = Icons.Default.Edit,
-				iconTint = MaterialTheme.colorScheme.onPrimary,
-				background = MaterialTheme.colorScheme.primary,
-				backgroundActive = MaterialTheme.colorScheme.primary,
-				stayDismissed = false,
-				onDismiss = onEdit
-			),
-			endActionsConfig = SwipeActionsConfig(
-				threshold = SWIPE_ACTION_THRESHOLD,
-				icon = Icons.Default.Delete,
-				iconTint = MaterialTheme.colorScheme.onError,
-				background = MaterialTheme.colorScheme.error,
-				backgroundActive = MaterialTheme.colorScheme.error,
-				stayDismissed = true,
-				onDismiss = onDelete
-			)
-		) {
-			UpcomingRecurrentItemRow(
-				item = item,
-				currencyFormat = currencyFormat,
-				position = position,
-				isOutOfPeriod = isOutOfPeriod,
-				onClick = onClick
-			)
-		}
-	}
-}
-
-@Composable
-private fun SwipeableExpenseItem(
-	transaction: Transaction,
-	currencyFormat: NumberFormat,
-	position: PaddedListItemPosition,
-	onDelete: () -> Unit,
-	onEdit: () -> Unit,
-	readOnly: Boolean,
-	isBeingDeleted: Boolean = false,
-	onClick: () -> Unit = {}
-) {
-	val shape = when (position) {
-		PaddedListItemPosition.First -> RoundedCornerShape(
-			topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
-		)
-
-		PaddedListItemPosition.Last -> RoundedCornerShape(
-			bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
-		)
-
-		PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
-		PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
-	}
-
-	if (readOnly) {
-		Surface(
-			shape = shape,
-			color = MaterialTheme.colorScheme.surfaceContainer,
-			modifier = Modifier.fillMaxWidth()
-		) {
-			ExpenseItem(
-				transaction = transaction,
-				currencyFormat = currencyFormat,
-				position = position,
-				onClick = onClick
-			)
-		}
-	} else {
-		Surface(
-			shape = shape,
-			color = MaterialTheme.colorScheme.surfaceContainer,
-			modifier = Modifier.fillMaxWidth()
-		) {
-			SwipeActions(
-				modifier = Modifier.fillMaxWidth(),
-				shape = shape,
-				enabled = !isBeingDeleted,
-				startActionsConfig = SwipeActionsConfig(
-					threshold = SWIPE_ACTION_THRESHOLD,
-					icon = Icons.Default.Edit,
-					iconTint = MaterialTheme.colorScheme.onPrimary,
-					background = MaterialTheme.colorScheme.primary,
-					backgroundActive = MaterialTheme.colorScheme.primary,
-					stayDismissed = false,
-					onDismiss = onEdit
-				),
-				endActionsConfig = SwipeActionsConfig(
-					threshold = SWIPE_ACTION_THRESHOLD,
-					icon = Icons.Default.Delete,
-					iconTint = MaterialTheme.colorScheme.onError,
-					background = MaterialTheme.colorScheme.error,
-					backgroundActive = MaterialTheme.colorScheme.error,
-					stayDismissed = true,
-					onDismiss = onDelete
-				)
-			) {
-				ExpenseItem(
-					transaction = transaction,
-					currencyFormat = currencyFormat,
-					position = position,
-					onClick = onClick
-				)
-			}
-		}
-	}
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun ExpenseItem(
-	transaction: Transaction,
-	currencyFormat: NumberFormat,
-	position: PaddedListItemPosition = PaddedListItemPosition.Middle,
-	onClick: () -> Unit = {}
-) {
-	CustomPaddedListItem(
-		onClick = onClick,
-		position = position,
-		background = MaterialTheme.colorScheme.surface,
-		contentColor = MaterialTheme.colorScheme.onSurface
-	) {
-		Column(modifier = Modifier.weight(1f)) {
-			Text(
-				text = transaction.comment.ifEmpty { "Gasto sin nombre" },
-				style = MaterialTheme.typography.titleMedium,
-				color = MaterialTheme.colorScheme.onSurface,
-				fontWeight = FontWeight.Medium
-			)
-			val timeText = prettyDate(
-				date = transaction.date, showTime = true, forceHideDate = true
-			)
-			val subtitle = if (transaction.isRecurrent) "Gasto recurrente - $timeText" else timeText
-			Text(
-				text = subtitle,
-				style = MaterialTheme.typography.bodySmall,
-				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-			)
-		}
-
-		Text(
-			text = currencyFormat.format(transaction.amount),
-			style = MaterialTheme.typography.titleSmallEmphasized,
-			color = MaterialTheme.colorScheme.onSurface,
-			fontWeight = FontWeight.SemiBold
-		)
-	}
-}
-
-@Composable
-fun NoTransactionsView(modifier: Modifier = Modifier) {
-	Column(
-		modifier = modifier,
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.Center
-	) {
-		Icon(
-			imageVector = Icons.Rounded.MoneyOffCsred,
-			contentDescription = null,
-			modifier = Modifier.size(64.dp),
-			tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-		)
-		Spacer(modifier = Modifier.height(16.dp))
-		Text(
-			text = "Sin gastos registrados",
-			style = MaterialTheme.typography.titleMedium,
-			color = MaterialTheme.colorScheme.onSurfaceVariant
-		)
-		Spacer(modifier = Modifier.height(8.dp))
-		Text(
-			text = "Agrega un gasto para empezar",
-			style = MaterialTheme.typography.bodyMedium,
-			color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-		)
-	}
 }
 
 @Preview
@@ -1614,9 +1238,6 @@ private fun UpcomingRecurrentItemPreview() {
 	}
 }
 
-/**
- * Content for the "fake" dialog that displays transaction details.
- */
 @Composable
 private fun TransactionDetailContent(
 	transaction: Transaction,
@@ -1726,10 +1347,6 @@ private fun TransactionDetailContent(
 	}
 }
 
-/**
- * Generate virtual transactions for a recurring expense that charges within the given period.
- * This creates "virtual" transaction copies for each billing date so they appear in history.
- */
 private fun getRecurringChargesInPeriod(
 	transaction: Transaction, periodStart: LocalDate, periodEnd: LocalDate, today: LocalDate
 ): List<Transaction> {
@@ -1740,10 +1357,7 @@ private fun getRecurringChargesInPeriod(
 	val virtualTransactions = mutableListOf<Transaction>()
 	var chargeDate = startDate
 
-	// Generate charge dates
 	while (!chargeDate.isAfter(subscriptionEnd)) {
-		// Only include charges within the budget period AND up to today
-		// (don't show future charges in history, those go in "upcoming" section)
 		if (!chargeDate.isBefore(periodStart) && !chargeDate.isAfter(periodEnd) && !chargeDate.isAfter(
 				today
 			)
@@ -1751,13 +1365,11 @@ private fun getRecurringChargesInPeriod(
 			virtualTransactions.add(
 				transaction.copy(
 					date = chargeDate.atStartOfDay(),
-					// Mark as virtual by using a special ID pattern (based on date)
 					id = transaction.id * 1000000 + chargeDate.toEpochDay()
 				)
 			)
 		}
 
-		// Calculate next charge date
 		chargeDate = when (frequency) {
 			RecurrentFrequency.WEEKLY -> chargeDate.plusWeeks(1)
 			RecurrentFrequency.BIWEEKLY -> chargeDate.plusWeeks(2)
