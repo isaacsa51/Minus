@@ -1,5 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.date
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -16,10 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.util.numberFormat
 import com.serranoie.app.minus.presentation.util.prettyDate
+import java.math.BigDecimal
 import java.time.LocalDate
 
 /**
@@ -36,8 +43,8 @@ fun HistoryDateDivider(
 	date: LocalDate?,
 	isExpanded: Boolean = true,
 	onToggleClick: () -> Unit = {},
-	totalAmount: String? = null,
-	currencyCode: String = "",
+	totalAmount: BigDecimal? = null,
+	currencyCode: String = "" ,
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 
@@ -70,9 +77,12 @@ fun HistoryDateDivider(
 			)
 		}
 
-		// Show total amount if provided
-		if (totalAmount != null) {
-			val totalText = "$currencyCode$totalAmount"
+		AnimatedVisibility(
+			visible = totalAmount != null && !isExpanded,
+			enter = fadeIn(animationSpec = tween(durationMillis = 150)),
+			exit = fadeOut(animationSpec = tween(durationMillis = 150))
+		) {
+			val totalText = numberFormat(context = LocalContext.current, value = totalAmount!!, currency = currencyCode)
 			Text(
 				text = totalText,
 				style = MaterialTheme.typography.labelMedium,
@@ -89,7 +99,7 @@ private fun DayPreviewDividerExpanded() {
 		HistoryDateDivider(
 			date = LocalDate.now(),
 			isExpanded = true,
-			totalAmount = "150.00",
+			totalAmount = BigDecimal("150.00"),
 			currencyCode = "$"
 		)
 	}
@@ -102,7 +112,7 @@ private fun DayPreviewDividerCollapsed() {
 		HistoryDateDivider(
 			date = LocalDate.now(),
 			isExpanded = false,
-			totalAmount = "150.00",
+			totalAmount = BigDecimal("3420.25"),
 			currencyCode = "$"
 		)
 	}

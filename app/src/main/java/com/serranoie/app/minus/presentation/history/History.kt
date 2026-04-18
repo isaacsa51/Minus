@@ -356,8 +356,8 @@ fun History(
 								}
 							}
 						},
-						totalAmount = dayTotal.toPlainString(),
-						currencyCode = currencyFormat.currency?.symbol ?: "$"
+						totalAmount = dayTotal,
+						currencyCode = currencyCode ?: "$"
 					)
 				}
 
@@ -540,8 +540,8 @@ fun History(
 									}
 								}
 							},
-							totalAmount = dayTotal.toPlainString(),
-							currencyCode = currencyFormat.currency?.symbol ?: "$"
+							totalAmount = dayTotal,
+							currencyCode = currencyCode ?: "$"
 						)
 					}
 
@@ -1281,7 +1281,7 @@ fun HistoryPreview() {
 				date = LocalDate.now(),
 				isExpanded = true,
 				onToggleClick = { },
-				totalAmount = "100.00",
+				totalAmount = BigDecimal("100.00"),
 				currencyCode = "$"
 			)
 
@@ -1521,7 +1521,7 @@ private fun HistoryFullContentPreview() {
 						date = LocalDate.now(),
 						isExpanded = true,
 						onToggleClick = {},
-						totalAmount = currentTx.sumOf { it.amount }.toPlainString(),
+						totalAmount = currentTx.sumOf { it.amount }.toPlainString() as BigDecimal?,
 						currencyCode = "€"
 					)
 				}
@@ -1550,7 +1550,7 @@ private fun HistoryFullContentPreview() {
 						date = LocalDate.now().minusDays(35),
 						isExpanded = true,
 						onToggleClick = {},
-						totalAmount = pastTx.sumOf { it.amount }.toPlainString(),
+						totalAmount = pastTx.sumOf { it.amount }.toPlainString() as BigDecimal?,
 						currencyCode = "€"
 					)
 				}
