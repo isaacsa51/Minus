@@ -7,6 +7,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -202,7 +204,7 @@ fun BudgetPill(
 				Row(
 					modifier = Modifier.fillMaxSize(),
 					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.SpaceBetween
+					horizontalArrangement = if (isCurrentPeriodOverBudget) Arrangement.Center else Arrangement.SpaceBetween
 				) {
 					// Status label on left
 					StatusLabel(
@@ -210,21 +212,22 @@ fun BudgetPill(
 						budgetPeriod = period,
 						isOverBudget = isCurrentPeriodOverBudget,
 						exhaustedMessage = exhaustedMessage,
-						modifier = Modifier.padding(start = 18.dp),
+						modifier = if (isCurrentPeriodOverBudget) Modifier else Modifier.padding(start = 18.dp),
 					)
 
-					Spacer(modifier = Modifier.weight(1f))
+					if (!isCurrentPeriodOverBudget) {
+						Spacer(modifier = Modifier.weight(1f))
+					}
 
 					// Value label on right
-					Text(
-						text = if (isCurrentPeriodOverBudget) {
-							""
-						} else {
-							currencyFormat.format(periodRemaining)
-						}, style = MaterialTheme.typography.titleMedium.copy(
+					if (!isCurrentPeriodOverBudget) {
+						Text(
+						text = currencyFormat.format(periodRemaining),
+						style = MaterialTheme.typography.titleMedium.copy(
 							fontWeight = FontWeight.Bold
 						), color = contentColor, modifier = Modifier.padding(end = 16.dp)
 					)
+					}
 				}
 			}
 		}
@@ -253,7 +256,7 @@ private fun StatusLabel(
 
 	val textStartOffset by animateDpAsState(
 		label = "textStartOffset",
-		targetValue = if (isOverBudget) 44.dp else 0.dp,
+		targetValue = 0.dp,
 		animationSpec = tween(250),
 	)
 	val labelVerticalOffset by animateDpAsState(
@@ -279,8 +282,7 @@ private fun StatusLabel(
 					fontSize = MaterialTheme.typography.titleMedium.fontSize
 				),
 				color = textColor,
-				overflow = TextOverflow.Ellipsis,
-				softWrap = false,
+				modifier = Modifier.basicMarquee()
 			)
 		}
 
@@ -295,6 +297,7 @@ private fun StatusLabel(
 				color = colorBad,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.basicMarquee(),
 			)
 		}
 	}

@@ -87,6 +87,7 @@ fun CategoryToolbar(
     stage: EditStage,
     onCommentUpdate: (String) -> Unit,
     editorFocusController: FocusController,
+    onSaveExpense: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val localDensity = LocalDensity.current
@@ -189,6 +190,7 @@ fun CategoryToolbar(
                     extendWidth = toolbarWidth,
                     onlyIcon = tags.isNotEmpty(),
                     onEdit = { isEdit = it },
+                    onSaveExpense = onSaveExpense,
                 )
             }
         }
@@ -324,6 +326,9 @@ fun TaggingToolbarWithViewModel(
             viewModel.processIntent(BudgetUiIntent.CommentUpdated(comment))
         },
         editorFocusController = editorFocusController,
+        onSaveExpense = {
+            viewModel.processIntent(BudgetUiIntent.ApplyTapped)
+        },
         modifier = modifier
     )
 }

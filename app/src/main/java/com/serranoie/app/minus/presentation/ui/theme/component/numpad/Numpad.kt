@@ -136,7 +136,13 @@ fun Numpad(
 			targetState = isCalculation,
 			label = "TopRowModeTransition",
 			transitionSpec = {
-				fadeIn(tween(durationMillis = 100)) togetherWith fadeOut(tween(durationMillis = 100))
+				if (targetState) {
+					// Enter calculation mode: slide up from bottom
+					(slideInVertically(animationSpec = tween(150)) { it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(animationSpec = tween(100)) { it / 5 } + fadeOut(tween(100)))
+				} else {
+					// Exit calculation mode: slide down to bottom
+					(slideInVertically(animationSpec = tween(150)) { -it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(animationSpec = tween(100)) { -it / 5 } + fadeOut(tween(100)))
+				}
 			}) { calcTopRow ->
 			Row(Modifier.fillMaxSize()) {
 				if (calcTopRow) {
@@ -195,15 +201,17 @@ fun Numpad(
 			label = "SwipeModeButtonsTransition",
 			transitionSpec = {
 				if (targetState) {
+					// Enter calculation mode: slide up from bottom
 					(slideInVertically(animationSpec = tween(150)) { it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(
 						animationSpec = tween(100)
-					) { -it / 5 } + fadeOut(
+					) { it / 5 } + fadeOut(
 						tween(100)
 					))
 				} else {
+					// Exit calculation mode: slide down to bottom
 					(slideInVertically(animationSpec = tween(150)) { -it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(
 						animationSpec = tween(100)
-					) { it / 5 } + fadeOut(
+					) { -it / 5 } + fadeOut(
 						tween(100)
 					))
 				}.using(SizeTransform(clip = true))

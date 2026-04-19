@@ -77,6 +77,7 @@ fun EditableCategoryTag(
 	extendWidth: Dp = 0.dp,
 	onlyIcon: Boolean = false,
 	onEdit: (Boolean) -> Unit = {},
+	onSaveExpense: () -> Unit = {},
 ) {
 	val focusManager = LocalFocusManager.current
 	val localDensity = LocalDensity.current
@@ -100,6 +101,11 @@ fun EditableCategoryTag(
 		onEdit(false)
 		onCommentUpdate(value.text.trim())
 		focusManager.clearFocus()
+	}
+
+	val saveAndClose = {
+		onSaveExpense()
+		close()
 	}
 
 	ExposedDropdownMenuBox(expanded = isShowSuggestions, onExpandedChange = {}) {
@@ -175,7 +181,7 @@ fun EditableCategoryTag(
 						CommentEditor(
 							value = value,
 							onChange = { value = it },
-							onApply = { close() })
+							onApply = { saveAndClose() })
 					} else if (!onlyIcon || value.text.isNotEmpty()) {
 						Text(
 							modifier = Modifier
