@@ -25,11 +25,14 @@ fun NumpadWithViewModel(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     Numpad(
+        modifier = Modifier,
         editorState = EditorState(
             mode = EditMode.ADD,
             rawSpentValue = uiState.value.numpadInput,
             stage = if (uiState.value.numpadInput.isNotEmpty()) EditStage.EDIT_SPENT else EditStage.IDLE,
-            currentSpent = uiState.value.numpadInput
+            currentSpent = uiState.value.numpadInput,
+            currentComment = uiState.value.currentComment,
+            editedTransaction = null
         ),
         isCalculation = uiState.value.isCalculation,
         onNumberInput = { digit ->

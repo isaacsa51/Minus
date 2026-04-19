@@ -59,6 +59,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
+import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Transaction as NumpadTransaction
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.launch
@@ -125,7 +126,16 @@ fun TransactionEditScreen(
 			mode = EditMode.EDIT,
 			rawSpentValue = editedAmount,
 			stage = EditStage.EDIT_SPENT,
-			currentComment = editedComment
+			currentSpent = editedAmount,
+			currentComment = editedComment,
+			editedTransaction = transaction?.let {
+				NumpadTransaction(
+					id = it.id,
+					amount = it.amount.toPlainString(),
+					comment = it.comment,
+					date = it.date?.atZone(ZoneId.systemDefault())?.toInstant()?.let { instant -> java.util.Date.from(instant) } ?: java.util.Date()
+				)
+			}
 		)
 	}
 

@@ -2,6 +2,9 @@ package com.serranoie.app.minus.presentation.ui.theme.component.numpad
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -31,33 +34,30 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.serranoie.app.minus.BuildConfig
-import com.serranoie.app.minus.presentation.util.getFloatDivider
-import com.serranoie.app.minus.presentation.util.tryConvertStringToNumber
-import com.serranoie.app.minus.presentation.util.join
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.util.getFloatDivider
+import com.serranoie.app.minus.presentation.util.join
+import com.serranoie.app.minus.presentation.util.tryConvertStringToNumber
 import logcat.logcat
 import java.util.Date
 
-val BUTTON_GAP = 3.dp
+val BUTTON_GAP = 4.dp
 
 enum class EditMode { ADD, EDIT }
 
 enum class EditStage { IDLE, EDIT_SPENT }
 
 data class Transaction(
-	val id: Long = 0, val amount: String, val comment: String = "", val date: Date = Date()
+	val id: Long, val amount: String, val comment: String, val date: Date
 )
 
-
 data class EditorState(
-	val mode: EditMode = EditMode.ADD,
-	val rawSpentValue: String = "",
-	val stage: EditStage = EditStage.IDLE,
-	val currentSpent: String = "",
-	val currentComment: String = "",
-	val editedTransaction: Transaction? = null
+	val mode: EditMode,
+	val rawSpentValue: String,
+	val stage: EditStage,
+	val currentSpent: String,
+	val currentComment: String,
+	val editedTransaction: Transaction?
 )
 
 @Composable
@@ -87,11 +87,14 @@ fun Numpad(
 	val haptic = LocalHapticFeedback.current
 	var debugProgress by remember { mutableIntStateOf(0) }
 
-	// Use derivedStateOf to only recompute when rawSpentValue actually changes
-	val hasOperators by remember(editorState.rawSpentValue) {
+	val hasOperators by remember {
 		derivedStateOf { editorState.rawSpentValue.any { it in "+-×÷" } }
 	}
-	val topRowWeight = if (isCalculation) 0.75f else 1f
+	val topRowWeight by animateFloatAsState(
+		targetValue = if (isCalculation) 0.75f else 1f,
+		animationSpec = tween(250, easing = FastOutSlowInEasing),
+		label = "TopRowWeightAnimation"
+	)
 
 	Column(
 		modifier
@@ -99,6 +102,7 @@ fun Numpad(
 			.padding(14.dp)
 			.pointerInput(isCalculation, hasOperators) {
 				var accumulatedDrag = 0f
+				var lastReportedProgress = 0f
 				detectVerticalDragGestures(
 					onDragStart = { accumulatedDrag = 0f },
 					onVerticalDrag = { _, dragAmount ->
@@ -116,7 +120,11 @@ fun Numpad(
 							!isCalculation && accumulatedDrag >= 0f -> 0f
 							else -> 0f
 						}
-						onDragProgressChanged(progress)
+						
+						if (kotlin.math.abs(progress - lastReportedProgress) >= 0.05f) {
+							onDragProgressChanged(progress)
+							lastReportedProgress = progress
+						}
 
 						if (dragAmount < -20f && !isCalculation) {
 							onCalculationModeChanged(true)
@@ -136,13 +144,9 @@ fun Numpad(
 			targetState = isCalculation,
 			label = "TopRowModeTransition",
 			transitionSpec = {
-				if (targetState) {
-					// Enter calculation mode: slide up from bottom
-					(slideInVertically(animationSpec = tween(150)) { it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(animationSpec = tween(100)) { it / 5 } + fadeOut(tween(100)))
-				} else {
-					// Exit calculation mode: slide down to bottom
-					(slideInVertically(animationSpec = tween(150)) { -it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(animationSpec = tween(100)) { -it / 5 } + fadeOut(tween(100)))
-				}
+				val enter = slideInVertically(animationSpec = tween(150, easing = FastOutSlowInEasing)) { it / 5 } + fadeIn(tween(100))
+				val exit = slideOutVertically(animationSpec = tween(100, easing = LinearEasing)) { it / 5 } + fadeOut(tween(80))
+				enter togetherWith exit
 			}) { calcTopRow ->
 			Row(Modifier.fillMaxSize()) {
 				if (calcTopRow) {
@@ -200,21 +204,9 @@ fun Numpad(
 			targetState = isCalculation,
 			label = "SwipeModeButtonsTransition",
 			transitionSpec = {
-				if (targetState) {
-					// Enter calculation mode: slide up from bottom
-					(slideInVertically(animationSpec = tween(150)) { it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(
-						animationSpec = tween(100)
-					) { it / 5 } + fadeOut(
-						tween(100)
-					))
-				} else {
-					// Exit calculation mode: slide down to bottom
-					(slideInVertically(animationSpec = tween(150)) { -it / 5 } + fadeIn(tween(150))) togetherWith (slideOutVertically(
-						animationSpec = tween(100)
-					) { -it / 5 } + fadeOut(
-						tween(100)
-					))
-				}.using(SizeTransform(clip = true))
+				val enter = slideInVertically(animationSpec = tween(150, easing = FastOutSlowInEasing)) { it / 5 } + fadeIn(tween(100))
+				val exit = slideOutVertically(animationSpec = tween(100, easing = LinearEasing)) { it / 5 } + fadeOut(tween(80))
+				(enter togetherWith exit).using(SizeTransform(clip = true))
 			}) { calcMode ->
 			if (calcMode) {
 				Column(
@@ -464,7 +456,7 @@ fun Numpad(
 							.fillMaxSize()
 							.weight(1F)
 					) {
-						val fixedSpent by remember(editorState.rawSpentValue, editorState.mode) {
+						val fixedSpent by remember {
 							derivedStateOf {
 								tryConvertStringToNumber(editorState.rawSpentValue).join(third = false)
 							}
@@ -474,8 +466,7 @@ fun Numpad(
 							label = "Delete or Apply",
 							targetState = (fixedSpent == "0" || fixedSpent == "0." || fixedSpent == "0.0") && editorState.mode == EditMode.EDIT,
 							transitionSpec = {
-								(fadeIn(tween(durationMillis = 150)) togetherWith fadeOut(tween(durationMillis = 150)))
-									.using(SizeTransform(clip = false))
+								fadeIn(tween(durationMillis = 150)) togetherWith fadeOut(tween(durationMillis = 150))
 							}) { targetIsDelete ->
 							if (targetIsDelete) {
 								NumpadButton(
@@ -497,13 +488,6 @@ fun Numpad(
 									type = NumpadButtonType.PRIMARY,
 									icon = Icons.Default.Check,
 									onClick = {
-//										if (BuildConfig.DEBUG_FEATURES && debugProgress == -1) {
-//											onTestNotifications?.invoke()
-//											onShowSnackbar?.invoke("Test notifications triggered!")
-//											debugProgress = 0
-//											return@NumpadButton
-//										NumpadButton}
-
 										debugProgress = 0
 										onApplyPressedForTutorial?.invoke()
 										onApply()
@@ -524,26 +508,12 @@ fun NumpadPreview() {
 	MinusTheme {
 		Numpad(
 			editorState = EditorState(
-				mode = EditMode.ADD, rawSpentValue = "123", stage = EditStage.EDIT_SPENT
-			),
-			isCalculation = false,
-			onNumberInput = { logcat("NumpadPreview") { "Number: $it" } },
-			onDotInput = { logcat("NumpadPreview") { "Dot pressed" } },
-			onBackspace = { logcat("NumpadPreview") { "Backspace" } },
-			onBackspaceLongPress = { logcat("NumpadPreview") { "Backspace long press" } },
-			onDelete = { logcat("NumpadPreview") { "Delete" } },
-			onApply = { logcat("NumpadPreview") { "Apply" } },
-		)
-	}
-}
-
-@Preview
-@Composable
-fun NumpadPreviewEditMode() {
-	MinusTheme {
-		Numpad(
-			editorState = EditorState(
-				mode = EditMode.EDIT, rawSpentValue = "0", stage = EditStage.EDIT_SPENT
+				mode = EditMode.ADD,
+				rawSpentValue = "123",
+				stage = EditStage.EDIT_SPENT,
+				currentSpent = "123",
+				currentComment = "",
+				editedTransaction = null
 			),
 			isCalculation = false,
 			onNumberInput = { },
@@ -562,7 +532,12 @@ fun NumpadPreviewCalculationMode() {
 	MinusTheme {
 		Numpad(
 			editorState = EditorState(
-				mode = EditMode.ADD, rawSpentValue = "123", stage = EditStage.EDIT_SPENT
+				mode = EditMode.ADD,
+				rawSpentValue = "123",
+				stage = EditStage.EDIT_SPENT,
+				currentSpent = "123",
+				currentComment = "",
+				editedTransaction = null
 			),
 			isCalculation = true,
 			onNumberInput = { },

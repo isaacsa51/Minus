@@ -241,7 +241,7 @@ fun MainScreen(
 		}
 
 		val calcModeKeyboardHeight =
-			(contentHeight * 0.6f).coerceAtMost(contentHeight - with(localDensity) { navigationBarOffset.toPx()/* + 96.dp.toPx()*/ })
+			(contentHeight * 0.50f).coerceAtMost(contentHeight - with(localDensity) { navigationBarOffset.toPx()/* + 96.dp.toPx()*/ })
 
 		val dragProgress = budgetUiState.dragProgress
 		val effectiveProgress = if (budgetUiState.isCalculation) {
