@@ -46,4 +46,6 @@ interface BudgetRepository {
 	suspend fun hideCategory(name: String)
 
 	suspend fun incrementCategoryUsage(name: String)
+
+	suspend fun getPeriodCount(): Int
 }

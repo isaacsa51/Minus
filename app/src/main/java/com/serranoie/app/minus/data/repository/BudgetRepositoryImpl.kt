@@ -256,4 +256,8 @@ class BudgetRepositoryImpl @Inject constructor(
     override suspend fun incrementCategoryUsage(name: String) {
         categoryDao.incrementUsage(name)
     }
+
+    override suspend fun getPeriodCount(): Int {
+        return transactionDao.countDistinctPeriods()
+    }
 }

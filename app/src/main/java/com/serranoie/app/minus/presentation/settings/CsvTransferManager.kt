@@ -33,7 +33,8 @@ class CsvTransferManager @Inject constructor(
 ) {
 
     suspend fun exportAndShareCsv() = withContext(Dispatchers.IO) {
-        val uri = saveCsvToDownloads()
+        val fileName = csvService.getExportFileName()
+        val uri = saveCsvToDownloads(fileName)
 
         if (uri != null) {
             withContext(Dispatchers.Main) {
@@ -53,7 +54,7 @@ class CsvTransferManager @Inject constructor(
         } else {
             // Fallback to cache if MediaStore failed or API < 29
             val exportDir = File(context.cacheDir, "exports").apply { mkdirs() }
-            val csvFile = File(exportDir, MinusCsvContract.FILE_NAME)
+            val csvFile = File(exportDir, fileName)
 
             try {
                 csvFile.outputStream().use { output ->
@@ -85,12 +86,12 @@ class CsvTransferManager @Inject constructor(
         }
     }
 
-    private suspend fun saveCsvToDownloads(): Uri? = withContext(Dispatchers.IO) {
+    private suspend fun saveCsvToDownloads(fileName: String): Uri? = withContext(Dispatchers.IO) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return@withContext null
 
         val resolver = context.contentResolver
         val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, MinusCsvContract.FILE_NAME)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
             put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
             put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
         }

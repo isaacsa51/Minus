@@ -77,6 +77,12 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE id = :transactionId LIMIT 1")
     suspend fun getTransactionById(transactionId: Long): TransactionEntity?
 
+    @Query("SELECT COUNT(DISTINCT periodId) FROM transactions WHERE periodId > 0")
+    suspend fun countDistinctPeriods(): Int
+
+    @Query("SELECT EXISTS(SELECT 1 FROM transactions WHERE periodId = :periodId)")
+    suspend fun hasTransactionsInPeriod(periodId: Long): Boolean
+
     @Query("SELECT EXISTS(SELECT 1 FROM transactions WHERE clientGeneratedId = :clientGeneratedId)")
     suspend fun existsByClientGeneratedId(clientGeneratedId: String): Boolean
 

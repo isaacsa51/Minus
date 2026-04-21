@@ -43,12 +43,18 @@ class WearExpenseIngestor @Inject constructor(
         }
 
         val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(payload.eventTime), ZoneId.systemDefault())
+
+        val categoryId: Long? = if (payload.comment.isNotBlank()) {
+            repository.findOrCreateCategory(payload.comment.trim()).id
+        } else null
+
         val tx = Transaction.create(
             amount = amount,
             comment = payload.comment,
             date = date,
             periodId = payload.periodId ?: 0L,
-            clientGeneratedId = payload.clientGeneratedId
+            clientGeneratedId = payload.clientGeneratedId,
+            categoryId = categoryId
         )
         val inserted = repository.addTransactionIfAbsent(tx)
         if (!inserted) {
