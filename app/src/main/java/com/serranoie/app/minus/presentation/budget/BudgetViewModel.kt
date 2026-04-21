@@ -1,4 +1,4 @@
-﻿package com.serranoie.app.minus.presentation.budget
+package com.serranoie.app.minus.presentation.budget
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -499,7 +499,7 @@ class BudgetViewModel @Inject constructor(
 					remainingBudget = "150.00",
 					currency = currency
 				)
-				logcat(TAG) { "✓ Test period end notification triggered" }
+				logcat(TAG) { "? Test period end notification triggered" }
 			} catch (e: Exception) {
 				logcat(TAG) { e.asLog() }
 			}
@@ -511,7 +511,7 @@ class BudgetViewModel @Inject constructor(
 					frequency = "MONTHLY",
 					currency = currency
 				)
-				logcat(TAG) { "✓ Test recurrent expense notification triggered" }
+				logcat(TAG) { "? Test recurrent expense notification triggered" }
 			} catch (e: Exception) {
 				logcat(TAG) { e.asLog() }
 			}
@@ -730,12 +730,22 @@ class BudgetViewModel @Inject constructor(
 		if (settings != null) {
 			val periodEndDate = settings.getPeriodEndDate()
 			if (today.isAfter(periodEndDate) || today.isEqual(periodEndDate)) {
+				val pendingTransaction = Transaction.create(
+					amount = amount,
+					comment = _currentComment.value,
+					date = LocalDateTime.now(),
+					periodId = 0L
+				)
 				_uiState.update {
 					it.copy(
-						showPeriodEndedDialog = true,
-						pendingExpenseAfterPeriodAmount = amount,
-						pendingExpenseAfterPeriodComment = _currentComment.value
+						pendingExpensesForNextPeriod = it.pendingExpensesForNextPeriod + pendingTransaction
 					)
+				}
+				_numpadInput.value = ""
+				_currentComment.value = ""
+				_uiState.update { it.copy(isCalculation = false) }
+				viewModelScope.launch {
+					_effects.emit(BudgetUiEffect.ShowMessage("Gasto en cola para el proximo periodo"))
 				}
 				return
 			}
@@ -921,7 +931,7 @@ class BudgetViewModel @Inject constructor(
 			.map { it.comment }
 			.filter { it.isNotBlank() }
 			.distinct()
-			.take(20) // Limit to 20 most recent tags
+			.take(20)
 	}
 
 	private fun handleRolloverSplitEqually(remaining: BigDecimal) {

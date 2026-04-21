@@ -26,6 +26,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -67,6 +68,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetLayout
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetValue
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.settingsDataStore
+import android.util.Log
+import androidx.compose.material3.SnackbarResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
@@ -150,10 +153,10 @@ fun MainScreen(
 		coroutineScope.launch {
 			val result = snackbarHostState.showSnackbar(
 				message = message,
-				actionLabel = "UNDO",
-				duration = androidx.compose.material3.SnackbarDuration.Short,
+				actionLabel = "",
+				duration = SnackbarDuration.Short,
 			)
-			if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+			if (result == SnackbarResult.ActionPerformed) {
 				cancelPendingDelete()
 			}
 		}
@@ -367,7 +370,16 @@ fun MainScreen(
 										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
 									},
 									onApplyTapped = {
+										Log.d("MainScreen", "Numpad check/save button pressed")
 										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+									},
+									onShowSnackbar = { message ->
+										coroutineScope.launch {
+											snackbarHostState.showSnackbar(
+												message = message,
+												duration = SnackbarDuration.Short
+											)
+										}
 									})
 							}
 						}
@@ -465,7 +477,16 @@ fun MainScreen(
 										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
 									},
 									onApplyTapped = {
+										Log.d("MainScreen", "Numpad check/save button pressed")
 										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+									},
+									onShowSnackbar = { message ->
+										coroutineScope.launch {
+											snackbarHostState.showSnackbar(
+												message = message,
+												duration = SnackbarDuration.Short
+											)
+										}
 									})
 							}
 						}

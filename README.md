@@ -1,6 +1,42 @@
 # Minus
 
-Minus is a streamlined expense tracking application designed for speed and reliability. It focuses on a frictionless entry experience by utilizing a familiar calculator-style layout, allowing users to log expenses, perform quick calculations, and manage their finances without navigating complex menus.
+<p align="center">
+  <img src="assets/app_icon.webp" alt="App Icon" width="128"/>
+</p>
+
+<p align="center">
+  <strong>Familiar calculator-style budget tracking app for Android.</strong><br>
+  Built with Jetpack Compose and Material Design 3 Expressive
+</p>
+
+<p align="center">
+  <a href="https://github.com/isaacsa51/Sorter/releases">
+    <img src="https://img.shields.io/github/v/release/isaacsa51/Minus?include_prereleases" alt="Release">
+  </a>
+  <img src="https://img.shields.io/badge/Platform-Android-green.svg" alt="Platform">
+  <img src="https://img.shields.io/badge/API-31%2B-brightgreen.svg" alt="API">
+  <img src="https://img.shields.io/badge/Kotlin-2.1.0-blue.svg" alt="Kotlin">
+</p>
+
+<p align="center">
+  <img src="assets/screenshot_2.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/>
+  <img src="assets/screenshot_3.png" alt="Screenshot 2" width="200" style="border-radius:26px;"/>
+  <img src="assets/screenshot_4.png" alt="Screenshot 3" width="200" style="border-radius:26px;"/>
+  <img src="assets/screenshot_5.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/>
+</p>
+
+---
+
+### Core Features
+
+- Easy Expense Entry: Log expenses directly through a Numpad interface.
+- Splitting Functionality: Built-in functionality to split checks among multiple people directly on demand.
+- CSV Export: Securely export expense data to the device Downloads folder for backup or further analysis in spreadsheet software.
+- Undo & Batch Actions: Restore individual expenses or delete all at once.
+- Wear OS Integration: Provides a companion app for quick expense entry on wearable devices.
+- Subscription Management: Easily manage and track subscriptions.
+- Material Design 3: Dynamic colors, smooth animations, predictive back gestures.
+- Customizable Settings: Light/Dark/System themes, Material You colors.
 
 ## Project Overview
 

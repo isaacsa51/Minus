@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">Minus</string>
     <string name="today">Hoy</string>
+
+    <!-- Pending expenses for new period -->
+    <plurals name="pending_expense">
+        <item quantity="one">%d gasto en cola para el nuevo período</item>
+        <item quantity="other">%d gastos en cola para el nuevo período</item>
+    </plurals>
     <string name="new_period_title">Nuevo Periodo</string>
     <string name="widget_description">Quick view of your expenses and add new ones</string>
     <string name="total_expenses_preview">Total Expenses</string>

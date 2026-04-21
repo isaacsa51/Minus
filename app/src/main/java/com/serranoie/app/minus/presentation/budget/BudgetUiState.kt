@@ -9,37 +9,37 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 data class BudgetUiState(
-    val isLoading: Boolean = false,
-    val budgetSettings: BudgetSettings? = null,
-    val budgetState: BudgetState? = null,
-    val transactions: List<Transaction> = emptyList(),
-    val selectedDate: LocalDate = LocalDate.now(),
-    val error: String? = null,
-    val numpadInput: String = "",
-    val isNumpadValid: Boolean = false,
-    val editMode: EditMode = EditMode.ADD,
-    val animState: AnimState = AnimState.IDLE,
-    val currentComment: String = "",
-    val tags: List<String> = emptyList(),
-    val showRolloverDialog: Boolean = false,
-    val remainingFromPreviousPeriod: BigDecimal = BigDecimal.ZERO,
-    val isFirstLaunch: Boolean = true,
-    val isRecurrentEnabled: Boolean = false,
-    val showRecurrentDialog: Boolean = false,
-    val pendingRecurrentAmount: BigDecimal? = null,
-    val pendingRecurrentComment: String = "",
-    val currentPeriodStartedAtMillis: Long = 0L,
-    val currentPeriodId: Long = 0L,
-    val isCalculation: Boolean = false,
-    val dragProgress: Float = 0f,
-    val lockSwipeable: Boolean = false,
-    val lockDraggable: Boolean = false,
-    // State for period ended dialog - shown when user tries to add expense after period ended
-    val showPeriodEndedDialog: Boolean = false,
-    val pendingExpenseAfterPeriodAmount: BigDecimal? = null,
-    val pendingExpenseAfterPeriodComment: String = ""
+	val isLoading: Boolean = false,
+	val budgetSettings: BudgetSettings? = null,
+	val budgetState: BudgetState? = null,
+	val transactions: List<Transaction> = emptyList(),
+	val selectedDate: LocalDate = LocalDate.now(),
+	val error: String? = null,
+	val numpadInput: String = "",
+	val isNumpadValid: Boolean = false,
+	val editMode: EditMode = EditMode.ADD,
+	val animState: AnimState = AnimState.IDLE,
+	val currentComment: String = "",
+	val tags: List<String> = emptyList(),
+	val showRolloverDialog: Boolean = false,
+	val remainingFromPreviousPeriod: BigDecimal = BigDecimal.ZERO,
+	val isFirstLaunch: Boolean = true,
+	val isRecurrentEnabled: Boolean = false,
+	val showRecurrentDialog: Boolean = false,
+	val pendingRecurrentAmount: BigDecimal? = null,
+	val pendingRecurrentComment: String = "",
+	val currentPeriodStartedAtMillis: Long = 0L,
+	val currentPeriodId: Long = 0L,
+	val isCalculation: Boolean = false,
+	val dragProgress: Float = 0f,
+	val lockSwipeable: Boolean = false,
+	val lockDraggable: Boolean = false,
+	val showPeriodEndedDialog: Boolean = false,
+	val pendingExpenseAfterPeriodAmount: BigDecimal? = null,
+	val pendingExpenseAfterPeriodComment: String = "",
+	val pendingExpensesForNextPeriod: List<Transaction> = emptyList()
 ) {
-    companion object {
-        val INITIAL = BudgetUiState()
-    }
+	companion object {
+		val INITIAL = BudgetUiState()
+	}
 }

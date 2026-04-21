@@ -144,9 +144,11 @@ fun Numpad(
 			targetState = isCalculation,
 			label = "TopRowModeTransition",
 			transitionSpec = {
-				val enter = slideInVertically(animationSpec = tween(150, easing = FastOutSlowInEasing)) { it / 5 } + fadeIn(tween(100))
-				val exit = slideOutVertically(animationSpec = tween(100, easing = LinearEasing)) { it / 5 } + fadeOut(tween(80))
-				enter togetherWith exit
+				if (targetState) {
+					(slideInVertically(animationSpec = tween(200, easing = FastOutSlowInEasing)) { it / 8 } + fadeIn(tween(150))) togetherWith (slideOutVertically(animationSpec = tween(150, easing = LinearEasing)) { it / 8 } + fadeOut(tween(100)))
+				} else {
+					(slideInVertically(animationSpec = tween(200, easing = FastOutSlowInEasing)) { -it / 8 } + fadeIn(tween(150))) togetherWith (slideOutVertically(animationSpec = tween(150, easing = LinearEasing)) { -it / 8 } + fadeOut(tween(100)))
+				}
 			}) { calcTopRow ->
 			Row(Modifier.fillMaxSize()) {
 				if (calcTopRow) {
@@ -204,10 +206,13 @@ fun Numpad(
 			targetState = isCalculation,
 			label = "SwipeModeButtonsTransition",
 			transitionSpec = {
-				val enter = slideInVertically(animationSpec = tween(150, easing = FastOutSlowInEasing)) { it / 5 } + fadeIn(tween(100))
-				val exit = slideOutVertically(animationSpec = tween(100, easing = LinearEasing)) { it / 5 } + fadeOut(tween(80))
-				(enter togetherWith exit).using(SizeTransform(clip = true))
-			}) { calcMode ->
+				if (targetState) {
+					(slideInVertically(animationSpec = tween(200, easing = FastOutSlowInEasing)) { it / 8 } + fadeIn(tween(150))) togetherWith (slideOutVertically(animationSpec = tween(150, easing = LinearEasing)) { it / 8 } + fadeOut(tween(100)))
+				} else {
+					(slideInVertically(animationSpec = tween(200, easing = FastOutSlowInEasing)) { -it / 8 } + fadeIn(tween(150))) togetherWith (slideOutVertically(animationSpec = tween(150, easing = LinearEasing)) { -it / 8 } + fadeOut(tween(100)))
+				}
+			}
+		) { calcMode ->
 			if (calcMode) {
 				Column(
 					modifier = Modifier.fillMaxSize()

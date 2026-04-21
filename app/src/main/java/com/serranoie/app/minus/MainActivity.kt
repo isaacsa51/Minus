@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -313,8 +314,11 @@ class MainActivity : ComponentActivity() {
 								)
 							}
 
-							if (midnightPeriodChecker.shouldShowTransitionDialog.value && midnightPeriodChecker.midnightTransitionData.value != null) {
-								val data = midnightPeriodChecker.midnightTransitionData.value!!
+							val shouldShowMidnightDialog by midnightPeriodChecker.shouldShowTransitionDialog.collectAsStateWithLifecycle()
+							val midnightTransitionData by midnightPeriodChecker.midnightTransitionData.collectAsStateWithLifecycle()
+
+							if (shouldShowMidnightDialog && midnightTransitionData != null) {
+								val data = midnightTransitionData!!
 								MidnightTransitionDialog(
 									periodStartDate = data.periodStartDate,
 									periodEndDate = data.periodEndDate,

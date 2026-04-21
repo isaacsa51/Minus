@@ -69,6 +69,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -91,6 +92,7 @@ import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
+import com.serranoie.app.minus.R
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDate
@@ -114,6 +116,7 @@ fun PeriodSwitcherSheet(
 	onEditBudget: (() -> Unit)? = null,
 	onFinishEarly: (() -> Unit)? = null,
 	startInEditMode: Boolean = false,
+	pendingExpensesCount: Int = 0,
 ) {
 	val haptic = LocalHapticFeedback.current
 	val currencyFormat = remember(currencyCode) {
@@ -194,7 +197,8 @@ fun PeriodSwitcherSheet(
 				onApply = { newSettings ->
 					onSaveBudget?.invoke(newSettings)
 					isEditMode = false
-				}
+				},
+				pendingExpensesCount = pendingExpensesCount,
 			)
 		} else {
 			ViewBudgetContent(
@@ -419,9 +423,6 @@ private fun ViewBudgetContent(
 }
 
 
-/**
- * Reusable budget editor content used in both PeriodSwitcherSheet and Wallet/Onboarding.
- */
 @Composable
 fun EditBudgetContent(
 	budgetSettings: BudgetSettings?,
@@ -430,11 +431,19 @@ fun EditBudgetContent(
 	title: String = "Nuevo presupuesto",
 	buttonLabel: String = "Aplicar",
 	showPreviousValuesChip: Boolean = true,
+	pendingExpensesCount: Int = 0,
 ) {
 	val haptic = LocalHapticFeedback.current
+	val resources = LocalContext.current.resources
 	val dateFormatter = remember {
 		DateTimeFormatter.ofPattern("d MMMM", Locale("es", "ES"))
 	}
+
+	val pendingNotificationText = resources.getQuantityString(
+		R.plurals.pending_expense,
+		pendingExpensesCount,
+		pendingExpensesCount
+	)
 
 	val currentBudget = budgetSettings?.totalBudget ?: BigDecimal.ZERO
 	val currentStart = budgetSettings?.startDate ?: LocalDate.now()
@@ -679,6 +688,27 @@ fun EditBudgetContent(
 			},
 			onClick = { showCurrencyPicker = true },
 		)
+
+		if (pendingExpensesCount > 0) {
+			Spacer(modifier = Modifier.height(8.dp))
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				Icon(
+					imageVector = Icons.Outlined.Info,
+					contentDescription = null,
+					tint = MaterialTheme.colorScheme.outline,
+					modifier = Modifier.size(20.dp),
+				)
+				Spacer(modifier = Modifier.width(8.dp))
+				Text(
+					text = pendingNotificationText,
+					style = MaterialTheme.typography.bodySmall,
+					color = MaterialTheme.colorScheme.outline,
+				)
+			}
+		}
 
 		if (validationMessage != null) {
 			Spacer(modifier = Modifier.height(16.dp))
@@ -1082,6 +1112,7 @@ private fun EditModePreview() {
 			),
 			onBack = { },
 			onApply = { },
+			pendingExpensesCount = 3,
 		)
 	}
 }

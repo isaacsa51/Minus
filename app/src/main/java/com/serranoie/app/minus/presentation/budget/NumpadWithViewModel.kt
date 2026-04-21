@@ -1,14 +1,17 @@
 package com.serranoie.app.minus.presentation.budget
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiEffect
 import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
+import android.util.Log
 
 /**
  * Wrapper composable that connects BudgetViewModel to Numpad.
@@ -20,9 +23,22 @@ fun NumpadWithViewModel(
     numberHintAnchorModifier: Modifier = Modifier,
     applyHintAnchorModifier: Modifier = Modifier,
     onAnyNumberTapped: (() -> Unit)? = null,
-    onApplyTapped: (() -> Unit)? = null
+    onApplyTapped: (() -> Unit)? = null,
+    onShowSnackbar: ((String) -> Unit)? = null
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Collect effects to show snackbar messages
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                is BudgetUiEffect.ShowMessage -> {
+                    onShowSnackbar?.invoke(effect.message)
+                }
+                else -> { /* Ignore other effects */ }
+            }
+        }
+    }
 
     Numpad(
         modifier = Modifier,
@@ -51,6 +67,7 @@ fun NumpadWithViewModel(
             viewModel.processIntent(BudgetUiIntent.ResetInputTapped)
         },
         onApply = {
+            Log.d("NumpadWithViewModel", "Apply button pressed, processing ApplyTapped intent")
             viewModel.processIntent(BudgetUiIntent.ApplyTapped)
         },
         onDelete = { },
@@ -64,7 +81,7 @@ fun NumpadWithViewModel(
             viewModel.processIntent(BudgetUiIntent.SetDragProgress(progress))
         },
         onToggleDebug = null,
-        onShowSnackbar = null,
+        onShowSnackbar = onShowSnackbar,
         onActivateTutorial = null,
         onTestNotifications = {
             viewModel.processIntent(BudgetUiIntent.TriggerTestNotifications)

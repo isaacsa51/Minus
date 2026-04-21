@@ -289,6 +289,7 @@ fun Editor(
 					budgetSettings = uiState.budgetSettings,
 					budgetState = uiState.budgetState,
 					selectedPeriod = selectedViewPeriod,
+					pendingExpensesCount = uiState.pendingExpensesForNextPeriod.size,
 					currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
 					startInEditMode = shouldForceSetupMode,
 					onPeriodSelected = { newPeriod ->
