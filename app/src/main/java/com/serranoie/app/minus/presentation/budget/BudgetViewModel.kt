@@ -89,8 +89,8 @@ class BudgetViewModel @Inject constructor(
 	private val _budgetState = MutableStateFlow<BudgetState?>(null)
 	val budgetState: StateFlow<BudgetState?> = _budgetState.asStateFlow()
 
-	private val _tags = MutableStateFlow<List<String>>(emptyList())
-	val tags: StateFlow<List<String>> = _tags.asStateFlow()
+	private val _categories = MutableStateFlow<List<com.serranoie.app.minus.domain.model.Category>>(emptyList())
+	val categories: StateFlow<List<com.serranoie.app.minus.domain.model.Category>> = _categories.asStateFlow()
 
 	private val _effects = MutableSharedFlow<BudgetUiEffect>()
 	val effects: SharedFlow<BudgetUiEffect> = _effects.asSharedFlow()
@@ -104,6 +104,7 @@ class BudgetViewModel @Inject constructor(
 		observeBudgetData()
 		observeEditorState()
 		observeInitialBudgetCheck()
+		observeCategories()
 	}
 
 	private fun observeBudgetData() {
@@ -156,6 +157,15 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
+	private fun observeCategories() {
+		viewModelScope.launch {
+			budgetRepository.getActiveCategories().collect { categories ->
+				_categories.value = categories
+				_uiState.update { it.copy(tags = categories.map { c -> c.name }) }
+			}
+		}
+	}
+
 	private fun buildPeriodBoundaryFlow() = context.settingsDataStore.data.map { prefs ->
 		Pair(
 			prefs[CURRENT_PERIOD_STARTED_AT_KEY] ?: 0L,
@@ -182,7 +192,6 @@ class BudgetViewModel @Inject constructor(
 		}
 
 		val showRollover = checkAndUpdateRollover(settings, budgetState)
-		val tags = extractTagsFromTransactions(transactions)
 
 		return BudgetUiState(
 			isLoading = false,
@@ -196,7 +205,7 @@ class BudgetViewModel @Inject constructor(
 			editMode = _uiState.value.editMode,
 			animState = if (_numpadInput.value.isNotEmpty()) AnimState.EDITING else AnimState.IDLE,
 			currentComment = _currentComment.value,
-			tags = tags,
+			tags = _categories.value.map { it.name },
 			showRolloverDialog = showRollover.first,
 			remainingFromPreviousPeriod = showRollover.second,
 			isFirstLaunch = settings == null,
@@ -248,7 +257,6 @@ class BudgetViewModel @Inject constructor(
 		_transactions.value = baseState.transactions
 		_budgetSettings.value = baseState.budgetSettings
 		_budgetState.value = baseState.budgetState
-		_tags.value = baseState.tags
 
 		updateWidgets(baseState)
 	}
@@ -535,6 +543,7 @@ class BudgetViewModel @Inject constructor(
 			is BudgetUiIntent.SetEditMode -> handleSetEditMode(intent.mode)
 			is BudgetUiIntent.SetAnimState -> handleSetAnimState(intent.state)
 			is BudgetUiIntent.CommentUpdated -> handleCommentUpdate(intent.comment)
+			is BudgetUiIntent.DeleteTag -> handleDeleteTag(intent.tag)
 			is BudgetUiIntent.RolloverSplitEqually -> handleRolloverSplitEqually(intent.remaining)
 			is BudgetUiIntent.RolloverCarryToNextDay -> handleRolloverCarryToNextDay(intent.remaining)
 			is BudgetUiIntent.DismissRolloverDialog -> handleDismissRolloverDialog()
@@ -734,7 +743,8 @@ class BudgetViewModel @Inject constructor(
 					amount = amount,
 					comment = _currentComment.value,
 					date = LocalDateTime.now(),
-					periodId = 0L
+					periodId = 0L,
+					categoryId = null
 				)
 				_uiState.update {
 					it.copy(
@@ -752,11 +762,16 @@ class BudgetViewModel @Inject constructor(
 		}
 
 		viewModelScope.launch {
+			val categoryId: Long? = if (_currentComment.value.isNotBlank()) {
+				budgetRepository.findOrCreateCategory(_currentComment.value.trim()).id
+			} else null
+
 			val transaction = Transaction.create(
 				amount = amount,
 				comment = _currentComment.value,
 				date = LocalDateTime.now(),
-				periodId = _uiState.value.currentPeriodId
+				periodId = _uiState.value.currentPeriodId,
+				categoryId = categoryId
 			)
 			addTransactionUseCase(transaction)
 			_numpadInput.value = ""
@@ -804,11 +819,16 @@ class BudgetViewModel @Inject constructor(
 		}
 
 		viewModelScope.launch {
+			val categoryId: Long? = if (comment.isNotBlank()) {
+				budgetRepository.findOrCreateCategory(comment.trim()).id
+			} else null
+
 			val transaction = Transaction.create(
 				amount = amount,
 				comment = comment,
 				date = LocalDateTime.now(),
-				periodId = 0L
+				periodId = 0L,
+				categoryId = categoryId
 			)
 			addTransactionUseCase(transaction)
 			_numpadInput.value = ""
@@ -832,6 +852,10 @@ class BudgetViewModel @Inject constructor(
 		val finalComment = rawComment.ifEmpty { fallbackComment }
 
 		viewModelScope.launch {
+			val categoryId: Long? = if (finalComment.isNotBlank()) {
+				budgetRepository.findOrCreateCategory(finalComment.trim()).id
+			} else null
+
 			val transaction = Transaction.create(
 				amount = amount,
 				comment = finalComment,
@@ -841,7 +865,8 @@ class BudgetViewModel @Inject constructor(
 				recurrentFrequency = frequency,
 				// Preserve current hour/minute instead of forcing 00:00
 				recurrentEndDate = endDate.atTime(now.toLocalTime()),
-				subscriptionDay = subscriptionDay
+				subscriptionDay = subscriptionDay,
+				categoryId = categoryId
 			)
 			addTransactionUseCase(transaction)
 
@@ -926,12 +951,16 @@ class BudgetViewModel @Inject constructor(
 		_currentComment.value = comment
 	}
 
-	private fun extractTagsFromTransactions(transactions: List<Transaction>): List<String> {
-		return transactions
-			.map { it.comment }
-			.filter { it.isNotBlank() }
-			.distinct()
-			.take(20)
+	private fun handleDeleteTag(tag: String) {
+		_categories.update { categories ->
+			categories.filterNot { it.name == tag }
+		}
+		_uiState.update { state ->
+			state.copy(tags = state.tags.filterNot { it == tag })
+		}
+		viewModelScope.launch {
+			budgetRepository.hideCategory(tag)
+		}
 	}
 
 	private fun handleRolloverSplitEqually(remaining: BigDecimal) {

@@ -6,27 +6,27 @@ import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-/**
- * Room entity for storing transactions.
- * Amount is stored as String to preserve BigDecimal precision.
- */
 @Entity(
     tableName = "transactions",
-    indices = [Index(value = ["clientGeneratedId"], unique = true)]
+    indices = [
+        Index(value = ["clientGeneratedId"], unique = true),
+        Index(value = ["categoryId"])
+    ]
 )
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val amount: String, // BigDecimal as String to preserve precision
+    val amount: String,
     val comment: String,
-    val date: Long, // Epoch millis
+    val date: Long,
     val createdAt: Long = System.currentTimeMillis(),
     val clientGeneratedId: String? = null,
     val periodId: Long = 0L,
     val isRecurrent: Boolean = false,
-    val recurrentFrequency: String? = null, // Stored as string name of enum
-    val recurrentEndDate: Long? = null, // Epoch millis for end date
-    val subscriptionDay: Int? = null // Day of month (1-31) for monthly subscriptions
+    val recurrentFrequency: String? = null,
+    val recurrentEndDate: Long? = null,
+    val subscriptionDay: Int? = null,
+    val categoryId: Long? = null
 ) {
     companion object {
         fun fromDomain(
@@ -36,7 +36,8 @@ data class TransactionEntity(
             isRecurrent: Boolean = false,
             recurrentFrequency: String? = null,
             recurrentEndDate: LocalDateTime? = null,
-            subscriptionDay: Int? = null
+            subscriptionDay: Int? = null,
+            categoryId: Long? = null
         ): TransactionEntity = TransactionEntity(
             id = 0,
             amount = amount,
@@ -45,7 +46,8 @@ data class TransactionEntity(
             isRecurrent = isRecurrent,
             recurrentFrequency = recurrentFrequency,
             recurrentEndDate = recurrentEndDate?.toEpochSecond(ZoneOffset.UTC)?.times(1000),
-            subscriptionDay = subscriptionDay
+            subscriptionDay = subscriptionDay,
+            categoryId = categoryId
         )
     }
 }

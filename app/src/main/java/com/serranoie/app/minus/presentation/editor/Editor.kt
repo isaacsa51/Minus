@@ -101,6 +101,7 @@ fun Editor(
 	onFinishBudgetEarly: () -> Unit = {},
 	onSaveBudget: (BudgetSettings) -> Unit = {},
 	onCommentUpdate: (String) -> Unit = {},
+	onDeleteTag: (String) -> Unit = {},
 	onRecurrentToggle: (Boolean) -> Unit = {},
 	onDismissRecurrentDialog: () -> Unit = {},
 	onRecurrentExpenseConfirm: (com.serranoie.app.minus.domain.model.RecurrentFrequency, LocalDate, Int?) -> Unit = { _, _, _ -> },
@@ -238,6 +239,7 @@ fun Editor(
 						tags = uiState.tags,
 						currentComment = uiState.currentComment,
 						onCommentUpdate = onCommentUpdate,
+						onDeleteTag = onDeleteTag,
 						editorFocusController = editorFocusController,
 						modifier = Modifier
 							.fillMaxWidth()
@@ -332,6 +334,7 @@ private fun EditingContent(
 	tags: List<String>,
 	currentComment: String,
 	onCommentUpdate: (String) -> Unit,
+	onDeleteTag: (String) -> Unit,
 	editorFocusController: FocusController,
 	modifier: Modifier = Modifier
 ) {
@@ -470,6 +473,7 @@ private fun EditingContent(
 				currentComment = currentComment,
 				stage = EditStage.EDIT_SPENT,
 				onCommentUpdate = onCommentUpdate,
+				onDeleteTag = onDeleteTag,
 				editorFocusController = editorFocusController,
 				modifier = Modifier
 					.fillMaxWidth()
@@ -623,6 +627,7 @@ fun EditorPreview_Idle() {
 			onOpenSettings = {},
 			onCommentClick = {},
 			onCommentUpdate = {},
+			onDeleteTag = {},
 			onRecurrentToggle = {},
 			onDismissRecurrentDialog = {},
 			onRecurrentExpenseConfirm = { _, _, _ -> })
@@ -657,6 +662,7 @@ fun EditorPreview_Editing() {
 			onOpenSettings = {},
 			onCommentClick = {},
 			onCommentUpdate = {},
+			onDeleteTag = {},
 			onRecurrentToggle = {},
 			onDismissRecurrentDialog = {},
 			onRecurrentExpenseConfirm = { _, _, _ -> })

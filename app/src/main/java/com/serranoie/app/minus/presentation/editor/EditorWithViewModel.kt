@@ -29,8 +29,7 @@ fun EditorWithViewModel(
 	Editor(
 		uiState = uiState,
 		animState = uiState.animState,
-		onInputChange = { newInput ->
-			// For now, direct keyboard input is not supported
+		onInputChange = { _ ->
 			// Users can type using the numpad buttons
 		},
 		onFocus = {
@@ -62,6 +61,9 @@ fun EditorWithViewModel(
 		},
 		onCommentUpdate = { comment ->
 			viewModel.processIntent(BudgetUiIntent.CommentUpdated(comment))
+		},
+		onDeleteTag = { tag ->
+			viewModel.processIntent(BudgetUiIntent.DeleteTag(tag))
 		},
 		onRecurrentToggle = { enabled ->
 			viewModel.processIntent(BudgetUiIntent.SetRecurrentEnabled(enabled))

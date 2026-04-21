@@ -7,92 +7,43 @@ import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.time.LocalDate
 
-/**
- * Repository interface for budget-related operations.
- * All operations return Flow for reactive updates.
- */
 interface BudgetRepository {
 
-    //region Transactions
-    /**
-     * Get all transactions ordered by date descending.
-     */
-    fun getTransactions(): Flow<List<Transaction>>
+	fun getTransactions(): Flow<List<Transaction>>
 
-    /**
-     * Get transactions for a specific date range.
-     */
-    fun getTransactionsForPeriod(start: LocalDate, end: LocalDate): Flow<List<Transaction>>
+	fun getTransactionsForPeriod(start: LocalDate, end: LocalDate): Flow<List<Transaction>>
 
-    /**
-     * Add a new transaction.
-     */
-    suspend fun addTransaction(transaction: Transaction)
+	suspend fun addTransaction(transaction: Transaction)
 
-    /**
-     * Add transaction only if dedupe key does not already exist.
-     * Returns true if inserted, false if duplicate was ignored.
-     */
-    suspend fun addTransactionIfAbsent(transaction: Transaction): Boolean
+	suspend fun addTransactionIfAbsent(transaction: Transaction): Boolean
 
-    /**
-     * Update an existing transaction.
-     */
-    suspend fun updateTransaction(transaction: Transaction)
+	suspend fun updateTransaction(transaction: Transaction)
 
-    /**
-     * Insert or replace transactions by ID in bulk.
-     */
-    suspend fun upsertTransactions(transactions: List<Transaction>)
+	suspend fun upsertTransactions(transactions: List<Transaction>)
 
-    /**
-     * True when a transaction with this dedupe key already exists.
-     */
-    suspend fun existsTransactionByClientGeneratedId(clientGeneratedId: String): Boolean
+	suspend fun existsTransactionByClientGeneratedId(clientGeneratedId: String): Boolean
 
-    /**
-     * Recent transactions for lightweight sync/snapshot payloads.
-     */
-    suspend fun getRecentTransactions(limit: Int): List<Transaction>
+	suspend fun getRecentTransactions(limit: Int): List<Transaction>
 
-    /**
-     * Delete a transaction (soft delete or hard delete based on implementation).
-     */
-    suspend fun deleteTransaction(transaction: Transaction)
+	suspend fun deleteTransaction(transaction: Transaction)
 
-    /**
-     * Get total spent amount for a specific day.
-     */
-    fun getSpentForDate(date: LocalDate): Flow<BigDecimal>
+	fun getSpentForDate(date: LocalDate): Flow<BigDecimal>
 
-    /**
-     * Get total spent amount for a date range.
-     */
-    fun getSpentForPeriod(start: LocalDate, end: LocalDate): Flow<BigDecimal>
-    //endregion
+	fun getSpentForPeriod(start: LocalDate, end: LocalDate): Flow<BigDecimal>
 
-    //region Budget Settings
-    /**
-     * Get current budget settings.
-     */
-    fun getBudgetSettings(): Flow<BudgetSettings?>
+	fun getBudgetSettings(): Flow<BudgetSettings?>
 
-    /**
-     * Save budget settings.
-     */
-    suspend fun saveBudgetSettings(settings: BudgetSettings)
+	suspend fun saveBudgetSettings(settings: BudgetSettings)
 
-    /**
-     * Get budget settings synchronously (for initial state).
-     */
-    suspend fun getBudgetSettingsSync(): BudgetSettings?
-    //endregion
+	suspend fun getBudgetSettingsSync(): BudgetSettings?
 
-    //region Budget Calculations
-    /**
-     * Calculate current budget state based on settings and transactions.
-     * This combines settings, transactions, and current date to produce display state.
-     */
-    fun calculateBudgetState(settings: BudgetSettings, currentDate: LocalDate): Flow<BudgetState>
-    //endregion
+	fun calculateBudgetState(settings: BudgetSettings, currentDate: LocalDate): Flow<BudgetState>
+
+	fun getActiveCategories(): Flow<List<com.serranoie.app.minus.domain.model.Category>>
+
+	suspend fun findOrCreateCategory(name: String): com.serranoie.app.minus.domain.model.Category
+
+	suspend fun hideCategory(name: String)
+
+	suspend fun incrementCategoryUsage(name: String)
 }

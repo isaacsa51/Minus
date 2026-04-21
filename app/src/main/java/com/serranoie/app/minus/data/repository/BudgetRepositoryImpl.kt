@@ -2,13 +2,16 @@ package com.serranoie.app.minus.data.repository
 
 import logcat.logcat
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
+import com.serranoie.app.minus.data.local.dao.CategoryDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
+import com.serranoie.app.minus.data.local.entity.CategoryEntity
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
 import com.serranoie.app.minus.domain.calculator.BudgetCalculator
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
@@ -20,16 +23,12 @@ import java.time.ZoneOffset
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val TAG = "BudgetRepositoryImpl - ISAAC"
 
-/**
- * Implementation of BudgetRepository using Room database.
- * Handles mapping between domain models and entities.
- */
 @Singleton
 class BudgetRepositoryImpl @Inject constructor(
     private val transactionDao: TransactionDao,
     private val settingsDao: BudgetSettingsDao,
+    private val categoryDao: CategoryDao,
     private val budgetCalculator: BudgetCalculator
 ) : BudgetRepository {
 
@@ -54,7 +53,8 @@ class BudgetRepositoryImpl @Inject constructor(
         recurrentEndDate = this.recurrentEndDate?.let { 
             LocalDateTime.ofEpochSecond(it / 1000, 0, ZoneOffset.UTC) 
         },
-        subscriptionDay = this.subscriptionDay
+        subscriptionDay = this.subscriptionDay,
+        categoryId = this.categoryId
     )
 
     private fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
@@ -68,7 +68,8 @@ class BudgetRepositoryImpl @Inject constructor(
         isRecurrent = this.isRecurrent,
         recurrentFrequency = this.recurrentFrequency?.name,
         recurrentEndDate = this.recurrentEndDate?.toEpochSecond(ZoneOffset.UTC)?.times(1000),
-        subscriptionDay = this.subscriptionDay
+        subscriptionDay = this.subscriptionDay,
+        categoryId = this.categoryId
     )
 
     private fun BudgetSettingsEntity.toDomain(): BudgetSettings {
@@ -107,9 +108,27 @@ class BudgetRepositoryImpl @Inject constructor(
         logcat { "toEntity: domain=$this -> entity=$entity" }
         return entity
     }
-    //endregion
 
-    //region Transactions
+    private fun CategoryEntity.toDomain(): Category =
+        Category(
+            id = this.id,
+            name = this.name,
+            isHidden = this.isHidden,
+            usageCount = this.usageCount,
+            lastUsedAt = this.lastUsedAt,
+            createdAt = this.createdAt
+        )
+
+    private fun Category.toEntity(): CategoryEntity =
+        CategoryEntity(
+            id = if (this.id == 0L) 0 else this.id,
+            name = this.name,
+            isHidden = this.isHidden,
+            usageCount = this.usageCount,
+            lastUsedAt = this.lastUsedAt,
+            createdAt = this.createdAt
+        )
+
     override fun getTransactions(): Flow<List<Transaction>> {
         return transactionDao.getAllTransactions()
             .map { entities -> entities.map { it.toDomain() } }
@@ -165,9 +184,7 @@ class BudgetRepositoryImpl @Inject constructor(
         return transactionDao.getTotalSpentForPeriod(startMillis, endMillis)
             .map { it?.let { BigDecimal(it) } ?: BigDecimal.ZERO }
     }
-    //endregion
 
-    //region Budget Settings
     override fun getBudgetSettings(): Flow<BudgetSettings?> {
         return settingsDao.getSettings()
             .map { it?.toDomain() }
@@ -184,14 +201,11 @@ class BudgetRepositoryImpl @Inject constructor(
     override suspend fun getBudgetSettingsSync(): BudgetSettings? {
         return settingsDao.getSettingsSync()?.toDomain()
     }
-    //endregion
 
-    //region Budget Calculations
     override fun calculateBudgetState(
         settings: BudgetSettings,
         currentDate: LocalDate
     ): Flow<BudgetState> {
-        // Get period end date
         val periodEnd = when (settings.period) {
             BudgetPeriod.DAILY -> settings.startDate
             BudgetPeriod.WEEKLY -> settings.startDate.plusWeeks(1)
@@ -199,11 +213,47 @@ class BudgetRepositoryImpl @Inject constructor(
             BudgetPeriod.MONTHLY -> settings.startDate.plusMonths(1)
         }
 
-        // Combine transactions for the period with real-time updates
         return getTransactionsForPeriod(settings.startDate, periodEnd)
             .map { transactions ->
                 budgetCalculator.calculate(settings, transactions, currentDate)
             }
     }
-    //endregion
+
+    override fun getActiveCategories(): Flow<List<Category>> {
+        return categoryDao.getActiveCategories()
+            .map { entities -> entities.map { it.toDomain() } }
+    }
+
+    override suspend fun findOrCreateCategory(name: String): Category {
+        val existing = categoryDao.getCategoryByName(name)
+        return if (existing != null) {
+            // If hidden, unhide it
+            if (existing.isHidden) {
+                categoryDao.unhideCategory(name)
+            }
+            // Increment usage count
+            categoryDao.incrementUsage(name)
+            // Return updated category
+            categoryDao.getCategoryByName(name)?.toDomain()
+                ?: existing.toDomain().copy(usageCount = existing.usageCount + 1)
+        } else {
+            val newCategory = CategoryEntity(
+                name = name,
+                isHidden = false,
+                usageCount = 1,
+                lastUsedAt = System.currentTimeMillis(),
+                createdAt = System.currentTimeMillis()
+            )
+            val id = categoryDao.insertCategory(newCategory)
+            newCategory.copy(id = id).toDomain()
+        }
+    }
+
+    override suspend fun hideCategory(name: String) {
+        categoryDao.hideCategory(name)
+    }
+
+    override suspend fun incrementCategoryUsage(name: String) {
+        categoryDao.incrementUsage(name)
+    }
 }

@@ -9,10 +9,6 @@ import androidx.room.Update
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Data Access Object for transaction operations.
- * All queries return Flow for reactive updates.
- */
 @Dao
 interface TransactionDao {
 

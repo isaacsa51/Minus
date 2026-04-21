@@ -11,7 +11,9 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,10 +34,13 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Label
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -78,6 +83,7 @@ fun EditableCategoryTag(
 	onlyIcon: Boolean = false,
 	onEdit: (Boolean) -> Unit = {},
 	onSaveExpense: () -> Unit = {},
+	onDeleteTag: (String) -> Unit = {},
 ) {
 	val focusManager = LocalFocusManager.current
 	val localDensity = LocalDensity.current
@@ -256,13 +262,20 @@ fun EditableCategoryTag(
 									contentPadding = PaddingValues(vertical = 8.dp),
 								) {
 									filteredItems.forEach { item ->
-										itemSuggest(item) {
-											dismissEvent.value = true
-											value = TextFieldValue(
-												item,
-												TextRange(item.length),
-											)
-										}
+										itemSuggest(
+											name = item,
+											onClick = {
+												dismissEvent.value = true
+												value = TextFieldValue(
+													item,
+													TextRange(item.length),
+												)
+											},
+											onDelete = {
+												dismissEvent.value = true
+												onDeleteTag(item)
+											}
+										)
 									}
 								}
 							}
@@ -287,13 +300,25 @@ fun EditableCategoryTag(
 fun LazyListScope.itemSuggest(
 	name: String,
 	onClick: () -> Unit,
+	onDelete: () -> Unit,
 ) {
 	item(name) {
+		var showDelete by remember { mutableStateOf(false) }
+
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.SpaceBetween,
 			modifier = Modifier
-				.clickable { onClick() }
+				.combinedClickable(
+					onClick = {
+						if (!showDelete) {
+							onClick()
+						}
+					},
+					onLongClick = {
+						showDelete = true
+					}
+				)
 				.fillMaxWidth()
 				.heightIn(42.dp)
 				.padding(start = 24.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
@@ -304,6 +329,25 @@ fun LazyListScope.itemSuggest(
 				softWrap = false,
 				modifier = Modifier.weight(1f)
 			)
+
+			if (showDelete) {
+				IconButton(
+					onClick = {
+						onDelete()
+						showDelete = false
+					},
+					modifier = Modifier.size(28.dp),
+					colors = IconButtonDefaults.iconButtonColors(
+						contentColor = MaterialTheme.colorScheme.error,
+					),
+				) {
+					Icon(
+						imageVector = Icons.Default.Close,
+						contentDescription = "Delete",
+						modifier = Modifier.size(16.dp),
+					)
+				}
+			}
 		}
 	}
 }
@@ -331,6 +375,7 @@ private fun PreviewEditableCategoryTag() {
 				tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
 				onCommentUpdate = {},
 				editorFocusController = remember { FocusController() },
+				onDeleteTag = {},
 			)
 		}
 	}

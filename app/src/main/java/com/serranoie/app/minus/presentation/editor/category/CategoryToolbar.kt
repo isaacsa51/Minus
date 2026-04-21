@@ -87,6 +87,7 @@ fun CategoryToolbar(
     stage: EditStage,
     onCommentUpdate: (String) -> Unit,
     editorFocusController: FocusController,
+    onDeleteTag: (String) -> Unit = {},
     onSaveExpense: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -146,13 +147,14 @@ fun CategoryToolbar(
                     ) { with(localDensity) { 24.dp.toPx().toInt() } },
                 ) {
 	                CategoryTag(value = tag, onClick = {
-		                onCommentUpdate(tag)
-	                })
+	                onCommentUpdate(tag)
+                }, onDelete = {
+	                onDeleteTag(tag)
+                })
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             }
 
-	        // ???????
             if (tags.isNotEmpty()) {
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -191,6 +193,7 @@ fun CategoryToolbar(
                     onlyIcon = tags.isNotEmpty(),
                     onEdit = { isEdit = it },
                     onSaveExpense = onSaveExpense,
+                    onDeleteTag = onDeleteTag,
                 )
             }
         }
@@ -326,6 +329,9 @@ fun TaggingToolbarWithViewModel(
             viewModel.processIntent(BudgetUiIntent.CommentUpdated(comment))
         },
         editorFocusController = editorFocusController,
+        onDeleteTag = { tag ->
+            viewModel.processIntent(BudgetUiIntent.DeleteTag(tag))
+        },
         onSaveExpense = {
             viewModel.processIntent(BudgetUiIntent.ApplyTapped)
         },

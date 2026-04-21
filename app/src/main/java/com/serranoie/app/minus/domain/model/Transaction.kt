@@ -18,7 +18,8 @@ data class Transaction(
 	val isRecurrent: Boolean = false,
 	val recurrentFrequency: RecurrentFrequency? = null,
 	val recurrentEndDate: LocalDateTime? = null,
-	val subscriptionDay: Int? = null // Day of month (1-31) for monthly subscriptions
+	val subscriptionDay: Int? = null, // Day of month (1-31) for monthly subscriptions
+    val categoryId: Long? = null
 ) {
     companion object {
         fun create(
@@ -30,7 +31,8 @@ data class Transaction(
             isRecurrent: Boolean = false,
             recurrentFrequency: RecurrentFrequency? = null,
             recurrentEndDate: LocalDateTime? = null,
-            subscriptionDay: Int? = null
+            subscriptionDay: Int? = null,
+            categoryId: Long? = null
         ): Transaction = Transaction(
             id = 0,
             amount = amount,
@@ -42,7 +44,8 @@ data class Transaction(
             isRecurrent = isRecurrent,
             recurrentFrequency = recurrentFrequency,
             recurrentEndDate = recurrentEndDate,
-            subscriptionDay = subscriptionDay
+            subscriptionDay = subscriptionDay,
+            categoryId = categoryId
         )
     }
 }

@@ -28,6 +28,7 @@ sealed interface BudgetUiIntent {
     data class SetEditMode(val mode: EditMode) : BudgetUiIntent
     data class SetAnimState(val state: AnimState) : BudgetUiIntent
     data class CommentUpdated(val comment: String) : BudgetUiIntent
+    data class DeleteTag(val tag: String) : BudgetUiIntent
 
     data class RolloverSplitEqually(val remaining: BigDecimal) : BudgetUiIntent
     data class RolloverCarryToNextDay(val remaining: BigDecimal) : BudgetUiIntent
