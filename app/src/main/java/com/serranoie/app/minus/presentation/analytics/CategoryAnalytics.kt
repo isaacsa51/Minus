@@ -30,6 +30,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Currency
@@ -155,6 +156,16 @@ fun CategoryAnalytics(
 
 				Spacer(modifier = Modifier.height(24.dp))
 			}
+
+			AverageSpendCard(
+				spends = state.categorySpends,
+				startDate = state.startPeriodDate,
+				finishDate = state.finishPeriodDate,
+				currency = "MXN",
+				modifier = Modifier.fillMaxWidth()
+			)
+
+			Spacer(modifier = Modifier.height(24.dp))
 
 			if (state.categorySpends.isNotEmpty()) {
 				Text(

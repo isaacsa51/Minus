@@ -75,8 +75,8 @@ fun FinishedPeriodHeader(
 		) {
 			Spacer(Modifier.height(36.dp))
 			Text(
-				text = "Perido terminado",
-				style = MaterialTheme.typography.headlineMedium,
+				text = "Periodo terminado",
+				style = MaterialTheme.typography.headlineSmallEmphasized,
 				fontSize = MaterialTheme.typography.headlineLarge.fontSize,
 				textAlign = TextAlign.Center,
 			)

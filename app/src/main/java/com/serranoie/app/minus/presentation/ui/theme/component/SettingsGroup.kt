@@ -183,7 +183,7 @@ fun PaddedListGroup(
 		title?.let {
 			Text(
 				text = it,
-				style = MaterialTheme.typography.labelLarge,
+				style = MaterialTheme.typography.labelLargeEmphasized,
 				color = MaterialTheme.colorScheme.primary,
 				modifier = Modifier.padding(bottom = 10.dp, start = 4.dp)
 			)

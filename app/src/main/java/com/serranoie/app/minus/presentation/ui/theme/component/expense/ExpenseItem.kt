@@ -13,6 +13,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListI
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.util.Locale
@@ -34,7 +35,7 @@ fun ExpenseItem(
 		Column(modifier = Modifier.weight(1f)) {
 			Text(
 				text = transaction.comment.ifEmpty { "Gasto sin nombre" },
-				style = MaterialTheme.typography.titleMedium,
+				style = MaterialTheme.typography.titleMediumCondensed,
 				color = MaterialTheme.colorScheme.onSurface,
 				fontWeight = FontWeight.Medium
 			)

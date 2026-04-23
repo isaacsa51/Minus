@@ -29,6 +29,8 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorPrimary
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleLargeCondensed
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -67,7 +69,6 @@ fun MidnightTransitionDialog(
 					.padding(24.dp),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				// Icon
 				Icon(
 					imageVector = Icons.Outlined.FactCheck,
 					contentDescription = null,
@@ -77,10 +78,9 @@ fun MidnightTransitionDialog(
 
 				Spacer(modifier = Modifier.height(16.dp))
 
-				// Title
 				Text(
 					text = "Periodo finalizado",
-					style = MaterialTheme.typography.headlineSmall.copy(
+					style = MaterialTheme.typography.titleMediumEmphasized.copy(
 						fontWeight = FontWeight.Bold
 					),
 					color = colorOnEditor
@@ -88,20 +88,18 @@ fun MidnightTransitionDialog(
 
 				Spacer(modifier = Modifier.height(8.dp))
 
-				// Period dates
 				Text(
 					text = "${periodStartDate.dayOfMonth} ${getMonthName(periodStartDate.monthValue)} - ${periodEndDate.dayOfMonth} ${
 						getMonthName(
 							periodEndDate.monthValue
 						)
 					}",
-					style = MaterialTheme.typography.bodyMedium,
+					style = MaterialTheme.typography.bodyLarge,
 					color = colorOnEditor.copy(alpha = 0.7f)
 				)
 
-				Spacer(modifier = Modifier.height(24.dp))
+				Spacer(modifier = Modifier.height(16.dp))
 
-				// Summary cards
 				SummaryCard(
 					label = "Gastado", value = formattedSpent, modifier = Modifier.fillMaxWidth()
 				)
@@ -117,6 +115,20 @@ fun MidnightTransitionDialog(
 
 				Spacer(modifier = Modifier.height(24.dp))
 
+				OutlinedButton(
+					onClick = onDismiss,
+					modifier = Modifier.fillMaxWidth(),
+					colors = ButtonDefaults.outlinedButtonColors(
+						contentColor = MaterialTheme.colorScheme.outline,
+					)
+				) {
+					Text(
+						text = "Mas tarde", modifier = Modifier.padding(vertical = 8.dp)
+					)
+				}
+
+				Spacer(modifier = Modifier.height(8.dp))
+
 				Button(
 					onClick = onViewAnalytics,
 					modifier = Modifier.fillMaxWidth(),
@@ -128,20 +140,6 @@ fun MidnightTransitionDialog(
 					Text(
 						text = "Ver analisis de gastos",
 						modifier = Modifier.padding(vertical = 8.dp)
-					)
-				}
-
-				Spacer(modifier = Modifier.height(8.dp))
-
-				OutlinedButton(
-					onClick = onDismiss,
-					modifier = Modifier.fillMaxWidth(),
-					colors = ButtonDefaults.outlinedButtonColors(
-						contentColor = MaterialTheme.colorScheme.outline,
-					)
-				) {
-					Text(
-						text = "Mas tarde", modifier = Modifier.padding(vertical = 8.dp)
 					)
 				}
 			}
@@ -166,13 +164,14 @@ private fun SummaryCard(
 		) {
 			Text(
 				text = label,
-				style = MaterialTheme.typography.bodySmall,
+				style = MaterialTheme.typography.labelMediumCondensed,
 				color = colorOnEditor.copy(alpha = 0.6f)
 			)
 			Text(
-				text = value, style = MaterialTheme.typography.titleLarge.copy(
-					fontWeight = FontWeight.Bold
-				), color = valueColor
+				text = value,
+				style = MaterialTheme.typography.titleLargeCondensed,
+				fontWeight = FontWeight.Normal,
+				color = valueColor
 			)
 		}
 	}

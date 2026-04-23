@@ -52,7 +52,8 @@ fun MiddlePeriodHeader(
 			Spacer(Modifier.weight(1F))
 			Text(
 				text = "Analisis",
-				style = MaterialTheme.typography.titleLarge,
+				style = MaterialTheme.typography.titleMediumEmphasized,
+				fontSize = MaterialTheme.typography.titleLarge.fontSize,
 			)
 			Spacer(Modifier.weight(1F))
 			Spacer(Modifier.width(48.dp))

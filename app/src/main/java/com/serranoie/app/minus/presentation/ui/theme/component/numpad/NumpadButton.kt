@@ -1,9 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.numpad
 
-import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -33,10 +34,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.colorOnButton
@@ -54,15 +61,22 @@ fun NumpadButton(
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 	val isPressed by interactionSource.collectIsPressedAsState()
-	
+	val baseTextStyle = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.W600)
+	val emphasizedTextStyle = MaterialTheme.typography.displayMediumEmphasized
+
 	val radius by animateDpAsState(
-		targetValue = if (isPressed) 24.dp else 100.dp,
-		animationSpec = if (isPressed) {
-			tween(durationMillis = 140, easing = LinearOutSlowInEasing)
+		targetValue = if (isPressed) 24.dp else 100.dp, animationSpec = if (isPressed) {
+			tween(durationMillis = 60, easing = LinearOutSlowInEasing)
 		} else {
 			tween(durationMillis = 620, easing = LinearEasing)
-		},
-		label = "ButtonRadius"
+		}, label = "ButtonRadius"
+	)
+	val pressProgress by animateFloatAsState(
+		targetValue = if (isPressed) 1f else 0f, animationSpec = if (isPressed) {
+			tween(durationMillis = 60, easing = LinearOutSlowInEasing)
+		} else {
+			tween(durationMillis = 560, easing = LinearEasing)
+		}, label = "ButtonPressProgress"
 	)
 
 	val color = when (type) {
@@ -84,8 +98,7 @@ fun NumpadButton(
 	}
 
 	Surface(
-		tonalElevation = 10.dp,
-		modifier = modifier
+		tonalElevation = 10.dp, modifier = modifier
 			.fillMaxSize()
 			.clip(RoundedCornerShape(radius))
 	) {
@@ -98,16 +111,14 @@ fun NumpadButton(
 					indication = ripple(),
 					onClick = onClick,
 					onLongClick = onLongClick,
-				),
-			contentAlignment = Alignment.Center
+				), contentAlignment = Alignment.Center
 		) {
 			if (text != null) {
 				Text(
 					text = text,
 					color = contentColor,
-					style = MaterialTheme.typography.displaySmall.copy(
-						fontWeight = FontWeight.Bold,
-						fontSize = 44.sp
+					style = baseTextStyle.interpolateToEmphasized(
+						emphasizedStyle = emphasizedTextStyle, progress = pressProgress
 					),
 					maxLines = 1,
 				)
@@ -116,12 +127,49 @@ fun NumpadButton(
 				Icon(
 					imageVector = icon,
 					tint = contentColor,
-					modifier = Modifier.size(40.dp),
+					modifier = Modifier.size(32.dp),
 					contentDescription = "Editor action",
 				)
 			}
 		}
 	}
+}
+
+@OptIn(ExperimentalTextApi::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun TextStyle.interpolateToEmphasized(
+	emphasizedStyle: TextStyle, progress: Float
+): TextStyle {
+	val clampedProgress = progress.coerceIn(0f, 1f)
+	val animatedWeight = lerp(400f, 700f, clampedProgress)
+	val animatedWidth = lerp(100f, 155f, clampedProgress)
+	val animatedFontSize = lerp(fontSize.value, emphasizedStyle.fontSize.value, clampedProgress).sp
+	val animatedLineHeight =
+		lerp(lineHeight.value, emphasizedStyle.lineHeight.value, clampedProgress).sp
+	val animatedLetterSpacing = lerp(
+		letterSpacing.value, emphasizedStyle.letterSpacing.value, clampedProgress
+	).sp
+
+	val animatedFontFamily = remember(animatedWeight, animatedWidth) {
+		FontFamily(
+			Font(
+				R.font.google_sans_flex, variationSettings = FontVariation.Settings(
+					FontVariation.weight(animatedWeight.toInt()), FontVariation.width(animatedWidth)
+				)
+			)
+		)
+	}
+
+	return copy(
+		fontFamily = animatedFontFamily,
+		fontSize = animatedFontSize,
+		lineHeight = animatedLineHeight,
+		letterSpacing = animatedLetterSpacing
+	)
+}
+
+private fun lerp(start: Float, stop: Float, fraction: Float): Float {
+	return start + (stop - start) * fraction
 }
 
 @Preview

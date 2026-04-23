@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.expense
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,8 +27,10 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.headlineSmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import java.time.LocalDateTime
-import java.util.Locale
 
 /**
  * Content for the "fake" dialog that displays transaction details.
@@ -47,7 +51,7 @@ fun ExpenseDetailContent(
 ) {
 	Column(
 		modifier = modifier.padding(16.dp),
-		verticalArrangement = Arrangement.spacedBy(12.dp),
+		verticalArrangement = Arrangement.spacedBy(8.dp),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		Box(
@@ -58,7 +62,7 @@ fun ExpenseDetailContent(
 			Text(
 				text = if (isRecurrentExpense) "GASTO RECURRENTE" else "GASTO",
 				color = Color.White,
-				style = MaterialTheme.typography.labelLarge,
+				style = MaterialTheme.typography.labelLargeEmphasized,
 				fontWeight = FontWeight.Bold,
 				fontSize = TextUnit(26f, TextUnitType.Sp),
 				fontFamily = FontFamily.Monospace
@@ -67,7 +71,7 @@ fun ExpenseDetailContent(
 
 		Text(
 			text = "Num. de Operación: $operationNumber",
-			style = MaterialTheme.typography.bodyMedium,
+			style = MaterialTheme.typography.bodyMediumCondensed,
 			color = MaterialTheme.colorScheme.onSurface,
 			textAlign = TextAlign.Center
 		)
@@ -76,14 +80,14 @@ fun ExpenseDetailContent(
 
 		Text(
 			text = "MONTO TOTAL",
-			style = MaterialTheme.typography.labelLarge,
+			style = MaterialTheme.typography.labelLargeCondensed,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			textAlign = TextAlign.Center
 		)
 
 		Text(
 			text = totalAmountText,
-			style = MaterialTheme.typography.headlineLarge,
+			style = MaterialTheme.typography.headlineSmallEmphasized,
 			color = MaterialTheme.colorScheme.error,
 			fontWeight = FontWeight.Bold,
 			textAlign = TextAlign.Center
@@ -95,13 +99,13 @@ fun ExpenseDetailContent(
 			Box(modifier = Modifier.fillMaxWidth()) {
 				Text(
 					text = label,
-					style = MaterialTheme.typography.bodyMedium,
+					style = MaterialTheme.typography.bodyMediumCondensed,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					modifier = Modifier.align(Alignment.CenterStart)
 				)
 				Text(
 					text = value,
-					style = MaterialTheme.typography.bodyMedium,
+					style = MaterialTheme.typography.bodyMediumCondensed,
 					color = MaterialTheme.colorScheme.onSurface,
 					modifier = Modifier.align(Alignment.CenterEnd)
 				)
@@ -119,7 +123,7 @@ fun ExpenseDetailContent(
 		Row(
 			modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			Button(
+			OutlinedButton(
 				onClick = onEdit, modifier = Modifier.weight(1f)
 			) {
 				Text("Editar")
@@ -141,7 +145,10 @@ fun ExpenseDetailContent(
 	}
 }
 
-@Preview
+@Preview(showBackground = true)
+@Preview(
+	uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
 @Composable
 private fun ExpenseDetailContentPreview() {
 	MinusTheme {

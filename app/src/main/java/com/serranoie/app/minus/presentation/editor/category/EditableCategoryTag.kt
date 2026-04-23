@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -197,7 +198,7 @@ fun EditableCategoryTag(
 								.heightIn(min = 28.dp)
 								.wrapContentHeight(align = Alignment.CenterVertically),
 							text = value.text.ifEmpty { "Add comment" },
-							style = MaterialTheme.typography.bodyMedium,
+							style = MaterialTheme.typography.bodyMediumCondensed,
 							softWrap = false,
 							overflow = TextOverflow.Ellipsis,
 						)
@@ -365,17 +366,34 @@ suspend fun PointerInputScope.detectTapUnconsumed(
 	}
 }
 
-@Preview(name = "EditableCategoryTag")
+@Preview(showBackground = true)
 @Composable
-private fun PreviewEditableCategoryTag() {
+private fun EditableCategoryTagPreview() {
 	MinusTheme {
-		Column {
+		Box(modifier = Modifier.padding(16.dp)) {
 			EditableCategoryTag(
 				currentComment = "Groceries",
 				tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
 				onCommentUpdate = {},
 				editorFocusController = remember { FocusController() },
-				onDeleteTag = {},
+				extendWidth = 300.dp
+			)
+		}
+	}
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EditableCategoryTagOnlyIconPreview() {
+	MinusTheme {
+		Box(modifier = Modifier.padding(16.dp)) {
+			EditableCategoryTag(
+				currentComment = "",
+				tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
+				onCommentUpdate = {},
+				editorFocusController = remember { FocusController() },
+				extendWidth = 300.dp,
+				onlyIcon = true
 			)
 		}
 	}

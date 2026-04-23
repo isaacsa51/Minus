@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import kotlin.math.sin
 
 /**
@@ -53,7 +54,6 @@ fun WavyDivider(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.spacedBy(12.dp)
 		) {
-			// Left wavy line
 			WavyLine(
 				modifier = Modifier
 					.weight(1f)
@@ -64,19 +64,17 @@ fun WavyDivider(
 				color = color
 			)
 
-			// Center text
 			Text(
 				text = text,
 				modifier = Modifier
 					.widthIn(max = maxTextWidth)
 					.basicMarquee(),
 				textAlign = TextAlign.Center,
-				style = MaterialTheme.typography.labelMedium,
+				style = MaterialTheme.typography.labelMediumCondensed,
 				color = MaterialTheme.colorScheme.outline,
 				maxLines = 1
 			)
 
-			// Right wavy line
 			WavyLine(
 				modifier = Modifier
 					.weight(1f)
@@ -120,7 +118,7 @@ private fun WavyLine(
 			while (x < width) {
 				val y = centerY + sin((x / wavelength) * 2 * Math.PI.toFloat()) * amplitude
 				lineTo(x, y)
-				x += 2f // Small steps for smooth curve
+				x += 2f
 			}
 		}
 

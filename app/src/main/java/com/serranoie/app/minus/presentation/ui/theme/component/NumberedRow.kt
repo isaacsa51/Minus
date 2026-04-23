@@ -26,58 +26,56 @@ import com.serranoie.app.minus.presentation.util.combineColors
 
 @Composable
 fun NumberedRow(
-    modifier: Modifier = Modifier,
-    number: Int,
-    title: String,
-    subtitle: String? = null,
+	modifier: Modifier = Modifier,
+	number: Int,
+	title: String,
+	subtitle: String? = null,
 ) {
-    val color = contentColorFor(
-        combineColors(
-            MaterialTheme.colorScheme.primaryContainer,
-            MaterialTheme.colorScheme.surfaceVariant,
-            angle = 0.9F,
-        )
-    )
+	val color = contentColorFor(
+		combineColors(
+			MaterialTheme.colorScheme.primaryContainer,
+			MaterialTheme.colorScheme.surfaceVariant,
+			angle = 0.9F,
+		)
+	)
 
-    Row {
-        Box(
-            Modifier
-                .size(28.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(text = number.toString())
-        }
+	Row {
+		Box(
+			Modifier
+				.size(28.dp)
+				.clip(CircleShape)
+				.background(MaterialTheme.colorScheme.primaryContainer),
+			contentAlignment = Alignment.Center,
+		) {
+			Text(text = number.toString(), style = MaterialTheme.typography.labelSmallEmphasized)
+		}
 
-        Spacer(modifier = Modifier.width(12.dp))
+		Spacer(modifier = Modifier.width(12.dp))
 
-        Column(
-            modifier = modifier
-                .padding(bottom = 24.dp)
-        ) {
-            Box(
-                modifier = Modifier.heightIn(min = 28.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = color,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            if (subtitle !== null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = color,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-    }
+		Column(
+			modifier = modifier.padding(bottom = 24.dp)
+		) {
+			Box(
+				modifier = Modifier.heightIn(min = 28.dp), contentAlignment = Alignment.CenterStart
+			) {
+				Text(
+					text = title,
+					style = MaterialTheme.typography.titleSmallEmphasized,
+					color = color,
+					overflow = TextOverflow.Ellipsis,
+				)
+			}
+			if (subtitle !== null) {
+				Spacer(modifier = Modifier.height(4.dp))
+				Text(
+					text = subtitle,
+					style = MaterialTheme.typography.bodyMedium,
+					color = color,
+					overflow = TextOverflow.Ellipsis,
+				)
+			}
+		}
+	}
 }
 
 

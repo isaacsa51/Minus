@@ -13,10 +13,6 @@ import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import android.util.Log
 
-/**
- * Wrapper composable that connects BudgetViewModel to Numpad.
- * Use this in production code.
- */
 @Composable
 fun NumpadWithViewModel(
     viewModel: BudgetViewModel = hiltViewModel(),
@@ -28,7 +24,6 @@ fun NumpadWithViewModel(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Collect effects to show snackbar messages
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {

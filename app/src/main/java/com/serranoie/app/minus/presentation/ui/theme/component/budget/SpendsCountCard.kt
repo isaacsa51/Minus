@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 
 @Composable
 fun SpendsCountCard(
@@ -56,18 +58,17 @@ fun SpendsCountCard(
 			) {
 				Text(
 					text = count.toString(),
-					style = MaterialTheme.typography.displayMedium,
-					fontSize = MaterialTheme.typography.titleLarge.fontSize,
-
+					style = MaterialTheme.typography.titleLargeEmphasized,
 					overflow = TextOverflow.Ellipsis,
 					softWrap = true,
 					textAlign = TextAlign.Center,
 				)
 				Text(
-					text = "Total gastado",
-					style = MaterialTheme.typography.labelMedium,
+					text = "Gastos totales",
+					modifier = Modifier.basicMarquee(),
+					style = MaterialTheme.typography.labelMediumCondensed,
 					color = textColor.copy(alpha = 0.6f),
-					softWrap = false,
+					softWrap = true,
 					textAlign = TextAlign.Center,
 				)
 				Spacer(modifier = Modifier.height(4.dp))
@@ -83,7 +84,7 @@ fun SpendsCountCard(
 
 
 @Preview(name = "SpendsCountCard",
-	device = "spec:width=800px,height=400px"
+	device = "spec:width=500px,height=300px"
 )
 @Composable
 private fun PreviewSpendsCountCard() {

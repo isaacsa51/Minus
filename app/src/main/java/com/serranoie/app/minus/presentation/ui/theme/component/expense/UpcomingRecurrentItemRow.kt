@@ -15,6 +15,7 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.prettyDate
 import java.text.NumberFormat
 import java.time.LocalDate
@@ -76,7 +77,7 @@ fun UpcomingRecurrentItemRow(
 			Column(modifier = Modifier.weight(1f)) {
 				Text(
 					text = transaction.comment.ifEmpty { "Gasto recurrente sin nombre" },
-					style = MaterialTheme.typography.titleMedium,
+					style = MaterialTheme.typography.titleMediumCondensed,
 					color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
 					fontWeight = FontWeight.Medium
 				)

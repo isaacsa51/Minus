@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Repeat
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +18,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 
 /**
  * A compact ticket card showing the next recurrent payment within a period.
@@ -40,120 +38,120 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecurrentTicketCard(
-    title: String,
-    amountFormatted: String,
-    nextChargeDate: String,
-    frequencyLabel: String? = null,
-    onClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    teethWidthDp: Float = 12f,
-    teethHeightDp: Float = 2f
+	title: String,
+	amountFormatted: String,
+	nextChargeDate: String,
+	frequencyLabel: String? = null,
+	onClick: (() -> Unit)? = null,
+	modifier: Modifier = Modifier,
+	backgroundColor: Color = MaterialTheme.colorScheme.surface,
+	teethWidthDp: Float = 12f,
+	teethHeightDp: Float = 2f
 ) {
-    TicketCard(
-        modifier = modifier,
-        backgroundColor = backgroundColor,
-        teethWidthDp = teethWidthDp,
-        teethHeightDp = teethHeightDp,
-        clickable = onClick
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = title.ifEmpty { "Subscripción sin nombre" },
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Clip,
-                    modifier = Modifier
-                        .weight(1f)
-                        .basicMarquee()
-                )
+	TicketCard(
+		modifier = modifier,
+		backgroundColor = backgroundColor,
+		teethWidthDp = teethWidthDp,
+		teethHeightDp = teethHeightDp,
+		clickable = onClick
+	) {
+		Column(
+			modifier = Modifier.fillMaxWidth()
+		) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(8.dp)
+			) {
+				Text(
+					text = title.ifEmpty { "Subscripción sin nombre" },
+					style = MaterialTheme.typography.titleSmallCondensed,
+					color = MaterialTheme.colorScheme.onSurface,
+					maxLines = 1,
+					overflow = TextOverflow.Clip,
+					modifier = Modifier
+						.weight(1f)
+						.basicMarquee()
+				)
 
-                // Amount
-                Text(
-                    text = amountFormatted,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Clip
-                )
-            }
+				// Amount
+				Text(
+					text = amountFormatted,
+					style = MaterialTheme.typography.titleSmallEmphasized,
+					color = MaterialTheme.colorScheme.primary,
+					fontWeight = FontWeight.Bold,
+					maxLines = 1,
+					overflow = TextOverflow.Clip
+				)
+			}
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = nextChargeDate,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 8.dp),
+				horizontalArrangement = Arrangement.SpaceBetween,
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Text(
+					text = nextChargeDate,
+					style = MaterialTheme.typography.bodySmallCondensed,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.weight(1f)
+				)
 
-                frequencyLabel?.let { label ->
-                    val spanishLabel = when (label.lowercase()) {
-                        "weekly" -> "Semanal"
-                        "biweekly" -> "Quincenal"
-                        "monthly" -> "Mensual"
-                        else -> label
-                    }
+				frequencyLabel?.let { label ->
+					val spanishLabel = when (label.lowercase()) {
+						"weekly" -> "Semanal"
+						"biweekly" -> "Quincenal"
+						"monthly" -> "Mensual"
+						else -> label
+					}
 
-                    Text(
-                        text = spanishLabel,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.secondary,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
-        }
-    }
+					Text(
+						text = spanishLabel,
+						style = MaterialTheme.typography.labelSmallEmphasized.copy(fontWeight = FontWeight.Normal),
+						color = MaterialTheme.colorScheme.secondary,
+						maxLines = 2,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier.padding(start = 8.dp)
+					)
+				}
+			}
+		}
+	}
 }
 
 @Preview(device = "id:wearos_square")
 @Composable
 private fun RecurrentTicketCardPreview() {
-    MinusTheme {
-        RecurrentTicketCard(
-            title = "Netflix",
-            amountFormatted = "$15.99",
-            nextChargeDate = "15 abr",
-            frequencyLabel = "Mensual",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
-    }
+	MinusTheme {
+		RecurrentTicketCard(
+			title = "Netflix",
+			amountFormatted = "$15.99",
+			nextChargeDate = "15 abr",
+			frequencyLabel = "Mensual",
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(16.dp)
+		)
+	}
 }
 
 @Preview
 @Composable
 private fun RecurrentTicketCardSecondaryPreview() {
-    MinusTheme {
-        RecurrentTicketCard(
-            title = "Spotify Premium",
-            amountFormatted = "$9.99",
-            nextChargeDate = "22 abr",
-            frequencyLabel = "Mensual",
-            backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
-    }
+	MinusTheme {
+		RecurrentTicketCard(
+			title = "Spotify Premium",
+			amountFormatted = "$9.99",
+			nextChargeDate = "22 abr",
+			frequencyLabel = "Mensual",
+			backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(16.dp)
+		)
+	}
 }

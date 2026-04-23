@@ -18,6 +18,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.serranoie.app.minus.THEME_MODE_KEY
 import com.serranoie.app.minus.appTheme
+import com.serranoie.app.minus.presentation.ui.theme.ExpressiveTypography
 import com.serranoie.app.minus.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.theme.harmonize.palette.CorePalette
 import kotlinx.coroutines.flow.first
@@ -123,7 +124,7 @@ fun MinusTheme(
 	MaterialTheme(
 		colorScheme = colorScheme,
 		shapes = shapes,
-		typography = ExpressiveTypography.withCondensedStyles(),
+		typography = ExpressiveTypography,
 		content = content
 	)
 

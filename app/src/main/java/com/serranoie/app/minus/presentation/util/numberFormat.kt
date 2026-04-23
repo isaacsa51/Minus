@@ -41,12 +41,21 @@ fun formatCurrencySymbolOnly(
 		return "$symbol${numberFormatter.format(value)}"
 	}
 	// Fallback to standard currency formatter
-	val formatter = NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
-		currency = java.util.Currency.getInstance(currencyCode)
-		this.maximumFractionDigits = maximumFractionDigits
-		this.minimumFractionDigits = minimumFractionDigits
+	return try {
+		val formatter = NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
+			currency = java.util.Currency.getInstance(currencyCode)
+			this.maximumFractionDigits = maximumFractionDigits
+			this.minimumFractionDigits = minimumFractionDigits
+		}
+		formatter.format(value)
+	} catch (e: Exception) {
+		// Fallback to number format with the raw currencyCode if Currency.getInstance fails
+		val numberFormatter = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
+			this.maximumFractionDigits = maximumFractionDigits
+			this.minimumFractionDigits = minimumFractionDigits
+		}
+		"$currencyCode${numberFormatter.format(value)}"
 	}
-	return formatter.format(value)
 }
 
 /**

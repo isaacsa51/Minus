@@ -2,6 +2,7 @@
 
 package com.serranoie.app.minus.presentation.editor
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,7 +33,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import logcat.logcat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
@@ -55,6 +54,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -78,6 +78,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -87,19 +88,21 @@ import com.serranoie.app.minus.presentation.onboarding.FinishDateSelector
 import com.serranoie.app.minus.presentation.onboarding.availablePeriodsFor
 import com.serranoie.app.minus.presentation.onboarding.budgetForPeriod
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.util.CurrencyAmountInputVisualTransformation
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
-import com.serranoie.app.minus.R
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
+import com.serranoie.app.minus.presentation.util.CurrencyAmountInputVisualTransformation
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import logcat.logcat
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Currency
 import java.util.Date
 import java.util.Locale
 
@@ -163,73 +166,73 @@ fun PeriodSwitcherSheet(
 			.fillMaxSize()
 			.windowInsetsPadding(WindowInsets.statusBars)
 	) {
-	AnimatedContent(
-		targetState = isEditMode,
-		transitionSpec = {
-			if (targetState) {
-				// Forward: entering edit mode
-				(slideInHorizontally(initialOffsetX = { it / 3 }, animationSpec = tween(300))
-						+ fadeIn(tween(250, delayMillis = 50)))
-					.togetherWith(
-						slideOutHorizontally(
-							targetOffsetX = { -it / 3 },
-							animationSpec = tween(300)
-						) + fadeOut(tween(200))
-					)
+		AnimatedContent(
+			targetState = isEditMode,
+			transitionSpec = {
+				if (targetState) {
+					// Forward: entering edit mode
+					(slideInHorizontally(initialOffsetX = { it / 3 }, animationSpec = tween(300))
+							+ fadeIn(tween(250, delayMillis = 50)))
+						.togetherWith(
+							slideOutHorizontally(
+								targetOffsetX = { -it / 3 },
+								animationSpec = tween(300)
+							) + fadeOut(tween(200))
+						)
+				} else {
+					// Backward: exiting edit mode
+					(slideInHorizontally(initialOffsetX = { -it / 3 }, animationSpec = tween(300))
+							+ fadeIn(tween(250, delayMillis = 50)))
+						.togetherWith(
+							slideOutHorizontally(
+								targetOffsetX = { it / 3 },
+								animationSpec = tween(300)
+							) + fadeOut(tween(200))
+						)
+				}
+			},
+			label = "sheetContent"
+		) { editMode ->
+			if (editMode) {
+				EditBudgetContent(
+					budgetSettings = budgetSettings,
+					onBack = { isEditMode = false },
+					onApply = { newSettings ->
+						onSaveBudget?.invoke(newSettings)
+						isEditMode = false
+					},
+					pendingExpensesCount = pendingExpensesCount,
+				)
 			} else {
-				// Backward: exiting edit mode
-				(slideInHorizontally(initialOffsetX = { -it / 3 }, animationSpec = tween(300))
-						+ fadeIn(tween(250, delayMillis = 50)))
-					.togetherWith(
-						slideOutHorizontally(
-							targetOffsetX = { it / 3 },
-							animationSpec = tween(300)
-						) + fadeOut(tween(200))
-					)
+				ViewBudgetContent(
+					budgetSettings = budgetSettings,
+					budgetState = budgetState,
+					periodCache = periodCache,
+					currencyFormat = currencyFormat,
+					currencyCode = currencyCode,
+					totalBudget = totalBudget,
+					totalSpent = totalSpent,
+					totalDays = totalDays,
+					startDateAsDate = startDateAsDate,
+					endDateAsDate = endDateAsDate,
+					available = available,
+					onPeriodSelected = { p ->
+						logcat { "User selected period chip: $p (previous=$periodCache)" }
+						periodCache = p
+						onPeriodSelected(p)
+					},
+					onEditClick = {
+						if (onSaveBudget != null) {
+							isEditMode = true
+						} else {
+							onEditBudget?.invoke()
+						}
+					},
+					onFinishEarlyClick = { showFinishConfirm = true },
+					showFinishEarly = onFinishEarly != null && budgetSettings != null,
+				)
 			}
-		},
-		label = "sheetContent"
-	) { editMode ->
-		if (editMode) {
-			EditBudgetContent(
-				budgetSettings = budgetSettings,
-				onBack = { isEditMode = false },
-				onApply = { newSettings ->
-					onSaveBudget?.invoke(newSettings)
-					isEditMode = false
-				},
-				pendingExpensesCount = pendingExpensesCount,
-			)
-		} else {
-			ViewBudgetContent(
-				budgetSettings = budgetSettings,
-				budgetState = budgetState,
-				periodCache = periodCache,
-				currencyFormat = currencyFormat,
-				currencyCode = currencyCode,
-				totalBudget = totalBudget,
-				totalSpent = totalSpent,
-				totalDays = totalDays,
-				startDateAsDate = startDateAsDate,
-				endDateAsDate = endDateAsDate,
-				available = available,
-				onPeriodSelected = { p ->
-					logcat { "User selected period chip: $p (previous=$periodCache)" }
-					periodCache = p
-					onPeriodSelected(p)
-				},
-				onEditClick = {
-					if (onSaveBudget != null) {
-						isEditMode = true
-					} else {
-						onEditBudget?.invoke()
-					}
-				},
-				onFinishEarlyClick = { showFinishConfirm = true },
-				showFinishEarly = onFinishEarly != null && budgetSettings != null,
-			)
 		}
-	}
 	}
 
 	// Finish Early Confirmation Dialog
@@ -289,8 +292,8 @@ private fun ViewBudgetContent(
 		) {
 			Text(
 				text = "Presupuesto",
-				style = MaterialTheme.typography.headlineMediumEmphasized,
-				fontWeight = FontWeight.Bold,
+				style = MaterialTheme.typography.titleLargeEmphasized,
+				fontWeight = FontWeight.W500,
 			)
 			IconButton(
 				onClick = onEditClick,
@@ -316,7 +319,8 @@ private fun ViewBudgetContent(
 
 		Row(
 			modifier = Modifier.fillMaxWidth(),
-			horizontalArrangement = Arrangement.spacedBy(12.dp),
+			horizontalArrangement = Arrangement.spacedBy(8.dp),
+			verticalAlignment = Alignment.CenterVertically,
 		) {
 			BudgetDisplay(
 				budget = totalBudget,
@@ -324,7 +328,8 @@ private fun ViewBudgetContent(
 				budgetSettings = budgetSettings,
 				currencyCode = currencyCode,
 				bigVariant = false,
-				modifier = Modifier.weight(1.5f),
+				modifier = Modifier
+					.weight(1.5f),
 				startDate = startDateAsDate,
 				finishDate = endDateAsDate
 			)
@@ -360,11 +365,11 @@ private fun ViewBudgetContent(
 			}
 		}
 
-		Spacer(modifier = Modifier.height(24.dp))
+		Spacer(modifier = Modifier.height(16.dp))
 
 		Text(
 			text = "¿Cómo repartir el presupuesto?",
-			style = MaterialTheme.typography.titleMedium,
+			style = MaterialTheme.typography.titleMediumCondensed,
 			fontWeight = FontWeight.Medium,
 			modifier = Modifier.padding(bottom = 12.dp),
 		)
@@ -415,7 +420,7 @@ private fun ViewBudgetContent(
 			) {
 				Text(
 					text = "Finalizar presupuesto temprano",
-					style = MaterialTheme.typography.bodyMedium,
+					style = MaterialTheme.typography.labelLargeEmphasized,
 				)
 			}
 		}
@@ -500,84 +505,13 @@ fun EditBudgetContent(
 	) {
 		Text(
 			text = title,
-			style = MaterialTheme.typography.headlineMediumEmphasized,
-			fontWeight = FontWeight.Bold,
+			style = MaterialTheme.typography.titleLargeEmphasized,
+			fontWeight = FontWeight.W500,
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(vertical = 16.dp),
 			textAlign = TextAlign.Center,
 		)
-
-		if (showPreviousValuesChip && currentBudget > BigDecimal.ZERO) {
-			AssistChip(
-				onClick = { showPreviousValues = !showPreviousValues },
-				label = { Text("Valores anteriores") },
-				leadingIcon = {
-					Icon(
-						imageVector = Icons.Rounded.Sync,
-						contentDescription = null,
-						modifier = Modifier.size(18.dp)
-					)
-				},
-				colors = AssistChipDefaults.assistChipColors(
-					containerColor = MaterialTheme.colorScheme.secondaryContainer,
-					labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-				),
-			)
-
-			if (showPreviousValues) {
-				Spacer(modifier = Modifier.height(8.dp))
-				Card(
-					modifier = Modifier.fillMaxWidth(),
-					colors = CardDefaults.cardColors(
-						containerColor = MaterialTheme.colorScheme.surfaceVariant,
-					),
-					shape = RoundedCornerShape(12.dp),
-				) {
-					Column(modifier = Modifier.padding(12.dp)) {
-						Text(
-							text = "Presupuesto anterior: $currencySymbol${
-								currentBudget.toPlainString()
-							}",
-							style = MaterialTheme.typography.bodyMedium,
-						)
-						if (currentEnd != null) {
-							Text(
-								text = "Período: $previousPeriodDays días",
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-							)
-						}
-						Spacer(modifier = Modifier.height(8.dp))
-						AssistChip(
-							onClick = {
-								budgetText = if (currentBudget > BigDecimal.ZERO) {
-									(currentBudget.multiply(BigDecimal(100)).toBigInteger()).toString()
-								} else ""
-								if (previousPeriodDays > 0) {
-									startCache = LocalDate.now()
-									endCache =
-										LocalDate.now().plusDays(previousPeriodDays.toLong() - 1)
-								}
-								currencyCache = currentCurrency
-								strategyCache = currentStrategy
-								showPreviousValues = false
-							},
-							label = { Text("Aplicar valores anteriores") },
-							leadingIcon = {
-								Icon(
-									imageVector = Icons.Default.Check,
-									contentDescription = null,
-									modifier = Modifier.size(18.dp)
-								)
-							},
-						)
-					}
-				}
-			}
-		}
-
-		Spacer(modifier = Modifier.height(24.dp))
 
 		Box(
 			modifier = Modifier
@@ -624,6 +558,86 @@ fun EditBudgetContent(
 				},
 				modifier = Modifier.fillMaxWidth(),
 			)
+		}
+
+		if (showPreviousValuesChip && currentBudget > BigDecimal.ZERO) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Start
+			) {
+				AssistChip(
+					onClick = { showPreviousValues = !showPreviousValues },
+					label = {
+						Text(
+							"Valores anteriores",
+							style = MaterialTheme.typography.labelMediumCondensed
+						)
+					},
+					leadingIcon = {
+						Icon(
+							imageVector = Icons.Rounded.Sync,
+							contentDescription = null,
+							modifier = Modifier.size(18.dp)
+						)
+					},
+					colors = AssistChipDefaults.assistChipColors(
+						containerColor = MaterialTheme.colorScheme.secondaryContainer,
+						labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+					),
+				)
+			}
+
+			if (showPreviousValues) {
+				Spacer(modifier = Modifier.height(8.dp))
+				Card(
+					modifier = Modifier.fillMaxWidth(),
+					colors = CardDefaults.cardColors(
+						containerColor = MaterialTheme.colorScheme.surfaceVariant,
+					),
+					shape = RoundedCornerShape(12.dp),
+				) {
+					Column(modifier = Modifier.padding(12.dp)) {
+						Text(
+							text = "Presupuesto anterior: $currencySymbol${
+								currentBudget.toPlainString()
+							}",
+							style = MaterialTheme.typography.bodyMedium,
+						)
+						if (currentEnd != null) {
+							Text(
+								text = "Período: $previousPeriodDays días",
+								style = MaterialTheme.typography.bodySmall,
+								color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+							)
+						}
+						Spacer(modifier = Modifier.height(8.dp))
+						AssistChip(
+							onClick = {
+								budgetText = if (currentBudget > BigDecimal.ZERO) {
+									(currentBudget.multiply(BigDecimal(100))
+										.toBigInteger()).toString()
+								} else ""
+								if (previousPeriodDays > 0) {
+									startCache = LocalDate.now()
+									endCache =
+										LocalDate.now().plusDays(previousPeriodDays.toLong() - 1)
+								}
+								currencyCache = currentCurrency
+								strategyCache = currentStrategy
+								showPreviousValues = false
+							},
+							label = { Text("Aplicar valores anteriores") },
+							leadingIcon = {
+								Icon(
+									imageVector = Icons.Default.Check,
+									contentDescription = null,
+									modifier = Modifier.size(18.dp)
+								)
+							},
+						)
+					}
+				}
+			}
 		}
 
 		Spacer(modifier = Modifier.height(16.dp))
@@ -736,7 +750,8 @@ fun EditBudgetContent(
 		Button(
 			onClick = {
 				haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-				val periodDays = endCache?.let { ChronoUnit.DAYS.between(startCache, it).toInt() + 1 } ?: 1
+				val periodDays =
+					endCache?.let { ChronoUnit.DAYS.between(startCache, it).toInt() + 1 } ?: 1
 				val period = when {
 					periodDays >= 30 -> BudgetPeriod.MONTHLY
 					periodDays >= 14 -> BudgetPeriod.BIWEEKLY
@@ -1025,7 +1040,6 @@ private fun CompactPeriodCard(
 	OutlinedCard(
 		modifier = modifier.clickable(onClick = onClick),
 		onClick = onClick,
-		shape = RoundedCornerShape(12.dp),
 		border = BorderStroke(
 			width = if (isSelected) 2.dp else 1.dp,
 			color = borderColor
@@ -1045,14 +1059,14 @@ private fun CompactPeriodCard(
 					BudgetPeriod.BIWEEKLY -> "Quincenal"
 					BudgetPeriod.MONTHLY -> "Mensual"
 				},
-				style = MaterialTheme.typography.bodyMedium,
+				style = if (isSelected) MaterialTheme.typography.bodySmallEmphasized else MaterialTheme.typography.bodySmallCondensed,
 				fontWeight = FontWeight.Medium,
 				color = textColor
 			)
 
 			Text(
 				text = currencyFormat.format(budgetAmount),
-				style = MaterialTheme.typography.bodySmall,
+				style = MaterialTheme.typography.bodySmallCondensed,
 				fontWeight = FontWeight.Bold,
 				color = if (isSelected) MaterialTheme.colorScheme.primary else textColor.copy(alpha = 0.7f)
 			)
@@ -1060,65 +1074,74 @@ private fun CompactPeriodCard(
 	}
 }
 
-@Preview(showSystemUi = false, showBackground = true)
+@Preview(
+	showBackground = true,
+	uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
 @Composable
 private fun PeriodSwitcherSheetPreview() {
 	MinusTheme {
-		PeriodSwitcherSheet(
-			budgetSettings = BudgetSettings(
-				totalBudget = BigDecimal("17725"),
-				period = BudgetPeriod.DAILY,
-				startDate = LocalDate.now().minusDays(29),
-				endDate = LocalDate.now(),
+		Surface {
+			PeriodSwitcherSheet(
+				budgetSettings = BudgetSettings(
+					totalBudget = BigDecimal("17725"),
+					period = BudgetPeriod.DAILY,
+					startDate = LocalDate.now().minusDays(29),
+					endDate = LocalDate.now(),
+					currencyCode = "MXN",
+					daysInPeriod = 30,
+					rollOverEnabled = false,
+					rollOverLimit = null,
+					rollOverCarryForward = false
+				),
+				budgetState = BudgetState(
+					remainingToday = BigDecimal("17675"),
+					totalSpentToday = BigDecimal("5072"),
+					dailyBudget = BigDecimal("5900"),
+					daysRemaining = 1,
+					progress = 0.03f,
+					isOverBudget = false,
+					totalBudget = BigDecimal("17725"),
+					totalSpentInPeriod = BigDecimal("5072"),
+				),
+				selectedPeriod = BudgetPeriod.DAILY,
 				currencyCode = "MXN",
-				daysInPeriod = 30,
-				rollOverEnabled = false,
-				rollOverLimit = null,
-				rollOverCarryForward = false
-			),
-			budgetState = BudgetState(
-				remainingToday = BigDecimal("17675"),
-				totalSpentToday = BigDecimal("5072"),
-				dailyBudget = BigDecimal("5900"),
-				daysRemaining = 1,
-				progress = 0.03f,
-				isOverBudget = false,
-				totalBudget = BigDecimal("17725"),
-				totalSpentInPeriod = BigDecimal("5072"),
-			),
-			selectedPeriod = BudgetPeriod.DAILY,
-			currencyCode = "MXN",
-			onPeriodSelected = { },
-			onSaveBudget = { },
-			onFinishEarly = { }
-		)
+				onPeriodSelected = { },
+				onSaveBudget = { },
+				onFinishEarly = { }
+			)
+		}
 	}
 }
 
-@Preview(showSystemUi = false, showBackground = true,
+@Preview(
+	showBackground = true,
 	device = "spec:width=1080px,height=2340px,dpi=440,cutout=double"
 )
 @Composable
 private fun EditModePreview() {
 	MinusTheme {
-		EditBudgetContent(
-			budgetSettings = BudgetSettings(
-				totalBudget = BigDecimal("17725"),
-				period = BudgetPeriod.DAILY,
-				startDate = LocalDate.now().minusDays(29),
-				endDate = LocalDate.now(),
-				currencyCode = "MXN",
-				daysInPeriod = 30,
-			),
-			onBack = { },
-			onApply = { },
-			pendingExpensesCount = 3,
-		)
+		Surface {
+			EditBudgetContent(
+				budgetSettings = BudgetSettings(
+					totalBudget = BigDecimal("17725"),
+					period = BudgetPeriod.DAILY,
+					startDate = LocalDate.now().minusDays(29),
+					endDate = LocalDate.now(),
+					currencyCode = "MXN",
+					daysInPeriod = 30,
+				),
+				onBack = { },
+				onApply = { },
+				pendingExpensesCount = 3,
+			)
+		}
 	}
 }
 
 
-@Preview(showSystemUi = false, showBackground = true,
+@Preview(
+	showSystemUi = false, showBackground = true,
 	device = "spec:width=1080px,height=2340px,dpi=440,cutout=double"
 )
 @Composable

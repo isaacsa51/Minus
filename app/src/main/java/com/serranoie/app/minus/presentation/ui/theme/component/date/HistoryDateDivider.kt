@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.util.numberFormat
 import com.serranoie.app.minus.presentation.util.prettyDate
 import java.math.BigDecimal
@@ -44,18 +45,19 @@ fun HistoryDateDivider(
 	isExpanded: Boolean = true,
 	onToggleClick: () -> Unit = {},
 	totalAmount: BigDecimal? = null,
-	currencyCode: String = "" ,
+	currencyCode: String = "",
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
-			.clickable(onClick = onToggleClick,
+			.clickable(
+				onClick = onToggleClick,
 				interactionSource = interactionSource,
 				indication = null
 			)
-			.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+			.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.SpaceBetween
 	) {
@@ -71,8 +73,13 @@ fun HistoryDateDivider(
 			)
 
 			Text(
-				text = prettyDate(date?.atStartOfDay(), forceShowDate = true, showTime = false, human = true),
-				style = MaterialTheme.typography.labelMedium,
+				text = prettyDate(
+					date?.atStartOfDay(),
+					forceShowDate = true,
+					showTime = false,
+					human = true
+				),
+				style = MaterialTheme.typography.labelMediumEmphasized,
 				color = MaterialTheme.colorScheme.primary
 			)
 		}
@@ -82,10 +89,14 @@ fun HistoryDateDivider(
 			enter = fadeIn(animationSpec = tween(durationMillis = 150)),
 			exit = fadeOut(animationSpec = tween(durationMillis = 150))
 		) {
-			val totalText = numberFormat(context = LocalContext.current, value = totalAmount!!, currency = currencyCode)
+			val totalText = numberFormat(
+				context = LocalContext.current,
+				value = totalAmount!!,
+				currency = currencyCode
+			)
 			Text(
 				text = totalText,
-				style = MaterialTheme.typography.labelMedium,
+				style = MaterialTheme.typography.labelMediumCondensed,
 				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
 			)
 		}
@@ -100,7 +111,7 @@ private fun DayPreviewDividerExpanded() {
 			date = LocalDate.now(),
 			isExpanded = true,
 			totalAmount = BigDecimal("150.00"),
-			currencyCode = "$"
+			currencyCode = "USD"
 		)
 	}
 }
@@ -113,7 +124,7 @@ private fun DayPreviewDividerCollapsed() {
 			date = LocalDate.now(),
 			isExpanded = false,
 			totalAmount = BigDecimal("3420.25"),
-			currencyCode = "$"
+			currencyCode = "USD"
 		)
 	}
 }

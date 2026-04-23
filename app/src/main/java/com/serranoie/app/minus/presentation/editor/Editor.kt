@@ -72,6 +72,7 @@ import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTextField
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
+import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -366,8 +367,8 @@ private fun EditingContent(
 		}
 	}
 
-	val baseTextStyle = MaterialTheme.typography.displayLarge.copy(
-		fontWeight = FontWeight.Bold
+	val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
+		fontWeight = FontWeight.W500
 	)
 
 	BoxWithConstraints(

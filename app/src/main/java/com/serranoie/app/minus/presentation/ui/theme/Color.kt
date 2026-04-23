@@ -6,7 +6,8 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import com.serranoie.app.minus.presentation.util.combineColors
 
-val seedColor = Color(0xFFAFD367)
+val seedColorLegacy = Color(0xFFAFD367)
+val seedColor = Color(0xFFC1E1C4)
 val colorSuperBad = Color(0xFFC70909)
 val colorMin = Color(0xFF185ED6)
 val colorMax = Color(0xFFDD1414)
@@ -60,15 +61,15 @@ val colorOnEditor
 val colorGood
 	@Composable
 	@ReadOnlyComposable
-	get() = Color(0xFF81C784) // Green
+	get() = Color(0xFF81C784)
 
 val colorNotGood
 	@Composable
 	@ReadOnlyComposable
-	get() = Color(0xFFFFB74D) // Orange
+	get() = Color(0xFFFFB74D)
 
 val colorBad
 	@Composable
 	@ReadOnlyComposable
-	get() = Color(0xFFE57373) // Red
+	get() = Color(0xFFE57373)
 

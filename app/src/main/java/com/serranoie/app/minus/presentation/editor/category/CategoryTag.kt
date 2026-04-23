@@ -35,14 +35,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CategoryTag(
-	value: String,
-	onClick: () -> Unit,
-	onDelete: () -> Unit,
-	modifier: Modifier = Modifier
+	value: String, onClick: () -> Unit, onDelete: () -> Unit, modifier: Modifier = Modifier
 ) {
 	var showDeleteButton by remember { mutableStateOf(false) }
 
@@ -52,26 +50,22 @@ fun CategoryTag(
 		contentColor = MaterialTheme.colorScheme.onSurface,
 		modifier = modifier
 			.clip(CircleShape)
-			.combinedClickable(
-				onClick = {
-					if (showDeleteButton) {
-						showDeleteButton = false
-					} else {
-						onClick()
-					}
-				},
-				onLongClick = {
-					showDeleteButton = true
+			.combinedClickable(onClick = {
+				if (showDeleteButton) {
+					showDeleteButton = false
+				} else {
+					onClick()
 				}
-			)
+			}, onLongClick = {
+				showDeleteButton = true
+			})
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.heightIn(min = 28.dp)
 		) {
 			Text(
 				text = value,
-				style = MaterialTheme.typography.bodyMedium,
+				style = MaterialTheme.typography.bodyMediumCondensed,
 				modifier = Modifier
 					.padding(horizontal = 12.dp, vertical = 8.dp)
 					.heightIn(min = 28.dp)
@@ -97,7 +91,7 @@ fun CategoryTag(
 				) {
 					Icon(
 						imageVector = Icons.Default.Close,
-						contentDescription = "Delete",
+						contentDescription = "Delete category",
 						modifier = Modifier.size(16.dp),
 					)
 				}

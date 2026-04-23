@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 
 @Composable
 fun RecurrentPaymentsDivider(
@@ -66,13 +67,13 @@ fun RecurrentPaymentsDivider(
 			)
 
 			Text(
-				text = title, style = MaterialTheme.typography.labelMedium, color = color
+				text = title, style = MaterialTheme.typography.labelMediumCondensed, color = color
 			)
 		}
 
 		Text(
 			text = "$itemCount",
-			style = MaterialTheme.typography.labelMedium,
+			style = MaterialTheme.typography.labelMediumCondensed,
 			color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
 		)
 	}

@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -17,14 +18,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.displayMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 
 @Composable
 fun StatCard(
@@ -36,9 +41,10 @@ fun StatCard(
 		containerColor = MaterialTheme.colorScheme.surfaceDim,
 		contentColor = MaterialTheme.colorScheme.onSurfaceVariant
 	),
-	valueFontSize: TextUnit = MaterialTheme.typography.titleLarge.fontSize,
-	valueFontStyle: TextStyle = MaterialTheme.typography.displayMedium,
-	labelFontStyle: TextStyle = MaterialTheme.typography.labelMedium,
+	valueFontSize: TextUnit = MaterialTheme.typography.titleLargeEmphasized.fontSize,
+	valueFontStyle: TextStyle = MaterialTheme.typography.displayMediumCondensed,
+	labelFontStyle: TextStyle = MaterialTheme.typography.labelMediumCondensed,
+	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 	content: @Composable ColumnScope.() -> Unit = {},
 	backdropContent: @Composable () -> Unit = {},
 ) {
@@ -64,23 +70,39 @@ fun StatCard(
 
 			Column(
 				Modifier
+					.align(Alignment.Center)
 					.fillMaxWidth()
-					.padding(contentPadding)
+					.padding(contentPadding),
+				horizontalAlignment = horizontalAlignment
 			) {
 				Text(
 					text = value,
+					modifier = Modifier.fillMaxWidth(),
 					style = valueFontStyle,
 					fontSize = valueFontSize,
 					overflow = TextOverflow.Ellipsis,
 					softWrap = false,
-					lineHeight = TextUnit(0.2f, TextUnitType.Em)
+					lineHeight = TextUnit(0.2f, TextUnitType.Em),
+					textAlign = when (horizontalAlignment) {
+						Alignment.Start -> TextAlign.Start
+						Alignment.CenterHorizontally -> TextAlign.Center
+						Alignment.End -> TextAlign.End
+						else -> TextAlign.Unspecified
+					}
 				)
 				Text(
 					text = label,
+					modifier = Modifier.fillMaxWidth().basicMarquee(),
 					style = labelFontStyle,
 					color = textColor.copy(alpha = 0.6f),
 					overflow = TextOverflow.Ellipsis,
 					softWrap = false,
+					textAlign = when (horizontalAlignment) {
+						Alignment.Start -> TextAlign.Start
+						Alignment.CenterHorizontally -> TextAlign.Center
+						Alignment.End -> TextAlign.End
+						else -> TextAlign.Unspecified
+					}
 				)
 				Spacer(modifier = Modifier.height(4.dp))
 
@@ -88,7 +110,8 @@ fun StatCard(
 					LocalContentColor provides textColor,
 				) {
 					Column(
-						//modifier = Modifier.fillMaxWidth(),
+						modifier = Modifier.fillMaxWidth(),
+						horizontalAlignment = horizontalAlignment,
 						content = content,
 					)
 				}

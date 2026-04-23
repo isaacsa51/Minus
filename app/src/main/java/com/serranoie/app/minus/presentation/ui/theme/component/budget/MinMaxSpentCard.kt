@@ -20,12 +20,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorMax
 import com.serranoie.app.minus.presentation.ui.theme.colorMin
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
@@ -109,17 +111,17 @@ fun MinMaxSpentCard(
 				if (spent.comment.isNotEmpty()) {
 					Row(
 						modifier = Modifier.padding(top = 4.dp),
+						verticalAlignment = Alignment.CenterVertically,
 					) {
 						Icon(
 							modifier = Modifier.padding(top = 2.dp).size(16.dp),
 							imageVector = Icons.Rounded.Label,
 							contentDescription = null,
 						)
-						Spacer(modifier = Modifier.width(6.dp))
+						Spacer(modifier = Modifier.width(8.dp))
 						Text(
-
 							text = spent.comment,
-							style = MaterialTheme.typography.bodyMedium,
+							style = MaterialTheme.typography.bodyMediumCondensed,
 						)
 					}
 				}

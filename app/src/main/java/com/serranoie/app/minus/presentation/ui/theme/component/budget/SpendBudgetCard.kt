@@ -35,9 +35,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.harmonizeWithColor
 import com.serranoie.app.minus.presentation.util.numberFormat
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -62,14 +64,9 @@ private fun DrawScope.drawWavyPattern(
     val halfPeriod = periodPx / 2
 
     val wavyPath = Path().apply {
-        // Start at top-left
         moveTo(x = 0f, y = 0f)
-        
-        // Line to the wavy edge start at top
         lineTo(x = edgeX, y = 0f)
         
-        // Draw the wavy vertical edge going down
-        // Use shift to animate the wave up/down
         val phaseOffset = shift * halfPeriod
         val wavesNeeded = kotlin.math.ceil(height / halfPeriod + 2).toInt()
         
@@ -95,7 +92,6 @@ private fun DrawScope.drawWavyPattern(
             }
         }
         
-        // Close the path at bottom
         lineTo(x = 0f, y = height)
         close()
     }
@@ -111,14 +107,12 @@ fun SpendBudgetCard(
 ) {
 	val context: Context = LocalContext.current
 
-    // Calculate percentage spent (0.0 to 1.0+)
     val percentSpent = remember(budget, spend) {
         if (budget > BigDecimal.ZERO) {
             spend.divide(budget, 4, RoundingMode.HALF_UP)
         } else BigDecimal.ZERO
     }
 
-    // Calculate percentage remaining for display
     val percentRemaining = remember(percentSpent) {
         BigDecimal(1).minus(percentSpent).coerceAtLeast(BigDecimal.ZERO)
     }
@@ -130,12 +124,10 @@ fun SpendBudgetCard(
         formatter.format(percentRemaining.multiply(BigDecimal(100)))
     }
 
-    // Animate the wavy pattern shift - use mutableFloatStateOf to avoid recompositions
     var shift by remember { mutableFloatStateOf(0f) }
     val animatable = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        // Infinite animation loop
         while (true) {
             animatable.animateTo(
                 targetValue = 1f,
@@ -145,14 +137,11 @@ fun SpendBudgetCard(
         }
     }
 
-    // Update shift value from animatable
     shift = animatable.value
 
-    // Get colors - use static colors to avoid composable calls inside remember
     val primaryColor = MaterialTheme.colorScheme.primary
     val isDarkTheme = isSystemInDarkTheme()
 
-    // Calculate the color based on percentage spent
     val combinedColor = remember(percentSpent) {
         combineColors(
             listOf(GoodColor, NotGoodColor, BadColor),
@@ -169,11 +158,10 @@ fun SpendBudgetCard(
     val periodPx = remember { with(density) { 30.dp.toPx() } }
     val amplitudePx = remember { with(density) { 4.dp.toPx() } }
 
-    // Get current content color for the text
     val contentColor = LocalContentColor.current
-    val currencyFormatter = remember { com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat("USD") }
+    val currencyFormatter = remember { symbolOnlyCurrencyFormat("USD") }
 
-	_root_ide_package_.com.serranoie.app.minus.presentation.ui.theme.component.StatCard(
+	StatCard(
 		modifier = modifier
 			.fillMaxWidth()
 			.heightIn(min = 80.dp, max = 120.dp),
@@ -219,7 +207,6 @@ fun SpendBudgetCard(
 private fun PreviewSpendBudgetCard() {
     MinusTheme {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Low spend - green
             SpendBudgetCard(
                 modifier = Modifier.height(IntrinsicSize.Min),
                 spend = BigDecimal(3740),
@@ -228,7 +215,6 @@ private fun PreviewSpendBudgetCard() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Medium spend - yellow/orange
             SpendBudgetCard(
                 modifier = Modifier.height(IntrinsicSize.Min),
                 spend = BigDecimal(30740),
@@ -237,7 +223,6 @@ private fun PreviewSpendBudgetCard() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // High spend - red
             SpendBudgetCard(
                 modifier = Modifier.height(IntrinsicSize.Min),
                 spend = BigDecimal(45740),
@@ -246,7 +231,6 @@ private fun PreviewSpendBudgetCard() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // No spend - full green
             SpendBudgetCard(
                 modifier = Modifier.height(IntrinsicSize.Min),
                 spend = BigDecimal.ZERO,

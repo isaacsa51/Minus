@@ -15,7 +15,7 @@ import java.math.BigDecimal
 import java.text.NumberFormat
 
 @Composable
-fun DayTotalItem(total: BigDecimal, currencyFormat: NumberFormat) {
+fun DayTotalItem(total: BigDecimal, currencyFormat: NumberFormat, modifier: Modifier = Modifier) {
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -24,7 +24,7 @@ fun DayTotalItem(total: BigDecimal, currencyFormat: NumberFormat) {
 	) {
 		Text(
 			text = "Day total: ${currencyFormat.format(total)}",
-			style = MaterialTheme.typography.labelLarge,
+			style = MaterialTheme.typography.labelLargeEmphasized,
 			color = MaterialTheme.colorScheme.onSurfaceVariant
 		)
 	}

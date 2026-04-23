@@ -34,7 +34,7 @@ fun NoTransactionsView(modifier: Modifier = Modifier) {
 		Spacer(modifier = Modifier.height(16.dp))
 		Text(
 			text = "Sin gastos registrados",
-			style = MaterialTheme.typography.titleMedium,
+			style = MaterialTheme.typography.titleMediumEmphasized,
 			color = MaterialTheme.colorScheme.onSurfaceVariant
 		)
 		Spacer(modifier = Modifier.height(8.dp))

@@ -7,7 +7,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,9 +39,13 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.onboarding.periodLabel
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -66,26 +68,17 @@ fun BudgetPill(
 	val totalSpentInPeriod = budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO
 	val totalSpentToday = budgetState?.totalSpentToday ?: BigDecimal.ZERO
 
-	// Use the viewPeriod parameter instead of reading from budgetSettings
 	val period = viewPeriod
-
-	// Calculate budgets for different periods based on daily budget
 	val dailyBudgetAmount = dailyBudget
 	val weeklyBudgetAmount = dailyBudget.multiply(BigDecimal(7))
 	val biweeklyBudgetAmount = dailyBudget.multiply(BigDecimal(14))
 	val monthlyBudgetAmount = dailyBudget.multiply(BigDecimal(30))
-
-	// Spent values
 	val dailySpent = totalSpentToday
 	val periodSpentAggregate = totalSpentInPeriod
-
-	// Calculate remaining for each split option
 	val dailyRemainingAmount = dailyBudgetAmount.subtract(dailySpent)
 	val weeklyRemainingAmount = weeklyBudgetAmount.subtract(periodSpentAggregate)
 	val biweeklyRemainingAmount = biweeklyBudgetAmount.subtract(periodSpentAggregate)
 	val monthlyRemainingAmount = monthlyBudgetAmount.subtract(periodSpentAggregate)
-
-	// Determine which budget values to use based on selected view period
 	val (periodBudget, periodSpent, periodRemaining) = when (period) {
 		BudgetPeriod.DAILY -> Triple(dailyBudgetAmount, dailySpent, dailyRemainingAmount)
 		BudgetPeriod.WEEKLY -> Triple(
@@ -101,14 +94,10 @@ fun BudgetPill(
 		)
 	}
 
-	// Check if current period is over budget
 	val isCurrentPeriodOverBudget = periodRemaining < BigDecimal.ZERO
-
 	val isDailyExhausted = dailyRemainingAmount <= BigDecimal.ZERO
 	val isWeeklyExhausted = weeklyRemainingAmount <= BigDecimal.ZERO
 	val isBiweeklyExhausted = biweeklyRemainingAmount <= BigDecimal.ZERO
-
-	// Determine exhausted message for smaller splits of the selected period
 	val exhaustedMessage = when (period) {
 		BudgetPeriod.WEEKLY -> {
 			if (weeklyRemainingAmount > BigDecimal.ZERO && isDailyExhausted) {
@@ -150,10 +139,7 @@ fun BudgetPill(
 		else -> null
 	}
 
-	// Show exhausted message if current period is over budget but we're showing a longer period with budget
 	val showExhaustedMessage = exhaustedMessage != null
-
-	// Calculate progress based on the selected period
 	val spendProgress = if (periodBudget > BigDecimal.ZERO) {
 		periodSpent.divide(periodBudget, 2, RoundingMode.HALF_UP).toFloat().coerceIn(0f, 1f)
 	} else 0f
@@ -206,27 +192,27 @@ fun BudgetPill(
 					verticalAlignment = Alignment.CenterVertically,
 					horizontalArrangement = if (isCurrentPeriodOverBudget) Arrangement.Center else Arrangement.SpaceBetween
 				) {
-					// Status label on left
 					StatusLabel(
 						budgetState = budgetState,
 						budgetPeriod = period,
 						isOverBudget = isCurrentPeriodOverBudget,
 						exhaustedMessage = exhaustedMessage,
-						modifier = if (isCurrentPeriodOverBudget) Modifier else Modifier.padding(start = 18.dp),
+						modifier = if (isCurrentPeriodOverBudget) Modifier else Modifier.padding(
+							start = 18.dp
+						),
 					)
 
 					if (!isCurrentPeriodOverBudget) {
 						Spacer(modifier = Modifier.weight(1f))
 					}
 
-					// Value label on right
 					if (!isCurrentPeriodOverBudget) {
 						Text(
-						text = currencyFormat.format(periodRemaining),
-						style = MaterialTheme.typography.titleMedium.copy(
-							fontWeight = FontWeight.Bold
-						), color = contentColor, modifier = Modifier.padding(end = 16.dp)
-					)
+							text = currencyFormat.format(periodRemaining),
+							style = MaterialTheme.typography.titleSmallCondensed,
+							color = contentColor,
+							modifier = Modifier.padding(end = 24.dp)
+						)
 					}
 				}
 			}
@@ -234,10 +220,6 @@ fun BudgetPill(
 	}
 }
 
-
-/**
- * Status label showing budget period text.
- */
 @Composable
 private fun StatusLabel(
 	budgetState: BudgetState?,
@@ -267,7 +249,7 @@ private fun StatusLabel(
 
 	Column(
 		modifier = modifier
-			.height(if (exhaustedMessage != null) 44.dp else 44.dp)
+			.height(44.dp)
 			.animateContentSize(animationSpec = tween(300)),
 		verticalArrangement = Arrangement.Center,
 	) {
@@ -278,9 +260,7 @@ private fun StatusLabel(
 			Spacer(modifier = Modifier.width(textStartOffset))
 			Text(
 				text = label,
-				style = MaterialTheme.typography.titleMedium.copy(
-					fontSize = MaterialTheme.typography.titleMedium.fontSize
-				),
+				style = if (isOverBudget) MaterialTheme.typography.titleSmallEmphasized else MaterialTheme.typography.bodyLargeCondensed,
 				color = textColor,
 				modifier = Modifier.basicMarquee()
 			)
@@ -293,7 +273,7 @@ private fun StatusLabel(
 		) {
 			Text(
 				text = exhaustedMessage.orEmpty(),
-				style = MaterialTheme.typography.labelSmall,
+				style = MaterialTheme.typography.labelSmallCondensed,
 				color = colorBad,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
@@ -307,109 +287,117 @@ private fun StatusLabel(
 @Preview(name = "BudgetPill")
 @Composable
 private fun PreviewBudgetPill() {
-	BudgetPill(
-		budgetState = BudgetState(
-			remainingToday = BigDecimal("110.00"),
-			totalSpentToday = BigDecimal("12.50"),
-			dailyBudget = BigDecimal("122.50"),
-			daysRemaining = 15,
-			progress = 0.1f,
-			isOverBudget = false,
-			totalBudget = BigDecimal("500.00"),
-			totalSpentInPeriod = BigDecimal("12.50")
-		),
-		budgetSettings = BudgetSettings(
-			totalBudget = BigDecimal("500.00"),
-			period = BudgetPeriod.DAILY,
-			startDate = LocalDate.now(),
-			currencyCode = "MXN"
-		),
-		viewPeriod = BudgetPeriod.DAILY,
-		currencyCode = "MXN",
-		onOpenSettings = { },
-		onOpenBudgetSheet = { },
-	)
+	MinusTheme {
+		BudgetPill(
+			budgetState = BudgetState(
+				remainingToday = BigDecimal("110.00"),
+				totalSpentToday = BigDecimal("12.50"),
+				dailyBudget = BigDecimal("122.50"),
+				daysRemaining = 15,
+				progress = 0.1f,
+				isOverBudget = false,
+				totalBudget = BigDecimal("500.00"),
+				totalSpentInPeriod = BigDecimal("12.50")
+			),
+			budgetSettings = BudgetSettings(
+				totalBudget = BigDecimal("500.00"),
+				period = BudgetPeriod.DAILY,
+				startDate = LocalDate.now(),
+				currencyCode = "MXN"
+			),
+			viewPeriod = BudgetPeriod.DAILY,
+			currencyCode = "MXN",
+			onOpenSettings = { },
+			onOpenBudgetSheet = { },
+		)
+	}
 }
 
 @Preview
 @Composable
 private fun PreviewBudgetPillCaution() {
-	BudgetPill(
-		budgetState = BudgetState(
-			remainingToday = BigDecimal("110.00"),
-			totalSpentToday = BigDecimal("85.50"),
-			dailyBudget = BigDecimal("122.50"),
-			daysRemaining = 15,
-			progress = 0.1f,
-			isOverBudget = false,
-			totalBudget = BigDecimal("500.00"),
-			totalSpentInPeriod = BigDecimal("12.50")
-		),
-		budgetSettings = BudgetSettings(
-			totalBudget = BigDecimal("500.00"),
-			period = BudgetPeriod.DAILY,
-			startDate = LocalDate.now(),
-			currencyCode = "MXN"
-		),
-		viewPeriod = BudgetPeriod.DAILY,
-		currencyCode = "MXN",
-		onOpenSettings = { },
-		onOpenBudgetSheet = { },
-	)
+	MinusTheme {
+
+		BudgetPill(
+			budgetState = BudgetState(
+				remainingToday = BigDecimal("110.00"),
+				totalSpentToday = BigDecimal("85.50"),
+				dailyBudget = BigDecimal("122.50"),
+				daysRemaining = 15,
+				progress = 0.1f,
+				isOverBudget = false,
+				totalBudget = BigDecimal("500.00"),
+				totalSpentInPeriod = BigDecimal("12.50")
+			),
+			budgetSettings = BudgetSettings(
+				totalBudget = BigDecimal("500.00"),
+				period = BudgetPeriod.DAILY,
+				startDate = LocalDate.now(),
+				currencyCode = "MXN"
+			),
+			viewPeriod = BudgetPeriod.DAILY,
+			currencyCode = "MXN",
+			onOpenSettings = { },
+			onOpenBudgetSheet = { },
+		)
+	}
 }
 
 
 @Preview
 @Composable
 private fun PreviewBudgetPillBad() {
-	BudgetPill(
-		budgetState = BudgetState(
-			remainingToday = BigDecimal("110.00"),
-			totalSpentToday = BigDecimal("115.50"),
-			dailyBudget = BigDecimal("110.50"),
-			daysRemaining = 15,
-			progress = 0.1f,
-			isOverBudget = false,
-			totalBudget = BigDecimal("500.00"),
-			totalSpentInPeriod = BigDecimal("12.50")
-		),
-		budgetSettings = BudgetSettings(
-			totalBudget = BigDecimal("500.00"),
-			period = BudgetPeriod.DAILY,
-			startDate = LocalDate.now(),
-			currencyCode = "MXN"
-		),
-		viewPeriod = BudgetPeriod.DAILY,
-		currencyCode = "MXN",
-		onOpenSettings = { },
-		onOpenBudgetSheet = { },
-	)
+	MinusTheme {
+		BudgetPill(
+			budgetState = BudgetState(
+				remainingToday = BigDecimal("110.00"),
+				totalSpentToday = BigDecimal("115.50"),
+				dailyBudget = BigDecimal("110.50"),
+				daysRemaining = 15,
+				progress = 0.1f,
+				isOverBudget = false,
+				totalBudget = BigDecimal("500.00"),
+				totalSpentInPeriod = BigDecimal("12.50")
+			),
+			budgetSettings = BudgetSettings(
+				totalBudget = BigDecimal("500.00"),
+				period = BudgetPeriod.DAILY,
+				startDate = LocalDate.now(),
+				currencyCode = "MXN"
+			),
+			viewPeriod = BudgetPeriod.DAILY,
+			currencyCode = "MXN",
+			onOpenSettings = { },
+			onOpenBudgetSheet = { },
+		)
+	}
 }
 
 @Preview(name = "BudgetPill Weekly with Daily Exhausted")
 @Composable
 private fun PreviewBudgetPillWeeklyDailyExhausted() {
-	// Simulate scenario where daily budget is exhausted but weekly still has budget
-	BudgetPill(
-		budgetState = BudgetState(
-			remainingToday = BigDecimal("-50.00"), // Daily over budget
-			totalSpentToday = BigDecimal("150.00"), // Spent more than daily budget
-			dailyBudget = BigDecimal("100.00"),
-			daysRemaining = 15,
-			progress = 0.1f,
-			isOverBudget = false,
-			totalBudget = BigDecimal("1500.00"),
-			totalSpentInPeriod = BigDecimal("150.00")
-		),
-		budgetSettings = BudgetSettings(
-			totalBudget = BigDecimal("1500.00"),
-			period = BudgetPeriod.DAILY,
-			startDate = LocalDate.now(),
-			currencyCode = "MXN"
-		),
-		viewPeriod = BudgetPeriod.WEEKLY,
-		currencyCode = "MXN",
-		onOpenSettings = { },
-		onOpenBudgetSheet = { },
-	)
+	MinusTheme {
+		BudgetPill(
+			budgetState = BudgetState(
+				remainingToday = BigDecimal("-50.00"),
+				totalSpentToday = BigDecimal("150.00"),
+				dailyBudget = BigDecimal("100.00"),
+				daysRemaining = 15,
+				progress = 0.1f,
+				isOverBudget = false,
+				totalBudget = BigDecimal("1500.00"),
+				totalSpentInPeriod = BigDecimal("150.00")
+			),
+			budgetSettings = BudgetSettings(
+				totalBudget = BigDecimal("1500.00"),
+				period = BudgetPeriod.DAILY,
+				startDate = LocalDate.now(),
+				currencyCode = "MXN"
+			),
+			viewPeriod = BudgetPeriod.WEEKLY,
+			currencyCode = "MXN",
+			onOpenSettings = { },
+			onOpenBudgetSheet = { },
+		)
+	}
 }

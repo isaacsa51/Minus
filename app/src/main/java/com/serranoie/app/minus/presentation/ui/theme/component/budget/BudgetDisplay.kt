@@ -42,6 +42,8 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyLargeCondensed
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.countDays
 import com.serranoie.app.minus.presentation.util.prettyDate
@@ -83,7 +85,7 @@ fun BudgetDisplay(
 		),
 		label = "Presupuesto total",
 		value = currencyFormat.format(displayBudget),
-		valueFontStyle = MaterialTheme.typography.displayMedium,
+		valueFontStyle = MaterialTheme.typography.displaySmallEmphasized,
 		valueFontSize = if (bigVariant) MaterialTheme.typography.headlineLarge.fontSize else MaterialTheme.typography.titleLarge.fontSize,
 		content = {
 			Spacer(modifier = Modifier.height(16.dp))
@@ -105,8 +107,8 @@ fun BudgetDisplay(
 						),
 						softWrap = false,
 						overflow = TextOverflow.Ellipsis,
-						style = MaterialTheme.typography.bodyMedium,
-						fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
+						style = MaterialTheme.typography.bodyMediumCondensed,
+//						fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
 					)
 				}
 
@@ -162,8 +164,8 @@ fun BudgetDisplay(
 								),
 								softWrap = false,
 								overflow = TextOverflow.Ellipsis,
-								style = MaterialTheme.typography.bodyMedium,
-								fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
+								style = MaterialTheme.typography.bodyMediumCondensed,
+//								fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
 							)
 
 							Cross {
@@ -180,8 +182,8 @@ fun BudgetDisplay(
 										},
 										softWrap = false,
 										overflow = TextOverflow.Ellipsis,
-										style = MaterialTheme.typography.bodyMedium,
-										fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
+										style = MaterialTheme.typography.bodyMediumCondensed,
+//										fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
 									)
 								}
 							}
@@ -199,8 +201,8 @@ fun BudgetDisplay(
 							},
 							softWrap = false,
 							overflow = TextOverflow.Ellipsis,
-							style = MaterialTheme.typography.bodyMedium,
-							fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
+							style = MaterialTheme.typography.bodyMediumCondensed,
+//							fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
 						)
 					}
 				}
@@ -230,7 +232,7 @@ fun CountDaysChip(
 			Text(
 				modifier = Modifier.padding(12.dp, 0.dp),
 				text = if (totalDays >= 2 || totalDays == 0) "$totalDays días" else "$totalDays día",
-				style = MaterialTheme.typography.bodyMedium,
+				style = MaterialTheme.typography.bodyMediumCondensed,
 			)
 		}
 	}

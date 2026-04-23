@@ -1,10 +1,22 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.date
 
-import logcat.logcat
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,12 +28,15 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.util.countDays
 import com.serranoie.app.minus.presentation.util.countDaysToToday
 import java.util.Date
@@ -75,13 +90,14 @@ fun DaysLeftCard(
 				) {
 					Text(
 						text = restDays.toString(),
-						style = MaterialTheme.typography.displayLarge.copy(
+						style = MaterialTheme.typography.displayLargeEmphasized.copy(
 							fontSize = MaterialTheme.typography.titleLarge.fontSize
 						)
 					)
 					Text(
-						text = "Días restantes",
-						style = MaterialTheme.typography.labelMedium,
+						text = "Días\nrestantes",
+						style = MaterialTheme.typography.labelMediumCondensed.copy(lineHeight = 12.sp),
+						textAlign = TextAlign.Center,
 						color = textColor.copy(alpha = 0.6f),
 					)
 					Spacer(modifier = Modifier.height(4.dp))
@@ -114,7 +130,10 @@ class ArcShape(
 			arcTo(
 				Rect(
 					offset = Offset(thicknessPx, thicknessPx),
-					size = Size(width = size.width - thicknessPx * 2, height = size.height - thicknessPx * 2),
+					size = Size(
+						width = size.width - thicknessPx * 2,
+						height = size.height - thicknessPx * 2
+					),
 				),
 				-360 * fixedProgress + shift,
 				360 * fixedProgress,
@@ -127,6 +146,7 @@ class ArcShape(
 		op(wavyPath, boundsPath, PathOperation.Intersect)
 	})
 }
+
 @Preview(name = "DaysLeftCard")
 @Composable
 private fun PreviewDaysLeftCard() {

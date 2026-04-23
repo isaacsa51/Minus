@@ -21,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -51,8 +52,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendsCoun
 import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
 import java.math.BigDecimal
 import java.util.Date
-
-const val ANALYTICS_SHEET = "finishPeriod"
 
 data class AnalyticsState(
 	val periodFinished: Boolean = false,
@@ -92,24 +91,33 @@ fun Analytics(
 		LocalWindowInsets.current.calculateBottomPadding().coerceAtLeast(16.dp)
 	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
 
-	Surface(modifier = Modifier.fillMaxSize()) {
-		Box(modifier = Modifier.fillMaxSize()) {
+	Scaffold(
+		modifier = Modifier.fillMaxSize(),
+		topBar = {
+			if (!state.periodFinished) {
+				MiddlePeriodHeader(
+					onClose = actions.onClose,
+				)
+			}
+		},
+	) { paddingValues ->
+		Box(
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(paddingValues)
+		) {
 			Column(
 				Modifier
 					.fillMaxSize()
 					.verticalScroll(scrollState)
-					.padding(top = statusBarHeight)
 			) {
-				if (!state.periodFinished) {
-					MiddlePeriodHeader(
-						onClose = actions.onClose,
-					)
-				} else {
+				if (state.periodFinished) {
 					FinishedPeriodHeader(
 						scrollState = scrollState,
 						hasSpends = state.spends.isNotEmpty(),
 					)
 				}
+
 				Spacer(modifier = Modifier.height(16.dp))
 				BudgetDisplay(
 						budget = state.wholeBudget,
@@ -190,6 +198,8 @@ Spacer(modifier = Modifier.height(16.dp))
 						Spacer(modifier = Modifier.width(16.dp))
 						AverageSpendCard(
 							spends = state.spends,
+							startDate = state.startPeriodDate,
+							finishDate = state.finishPeriodDate,
 							currency = "MXN",
 							modifier = Modifier
 								.weight(1f)

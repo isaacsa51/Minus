@@ -17,19 +17,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.util.HarmonizedColorPalette
 import com.serranoie.app.minus.presentation.util.numberFormat
 import java.math.BigDecimal
 
 @Composable
 fun CategoryAmount(
-	modifier: Modifier = Modifier,
 	value: String,
+	modifier: Modifier = Modifier,
 	amount: BigDecimal = BigDecimal.ZERO,
 	isSpecial: Boolean = false,
 	palette: HarmonizedColorPalette? = null,
 	currency: String = "MXN",
-	onClick: (() -> Unit)? = null,
+	onClick: (() -> Unit)? = null
 ) {
 	val context = LocalContext.current
 
@@ -48,7 +49,7 @@ fun CategoryAmount(
 				text = value,
 				softWrap = false,
 				overflow = TextOverflow.Ellipsis,
-				style = MaterialTheme.typography.bodyMedium.copy(
+				style = MaterialTheme.typography.bodyMediumCondensed.copy(
 					fontStyle = if (isSpecial) FontStyle.Italic else FontStyle.Normal,
 				),
 			)
@@ -60,7 +61,7 @@ fun CategoryAmount(
 					currency = currency,
 				),
 				softWrap = false,
-				style = MaterialTheme.typography.bodyMedium,
+				style = MaterialTheme.typography.bodyMediumCondensed,
 			)
 		}
 	}
@@ -72,7 +73,7 @@ fun CategoryAmount(
 private fun PreviewCategoryAmount() {
 	MinusTheme {
 		CategoryAmount(
-			value = "Alimentacion",
+			value = "Comida",
 			amount = BigDecimal(100),
 		)
 	}

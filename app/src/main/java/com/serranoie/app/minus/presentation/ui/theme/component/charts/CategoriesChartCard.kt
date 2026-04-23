@@ -130,8 +130,10 @@ fun CategoriesChartCard(
 		result
 	}
 
+	val isEmpty = tags.isEmpty() || (tags.size == 1 && tags.first().name == labelWithoutTag)
+
 	Card(
-		modifier = modifier.fillMaxHeight(),
+		modifier = if (isEmpty) modifier else modifier.fillMaxHeight(),
 		shape = RoundedCornerShape(22.dp),
 		colors = CardDefaults.cardColors(
 			containerColor = combineColors(
@@ -141,7 +143,7 @@ fun CategoriesChartCard(
 			),
 		)
 	) {
-		if (tags.size == 1 && tags.first().name == labelWithoutTag) {
+		if (isEmpty) {
 			Box {
 				Column(
 					modifier = Modifier
@@ -150,17 +152,20 @@ fun CategoriesChartCard(
 					verticalArrangement = Arrangement.Center,
 					horizontalAlignment = Alignment.CenterHorizontally,
 				) {
-					Row(Modifier.fillMaxWidth()) {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						verticalAlignment = Alignment.CenterVertically
+					) {
 						DonutChart(
 							modifier = Modifier
-								.padding(end = 16.dp, bottom = 8.dp)
+								.padding(end = 16.dp)
 								.size(64.dp),
 							items = listOf(CategoryUsage("", BigDecimal(360), stubColor)),
 						)
 						Column {
 							Text(
 								text = "We can't split your spends by categories",
-								style = MaterialTheme.typography.bodyLarge.copy(
+								style = MaterialTheme.typography.bodyLargeEmphasized.copy(
 									color = MaterialTheme.colorScheme.onSurfaceVariant,
 								),
 							)
@@ -189,21 +194,20 @@ fun CategoriesChartCard(
 				items = tags,
 			)
 			FlowRow(
-				verticalArrangement = Arrangement.spacedBy(0.dp),
-				horizontalArrangement = Arrangement.spacedBy(0.dp),
-				modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth()
+				modifier = Modifier
+					.padding(horizontal = 8.dp)
+					.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				verticalArrangement = Arrangement.spacedBy(0.dp)
 			) {
 				tags.forEach { tag ->
 					val categoryTransactions = remember(spends, tag.name) {
 						spends.filter {
-							val category = if (it.comment.trim()
-									.isEmpty()
-							) labelWithoutTag else it.comment.trim()
+							val category = it.comment.trim().ifEmpty { labelWithoutTag }
 							category == tag.name
 						}
 					}
 					CategoryAmount(
-						modifier = Modifier.padding(horizontal = 4.dp),
 						value = tag.name,
 						amount = tag.amount,
 						palette = tag.color,
@@ -217,7 +221,6 @@ fun CategoriesChartCard(
 			}
 		}
 	}
-
 }
 
 @Preview(name = "CategoriesChart", device = "spec:width=800px,height=800px")
@@ -259,6 +262,16 @@ private fun PreviewCategoriesChart() {
 					isDeleted = false
 				),
 			)
+		)
+	}
+}
+
+@Preview(name = "CategoriesChart - Empty state", device = "spec:width=800px,height=800px")
+@Composable
+private fun PreviewCategoriesChartEmptyState() {
+	MinusTheme {
+		CategoriesChartCard(
+			spends = emptyList(),
 		)
 	}
 }

@@ -41,7 +41,7 @@ val GoogleSansFlexDisplayMediumEmphasized = FontFamily(
 val GoogleSansFlexDisplaySmallEmphasized = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(600), FontVariation.width(155f)
+			FontVariation.weight(700), FontVariation.width(125f)
 		)
 	)
 )
@@ -95,7 +95,7 @@ val GoogleSansFlexTitleMediumEmphasized = FontFamily(
 val GoogleSansFlexTitleSmallEmphasized = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(600), FontVariation.width(135f)
+			FontVariation.weight(600), FontVariation.width(115f)
 		)
 	)
 )
@@ -131,7 +131,7 @@ val GoogleSansFlexBodySmallEmphasized = FontFamily(
 val GoogleSansFlexLabelLargeEmphasized = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(700), FontVariation.width(125f)
+			FontVariation.weight(500), FontVariation.width(115f)
 		)
 	)
 )
@@ -159,7 +159,7 @@ val GoogleSansFlexLabelSmallEmphasized = FontFamily(
 val GoogleSansFlexDisplayLargeCondensed = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(700), FontVariation.width(75f)
+			FontVariation.weight(500), FontVariation.width(65f)
 		)
 	)
 )
@@ -240,7 +240,7 @@ val GoogleSansFlexTitleSmallCondensed = FontFamily(
 val GoogleSansFlexBodyLargeCondensed = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(500), FontVariation.width(85f)
+			FontVariation.weight(500), FontVariation.width(70f)
 		)
 	)
 )
@@ -249,7 +249,7 @@ val GoogleSansFlexBodyLargeCondensed = FontFamily(
 val GoogleSansFlexBodyMediumCondensed = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(500), FontVariation.width(85f)
+			FontVariation.weight(500), FontVariation.width(80f)
 		)
 	)
 )
@@ -267,7 +267,7 @@ val GoogleSansFlexBodySmallCondensed = FontFamily(
 val GoogleSansFlexLabelLargeCondensed = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(700), FontVariation.width(75f)
+			FontVariation.weight(500), FontVariation.width(75f)
 		)
 	)
 )
@@ -276,7 +276,7 @@ val GoogleSansFlexLabelLargeCondensed = FontFamily(
 val GoogleSansFlexLabelMediumCondensed = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(700), FontVariation.width(75f)
+			FontVariation.weight(500), FontVariation.width(65f)
 		)
 	)
 )
@@ -572,6 +572,26 @@ fun Typography.withCondensedStyles(): Typography {
 		)
 	)
 }
+
+val Typography.displayLargeCondensed: TextStyle get() = displayLarge.copy(fontFamily = GoogleSansFlexDisplayLargeCondensed, fontSize = 64.sp, lineHeight = 72.sp, letterSpacing = 0.sp)
+val Typography.displayMediumCondensed: TextStyle get() = displayMedium.copy(fontFamily = GoogleSansFlexDisplayMediumCondensed, fontSize = 52.sp, lineHeight = 60.sp, letterSpacing = 0.sp)
+val Typography.displaySmallCondensed: TextStyle get() = displaySmall.copy(fontFamily = GoogleSansFlexDisplaySmallCondensed, fontSize = 44.sp, lineHeight = 52.sp, letterSpacing = 0.sp)
+
+val Typography.headlineLargeCondensed: TextStyle get() = headlineLarge.copy(fontFamily = GoogleSansFlexHeadlineLargeCondensed, fontSize = 36.sp, lineHeight = 44.sp, letterSpacing = 0.sp)
+val Typography.headlineMediumCondensed: TextStyle get() = headlineMedium.copy(fontFamily = GoogleSansFlexHeadlineMediumCondensed, fontSize = 32.sp, lineHeight = 40.sp, letterSpacing = 0.sp)
+val Typography.headlineSmallCondensed: TextStyle get() = headlineSmall.copy(fontFamily = GoogleSansFlexHeadlineSmallCondensed, fontSize = 28.sp, lineHeight = 36.sp, letterSpacing = 0.sp)
+
+val Typography.titleLargeCondensed: TextStyle get() = titleLarge.copy(fontFamily = GoogleSansFlexTitleLargeCondensed, fontSize = 24.sp, lineHeight = 32.sp, letterSpacing = 0.15.sp)
+val Typography.titleMediumCondensed: TextStyle get() = titleMedium.copy(fontFamily = GoogleSansFlexTitleMediumCondensed, fontSize = 18.sp, lineHeight = 26.sp, letterSpacing = 0.2.sp)
+val Typography.titleSmallCondensed: TextStyle get() = titleSmall.copy(fontFamily = GoogleSansFlexTitleSmallCondensed, fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.15.sp)
+
+val Typography.bodyLargeCondensed: TextStyle get() = bodyLarge.copy(fontFamily = GoogleSansFlexBodyLargeCondensed, fontSize = 18.sp, lineHeight = 28.sp, letterSpacing = 0.6.sp)
+val Typography.bodyMediumCondensed: TextStyle get() = bodyMedium.copy(fontFamily = GoogleSansFlexBodyMediumCondensed, fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.4.sp)
+val Typography.bodySmallCondensed: TextStyle get() = bodySmall.copy(fontFamily = GoogleSansFlexBodySmallCondensed, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.5.sp)
+
+val Typography.labelLargeCondensed: TextStyle get() = labelLarge.copy(fontFamily = GoogleSansFlexLabelLargeCondensed, fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.15.sp)
+val Typography.labelMediumCondensed: TextStyle get() = labelMedium.copy(fontFamily = GoogleSansFlexLabelMediumCondensed, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.6.sp)
+val Typography.labelSmallCondensed: TextStyle get() = labelSmall.copy(fontFamily = GoogleSansFlexLabelSmallCondensed, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.6.sp)
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 val ExpressiveTypography = Typography.withEmphasizedStyles()

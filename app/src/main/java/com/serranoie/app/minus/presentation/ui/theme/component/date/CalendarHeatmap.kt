@@ -1,7 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.date
 
 import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,6 +41,7 @@ import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +50,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.getWeek
 import com.serranoie.app.minus.presentation.util.prettyWeekDay
@@ -55,7 +59,6 @@ import com.serranoie.app.minus.presentation.util.toDate
 import com.serranoie.app.minus.presentation.util.toLocalDate
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
@@ -133,9 +136,11 @@ fun CalendarHeatmap(
 			)
 			Spacer(modifier = Modifier.width(4.dp))
 			Text(
+				modifier = Modifier.basicMarquee(),
 				text = "Esta gráfica muestra el dinero gastado en cada día del periodo",
-				style = MaterialTheme.typography.labelSmall.copy(
+				style = MaterialTheme.typography.labelSmallCondensed.copy(
 					color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.8f),
+					fontWeight = FontWeight.W100,
 				),
 			)
 		}
@@ -151,29 +156,29 @@ fun CalendarHeatmap(
 					)
 
 					DaysOfWeek(
-					modifier = Modifier.layoutId("fullWidth")
-				)
+						modifier = Modifier.layoutId("fullWidth")
+					)
 
-				month.weeks.forEach { week ->
-					val beginningWeek = week.yearMonth.atDay(1).plusWeeks(week.number.toLong())
-					val currentDay =
-						beginningWeek.with(TemporalAdjusters.previousOrSame(getWeek()[0]))
+					month.weeks.forEach { week ->
+						val beginningWeek = week.yearMonth.atDay(1).plusWeeks(week.number.toLong())
+						val currentDay =
+							beginningWeek.with(TemporalAdjusters.previousOrSame(getWeek()[0]))
 
-					if (currentDay.plusDays(6)
-							.isAfter(calendarUiState.disabledBefore) && currentDay.isBefore(
+						if (currentDay.plusDays(6)
+								.isAfter(calendarUiState.disabledBefore) && currentDay.isBefore(
 								calendarUiState.disabledAfter!!.plusDays(1)
 							)
-					) {
-						WeekRow(
-							modifier = Modifier.layoutId("fullWidth"),
-							week = week,
-							calendarUiState = calendarUiState,
-							spendingDays = spendingDays,
-							budget = budget,
-							maxSpendsPerDay = maxSpendsPerDay,
-						)
-}
-				}
+						) {
+							WeekRow(
+								modifier = Modifier.layoutId("fullWidth"),
+								week = week,
+								calendarUiState = calendarUiState,
+								spendingDays = spendingDays,
+								budget = budget,
+								maxSpendsPerDay = maxSpendsPerDay,
+							)
+						}
+					}
 				}
 			})
 	}
@@ -185,10 +190,10 @@ internal fun MonthHeader(modifier: Modifier = Modifier, yearMonth: YearMonth) {
 	Row(modifier = modifier.height(CELL_SIZE), verticalAlignment = Alignment.Bottom) {
 		Text(
 			modifier = Modifier
-				.padding(start = 24.dp)
+				.padding(start = 12.dp)
 				.weight(1f),
 			text = prettyYearMonth(yearMonth),
-			style = MaterialTheme.typography.titleMedium,
+			style = MaterialTheme.typography.titleMediumEmphasized,
 			color = MaterialTheme.colorScheme.onSurface,
 		)
 	}
@@ -306,8 +311,7 @@ fun WeekRow(
 					val countRatio = if (maxSpendsPerDay > 0) {
 						(daySpendsCount.toFloat() / maxSpendsPerDay.toFloat()).coerceIn(0f, 1f)
 					} else 0f
-					val heatIntensity = (amountRatio * 0.6f + countRatio * 0.4f)
-						.coerceIn(0f, 1.4f)
+					val heatIntensity = (amountRatio * 0.6f + countRatio * 0.4f).coerceIn(0f, 1.4f)
 
 					DayCell(
 						modifier = Modifier.weight(1f),
@@ -317,7 +321,7 @@ fun WeekRow(
 						spendingRatio = heatIntensity,
 						hasSpending = spendingDay != null,
 					)
-} else {
+				} else {
 					Box(
 						modifier = Modifier
 							.size(CELL_SIZE)
@@ -345,7 +349,7 @@ internal fun DayOfWeekHeading(day: String, modifier: Modifier = Modifier) {
 				.wrapContentHeight(Alignment.CenterVertically),
 			textAlign = TextAlign.Center,
 			text = day,
-			style = MaterialTheme.typography.labelSmall,
+			style = MaterialTheme.typography.labelSmallEmphasized,
 			color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5F),
 		)
 	}
@@ -473,14 +477,14 @@ internal fun DayCell(
 				enabled = !disabled,
 			)
 			.border(
-				width = if (current) 2.dp else 0.dp,
-				color = MaterialTheme.colorScheme.primary,
+				width = if (current) 2.dp else 1.dp,
+				color = if (current) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
 				shape = RoundedCornerShape(8.dp)
 			), contentAlignment = Alignment.Center
 	) {
 		Text(
 			text = day.dayOfMonth.toString(),
-			style = MaterialTheme.typography.bodyMedium,
+			style = MaterialTheme.typography.bodyMediumEmphasized,
 			color = when {
 				disabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
 				hasSpending && spendingRatio > 1.0f -> MaterialTheme.colorScheme.onError
@@ -566,7 +570,13 @@ class CalendarState(
 	}
 }
 
-@Preview(name = "Calendar Heatmap - Full 2 Weeks", showBackground = true, widthDp = 420)
+@Preview(name = "Calendar Heatmap - Full 2 Weeks", widthDp = 420)
+@Preview(
+	name = "Calendar Heatmap - Full 2 Weeks Dark Mode",
+	widthDp = 420,
+	showSystemUi = false,
+	uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
 @Composable
 private fun PreviewCalendarHeatmap() {
 	val start = LocalDate.now().minusDays(13)
@@ -578,7 +588,9 @@ private fun PreviewCalendarHeatmap() {
 			repeat(count) { txIndex ->
 				val dayAmount = amountByDay[index]
 				val splitAmount = if (count > 0) {
-					BigDecimal(dayAmount).divide(BigDecimal(count), 2, java.math.RoundingMode.HALF_UP)
+					BigDecimal(dayAmount).divide(
+						BigDecimal(count), 2, java.math.RoundingMode.HALF_UP
+					)
 				} else {
 					BigDecimal.ZERO
 				}
@@ -593,7 +605,7 @@ private fun PreviewCalendarHeatmap() {
 		}
 	}
 
-	MinusTheme{
+	MinusTheme {
 		CalendarHeatmap(
 			budget = BigDecimal(200),
 			transactions = mockTransactions,
