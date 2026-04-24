@@ -38,12 +38,13 @@ private fun WelcomeStep(
 	onSetBudget: () -> Unit = {},
 ) {
 	val localBottomSheetScrollState = LocalBottomSheetScrollState.current
+	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
 	val navigationBarHeight =
 		LocalWindowInsets.current.calculateBottomPadding().coerceAtLeast(16.dp)
 	Surface(
 		modifier = Modifier
 			.fillMaxSize()
-			.padding(top = localBottomSheetScrollState.topPadding)
+			.padding(top = if (localBottomSheetScrollState.topPadding > 0.dp) localBottomSheetScrollState.topPadding else statusBarHeight)
 	) {
 		Column(
 			modifier = Modifier
@@ -52,18 +53,17 @@ private fun WelcomeStep(
 				.padding(start = 24.dp, end = 24.dp, bottom = navigationBarHeight),
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
-			Spacer(Modifier.height(24.dp))
 			Text(
 				text = "Bienvenido a Minus!",
-				style = MaterialTheme.typography.displayMedium,
+				style = MaterialTheme.typography.headlineMediumEmphasized,
 			)
-			Spacer(Modifier.height(16.dp))
+			Spacer(Modifier.height(4.dp))
 			Text(
 				text = "Hola y bienvenido, empezemos a ahorrar juntos",
-				style = MaterialTheme.typography.titleMedium,
+				style = MaterialTheme.typography.titleMediumEmphasized,
 				textAlign = TextAlign.Center,
 			)
-			Spacer(Modifier.height(48.dp))
+			Spacer(Modifier.height(16.dp))
 			Column(
 				modifier = Modifier.fillMaxWidth(),
 				horizontalAlignment = Alignment.Start,

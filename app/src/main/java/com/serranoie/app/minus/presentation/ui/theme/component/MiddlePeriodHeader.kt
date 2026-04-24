@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 
 @Composable
@@ -30,9 +31,11 @@ fun MiddlePeriodHeader(
 	onClose: () -> Unit = {},
 ) {
 	val localBottomSheetScrollState = LocalBottomSheetScrollState.current
+	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
+	val topPadding =
+		if (localBottomSheetScrollState.topPadding > 0.dp) localBottomSheetScrollState.topPadding else statusBarHeight
 
-
-	Box(Modifier.padding(top = localBottomSheetScrollState.topPadding)) {
+	Box(Modifier.padding(top = topPadding)) {
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()

@@ -170,7 +170,9 @@ fun AppNavGraph(
             OnboardingScreen(
                 onSetBudget = {
                     onOnboardingComplete()
-                    navController.navigate(Screen.Main.route) {
+                    navController.navigate(
+                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true)
+                    ) {
                         popUpTo(Screen.Onboarding.route) { inclusive = true }
                     }
                 },
@@ -179,7 +181,9 @@ fun AppNavGraph(
                 },
                 onClose = {
                     onOnboardingComplete()
-                    navController.navigate(Screen.Main.route) {
+                    navController.navigate(
+                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true)
+                    ) {
                         popUpTo(Screen.Onboarding.route) { inclusive = true }
                     }
                 }
@@ -302,7 +306,9 @@ fun AppNavGraph(
                 actions = AnalyticsActions(
                     onCreateNewPeriod = {
                         viewModel.clearEarlyFinishState()
-                        navController.navigate(Screen.Wallet.createRoute(forceChange = true))
+                        navController.navigate(
+                            Screen.Main.createRoute(openWallet = true, forceWalletSetup = true)
+                        )
                     },
                     onClose = {
                         navController.navigate(Screen.Main.route) {

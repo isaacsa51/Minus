@@ -89,10 +89,12 @@ import com.serranoie.app.minus.presentation.onboarding.availablePeriodsFor
 import com.serranoie.app.minus.presentation.onboarding.budgetForPeriod
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.colorBad
+import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.CurrencyAmountInputVisualTransformation
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
@@ -278,7 +280,7 @@ private fun ViewBudgetContent(
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(horizontal = 20.dp)
+			.padding(horizontal = 16.dp)
 			.padding(top = 4.dp, bottom = 32.dp)
 			.navigationBarsPadding()
 			.verticalScroll(rememberScrollState()),
@@ -286,7 +288,7 @@ private fun ViewBudgetContent(
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(vertical = 16.dp),
+				.padding(vertical = 12.dp),
 			horizontalArrangement = Arrangement.SpaceBetween,
 			verticalAlignment = Alignment.CenterVertically,
 		) {
@@ -307,15 +309,7 @@ private fun ViewBudgetContent(
 			}
 		}
 
-		Spacer(modifier = Modifier.height(16.dp))
-
-		SpendBudgetCard(
-			spend = totalSpent,
-			budget = totalBudget,
-			modifier = Modifier.fillMaxWidth(),
-		)
-
-		Spacer(modifier = Modifier.height(12.dp))
+		Spacer(modifier = Modifier.height(8.dp))
 
 		Row(
 			modifier = Modifier.fillMaxWidth(),
@@ -498,7 +492,7 @@ fun EditBudgetContent(
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(horizontal = 20.dp)
+			.padding(horizontal = 16.dp)
 			.padding(top = 4.dp, bottom = 32.dp)
 			.navigationBarsPadding()
 			.verticalScroll(rememberScrollState()),
@@ -592,49 +586,75 @@ fun EditBudgetContent(
 				Card(
 					modifier = Modifier.fillMaxWidth(),
 					colors = CardDefaults.cardColors(
-						containerColor = MaterialTheme.colorScheme.surfaceVariant,
+						containerColor = colorButton,
 					),
-					shape = RoundedCornerShape(12.dp),
+					shape = RoundedCornerShape(16.dp),
 				) {
-					Column(modifier = Modifier.padding(12.dp)) {
-						Text(
-							text = "Presupuesto anterior: $currencySymbol${
-								currentBudget.toPlainString()
-							}",
-							style = MaterialTheme.typography.bodyMedium,
-						)
-						if (currentEnd != null) {
+					Row(
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(16.dp),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Período: $previousPeriodDays días",
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+								text = "Presupuesto",
+								style = MaterialTheme.typography.labelSmallCondensed,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+							Text(
+								text = "$currencySymbol${currentBudget.toPlainString()}",
+								style = MaterialTheme.typography.titleMediumCondensed,
+								fontWeight = FontWeight.Bold
 							)
 						}
-						Spacer(modifier = Modifier.height(8.dp))
-						AssistChip(
-							onClick = {
-								budgetText = if (currentBudget > BigDecimal.ZERO) {
-									(currentBudget.multiply(BigDecimal(100))
-										.toBigInteger()).toString()
-								} else ""
-								if (previousPeriodDays > 0) {
-									startCache = LocalDate.now()
-									endCache =
-										LocalDate.now().plusDays(previousPeriodDays.toLong() - 1)
-								}
-								currencyCache = currentCurrency
-								strategyCache = currentStrategy
-								showPreviousValues = false
-							},
-							label = { Text("Aplicar valores anteriores") },
-							leadingIcon = {
+
+						Column(
+							modifier = Modifier.weight(1f),
+							horizontalAlignment = Alignment.CenterHorizontally
+						) {
+							Text(
+								text = "Período",
+								style = MaterialTheme.typography.labelSmallCondensed,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+							Text(
+								text = "$previousPeriodDays días",
+								style = MaterialTheme.typography.titleMediumCondensed,
+								fontWeight = FontWeight.Bold
+							)
+						}
+
+						Box(
+							modifier = Modifier.weight(0.5f),
+							contentAlignment = Alignment.CenterEnd
+						) {
+							IconButton(
+								onClick = {
+									budgetText = if (currentBudget > BigDecimal.ZERO) {
+										(currentBudget.multiply(BigDecimal(100))
+											.toBigInteger()).toString()
+									} else ""
+									if (previousPeriodDays > 0) {
+										startCache = LocalDate.now()
+										endCache =
+											LocalDate.now()
+												.plusDays(previousPeriodDays.toLong() - 1)
+									}
+									currencyCache = currentCurrency
+									strategyCache = currentStrategy
+									showPreviousValues = false
+								},
+								modifier = Modifier.size(40.dp)
+							) {
 								Icon(
 									imageVector = Icons.Default.Check,
-									contentDescription = null,
-									modifier = Modifier.size(18.dp)
+									contentDescription = "Aplicar",
+									tint = colorBad
 								)
-							},
-						)
+							}
+						}
 					}
 				}
 			}

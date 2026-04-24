@@ -32,7 +32,7 @@ val GoogleSansFlexDisplayLargeEmphasized = FontFamily(
 val GoogleSansFlexDisplayMediumEmphasized = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(700), FontVariation.width(155f)
+			FontVariation.weight(600), FontVariation.width(132f)
 		)
 	)
 )

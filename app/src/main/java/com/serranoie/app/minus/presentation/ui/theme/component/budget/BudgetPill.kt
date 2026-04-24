@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -56,8 +55,9 @@ fun BudgetPill(
 	budgetSettings: BudgetSettings? = null,
 	viewPeriod: BudgetPeriod = budgetSettings?.period ?: BudgetPeriod.DAILY,
 	currencyCode: String,
-	onOpenSettings: () -> Unit,
+	onOpenSettings: () -> Unit = {},
 	onOpenBudgetSheet: () -> Unit = {},
+	bigVariant: Boolean = false,
 	modifier: Modifier = Modifier,
 ) {
 
@@ -145,15 +145,17 @@ fun BudgetPill(
 	} else 0f
 
 	val containerColor = when {
-		isCurrentPeriodOverBudget -> colorBad.copy(alpha = 0.25f)
+		isCurrentPeriodOverBudget -> colorBad.let { if (bigVariant) it else it.copy(alpha = 0.25f) }
 		spendProgress > 0.65f -> colorNotGood.copy(alpha = 0.25f)
-		else -> colorGood.copy(alpha = 0.25f)
+		else -> if (bigVariant) MaterialTheme.colorScheme.secondaryContainer else colorGood.copy(
+			alpha = 0.25f
+		)
 	}
 
 	val contentColor = when {
-		isCurrentPeriodOverBudget -> colorBad
+		isCurrentPeriodOverBudget -> if (bigVariant) Color.White else colorBad
 		spendProgress > 0.65f -> colorNotGood
-		else -> colorGood
+		else -> if (bigVariant) MaterialTheme.colorScheme.onSecondaryContainer else colorGood
 	}
 
 	val animatedProgress by animateFloatAsState(
@@ -175,38 +177,41 @@ fun BudgetPill(
 			onClick = onOpenBudgetSheet
 		) {
 			Box(
-				modifier = Modifier.fillMaxHeight(), contentAlignment = Alignment.Center
+				modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
 			) {
 				// Background progress indicator
-				LinearProgressIndicator(
-					progress = { animatedProgress },
-					modifier = Modifier
-						.fillMaxSize()
-						.clip(CircleShape),
-					color = contentColor.copy(alpha = 0.5f),
-					trackColor = Color.Transparent,
-					drawStopIndicator = {})
+				if (!bigVariant) {
+					LinearProgressIndicator(
+						progress = { animatedProgress },
+						modifier = Modifier
+							.fillMaxSize()
+							.clip(CircleShape),
+						color = contentColor.copy(alpha = 0.5f),
+						trackColor = Color.Transparent,
+						drawStopIndicator = {})
+				}
 
 				Row(
 					modifier = Modifier.fillMaxSize(),
 					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = if (isCurrentPeriodOverBudget) Arrangement.Center else Arrangement.SpaceBetween
+					horizontalArrangement = if (isCurrentPeriodOverBudget || bigVariant) Arrangement.Center else Arrangement.SpaceBetween
 				) {
 					StatusLabel(
 						budgetState = budgetState,
 						budgetPeriod = period,
 						isOverBudget = isCurrentPeriodOverBudget,
 						exhaustedMessage = exhaustedMessage,
-						modifier = if (isCurrentPeriodOverBudget) Modifier else Modifier.padding(
+						bigVariant = bigVariant,
+						modifier = if (isCurrentPeriodOverBudget || bigVariant) Modifier else Modifier.padding(
 							start = 18.dp
 						),
 					)
 
-					if (!isCurrentPeriodOverBudget) {
+					if (!isCurrentPeriodOverBudget && !bigVariant) {
 						Spacer(modifier = Modifier.weight(1f))
 					}
 
-					if (!isCurrentPeriodOverBudget) {
+					if (!isCurrentPeriodOverBudget && !bigVariant) {
 						Text(
 							text = currencyFormat.format(periodRemaining),
 							style = MaterialTheme.typography.titleSmallCondensed,
@@ -226,6 +231,7 @@ private fun StatusLabel(
 	budgetPeriod: BudgetPeriod = BudgetPeriod.DAILY,
 	isOverBudget: Boolean,
 	exhaustedMessage: String? = null,
+	bigVariant: Boolean = false,
 	modifier: Modifier = Modifier,
 ) {
 	val textColor = LocalContentColor.current
@@ -236,6 +242,11 @@ private fun StatusLabel(
 		else -> budgetPeriod.periodLabel()
 	}
 
+	val amount = when (budgetPeriod) {
+		BudgetPeriod.DAILY -> budgetState?.remainingToday
+		else -> budgetState?.totalBudget?.subtract(budgetState.totalSpentInPeriod)
+	} ?: BigDecimal.ZERO
+
 	val textStartOffset by animateDpAsState(
 		label = "textStartOffset",
 		targetValue = 0.dp,
@@ -243,15 +254,16 @@ private fun StatusLabel(
 	)
 	val labelVerticalOffset by animateDpAsState(
 		label = "labelVerticalOffset",
-		targetValue = if (exhaustedMessage != null) (-2).dp else 0.dp,
+		targetValue = if (exhaustedMessage != null && !bigVariant) (-2).dp else 0.dp,
 		animationSpec = tween(300),
 	)
 
 	Column(
 		modifier = modifier
-			.height(44.dp)
+			.height(if (bigVariant) 72.dp else 44.dp)
 			.animateContentSize(animationSpec = tween(300)),
 		verticalArrangement = Arrangement.Center,
+		horizontalAlignment = if (bigVariant) Alignment.CenterHorizontally else Alignment.Start
 	) {
 		Row(
 			modifier = Modifier.offset(y = labelVerticalOffset),
@@ -259,15 +271,18 @@ private fun StatusLabel(
 		) {
 			Spacer(modifier = Modifier.width(textStartOffset))
 			Text(
-				text = label,
-				style = if (isOverBudget) MaterialTheme.typography.titleSmallEmphasized else MaterialTheme.typography.bodyLargeCondensed,
-				color = textColor,
-				modifier = Modifier.basicMarquee()
+				text = label, style = if (bigVariant) {
+					MaterialTheme.typography.titleMediumEmphasized
+				} else if (isOverBudget) {
+					MaterialTheme.typography.titleSmallEmphasized
+				} else {
+					MaterialTheme.typography.bodyLargeCondensed
+				}, color = textColor, modifier = Modifier.basicMarquee()
 			)
 		}
 
 		AnimatedVisibility(
-			visible = exhaustedMessage != null, enter = slideInVertically(
+			visible = exhaustedMessage != null && !bigVariant, enter = slideInVertically(
 				initialOffsetY = { -it }, animationSpec = tween(300)
 			) + fadeIn(animationSpec = tween(300))
 		) {

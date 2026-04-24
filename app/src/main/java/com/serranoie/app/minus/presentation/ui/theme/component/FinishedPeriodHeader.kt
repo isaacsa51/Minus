@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.presentation.analytics.Size
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.util.combineColors
@@ -48,7 +49,7 @@ fun FinishedPeriodHeader(
 	hasSpends: Boolean = false,
 ) {
 	val localDensity = LocalDensity.current
-	val statusBarHeight = with(localDensity) { WindowInsets.statusBars.getTop(this).toDp() }
+	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
 
 	var headerSize by remember { mutableStateOf(Size(0.dp, 0.dp)) }
 	val scroll = with(localDensity) { scrollState.value.toDp() }

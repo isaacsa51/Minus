@@ -141,8 +141,8 @@ private fun TextStyle.interpolateToEmphasized(
 	emphasizedStyle: TextStyle, progress: Float
 ): TextStyle {
 	val clampedProgress = progress.coerceIn(0f, 1f)
-	val animatedWeight = lerp(400f, 700f, clampedProgress)
-	val animatedWidth = lerp(100f, 155f, clampedProgress)
+	val animatedWeight = lerp(400f, 600f, clampedProgress)
+	val animatedWidth = lerp(100f, 125f, clampedProgress)
 	val animatedFontSize = lerp(fontSize.value, emphasizedStyle.fontSize.value, clampedProgress).sp
 	val animatedLineHeight =
 		lerp(lineHeight.value, emphasizedStyle.lineHeight.value, clampedProgress).sp

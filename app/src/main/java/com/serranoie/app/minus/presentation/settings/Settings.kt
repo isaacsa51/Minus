@@ -2,7 +2,6 @@
 
 package com.serranoie.app.minus.presentation.settings
 
-import android.R.attr.versionName
 import android.app.TimePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,22 +18,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -57,14 +55,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.serranoie.app.minus.R
+import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
@@ -106,30 +103,33 @@ fun Settings(
 	val context = LocalContext.current
 	val view = LocalView.current
 	val snackbarHostState = remember { SnackbarHostState() }
+	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
 
 	Scaffold(
-		modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+		modifier = modifier
+			.padding(top = statusBarHeight)
+			.nestedScroll(scrollBehavior.nestedScrollConnection),
 		snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
 		topBar = {
-			LargeTopAppBar(
+			MediumTopAppBar(
 				title = {
-				Text(
-					text = "Ajustes",
-					style = MaterialTheme.typography.titleLargeEmphasized,
-				)
-			}, navigationIcon = {
-				IconButton(
-					onClick = onBack, modifier = Modifier.testTag("SettingsBackButton")
-				) {
-					Icon(
-						imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-						contentDescription = null
+					Text(
+						text = "Ajustes",
+						style = MaterialTheme.typography.titleLargeEmphasized,
 					)
-				}
-			}, colors = TopAppBarDefaults.topAppBarColors(
-				containerColor = MaterialTheme.colorScheme.surface,
-				titleContentColor = MaterialTheme.colorScheme.onSurface
-			), scrollBehavior = scrollBehavior
+				}, navigationIcon = {
+					IconButton(
+						onClick = onBack, modifier = Modifier.testTag("SettingsBackButton")
+					) {
+						Icon(
+							imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+							contentDescription = null
+						)
+					}
+				}, colors = TopAppBarDefaults.topAppBarColors(
+					containerColor = MaterialTheme.colorScheme.surface,
+					titleContentColor = MaterialTheme.colorScheme.onSurface
+				), scrollBehavior = scrollBehavior
 			)
 		}) { paddingValues ->
 		LazyColumn(
