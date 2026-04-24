@@ -35,7 +35,7 @@ class PeriodEndAlarmReceiver : BroadcastReceiver() {
 	            val settings = budgetRepository.getBudgetSettingsSync() ?: return@launch
 	            val periodEnd = settings.getPeriodEndDate()
                 val today = LocalDate.now()
-                if (!today.isAfter(periodEnd)) {
+                if (today.isBefore(periodEnd)) {
                     return@launch
                 }
                 val transactions = budgetRepository.getTransactions().first()

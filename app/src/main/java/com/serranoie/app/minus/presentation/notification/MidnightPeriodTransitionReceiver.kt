@@ -6,8 +6,6 @@ import android.content.Intent
 import logcat.asLog
 import logcat.logcat
 import androidx.datastore.preferences.core.edit
-import com.serranoie.app.minus.CURRENT_PERIOD_ID_KEY
-import com.serranoie.app.minus.CURRENT_PERIOD_STARTED_AT_KEY
 import com.serranoie.app.minus.MIDNIGHT_TRANSITION_OCCURRED_KEY
 import com.serranoie.app.minus.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.REMAINING_FROM_LAST_PERIOD_KEY
@@ -61,8 +59,8 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
                 val periodEnd = settings.getPeriodEndDate()
                 val today = LocalDate.now()
 
-                // Check if the period ended (period end date is before today)
-                if (!today.isAfter(periodEnd)) {
+                // Check if the period ended (period end date is today or before today)
+                if (today.isBefore(periodEnd)) {
                     logcat { "Period has not ended yet (end=$periodEnd, today=$today), skipping" }
                     return@launch
                 }
@@ -88,7 +86,7 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
 
                 // Update DataStore to mark that midnight transition happened
                 // This allows MainActivity to detect it when coming to foreground
-                updateMidnightTransitionState(context, settings, periodEnd, remaining)
+                updateMidnightTransitionState(context, periodEnd, remaining)
 
                 logcat { "Midnight transition completed successfully" }
 
@@ -102,7 +100,6 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
 
     private suspend fun updateMidnightTransitionState(
         context: Context,
-        settings: com.serranoie.app.minus.domain.model.BudgetSettings,
         periodEnd: LocalDate,
         remaining: java.math.BigDecimal
     ) {
@@ -112,8 +109,5 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
             prefs[REMAINING_FROM_LAST_PERIOD_KEY] = remaining.toPlainString()
             prefs[MIDNIGHT_TRANSITION_OCCURRED_KEY] = true
         }
-    }
-
-    companion object {
     }
 }

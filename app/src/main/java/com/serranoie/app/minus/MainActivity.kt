@@ -56,7 +56,7 @@ import com.serranoie.app.minus.presentation.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE
 import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
-import com.serranoie.app.minus.presentation.ui.theme.component.MidnightTransitionDialog
+import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
 import com.serranoie.app.minus.presentation.ui.theme.syncTheme
 import com.serranoie.app.minus.presentation.util.lockScreenOrientation
 import dagger.hilt.android.AndroidEntryPoint
@@ -110,8 +110,6 @@ class MainActivity : ComponentActivity() {
 	private val onboardingComplete: MutableState<Boolean> = mutableStateOf(false)
 	private val periodEnded: MutableState<Boolean> = mutableStateOf(false)
 	private val earlyFinishPending: MutableState<Boolean> = mutableStateOf(false)
-	private val showMidnightTransitionDialog: MutableState<Boolean> = mutableStateOf(false)
-
 	@javax.inject.Inject
 	lateinit var notificationScheduler: NotificationScheduler
 
@@ -179,7 +177,7 @@ class MainActivity : ComponentActivity() {
 					val endDate = Instant.ofEpochMilli(endDateMillis).atZone(ZoneId.systemDefault())
 						.toLocalDate()
 					val today = LocalDate.now()
-					periodEnded.value = today.isAfter(endDate)
+					periodEnded.value = today.isAfter(endDate) || today.isEqual(endDate)
 				}
 
 				val transitionOccurred = prefs[MIDNIGHT_TRANSITION_OCCURRED_KEY] ?: false
@@ -192,7 +190,8 @@ class MainActivity : ComponentActivity() {
 						val lastPeriodEnd =
 							Instant.ofEpochMilli(lastPeriodEndMillis).atZone(ZoneId.systemDefault())
 								.toLocalDate()
-						periodEnded.value = LocalDate.now().isAfter(lastPeriodEnd)
+						periodEnded.value =
+							LocalDate.now().isAfter(lastPeriodEnd) || LocalDate.now().isEqual(lastPeriodEnd)
 					}
 					logcat(tag) { "Midnight transition detected on app start, routing to Analytics" }
 				}
@@ -319,13 +318,23 @@ class MainActivity : ComponentActivity() {
 
 							if (shouldShowMidnightDialog && midnightTransitionData != null) {
 								val data = midnightTransitionData!!
-								MidnightTransitionDialog(
-									periodStartDate = data.periodStartDate,
-									periodEndDate = data.periodEndDate,
-									totalBudget = data.totalBudget,
+								val periodLabel =
+									"${data.periodStartDate.dayOfMonth} ${data.periodStartDate.month.name.lowercase().take(3)} - ${data.periodEndDate.dayOfMonth} ${data.periodEndDate.month.name.lowercase().take(3)}"
+								RolloverDialog(
 									remainingAmount = data.remainingAmount,
-									totalSpent = data.totalSpent,
 									currencyCode = data.currencyCode,
+									periodLabel = periodLabel,
+									spentAmount = data.totalSpent,
+									onSplitEqually = {
+										lifecycleScope.launch {
+											midnightPeriodChecker.rollRemainingSplitEqually()
+										}
+									},
+									onCarryToNextDay = {
+										lifecycleScope.launch {
+											midnightPeriodChecker.rollRemainingToFirstDay()
+										}
+									},
 									onViewAnalytics = {
 										midnightPeriodChecker.onTransitionDialogConfirmed()
 										navController.navigate(Screen.Analytics.route) {

@@ -265,7 +265,9 @@ fun AppNavGraph(
 
             // Check if period is finished naturally or marked as finished early
             val today = java.time.LocalDate.now()
-            val periodFinishedNaturally = budgetSettings?.getPeriodEndDate()?.isBefore(today) ?: false
+            val periodFinishedNaturally = budgetSettings?.getPeriodEndDate()?.let { endDate ->
+                today.isAfter(endDate) || today.isEqual(endDate)
+            } ?: false
             val periodFinished = periodFinishedNaturally || earlyFinishActive
 
             val wholeBudget = budgetSettings?.totalBudget ?: budgetState?.totalBudget ?: BigDecimal.ZERO

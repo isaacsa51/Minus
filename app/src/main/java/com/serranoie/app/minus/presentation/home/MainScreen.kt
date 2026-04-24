@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.home
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -19,16 +20,22 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +52,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -64,16 +72,19 @@ import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.tutorial.firstLaunchTutorialStageFlow
 import com.serranoie.app.minus.presentation.ui.theme.colorEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
+import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetLayout
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetValue
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.settingsDataStore
-import android.util.Log
-import androidx.compose.material3.SnackbarResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.time.LocalDate
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalWearMaterialApi::class)
 @Composable
@@ -207,6 +218,83 @@ fun MainScreen(
 	}
 
 	nightMode = isNightMode()
+
+	// 1. Show rollover dialog if needed
+	if (budgetUiState.showRolloverDialog) {
+		val periodStartDate = budgetUiState.budgetSettings?.startDate
+		val periodEndDate = budgetUiState.budgetSettings?.getPeriodEndDate()
+		val periodLabel = if (periodStartDate != null && periodEndDate != null) {
+			"${periodStartDate.dayOfMonth} ${periodStartDate.month.name.lowercase().take(3)} - ${periodEndDate.dayOfMonth} ${periodEndDate.month.name.lowercase().take(3)}"
+		} else {
+			LocalDate.now().month.name.lowercase().take(3)
+		}
+		val spentAmount =
+			budgetUiState.budgetSettings?.totalBudget?.subtract(budgetUiState.remainingFromPreviousPeriod)
+				?: BigDecimal.ZERO
+		RolloverDialog(
+			remainingAmount = budgetUiState.remainingFromPreviousPeriod,
+			currencyCode = budgetUiState.budgetSettings?.currencyCode ?: "USD",
+			periodLabel = periodLabel,
+			spentAmount = spentAmount,
+			onSplitEqually = {
+				budgetViewModel.processIntent(BudgetUiIntent.RolloverSplitEqually(budgetUiState.remainingFromPreviousPeriod))
+			},
+			onCarryToNextDay = {
+				budgetViewModel.processIntent(BudgetUiIntent.RolloverCarryToNextDay(budgetUiState.remainingFromPreviousPeriod))
+			},
+			onDismiss = {
+				budgetViewModel.processIntent(BudgetUiIntent.DismissRolloverDialog)
+			})
+	}
+
+	// 2. Show period ended dialog when user tries to add expense after period ended
+	if (budgetUiState.showPeriodEndedDialog && budgetUiState.pendingExpenseAfterPeriodAmount != null) {
+		val amount = budgetUiState.pendingExpenseAfterPeriodAmount!!
+		val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
+		AlertDialog(
+			onDismissRequest = {
+				budgetViewModel.processIntent(BudgetUiIntent.DismissPeriodEndedDialog)
+			},
+			title = {
+				Text(
+					text = "Periodo finalizado",
+					style = MaterialTheme.typography.headlineSmall
+				)
+			},
+			text = {
+				Column {
+					Text(
+						text = "El gasto de ${currencyFormat.format(amount)} será registrado en el próximo periodo presupuestal.",
+						style = MaterialTheme.typography.bodyMedium
+					)
+					Spacer(modifier = Modifier.height(8.dp))
+					Text(
+						text = "El nuevo periodo comenzará cuando configures tu presupuesto.",
+						style = MaterialTheme.typography.bodySmall,
+						color = MaterialTheme.colorScheme.onSurfaceVariant
+					)
+				}
+			},
+			confirmButton = {
+				Button(
+					onClick = {
+						budgetViewModel.processIntent(BudgetUiIntent.ConfirmExpenseAfterPeriod)
+					}
+				) {
+					Text("Aceptar")
+				}
+			},
+			dismissButton = {
+				TextButton(
+					onClick = {
+						budgetViewModel.processIntent(BudgetUiIntent.DismissPeriodEndedDialog)
+					}
+				) {
+					Text("Cancelar")
+				}
+			}
+		)
+	}
 
 	BoxWithConstraints(
 		modifier = Modifier
@@ -376,8 +464,7 @@ fun MainScreen(
 									onShowSnackbar = { message ->
 										coroutineScope.launch {
 											snackbarHostState.showSnackbar(
-												message = message,
-												duration = SnackbarDuration.Short
+												message = message, duration = SnackbarDuration.Short
 											)
 										}
 									})
@@ -483,8 +570,7 @@ fun MainScreen(
 									onShowSnackbar = { message ->
 										coroutineScope.launch {
 											snackbarHostState.showSnackbar(
-												message = message,
-												duration = SnackbarDuration.Short
+												message = message, duration = SnackbarDuration.Short
 											)
 										}
 									})

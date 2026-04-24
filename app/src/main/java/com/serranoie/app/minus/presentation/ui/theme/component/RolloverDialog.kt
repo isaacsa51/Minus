@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +11,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.FactCheck
+import androidx.compose.material.icons.outlined.NextPlan
+import androidx.compose.material.icons.outlined.Splitscreen
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -28,13 +30,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyLargeCondensed
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorPrimary
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
-import java.text.NumberFormat
-import java.util.Currency
-import java.util.Locale
 
 /**
  * Roll-over options dialog shown when there's remaining budget and a new period starts.
@@ -43,23 +45,25 @@ import java.util.Locale
 fun RolloverDialog(
 	remainingAmount: BigDecimal,
 	currencyCode: String,
+	periodLabel: String,
+	spentAmount: BigDecimal,
 	onSplitEqually: () -> Unit,
 	onCarryToNextDay: () -> Unit,
-	onDismiss: () -> Unit
+	onDismiss: () -> Unit,
+	onViewAnalytics: (() -> Unit)? = null,
 ) {
-	val currencyFormat = com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat(currencyCode)
+	val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
 
 	val formattedRemaining = currencyFormat.format(remainingAmount)
+	val formattedSpent = currencyFormat.format(spentAmount)
 
 	Dialog(onDismissRequest = onDismiss) {
 		Card(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(16.dp),
-			colors = CardDefaults.cardColors(
+				.padding(16.dp), colors = CardDefaults.cardColors(
 				containerColor = colorEditor
-			),
-			shape = RoundedCornerShape(24.dp)
+			), shape = RoundedCornerShape(24.dp)
 		) {
 			Column(
 				modifier = Modifier
@@ -67,24 +71,37 @@ fun RolloverDialog(
 					.padding(24.dp),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				// Title
+				Icon(
+					imageVector = Icons.Outlined.FactCheck,
+					contentDescription = null,
+					modifier = Modifier.size(48.dp),
+					tint = colorPrimary
+				)
+
+				Spacer(modifier = Modifier.height(16.dp))
+
 				Text(
-					text = "Presupuesto restante",
-					style = MaterialTheme.typography.titleLarge.copy(
-						fontWeight = FontWeight.Bold
-					),
+					text = "Periodo finalizado",
+					textAlign = TextAlign.Center,
+					style = MaterialTheme.typography.titleMediumEmphasized,
 					color = colorOnEditor
 				)
 
 				Spacer(modifier = Modifier.height(8.dp))
 
-				// Remaining amount
 				Text(
 					text = formattedRemaining,
-					style = MaterialTheme.typography.displaySmall.copy(
-						fontWeight = FontWeight.Bold
-					),
-					color = colorPrimary
+					textAlign = TextAlign.Center,
+					style = MaterialTheme.typography.displaySmallEmphasized,
+					color = MaterialTheme.colorScheme.tertiary
+				)
+
+				Spacer(modifier = Modifier.height(8.dp))
+				Text(
+					text = periodLabel,
+					textAlign = TextAlign.Center,
+					style = MaterialTheme.typography.bodyLargeCondensed,
+					color = colorOnEditor.copy(alpha = 0.7f)
 				)
 
 				Spacer(modifier = Modifier.height(8.dp))
@@ -96,11 +113,10 @@ fun RolloverDialog(
 					textAlign = TextAlign.Center
 				)
 
-				Spacer(modifier = Modifier.height(24.dp))
+				Spacer(modifier = Modifier.height(16.dp))
 
-				// Option 1: Split equally
 				RollOverOptionCard(
-					icon = Icons.Outlined.DateRange,
+					icon = Icons.Outlined.Splitscreen,
 					title = "Dividir igualmente",
 					description = "Agregar $formattedRemaining al presupuesto de los próximos días",
 					onClick = onSplitEqually
@@ -108,21 +124,29 @@ fun RolloverDialog(
 
 				Spacer(modifier = Modifier.height(12.dp))
 
-				// Option 2: Carry to next day
 				RollOverOptionCard(
-					icon = Icons.Outlined.Edit,
+					icon = Icons.Outlined.NextPlan,
 					title = "Pasar a mañana",
 					description = "Agregar $formattedRemaining al presupuesto de mañana",
 					onClick = onCarryToNextDay
 				)
 
+				if (onViewAnalytics != null) {
+					Spacer(modifier = Modifier.height(12.dp))
+
+					RollOverOptionCard(
+						icon = Icons.Outlined.FactCheck,
+						title = "Ver análisis",
+						description = "Revisar el resumen del periodo finalizado",
+						onClick = onViewAnalytics
+					)
+				}
+
 				Spacer(modifier = Modifier.height(16.dp))
 
-				// Dismiss button
 				TextButton(onClick = onDismiss) {
 					Text(
-						text = "Cancelar",
-						color = colorOnEditor.copy(alpha = 0.6f)
+						text = "Cancelar", color = colorOnEditor.copy(alpha = 0.6f)
 					)
 				}
 			}
@@ -135,19 +159,12 @@ fun RolloverDialog(
  */
 @Composable
 private fun RollOverOptionCard(
-	icon: ImageVector,
-	title: String,
-	description: String,
-	onClick: () -> Unit
+	icon: ImageVector, title: String, description: String, onClick: () -> Unit
 ) {
 	Card(
-		modifier = Modifier
-			.fillMaxWidth(),
-		colors = CardDefaults.cardColors(
+		modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
 			containerColor = colorPrimary.copy(alpha = 0.1f)
-		),
-		shape = RoundedCornerShape(16.dp),
-		onClick = onClick
+		), shape = RoundedCornerShape(16.dp), onClick = onClick
 	) {
 		Row(
 			modifier = Modifier
@@ -166,15 +183,13 @@ private fun RollOverOptionCard(
 
 			Column {
 				Text(
-					text = title,
-					style = MaterialTheme.typography.titleMedium.copy(
+					text = title, style = MaterialTheme.typography.titleMedium.copy(
 						fontWeight = FontWeight.Medium
-					),
-					color = colorPrimary
+					), color = colorPrimary
 				)
 				Text(
 					text = description,
-					style = MaterialTheme.typography.bodySmall,
+					style = MaterialTheme.typography.bodySmallCondensed,
 					color = colorOnEditor.copy(alpha = 0.7f)
 				)
 			}
@@ -182,16 +197,82 @@ private fun RollOverOptionCard(
 	}
 }
 
-@Preview
+@Preview(showBackground = true, name = "Estado Básico")
 @Composable
-private fun RolloverDialogPreview() {
+private fun RolloverDialogBasicPreview() {
 	MinusTheme {
 		RolloverDialog(
-			remainingAmount = BigDecimal("125.00"),
+			remainingAmount = BigDecimal("150.50"),
 			currencyCode = "MXN",
+			periodLabel = "1 abr - 30 abr",
+			spentAmount = BigDecimal("850.00"),
+			onSplitEqually = {},
+			onCarryToNextDay = {},
+			onDismiss = {})
+	}
+}
+
+@Preview(showBackground = true, name = "Con Info de Periodo")
+@Composable
+private fun RolloverDialogInfoPreview() {
+	MinusTheme {
+		RolloverDialog(
+			remainingAmount = BigDecimal("2450.00"),
+			currencyCode = "USD",
+			periodLabel = "Periodo: 1 - 15 de Octubre",
+			spentAmount = BigDecimal("8500.00"),
+			onSplitEqually = {},
+			onCarryToNextDay = {},
+			onDismiss = {})
+	}
+}
+
+@Preview(showBackground = true, name = "Con Análisis")
+@Composable
+private fun RolloverDialogAnalyticsPreview() {
+	MinusTheme {
+		RolloverDialog(
+			remainingAmount = BigDecimal("320.00"),
+			currencyCode = "EUR",
+			periodLabel = "1 may - 31 may",
+			spentAmount = BigDecimal("1680.00"),
 			onSplitEqually = {},
 			onCarryToNextDay = {},
 			onDismiss = {},
-		)
+			onViewAnalytics = {})
+	}
+}
+
+@Preview(showBackground = true, name = "Estado Completo")
+@Composable
+private fun RolloverDialogFullPreview() {
+	MinusTheme {
+		RolloverDialog(
+			remainingAmount = BigDecimal("1250.75"),
+			currencyCode = "MXN",
+			periodLabel = "Septiembre 2023",
+			spentAmount = BigDecimal("15400.00"),
+			onSplitEqually = {},
+			onCarryToNextDay = {},
+			onDismiss = {},
+			onViewAnalytics = {})
+	}
+}
+
+@Preview(
+	showBackground = true, name = "Modo Noche", uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun RolloverDialogDarkModePreview() {
+	MinusTheme {
+		RolloverDialog(
+			remainingAmount = BigDecimal("500.00"),
+			currencyCode = "MXN",
+			periodLabel = "Ayer",
+			spentAmount = BigDecimal("1200.00"),
+			onSplitEqually = {},
+			onCarryToNextDay = {},
+			onDismiss = {},
+			onViewAnalytics = {})
 	}
 }

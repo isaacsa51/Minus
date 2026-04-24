@@ -99,6 +99,7 @@ class BudgetViewModel @Inject constructor(
 	private val _currentComment = MutableStateFlow("")
 
 	private var lastPeriodEndDate: LocalDate? = null
+	private var resolvedRolloverPeriodEndDate: LocalDate? = null
 
 	init {
 		observeBudgetData()
@@ -251,6 +252,15 @@ class BudgetViewModel @Inject constructor(
 				dragProgress = current.dragProgress,
 				lockSwipeable = current.lockSwipeable,
 				lockDraggable = current.lockDraggable,
+				showRolloverDialog = current.showRolloverDialog || baseState.showRolloverDialog,
+				remainingFromPreviousPeriod = if (current.showRolloverDialog && current.remainingFromPreviousPeriod > BigDecimal.ZERO) {
+					current.remainingFromPreviousPeriod
+				} else {
+					baseState.remainingFromPreviousPeriod
+				},
+				showPeriodEndedDialog = current.showPeriodEndedDialog,
+				pendingExpenseAfterPeriodAmount = current.pendingExpenseAfterPeriodAmount,
+				pendingExpenseAfterPeriodComment = current.pendingExpenseAfterPeriodComment,
 			)
 		}
 
@@ -385,14 +395,15 @@ class BudgetViewModel @Inject constructor(
 			val remaining = settings.totalBudget.subtract(totalSpent)
 
 			if (remaining > BigDecimal.ZERO) {
-				_uiState.update {
-					it.copy(
-						showRolloverDialog = true, remainingFromPreviousPeriod = remaining
-					)
-				}
-			} else {
-				startNewPeriod(settings)
+			_uiState.update {
+				it.copy(
+					showRolloverDialog = true, remainingFromPreviousPeriod = remaining
+				)
 			}
+			resolvedRolloverPeriodEndDate = null
+		} else {
+			startNewPeriod(settings)
+		}
 
 			lastPeriodEndDate = periodEnd
 		}
@@ -412,6 +423,9 @@ class BudgetViewModel @Inject constructor(
 				lastPeriodEndDate
 			))
 		) {
+			if (resolvedRolloverPeriodEndDate == lastPeriodEndDate) {
+				return Pair(false, BigDecimal.ZERO)
+			}
 			val remaining = budgetState.remainingToday
 
 			if (remaining > BigDecimal.ZERO && !_uiState.value.showRolloverDialog) {
@@ -971,6 +985,7 @@ class BudgetViewModel @Inject constructor(
 
 	private suspend fun applyRolloverSplitEqually(remaining: BigDecimal) {
 		val settings = budgetRepository.getBudgetSettingsSync() ?: return
+		val previousPeriodEnd = settings.getPeriodEndDate()
 
 		val newTotalBudget = settings.totalBudget.add(remaining)
 		val updatedSettings = settings.copy(
@@ -988,12 +1003,14 @@ class BudgetViewModel @Inject constructor(
 				showRolloverDialog = false, remainingFromPreviousPeriod = BigDecimal.ZERO
 			)
 		}
-		lastPeriodEndDate = settings.getPeriodEndDate()
+		resolvedRolloverPeriodEndDate = previousPeriodEnd
+		lastPeriodEndDate = previousPeriodEnd
 	}
 
 	private fun handleRolloverCarryToNextDay(remaining: BigDecimal) {
 		viewModelScope.launch {
 			val settings = budgetRepository.getBudgetSettingsSync() ?: return@launch
+			val previousPeriodEnd = settings.getPeriodEndDate()
 
 			val updatedSettings = settings.copy(
 				totalBudget = settings.totalBudget,
@@ -1010,26 +1027,23 @@ class BudgetViewModel @Inject constructor(
 					showRolloverDialog = false, remainingFromPreviousPeriod = BigDecimal.ZERO
 				)
 			}
-			lastPeriodEndDate = settings.getPeriodEndDate()
+			resolvedRolloverPeriodEndDate = previousPeriodEnd
+			lastPeriodEndDate = previousPeriodEnd
 		}
 	}
 
 	private fun handleDismissRolloverDialog() {
 		viewModelScope.launch {
-			val remaining = _uiState.value.remainingFromPreviousPeriod
-			if (remaining > BigDecimal.ZERO) {
-				applyRolloverSplitEqually(remaining)
-			} else {
-				_uiState.update {
-					it.copy(
-						showRolloverDialog = false,
-						remainingFromPreviousPeriod = BigDecimal.ZERO
-					)
-				}
-				val settings = budgetRepository.getBudgetSettingsSync()
-				if (settings != null) {
-					startNewPeriod(settings)
-				}
+			val settings = budgetRepository.getBudgetSettingsSync()
+			resolvedRolloverPeriodEndDate = settings?.getPeriodEndDate() ?: lastPeriodEndDate
+			_uiState.update {
+				it.copy(
+					showRolloverDialog = false,
+					remainingFromPreviousPeriod = BigDecimal.ZERO
+				)
+			}
+			if (settings != null) {
+				startNewPeriod(settings)
 			}
 		}
 	}

@@ -42,7 +42,7 @@ import java.math.RoundingMode
 import java.time.LocalDateTime
 
 /**
- * A simplified and helpful recommendation card based on the 50/30/20 rule.
+ * Recommendation card based on the popular 50/30/20 rule.
  * 50% Needs (Recurrent), 30% Wants (Variable), 20% Savings.
  */
 @Composable
