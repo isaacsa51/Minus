@@ -285,7 +285,7 @@ val GoogleSansFlexLabelMediumCondensed = FontFamily(
 val GoogleSansFlexLabelSmallCondensed = FontFamily(
 	Font(
 		R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-			FontVariation.weight(700), FontVariation.width(75f)
+			FontVariation.weight(500), FontVariation.width(75f)
 		)
 	)
 )

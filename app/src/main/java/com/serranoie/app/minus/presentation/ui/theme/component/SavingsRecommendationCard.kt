@@ -1,18 +1,41 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
-import androidx.compose.foundation.layout.*
+import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.formatCurrencySymbolOnly
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -35,10 +58,13 @@ fun SavingsRecommendationCard(
 	val savings = budget.subtract(totalSpent).max(BigDecimal.ZERO)
 
 	val safeBudget = if (budget <= BigDecimal.ZERO) BigDecimal.ONE else budget
-	
-	val savingsPct = savings.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
-	val recurrentPct = recurrentSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
-	val variablePct = variableSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
+
+	val savingsPct =
+		savings.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
+	val recurrentPct =
+		recurrentSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
+	val variablePct =
+		variableSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
 
 	Column(
 		modifier = modifier
@@ -48,104 +74,200 @@ fun SavingsRecommendationCard(
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Icon(
-				imageVector = Icons.Outlined.Analytics,
+				imageVector = Icons.Outlined.Info,
 				contentDescription = null,
-				tint = MaterialTheme.colorScheme.primary,
+				tint = MaterialTheme.colorScheme.outline,
 				modifier = Modifier.size(20.dp)
 			)
 			Spacer(modifier = Modifier.width(8.dp))
 			Text(
-				text = "Regla 50/30/20",
-				style = MaterialTheme.typography.titleSmall,
-				fontWeight = FontWeight.Bold,
-				color = MaterialTheme.colorScheme.primary
+				text = "Recomendación de ahorro",
+				style = MaterialTheme.typography.titleSmallCondensed,
+				color = MaterialTheme.colorScheme.outline
 			)
 		}
 
-		Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+		Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.Bottom
+			) {
+				Column {
+					Text(
+						text = "Ahorro actual",
+						style = MaterialTheme.typography.bodyMedium,
+						color = MaterialTheme.colorScheme.onSurfaceVariant
+					)
+					Text(
+						text = "$savingsPct%",
+						style = MaterialTheme.typography.headlineSmallEmphasized,
+						fontWeight = FontWeight.ExtraBold,
+						color = if (savingsPct >= 20) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+					)
+				}
+			}
+
+			LinearSavingsBar(
+				recurrentPct = recurrentPct,
+				variablePct = variablePct,
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(16.dp)
+			)
+
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.SpaceBetween,
+				verticalAlignment = Alignment.Top
 			) {
 				Text(
-					text = "Ahorro actual",
-					style = MaterialTheme.typography.bodyMedium,
-					color = MaterialTheme.colorScheme.onSurface
+					text = "Disponible: ${formatCurrencySymbolOnly(savings, currency)}",
+					style = MaterialTheme.typography.labelSmallCondensed.copy(fontWeight = FontWeight.Light),
+					color = MaterialTheme.colorScheme.onSurfaceVariant
 				)
-				Text(
-					text = "$savingsPct%",
-					style = MaterialTheme.typography.titleLarge,
-					fontWeight = FontWeight.Bold,
-					color = if (savingsPct >= 20) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-				)
+				Column(horizontalAlignment = Alignment.End) {
+					Text(
+						text = "Ahorro ideal: ${
+							formatCurrencySymbolOnly(
+								budget.multiply(BigDecimal("0.2")), currency
+							)
+						}",
+						style = MaterialTheme.typography.labelSmallCondensed.copy(
+							fontWeight = FontWeight.Light,
+							textDecoration = if (savingsPct < 20) TextDecoration.LineThrough else TextDecoration.None
+						),
+						color = MaterialTheme.colorScheme.onSurfaceVariant
+					)
+					if (savingsPct < 20) {
+						Text(
+							text = "Ahorro actual: ${formatCurrencySymbolOnly(savings, currency)}",
+							style = MaterialTheme.typography.labelSmallCondensed.copy(fontWeight = FontWeight.Bold),
+							color = MaterialTheme.colorScheme.error
+						)
+					}
+				}
 			}
-			LinearProgressIndicator(
-				progress = { (savingsPct / 100f).coerceIn(0f, 1f) },
-				modifier = Modifier.fillMaxWidth().height(8.dp),
-				strokeCap = StrokeCap.Round,
-				trackColor = MaterialTheme.colorScheme.surfaceVariant,
-				color = if (savingsPct >= 20) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-			)
-			Text(
-				text = "Meta: 20% (${formatCurrencySymbolOnly(budget.multiply(BigDecimal("0.2")), currency)})",
-				style = MaterialTheme.typography.labelSmall,
-				color = MaterialTheme.colorScheme.onSurfaceVariant
-			)
 		}
 
 		HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
 		Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 			RecommendationItem(
-				label = "Gastos Fijos (Necesidades)",
+				label = "Gastos Recurrentes",
 				value = formatCurrencySymbolOnly(recurrentSpent, currency),
 				percentage = recurrentPct,
 				target = 50,
-				description = if (recurrentPct > 50) "Están elevados. Busca reducir servicios o suscripciones." else "Bajo el límite del 50%."
+				color = MaterialTheme.colorScheme.outlineVariant
 			)
 
 			RecommendationItem(
-				label = "Gastos Variables (Deseos)",
+				label = "Gastos Únicos",
 				value = formatCurrencySymbolOnly(variableSpent, currency),
 				percentage = variablePct,
 				target = 30,
-				description = if (variablePct > 30) "Considera limitar gastos no esenciales este periodo." else "Buen control de tus gustos."
+				color = MaterialTheme.colorScheme.primary
 			)
 		}
 	}
 }
 
 @Composable
-private fun RecommendationItem(
-	label: String,
-	value: String,
-	percentage: Int,
-	target: Int,
-	description: String
+fun LinearSavingsBar(
+	recurrentPct: Int, variablePct: Int, modifier: Modifier = Modifier
 ) {
-	Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-		Row(
-			modifier = Modifier.fillMaxWidth(),
-			horizontalArrangement = Arrangement.SpaceBetween,
-			verticalAlignment = Alignment.CenterVertically
-		) {
+	val totalSpentPct = recurrentPct + variablePct
+
+	Box(
+		modifier = modifier
+			.clip(CircleShape)
+			.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+	) {
+		Row(modifier = Modifier.fillMaxSize()) {
+			val recSafe = recurrentPct.coerceAtMost(80).toFloat()
+			val varSafe = if (recurrentPct < 80) {
+				variablePct.coerceAtMost(80 - recurrentPct).toFloat()
+			} else 0f
+			val gapSafe = (80 - (recSafe + varSafe)).coerceAtLeast(0f)
+
+			val totalInvasion = (totalSpentPct - 80).coerceIn(0, 20).toFloat()
+			val safeSavings = (20 - totalInvasion).coerceAtLeast(0f)
+
+			if (recSafe > 0) {
+				Box(
+					Modifier
+						.weight(recSafe)
+						.fillMaxHeight()
+						.background(MaterialTheme.colorScheme.outlineVariant)
+				)
+			}
+			if (varSafe > 0) {
+				Box(
+					Modifier
+						.weight(varSafe)
+						.fillMaxHeight()
+						.background(MaterialTheme.colorScheme.primary)
+				)
+			}
+			if (gapSafe > 0) {
+				Spacer(Modifier.weight(gapSafe))
+			}
+
+			Box(
+				Modifier
+					.width(1.dp)
+					.fillMaxHeight()
+					.background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f))
+			)
+
+			if (totalInvasion > 0) {
+				Box(
+					Modifier
+						.weight(totalInvasion)
+						.fillMaxHeight()
+						.background(MaterialTheme.colorScheme.error)
+				)
+			}
+			if (safeSavings > 0) {
+				Box(
+					Modifier
+						.weight(safeSavings)
+						.fillMaxHeight()
+						.background(MaterialTheme.colorScheme.error.copy(alpha = 0.15f))
+				)
+			}
+		}
+	}
+}
+
+@Composable
+private fun RecommendationItem(
+	label: String, value: String, percentage: Int, target: Int, color: Color
+) {
+	Row(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalArrangement = Arrangement.SpaceBetween,
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Row(verticalAlignment = Alignment.CenterVertically) {
+			Box(
+				modifier = Modifier
+					.size(10.dp)
+					.clip(CircleShape)
+					.background(color)
+			)
+			Spacer(modifier = Modifier.width(8.dp))
 			Text(
 				text = label,
-				style = MaterialTheme.typography.labelMedium,
-				fontWeight = FontWeight.SemiBold
-			)
-			Text(
-				text = "$value ($percentage%)",
-				style = MaterialTheme.typography.bodySmall,
-				fontWeight = FontWeight.Medium,
-				color = if (percentage > target) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+				style = MaterialTheme.typography.labelLarge,
+				fontWeight = FontWeight.Medium
 			)
 		}
 		Text(
-			text = description,
-			style = MaterialTheme.typography.labelSmall,
-			color = MaterialTheme.colorScheme.onSurfaceVariant
+			text = "$value ($percentage%)",
+			style = MaterialTheme.typography.bodyMediumCondensed,
+			fontWeight = FontWeight.Bold,
+			color = if (percentage > target) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
 		)
 	}
 }
@@ -154,12 +276,55 @@ private fun RecommendationItem(
 @Composable
 private fun SavingsRecommendationPreview() {
 	MinusTheme {
-		SavingsRecommendationCard(
-			budget = BigDecimal("20000"),
-			spends = listOf(
-				Transaction(amount = BigDecimal("11000"), isRecurrent = true, comment = "Renta + Luz", date = LocalDateTime.now()),
-				Transaction(amount = BigDecimal("4000"), isRecurrent = false, comment = "Cenas", date = LocalDateTime.now()),
+		Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+			Text("Caso: Gastos normales", style = MaterialTheme.typography.titleSmall)
+			SavingsRecommendationCard(
+				budget = BigDecimal("20000"), spends = listOf(
+					Transaction(
+						amount = BigDecimal("6000"),
+						isRecurrent = true,
+						comment = "Renta",
+						date = LocalDateTime.now()
+					),
+					Transaction(
+						amount = BigDecimal("4000"),
+						isRecurrent = false,
+						comment = "Súper",
+						date = LocalDateTime.now()
+					),
+				)
 			)
-		)
+		}
+	}
+}
+
+@Preview(
+	showBackground = true,
+	uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Composable
+private fun SavingsRecommendationNoRecurrentPreview() {
+	MinusTheme {
+		Surface {
+
+			Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+				SavingsRecommendationCard(
+					budget = BigDecimal("12000"), spends = listOf(
+						Transaction(
+							amount = BigDecimal("6000"),
+							isRecurrent = false,
+							comment = "Salidas",
+							date = LocalDateTime.now()
+						),
+						Transaction(
+							amount = BigDecimal("4000"),
+							isRecurrent = false,
+							comment = "Súper",
+							date = LocalDateTime.now()
+						),
+					)
+				)
+			}
+		}
 	}
 }
