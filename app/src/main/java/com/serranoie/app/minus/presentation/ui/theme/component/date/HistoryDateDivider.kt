@@ -20,12 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
-import com.serranoie.app.minus.presentation.util.numberFormat
 import com.serranoie.app.minus.presentation.util.prettyDate
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -79,7 +77,7 @@ fun HistoryDateDivider(
 					showTime = false,
 					human = true
 				),
-				style = MaterialTheme.typography.labelMediumEmphasized,
+				style = MaterialTheme.typography.labelMediumCondensed,
 				color = MaterialTheme.colorScheme.primary
 			)
 		}
@@ -89,15 +87,17 @@ fun HistoryDateDivider(
 			enter = fadeIn(animationSpec = tween(durationMillis = 150)),
 			exit = fadeOut(animationSpec = tween(durationMillis = 150))
 		) {
-			val totalText = numberFormat(
-				context = LocalContext.current,
-				value = totalAmount!!,
-				currency = currencyCode
-			)
-			Text(
-				text = totalText,
-				style = MaterialTheme.typography.labelMediumCondensed,
-				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+			val currencyFormat = java.text.NumberFormat.getCurrencyInstance().apply {
+				if (currencyCode.isNotBlank()) {
+					runCatching {
+						currency = java.util.Currency.getInstance(currencyCode)
+					}
+				}
+			}
+			DayTotalItem(
+				total = totalAmount!!,
+				currencyFormat = currencyFormat,
+				modifier = Modifier
 			)
 		}
 	}

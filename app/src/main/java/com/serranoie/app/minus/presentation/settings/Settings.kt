@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -79,11 +80,13 @@ import java.util.Locale
 fun Settings(
 	modifier: Modifier = Modifier,
 	currentTheme: String,
+	currentTypography: String,
 	isMaterialYouEnabled: Boolean,
 	notificationHour: Int,
 	notificationMinute: Int,
 	exactAlarmEnabled: Boolean,
 	onThemeChange: (String) -> Unit,
+	onTypographyChange: (String) -> Unit,
 	onMaterialYouToggle: () -> Unit,
 	onNotificationTimeChange: (Int, Int) -> Unit,
 	onOpenExactAlarmSettings: () -> Unit,
@@ -95,8 +98,10 @@ fun Settings(
 	onBack: () -> Unit = {},
 ) {
 	var showThemeDialog by remember { mutableStateOf(false) }
+	var showTypographyDialog by remember { mutableStateOf(false) }
 	var showNotificationTimePicker by remember { mutableStateOf(false) }
 	val dismissThemeDialog = { showThemeDialog = false }
+	val dismissTypographyDialog = { showTypographyDialog = false }
 	val dismissNotificationTimePicker = { showNotificationTimePicker = false }
 	val scrollBehavior =
 		TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -145,7 +150,7 @@ fun Settings(
 					CustomPaddedListItem(
 						onClick = {
 							showThemeDialog = true
-//							view.weakHapticFeedback()
+							view.weakHapticFeedback()
 						},
 						position = PaddedListItemPosition.First,
 						modifier = Modifier.testTag("SettingsThemeItem")
@@ -172,6 +177,42 @@ fun Settings(
 						}
 						Text(
 							text = currentTheme,
+							style = MaterialTheme.typography.labelLarge,
+							color = MaterialTheme.colorScheme.primary
+						)
+					}
+
+					CustomPaddedListItem(
+						onClick = {
+							showTypographyDialog = true
+							view.weakHapticFeedback()
+						},
+						position = PaddedListItemPosition.Middle,
+						modifier = Modifier.testTag("SettingsTypoItem")
+					) {
+						Icon(
+							imageVector = Icons.Default.TextFields,
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.primary
+						)
+						Spacer(modifier = Modifier.width(16.dp))
+
+						Column(modifier = Modifier.weight(1f)) {
+							Spacer(modifier = Modifier.width(16.dp))
+
+							Text(
+								text = "Tipografía",
+								style = MaterialTheme.typography.bodyLarge,
+								color = MaterialTheme.colorScheme.onSurface
+							)
+							Text(
+								text = "Cambia el estilo de la tipografía dentro de la app",
+								style = MaterialTheme.typography.bodySmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+						Text(
+							text = currentTypography,
 							style = MaterialTheme.typography.labelLarge,
 							color = MaterialTheme.colorScheme.primary
 						)
@@ -468,6 +509,14 @@ fun Settings(
 			)
 		}
 
+		if (showTypographyDialog) {
+			TypographyPickerDialog(
+				currentTypography = currentTypography,
+				onTypographySelected = onTypographyChange,
+				onDismiss = dismissTypographyDialog,
+			)
+		}
+
 		if (showNotificationTimePicker) {
 			NotificationTimePickerDialog(
 				initialHour = notificationHour,
@@ -605,6 +654,73 @@ private fun ThemeOption(
 }
 
 @Composable
+fun TypographyPickerDialog(
+	currentTypography: String,
+	onTypographySelected: (String) -> Unit,
+	onDismiss: () -> Unit,
+) {
+	Dialog(onDismissRequest = onDismiss) {
+		Surface(
+			shape = RoundedCornerShape(28.dp),
+			color = MaterialTheme.colorScheme.surfaceContainerHigh,
+			tonalElevation = 6.dp,
+			modifier = Modifier.testTag("TypographyPickerDialog")
+		) {
+			Column(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(24.dp)
+			) {
+				Text(
+					text = "Tipografía de la aplicación",
+					style = MaterialTheme.typography.headlineSmall,
+					fontWeight = FontWeight.Bold,
+					color = MaterialTheme.colorScheme.onSurface,
+					modifier = Modifier.padding(bottom = 16.dp)
+				)
+
+				ThemeOption(
+					title = "Default",
+					subtitle = "Usa la tipografía base",
+					icon = Icons.Default.TextFields,
+					isSelected = currentTypography == "Default",
+					onClick = {
+						onTypographySelected("Default")
+						onDismiss()
+					}
+				)
+
+				Spacer(modifier = Modifier.height(8.dp))
+
+				ThemeOption(
+					title = "Condensada",
+					subtitle = "Usa la tipografía compacta",
+					icon = Icons.Default.TextFields,
+					isSelected = currentTypography == "Condensed",
+					onClick = {
+						onTypographySelected("Condensed")
+						onDismiss()
+					}
+				)
+
+				Spacer(modifier = Modifier.height(8.dp))
+
+				ThemeOption(
+					title = "Expressive",
+					subtitle = "Usa la tipografía expresiva",
+					icon = Icons.Default.TextFields,
+					isSelected = currentTypography == "Expressive",
+					onClick = {
+						onTypographySelected("Expressive")
+						onDismiss()
+					}
+				)
+			}
+		}
+	}
+}
+
+@Composable
 private fun NotificationTimePickerDialog(
 	initialHour: Int, initialMinute: Int, onDismiss: () -> Unit, onTimeSelected: (Int, Int) -> Unit
 ) {
@@ -640,11 +756,13 @@ private fun PreviewSettings() {
 	MinusTheme {
 		Settings(
 			currentTheme = "System",
+			currentTypography = "Expressive",
 			isMaterialYouEnabled = true,
 			notificationHour = 9,
 			notificationMinute = 0,
 			exactAlarmEnabled = true,
 			onThemeChange = {},
+			onTypographyChange = {},
 			onMaterialYouToggle = {},
 			onNotificationTimeChange = { _, _ -> },
 			onOpenExactAlarmSettings = {},

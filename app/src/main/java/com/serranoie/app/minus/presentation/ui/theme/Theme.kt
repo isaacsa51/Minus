@@ -15,16 +15,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.serranoie.app.minus.THEME_MODE_KEY
+import com.serranoie.app.minus.TYPOGRAPHY_MODE_KEY
 import com.serranoie.app.minus.appTheme
-import com.serranoie.app.minus.presentation.ui.theme.ExpressiveTypography
+import com.serranoie.app.minus.appTypography
 import com.serranoie.app.minus.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.theme.harmonize.palette.CorePalette
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 enum class ThemeMode { LIGHT, NIGHT, SYSTEM }
+enum class TypographyMode { DEFAULT, CONDENSED, EXPRESSIVE }
 
 fun darkScheme(): ColorScheme {
 	val palette = CorePalette.contentOf(seedColor.toArgb())
@@ -121,10 +122,16 @@ fun MinusTheme(
 		else -> lightScheme()
 	}
 
+	val typography = when (LocalContext.current.appTypography) {
+		TypographyMode.DEFAULT -> Typography
+		TypographyMode.CONDENSED -> Typography.withCondensedStyles()
+		TypographyMode.EXPRESSIVE -> ExpressiveTypography
+	}
+
 	MaterialTheme(
 		colorScheme = colorScheme,
 		shapes = shapes,
-		typography = ExpressiveTypography,
+		typography = typography,
 		content = content
 	)
 
@@ -144,6 +151,10 @@ fun syncTheme(context: Context) {
 	val mode = ThemeMode.valueOf(
 		currentValue[THEME_MODE_KEY] ?: ThemeMode.SYSTEM.toString()
 	)
+	val typographyMode = TypographyMode.valueOf(
+		currentValue[TYPOGRAPHY_MODE_KEY] ?: TypographyMode.EXPRESSIVE.toString()
+	)
 
 	context.appTheme = mode
+	context.appTypography = typographyMode
 }

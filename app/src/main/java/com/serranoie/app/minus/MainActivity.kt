@@ -56,6 +56,7 @@ import com.serranoie.app.minus.presentation.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE
 import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
+import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
 import com.serranoie.app.minus.presentation.ui.theme.syncTheme
 import com.serranoie.app.minus.presentation.util.lockScreenOrientation
@@ -67,16 +68,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import logcat.asLog
 import logcat.logcat
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
 import java.util.Locale
 
 val Context.settingsDataStore by preferencesDataStore("settings")
 var Context.appTheme by mutableStateOf(ThemeMode.SYSTEM)
+var Context.appTypography by mutableStateOf(TypographyMode.EXPRESSIVE)
 var Context.dynamicColorEnabled by mutableStateOf(false)
-var Context.systemLocale: Locale? by mutableStateOf(null)
-var Context.errorForReport: String? by mutableStateOf(null)
 
 val LocalWindowSize = compositionLocalOf { WindowWidthSizeClass.Compact }
 val LocalWindowInsets = compositionLocalOf { PaddingValues(0.dp) }
@@ -86,6 +83,7 @@ val BUDGET_END_DATE_KEY = longPreferencesKey("budget_end_date_millis")
 val NOTIFICATION_HOUR_KEY = intPreferencesKey("notification_hour")
 val NOTIFICATION_MINUTE_KEY = intPreferencesKey("notification_minute")
 val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
+val TYPOGRAPHY_MODE_KEY = stringPreferencesKey("typography_mode")
 val DYNAMIC_COLOR_KEY = booleanPreferencesKey("dynamic_color_enabled")
 val EARLY_FINISH_ACTIVE_KEY = booleanPreferencesKey("early_finish_active")
 val EARLY_FINISH_ACTUAL_DATE_KEY = longPreferencesKey("early_finish_actual_date_millis")
@@ -108,7 +106,6 @@ class MainActivity : ComponentActivity() {
 	private val isReady: MutableState<Boolean> = mutableStateOf(false)
 	private val dataStoreLoaded: MutableState<Boolean> = mutableStateOf(false)
 	private val onboardingComplete: MutableState<Boolean> = mutableStateOf(false)
-	private val periodEnded: MutableState<Boolean> = mutableStateOf(false)
 	private val earlyFinishPending: MutableState<Boolean> = mutableStateOf(false)
 	@javax.inject.Inject
 	lateinit var notificationScheduler: NotificationScheduler
@@ -171,31 +168,6 @@ class MainActivity : ComponentActivity() {
 
 				val prefs = applicationContext.settingsDataStore.data.first()
 				onboardingComplete.value = prefs[ONBOARDING_COMPLETED_KEY] ?: false
-				val endDateMillis = prefs[BUDGET_END_DATE_KEY]
-
-				if (endDateMillis != null && endDateMillis > 0) {
-					val endDate = Instant.ofEpochMilli(endDateMillis).atZone(ZoneId.systemDefault())
-						.toLocalDate()
-					val today = LocalDate.now()
-					periodEnded.value = today.isAfter(endDate) || today.isEqual(endDate)
-				}
-
-				val transitionOccurred = prefs[MIDNIGHT_TRANSITION_OCCURRED_KEY] ?: false
-				if (transitionOccurred) {
-					applicationContext.settingsDataStore.edit {
-						it[MIDNIGHT_TRANSITION_OCCURRED_KEY] = false
-					}
-					val lastPeriodEndMillis = prefs[LAST_PERIOD_END_KEY]
-					if (lastPeriodEndMillis != null) {
-						val lastPeriodEnd =
-							Instant.ofEpochMilli(lastPeriodEndMillis).atZone(ZoneId.systemDefault())
-								.toLocalDate()
-						periodEnded.value =
-							LocalDate.now().isAfter(lastPeriodEnd) || LocalDate.now().isEqual(lastPeriodEnd)
-					}
-					logcat(tag) { "Midnight transition detected on app start, routing to Analytics" }
-				}
-
 				earlyFinishPending.value = prefs[EARLY_FINISH_ACTIVE_KEY] ?: false
 
 				val themeModeString = prefs[THEME_MODE_KEY]
@@ -207,6 +179,17 @@ class MainActivity : ComponentActivity() {
 					}
 				} else {
 					context.appTheme = ThemeMode.SYSTEM
+				}
+
+				val typographyModeString = prefs[TYPOGRAPHY_MODE_KEY]
+				if (typographyModeString != null) {
+					try {
+						context.appTypography = TypographyMode.valueOf(typographyModeString)
+					} catch (_: IllegalArgumentException) {
+						context.appTypography = TypographyMode.EXPRESSIVE
+					}
+				} else {
+					context.appTypography = TypographyMode.EXPRESSIVE
 				}
 
 				val dynamicColor = prefs[DYNAMIC_COLOR_KEY] ?: false
@@ -236,7 +219,7 @@ class MainActivity : ComponentActivity() {
 		ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
 			override fun onStart(owner: LifecycleOwner) {
 				lifecycleScope.launch {
-					midnightPeriodChecker.checkMidnightTransition()
+					midnightPeriodChecker.handleEndingPeriod()
 				}
 			}
 		})
@@ -316,8 +299,17 @@ class MainActivity : ComponentActivity() {
 							val shouldShowMidnightDialog by midnightPeriodChecker.shouldShowTransitionDialog.collectAsStateWithLifecycle()
 							val midnightTransitionData by midnightPeriodChecker.midnightTransitionData.collectAsStateWithLifecycle()
 
-							if (shouldShowMidnightDialog && midnightTransitionData != null) {
-								val data = midnightTransitionData!!
+															if (shouldShowMidnightDialog && midnightTransitionData != null) {
+									val data = midnightTransitionData!!
+									if (data.shouldNavigateToAnalyticsOnly) {
+										LaunchedEffect(data.periodEndDate, data.remainingAmount, data.totalBudget, data.totalSpent) {
+											midnightPeriodChecker.onTransitionDialogConfirmed()
+											navController.navigate(Screen.Analytics.route) {
+												popUpTo(Screen.Main.route) { inclusive = false }
+												launchSingleTop = true
+											}
+										}
+									} else {
 								val periodLabel =
 									"${data.periodStartDate.dayOfMonth} ${data.periodStartDate.month.name.lowercase().take(3)} - ${data.periodEndDate.dayOfMonth} ${data.periodEndDate.month.name.lowercase().take(3)}"
 								RolloverDialog(
@@ -325,16 +317,24 @@ class MainActivity : ComponentActivity() {
 									currencyCode = data.currencyCode,
 									periodLabel = periodLabel,
 									spentAmount = data.totalSpent,
-									onSplitEqually = {
-										lifecycleScope.launch {
-											midnightPeriodChecker.rollRemainingSplitEqually()
-										}
-									},
-									onCarryToNextDay = {
-										lifecycleScope.launch {
-											midnightPeriodChecker.rollRemainingToFirstDay()
-										}
-									},
+																						onSplitEqually = {
+														lifecycleScope.launch {
+															midnightPeriodChecker.rollRemainingSplitEqually()
+															navController.navigate(Screen.Analytics.route) {
+																popUpTo(Screen.Main.route) { inclusive = false }
+																launchSingleTop = true
+															}
+														}
+													},
+													onCarryToNextDay = {
+														lifecycleScope.launch {
+															midnightPeriodChecker.rollRemainingToFirstDay()
+															navController.navigate(Screen.Analytics.route) {
+																popUpTo(Screen.Main.route) { inclusive = false }
+																launchSingleTop = true
+															}
+														}
+													},
 									onViewAnalytics = {
 										midnightPeriodChecker.onTransitionDialogConfirmed()
 										navController.navigate(Screen.Analytics.route) {
@@ -345,6 +345,7 @@ class MainActivity : ComponentActivity() {
 										midnightPeriodChecker.onTransitionDialogDismissed()
 									}
 								)
+								}
 							}
 						}
 					}

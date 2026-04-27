@@ -85,12 +85,12 @@ import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActions
 import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActionsConfig
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransactionsView
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
-import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItemRow
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.RecurrentTicketCard
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TicketView
 import com.serranoie.app.minus.presentation.util.prettyDate
@@ -101,7 +101,6 @@ import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -387,27 +386,13 @@ fun History(
 								}
 							}
 
-							val totalText = currencyFormat.format(dayTotal)
-							Row(
+							DayTotalItem(
+								total = dayTotal,
+								currencyFormat = currencyFormat,
 								modifier = Modifier
 									.fillMaxWidth()
-									.padding(horizontal = 16.dp, vertical = 8.dp),
-								horizontalArrangement = Arrangement.End,
-								verticalAlignment = Alignment.CenterVertically
-							) {
-								Text(
-									text = "Total del día: ",
-									style = MaterialTheme.typography.labelMedium,
-									color = MaterialTheme.colorScheme.onSurfaceVariant
-								)
-
-								Text(
-									text = totalText,
-									style = MaterialTheme.typography.labelLarge,
-									color = MaterialTheme.colorScheme.primary,
-									fontWeight = FontWeight.Bold
-								)
-							}
+									.padding(horizontal = 16.dp, vertical = 8.dp)
+							)
 						}
 					}
 				}
@@ -1191,49 +1176,6 @@ private fun HistoryFullContentPreview() {
 					)
 				}
 			}
-		}
-	}
-}
-
-@Preview
-@Composable
-private fun UpcomingRecurrentItemPreview() {
-	MinusTheme {
-		Column {
-			UpcomingRecurrentItemRow(
-				item = UpcomingRecurrentItem(
-					transaction = Transaction(
-						id = 1L,
-						amount = BigDecimal("199.00"),
-						comment = "Netflix",
-						date = LocalDateTime.now(),
-						isRecurrent = true,
-						recurrentFrequency = RecurrentFrequency.MONTHLY,
-						subscriptionDay = 15
-					), nextChargeDate = LocalDate.now().plusDays(2), isInCurrentPeriod = true
-				),
-				currencyFormat = NumberFormat.getCurrencyInstance(),
-				position = PaddedListItemPosition.Single
-			)
-
-			Spacer(modifier = Modifier.height(8.dp))
-
-			UpcomingRecurrentItemRow(
-				item = UpcomingRecurrentItem(
-					transaction = Transaction(
-						id = 2L,
-						amount = BigDecimal("99.00"),
-						comment = "Spotify",
-						date = LocalDateTime.now(),
-						isRecurrent = true,
-						recurrentFrequency = RecurrentFrequency.MONTHLY,
-						subscriptionDay = 3
-					), nextChargeDate = LocalDate.now().plusDays(15), isInCurrentPeriod = false
-				),
-				currencyFormat = NumberFormat.getCurrencyInstance(),
-				position = PaddedListItemPosition.Single,
-				isOutOfPeriod = true
-			)
 		}
 	}
 }

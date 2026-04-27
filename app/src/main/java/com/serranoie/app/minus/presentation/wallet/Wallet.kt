@@ -36,7 +36,10 @@ fun Wallet(
 				showPreviousValuesChip = budgetSettings != null,
 				onBack = onClose,
 				onApply = { newSettings ->
-					budgetViewModel.saveBudgetSettings(newSettings)
+					budgetViewModel.saveBudgetSettings(
+						newSettings,
+						forceNewPeriodBoundary = forceChange || budgetSettings == null
+					)
 					if (forceChange || budgetSettings == null) {
 						onOnboardingComplete()
 					}

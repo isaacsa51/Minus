@@ -47,6 +47,7 @@ fun FinishedPeriodHeader(
 	modifier: Modifier = Modifier,
 	scrollState: ScrollState = rememberScrollState(),
 	hasSpends: Boolean = false,
+	isOverBudget: Boolean = false,
 ) {
 	val localDensity = LocalDensity.current
 	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
@@ -55,7 +56,7 @@ fun FinishedPeriodHeader(
 	val scroll = with(localDensity) { scrollState.value.toDp() }
 
 	Box(
-		modifier = Modifier
+		modifier = modifier
 			.fillMaxWidth()
 			.padding(top = statusBarHeight)
 			.onGloballyPositioned {
@@ -85,6 +86,12 @@ fun FinishedPeriodHeader(
 			if (!hasSpends) {
 				Text(
 					text = "Huh? No gastaste nada en este periodo",
+					style = MaterialTheme.typography.titleMedium,
+					textAlign = TextAlign.Center,
+				)
+			} else if (isOverBudget) {
+				Text(
+					text = "Cuidado! Al parecer te has endeudado en este periodo, aquí abajo están las estadisticas",
 					style = MaterialTheme.typography.titleMedium,
 					textAlign = TextAlign.Center,
 				)
@@ -147,6 +154,19 @@ private fun PreviewFinishedPeriodHeader() {
 	MinusTheme {
 		Surface {
 			FinishedPeriodHeader()
+		}
+	}
+}
+
+@Preview(name = "FinishedPeriodHeader - OverBudget")
+@Composable
+private fun PreviewFinishedPeriodHeaderOverBudget() {
+	MinusTheme {
+		Surface {
+			FinishedPeriodHeader(
+				hasSpends = true,
+				isOverBudget = true,
+			)
 		}
 	}
 }

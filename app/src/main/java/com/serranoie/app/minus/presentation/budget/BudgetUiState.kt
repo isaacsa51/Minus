@@ -21,8 +21,6 @@ data class BudgetUiState(
 	val animState: AnimState = AnimState.IDLE,
 	val currentComment: String = "",
 	val tags: List<String> = emptyList(),
-	val showRolloverDialog: Boolean = false,
-	val remainingFromPreviousPeriod: BigDecimal = BigDecimal.ZERO,
 	val isFirstLaunch: Boolean = true,
 	val isRecurrentEnabled: Boolean = false,
 	val showRecurrentDialog: Boolean = false,
@@ -34,9 +32,6 @@ data class BudgetUiState(
 	val dragProgress: Float = 0f,
 	val lockSwipeable: Boolean = false,
 	val lockDraggable: Boolean = false,
-	val showPeriodEndedDialog: Boolean = false,
-	val pendingExpenseAfterPeriodAmount: BigDecimal? = null,
-	val pendingExpenseAfterPeriodComment: String = "",
 	val pendingExpensesForNextPeriod: List<Transaction> = emptyList()
 ) {
 	companion object {

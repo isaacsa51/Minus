@@ -6,6 +6,7 @@ import com.serranoie.app.minus.data.local.AppDatabase
 import com.serranoie.app.minus.data.local.AppDatabaseMigrations
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
+import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import dagger.Module
 import dagger.Provides
@@ -29,6 +30,7 @@ object DatabaseModule {
             AppDatabase.DATABASE_NAME
         )
             .addMigrations(AppDatabaseMigrations.MIGRATION_6_7)
+            .addMigrations(AppDatabaseMigrations.MIGRATION_8_9)
             .fallbackToDestructiveMigration()
             .build()
 	}
@@ -46,5 +48,10 @@ object DatabaseModule {
 	@Provides
 	fun provideCategoryDao(database: AppDatabase): CategoryDao {
 		return database.categoryDao()
+	}
+
+	@Provides
+	fun provideQueuedTransactionDao(database: AppDatabase): QueuedTransactionDao {
+		return database.queuedTransactionDao()
 	}
 }

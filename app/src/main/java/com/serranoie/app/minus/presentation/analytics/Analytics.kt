@@ -115,6 +115,7 @@ fun Analytics(
 					FinishedPeriodHeader(
 						scrollState = scrollState,
 						hasSpends = state.spends.isNotEmpty(),
+						isOverBudget = state.spends.sumOf { it.amount } > state.wholeBudget,
 					)
 				}
 

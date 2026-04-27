@@ -41,7 +41,9 @@ import com.serranoie.app.minus.EARLY_FINISH_ORIGINAL_END_DATE_KEY
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.NOTIFICATION_MINUTE_KEY
+import com.serranoie.app.minus.TYPOGRAPHY_MODE_KEY
 import com.serranoie.app.minus.appTheme
+import com.serranoie.app.minus.appTypography
 import com.serranoie.app.minus.dynamicColorEnabled
 import com.serranoie.app.minus.presentation.analytics.Analytics
 import com.serranoie.app.minus.presentation.analytics.AnalyticsActions
@@ -56,6 +58,7 @@ import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.tutorial.PERIOD_MAPPING_MODE_KEY
 import com.serranoie.app.minus.presentation.tutorial.periodMappingModeFlow
 import com.serranoie.app.minus.presentation.wallet.Wallet
+import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
 import com.serranoie.app.minus.settingsDataStore
@@ -266,7 +269,7 @@ fun AppNavGraph(
             // Check if period is finished naturally or marked as finished early
             val today = java.time.LocalDate.now()
             val periodFinishedNaturally = budgetSettings?.getPeriodEndDate()?.let { endDate ->
-                today.isAfter(endDate) || today.isEqual(endDate)
+                today.isAfter(endDate)
             } ?: false
             val periodFinished = periodFinishedNaturally || earlyFinishActive
 
@@ -394,8 +397,14 @@ fun AppNavGraph(
                 com.serranoie.app.minus.presentation.ui.theme.ThemeMode.NIGHT -> "Dark"
                 else -> "System"
             }
+            val currentTypographyString = when (context.appTypography) {
+                TypographyMode.DEFAULT -> "Default"
+                TypographyMode.CONDENSED -> "Condensed"
+                TypographyMode.EXPRESSIVE -> "Expressive"
+            }
             Settings(
                 currentTheme = currentThemeString,
+                currentTypography = currentTypographyString,
                 isMaterialYouEnabled = context.dynamicColorEnabled,
                 notificationHour = notificationHour,
                 notificationMinute = notificationMinute,
@@ -411,6 +420,19 @@ fun AppNavGraph(
                     scope.launch {
                         context.settingsDataStore.edit { prefs ->
                             prefs[com.serranoie.app.minus.THEME_MODE_KEY] = newThemeMode.toString()
+                        }
+                    }
+                },
+                onTypographyChange = { typographyMode ->
+                    val newTypographyMode = when (typographyMode) {
+                        "Default" -> TypographyMode.DEFAULT
+                        "Condensed" -> TypographyMode.CONDENSED
+                        else -> TypographyMode.EXPRESSIVE
+                    }
+                    context.appTypography = newTypographyMode
+                    scope.launch {
+                        context.settingsDataStore.edit { prefs ->
+                            prefs[TYPOGRAPHY_MODE_KEY] = newTypographyMode.toString()
                         }
                     }
                 },

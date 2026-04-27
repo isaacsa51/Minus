@@ -97,9 +97,7 @@ class BudgetViewModel @Inject constructor(
 
 	private val _numpadInput = MutableStateFlow("")
 	private val _currentComment = MutableStateFlow("")
-
-	private var lastPeriodEndDate: LocalDate? = null
-	private var resolvedRolloverPeriodEndDate: LocalDate? = null
+	private val _pendingPeriodBoundaryOverride = MutableStateFlow<Pair<Long, Long>?>(null)
 
 	init {
 		observeBudgetData()
@@ -113,9 +111,10 @@ class BudgetViewModel @Inject constructor(
 			combine(
 				budgetRepository.getBudgetSettings(),
 				budgetRepository.getTransactions(),
-				buildPeriodBoundaryFlow()
-			) { settings, transactions, periodBoundary ->
-				createBaseUiState(settings, transactions, periodBoundary)
+				buildPeriodBoundaryFlow(),
+				budgetRepository.getQueuedTransactions()
+			) { settings, transactions, periodBoundary, queuedTransactions ->
+				createBaseUiState(settings, transactions, periodBoundary, queuedTransactions)
 			}.catch { error ->
 				emit(
 					BudgetUiState(
@@ -152,8 +151,6 @@ class BudgetViewModel @Inject constructor(
 			val settings = budgetRepository.getBudgetSettingsSync()
 			if (settings == null) {
 				_uiState.update { it.copy(isFirstLaunch = true) }
-			} else {
-				checkRolloverOnPeriodStart(settings)
 			}
 		}
 	}
@@ -168,7 +165,7 @@ class BudgetViewModel @Inject constructor(
 	}
 
 	private fun buildPeriodBoundaryFlow() = context.settingsDataStore.data.map { prefs ->
-		Pair(
+		_pendingPeriodBoundaryOverride.value ?: Pair(
 			prefs[CURRENT_PERIOD_STARTED_AT_KEY] ?: 0L,
 			prefs[CURRENT_PERIOD_ID_KEY] ?: 0L
 		)
@@ -178,6 +175,7 @@ class BudgetViewModel @Inject constructor(
 		settings: BudgetSettings?,
 		transactions: List<Transaction>,
 		periodBoundary: Pair<Long, Long>,
+		queuedTransactions: List<Transaction>,
 	): BudgetUiState {
 		val currentPeriodStartedAtMillis = periodBoundary.first
 		val currentPeriodId = periodBoundary.second
@@ -192,8 +190,6 @@ class BudgetViewModel @Inject constructor(
 			calculateBudgetState(s, periodTransactions, today)
 		}
 
-		val showRollover = checkAndUpdateRollover(settings, budgetState)
-
 		return BudgetUiState(
 			isLoading = false,
 			budgetSettings = settings,
@@ -207,9 +203,8 @@ class BudgetViewModel @Inject constructor(
 			animState = if (_numpadInput.value.isNotEmpty()) AnimState.EDITING else AnimState.IDLE,
 			currentComment = _currentComment.value,
 			tags = _categories.value.map { it.name },
-			showRolloverDialog = showRollover.first,
-			remainingFromPreviousPeriod = showRollover.second,
 			isFirstLaunch = settings == null,
+			pendingExpensesForNextPeriod = queuedTransactions,
 			currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
 			currentPeriodId = currentPeriodId,
 			isCalculation = _uiState.value.isCalculation,
@@ -252,15 +247,7 @@ class BudgetViewModel @Inject constructor(
 				dragProgress = current.dragProgress,
 				lockSwipeable = current.lockSwipeable,
 				lockDraggable = current.lockDraggable,
-				showRolloverDialog = current.showRolloverDialog || baseState.showRolloverDialog,
-				remainingFromPreviousPeriod = if (current.showRolloverDialog && current.remainingFromPreviousPeriod > BigDecimal.ZERO) {
-					current.remainingFromPreviousPeriod
-				} else {
-					baseState.remainingFromPreviousPeriod
-				},
-				showPeriodEndedDialog = current.showPeriodEndedDialog,
-				pendingExpenseAfterPeriodAmount = current.pendingExpenseAfterPeriodAmount,
-				pendingExpenseAfterPeriodComment = current.pendingExpenseAfterPeriodComment,
+				pendingExpensesForNextPeriod = baseState.pendingExpensesForNextPeriod,
 			)
 		}
 
@@ -381,61 +368,6 @@ class BudgetViewModel @Inject constructor(
 		return currentMonthHeatmap to currentMonthTotalSpent
 	}
 
-	private suspend fun checkRolloverOnPeriodStart(settings: BudgetSettings) {
-		val today = LocalDate.now()
-		val periodEnd = settings.getPeriodEndDate()
-
-		if (today.isAfter(periodEnd) || today.isEqual(periodEnd)) {
-			val transactions = budgetRepository.getTransactions().first()
-			val periodTransactions = transactions.filter {
-				val txDate = it.date?.toLocalDate()
-				!txDate?.isBefore(settings.startDate)!! && !txDate?.isAfter(periodEnd)!!
-			}
-			val totalSpent = periodTransactions.filter { !it.isDeleted }.sumOf { it.amount }
-			val remaining = settings.totalBudget.subtract(totalSpent)
-
-			if (remaining > BigDecimal.ZERO) {
-			_uiState.update {
-				it.copy(
-					showRolloverDialog = true, remainingFromPreviousPeriod = remaining
-				)
-			}
-			resolvedRolloverPeriodEndDate = null
-		} else {
-			startNewPeriod(settings)
-		}
-
-			lastPeriodEndDate = periodEnd
-		}
-	}
-
-	private fun checkAndUpdateRollover(
-		settings: BudgetSettings?, budgetState: com.serranoie.app.minus.domain.model.BudgetState?
-	): Pair<Boolean, BigDecimal> {
-		if (settings == null || budgetState == null) {
-			return Pair(false, BigDecimal.ZERO)
-		}
-
-		val today = LocalDate.now()
-		val periodEnd = settings.getPeriodEndDate()
-
-		if (lastPeriodEndDate != null && (today.isAfter(lastPeriodEndDate) || today.isEqual(
-				lastPeriodEndDate
-			))
-		) {
-			if (resolvedRolloverPeriodEndDate == lastPeriodEndDate) {
-				return Pair(false, BigDecimal.ZERO)
-			}
-			val remaining = budgetState.remainingToday
-
-			if (remaining > BigDecimal.ZERO && !_uiState.value.showRolloverDialog) {
-				return Pair(true, remaining)
-			}
-		}
-
-		return Pair(_uiState.value.showRolloverDialog, _uiState.value.remainingFromPreviousPeriod)
-	}
-
 	private suspend fun startNewPeriod(settings: BudgetSettings) {
 		val newStartDate = LocalDate.now()
 		val updatedSettings = settings.copy(
@@ -446,10 +378,15 @@ class BudgetViewModel @Inject constructor(
 		persistBudgetSettings(updatedSettings, forceNewPeriodBoundary = true)
 	}
 
-	fun saveBudgetSettings(settings: BudgetSettings) {
-		logcat(TAG) { "saveBudgetSettings called: settings=$settings" }
+	fun saveBudgetSettings(
+		settings: BudgetSettings,
+		forceNewPeriodBoundary: Boolean = false,
+	) {
+		logcat(TAG) {
+			"saveBudgetSettings called: settings=$settings forceNewPeriodBoundary=$forceNewPeriodBoundary"
+		}
 		viewModelScope.launch {
-			persistBudgetSettings(settings)
+			persistBudgetSettings(settings, forceNewPeriodBoundary = forceNewPeriodBoundary)
 		}
 	}
 	
@@ -558,9 +495,6 @@ class BudgetViewModel @Inject constructor(
 			is BudgetUiIntent.SetAnimState -> handleSetAnimState(intent.state)
 			is BudgetUiIntent.CommentUpdated -> handleCommentUpdate(intent.comment)
 			is BudgetUiIntent.DeleteTag -> handleDeleteTag(intent.tag)
-			is BudgetUiIntent.RolloverSplitEqually -> handleRolloverSplitEqually(intent.remaining)
-			is BudgetUiIntent.RolloverCarryToNextDay -> handleRolloverCarryToNextDay(intent.remaining)
-			is BudgetUiIntent.DismissRolloverDialog -> handleDismissRolloverDialog()
 			is BudgetUiIntent.MarkFirstLaunchComplete -> markFirstLaunchComplete()
 			is BudgetUiIntent.SetRecurrentEnabled -> handleSetRecurrentEnabled(intent.enabled)
 			is BudgetUiIntent.DismissRecurrentDialog -> handleDismissRecurrentDialog()
@@ -573,8 +507,6 @@ class BudgetViewModel @Inject constructor(
 			is BudgetUiIntent.SetDragProgress -> handleDragProgress(intent.progress)
 			is BudgetUiIntent.SetLockSwipeable -> handleSetLockSwipeable(intent.locked)
 			is BudgetUiIntent.SetLockDraggable -> handleSetLockDraggable(intent.locked)
-			is BudgetUiIntent.DismissPeriodEndedDialog -> handleDismissPeriodEndedDialog()
-			is BudgetUiIntent.ConfirmExpenseAfterPeriod -> handleConfirmExpenseAfterPeriod()
 		}
 	}
 
@@ -752,23 +684,22 @@ class BudgetViewModel @Inject constructor(
 		val today = LocalDate.now()
 		if (settings != null) {
 			val periodEndDate = settings.getPeriodEndDate()
-			if (today.isAfter(periodEndDate) || today.isEqual(periodEndDate)) {
-				val pendingTransaction = Transaction.create(
-					amount = amount,
-					comment = _currentComment.value,
-					date = LocalDateTime.now(),
-					periodId = 0L,
-					categoryId = null
-				)
-				_uiState.update {
-					it.copy(
-						pendingExpensesForNextPeriod = it.pendingExpensesForNextPeriod + pendingTransaction
-					)
-				}
-				_numpadInput.value = ""
-				_currentComment.value = ""
-				_uiState.update { it.copy(isCalculation = false) }
+			if (today.isAfter(periodEndDate)) {
 				viewModelScope.launch {
+					val categoryId: Long? = if (_currentComment.value.isNotBlank()) {
+						budgetRepository.findOrCreateCategory(_currentComment.value.trim()).id
+					} else null
+					val pendingTransaction = Transaction.create(
+						amount = amount,
+						comment = _currentComment.value,
+						date = LocalDateTime.now(),
+						periodId = 0L,
+						categoryId = categoryId
+					)
+					budgetRepository.addQueuedTransaction(pendingTransaction)
+					_numpadInput.value = ""
+					_currentComment.value = ""
+					_uiState.update { it.copy(isCalculation = false) }
 					_effects.emit(BudgetUiEffect.ShowMessage("Gasto en cola para el proximo periodo"))
 				}
 				return
@@ -776,6 +707,7 @@ class BudgetViewModel @Inject constructor(
 		}
 
 		viewModelScope.launch {
+			val activePeriodId = resolveActivePeriodId()
 			val categoryId: Long? = if (_currentComment.value.isNotBlank()) {
 				budgetRepository.findOrCreateCategory(_currentComment.value.trim()).id
 			} else null
@@ -784,7 +716,7 @@ class BudgetViewModel @Inject constructor(
 				amount = amount,
 				comment = _currentComment.value,
 				date = LocalDateTime.now(),
-				periodId = _uiState.value.currentPeriodId,
+				periodId = activePeriodId,
 				categoryId = categoryId
 			)
 			addTransactionUseCase(transaction)
@@ -808,50 +740,6 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-	private fun handleDismissPeriodEndedDialog() {
-		_uiState.update {
-			it.copy(
-				showPeriodEndedDialog = false,
-				pendingExpenseAfterPeriodAmount = null,
-				pendingExpenseAfterPeriodComment = ""
-			)
-		}
-		_numpadInput.value = ""
-		_currentComment.value = ""
-	}
-
-	private fun handleConfirmExpenseAfterPeriod() {
-		val amount = _uiState.value.pendingExpenseAfterPeriodAmount ?: return
-		val comment = _uiState.value.pendingExpenseAfterPeriodComment
-
-		_uiState.update {
-			it.copy(
-				showPeriodEndedDialog = false,
-				pendingExpenseAfterPeriodAmount = null,
-				pendingExpenseAfterPeriodComment = ""
-			)
-		}
-
-		viewModelScope.launch {
-			val categoryId: Long? = if (comment.isNotBlank()) {
-				budgetRepository.findOrCreateCategory(comment.trim()).id
-			} else null
-
-			val transaction = Transaction.create(
-				amount = amount,
-				comment = comment,
-				date = LocalDateTime.now(),
-				periodId = 0L,
-				categoryId = categoryId
-			)
-			addTransactionUseCase(transaction)
-			_numpadInput.value = ""
-			_currentComment.value = ""
-			_uiState.update { it.copy(isCalculation = false) }
-			logcat(TAG) { "Expense saved after period ended" }
-		}
-	}
-
 	private fun handleRecurrentExpenseApply(frequency: RecurrentFrequency, endDate: LocalDate, subscriptionDay: Int?) {
 		val amount = _uiState.value.pendingRecurrentAmount ?: return
 		val rawComment = _uiState.value.pendingRecurrentComment.trim()
@@ -866,6 +754,7 @@ class BudgetViewModel @Inject constructor(
 		val finalComment = rawComment.ifEmpty { fallbackComment }
 
 		viewModelScope.launch {
+			val activePeriodId = resolveActivePeriodId()
 			val categoryId: Long? = if (finalComment.isNotBlank()) {
 				budgetRepository.findOrCreateCategory(finalComment.trim()).id
 			} else null
@@ -874,7 +763,7 @@ class BudgetViewModel @Inject constructor(
 				amount = amount,
 				comment = finalComment,
 				date = now,
-				periodId = _uiState.value.currentPeriodId,
+				periodId = activePeriodId,
 				isRecurrent = true,
 				recurrentFrequency = frequency,
 				// Preserve current hour/minute instead of forcing 00:00
@@ -977,77 +866,6 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-	private fun handleRolloverSplitEqually(remaining: BigDecimal) {
-		viewModelScope.launch {
-			applyRolloverSplitEqually(remaining)
-		}
-	}
-
-	private suspend fun applyRolloverSplitEqually(remaining: BigDecimal) {
-		val settings = budgetRepository.getBudgetSettingsSync() ?: return
-		val previousPeriodEnd = settings.getPeriodEndDate()
-
-		val newTotalBudget = settings.totalBudget.add(remaining)
-		val updatedSettings = settings.copy(
-			totalBudget = newTotalBudget,
-			startDate = LocalDate.now(),
-			rollOverCarryForward = false,
-			rollOverLimit = null,
-			remainingBudgetStrategy = com.serranoie.app.minus.domain.model.RemainingBudgetStrategy.SPLIT_EQUALLY
-		)
-
-		persistBudgetSettings(updatedSettings, forceNewPeriodBoundary = true)
-
-		_uiState.update {
-			it.copy(
-				showRolloverDialog = false, remainingFromPreviousPeriod = BigDecimal.ZERO
-			)
-		}
-		resolvedRolloverPeriodEndDate = previousPeriodEnd
-		lastPeriodEndDate = previousPeriodEnd
-	}
-
-	private fun handleRolloverCarryToNextDay(remaining: BigDecimal) {
-		viewModelScope.launch {
-			val settings = budgetRepository.getBudgetSettingsSync() ?: return@launch
-			val previousPeriodEnd = settings.getPeriodEndDate()
-
-			val updatedSettings = settings.copy(
-				totalBudget = settings.totalBudget,
-				startDate = LocalDate.now(),
-				rollOverCarryForward = true,
-				rollOverLimit = remaining,
-				remainingBudgetStrategy = com.serranoie.app.minus.domain.model.RemainingBudgetStrategy.ADD_TO_FIRST_DAY
-			)
-
-			persistBudgetSettings(updatedSettings, forceNewPeriodBoundary = true)
-
-			_uiState.update {
-				it.copy(
-					showRolloverDialog = false, remainingFromPreviousPeriod = BigDecimal.ZERO
-				)
-			}
-			resolvedRolloverPeriodEndDate = previousPeriodEnd
-			lastPeriodEndDate = previousPeriodEnd
-		}
-	}
-
-	private fun handleDismissRolloverDialog() {
-		viewModelScope.launch {
-			val settings = budgetRepository.getBudgetSettingsSync()
-			resolvedRolloverPeriodEndDate = settings?.getPeriodEndDate() ?: lastPeriodEndDate
-			_uiState.update {
-				it.copy(
-					showRolloverDialog = false,
-					remainingFromPreviousPeriod = BigDecimal.ZERO
-				)
-			}
-			if (settings != null) {
-				startNewPeriod(settings)
-			}
-		}
-	}
-
 	private fun handleMarkFirstLaunchComplete() {
 		_uiState.update { it.copy(isFirstLaunch = false) }
 	}
@@ -1078,6 +896,13 @@ class BudgetViewModel @Inject constructor(
 		} else {
 			previousPrefs[CURRENT_PERIOD_ID_KEY] ?: periodStartMillis
 		}
+		_pendingPeriodBoundaryOverride.value = periodStartMillis to periodId
+		_uiState.update {
+			it.copy(
+				currentPeriodStartedAtMillis = periodStartMillis,
+				currentPeriodId = periodId
+			)
+		}
 		logcat(TAG) {
 			"persistBudgetSettings boundaryDecision shouldCreateNewPeriodBoundary=$shouldCreateNewPeriodBoundary periodStartMillis=$periodStartMillis periodId=$periodId"
 		}
@@ -1095,12 +920,27 @@ class BudgetViewModel @Inject constructor(
 				prefs[NOTIFICATION_MINUTE_KEY] = DEFAULT_NOTIFICATION_MINUTE
 			}
 		}
+		if (shouldCreateNewPeriodBoundary) {
+			budgetRepository.assignQueuedTransactionsToPeriod(periodId)
+		}
 		val afterPrefs = context.settingsDataStore.data.first()
+		_pendingPeriodBoundaryOverride.value = null
 		logcat(TAG) {
 			"persistBudgetSettings END savedSettingsPeriod=${settings.period} savedSettingsDays=${settings.daysInPeriod} savedSettingsStart=${settings.startDate} savedSettingsEnd=${settings.endDate} datastorePeriodStart=${afterPrefs[CURRENT_PERIOD_STARTED_AT_KEY]} datastorePeriodId=${afterPrefs[CURRENT_PERIOD_ID_KEY]}"
 		}
 		notificationScheduler.schedulePeriodEndNotification(periodEndDate)
 		logcat(TAG) { "Period end notification scheduled for $periodEndDate" }
+	}
+
+	private suspend fun resolveActivePeriodId(): Long {
+		_pendingPeriodBoundaryOverride.value?.second?.let { pendingPeriodId ->
+			if (pendingPeriodId > 0L) return pendingPeriodId
+		}
+
+		val dataStorePeriodId = context.settingsDataStore.data.first()[CURRENT_PERIOD_ID_KEY] ?: 0L
+		if (dataStorePeriodId > 0L) return dataStorePeriodId
+
+		return _uiState.value.currentPeriodId
 	}
 
 	private fun validateNumpadInput(input: String): Boolean {

@@ -11,13 +11,19 @@ interface BudgetRepository {
 
 	fun getTransactions(): Flow<List<Transaction>>
 
+	fun getQueuedTransactions(): Flow<List<Transaction>>
+
 	fun getTransactionsForPeriod(start: LocalDate, end: LocalDate): Flow<List<Transaction>>
 
 	suspend fun addTransaction(transaction: Transaction)
 
+	suspend fun addQueuedTransaction(transaction: Transaction)
+
 	suspend fun addTransactionIfAbsent(transaction: Transaction): Boolean
 
 	suspend fun updateTransaction(transaction: Transaction)
+
+	suspend fun assignQueuedTransactionsToPeriod(periodId: Long)
 
 	suspend fun upsertTransactions(transactions: List<Transaction>)
 

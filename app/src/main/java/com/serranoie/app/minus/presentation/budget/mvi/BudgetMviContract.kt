@@ -5,7 +5,6 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.editor.AnimState
 import com.serranoie.app.minus.presentation.editor.EditMode
-import java.math.BigDecimal
 import java.time.LocalDate
 
 sealed interface BudgetUiIntent {
@@ -30,10 +29,6 @@ sealed interface BudgetUiIntent {
     data class CommentUpdated(val comment: String) : BudgetUiIntent
     data class DeleteTag(val tag: String) : BudgetUiIntent
 
-    data class RolloverSplitEqually(val remaining: BigDecimal) : BudgetUiIntent
-    data class RolloverCarryToNextDay(val remaining: BigDecimal) : BudgetUiIntent
-    data object DismissRolloverDialog : BudgetUiIntent
-
     data object MarkFirstLaunchComplete : BudgetUiIntent
     data class SetRecurrentEnabled(val enabled: Boolean) : BudgetUiIntent
     data object DismissRecurrentDialog : BudgetUiIntent
@@ -47,10 +42,6 @@ sealed interface BudgetUiIntent {
     data object TriggerTestNotifications : BudgetUiIntent
     data class SetLockSwipeable(val locked: Boolean) : BudgetUiIntent
     data class SetLockDraggable(val locked: Boolean) : BudgetUiIntent
-
-    // Intent for period ended dialog - shown when user tries to add expense after period ended
-    data object DismissPeriodEndedDialog : BudgetUiIntent
-    data object ConfirmExpenseAfterPeriod : BudgetUiIntent
 }
 
 sealed interface BudgetUiEffect {

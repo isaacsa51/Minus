@@ -54,7 +54,10 @@ fun EditorWithViewModel(
 			}
 		},
 		onSaveBudget = { newSettings ->
-			viewModel.saveBudgetSettings(newSettings)
+			viewModel.saveBudgetSettings(
+				newSettings,
+				forceNewPeriodBoundary = forceWalletSetup
+			)
 		},
 		onFinishBudgetEarly = {
 			viewModel.processIntent(BudgetUiIntent.FinishBudgetEarly)

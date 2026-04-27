@@ -59,8 +59,8 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
                 val periodEnd = settings.getPeriodEndDate()
                 val today = LocalDate.now()
 
-                // Check if the period ended (period end date is today or before today)
-                if (today.isBefore(periodEnd)) {
+                // Check if the period ended only after the final day has fully passed
+                if (!today.isAfter(periodEnd)) {
                     logcat { "Period has not ended yet (end=$periodEnd, today=$today), skipping" }
                     return@launch
                 }

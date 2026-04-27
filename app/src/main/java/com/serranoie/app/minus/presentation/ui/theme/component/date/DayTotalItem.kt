@@ -11,26 +11,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import java.math.BigDecimal
 import java.text.NumberFormat
 
 @Composable
 fun DayTotalItem(total: BigDecimal, currencyFormat: NumberFormat, modifier: Modifier = Modifier) {
 	Row(
-		modifier = Modifier
+		modifier = modifier
 			.fillMaxWidth()
 			.padding(horizontal = 16.dp, vertical = 4.dp),
 		horizontalArrangement = Arrangement.End
 	) {
 		Text(
 			text = "Day total: ${currencyFormat.format(total)}",
-			style = MaterialTheme.typography.labelLargeEmphasized,
+			style = MaterialTheme.typography.bodySmallCondensed,
 			color = MaterialTheme.colorScheme.onSurfaceVariant
 		)
 	}
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun DayTotalPreview() {
 	MinusTheme {

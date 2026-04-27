@@ -11,4 +11,21 @@ object AppDatabaseMigrations {
             db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_clientGeneratedId ON transactions(clientGeneratedId)")
         }
     }
+
+    val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS queued_transactions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    amount TEXT NOT NULL,
+                    comment TEXT NOT NULL,
+                    date INTEGER NOT NULL,
+                    createdAt INTEGER NOT NULL,
+                    categoryId INTEGER
+                )
+                """.trimIndent()
+            )
+        }
+    }
 }

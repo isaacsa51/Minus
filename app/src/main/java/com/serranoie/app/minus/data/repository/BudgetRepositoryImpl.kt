@@ -1,11 +1,15 @@
 package com.serranoie.app.minus.data.repository
 
+import androidx.room.withTransaction
 import logcat.logcat
+import com.serranoie.app.minus.data.local.AppDatabase
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
+import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
 import com.serranoie.app.minus.data.local.entity.CategoryEntity
+import com.serranoie.app.minus.data.local.entity.QueuedTransactionEntity
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
 import com.serranoie.app.minus.domain.calculator.BudgetCalculator
 import com.serranoie.app.minus.domain.model.BudgetPeriod
@@ -26,9 +30,11 @@ import javax.inject.Singleton
 
 @Singleton
 class BudgetRepositoryImpl @Inject constructor(
+    private val appDatabase: AppDatabase,
     private val transactionDao: TransactionDao,
     private val settingsDao: BudgetSettingsDao,
     private val categoryDao: CategoryDao,
+    private val queuedTransactionDao: QueuedTransactionDao,
     private val budgetCalculator: BudgetCalculator
 ) : BudgetRepository {
 
@@ -69,6 +75,31 @@ class BudgetRepositoryImpl @Inject constructor(
         recurrentFrequency = this.recurrentFrequency?.name,
         recurrentEndDate = this.recurrentEndDate?.toEpochSecond(ZoneOffset.UTC)?.times(1000),
         subscriptionDay = this.subscriptionDay,
+        categoryId = this.categoryId
+    )
+
+    private fun QueuedTransactionEntity.toDomain(): Transaction = Transaction(
+        id = this.id,
+        amount = BigDecimal(this.amount),
+        comment = this.comment,
+        date = LocalDateTime.ofEpochSecond(this.date / 1000, 0, ZoneOffset.UTC),
+        createdAt = this.createdAt,
+        clientGeneratedId = null,
+        periodId = 0L,
+        isDeleted = false,
+        isRecurrent = false,
+        recurrentFrequency = null,
+        recurrentEndDate = null,
+        subscriptionDay = null,
+        categoryId = this.categoryId
+    )
+
+    private fun Transaction.toQueuedEntity(): QueuedTransactionEntity = QueuedTransactionEntity(
+        id = if (this.id == 0L) 0 else this.id,
+        amount = this.amount.toPlainString(),
+        comment = this.comment,
+        date = this.date!!.toEpochSecond(ZoneOffset.UTC) * 1000,
+        createdAt = this.createdAt,
         categoryId = this.categoryId
     )
 
@@ -134,6 +165,11 @@ class BudgetRepositoryImpl @Inject constructor(
             .map { entities -> entities.map { it.toDomain() } }
     }
 
+    override fun getQueuedTransactions(): Flow<List<Transaction>> {
+        return queuedTransactionDao.getAllQueuedTransactions()
+            .map { entities -> entities.map { it.toDomain() } }
+    }
+
     override fun getTransactionsForPeriod(start: LocalDate, end: LocalDate): Flow<List<Transaction>> {
         val startMillis = start.toEpochDay() * 86400000
         val endMillis = end.toEpochDay() * 86400000
@@ -145,6 +181,10 @@ class BudgetRepositoryImpl @Inject constructor(
         transactionDao.insert(transaction.toEntity())
     }
 
+    override suspend fun addQueuedTransaction(transaction: Transaction) {
+        queuedTransactionDao.insert(transaction.toQueuedEntity())
+    }
+
     override suspend fun addTransactionIfAbsent(transaction: Transaction): Boolean {
         val rowId = transactionDao.insertIgnore(transaction.toEntity())
         return rowId != -1L
@@ -152,6 +192,23 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun updateTransaction(transaction: Transaction) {
         transactionDao.update(transaction.toEntity())
+    }
+
+    override suspend fun assignQueuedTransactionsToPeriod(periodId: Long) {
+        appDatabase.withTransaction {
+            val queuedTransactions = queuedTransactionDao.getAllQueuedTransactionsSync()
+            if (queuedTransactions.isEmpty()) return@withTransaction
+
+            val transactions = queuedTransactions.map { queued ->
+                queued.toDomain().copy(
+                    id = 0L,
+                    periodId = periodId
+                )
+            }
+
+            transactionDao.insertAllOrReplace(transactions.map { it.toEntity() })
+            queuedTransactionDao.clearAll()
+        }
     }
 
     override suspend fun upsertTransactions(transactions: List<Transaction>) {
