@@ -4,18 +4,13 @@ import android.content.Context
 import logcat.logcat
 import androidx.datastore.preferences.core.edit
 import com.serranoie.app.minus.BUDGET_END_DATE_KEY
-import com.serranoie.app.minus.CURRENT_PERIOD_ID_KEY
-import com.serranoie.app.minus.CURRENT_PERIOD_STARTED_AT_KEY
-import com.serranoie.app.minus.DEFAULT_NOTIFICATION_HOUR
-import com.serranoie.app.minus.DEFAULT_NOTIFICATION_MINUTE
 import com.serranoie.app.minus.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.MIDNIGHT_TRANSITION_OCCURRED_KEY
-import com.serranoie.app.minus.NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.NOTIFICATION_MINUTE_KEY
+import com.serranoie.app.minus.PENDING_ROLLOVER_AMOUNT_KEY
+import com.serranoie.app.minus.PENDING_ROLLOVER_STRATEGY_KEY
 import com.serranoie.app.minus.REMAINING_FROM_LAST_PERIOD_KEY
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
-import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.settingsDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,9 +38,7 @@ data class MidnightTransitionData(
 @Singleton
 class MidnightPeriodChecker @Inject constructor(
 	@ApplicationContext private val context: Context,
-	private val budgetRepository: BudgetRepository,
-	private val notificationScheduler: NotificationScheduler,
-	private val timeProvider: TimeProvider
+	private val budgetRepository: BudgetRepository
 ) {
 	data class EndingPeriodState(
 		val shouldHandleEndingPeriod: Boolean,
@@ -77,6 +70,10 @@ class MidnightPeriodChecker @Inject constructor(
 			logcat { "No period end date found" }
 			return
 		}
+		persistLastPeriodSnapshot(
+			periodEndDate = lastPeriodEndDate,
+			remainingAmount = endingPeriodState.remainingAmount,
+		)
 
 		val settings = budgetRepository.getBudgetSettingsSync() ?: run {
 			logcat { "No budget settings found" }
@@ -124,21 +121,23 @@ class MidnightPeriodChecker @Inject constructor(
 				_shouldShowTransitionDialog.value = true
 				logcat { "Ending period detected, asking user for rollover strategy" }
 			}
-			RemainingBudgetStrategy.SPLIT_EQUALLY -> {
-				rollRemainingSplitEquallyAutomatically(
-					remainingAmount = endingPeriodState.remainingAmount,
-					periodEndDate = lastPeriodEndDate,
-					totalSpent = totalSpent,
-					routeToAnalytics = true,
-				)
-			}
+			RemainingBudgetStrategy.SPLIT_EQUALLY,
 			RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> {
-				rollRemainingToFirstDayAutomatically(
+				enqueuePendingRollover(
+					strategy = settings.remainingBudgetStrategy,
 					remainingAmount = endingPeriodState.remainingAmount,
-					periodEndDate = lastPeriodEndDate,
-					totalSpent = totalSpent,
-					routeToAnalytics = true,
 				)
+				_midnightTransitionData.value = MidnightTransitionData(
+					periodStartDate = periodStartDate,
+					periodEndDate = lastPeriodEndDate,
+					totalBudget = settings.totalBudget,
+					remainingAmount = endingPeriodState.remainingAmount,
+					totalSpent = totalSpent,
+					currencyCode = settings.currencyCode,
+					shouldNavigateToAnalyticsOnly = true,
+				)
+				_shouldShowTransitionDialog.value = true
+				logcat { "Ending period detected, queued pending rollover and routing to analytics" }
 			}
 		}
 	}
@@ -155,13 +154,18 @@ class MidnightPeriodChecker @Inject constructor(
 		val dataStoreEndDate = endDateMillis?.let { millis ->
 			Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
 		}
-		val effectiveEndDate = dataStoreEndDate ?: settingsEndDate
+		val dataStoreIsInFuture = dataStoreEndDate?.let { it.isAfter(today) } ?: false
+		val effectiveEndDate = if (dataStoreIsInFuture) settingsEndDate ?: dataStoreEndDate else dataStoreEndDate ?: settingsEndDate
 		val periodEndedBasedOnDate = effectiveEndDate?.let { today.isAfter(it) } ?: false
 
-		val lastPeriodEndMillis = prefs[LAST_PERIOD_END_KEY] ?: endDateMillis
-		val periodEndDate = lastPeriodEndMillis?.let {
-			Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
-		} ?: effectiveEndDate
+		val periodEndDate = if (transitionOccurred) {
+			val lastPeriodEndMillis = prefs[LAST_PERIOD_END_KEY] ?: endDateMillis
+			lastPeriodEndMillis?.let {
+				Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
+			} ?: effectiveEndDate
+		} else {
+			effectiveEndDate
+		}
 
 		val remaining = if (transitionOccurred) {
 			BigDecimal(prefs[REMAINING_FROM_LAST_PERIOD_KEY] ?: "0")
@@ -207,139 +211,43 @@ class MidnightPeriodChecker @Inject constructor(
 
 	suspend fun rollRemainingSplitEqually() {
 		val data = _midnightTransitionData.value ?: return
-		rollRemainingSplitEquallyAutomatically(
+		enqueuePendingRollover(
+			strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
 			remainingAmount = data.remainingAmount,
-			periodEndDate = data.periodEndDate,
-			totalSpent = data.totalSpent,
-			routeToAnalytics = false,
 		)
 		onTransitionDialogConfirmed()
 	}
 
 	suspend fun rollRemainingToFirstDay() {
 		val data = _midnightTransitionData.value ?: return
-		rollRemainingToFirstDayAutomatically(
+		enqueuePendingRollover(
+			strategy = RemainingBudgetStrategy.ADD_TO_FIRST_DAY,
 			remainingAmount = data.remainingAmount,
-			periodEndDate = data.periodEndDate,
-			totalSpent = data.totalSpent,
-			routeToAnalytics = false,
 		)
 		onTransitionDialogConfirmed()
 	}
 
-	private suspend fun rollRemainingSplitEquallyAutomatically(
+	private suspend fun persistLastPeriodSnapshot(
+		periodEndDate: LocalDate,
 		remainingAmount: BigDecimal,
-		periodEndDate: LocalDate,
-		totalSpent: BigDecimal,
-		routeToAnalytics: Boolean,
 	) {
-		val settings = budgetRepository.getBudgetSettingsSync() ?: return
-		val (newStartDate, newEndDate, newDaysInPeriod) = calculateNextPeriodWindow(settings, periodEndDate)
-		val updatedSettings = settings.copy(
-			totalBudget = settings.totalBudget.add(remainingAmount),
-			startDate = newStartDate,
-			endDate = newEndDate,
-			daysInPeriod = newDaysInPeriod,
-			rollOverCarryForward = false,
-			rollOverLimit = null,
-			remainingBudgetStrategy = RemainingBudgetStrategy.SPLIT_EQUALLY
-		)
-		persistBudgetSettings(updatedSettings, forceNewPeriodBoundary = true)
-		if (routeToAnalytics) {
-			_midnightTransitionData.value = MidnightTransitionData(
-				periodStartDate = settings.startDate,
-				periodEndDate = periodEndDate,
-				totalBudget = settings.totalBudget,
-				remainingAmount = remainingAmount,
-				totalSpent = totalSpent,
-				currencyCode = settings.currencyCode,
-				shouldNavigateToAnalyticsOnly = true,
-			)
-			_shouldShowTransitionDialog.value = true
-			logcat { "Ending period detected, applied SPLIT_EQUALLY automatically and routing to analytics" }
-		}
-	}
-
-	private suspend fun rollRemainingToFirstDayAutomatically(
-		remainingAmount: BigDecimal,
-		periodEndDate: LocalDate,
-		totalSpent: BigDecimal,
-		routeToAnalytics: Boolean,
-	) {
-		val settings = budgetRepository.getBudgetSettingsSync() ?: return
-		val (newStartDate, newEndDate, newDaysInPeriod) = calculateNextPeriodWindow(settings, periodEndDate)
-		val updatedSettings = settings.copy(
-			startDate = newStartDate,
-			endDate = newEndDate,
-			daysInPeriod = newDaysInPeriod,
-			rollOverCarryForward = true,
-			rollOverLimit = remainingAmount,
-			remainingBudgetStrategy = RemainingBudgetStrategy.ADD_TO_FIRST_DAY
-		)
-		persistBudgetSettings(updatedSettings, forceNewPeriodBoundary = true)
-		if (routeToAnalytics) {
-			_midnightTransitionData.value = MidnightTransitionData(
-				periodStartDate = settings.startDate,
-				periodEndDate = periodEndDate,
-				totalBudget = settings.totalBudget,
-				remainingAmount = remainingAmount,
-				totalSpent = totalSpent,
-				currencyCode = settings.currencyCode,
-				shouldNavigateToAnalyticsOnly = true,
-			)
-			_shouldShowTransitionDialog.value = true
-			logcat { "Ending period detected, applied ADD_TO_FIRST_DAY automatically and routing to analytics" }
-		}
-	}
-
-	private fun calculateNextPeriodWindow(
-		settings: com.serranoie.app.minus.domain.model.BudgetSettings,
-		periodEndDate: LocalDate,
-	): Triple<LocalDate, LocalDate?, Int> {
-		val previousDays = ChronoUnit.DAYS.between(settings.startDate, settings.getPeriodEndDate())
-			.toInt()
-			.plus(1)
-			.coerceAtLeast(1)
-		val newStartDate = periodEndDate.plusDays(1)
-		val newEndDate = settings.endDate?.let { newStartDate.plusDays(previousDays.toLong() - 1) }
-		return Triple(newStartDate, newEndDate, previousDays)
-	}
-
-	private suspend fun persistBudgetSettings(
-		settings: com.serranoie.app.minus.domain.model.BudgetSettings,
-		forceNewPeriodBoundary: Boolean = false,
-	) {
-		val previousSettings = budgetRepository.getBudgetSettingsSync()
-		val previousPrefs = context.settingsDataStore.data.first()
-		budgetRepository.saveBudgetSettings(settings)
-		val shouldCreateNewPeriodBoundary = forceNewPeriodBoundary ||
-			previousSettings == null ||
-			previousSettings.startDate != settings.startDate
-		val periodStartMillis = if (shouldCreateNewPeriodBoundary) {
-			timeProvider.nowEpochMillis()
-		} else {
-			previousPrefs[CURRENT_PERIOD_STARTED_AT_KEY]
-				?: settings.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-		}
-		val periodId = if (shouldCreateNewPeriodBoundary) {
-			periodStartMillis
-		} else {
-			previousPrefs[CURRENT_PERIOD_ID_KEY] ?: periodStartMillis
-		}
-		val periodEndDate = settings.getPeriodEndDate()
-		val millis = periodEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 		context.settingsDataStore.edit { prefs ->
-			prefs[BUDGET_END_DATE_KEY] = millis
-			prefs[CURRENT_PERIOD_STARTED_AT_KEY] = periodStartMillis
-			prefs[CURRENT_PERIOD_ID_KEY] = periodId
-			if (!prefs.contains(NOTIFICATION_HOUR_KEY)) {
-				prefs[NOTIFICATION_HOUR_KEY] = DEFAULT_NOTIFICATION_HOUR
-			}
-			if (!prefs.contains(NOTIFICATION_MINUTE_KEY)) {
-				prefs[NOTIFICATION_MINUTE_KEY] = DEFAULT_NOTIFICATION_MINUTE
-			}
+			prefs[LAST_PERIOD_END_KEY] = periodEndDate
+				.atStartOfDay(ZoneId.systemDefault())
+				.toInstant()
+				.toEpochMilli()
+			prefs[REMAINING_FROM_LAST_PERIOD_KEY] = remainingAmount.toPlainString()
 		}
-		notificationScheduler.schedulePeriodEndNotification(periodEndDate)
+	}
+
+	private suspend fun enqueuePendingRollover(
+		strategy: RemainingBudgetStrategy,
+		remainingAmount: BigDecimal,
+	) {
+		context.settingsDataStore.edit { prefs ->
+			prefs[PENDING_ROLLOVER_STRATEGY_KEY] = strategy.name
+			prefs[PENDING_ROLLOVER_AMOUNT_KEY] = remainingAmount.toPlainString()
+		}
 	}
 
 	fun reset() {

@@ -94,6 +94,10 @@ const val DEFAULT_NOTIFICATION_HOUR = 9
 val MIDNIGHT_TRANSITION_OCCURRED_KEY = booleanPreferencesKey("midnight_transition_occurred")
 val LAST_PERIOD_END_KEY = longPreferencesKey("last_period_end_millis")
 val REMAINING_FROM_LAST_PERIOD_KEY = stringPreferencesKey("remaining_from_last_period")
+val PENDING_ROLLOVER_AMOUNT_KEY = stringPreferencesKey("pending_rollover_amount")
+val PENDING_ROLLOVER_STRATEGY_KEY = stringPreferencesKey("pending_rollover_strategy")
+val CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY = stringPreferencesKey("current_period_rollover_amount")
+val CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY = booleanPreferencesKey("current_period_rollover_carry_forward")
 
 const val DEFAULT_NOTIFICATION_MINUTE = 0
 

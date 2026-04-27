@@ -38,6 +38,8 @@ import com.serranoie.app.minus.DEFAULT_NOTIFICATION_MINUTE
 import com.serranoie.app.minus.EARLY_FINISH_ACTIVE_KEY
 import com.serranoie.app.minus.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.EARLY_FINISH_ORIGINAL_END_DATE_KEY
+import com.serranoie.app.minus.LAST_PERIOD_END_KEY
+import com.serranoie.app.minus.REMAINING_FROM_LAST_PERIOD_KEY
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.NOTIFICATION_MINUTE_KEY
@@ -235,27 +237,52 @@ fun AppNavGraph(
             val budgetState = uiState.budgetState
             val currentPeriodId = uiState.currentPeriodId
 
-            // Filter transactions for the current period only
-            val transactions = remember(currentPeriodId, allTransactions, budgetSettings) {
+            val lastPeriodEnd = preferences[LAST_PERIOD_END_KEY]?.let {
+                Date(it).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+            }
+            val remainingFromLastPeriod = preferences[REMAINING_FROM_LAST_PERIOD_KEY]
+                ?.toBigDecimalOrNull()
+
+            val shouldShowEndedPeriodSnapshot =
+                lastPeriodEnd != null && remainingFromLastPeriod != null && budgetSettings != null
+
+            val endedPeriodStartDate = if (shouldShowEndedPeriodSnapshot) {
+                val currentEnd = budgetSettings!!.getPeriodEndDate()
+                val currentDays = ChronoUnit.DAYS.between(budgetSettings.startDate, currentEnd).toInt() + 1
+                lastPeriodEnd!!.minusDays((currentDays - 1).toLong())
+            } else null
+
+            // Filter transactions for the relevant period (ended snapshot when available, otherwise current)
+            val transactions = remember(currentPeriodId, allTransactions, budgetSettings, endedPeriodStartDate, lastPeriodEnd, shouldShowEndedPeriodSnapshot) {
                 allTransactions.filter { transaction ->
-                    // If periodId is available, filter by it
-                    if (currentPeriodId > 0L && transaction.periodId > 0L) {
-                        return@filter transaction.periodId == currentPeriodId
-                    }
-                    // Otherwise filter by date range
                     val txDate = transaction.date?.toLocalDate() ?: return@filter false
-                    val startDate = budgetSettings?.startDate ?: return@filter false
-                    val endDate = budgetSettings?.getPeriodEndDate() ?: return@filter false
-                    !txDate.isBefore(startDate) && !txDate.isAfter(endDate)
+                    if (shouldShowEndedPeriodSnapshot && endedPeriodStartDate != null && lastPeriodEnd != null) {
+                        !txDate.isBefore(endedPeriodStartDate) && !txDate.isAfter(lastPeriodEnd)
+                    } else {
+                        if (currentPeriodId > 0L && transaction.periodId > 0L) {
+                            return@filter transaction.periodId == currentPeriodId
+                        }
+                        val startDate = budgetSettings?.startDate ?: return@filter false
+                        val endDate = budgetSettings?.getPeriodEndDate() ?: return@filter false
+                        !txDate.isBefore(startDate) && !txDate.isAfter(endDate)
+                    }
                 }
             }
 
-            val startDate = budgetSettings?.startDate?.atStartOfDay()?.let {
-                Date.from(it.atZone(ZoneId.systemDefault()).toInstant())
-            } ?: Date()
+            val startDate = if (shouldShowEndedPeriodSnapshot && endedPeriodStartDate != null) {
+                Date.from(endedPeriodStartDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+            } else {
+                budgetSettings?.startDate?.atStartOfDay()?.let {
+                    Date.from(it.atZone(ZoneId.systemDefault()).toInstant())
+                } ?: Date()
+            }
 
-            val plannedFinishDate = budgetSettings?.getPeriodEndDate()?.atStartOfDay()?.let {
-                Date.from(it.atZone(ZoneId.systemDefault()).toInstant())
+            val plannedFinishDate = if (shouldShowEndedPeriodSnapshot && lastPeriodEnd != null) {
+                Date.from(lastPeriodEnd.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+            } else {
+                budgetSettings?.getPeriodEndDate()?.atStartOfDay()?.let {
+                    Date.from(it.atZone(ZoneId.systemDefault()).toInstant())
+                }
             }
 
             val earlyFinishActive = preferences[EARLY_FINISH_ACTIVE_KEY] ?: false
@@ -273,12 +300,21 @@ fun AppNavGraph(
             } ?: false
             val periodFinished = periodFinishedNaturally || earlyFinishActive
 
-            val wholeBudget = budgetSettings?.totalBudget ?: budgetState?.totalBudget ?: BigDecimal.ZERO
+            val wholeBudget = if (shouldShowEndedPeriodSnapshot && budgetSettings != null && remainingFromLastPeriod != null) {
+                val spentInEndedPeriod = transactions.filter { !it.isDeleted }.sumOf { it.amount }
+                spentInEndedPeriod.add(remainingFromLastPeriod)
+            } else {
+                budgetSettings?.totalBudget ?: budgetState?.totalBudget ?: BigDecimal.ZERO
+            }
             val totalSpentInPeriod = transactions.filter { !it.isDeleted }.sumOf { it.amount }
             val remainingBudget = wholeBudget.subtract(totalSpentInPeriod)
-            val plannedPeriodDays = budgetSettings?.getPeriodEndDate()?.let { periodEnd ->
-                ChronoUnit.DAYS.between(budgetSettings.startDate, periodEnd).toInt() + 1
-            } ?: 0
+            val plannedPeriodDays = if (shouldShowEndedPeriodSnapshot && endedPeriodStartDate != null && lastPeriodEnd != null) {
+                ChronoUnit.DAYS.between(endedPeriodStartDate, lastPeriodEnd).toInt() + 1
+            } else {
+                budgetSettings?.getPeriodEndDate()?.let { periodEnd ->
+                    ChronoUnit.DAYS.between(budgetSettings.startDate, periodEnd).toInt() + 1
+                } ?: 0
+            }
             val dailyBudget = if (wholeBudget > BigDecimal.ZERO && plannedPeriodDays > 0) {
                 wholeBudget.divide(BigDecimal(plannedPeriodDays), 2, RoundingMode.HALF_UP)
             } else {
@@ -294,6 +330,21 @@ fun AppNavGraph(
                 0
             }
 
+            val displaySettings = budgetSettings?.copy(
+                totalBudget = if (shouldShowEndedPeriodSnapshot && remainingFromLastPeriod != null) {
+                    wholeBudget.subtract(remainingFromLastPeriod)
+                } else {
+                    budgetSettings.totalBudget
+                },
+                rollOverLimit = if (shouldShowEndedPeriodSnapshot) remainingFromLastPeriod else budgetSettings.rollOverLimit
+            )
+            val displayBudgetState = budgetState?.copy(
+                totalBudget = wholeBudget
+            )
+            val shouldShowRolloverStyleInAnalytics =
+                !shouldShowEndedPeriodSnapshot &&
+                    displaySettings?.rollOverLimit?.let { it > BigDecimal.ZERO } == true
+
             val analyticsState = AnalyticsState(
                 periodFinished = periodFinished,
                 transactions = transactions,
@@ -303,7 +354,10 @@ fun AppNavGraph(
                 finishPeriodActualDate = if (earlyFinishActive) earlyFinishActualDate else null,
                 startPeriodDate = startDate,
                 finishPeriodDate = if (earlyFinishActive) earlyFinishOriginalEndDate else plannedFinishDate,
-                extraAffordableDaysFromRemaining = extraAffordableDaysFromRemaining
+                extraAffordableDaysFromRemaining = extraAffordableDaysFromRemaining,
+                budgetSettingsForDisplay = displaySettings,
+                budgetStateForDisplay = displayBudgetState,
+                showRolloverStyleInBudgetDisplay = shouldShowRolloverStyleInAnalytics
             )
 
             Analytics(

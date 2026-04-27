@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.BUDGET_END_DATE_KEY
 import com.serranoie.app.minus.CURRENT_PERIOD_ID_KEY
+import com.serranoie.app.minus.CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY
+import com.serranoie.app.minus.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY
 import com.serranoie.app.minus.CURRENT_PERIOD_STARTED_AT_KEY
 import com.serranoie.app.minus.DEFAULT_NOTIFICATION_HOUR
 import com.serranoie.app.minus.DEFAULT_NOTIFICATION_MINUTE
@@ -16,10 +18,13 @@ import com.serranoie.app.minus.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.EARLY_FINISH_ORIGINAL_END_DATE_KEY
 import com.serranoie.app.minus.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.NOTIFICATION_MINUTE_KEY
+import com.serranoie.app.minus.PENDING_ROLLOVER_AMOUNT_KEY
+import com.serranoie.app.minus.PENDING_ROLLOVER_STRATEGY_KEY
 import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.time.TimeProvider
 import com.serranoie.app.minus.domain.usecase.AddTransactionUseCase
@@ -112,9 +117,23 @@ class BudgetViewModel @Inject constructor(
 				budgetRepository.getBudgetSettings(),
 				budgetRepository.getTransactions(),
 				buildPeriodBoundaryFlow(),
-				budgetRepository.getQueuedTransactions()
-			) { settings, transactions, periodBoundary, queuedTransactions ->
-				createBaseUiState(settings, transactions, periodBoundary, queuedTransactions)
+				budgetRepository.getQueuedTransactions(),
+				context.settingsDataStore.data.map { prefs ->
+					val rolloverAmount = prefs[CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY]
+						?.toBigDecimalOrNull()
+						?: BigDecimal.ZERO
+					val rolloverCarryForward = prefs[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY] ?: false
+					rolloverAmount to rolloverCarryForward
+				}
+			) { settings, transactions, periodBoundary, queuedTransactions, rolloverInfo ->
+				createBaseUiState(
+					settings = settings,
+					transactions = transactions,
+					periodBoundary = periodBoundary,
+					queuedTransactions = queuedTransactions,
+					rolloverAmount = rolloverInfo.first,
+					rolloverCarryForward = rolloverInfo.second,
+				)
 			}.catch { error ->
 				emit(
 					BudgetUiState(
@@ -176,10 +195,16 @@ class BudgetViewModel @Inject constructor(
 		transactions: List<Transaction>,
 		periodBoundary: Pair<Long, Long>,
 		queuedTransactions: List<Transaction>,
+		rolloverAmount: BigDecimal,
+		rolloverCarryForward: Boolean,
 	): BudgetUiState {
 		val currentPeriodStartedAtMillis = periodBoundary.first
 		val currentPeriodId = periodBoundary.second
-		val budgetState = settings?.let { s ->
+		val settingsWithRollover = settings?.copy(
+			rollOverLimit = if (rolloverAmount > BigDecimal.ZERO) rolloverAmount else null,
+			rollOverCarryForward = rolloverCarryForward,
+		)
+		val budgetState = settingsWithRollover?.let { s ->
 			val today = LocalDate.now()
 			val periodTransactions = filterPeriodTransactions(
 				transactions = transactions,
@@ -192,7 +217,7 @@ class BudgetViewModel @Inject constructor(
 
 		return BudgetUiState(
 			isLoading = false,
-			budgetSettings = settings,
+			budgetSettings = settingsWithRollover,
 			budgetState = budgetState,
 			transactions = transactions,
 			selectedDate = LocalDate.now(),
@@ -874,22 +899,46 @@ class BudgetViewModel @Inject constructor(
 		settings: BudgetSettings,
 		forceNewPeriodBoundary: Boolean = false,
 	) {
-		logcat(TAG) { "persistBudgetSettings START settings=$settings forceNewPeriodBoundary=$forceNewPeriodBoundary" }
+		val previousPrefs = context.settingsDataStore.data.first()
+		val pendingRolloverAmount = previousPrefs[PENDING_ROLLOVER_AMOUNT_KEY]?.toBigDecimalOrNull()
+		val pendingRolloverStrategy = previousPrefs[PENDING_ROLLOVER_STRATEGY_KEY]?.let {
+			runCatching { RemainingBudgetStrategy.valueOf(it) }.getOrNull()
+		}
+		val shouldApplyPendingRollover =
+			forceNewPeriodBoundary && pendingRolloverAmount != null && pendingRolloverAmount > BigDecimal.ZERO
+		val appliedRolloverAmount = if (shouldApplyPendingRollover) pendingRolloverAmount else BigDecimal.ZERO
+		val appliedCarryForward = shouldApplyPendingRollover && pendingRolloverStrategy == RemainingBudgetStrategy.ADD_TO_FIRST_DAY
+		val effectiveSettings = if (shouldApplyPendingRollover && pendingRolloverStrategy != null) {
+			when (pendingRolloverStrategy) {
+				RemainingBudgetStrategy.SPLIT_EQUALLY -> settings.copy(
+					totalBudget = settings.totalBudget.add(pendingRolloverAmount),
+					rollOverCarryForward = false,
+					rollOverLimit = pendingRolloverAmount
+				)
+				RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> settings.copy(
+					rollOverCarryForward = true,
+					rollOverLimit = pendingRolloverAmount
+				)
+				RemainingBudgetStrategy.ASK_ALWAYS -> settings
+			}
+		} else {
+			settings
+		}
+		logcat(TAG) { "persistBudgetSettings START settings=$settings effectiveSettings=$effectiveSettings forceNewPeriodBoundary=$forceNewPeriodBoundary" }
 		clearEarlyFinishStateSync()
 		val previousSettings = budgetRepository.getBudgetSettingsSync()
-		val previousPrefs = context.settingsDataStore.data.first()
 		logcat(TAG) { "persistBudgetSettings previousSettings=$previousSettings" }
 		logcat(TAG) { "persistBudgetSettings previousPrefs currentPeriodStartedAt=${previousPrefs[CURRENT_PERIOD_STARTED_AT_KEY]} currentPeriodId=${previousPrefs[CURRENT_PERIOD_ID_KEY]}" }
-		budgetRepository.saveBudgetSettings(settings)
+		budgetRepository.saveBudgetSettings(effectiveSettings)
 		logcat(TAG) { "Budget settings saved to repository" }
 		val shouldCreateNewPeriodBoundary = forceNewPeriodBoundary ||
 			previousSettings == null ||
-			previousSettings.startDate != settings.startDate
+			previousSettings.startDate != effectiveSettings.startDate
 		val periodStartMillis = if (shouldCreateNewPeriodBoundary) {
 			timeProvider.nowEpochMillis()
 		} else {
 			previousPrefs[CURRENT_PERIOD_STARTED_AT_KEY]
-				?: settings.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+				?: effectiveSettings.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 		}
 		val periodId = if (shouldCreateNewPeriodBoundary) {
 			periodStartMillis
@@ -906,13 +955,19 @@ class BudgetViewModel @Inject constructor(
 		logcat(TAG) {
 			"persistBudgetSettings boundaryDecision shouldCreateNewPeriodBoundary=$shouldCreateNewPeriodBoundary periodStartMillis=$periodStartMillis periodId=$periodId"
 		}
-		val periodEndDate = settings.getPeriodEndDate()
+		val periodEndDate = effectiveSettings.getPeriodEndDate()
 		val millis = periodEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 		logcat(TAG) { "Saving end date to DataStore: $periodEndDate -> $millis" }
 		context.settingsDataStore.edit { prefs ->
 			prefs[BUDGET_END_DATE_KEY] = millis
 			prefs[CURRENT_PERIOD_STARTED_AT_KEY] = periodStartMillis
 			prefs[CURRENT_PERIOD_ID_KEY] = periodId
+			prefs[CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY] = appliedRolloverAmount.toPlainString()
+			prefs[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY] = appliedCarryForward
+			if (shouldApplyPendingRollover) {
+				prefs.remove(PENDING_ROLLOVER_AMOUNT_KEY)
+				prefs.remove(PENDING_ROLLOVER_STRATEGY_KEY)
+			}
 			if (!prefs.contains(NOTIFICATION_HOUR_KEY)) {
 				prefs[NOTIFICATION_HOUR_KEY] = DEFAULT_NOTIFICATION_HOUR
 			}
@@ -926,7 +981,7 @@ class BudgetViewModel @Inject constructor(
 		val afterPrefs = context.settingsDataStore.data.first()
 		_pendingPeriodBoundaryOverride.value = null
 		logcat(TAG) {
-			"persistBudgetSettings END savedSettingsPeriod=${settings.period} savedSettingsDays=${settings.daysInPeriod} savedSettingsStart=${settings.startDate} savedSettingsEnd=${settings.endDate} datastorePeriodStart=${afterPrefs[CURRENT_PERIOD_STARTED_AT_KEY]} datastorePeriodId=${afterPrefs[CURRENT_PERIOD_ID_KEY]}"
+			"persistBudgetSettings END savedSettingsPeriod=${effectiveSettings.period} savedSettingsDays=${effectiveSettings.daysInPeriod} savedSettingsStart=${effectiveSettings.startDate} savedSettingsEnd=${effectiveSettings.endDate} datastorePeriodStart=${afterPrefs[CURRENT_PERIOD_STARTED_AT_KEY]} datastorePeriodId=${afterPrefs[CURRENT_PERIOD_ID_KEY]}"
 		}
 		notificationScheduler.schedulePeriodEndNotification(periodEndDate)
 		logcat(TAG) { "Period end notification scheduled for $periodEndDate" }

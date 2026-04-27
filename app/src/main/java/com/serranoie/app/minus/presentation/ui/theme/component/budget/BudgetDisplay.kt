@@ -48,6 +48,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.countDays
 import com.serranoie.app.minus.presentation.util.prettyDate
 import java.math.BigDecimal
+import logcat.logcat
 import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
@@ -69,12 +70,44 @@ fun BudgetDisplay(
 	finishDate: Date?,
 	actualFinishDate: Date? = null,
 	extraDaysFromRemaining: Int = 0,
+	showRolloverStyle: Boolean = true,
 	contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
 ) {
 	val currencyFormat =
 		com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat(currencyCode)
 
-	val displayBudget = budgetState?.totalBudget ?: budget
+	val settingsTotalBudget = budgetSettings?.totalBudget
+	val stateTotalBudget = budgetState?.totalBudget
+	val rolloverFromSettings = budgetSettings?.rollOverLimit?.takeIf { it > BigDecimal.ZERO }
+
+	val displayBudget = when {
+		stateTotalBudget != null -> stateTotalBudget
+		settingsTotalBudget != null -> settingsTotalBudget
+		else -> budget
+	}
+
+	val baseBudget = when {
+		settingsTotalBudget != null &&
+			rolloverFromSettings != null &&
+			settingsTotalBudget > rolloverFromSettings -> {
+			settingsTotalBudget.subtract(rolloverFromSettings)
+		}
+
+		settingsTotalBudget != null &&
+			stateTotalBudget != null &&
+			stateTotalBudget > settingsTotalBudget -> {
+			settingsTotalBudget
+		}
+
+		settingsTotalBudget != null -> settingsTotalBudget
+		else -> budget
+	}
+
+	val rolloverAmount = displayBudget.subtract(baseBudget).takeIf { it > BigDecimal.ZERO } ?: BigDecimal.ZERO
+	val shouldShowCrossedBaseBudget = showRolloverStyle && rolloverAmount > BigDecimal.ZERO
+	logcat("BudgetDisplay") {
+		"state budget=$budget settingsTotal=$settingsTotalBudget stateTotal=$stateTotalBudget rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward} showRolloverStyle=$showRolloverStyle baseBudget=$baseBudget displayBudget=$displayBudget rolloverAmount=$rolloverAmount showCross=$shouldShowCrossedBaseBudget"
+	}
 
 	StatCard(
 		modifier = modifier.fillMaxWidth(),
@@ -85,11 +118,11 @@ fun BudgetDisplay(
 		),
 		label = "Presupuesto total",
 		value = currencyFormat.format(displayBudget),
+		crossedValue = if (shouldShowCrossedBaseBudget) currencyFormat.format(baseBudget) else null,
+		crossedValueColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
 		valueFontStyle = MaterialTheme.typography.displaySmallEmphasized,
 		valueFontSize = if (bigVariant) MaterialTheme.typography.headlineLarge.fontSize else MaterialTheme.typography.titleLarge.fontSize,
 		content = {
-			Spacer(modifier = Modifier.height(16.dp))
-
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -249,7 +282,7 @@ fun Cross(
 		Canvas(modifier = Modifier.matchParentSize()) {
 			val width = this.size.width
 			val height = this.size.height
-			val offset = Offset(6f, 6f)
+			val offset = Offset(4f, 4f)
 			val thickness = 6f
 
 			drawLine(
@@ -386,6 +419,38 @@ private fun BudgetDisplayPreview_OverBudget() {
 			startDate = startDate,
 			finishDate = finishDate,
 			actualFinishDate = actualFinishDate
+		)
+	}
+}
+
+@Preview(device = "spec:width=800px,height=500px")
+@Composable
+private fun BudgetDisplayPreview_RolloverSplit() {
+	MinusTheme {
+		val startDate = Date()
+		val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 1) }.time
+
+		BudgetDisplay(
+			budget = BigDecimal("1333.50"),
+			budgetState = BudgetState(
+				remainingToday = BigDecimal("1533.50"),
+				totalSpentToday = BigDecimal.ZERO,
+				dailyBudget = BigDecimal("1533.50"),
+				daysRemaining = 1,
+				progress = 0f,
+				isOverBudget = false,
+				totalBudget = BigDecimal("1533.50"),
+				totalSpentInPeriod = BigDecimal.ZERO
+			),
+			budgetSettings = BudgetSettings(
+				totalBudget = BigDecimal("1333.50"),
+				period = BudgetPeriod.DAILY,
+				startDate = LocalDate.now(),
+				currencyCode = "USD"
+			),
+			currencyCode = "USD",
+			startDate = startDate,
+			finishDate = finishDate
 		)
 	}
 }

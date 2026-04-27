@@ -96,6 +96,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TicketView
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
+import logcat.logcat
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDate
@@ -304,6 +305,9 @@ fun History(
 				}
 
 				val budget = budgetState?.totalBudget ?: BigDecimal.ZERO
+				logcat("History") {
+					"BudgetDisplay input budget=$budget budgetStateTotal=${budgetState?.totalBudget} budgetSettingsTotal=${budgetSettings?.totalBudget} rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward}"
+				}
 
 				BudgetDisplay(
 					budget = budget,

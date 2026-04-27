@@ -311,6 +311,9 @@ private fun ViewBudgetContent(
 
 		Spacer(modifier = Modifier.height(8.dp))
 
+		logcat(PERIOD_SWITCHER_TAG) {
+			"BudgetDisplay input totalBudget=$totalBudget budgetStateTotal=${budgetState?.totalBudget} budgetSettingsTotal=${budgetSettings?.totalBudget} rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward}"
+		}
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.spacedBy(8.dp),

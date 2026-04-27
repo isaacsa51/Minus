@@ -113,10 +113,12 @@ fun Editor(
 	val scope = rememberCoroutineScope()
 	val sheetState = rememberModalBottomSheetState()
 	var showBottomSheet by remember { mutableStateOf(false) }
+	var hasAutoOpenedWalletSheet by remember { mutableStateOf(false) }
 
 	LaunchedEffect(openWalletOnStart) {
-		if (openWalletOnStart) {
+		if (openWalletOnStart && !hasAutoOpenedWalletSheet) {
 			showBottomSheet = true
+			hasAutoOpenedWalletSheet = true
 		}
 	}
 
@@ -284,9 +286,9 @@ fun Editor(
 					.fillMaxWidth()
 					.heightIn(max = 600.dp)
 			) {
-				val shouldForceSetupMode = forceWalletSetup && uiState.budgetSettings == null
+				val shouldForceSetupMode = forceWalletSetup
 				logcat {
-					"Opening PeriodSwitcherSheet: forceWalletSetup=$forceWalletSetup, hasBudgetSettings=${uiState.budgetSettings != null}, startInEditMode=$shouldForceSetupMode"
+					"Opening PeriodSwitcherSheet: forceWalletSetup=$forceWalletSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$shouldForceSetupMode"
 				}
 				PeriodSwitcherSheet(
 					budgetSettings = uiState.budgetSettings,

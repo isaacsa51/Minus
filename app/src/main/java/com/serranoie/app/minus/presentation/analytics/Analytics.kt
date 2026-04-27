@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.history.History
@@ -63,6 +65,9 @@ data class AnalyticsState(
 	val startPeriodDate: Date = Date(),
 	val finishPeriodDate: Date? = null,
 	val extraAffordableDaysFromRemaining: Int = 0,
+	val budgetSettingsForDisplay: BudgetSettings? = null,
+	val budgetStateForDisplay: BudgetState? = null,
+	val showRolloverStyleInBudgetDisplay: Boolean = false,
 	val isLoading: Boolean = false,
 )
 
@@ -128,8 +133,9 @@ fun Analytics(
 						actualFinishDate = state.finishPeriodActualDate,
 						extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
 						modifier = Modifier.padding(horizontal = 16.dp),
-						budgetState = null,
-						budgetSettings = null,
+						budgetState = state.budgetStateForDisplay,
+						budgetSettings = state.budgetSettingsForDisplay,
+						showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
 					)
 Spacer(modifier = Modifier.height(16.dp))
 					Row(
