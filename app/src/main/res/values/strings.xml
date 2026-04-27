@@ -43,4 +43,5 @@
 
     <string name="period_mapping_active_budget">Modo presupuesto activo</string>
     <string name="period_mapping_calendar_bucket">Modo calendario</string>
+    <string name="day_total_format">Total: %1$s</string>
 </resources>

@@ -97,7 +97,8 @@ fun HistoryDateDivider(
 			DayTotalItem(
 				total = totalAmount!!,
 				currencyFormat = currencyFormat,
-				modifier = Modifier
+				modifier = Modifier,
+				showLabel = false,
 			)
 		}
 	}
