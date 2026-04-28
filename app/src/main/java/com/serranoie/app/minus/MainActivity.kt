@@ -1,10 +1,7 @@
 package com.serranoie.app.minus
 
-import android.Manifest
 import android.content.Context
 import android.content.pm.ActivityInfo
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
@@ -28,14 +25,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -43,34 +36,43 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.wearable.CapabilityClient
-import com.google.android.gms.wearable.Wearable
-import com.serranoie.app.minus.data.repository.BudgetRepository
-import com.serranoie.app.minus.domain.time.MidnightPeriodChecker
+import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_ID_KEY_NAME
+import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_STARTED_AT_KEY_NAME
+import com.serranoie.app.minus.data.repository.DYNAMIC_COLOR_KEY_NAME
+import com.serranoie.app.minus.data.repository.EARLY_FINISH_ACTIVE_KEY_NAME
+import com.serranoie.app.minus.data.repository.EARLY_FINISH_ACTUAL_DATE_KEY_NAME
+import com.serranoie.app.minus.data.repository.EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME
+import com.serranoie.app.minus.data.repository.NOTIFICATION_HOUR_KEY_NAME
+import com.serranoie.app.minus.data.repository.NOTIFICATION_MINUTE_KEY_NAME
+import com.serranoie.app.minus.data.repository.ONBOARDING_COMPLETED_KEY_NAME
+import com.serranoie.app.minus.data.repository.SETTINGS_DATASTORE_NAME
+import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.data.repository.THEME_MODE_KEY_NAME
+import com.serranoie.app.minus.data.repository.TYPOGRAPHY_MODE_KEY_NAME
+import com.serranoie.app.minus.data.wearable.WearableService
+import com.serranoie.app.minus.domain.time.MidnightTransitionManager
 import com.serranoie.app.minus.navigation.AppNavGraph
 import com.serranoie.app.minus.navigation.Screen
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
-import com.serranoie.app.minus.presentation.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
-import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
+import com.serranoie.app.minus.presentation.permission.PermissionHandler
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.ThemeManager
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
 import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
-import com.serranoie.app.minus.presentation.ui.theme.syncTheme
 import com.serranoie.app.minus.presentation.util.lockScreenOrientation
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import logcat.asLog
 import logcat.logcat
-import java.util.Locale
+import javax.inject.Inject
 
-val Context.settingsDataStore by preferencesDataStore("settings")
+val Context.settingsDataStore by preferencesDataStore(SETTINGS_DATASTORE_NAME)
 var Context.appTheme by mutableStateOf(ThemeMode.SYSTEM)
 var Context.appTypography by mutableStateOf(TypographyMode.EXPRESSIVE)
 var Context.dynamicColorEnabled by mutableStateOf(false)
@@ -78,27 +80,19 @@ var Context.dynamicColorEnabled by mutableStateOf(false)
 val LocalWindowSize = compositionLocalOf { WindowWidthSizeClass.Compact }
 val LocalWindowInsets = compositionLocalOf { PaddingValues(0.dp) }
 
-val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("onboarding_completed")
+val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NAME)
 val BUDGET_END_DATE_KEY = longPreferencesKey("budget_end_date_millis")
-val NOTIFICATION_HOUR_KEY = intPreferencesKey("notification_hour")
-val NOTIFICATION_MINUTE_KEY = intPreferencesKey("notification_minute")
-val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
-val TYPOGRAPHY_MODE_KEY = stringPreferencesKey("typography_mode")
-val DYNAMIC_COLOR_KEY = booleanPreferencesKey("dynamic_color_enabled")
-val EARLY_FINISH_ACTIVE_KEY = booleanPreferencesKey("early_finish_active")
-val EARLY_FINISH_ACTUAL_DATE_KEY = longPreferencesKey("early_finish_actual_date_millis")
-val EARLY_FINISH_ORIGINAL_END_DATE_KEY = longPreferencesKey("early_finish_original_end_date_millis")
-val CURRENT_PERIOD_STARTED_AT_KEY = longPreferencesKey("current_period_started_at_millis")
-val CURRENT_PERIOD_ID_KEY = longPreferencesKey("current_period_id")
+val NOTIFICATION_HOUR_KEY = intPreferencesKey(NOTIFICATION_HOUR_KEY_NAME)
+val NOTIFICATION_MINUTE_KEY = intPreferencesKey(NOTIFICATION_MINUTE_KEY_NAME)
+val THEME_MODE_KEY = stringPreferencesKey(THEME_MODE_KEY_NAME)
+val TYPOGRAPHY_MODE_KEY = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
+val DYNAMIC_COLOR_KEY = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
+val EARLY_FINISH_ACTIVE_KEY = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
+val EARLY_FINISH_ACTUAL_DATE_KEY = longPreferencesKey(EARLY_FINISH_ACTUAL_DATE_KEY_NAME)
+val EARLY_FINISH_ORIGINAL_END_DATE_KEY = longPreferencesKey(EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME)
+val CURRENT_PERIOD_STARTED_AT_KEY = longPreferencesKey(CURRENT_PERIOD_STARTED_AT_KEY_NAME)
+val CURRENT_PERIOD_ID_KEY = longPreferencesKey(CURRENT_PERIOD_ID_KEY_NAME)
 const val DEFAULT_NOTIFICATION_HOUR = 9
-val MIDNIGHT_TRANSITION_OCCURRED_KEY = booleanPreferencesKey("midnight_transition_occurred")
-val LAST_PERIOD_END_KEY = longPreferencesKey("last_period_end_millis")
-val REMAINING_FROM_LAST_PERIOD_KEY = stringPreferencesKey("remaining_from_last_period")
-val PENDING_ROLLOVER_AMOUNT_KEY = stringPreferencesKey("pending_rollover_amount")
-val PENDING_ROLLOVER_STRATEGY_KEY = stringPreferencesKey("pending_rollover_strategy")
-val CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY = stringPreferencesKey("current_period_rollover_amount")
-val CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY = booleanPreferencesKey("current_period_rollover_carry_forward")
-
 const val DEFAULT_NOTIFICATION_MINUTE = 0
 
 @AndroidEntryPoint
@@ -111,40 +105,36 @@ class MainActivity : ComponentActivity() {
 	private val dataStoreLoaded: MutableState<Boolean> = mutableStateOf(false)
 	private val onboardingComplete: MutableState<Boolean> = mutableStateOf(false)
 	private val earlyFinishPending: MutableState<Boolean> = mutableStateOf(false)
-	@javax.inject.Inject
+
+	@Inject
 	lateinit var notificationScheduler: NotificationScheduler
 
-	@javax.inject.Inject
-	lateinit var budgetRepository: BudgetRepository
+	@Inject
+	lateinit var settingsRepository: SettingsRepository
 
-	@javax.inject.Inject
-	lateinit var midnightPeriodChecker: MidnightPeriodChecker
+	@Inject
+	lateinit var permissionHandler: PermissionHandler
+
+	@Inject
+	lateinit var themeManager: ThemeManager
+
+	@Inject
+	lateinit var wearableService: WearableService
+
+	@Inject
+	lateinit var midnightTransitionManager: MidnightTransitionManager
 
 	private val requestNotificationPermissionLauncher = registerForActivityResult(
 		ActivityResultContracts.RequestPermission()
 	) { isGranted ->
-		if (isGranted) {
-			notificationScheduler.initializeNotifications()
-		}
+		permissionHandler.onNotificationPermissionResult(isGranted, notificationScheduler)
 	}
 
 	private fun checkAndRequestNotificationPermission() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-			when {
-				ContextCompat.checkSelfPermission(
-					this, Manifest.permission.POST_NOTIFICATIONS
-				) == PackageManager.PERMISSION_GRANTED -> {
-				}
-
-				shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
-					requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-				}
-
-				else -> {
-					requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-				}
-			}
-		}
+		permissionHandler.requestNotificationPermissionIfNeeded(
+			activity = this,
+			launcher = requestNotificationPermissionLauncher,
+		)
 	}
 
 	@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -157,51 +147,28 @@ class MainActivity : ComponentActivity() {
 			keepOn
 		}
 
+		super.onCreate(savedInstanceState)
+		enableEdgeToEdge()
+
 		lifecycleScope.launch {
 			try {
 				runCatching {
-					val cap = Wearable.getCapabilityClient(this@MainActivity)
-						.getCapability("minus_wear_sender", CapabilityClient.FILTER_REACHABLE)
-						.await()
+					val nodeIds = wearableService.getReachableSenderNodeIds()
 					logcat(tag) {
-						"wear capability minus_wear_sender reachableNodes=${cap.nodes.size} ids=${cap.nodes.joinToString { it.id }}"
+						"wear capability minus_wear_sender reachableNodes=${nodeIds.size} ids=${nodeIds.joinToString()}"
 					}
 				}.onFailure {
 					logcat(tag) { it.asLog() }
 				}
 
-				val prefs = applicationContext.settingsDataStore.data.first()
-				onboardingComplete.value = prefs[ONBOARDING_COMPLETED_KEY] ?: false
-				earlyFinishPending.value = prefs[EARLY_FINISH_ACTIVE_KEY] ?: false
-
-				val themeModeString = prefs[THEME_MODE_KEY]
-				if (themeModeString != null) {
-					try {
-						context.appTheme = ThemeMode.valueOf(themeModeString)
-					} catch (e: IllegalArgumentException) {
-						context.appTheme = ThemeMode.SYSTEM
-					}
-				} else {
-					context.appTheme = ThemeMode.SYSTEM
-				}
-
-				val typographyModeString = prefs[TYPOGRAPHY_MODE_KEY]
-				if (typographyModeString != null) {
-					try {
-						context.appTypography = TypographyMode.valueOf(typographyModeString)
-					} catch (_: IllegalArgumentException) {
-						context.appTypography = TypographyMode.EXPRESSIVE
-					}
-				} else {
-					context.appTypography = TypographyMode.EXPRESSIVE
-				}
-
-				val dynamicColor = prefs[DYNAMIC_COLOR_KEY] ?: false
-				context.dynamicColorEnabled = dynamicColor
+				val userSettings = settingsRepository.getSettings()
+				onboardingComplete.value = userSettings.onboardingCompleted
+				earlyFinishPending.value = userSettings.earlyFinishActive
+				themeManager.applyUserSettings(context, userSettings)
 
 				dataStoreLoaded.value = true
 				isDone.value = true
-			} catch (e: Exception) {
+			} catch (_: Exception) {
 				dataStoreLoaded.value = true
 				isDone.value = true
 			}
@@ -209,31 +176,27 @@ class MainActivity : ComponentActivity() {
 			notificationScheduler.initializeNotifications()
 		}
 
-		super.onCreate(savedInstanceState)
-		enableEdgeToEdge()
-
-		applicationContext.settingsDataStore.data
-			.onEach { preferences ->
-				logcat(tag) {
-					"DataStore observer -> onboarding_completed=${preferences[ONBOARDING_COMPLETED_KEY]}"
-				}
+		settingsRepository.observeSettings().onEach { settings ->
+			logcat(tag) {
+				"Settings observer -> onboarding_completed=${settings.onboardingCompleted}"
 			}
-			.launchIn(lifecycleScope)
+			onboardingComplete.value = settings.onboardingCompleted
+			earlyFinishPending.value = settings.earlyFinishActive
+			themeManager.applyUserSettings(applicationContext, settings)
+		}.launchIn(lifecycleScope)
 
 		ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
 			override fun onStart(owner: LifecycleOwner) {
 				lifecycleScope.launch {
-					midnightPeriodChecker.handleEndingPeriod()
+					midnightTransitionManager.handleAppStart()
 				}
 			}
 		})
 
 		setContent {
-			val localContext = LocalContext.current
 			val activityResultRegistryOwner = LocalActivityResultRegistryOwner.current
 
 			LaunchedEffect(Unit) {
-				syncTheme(localContext)
 				isReady.value = true
 			}
 
@@ -243,10 +206,6 @@ class MainActivity : ComponentActivity() {
 				}
 			}
 
-			LaunchedEffect(onboardingComplete.value) {
-				if (onboardingComplete.value) {
-				}
-			}
 
 			val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
 
@@ -284,71 +243,67 @@ class MainActivity : ComponentActivity() {
 											logcat(tag) {
 												"onOnboardingComplete -> writing onboarding_completed=true"
 											}
-											applicationContext.settingsDataStore.edit { prefs ->
-												prefs[ONBOARDING_COMPLETED_KEY] = true
-												prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] =
-													FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
-											}
-											val saved =
-												applicationContext.settingsDataStore.data.first()[ONBOARDING_COMPLETED_KEY]
-													?: false
-											logcat(tag) {
-												"onOnboardingComplete -> saved onboarding_completed=$saved"
-											}
+											settingsRepository.setOnboardingCompleted(true)
 										}
-									}
-								)
+									})
 							}
 
-							val shouldShowMidnightDialog by midnightPeriodChecker.shouldShowTransitionDialog.collectAsStateWithLifecycle()
-							val midnightTransitionData by midnightPeriodChecker.midnightTransitionData.collectAsStateWithLifecycle()
+							val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()
+							val midnightTransitionData by midnightTransitionManager.midnightTransitionData.collectAsStateWithLifecycle()
 
-															if (shouldShowMidnightDialog && midnightTransitionData != null) {
-									val data = midnightTransitionData!!
-									if (data.shouldNavigateToAnalyticsOnly) {
-										LaunchedEffect(data.periodEndDate, data.remainingAmount, data.totalBudget, data.totalSpent) {
-											midnightPeriodChecker.onTransitionDialogConfirmed()
-											navController.navigate(Screen.Analytics.route) {
-												popUpTo(Screen.Main.route) { inclusive = false }
-												launchSingleTop = true
-											}
-										}
-									} else {
-								val periodLabel =
-									"${data.periodStartDate.dayOfMonth} ${data.periodStartDate.month.name.lowercase().take(3)} - ${data.periodEndDate.dayOfMonth} ${data.periodEndDate.month.name.lowercase().take(3)}"
-								RolloverDialog(
-									remainingAmount = data.remainingAmount,
-									currencyCode = data.currencyCode,
-									periodLabel = periodLabel,
-									spentAmount = data.totalSpent,
-																						onSplitEqually = {
-														lifecycleScope.launch {
-															midnightPeriodChecker.rollRemainingSplitEqually()
-															navController.navigate(Screen.Analytics.route) {
-																popUpTo(Screen.Main.route) { inclusive = false }
-																launchSingleTop = true
-															}
-														}
-													},
-													onCarryToNextDay = {
-														lifecycleScope.launch {
-															midnightPeriodChecker.rollRemainingToFirstDay()
-															navController.navigate(Screen.Analytics.route) {
-																popUpTo(Screen.Main.route) { inclusive = false }
-																launchSingleTop = true
-															}
-														}
-													},
-									onViewAnalytics = {
-										midnightPeriodChecker.onTransitionDialogConfirmed()
+							if (shouldShowMidnightDialog && midnightTransitionData != null) {
+								val data = midnightTransitionData!!
+								if (data.shouldNavigateToAnalyticsOnly) {
+									LaunchedEffect(
+										data.periodEndDate,
+										data.remainingAmount,
+										data.totalBudget,
+										data.totalSpent
+									) {
+										midnightTransitionManager.onTransitionDialogConfirmed()
 										navController.navigate(Screen.Analytics.route) {
 											popUpTo(Screen.Main.route) { inclusive = false }
+											launchSingleTop = true
 										}
-									},
-									onDismiss = {
-										midnightPeriodChecker.onTransitionDialogDismissed()
 									}
-								)
+								} else {
+									val periodLabel = "${data.periodStartDate.dayOfMonth} ${
+										data.periodStartDate.month.name.lowercase().take(3)
+									} - ${data.periodEndDate.dayOfMonth} ${
+										data.periodEndDate.month.name.lowercase().take(3)
+									}"
+									RolloverDialog(
+										remainingAmount = data.remainingAmount,
+										currencyCode = data.currencyCode,
+										periodLabel = periodLabel,
+										spentAmount = data.totalSpent,
+										onSplitEqually = {
+											lifecycleScope.launch {
+												midnightTransitionManager.rollRemainingSplitEqually()
+												navController.navigate(Screen.Analytics.route) {
+													popUpTo(Screen.Main.route) { inclusive = false }
+													launchSingleTop = true
+												}
+											}
+										},
+										onCarryToNextDay = {
+											lifecycleScope.launch {
+												midnightTransitionManager.rollRemainingToFirstDay()
+												navController.navigate(Screen.Analytics.route) {
+													popUpTo(Screen.Main.route) { inclusive = false }
+													launchSingleTop = true
+												}
+											}
+										},
+										onViewAnalytics = {
+											midnightTransitionManager.onTransitionDialogConfirmed()
+											navController.navigate(Screen.Analytics.route) {
+												popUpTo(Screen.Main.route) { inclusive = false }
+											}
+										},
+										onDismiss = {
+											midnightTransitionManager.onTransitionDialogDismissed()
+										})
 								}
 							}
 						}

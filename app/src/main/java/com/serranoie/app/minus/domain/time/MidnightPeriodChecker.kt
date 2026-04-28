@@ -1,14 +1,8 @@
 package com.serranoie.app.minus.domain.time
 
 import android.content.Context
-import logcat.logcat
 import androidx.datastore.preferences.core.edit
 import com.serranoie.app.minus.BUDGET_END_DATE_KEY
-import com.serranoie.app.minus.LAST_PERIOD_END_KEY
-import com.serranoie.app.minus.MIDNIGHT_TRANSITION_OCCURRED_KEY
-import com.serranoie.app.minus.PENDING_ROLLOVER_AMOUNT_KEY
-import com.serranoie.app.minus.PENDING_ROLLOVER_STRATEGY_KEY
-import com.serranoie.app.minus.REMAINING_FROM_LAST_PERIOD_KEY
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.settingsDataStore
@@ -17,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import logcat.logcat
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -121,6 +116,7 @@ class MidnightPeriodChecker @Inject constructor(
 				_shouldShowTransitionDialog.value = true
 				logcat { "Ending period detected, asking user for rollover strategy" }
 			}
+
 			RemainingBudgetStrategy.SPLIT_EQUALLY,
 			RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> {
 				enqueuePendingRollover(
@@ -155,7 +151,9 @@ class MidnightPeriodChecker @Inject constructor(
 			Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
 		}
 		val dataStoreIsInFuture = dataStoreEndDate?.let { it.isAfter(today) } ?: false
-		val effectiveEndDate = if (dataStoreIsInFuture) settingsEndDate ?: dataStoreEndDate else dataStoreEndDate ?: settingsEndDate
+		val effectiveEndDate =
+			if (dataStoreIsInFuture) settingsEndDate ?: dataStoreEndDate else dataStoreEndDate
+				?: settingsEndDate
 		val periodEndedBasedOnDate = effectiveEndDate?.let { today.isAfter(it) } ?: false
 
 		val periodEndDate = if (transitionOccurred) {

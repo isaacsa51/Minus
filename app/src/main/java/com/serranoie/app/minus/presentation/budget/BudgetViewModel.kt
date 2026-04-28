@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.BUDGET_END_DATE_KEY
 import com.serranoie.app.minus.CURRENT_PERIOD_ID_KEY
-import com.serranoie.app.minus.CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY
-import com.serranoie.app.minus.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY
+import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY
+import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY
 import com.serranoie.app.minus.CURRENT_PERIOD_STARTED_AT_KEY
 import com.serranoie.app.minus.DEFAULT_NOTIFICATION_HOUR
 import com.serranoie.app.minus.DEFAULT_NOTIFICATION_MINUTE
@@ -18,8 +18,8 @@ import com.serranoie.app.minus.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.EARLY_FINISH_ORIGINAL_END_DATE_KEY
 import com.serranoie.app.minus.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.PENDING_ROLLOVER_AMOUNT_KEY
-import com.serranoie.app.minus.PENDING_ROLLOVER_STRATEGY_KEY
+import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_AMOUNT_KEY
+import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_STRATEGY_KEY
 import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState

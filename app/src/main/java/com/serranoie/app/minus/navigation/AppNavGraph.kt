@@ -17,7 +17,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
@@ -25,6 +25,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.EntryPointAccessors
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -38,8 +39,8 @@ import com.serranoie.app.minus.DEFAULT_NOTIFICATION_MINUTE
 import com.serranoie.app.minus.EARLY_FINISH_ACTIVE_KEY
 import com.serranoie.app.minus.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.EARLY_FINISH_ORIGINAL_END_DATE_KEY
-import com.serranoie.app.minus.LAST_PERIOD_END_KEY
-import com.serranoie.app.minus.REMAINING_FROM_LAST_PERIOD_KEY
+import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
+import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.NOTIFICATION_MINUTE_KEY
@@ -59,6 +60,7 @@ import com.serranoie.app.minus.presentation.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE
 import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.tutorial.PERIOD_MAPPING_MODE_KEY
 import com.serranoie.app.minus.presentation.tutorial.periodMappingModeFlow
+import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
 import com.serranoie.app.minus.presentation.wallet.Wallet
 import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
@@ -228,9 +230,9 @@ fun AppNavGraph(
 
         composable(Screen.Analytics.route) {
             val viewModel: BudgetViewModel = hiltViewModel()
-            val uiState = viewModel.uiState.collectAsState().value
+            val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
             val context = androidx.compose.ui.platform.LocalContext.current
-            val preferences = context.settingsDataStore.data.collectAsState(initial = emptyPreferences()).value
+            val preferences = context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences()).value
 
             val budgetSettings = uiState.budgetSettings
             val allTransactions = uiState.transactions
@@ -247,9 +249,9 @@ fun AppNavGraph(
                 lastPeriodEnd != null && remainingFromLastPeriod != null && budgetSettings != null
 
             val endedPeriodStartDate = if (shouldShowEndedPeriodSnapshot) {
-                val currentEnd = budgetSettings!!.getPeriodEndDate()
+                val currentEnd = budgetSettings.getPeriodEndDate()
                 val currentDays = ChronoUnit.DAYS.between(budgetSettings.startDate, currentEnd).toInt() + 1
-                lastPeriodEnd!!.minusDays((currentDays - 1).toLong())
+                lastPeriodEnd.minusDays((currentDays - 1).toLong())
             } else null
 
             // Filter transactions for the relevant period (ended snapshot when available, otherwise current)
@@ -263,7 +265,7 @@ fun AppNavGraph(
                             return@filter transaction.periodId == currentPeriodId
                         }
                         val startDate = budgetSettings?.startDate ?: return@filter false
-                        val endDate = budgetSettings?.getPeriodEndDate() ?: return@filter false
+                        val endDate = budgetSettings.getPeriodEndDate()
                         !txDate.isBefore(startDate) && !txDate.isAfter(endDate)
                     }
                 }
@@ -396,6 +398,13 @@ fun AppNavGraph(
             val openWallet = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_OPEN_WALLET) ?: false
             val forceWalletSetup = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_FORCE_WALLET_SETUP) ?: false
 
+            LaunchedEffect(backStackEntry.id) {
+                if (openWallet || forceWalletSetup) {
+                    backStackEntry.arguments?.putBoolean(Screen.Main.ARG_OPEN_WALLET, false)
+                    backStackEntry.arguments?.putBoolean(Screen.Main.ARG_FORCE_WALLET_SETUP, false)
+                }
+            }
+
             MainScreen(
                 openWalletOnStart = openWallet,
                 forceWalletSetup = forceWalletSetup,
@@ -433,7 +442,7 @@ fun AppNavGraph(
                 }
             )
 
-            val preferences = context.settingsDataStore.data.collectAsState(initial = emptyPreferences()).value
+            val preferences = context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences()).value
             val currentThemeMode = context.appTheme
             val notificationHour = preferences[NOTIFICATION_HOUR_KEY] ?: DEFAULT_NOTIFICATION_HOUR
             val notificationMinute = preferences[NOTIFICATION_MINUTE_KEY] ?: DEFAULT_NOTIFICATION_MINUTE
@@ -444,11 +453,11 @@ fun AppNavGraph(
                 true
             }
             val periodMappingMode = context.periodMappingModeFlow()
-                .collectAsState(initial = PeriodMappingMode.ACTIVE_BUDGET).value
+	            .collectAsStateWithLifecycle(initialValue = PeriodMappingMode.ACTIVE_BUDGET).value
 
             val currentThemeString = when (currentThemeMode) {
-                com.serranoie.app.minus.presentation.ui.theme.ThemeMode.LIGHT -> "Light"
-                com.serranoie.app.minus.presentation.ui.theme.ThemeMode.NIGHT -> "Dark"
+                ThemeMode.LIGHT -> "Light"
+                ThemeMode.NIGHT -> "Dark"
                 else -> "System"
             }
             val currentTypographyString = when (context.appTypography) {
@@ -466,9 +475,9 @@ fun AppNavGraph(
                 onThemeChange = { themeMode ->
                     logcat(tag) { "Theme changed to: $themeMode" }
                     val newThemeMode = when (themeMode) {
-                        "Light" -> com.serranoie.app.minus.presentation.ui.theme.ThemeMode.LIGHT
-                        "Dark" -> com.serranoie.app.minus.presentation.ui.theme.ThemeMode.NIGHT
-                        else -> com.serranoie.app.minus.presentation.ui.theme.ThemeMode.SYSTEM
+                        "Light" -> ThemeMode.LIGHT
+                        "Dark" -> ThemeMode.NIGHT
+                        else -> ThemeMode.SYSTEM
                     }
                     context.appTheme = newThemeMode
                     scope.launch {

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.HorizontalDivider
@@ -177,6 +178,7 @@ fun LinearSavingsBar(
 	recurrentPct: Int, variablePct: Int, modifier: Modifier = Modifier
 ) {
 	val totalSpentPct = recurrentPct + variablePct
+	val roundedCorner = RoundedCornerShape(12.dp)
 
 	Box(
 		modifier = modifier
@@ -198,6 +200,7 @@ fun LinearSavingsBar(
 					Modifier
 						.weight(recSafe)
 						.fillMaxHeight()
+						.clip(roundedCorner)
 						.background(MaterialTheme.colorScheme.outlineVariant)
 				)
 			}
@@ -206,6 +209,7 @@ fun LinearSavingsBar(
 					Modifier
 						.weight(varSafe)
 						.fillMaxHeight()
+						.clip(roundedCorner)
 						.background(MaterialTheme.colorScheme.primary)
 				)
 			}
@@ -225,6 +229,7 @@ fun LinearSavingsBar(
 					Modifier
 						.weight(totalInvasion)
 						.fillMaxHeight()
+						.clip(roundedCorner)
 						.background(MaterialTheme.colorScheme.error)
 				)
 			}
@@ -233,6 +238,7 @@ fun LinearSavingsBar(
 					Modifier
 						.weight(safeSavings)
 						.fillMaxHeight()
+						.clip(roundedCorner)
 						.background(MaterialTheme.colorScheme.error.copy(alpha = 0.15f))
 				)
 			}
@@ -276,8 +282,7 @@ private fun RecommendationItem(
 @Composable
 private fun SavingsRecommendationPreview() {
 	MinusTheme {
-		Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-			Text("Caso: Gastos normales", style = MaterialTheme.typography.titleSmall)
+		Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
 			SavingsRecommendationCard(
 				budget = BigDecimal("20000"), spends = listOf(
 					Transaction(

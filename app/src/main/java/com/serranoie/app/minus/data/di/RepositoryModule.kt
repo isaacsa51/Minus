@@ -2,6 +2,8 @@ package com.serranoie.app.minus.data.di
 
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.BudgetRepositoryImpl
+import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.data.repository.SettingsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -25,4 +27,13 @@ abstract class RepositoryModule {
     abstract fun bindBudgetRepository(
         impl: BudgetRepositoryImpl
     ): BudgetRepository
+
+    /**
+     * Binds SettingsRepositoryImpl to SettingsRepository interface.
+     */
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
 }

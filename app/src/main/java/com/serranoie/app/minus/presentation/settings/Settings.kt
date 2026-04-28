@@ -62,7 +62,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
@@ -108,11 +107,9 @@ fun Settings(
 	val context = LocalContext.current
 	val view = LocalView.current
 	val snackbarHostState = remember { SnackbarHostState() }
-	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
 
 	Scaffold(
 		modifier = modifier
-			.padding(top = statusBarHeight)
 			.nestedScroll(scrollBehavior.nestedScrollConnection),
 		snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
 		topBar = {

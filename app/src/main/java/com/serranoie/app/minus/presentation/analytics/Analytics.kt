@@ -155,7 +155,6 @@ Spacer(modifier = Modifier.height(16.dp))
 							)
 						}
 					}
-					Spacer(modifier = Modifier.height(16.dp))
 					SpendsChart(
 						spends = state.spends,
 						modifier = Modifier
