@@ -21,8 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CategoryAmount
@@ -60,8 +62,8 @@ fun CategoriesChartCard(
 	onCategoryClick: ((categoryName: String, categorySpends: List<Transaction>) -> Unit)? = null,
 ) {
 	val isNightMode = isNightMode()
-	val labelWithoutTag = "Sin categoria"
-	val labelRest = "Restante"
+	val labelWithoutTag = stringResource(R.string.categories_chart_uncategorized)
+	val labelRest = stringResource(R.string.categories_chart_rest)
 	val maxDisplay = 7
 
 	val colors = baseColors.map {
@@ -164,7 +166,7 @@ fun CategoriesChartCard(
 						)
 						Column {
 							Text(
-								text = "We can't split your spends by categories",
+								text = stringResource(R.string.categories_chart_empty_title),
 								style = MaterialTheme.typography.bodyLargeEmphasized.copy(
 									color = MaterialTheme.colorScheme.onSurfaceVariant,
 								),
@@ -174,7 +176,7 @@ fun CategoriesChartCard(
 								modifier = Modifier.fillMaxWidth(),
 							) {
 								Text(
-									text = "Use tags to see chart by categories ",
+									text = stringResource(R.string.categories_chart_empty_subtitle),
 									style = MaterialTheme.typography.bodyMedium.copy(
 										color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.8f),
 									),

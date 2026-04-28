@@ -13,10 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
@@ -46,7 +48,7 @@ fun RecurrentTicketCard(
 	modifier: Modifier = Modifier,
 	backgroundColor: Color = MaterialTheme.colorScheme.surface,
 	teethWidthDp: Float = 12f,
-	teethHeightDp: Float = 2f
+	teethHeightDp: Float = 1.5f
 ) {
 	TicketCard(
 		modifier = modifier,
@@ -64,7 +66,7 @@ fun RecurrentTicketCard(
 				horizontalArrangement = Arrangement.spacedBy(8.dp)
 			) {
 				Text(
-					text = title.ifEmpty { "Subscripción sin nombre" },
+					text = title.ifEmpty { stringResource(R.string.recurrent_ticket_unnamed_subscription) },
 					style = MaterialTheme.typography.titleSmallCondensed,
 					color = MaterialTheme.colorScheme.onSurface,
 					maxLines = 1,
@@ -102,15 +104,15 @@ fun RecurrentTicketCard(
 				)
 
 				frequencyLabel?.let { label ->
-					val spanishLabel = when (label.lowercase()) {
-						"weekly" -> "Semanal"
-						"biweekly" -> "Quincenal"
-						"monthly" -> "Mensual"
+					val localizedLabel = when (label.lowercase()) {
+						"weekly" -> stringResource(R.string.recurrent_ticket_frequency_weekly)
+						"biweekly" -> stringResource(R.string.recurrent_ticket_frequency_biweekly)
+						"monthly" -> stringResource(R.string.recurrent_ticket_frequency_monthly)
 						else -> label
 					}
 
 					Text(
-						text = spanishLabel,
+						text = localizedLabel,
 						style = MaterialTheme.typography.labelSmallEmphasized.copy(fontWeight = FontWeight.Normal),
 						color = MaterialTheme.colorScheme.secondary,
 						maxLines = 2,

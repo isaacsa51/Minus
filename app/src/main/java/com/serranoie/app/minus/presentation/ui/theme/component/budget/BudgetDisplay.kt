@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,30 +33,28 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.bodyLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.countDays
 import com.serranoie.app.minus.presentation.util.prettyDate
-import java.math.BigDecimal
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import logcat.logcat
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 
-const val DAY = 24 * 60 * 60 * 1000
-
-/**
- * Displays budget information: total budget, date range, and stats.
- */
 @Composable
 fun BudgetDisplay(
 	budget: BigDecimal,
@@ -74,7 +71,7 @@ fun BudgetDisplay(
 	contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
 ) {
 	val currencyFormat =
-		com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat(currencyCode)
+		symbolOnlyCurrencyFormat(currencyCode)
 
 	val settingsTotalBudget = budgetSettings?.totalBudget
 	val stateTotalBudget = budgetState?.totalBudget
@@ -87,15 +84,11 @@ fun BudgetDisplay(
 	}
 
 	val baseBudget = when {
-		settingsTotalBudget != null &&
-			rolloverFromSettings != null &&
-			settingsTotalBudget > rolloverFromSettings -> {
+		settingsTotalBudget != null && rolloverFromSettings != null && settingsTotalBudget > rolloverFromSettings -> {
 			settingsTotalBudget.subtract(rolloverFromSettings)
 		}
 
-		settingsTotalBudget != null &&
-			stateTotalBudget != null &&
-			stateTotalBudget > settingsTotalBudget -> {
+		settingsTotalBudget != null && stateTotalBudget != null && stateTotalBudget > settingsTotalBudget -> {
 			settingsTotalBudget
 		}
 
@@ -103,7 +96,8 @@ fun BudgetDisplay(
 		else -> budget
 	}
 
-	val rolloverAmount = displayBudget.subtract(baseBudget).takeIf { it > BigDecimal.ZERO } ?: BigDecimal.ZERO
+	val rolloverAmount =
+		displayBudget.subtract(baseBudget).takeIf { it > BigDecimal.ZERO } ?: BigDecimal.ZERO
 	val shouldShowCrossedBaseBudget = showRolloverStyle && rolloverAmount > BigDecimal.ZERO
 	logcat("BudgetDisplay") {
 		"state budget=$budget settingsTotal=$settingsTotalBudget stateTotal=$stateTotalBudget rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward} showRolloverStyle=$showRolloverStyle baseBudget=$baseBudget displayBudget=$displayBudget rolloverAmount=$rolloverAmount showCross=$shouldShowCrossedBaseBudget"
@@ -116,7 +110,7 @@ fun BudgetDisplay(
 			containerColor = MaterialTheme.colorScheme.onSurface,
 			contentColor = MaterialTheme.colorScheme.surfaceVariant
 		),
-		label = "Presupuesto total",
+		label = stringResource(R.string.total_budget),
 		value = currencyFormat.format(displayBudget),
 		crossedValue = if (shouldShowCrossedBaseBudget) currencyFormat.format(baseBudget) else null,
 		crossedValueColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
@@ -141,7 +135,6 @@ fun BudgetDisplay(
 						softWrap = false,
 						overflow = TextOverflow.Ellipsis,
 						style = MaterialTheme.typography.bodyMediumCondensed,
-//						fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
 					)
 				}
 
@@ -198,7 +191,6 @@ fun BudgetDisplay(
 								softWrap = false,
 								overflow = TextOverflow.Ellipsis,
 								style = MaterialTheme.typography.bodyMediumCondensed,
-//								fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
 							)
 
 							Cross {
@@ -216,7 +208,6 @@ fun BudgetDisplay(
 										softWrap = false,
 										overflow = TextOverflow.Ellipsis,
 										style = MaterialTheme.typography.bodyMediumCondensed,
-//										fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
 									)
 								}
 							}
@@ -235,7 +226,6 @@ fun BudgetDisplay(
 							softWrap = false,
 							overflow = TextOverflow.Ellipsis,
 							style = MaterialTheme.typography.bodyMediumCondensed,
-//							fontSize = if (bigVariant) MaterialTheme.typography.bodySmall.fontSize else MaterialTheme.typography.labelSmall.fontSize,
 						)
 					}
 				}
@@ -263,8 +253,10 @@ fun CountDaysChip(
 			contentAlignment = Alignment.Center,
 		) {
 			Text(
-				modifier = Modifier.padding(12.dp, 0.dp),
-				text = if (totalDays >= 2 || totalDays == 0) "$totalDays días" else "$totalDays día",
+				modifier = Modifier.padding(horizontal = 12.dp),
+				text = pluralStringResource(
+					R.plurals.analytics_days_left, totalDays, totalDays
+				),
 				style = MaterialTheme.typography.bodyMediumCondensed,
 			)
 		}
@@ -428,11 +420,10 @@ private fun BudgetDisplayPreview_OverBudget() {
 private fun BudgetDisplayPreview_RolloverSplit() {
 	MinusTheme {
 		val startDate = Date()
-		val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 1) }.time
+		val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 0) }.time
 
 		BudgetDisplay(
-			budget = BigDecimal("1333.50"),
-			budgetState = BudgetState(
+			budget = BigDecimal("1333.50"), budgetState = BudgetState(
 				remainingToday = BigDecimal("1533.50"),
 				totalSpentToday = BigDecimal.ZERO,
 				dailyBudget = BigDecimal("1533.50"),
@@ -441,16 +432,12 @@ private fun BudgetDisplayPreview_RolloverSplit() {
 				isOverBudget = false,
 				totalBudget = BigDecimal("1533.50"),
 				totalSpentInPeriod = BigDecimal.ZERO
-			),
-			budgetSettings = BudgetSettings(
+			), budgetSettings = BudgetSettings(
 				totalBudget = BigDecimal("1333.50"),
 				period = BudgetPeriod.DAILY,
 				startDate = LocalDate.now(),
 				currencyCode = "USD"
-			),
-			currencyCode = "USD",
-			startDate = startDate,
-			finishDate = finishDate
+			), currencyCode = "USD", startDate = startDate, finishDate = finishDate
 		)
 	}
 }

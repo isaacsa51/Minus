@@ -48,6 +48,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
@@ -117,10 +118,10 @@ fun RecurrentExpenseDialog(
 	AlertDialog(modifier = modifier, onDismissRequest = onDismiss, title = {
 		Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
 			Text(
-				text = "Gasto recurrente", style = MaterialTheme.typography.titleLargeEmphasized
+				text = stringResource(R.string.recurrent_expense), style = MaterialTheme.typography.titleLargeEmphasized
 			)
 			Text(
-				text = "Configura en qué frecuencia se repetirá este gasto.",
+				text = stringResource(R.string.recurrent_expense_details),
 				style = MaterialTheme.typography.bodySmall,
 				color = MaterialTheme.colorScheme.onSurfaceVariant
 			)
@@ -129,9 +130,13 @@ fun RecurrentExpenseDialog(
 		Column(
 			modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			Text("Frecuencia del pago", style = MaterialTheme.typography.labelMediumCondensed)
+			Text(stringResource(R.string.recurrent_expense_frequency_subtitle), style = MaterialTheme.typography.labelMediumCondensed)
 
-			val options = listOf("Semanal", "Quincenal", "Mensual")
+			val options = listOf(
+				stringResource(R.string.recurrent_frequency_weekly),
+				stringResource(R.string.recurrent_frequency_biweekly),
+				stringResource(R.string.recurrent_frequency_monthly)
+			)
 			val frequencies = listOf(
 				RecurrentFrequency.WEEKLY,
 				RecurrentFrequency.BIWEEKLY,
@@ -179,13 +184,13 @@ fun RecurrentExpenseDialog(
 						}) {
 							Icon(
 								Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-								contentDescription = "Día anterior",
+								contentDescription = stringResource(R.string.previous_day),
 								modifier = Modifier.size(18.dp)
 							)
 						}
 
 						Text(
-							text = "Día $selectedDay de cada mes",
+							text = stringResource(R.string.monthly_on_day_format, selectedDay),
 							style = MaterialTheme.typography.titleMedium
 						)
 
@@ -194,7 +199,7 @@ fun RecurrentExpenseDialog(
 						}) {
 							Icon(
 								Icons.AutoMirrored.Filled.KeyboardArrowRight,
-								contentDescription = "Día siguiente",
+								contentDescription = stringResource(R.string.next_day),
 								modifier = Modifier.size(18.dp)
 							)
 						}
@@ -203,7 +208,7 @@ fun RecurrentExpenseDialog(
 			}
 
 			Text(
-				text = "Fecha límite",
+				text = stringResource(R.string.limit_date),
 				style = MaterialTheme.typography.labelMediumCondensed,
 			)
 
@@ -211,7 +216,7 @@ fun RecurrentExpenseDialog(
 				value = selectedEndDate.format(dateFormatter),
 				onValueChange = {},
 				readOnly = true,
-				placeholder = { Text("Fecha") },
+				placeholder = { Text(stringResource(R.string.date_placeholder)) },
 				trailingIcon = {
 					Icon(
 						imageVector = Icons.Default.CalendarToday,
@@ -233,7 +238,7 @@ fun RecurrentExpenseDialog(
 			TextButton(
 				onClick = { showDatePicker = true }, modifier = Modifier.align(Alignment.End)
 			) {
-				Text("Cambiar fecha")
+				Text(stringResource(R.string.change_date))
 			}
 
 			OutlinedCard(
@@ -278,39 +283,27 @@ fun RecurrentExpenseDialog(
 					if (selectedFrequency == RecurrentFrequency.MONTHLY) selectedDay else null
 				)
 			}) {
-			Text("Guardar")
+			Text(stringResource(R.string.save))
 		}
 	}, dismissButton = {
 		TextButton(onClick = onDismiss) {
-			Text("Cancelar")
+			Text(stringResource(R.string.cancel))
 		}
 	})
 }
 
+@Composable
 private fun buildRecurrentSummary(
 	frequency: RecurrentFrequency,
 	selectedDay: Int,
 	selectedEndDate: LocalDate,
 	formatter: DateTimeFormatter
 ): String {
+	val formattedDate = selectedEndDate.format(formatter)
 	return when (frequency) {
-		RecurrentFrequency.WEEKLY -> "Se cobrará cada semana hasta ${
-			selectedEndDate.format(
-				formatter
-			)
-		}."
-
-		RecurrentFrequency.BIWEEKLY -> "Se cobrará cada quincena hasta ${
-			selectedEndDate.format(
-				formatter
-			)
-		}."
-
-		RecurrentFrequency.MONTHLY -> "Se cobrará cada mes el día $selectedDay hasta ${
-			selectedEndDate.format(
-				formatter
-			)
-		}."
+		RecurrentFrequency.WEEKLY -> stringResource(R.string.summary_weekly_format, formattedDate)
+		RecurrentFrequency.BIWEEKLY -> stringResource(R.string.summary_biweekly_format, formattedDate)
+		RecurrentFrequency.MONTHLY -> stringResource(R.string.summary_monthly_format, selectedDay, formattedDate)
 	}
 }
 

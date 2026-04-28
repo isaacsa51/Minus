@@ -42,7 +42,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Date
 
-const val FINISH_DATE_SELECTOR_SHEET = "finishDateSelector"
 
 fun BudgetPeriod.toDays(): Int = when (this) {
 	BudgetPeriod.DAILY -> 1
@@ -179,25 +178,22 @@ fun FinishDateSelector(
 				verticalAlignment = Alignment.CenterVertically,
 			) {
 				IconButton(onClick = onBackPressed) {
-					Icon(Icons.Default.Close, contentDescription = "Cerrar")
+					Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close))
 				}
 				Spacer(Modifier.weight(1f))
 				Column(horizontalAlignment = Alignment.CenterHorizontally) {
 					Text(
-						text = "Selecciona el período",
+						text = stringResource(R.string.onboarding_finish_date_selector_title),
 						style = MaterialTheme.typography.titleMedium,
 					)
 					if (totalDays > 0) {
 						Text(
-							text = "$totalDays días" + " · ${
-								startDate?.format(
-									dateFormatter
-								)
-							} - ${
-								endDate?.format(
-									dateFormatter
-								)
-							}",
+							text = stringResource(
+								R.string.onboarding_finish_date_selector_days_range,
+								totalDays,
+								startDate?.format(dateFormatter).orEmpty(),
+								endDate?.format(dateFormatter).orEmpty(),
+							),
 							style = MaterialTheme.typography.bodySmall,
 							color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
 						)
@@ -211,7 +207,7 @@ fun FinishDateSelector(
 						}
 					},
 					enabled = hasRange && selectedPeriod != null,
-				) { Text("Aplicar") }
+				) { Text(stringResource(R.string.apply)) }
 			}
 
 			DateRangePicker(
@@ -232,7 +228,7 @@ fun FinishDateSelector(
 						.padding(horizontal = 16.dp, vertical = 12.dp),
 				) {
 					Text(
-						text = "¿Cómo quieres ver tu presupuesto?",
+						text = stringResource(R.string.onboarding_finish_date_selector_budget_view_question),
 						style = MaterialTheme.typography.titleSmall,
 						modifier = Modifier.padding(bottom = 10.dp),
 					)

@@ -58,12 +58,10 @@ class RecurrentExpenseNotificationWorker(
                 return Result.success()
             }
 
-            // Get all transactions
             val transactions = budgetRepository.getTransactions().first()
             val today = LocalDate.now()
             val budgetEndDate = settings.getPeriodEndDate()
 
-            // Filter for recurrent transactions that should trigger today
             val recurrentTransactions = transactions.filter { transaction ->
                 val frequency = transaction.recurrentFrequency
                 val date = transaction.date
@@ -73,8 +71,6 @@ class RecurrentExpenseNotificationWorker(
                 isDueToday(transaction, today, frequency)
             }
 
-            // Also find subscriptions that will charge before the budget period ends
-            // This helps users plan for upcoming expenses within their current budget
             val upcomingSubscriptions = transactions.filter { transaction ->
                 shouldWarnUpcoming(transaction, today, budgetEndDate)
             }
@@ -82,7 +78,6 @@ class RecurrentExpenseNotificationWorker(
             logcat { "Found ${recurrentTransactions.size} recurrent expenses due today" }
             logcat { "Found ${upcomingSubscriptions.size} upcoming subscriptions this period" }
 
-            // Send notification for each recurrent expense due today
             for (transaction in recurrentTransactions) {
                 val amount = transaction.amount.toPlainString()
                 val comment = transaction.comment
@@ -119,21 +114,14 @@ class RecurrentExpenseNotificationWorker(
             Result.failure()
         }
     }
-
-    /**
-     * Check if a recurrent expense should trigger today based on its frequency.
-     * For monthly subscriptions, uses the specific subscriptionDay if set.
-     */
     private fun isDueToday(transaction: Transaction, today: LocalDate, frequency: RecurrentFrequency): Boolean {
         val startDate = transaction.date?.toLocalDate() ?: return false
         
-        // First check if we're still within the subscription period
         val endDate = transaction.recurrentEndDate?.toLocalDate()
         if (endDate != null && today.isAfter(endDate)) {
-            return false // Subscription has ended
+            return false
         }
         
-        // Don't notify before the start date
         if (today.isBefore(startDate)) {
             return false
         }
@@ -148,11 +136,9 @@ class RecurrentExpenseNotificationWorker(
                 daysBetween > 0 && daysBetween % 14 == 0
             }
             RecurrentFrequency.MONTHLY -> {
-                // Use subscriptionDay if available, otherwise fall back to start date day
                 val billingDay = transaction.subscriptionDay ?: startDate.dayOfMonth
                 val todayDay = today.dayOfMonth
                 
-                // Check if today is the billing day
                 if (todayDay != billingDay) {
                     return false
                 }
@@ -165,31 +151,21 @@ class RecurrentExpenseNotificationWorker(
         }
     }
 
-    /**
-     * Check if we should warn about an upcoming subscription charge within the budget period.
-     * Returns true if the subscription will charge within the next few days.
-     */
     private fun shouldWarnUpcoming(transaction: Transaction, today: LocalDate, budgetEndDate: LocalDate): Boolean {
         if (!transaction.isRecurrent) return false
         if (transaction.recurrentFrequency != RecurrentFrequency.MONTHLY) return false
         
         val subscriptionDay = transaction.subscriptionDay ?: transaction.date?.toLocalDate()?.dayOfMonth ?: return false
         
-        // Check if the billing day falls within the budget period (and is upcoming)
         var nextChargeDate = today.withDayOfMonth(subscriptionDay)
         if (nextChargeDate.isBefore(today) || nextChargeDate.isEqual(today)) {
-            // If today's date has passed this month's billing day, check next month
             nextChargeDate = nextChargeDate.plusMonths(1)
         }
         
-        // Only warn if it's within the budget period and within 3 days
-        return !nextChargeDate.isAfter(budgetEndDate) && 
+        return !nextChargeDate.isAfter(budgetEndDate) &&
                ChronoUnit.DAYS.between(today, nextChargeDate) in 1..3
     }
 
-    /**
-     * Calculate how many days until the next charge for a subscription.
-     */
     private fun calculateDaysUntilCharge(transaction: Transaction, today: LocalDate): Long? {
         if (transaction.recurrentFrequency != RecurrentFrequency.MONTHLY) return null
         

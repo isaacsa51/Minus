@@ -28,15 +28,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
-import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.formatCurrencySymbolOnly
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -66,6 +68,8 @@ fun SavingsRecommendationCard(
 		recurrentSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
 	val variablePct =
 		variableSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
+	val idealSavingsPerPeriod = budget.multiply(BigDecimal("0.2"))
+	val projectedSavingsSixMonths = idealSavingsPerPeriod.multiply(BigDecimal(6))
 
 	Column(
 		modifier = modifier
@@ -73,17 +77,39 @@ fun SavingsRecommendationCard(
 			.padding(16.dp),
 		verticalArrangement = Arrangement.spacedBy(16.dp)
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically) {
-			Icon(
-				imageVector = Icons.Outlined.Info,
-				contentDescription = null,
-				tint = MaterialTheme.colorScheme.outline,
-				modifier = Modifier.size(20.dp)
-			)
-			Spacer(modifier = Modifier.width(8.dp))
+		Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+			Row(verticalAlignment = Alignment.CenterVertically) {
+				Icon(
+					imageVector = Icons.Outlined.Info,
+					contentDescription = null,
+					tint = MaterialTheme.colorScheme.outline,
+					modifier = Modifier.size(20.dp)
+				)
+				Spacer(modifier = Modifier.width(8.dp))
+				Text(
+					text = stringResource(R.string.savings_recommendation_title),
+					style = MaterialTheme.typography.bodySmallCondensed,
+					color = MaterialTheme.colorScheme.outline
+				)
+			}
 			Text(
-				text = "Recomendación de ahorro",
-				style = MaterialTheme.typography.titleSmallCondensed,
+				text = stringResource(R.string.savings_recommendation_method_brief),
+				style = MaterialTheme.typography.labelSmall,
+				color = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f)
+			)
+			Text(
+				text = stringResource(R.string.savings_recommendation_six_month_example_intro),
+				style = MaterialTheme.typography.labelSmall,
+				color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
+			)
+			Text(
+				text = stringResource(
+					R.string.savings_recommendation_six_month_example_equation,
+					formatCurrencySymbolOnly(idealSavingsPerPeriod, currency),
+					formatCurrencySymbolOnly(projectedSavingsSixMonths, currency)
+				),
+				style = MaterialTheme.typography.labelSmallCondensed,
+				fontWeight = FontWeight.SemiBold,
 				color = MaterialTheme.colorScheme.outline
 			)
 		}
@@ -96,7 +122,7 @@ fun SavingsRecommendationCard(
 			) {
 				Column {
 					Text(
-						text = "Ahorro actual",
+						text = stringResource(R.string.savings_recommendation_current_savings_label),
 						style = MaterialTheme.typography.bodyMedium,
 						color = MaterialTheme.colorScheme.onSurfaceVariant
 					)
@@ -123,17 +149,21 @@ fun SavingsRecommendationCard(
 				verticalAlignment = Alignment.Top
 			) {
 				Text(
-					text = "Disponible: ${formatCurrencySymbolOnly(savings, currency)}",
+					text = stringResource(
+						R.string.savings_recommendation_available_format,
+						formatCurrencySymbolOnly(savings, currency)
+					),
 					style = MaterialTheme.typography.labelSmallCondensed.copy(fontWeight = FontWeight.Light),
 					color = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 				Column(horizontalAlignment = Alignment.End) {
 					Text(
-						text = "Ahorro ideal: ${
+						text = stringResource(
+							R.string.savings_recommendation_ideal_savings_format,
 							formatCurrencySymbolOnly(
 								budget.multiply(BigDecimal("0.2")), currency
 							)
-						}",
+						),
 						style = MaterialTheme.typography.labelSmallCondensed.copy(
 							fontWeight = FontWeight.Light,
 							textDecoration = if (savingsPct < 20) TextDecoration.LineThrough else TextDecoration.None
@@ -142,7 +172,10 @@ fun SavingsRecommendationCard(
 					)
 					if (savingsPct < 20) {
 						Text(
-							text = "Ahorro actual: ${formatCurrencySymbolOnly(savings, currency)}",
+							text = stringResource(
+								R.string.savings_recommendation_current_savings_format,
+								formatCurrencySymbolOnly(savings, currency)
+							),
 							style = MaterialTheme.typography.labelSmallCondensed.copy(fontWeight = FontWeight.Bold),
 							color = MaterialTheme.colorScheme.error
 						)
@@ -155,7 +188,7 @@ fun SavingsRecommendationCard(
 
 		Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 			RecommendationItem(
-				label = "Gastos Recurrentes",
+				label = stringResource(R.string.savings_recommendation_recurrent_expenses_label),
 				value = formatCurrencySymbolOnly(recurrentSpent, currency),
 				percentage = recurrentPct,
 				target = 50,
@@ -163,7 +196,7 @@ fun SavingsRecommendationCard(
 			)
 
 			RecommendationItem(
-				label = "Gastos Únicos",
+				label = stringResource(R.string.savings_recommendation_one_time_expenses_label),
 				value = formatCurrencySymbolOnly(variableSpent, currency),
 				percentage = variablePct,
 				target = 30,

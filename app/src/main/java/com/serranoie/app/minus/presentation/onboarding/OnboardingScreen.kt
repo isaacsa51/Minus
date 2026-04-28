@@ -16,9 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.LocalWindowInsets
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.DescriptionButton
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
@@ -54,12 +56,12 @@ private fun WelcomeStep(
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
 			Text(
-				text = "Bienvenido a Minus!",
+				text = stringResource(R.string.onboarding_welcome_title),
 				style = MaterialTheme.typography.headlineMediumEmphasized,
 			)
 			Spacer(Modifier.height(4.dp))
 			Text(
-				text = "Hola y bienvenido, empezemos a ahorrar juntos",
+				text = stringResource(R.string.onboarding_welcome_subtitle),
 				style = MaterialTheme.typography.titleMediumEmphasized,
 				textAlign = TextAlign.Center,
 			)
@@ -70,23 +72,23 @@ private fun WelcomeStep(
 			) {
 				NumberedRow(
 					number = 1,
-					title = "Establece un presupuesto",
-					subtitle = "Calcula aproximadamente cuanto dinero ocupas en un periodo de tiempo y mantente informado cuanto puedes guardar.",
+					title = stringResource(R.string.onboarding_step_1_title),
+					subtitle = stringResource(R.string.onboarding_step_1_subtitle),
 				)
 				NumberedRow(
 					number = 2,
-					title = "Guarda cada gasto",
-					subtitle = "Esta app te ayudará a calcular cuanto ocupas gastar por día/semana/quincena o mes para que estes dentro de este rango y tengas noción de cuánto te queda.",
+					title = stringResource(R.string.onboarding_step_2_title),
+					subtitle = stringResource(R.string.onboarding_step_2_subtitle),
 				)
 				NumberedRow(
 					number = 3,
-					title = "Gasta sabiamente",
-					subtitle = "Con el tiempo, aprenderas a sentir cuanto puedes ahorrar y cuanto puedes gastar.",
+					title = stringResource(R.string.onboarding_step_3_title),
+					subtitle = stringResource(R.string.onboarding_step_3_subtitle),
 				)
 			}
 			Spacer(Modifier.height(48.dp))
 			DescriptionButton(
-				title = { Text("Establece un presupuesto") },
+				title = { Text(stringResource(R.string.onboarding_set_budget_button)) },
 				contentPadding = PaddingValues(horizontal = 24.dp, vertical = 32.dp),
 				onClick = {
 					onSetBudget()

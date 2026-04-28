@@ -71,6 +71,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -169,31 +170,27 @@ fun PeriodSwitcherSheet(
 			.windowInsetsPadding(WindowInsets.statusBars)
 	) {
 		AnimatedContent(
-			targetState = isEditMode,
-			transitionSpec = {
+			targetState = isEditMode, transitionSpec = {
 				if (targetState) {
 					// Forward: entering edit mode
-					(slideInHorizontally(initialOffsetX = { it / 3 }, animationSpec = tween(300))
-							+ fadeIn(tween(250, delayMillis = 50)))
-						.togetherWith(
-							slideOutHorizontally(
-								targetOffsetX = { -it / 3 },
-								animationSpec = tween(300)
-							) + fadeOut(tween(200))
-						)
+					(slideInHorizontally(
+						initialOffsetX = { it / 3 }, animationSpec = tween(300)
+					) + fadeIn(tween(250, delayMillis = 50))).togetherWith(
+						slideOutHorizontally(
+							targetOffsetX = { -it / 3 }, animationSpec = tween(300)
+						) + fadeOut(tween(200))
+					)
 				} else {
 					// Backward: exiting edit mode
-					(slideInHorizontally(initialOffsetX = { -it / 3 }, animationSpec = tween(300))
-							+ fadeIn(tween(250, delayMillis = 50)))
-						.togetherWith(
-							slideOutHorizontally(
-								targetOffsetX = { it / 3 },
-								animationSpec = tween(300)
-							) + fadeOut(tween(200))
-						)
+					(slideInHorizontally(
+						initialOffsetX = { -it / 3 }, animationSpec = tween(300)
+					) + fadeIn(tween(250, delayMillis = 50))).togetherWith(
+						slideOutHorizontally(
+							targetOffsetX = { it / 3 }, animationSpec = tween(300)
+						) + fadeOut(tween(200))
+					)
 				}
-			},
-			label = "sheetContent"
+			}, label = "sheetContent"
 		) { editMode ->
 			if (editMode) {
 				EditBudgetContent(
@@ -241,8 +238,8 @@ fun PeriodSwitcherSheet(
 	if (showFinishConfirm) {
 		AlertDialog(
 			onDismissRequest = { showFinishConfirm = false },
-			title = { Text("¿Finalizar presupuesto?") },
-			text = { Text("Esto cerrará el período actual y comenzará uno nuevo. ¿Estás seguro?") },
+			title = { Text(stringResource(R.string.finalize_period_question)) },
+			text = { Text(stringResource(R.string.finalize_period_confirm)) },
 			confirmButton = {
 				TextButton(
 					onClick = {
@@ -250,7 +247,12 @@ fun PeriodSwitcherSheet(
 						haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 						onFinishEarly?.invoke()
 					},
-				) { Text("Finalizar", color = MaterialTheme.colorScheme.error) }
+				) {
+					Text(
+						stringResource(R.string.finalize_action),
+						color = MaterialTheme.colorScheme.error
+					)
+				}
 			},
 			dismissButton = {
 				TextButton(onClick = { showFinishConfirm = false }) { Text("Cancelar") }
@@ -293,17 +295,16 @@ private fun ViewBudgetContent(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Text(
-				text = "Presupuesto",
+				text = stringResource(R.string.total_budget),
 				style = MaterialTheme.typography.titleLargeEmphasized,
 				fontWeight = FontWeight.W500,
 			)
 			IconButton(
-				onClick = onEditClick,
-				modifier = Modifier.size(40.dp)
+				onClick = onEditClick, modifier = Modifier.size(40.dp)
 			) {
 				Icon(
 					imageVector = Icons.Default.Edit,
-					contentDescription = "Editar presupuesto",
+					contentDescription = stringResource(R.string.edit_budget),
 					tint = MaterialTheme.colorScheme.onSurface,
 				)
 			}
@@ -325,8 +326,7 @@ private fun ViewBudgetContent(
 				budgetSettings = budgetSettings,
 				currencyCode = currencyCode,
 				bigVariant = false,
-				modifier = Modifier
-					.weight(1.5f),
+				modifier = Modifier.weight(1.5f),
 				startDate = startDateAsDate,
 				finishDate = endDateAsDate
 			)
@@ -348,11 +348,10 @@ private fun ViewBudgetContent(
 					shape = RoundedCornerShape(12.dp)
 				) {
 					Box(
-						modifier = Modifier.fillMaxWidth(),
-						contentAlignment = Alignment.Center
+						modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
 					) {
 						Text(
-							text = "Sin fecha de fin",
+							text = stringResource(R.string.no_ending_date),
 							style = MaterialTheme.typography.bodySmall,
 							color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
 							modifier = Modifier.padding(16.dp)
@@ -365,7 +364,7 @@ private fun ViewBudgetContent(
 		Spacer(modifier = Modifier.height(16.dp))
 
 		Text(
-			text = "¿Cómo repartir el presupuesto?",
+			text = stringResource(R.string.budget_split_logic),
 			style = MaterialTheme.typography.titleMediumCondensed,
 			fontWeight = FontWeight.Medium,
 			modifier = Modifier.padding(bottom = 12.dp),
@@ -416,7 +415,7 @@ private fun ViewBudgetContent(
 				),
 			) {
 				Text(
-					text = "Finalizar presupuesto temprano",
+					text = stringResource(R.string.finalize_period),
 					style = MaterialTheme.typography.labelLargeEmphasized,
 				)
 			}
@@ -430,8 +429,8 @@ fun EditBudgetContent(
 	budgetSettings: BudgetSettings?,
 	onBack: () -> Unit = {},
 	onApply: (BudgetSettings) -> Unit,
-	title: String = "Nuevo presupuesto",
-	buttonLabel: String = "Aplicar",
+	title: String = stringResource(R.string.new_budget_period),
+	buttonLabel: String = stringResource(R.string.apply),
 	showPreviousValuesChip: Boolean = true,
 	pendingExpensesCount: Int = 0,
 ) {
@@ -442,9 +441,7 @@ fun EditBudgetContent(
 	}
 
 	val pendingNotificationText = resources.getQuantityString(
-		R.plurals.pending_expense,
-		pendingExpensesCount,
-		pendingExpensesCount
+		R.plurals.pending_expense, pendingExpensesCount, pendingExpensesCount
 	)
 
 	val currentBudget = budgetSettings?.totalBudget ?: BigDecimal.ZERO
@@ -455,8 +452,7 @@ fun EditBudgetContent(
 		budgetSettings?.remainingBudgetStrategy ?: RemainingBudgetStrategy.ASK_ALWAYS
 
 	val previousPeriodDays = remember(currentStart, currentEnd) {
-		if (currentEnd != null) ChronoUnit.DAYS.between(currentStart, currentEnd)
-			.toInt() + 1 else 0
+		if (currentEnd != null) ChronoUnit.DAYS.between(currentStart, currentEnd).toInt() + 1 else 0
 	}
 
 	val currencySymbol = remember(currentCurrency) {
@@ -480,15 +476,14 @@ fun EditBudgetContent(
 	var showStrategyPicker by remember { mutableStateOf(false) }
 	var showPreviousValues by remember { mutableStateOf(false) }
 
-	val parsedBudget =
-		budgetText.toBigDecimalOrNull()?.divide(BigDecimal(100)) ?: BigDecimal.ZERO
+	val parsedBudget = budgetText.toBigDecimalOrNull()?.divide(BigDecimal(100)) ?: BigDecimal.ZERO
 	val totalDays = endCache?.let { ChronoUnit.DAYS.between(startCache, it).toInt() + 1 } ?: 0
 	val canApply = parsedBudget > BigDecimal.ZERO && totalDays > 0
 
 	val validationMessage = when {
-		parsedBudget <= BigDecimal.ZERO && budgetText.isNotEmpty() -> "El presupuesto debe ser mayor a 0"
-		endCache == null -> "Sin fecha final definida"
-		totalDays < 1 -> "Calcula el presupuesto para al menos un día"
+		parsedBudget <= BigDecimal.ZERO && budgetText.isNotEmpty() -> stringResource(R.string.budget_validation_major_zero)
+		endCache == null -> stringResource(R.string.budget_no_days_defined)
+		totalDays < 1 -> stringResource(R.string.budget_less_than_one_day_validation)
 		else -> null
 	}
 
@@ -559,14 +554,13 @@ fun EditBudgetContent(
 
 		if (showPreviousValuesChip && currentBudget > BigDecimal.ZERO) {
 			Row(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.Start
+				modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
 			) {
 				AssistChip(
 					onClick = { showPreviousValues = !showPreviousValues },
 					label = {
 						Text(
-							"Valores anteriores",
+							stringResource(R.string.previous_values),
 							style = MaterialTheme.typography.labelMediumCondensed
 						)
 					},
@@ -618,7 +612,7 @@ fun EditBudgetContent(
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {
 							Text(
-								text = "Período",
+								text = stringResource(R.string.period),
 								style = MaterialTheme.typography.labelSmallCondensed,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -630,8 +624,7 @@ fun EditBudgetContent(
 						}
 
 						Box(
-							modifier = Modifier.weight(0.5f),
-							contentAlignment = Alignment.CenterEnd
+							modifier = Modifier.weight(0.5f), contentAlignment = Alignment.CenterEnd
 						) {
 							IconButton(
 								onClick = {
@@ -641,15 +634,13 @@ fun EditBudgetContent(
 									} else ""
 									if (previousPeriodDays > 0) {
 										startCache = LocalDate.now()
-										endCache =
-											LocalDate.now()
-												.plusDays(previousPeriodDays.toLong() - 1)
+										endCache = LocalDate.now()
+											.plusDays(previousPeriodDays.toLong() - 1)
 									}
 									currencyCache = currentCurrency
 									strategyCache = currentStrategy
 									showPreviousValues = false
-								},
-								modifier = Modifier.size(40.dp)
+								}, modifier = Modifier.size(40.dp)
 							) {
 								Icon(
 									imageVector = Icons.Default.Check,
@@ -829,8 +820,7 @@ fun EditBudgetContent(
 			onSelect = { code ->
 				currencyCache = code
 				showCurrencyPicker = false
-			}
-		)
+			})
 	}
 
 	if (showStrategyPicker) {
@@ -840,8 +830,7 @@ fun EditBudgetContent(
 			onSelect = { strategy ->
 				strategyCache = strategy
 				showStrategyPicker = false
-			}
-		)
+			})
 	}
 }
 
@@ -977,10 +966,7 @@ private fun StrategyPickerDialog(
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 				Text(
-					text = "Puedes elegir como distribuir el balance del presupuesto al final de cada día.\n\n" +
-							"Por ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: " +
-							"puedes repartir 100 en los días que queda, o gastar 600 " +
-							"(presupuesto por día + sobrante del periodo anterior) hoy.",
+					text = "Puedes elegir como distribuir el balance del presupuesto al final de cada día.\n\n" + "Por ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: " + "puedes repartir 100 en los días que queda, o gastar 600 " + "(presupuesto por día + sobrante del periodo anterior) hoy.",
 					style = MaterialTheme.typography.bodySmall,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 				)
@@ -1064,8 +1050,7 @@ private fun CompactPeriodCard(
 		modifier = modifier.clickable(onClick = onClick),
 		onClick = onClick,
 		border = BorderStroke(
-			width = if (isSelected) 2.dp else 1.dp,
-			color = borderColor
+			width = if (isSelected) 2.dp else 1.dp, color = borderColor
 		),
 		colors = CardDefaults.outlinedCardColors(containerColor = backgroundColor),
 	) {
@@ -1077,10 +1062,10 @@ private fun CompactPeriodCard(
 		) {
 			Text(
 				text = when (period) {
-					BudgetPeriod.DAILY -> "Diario"
-					BudgetPeriod.WEEKLY -> "Semanal"
-					BudgetPeriod.BIWEEKLY -> "Quincenal"
-					BudgetPeriod.MONTHLY -> "Mensual"
+					BudgetPeriod.DAILY -> stringResource(R.string.budget_period_daily)
+					BudgetPeriod.WEEKLY -> stringResource(R.string.budget_period_weekly)
+					BudgetPeriod.BIWEEKLY -> stringResource(R.string.budget_period_biweekly)
+					BudgetPeriod.MONTHLY -> stringResource(R.string.budget_period_monthly)
 				},
 				style = if (isSelected) MaterialTheme.typography.bodySmallEmphasized else MaterialTheme.typography.bodySmallCondensed,
 				fontWeight = FontWeight.Medium,
@@ -1131,15 +1116,13 @@ private fun PeriodSwitcherSheetPreview() {
 				currencyCode = "MXN",
 				onPeriodSelected = { },
 				onSaveBudget = { },
-				onFinishEarly = { }
-			)
+				onFinishEarly = { })
 		}
 	}
 }
 
 @Preview(
-	showBackground = true,
-	device = "spec:width=1080px,height=2340px,dpi=440,cutout=double"
+	showBackground = true, device = "spec:width=1080px,height=2340px,dpi=440,cutout=double"
 )
 @Composable
 private fun EditModePreview() {
@@ -1164,7 +1147,8 @@ private fun EditModePreview() {
 
 
 @Preview(
-	showSystemUi = false, showBackground = true,
+	showSystemUi = false,
+	showBackground = true,
 	device = "spec:width=1080px,height=2340px,dpi=440,cutout=double"
 )
 @Composable

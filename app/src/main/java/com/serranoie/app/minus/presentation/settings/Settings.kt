@@ -58,10 +58,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
@@ -116,7 +118,7 @@ fun Settings(
 			MediumTopAppBar(
 				title = {
 					Text(
-						text = "Ajustes",
+						text = stringResource(R.string.settings_title),
 						style = MaterialTheme.typography.titleLargeEmphasized,
 					)
 				}, navigationIcon = {
@@ -142,7 +144,7 @@ fun Settings(
 		) {
 			item {
 				PaddedListGroup(
-					title = "Apariencia"
+					title = stringResource(R.string.settings_section_appearance)
 				) {
 					CustomPaddedListItem(
 						onClick = {
@@ -162,12 +164,12 @@ fun Settings(
 							Spacer(modifier = Modifier.width(16.dp))
 
 							Text(
-								text = "Tema",
+								text = stringResource(R.string.settings_theme_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Cambia el tipo de tema dentro de la app",
+								text = stringResource(R.string.settings_theme_subtitle),
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -198,12 +200,12 @@ fun Settings(
 							Spacer(modifier = Modifier.width(16.dp))
 
 							Text(
-								text = "Tipografía",
+								text = stringResource(R.string.settings_typography_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Cambia el estilo de la tipografía dentro de la app",
+								text = stringResource(R.string.settings_typography_subtitle),
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -228,12 +230,12 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Material You",
+								text = stringResource(R.string.settings_material_you_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Usa colores de tu fondo de pantalla para aplicar un tema dinamico en la aplicación",
+								text = stringResource(R.string.settings_material_you_subtitle),
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -250,7 +252,7 @@ fun Settings(
 
 			item {
 				PaddedListGroup(
-					title = "Notificaciones"
+					title = stringResource(R.string.settings_section_notifications)
 				) {
 					CustomPaddedListItem(
 						onClick = {
@@ -267,12 +269,12 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Hora de fin de periodo",
+								text = stringResource(R.string.settings_period_end_time_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "La notificación se mostrará el día después de terminar el periodo",
+								text = stringResource(R.string.settings_period_end_time_subtitle),
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -301,15 +303,15 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Alarmas exactas",
+								text = stringResource(R.string.settings_exact_alarm_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
 								text = if (exactAlarmEnabled) {
-									"Activadas para intentar mostrar la notificación a la hora elegida"
+									stringResource(R.string.settings_exact_alarm_enabled_subtitle)
 								} else {
-									"Desactivadas; Android podría retrasar la notificación"
+									stringResource(R.string.settings_exact_alarm_disabled_subtitle)
 								},
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -321,7 +323,7 @@ fun Settings(
 
 			item {
 				PaddedListGroup(
-					title = "Información de la app"
+					title = stringResource(R.string.settings_section_app_info)
 				) {
 					CustomPaddedListItem(
 						onClick = {
@@ -337,12 +339,12 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Acerca de",
+								text = stringResource(R.string.settings_about_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Conozca más a fondo sobre la app y su desarrollo",
+								text = stringResource(R.string.settings_about_subtitle),
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -365,12 +367,12 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Encontró un bug?",
+								text = stringResource(R.string.settings_bug_report_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Genere un reporte del problema y lo solucionaremos pronto",
+								text = stringResource(R.string.settings_bug_report_subtitle),
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -391,7 +393,7 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Version",
+								text = stringResource(R.string.settings_version_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
@@ -407,7 +409,7 @@ fun Settings(
 
 			item {
 				PaddedListGroup(
-					title = "Respaldo de información"
+					title = stringResource(R.string.settings_section_data_backup)
 				) {
 					CustomPaddedListItem(
 						onClick = {
@@ -423,12 +425,12 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Respaldar información",
+								text = stringResource(R.string.settings_backup_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Respaldar información en minus_export.csv",
+								text = stringResource(R.string.settings_backup_subtitle),
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -449,12 +451,12 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Importar CSV",
+								text = stringResource(R.string.settings_import_csv_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Importar información desde un archivo CSV",
+								text = stringResource(R.string.settings_import_csv_subtitle),
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -465,7 +467,7 @@ fun Settings(
 
 			item {
 				PaddedListGroup(
-					title = "Tutorial"
+					title = stringResource(R.string.settings_section_tutorial)
 				) {
 					CustomPaddedListItem(
 						onClick = {
@@ -483,12 +485,12 @@ fun Settings(
 						Spacer(modifier = Modifier.width(16.dp))
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
-								text = "Reiniciar el tutorial",
+								text = stringResource(R.string.settings_reset_tutorial_title),
 								style = MaterialTheme.typography.bodyLarge,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "Podrá ver los hints de cada gesto, información e acciones dentro de la app de nuevo.",
+								text = stringResource(R.string.settings_reset_tutorial_subtitle),
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
@@ -544,7 +546,7 @@ fun ThemePickerDialog(
 					.padding(24.dp)
 			) {
 				Text(
-					text = "Tema de la aplicación",
+					text = stringResource(R.string.settings_theme_dialog_title),
 					style = MaterialTheme.typography.headlineSmall,
 					fontWeight = FontWeight.Bold,
 					color = MaterialTheme.colorScheme.onSurface,
@@ -552,8 +554,8 @@ fun ThemePickerDialog(
 				)
 
 				ThemeOption(
-					title = "Claro",
-					subtitle = "Siempre usar tema claro",
+					title = stringResource(R.string.settings_theme_light_title),
+					subtitle = stringResource(R.string.settings_theme_light_subtitle),
 					icon = Icons.Default.LightMode,
 					isSelected = currentTheme == "Light",
 					onClick = {
@@ -564,8 +566,8 @@ fun ThemePickerDialog(
 				Spacer(modifier = Modifier.height(8.dp))
 
 				ThemeOption(
-					title = "Oscuro",
-					subtitle = "Siempre usar tema oscuro",
+					title = stringResource(R.string.settings_theme_dark_title),
+					subtitle = stringResource(R.string.settings_theme_dark_subtitle),
 					icon = Icons.Default.DarkMode,
 					isSelected = currentTheme == "Dark",
 					onClick = {
@@ -576,8 +578,8 @@ fun ThemePickerDialog(
 				Spacer(modifier = Modifier.height(8.dp))
 
 				ThemeOption(
-					title = "Seguir el sistema",
-					subtitle = "Sigue el mismo tema que tenga el sistema",
+					title = stringResource(R.string.settings_theme_system_title),
+					subtitle = stringResource(R.string.settings_theme_system_subtitle),
 					icon = Icons.Default.Brightness4,
 					isSelected = currentTheme == "System",
 					onClick = {
@@ -669,7 +671,7 @@ fun TypographyPickerDialog(
 					.padding(24.dp)
 			) {
 				Text(
-					text = "Tipografía de la aplicación",
+					text = stringResource(R.string.settings_typography_dialog_title),
 					style = MaterialTheme.typography.headlineSmall,
 					fontWeight = FontWeight.Bold,
 					color = MaterialTheme.colorScheme.onSurface,
@@ -677,8 +679,8 @@ fun TypographyPickerDialog(
 				)
 
 				ThemeOption(
-					title = "Default",
-					subtitle = "Usa la tipografía base",
+					title = stringResource(R.string.settings_typography_default_title),
+					subtitle = stringResource(R.string.settings_typography_default_subtitle),
 					icon = Icons.Default.TextFields,
 					isSelected = currentTypography == "Default",
 					onClick = {
@@ -690,8 +692,8 @@ fun TypographyPickerDialog(
 				Spacer(modifier = Modifier.height(8.dp))
 
 				ThemeOption(
-					title = "Condensada",
-					subtitle = "Usa la tipografía compacta",
+					title = stringResource(R.string.settings_typography_condensed_title),
+					subtitle = stringResource(R.string.settings_typography_condensed_subtitle),
 					icon = Icons.Default.TextFields,
 					isSelected = currentTypography == "Condensed",
 					onClick = {
@@ -703,8 +705,8 @@ fun TypographyPickerDialog(
 				Spacer(modifier = Modifier.height(8.dp))
 
 				ThemeOption(
-					title = "Expressive",
-					subtitle = "Usa la tipografía expresiva",
+					title = stringResource(R.string.settings_typography_expressive_title),
+					subtitle = stringResource(R.string.settings_typography_expressive_subtitle),
 					icon = Icons.Default.TextFields,
 					isSelected = currentTypography == "Expressive",
 					onClick = {

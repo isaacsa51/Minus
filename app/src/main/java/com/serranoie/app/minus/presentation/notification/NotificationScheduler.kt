@@ -53,20 +53,12 @@ class NotificationScheduler @Inject constructor(
     private val workManager by lazy { WorkManager.getInstance(context) }
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    /**
-     * Initialize all notification workers.
-     * Call this when the app starts or when budget settings change.
-     */
     fun initializeNotifications() {
         scheduleRecurrentExpenseCheck()
         checkAndReschedulePeriodEndNotification()
         scheduleMidnightPeriodCheck()
     }
 
-    /**
-     * Schedule an AlarmManager alarm for midnight to check if a period transition occurred.
-     * This runs daily to detect when the user passes midnight and a budget period ends.
-     */
     fun scheduleMidnightPeriodCheck() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, MidnightPeriodTransitionReceiver::class.java).apply {
@@ -81,7 +73,6 @@ class NotificationScheduler @Inject constructor(
 
         alarmManager.cancel(pendingIntent)
 
-        // Schedule for next midnight
         val tomorrow = LocalDate.now().plusDays(1)
         val midnight = LocalDateTime.of(tomorrow, LocalTime.MIDNIGHT)
         val triggerTime = midnight.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -114,10 +105,6 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
-    /**
-     * Check if period end notification needs to be rescheduled.
-     * This is called on app startup to ensure notifications are properly scheduled.
-     */
     private fun checkAndReschedulePeriodEndNotification() {
         scope.launch {
             try {
@@ -133,10 +120,6 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
-    /**
-     * Schedule an AlarmManager alarm for the day after the period ends.
-     * Call this when budget settings are saved.
-     */
     fun schedulePeriodEndNotification(periodEndDate: LocalDate, currentDate: LocalDate = LocalDate.now()) {
         scope.launch {
             val (hour, minute) = getPeriodEndNotificationTime()
@@ -195,16 +178,11 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
-    /**
-     * Schedule daily check for recurrent expenses.
-     * Runs once per day at 8 AM to check if any recurrent expenses are due.
-     */
     private fun scheduleRecurrentExpenseCheck() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
             .build()
 
-        // Calculate initial delay to 8 AM
         val now = LocalDateTime.now()
         val targetTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0))
         val initialDelay = if (targetTime.isAfter(now)) {
@@ -227,10 +205,6 @@ class NotificationScheduler @Inject constructor(
         )
     }
 
-    /**
-     * Cancel all scheduled notifications.
-     * Call this when user wants to disable notifications.
-     */
     fun cancelAllNotifications() {
         logcat { "Cancelling all notification work" }
         cancelPeriodEndNotification()
@@ -238,9 +212,6 @@ class NotificationScheduler @Inject constructor(
         workManager.cancelUniqueWork(RecurrentExpenseNotificationWorker.WORK_NAME)
     }
 
-    /**
-     * Cancel the midnight period check alarm.
-     */
     fun cancelMidnightPeriodCheck() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val pendingIntent = PendingIntent.getBroadcast(
@@ -255,9 +226,6 @@ class NotificationScheduler @Inject constructor(
         logcat { "Midnight period check alarm cancelled" }
     }
 
-    /**
-     * Reschedule notifications when budget settings change.
-     */
     fun rescheduleNotifications(periodEndDate: LocalDate?) {
         logcat { "Rescheduling notifications for period end: $periodEndDate" }
         if (periodEndDate != null) {

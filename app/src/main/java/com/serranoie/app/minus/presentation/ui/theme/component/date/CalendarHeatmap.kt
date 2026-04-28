@@ -40,11 +40,13 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
@@ -137,7 +139,7 @@ fun CalendarHeatmap(
 			Spacer(modifier = Modifier.width(4.dp))
 			Text(
 				modifier = Modifier.basicMarquee(),
-				text = "Esta gráfica muestra el dinero gastado en cada día del periodo",
+				text = stringResource(R.string.calendar_heatmap_info_text),
 				style = MaterialTheme.typography.labelSmallCondensed.copy(
 					color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.8f),
 					fontWeight = FontWeight.W100,

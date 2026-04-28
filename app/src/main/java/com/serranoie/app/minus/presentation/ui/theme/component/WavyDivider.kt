@@ -18,9 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import kotlin.math.sin
@@ -138,7 +140,7 @@ private fun WavyLine(
 private fun WavyDividerPreview() {
 	MinusTheme {
 		WavyDivider(
-			text = "Mostrar todos los gastos en el periodo pasado...",
+			text = stringResource(R.string.wavy_divider_show_all_past_period_expenses),
 			amplitude = 3f,
 			wavelength = 60f
 		)
@@ -150,7 +152,7 @@ private fun WavyDividerPreview() {
 private fun WavyDividerHighAmplitudePreview() {
 	MinusTheme {
 		WavyDivider(
-			text = " HIGH ",
+			text = "Testiiiing...",
 			amplitude = 4f,
 			wavelength = 50f
 		)

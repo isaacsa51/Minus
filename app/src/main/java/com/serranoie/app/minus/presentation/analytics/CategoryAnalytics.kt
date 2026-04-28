@@ -21,10 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.LocalWindowInsets
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
@@ -89,7 +91,7 @@ fun CategoryAnalytics(
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				Text(
-					text = "Analisis",
+					text = stringResource(R.string.analytics_title),
 					style = MaterialTheme.typography.headlineMedium,
 					fontWeight = FontWeight.Bold,
 					color = MaterialTheme.colorScheme.onSurface
@@ -140,7 +142,7 @@ fun CategoryAnalytics(
 						horizontalAlignment = Alignment.CenterHorizontally
 					) {
 						Text(
-							text = "Gasto unico",
+							text = stringResource(R.string.single_expense),
 							style = MaterialTheme.typography.labelMedium,
 							color = MaterialTheme.colorScheme.onSurfaceVariant
 						)
@@ -169,7 +171,7 @@ fun CategoryAnalytics(
 
 			if (state.categorySpends.isNotEmpty()) {
 				Text(
-					text = "Historial de gastos",
+					text = stringResource(R.string.expenses_history),
 					style = MaterialTheme.typography.titleMedium,
 					fontWeight = FontWeight.Medium,
 					modifier = Modifier.padding(vertical = 8.dp)

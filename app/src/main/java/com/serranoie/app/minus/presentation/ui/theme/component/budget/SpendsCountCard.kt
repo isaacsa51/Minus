@@ -21,10 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 
@@ -64,7 +66,7 @@ fun SpendsCountCard(
 					textAlign = TextAlign.Center,
 				)
 				Text(
-					text = "Gastos totales",
+					text = stringResource(R.string.total_expenses),
 					modifier = Modifier.basicMarquee(),
 					style = MaterialTheme.typography.labelMediumCondensed,
 					color = textColor.copy(alpha = 0.6f),

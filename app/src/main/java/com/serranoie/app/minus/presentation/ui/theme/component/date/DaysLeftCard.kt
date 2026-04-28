@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.util.countDays
@@ -95,7 +97,7 @@ fun DaysLeftCard(
 						)
 					)
 					Text(
-						text = "Días\nrestantes",
+						text = stringResource(R.string.days_remaining_label),
 						style = MaterialTheme.typography.labelMediumCondensed.copy(lineHeight = 12.sp),
 						textAlign = TextAlign.Center,
 						color = textColor.copy(alpha = 0.6f),

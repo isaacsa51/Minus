@@ -8,9 +8,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
@@ -56,10 +58,10 @@ fun UpcomingRecurrentItemRow(
 
 	val daysUntil = ChronoUnit.DAYS.between(LocalDate.now(), nextChargeDate)
 	val daysText = when {
-		daysUntil == 0L -> "Hoy"
-		daysUntil == 1L -> "Mañana"
-		daysUntil < 7 -> "En $daysUntil días"
-		else -> "En ${daysUntil / 7} semanas"
+		daysUntil == 0L -> stringResource(R.string.upcoming_recurrent_today)
+		daysUntil == 1L -> stringResource(R.string.upcoming_recurrent_tomorrow)
+		daysUntil < 7 -> stringResource(R.string.upcoming_recurrent_in_days, daysUntil)
+		else -> stringResource(R.string.upcoming_recurrent_in_weeks, daysUntil / 7)
 	}
 
 	val alpha = if (isOutOfPeriod) 0.6f else 1f
@@ -76,7 +78,7 @@ fun UpcomingRecurrentItemRow(
 		) {
 			Column(modifier = Modifier.weight(1f)) {
 				Text(
-					text = transaction.comment.ifEmpty { "Gasto recurrente sin nombre" },
+					text = transaction.comment.ifEmpty { stringResource(R.string.upcoming_recurrent_unnamed_expense) },
 					style = MaterialTheme.typography.titleMediumCondensed,
 					color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
 					fontWeight = FontWeight.Medium

@@ -32,8 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -101,20 +103,27 @@ fun BudgetPill(
 	val exhaustedMessage = when (period) {
 		BudgetPeriod.WEEKLY -> {
 			if (weeklyRemainingAmount > BigDecimal.ZERO && isDailyExhausted) {
-				"Presupuesto diario agotado"
+				stringResource(
+					R.string.budget_pill_exhausted_single,
+					stringResource(R.string.budget_pill_exhausted_daily_label)
+				)
 			} else null
 		}
 
 		BudgetPeriod.BIWEEKLY -> {
 			if (biweeklyRemainingAmount > BigDecimal.ZERO) {
 				val exhausted = buildList {
-					if (isDailyExhausted) add("diario")
-					if (isWeeklyExhausted) add("semanal")
+					if (isDailyExhausted) add(stringResource(R.string.budget_pill_exhausted_daily_label))
+					if (isWeeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
 				}
 				when (exhausted.size) {
 					0 -> null
-					1 -> "Presupuesto ${exhausted.first()} agotado"
-					2 -> "Presupuesto ${exhausted[0]} y ${exhausted[1]} agotado"
+					1 -> stringResource(R.string.budget_pill_exhausted_single, exhausted.first())
+					2 -> stringResource(
+						R.string.budget_pill_exhausted_double,
+						exhausted[0],
+						exhausted[1]
+					)
 					else -> null
 				}
 			} else null
@@ -123,15 +132,24 @@ fun BudgetPill(
 		BudgetPeriod.MONTHLY -> {
 			if (monthlyRemainingAmount > BigDecimal.ZERO) {
 				val exhausted = buildList {
-					if (isDailyExhausted) add("diario")
-					if (isWeeklyExhausted) add("semanal")
-					if (isBiweeklyExhausted) add("quincenal")
+					if (isDailyExhausted) add(stringResource(R.string.budget_pill_exhausted_daily_label))
+					if (isWeeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
+					if (isBiweeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
 				}
 				when (exhausted.size) {
 					0 -> null
-					1 -> "Presupuesto ${exhausted.first()} agotado"
-					2 -> "Presupuesto ${exhausted[0]} y ${exhausted[1]} agotado"
-					else -> "Presupuesto ${exhausted[0]}, ${exhausted[1]} y ${exhausted[2]} agotado"
+					1 -> stringResource(R.string.budget_pill_exhausted_single, exhausted.first())
+					2 -> stringResource(
+						R.string.budget_pill_exhausted_double,
+						exhausted[0],
+						exhausted[1]
+					)
+					else -> stringResource(
+						R.string.budget_pill_exhausted_triple,
+						exhausted[0],
+						exhausted[1],
+						exhausted[2]
+					)
 				}
 			} else null
 		}
@@ -237,8 +255,8 @@ private fun StatusLabel(
 	val textColor = LocalContentColor.current
 
 	val label = when {
-		isOverBudget -> "Presupuesto agotado"
-		budgetState == null -> "Sin presupuesto"
+		isOverBudget -> stringResource(R.string.budget_pill_over_budget)
+		budgetState == null -> stringResource(R.string.budget_pill_no_budget)
 		else -> budgetPeriod.periodLabel()
 	}
 

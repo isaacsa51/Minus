@@ -9,13 +9,11 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,12 +30,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.serranoie.app.minus.R
 import com.serranoie.app.minus.LocalWindowInsets
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.analytics.Size
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.util.combineColors
@@ -77,7 +76,7 @@ fun FinishedPeriodHeader(
 		) {
 			Spacer(Modifier.height(36.dp))
 			Text(
-				text = "Periodo terminado",
+				text = stringResource(R.string.finished_period_header_title),
 				style = MaterialTheme.typography.headlineSmallEmphasized,
 				fontSize = MaterialTheme.typography.headlineLarge.fontSize,
 				textAlign = TextAlign.Center,
@@ -85,19 +84,19 @@ fun FinishedPeriodHeader(
 			Spacer(Modifier.height(8.dp))
 			if (!hasSpends) {
 				Text(
-					text = "Huh? No gastaste nada en este periodo",
+					text = stringResource(R.string.finished_period_header_no_spends),
 					style = MaterialTheme.typography.titleMedium,
 					textAlign = TextAlign.Center,
 				)
 			} else if (isOverBudget) {
 				Text(
-					text = "Cuidado! Al parecer te has endeudado en este periodo, aquí abajo están las estadisticas",
+					text = stringResource(R.string.finished_period_header_over_budget),
 					style = MaterialTheme.typography.titleMedium,
 					textAlign = TextAlign.Center,
 				)
 			} else {
 				Text(
-					text = "Aquí están las estadisticas de todos tus gastos",
+					text = stringResource(R.string.finished_period_header_summary),
 					style = MaterialTheme.typography.titleMedium,
 					textAlign = TextAlign.Center,
 				)

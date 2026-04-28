@@ -59,6 +59,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,6 +69,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.serranoie.app.minus.LocalWindowInsets
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import kotlinx.coroutines.delay
@@ -197,7 +199,7 @@ fun EditableCategoryTag(
 								)
 								.heightIn(min = 28.dp)
 								.wrapContentHeight(align = Alignment.CenterVertically),
-							text = value.text.ifEmpty { "Add comment" },
+							text = value.text.ifEmpty { stringResource(R.string.add_new_category) },
 							style = MaterialTheme.typography.bodyMediumCondensed,
 							softWrap = false,
 							overflow = TextOverflow.Ellipsis,

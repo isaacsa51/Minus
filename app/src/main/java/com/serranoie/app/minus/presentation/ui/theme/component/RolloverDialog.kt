@@ -25,10 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
@@ -81,7 +83,7 @@ fun RolloverDialog(
 				Spacer(modifier = Modifier.height(16.dp))
 
 				Text(
-					text = "Periodo finalizado",
+					text = stringResource(R.string.rollover_dialog_period_finished_title),
 					textAlign = TextAlign.Center,
 					style = MaterialTheme.typography.titleMediumEmphasized,
 					color = colorOnEditor
@@ -107,7 +109,7 @@ fun RolloverDialog(
 				Spacer(modifier = Modifier.height(8.dp))
 
 				Text(
-					text = "¿Qué quieres hacer con el dinero restante?",
+					text = stringResource(R.string.rollover_dialog_question),
 					style = MaterialTheme.typography.bodyMedium,
 					color = colorOnEditor.copy(alpha = 0.7f),
 					textAlign = TextAlign.Center
@@ -117,8 +119,11 @@ fun RolloverDialog(
 
 				RollOverOptionCard(
 					icon = Icons.Outlined.Splitscreen,
-					title = "Dividir igualmente",
-					description = "Agregar $formattedRemaining al presupuesto de los próximos días",
+					title = stringResource(R.string.rollover_dialog_split_equally_title),
+					description = stringResource(
+						R.string.rollover_dialog_split_equally_desc,
+						formattedRemaining
+					),
 					onClick = onSplitEqually
 				)
 
@@ -126,8 +131,11 @@ fun RolloverDialog(
 
 				RollOverOptionCard(
 					icon = Icons.Outlined.NextPlan,
-					title = "Pasar a mañana",
-					description = "Agregar $formattedRemaining al presupuesto de mañana",
+					title = stringResource(R.string.rollover_dialog_carry_to_tomorrow_title),
+					description = stringResource(
+						R.string.rollover_dialog_carry_to_tomorrow_desc,
+						formattedRemaining
+					),
 					onClick = onCarryToNextDay
 				)
 
@@ -136,8 +144,8 @@ fun RolloverDialog(
 
 					RollOverOptionCard(
 						icon = Icons.Outlined.FactCheck,
-						title = "Ver análisis",
-						description = "Revisar el resumen del periodo finalizado",
+						title = stringResource(R.string.rollover_dialog_view_analytics_title),
+						description = stringResource(R.string.rollover_dialog_view_analytics_desc),
 						onClick = onViewAnalytics
 					)
 				}
@@ -146,7 +154,7 @@ fun RolloverDialog(
 
 				TextButton(onClick = onDismiss) {
 					Text(
-						text = "Cancelar", color = colorOnEditor.copy(alpha = 0.6f)
+						text = stringResource(R.string.cancel), color = colorOnEditor.copy(alpha = 0.6f)
 					)
 				}
 			}
@@ -154,9 +162,6 @@ fun RolloverDialog(
 	}
 }
 
-/**
- * Individual roll-over option card.
- */
 @Composable
 private fun RollOverOptionCard(
 	icon: ImageVector, title: String, description: String, onClick: () -> Unit

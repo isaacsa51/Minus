@@ -34,12 +34,6 @@ class NotificationHelper @Inject constructor(
 
         const val NOTIFICATION_ID_PERIOD_END = 1001
         const val NOTIFICATION_ID_RECURRENT = 1002
-
-        const val EXTRA_REMAINING_BUDGET = "remaining_budget"
-        const val EXTRA_CURRENCY = "currency"
-        const val EXTRA_EXPENSE_AMOUNT = "expense_amount"
-        const val EXTRA_EXPENSE_COMMENT = "expense_comment"
-        const val EXTRA_EXPENSE_FREQUENCY = "expense_frequency"
     }
 
     init {
@@ -50,7 +44,6 @@ class NotificationHelper @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            // Budget Period End Channel
             val periodEndChannel = NotificationChannel(
                 CHANNEL_PERIOD_END,
                 "Budget Period End",
@@ -60,7 +53,6 @@ class NotificationHelper @Inject constructor(
                 enableVibration(true)
             }
 
-            // Recurrent Expenses Channel
             val recurrentChannel = NotificationChannel(
                 CHANNEL_RECURRENT,
                 "Recurrent Expenses",
@@ -76,9 +68,6 @@ class NotificationHelper @Inject constructor(
         }
     }
 
-    /**
-     * Check and log notification permission status.
-     */
     private fun checkNotificationPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val granted = ContextCompat.checkSelfPermission(
@@ -93,9 +82,6 @@ class NotificationHelper @Inject constructor(
         }
     }
 
-    /**
-     * Show notification when budget period ends.
-     */
     fun showPeriodEndNotification(remainingBudget: String, currency: String) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
@@ -132,9 +118,6 @@ class NotificationHelper @Inject constructor(
         logcat { "Period end notification shown successfully" }
     }
 
-    /**
-     * Build a user-friendly message for period end notification.
-     */
     private fun buildPeriodEndMessage(remainingBudget: String, currency: String): String {
         val amount = remainingBudget.toDoubleOrNull() ?: 0.0
         return if (amount > 0) {
@@ -146,9 +129,6 @@ class NotificationHelper @Inject constructor(
         }
     }
 
-    /**
-     * Show notification when a recurrent expense is due.
-     */
     fun showRecurrentExpenseNotification(amount: String, comment: String, frequency: String, currency: String) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
@@ -189,10 +169,6 @@ class NotificationHelper @Inject constructor(
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_RECURRENT, notification)
     }
 
-    /**
-     * Show notification for an upcoming subscription charge.
-     * Warns users about subscriptions charging in the next few days within their budget period.
-     */
     fun showUpcomingSubscriptionNotification(amount: String, comment: String, daysUntil: Long, currency: String) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {

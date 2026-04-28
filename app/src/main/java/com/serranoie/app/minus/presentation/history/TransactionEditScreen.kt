@@ -46,10 +46,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.editor.category.CategoryToolbar
@@ -59,16 +62,18 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
-import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Transaction as NumpadTransaction
+import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Transaction as NumpadTransaction
 
 /**
  * Screen for editing a transaction.
@@ -121,6 +126,11 @@ fun TransactionEditScreen(
 
 	var isCalculation by remember { mutableStateOf(false) }
 
+
+	val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
+		fontWeight = FontWeight.W500
+	)
+
 	val editorState = remember(editedAmount) {
 		EditorState(
 			mode = EditMode.EDIT,
@@ -133,10 +143,9 @@ fun TransactionEditScreen(
 					id = it.id,
 					amount = it.amount.toPlainString(),
 					comment = it.comment,
-					date = it.date?.atZone(ZoneId.systemDefault())?.toInstant()?.let { instant -> java.util.Date.from(instant) } ?: java.util.Date()
-				)
-			}
-		)
+					date = it.date?.atZone(ZoneId.systemDefault())?.toInstant()
+						?.let { instant -> java.util.Date.from(instant) } ?: java.util.Date())
+			})
 	}
 
 	Column(
@@ -155,14 +164,16 @@ fun TransactionEditScreen(
 			) {
 				Icon(
 					imageVector = Icons.Default.Close,
-					contentDescription = "Cancelar edición",
+					contentDescription = stringResource(R.string.cancel_edit_content_desc),
 					tint = MaterialTheme.colorScheme.onSurface
 				)
 			}
 
 			Text(
-				text = if (transaction.isRecurrent) "Editar gasto recurrente" else "Editar gasto",
-				style = MaterialTheme.typography.titleMedium,
+				text = if (transaction.isRecurrent) stringResource(R.string.edit_recurrent_expense_title) else stringResource(
+					R.string.edit_expense_title
+				),
+				style = MaterialTheme.typography.titleMediumEmphasized,
 				color = MaterialTheme.colorScheme.onSurface,
 				modifier = Modifier.padding(start = 8.dp)
 			)
@@ -225,7 +236,7 @@ fun TransactionEditScreen(
 
 			Text(
 				text = formattedAmount,
-				style = MaterialTheme.typography.displayLarge,
+				style = baseTextStyle,
 				color = MaterialTheme.colorScheme.onSurface,
 				textAlign = TextAlign.End,
 				modifier = Modifier.fillMaxWidth()
@@ -255,16 +266,16 @@ fun TransactionEditScreen(
 							modifier = Modifier.size(20.dp)
 						)
 						Text(
-							text = if (isRecurrent) "Configurar recurrencia" else "Hacer recurrente",
+							text = if (isRecurrent) stringResource(R.string.configure_recurrence) else stringResource(R.string.make_recurrent),
 							style = MaterialTheme.typography.bodyMedium
 						)
 					}
 
 					if (isRecurrent) {
 						val freqText = when (selectedFrequency) {
-							RecurrentFrequency.WEEKLY -> "Semanal"
-							RecurrentFrequency.BIWEEKLY -> "Quincenal"
-							RecurrentFrequency.MONTHLY -> "Mensual"
+							RecurrentFrequency.WEEKLY -> stringResource(R.string.weekly_with_desc)
+							RecurrentFrequency.BIWEEKLY -> stringResource(R.string.biweekly_with_desc)
+							RecurrentFrequency.MONTHLY -> stringResource(R.string.recurrent_frequency_monthly, subscriptionDay)
 						}
 						Text(
 							text = freqText,
@@ -386,11 +397,11 @@ fun TransactionEditScreen(
 					}
 					showDatePicker = false
 				}) {
-				Text("Aceptar")
+				Text(stringResource(R.string.accept))
 			}
 		}, dismissButton = {
 			TextButton(onClick = { showDatePicker = false }) {
-				Text("Cancelar")
+				Text(stringResource(R.string.cancel))
 			}
 		}) {
 			DatePicker(state = datePickerState)
@@ -411,7 +422,7 @@ fun TransactionEditScreen(
 					horizontalAlignment = Alignment.CenterHorizontally
 				) {
 					Text(
-						text = "Seleccionar hora",
+						text = stringResource(R.string.select_time),
 						style = MaterialTheme.typography.titleMedium,
 						modifier = Modifier.padding(bottom = 16.dp)
 					)
@@ -425,7 +436,7 @@ fun TransactionEditScreen(
 						horizontalArrangement = Arrangement.End
 					) {
 						TextButton(onClick = { showTimePicker = false }) {
-							Text("Cancelar")
+							Text(stringResource(R.string.cancel))
 						}
 
 						TextButton(
@@ -435,7 +446,7 @@ fun TransactionEditScreen(
 								)
 								showTimePicker = false
 							}) {
-							Text("Aceptar")
+							Text(stringResource(R.string.accept))
 						}
 					}
 				}
@@ -497,11 +508,11 @@ private fun RecurrentConfigBottomSheetContent(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = "Configurar recurrencia", style = MaterialTheme.typography.headlineSmall
+				text = stringResource(R.string.configure_recurrence), style = MaterialTheme.typography.headlineSmall
 			)
 
 			TextButton(onClick = onDismiss) {
-				Text("Listo")
+				Text(stringResource(R.string.done))
 			}
 		}
 
@@ -513,7 +524,7 @@ private fun RecurrentConfigBottomSheetContent(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = "Gasto recurrente", style = MaterialTheme.typography.bodyLarge
+				text = stringResource(R.string.recurrent_expense), style = MaterialTheme.typography.bodyLarge
 			)
 			Switch(
 				checked = isRecurrent, onCheckedChange = onIsRecurrentChange
@@ -530,13 +541,13 @@ private fun RecurrentConfigBottomSheetContent(
 			) {
 				OutlinedTextField(
 					value = when (selectedFrequency) {
-					RecurrentFrequency.WEEKLY -> "Semanal (cada 7 días)"
-					RecurrentFrequency.BIWEEKLY -> "Quincenal (cada 14 días)"
-					RecurrentFrequency.MONTHLY -> "Mensual"
+					RecurrentFrequency.WEEKLY -> stringResource(R.string.weekly_with_desc)
+					RecurrentFrequency.BIWEEKLY -> stringResource(R.string.biweekly_with_desc)
+					RecurrentFrequency.MONTHLY -> stringResource(R.string.recurrent_frequency_monthly, subscriptionDay)
 				},
 					onValueChange = {},
 					readOnly = true,
-					label = { Text("Frecuencia") },
+					label = { Text(stringResource(R.string.frequency_label)) },
 					trailingIcon = {
 						ExposedDropdownMenuDefaults.TrailingIcon(expanded = showFrequencyDropdown)
 					},
@@ -548,15 +559,15 @@ private fun RecurrentConfigBottomSheetContent(
 				ExposedDropdownMenu(
 					expanded = showFrequencyDropdown,
 					onDismissRequest = { showFrequencyDropdown = false }) {
-					DropdownMenuItem(text = { Text("Semanal (cada 7 días)") }, onClick = {
+					DropdownMenuItem(text = { Text(stringResource(R.string.weekly_with_desc)) }, onClick = {
 						onFrequencyChange(RecurrentFrequency.WEEKLY)
 						showFrequencyDropdown = false
 					})
-					DropdownMenuItem(text = { Text("Quincenal (cada 14 días)") }, onClick = {
+					DropdownMenuItem(text = { Text(stringResource(R.string.biweekly_with_desc)) }, onClick = {
 						onFrequencyChange(RecurrentFrequency.BIWEEKLY)
 						showFrequencyDropdown = false
 					})
-					DropdownMenuItem(text = { Text("Mensual") }, onClick = {
+					DropdownMenuItem(text = { Text(stringResource(R.string.recurrent_frequency_monthly, subscriptionDay)) }, onClick = {
 						onFrequencyChange(RecurrentFrequency.MONTHLY)
 						showFrequencyDropdown = false
 					})
@@ -575,7 +586,7 @@ private fun RecurrentConfigBottomSheetContent(
 						value = "$subscriptionDay",
 						onValueChange = {},
 						readOnly = true,
-						label = { Text("Día de cobro") },
+						label = { Text(stringResource(R.string.billing_day)) },
 						trailingIcon = {
 							ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDayDropdown)
 						},
@@ -603,10 +614,10 @@ private fun RecurrentConfigBottomSheetContent(
 				value = recurrentEndDate.toString(),
 				onValueChange = {},
 				readOnly = true,
-				label = { Text("Finaliza el") },
+				label = { Text(stringResource(R.string.end_date)) },
 				trailingIcon = {
 					TextButton(onClick = { showEndDatePicker = true }) {
-						Text("Cambiar")
+						Text(stringResource(R.string.change_date))
 					}
 				},
 				modifier = Modifier.fillMaxWidth()
@@ -633,11 +644,11 @@ private fun RecurrentConfigBottomSheetContent(
 					}
 					showEndDatePicker = false
 				}) {
-				Text("Aceptar")
+				Text(stringResource(R.string.accept))
 			}
 		}, dismissButton = {
 			TextButton(onClick = { showEndDatePicker = false }) {
-				Text("Cancelar")
+				Text(stringResource(R.string.cancel))
 			}
 		}) {
 			DatePicker(state = datePickerState)
@@ -728,8 +739,8 @@ private fun evaluateCalculation(input: String): String? {
 				"-" -> result - nextNum
 				"*" -> result * nextNum
 				"/" -> {
-					if (nextNum.compareTo(java.math.BigDecimal.ZERO) == 0) return null // Division by zero
-					result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
+					if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null // Division by zero
+					result.divide(nextNum, 2, RoundingMode.HALF_UP)
 				}
 
 				else -> return null
@@ -739,7 +750,7 @@ private fun evaluateCalculation(input: String): String? {
 		if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
 			result.toBigInteger().toString()
 		} else {
-			result.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+			result.setScale(2, RoundingMode.HALF_UP).toPlainString()
 		}
 	} catch (e: Exception) {
 		null
