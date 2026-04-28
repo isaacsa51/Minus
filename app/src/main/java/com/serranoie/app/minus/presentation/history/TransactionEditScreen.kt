@@ -75,11 +75,6 @@ import java.time.LocalTime
 import java.time.ZoneId
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Transaction as NumpadTransaction
 
-/**
- * Screen for editing a transaction.
- * Shows date/time picker, amount editor with numpad, and category input.
- * For recurring transactions, allows editing billing day, end date, and frequency via bottom sheet.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionEditScreen(

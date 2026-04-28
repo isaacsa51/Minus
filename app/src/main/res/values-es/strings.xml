@@ -1,0 +1,292 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Menos</string>
+
+    <string name="today">Hoy</string>
+    <string name="yesterday">Ayer</string>
+    <string name="tomorrow">Mañana</string>
+    <string name="apply">Aplicar</string>
+    <string name="accept">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="save">Guardar</string>
+    <string name="delete">Borrar</string>
+    <string name="edit">Editar</string>
+    <string name="close">Cerca</string>
+    <string name="done">Hecho</string>
+    <string name="add">Agregar</string>
+    <string name="remove">Eliminar</string>
+    <string name="back">Atrás</string>
+    <string name="next">Próximo</string>
+    <string name="period">Período</string>
+    <string name="previous_values">Valores anteriores</string>
+    <string name="budget">Presupuesto</string>
+    <string name="recurrent_expense">Gasto recurrente</string>
+    <string name="recurrent_expense_details">Definamos el gasto recurrente</string>
+    <string name="recurrent_expense_frequency_subtitle">¿Con qué frecuencia desea pagar este gasto?</string>
+    <string name="recurrent_frequency_weekly">Semanal</string>
+    <string name="recurrent_frequency_biweekly">Quincenal</string>
+    <string name="recurrent_frequency_monthly">Mensual</string>
+    <string name="previous_day">Día anterior</string>
+    <string name="next_day">Día siguiente</string>
+    <string name="monthly_on_day_format">Día %1$d de cada mes</string>
+    <string name="limit_date">Fecha limite</string>
+    <string name="date_placeholder">Fecha</string>
+    <string name="change_date">Cambiar fecha</string>
+    <string name="summary_weekly_format">Se cobrará todas las semanas hasta %1$s.</string>
+    <string name="summary_biweekly_format">Se cobrará cada dos semanas hasta %1$s.</string>
+    <string name="summary_monthly_format">Se cobrará todos los meses en el día %1$d hasta %2$s.</string>
+
+
+    <string name="period_finished">Periodo terminado</string>
+    <string name="remaining_budget">Presupuesto restante</string>
+    <string name="rollover_question">¿Qué quieres hacer con el dinero restante?</string>
+    <string name="split_equally">Dividir en partes iguales</string>
+    <string name="split_equally_desc">Añadir %1$s al presupuesto de los próximos días</string>
+    <string name="carry_to_next_day">Llevar a mañana</string>
+    <string name="carry_to_next_day_desc">Agregar %1$s al presupuesto\'de mañana</string>
+    <string name="view_analytics">Ver análisis</string>
+    <string name="view_analytics_desc">Revisar el resumen del periodo finalizado.</string>
+
+
+    <string name="edit_recurrent_expense_title">Editar gasto recurrente</string>
+    <string name="edit_expense_title">Editar gasto</string>
+    <string name="cancel_edit_content_desc">Cancelar edición</string>
+    <string name="configure_recurrence">Configurar la recurrencia</string>
+    <string name="make_recurrent">Hacer Recurrente</string>
+    <string name="select_time">Seleccionar hora</string>
+    <string name="billing_day">Día de pago</string>
+    <string name="end_date">Fecha de finalización</string>
+    <string name="frequency_label">Frecuencia</string>
+    <string name="weekly_with_desc">Semanal (cada 7 días)</string>
+    <string name="biweekly_with_desc">Quincenal (cada 14 días)</string>
+
+    <string name="edit_budget">Editar presupuesto</string>
+    <string name="new_budget">Nuevo de ahorro</string>
+    <plurals name="pending_expense">
+        <item quantity="one">%d gasto para el siguiente periodo</item>
+        <item quantity="other">%d gastos para el próximo período</item>
+    </plurals>
+    <string name="new_period_title">Nuevo período de ahorro</string>
+    <string name="widget_description">Vista rápida de tus gastos y añade nuevos</string>
+    <string name="total_expenses">Gastos Totales</string>
+    <string name="new_expense">Nuevo Gasto</string>
+    <string name="daily_average">Promedio diario</string>
+    <string name="expenses_history">Historial de gastos</string>
+    <string name="single_expense">Gasto único</string>
+    <string name="add_expense">+ Agregar Gasto</string>
+    <string name="finalize_period_question">¿Finalizar período?</string>
+    <string name="finalize_period">Finalizar el período presupuestario anticipadamente</string>
+    <string name="finalize_period_confirm">Esto cerrará el período actual y comenzará uno nuevo. ¿Está seguro?</string>
+    <string name="finalize_action">Finalizar</string>
+    <string name="no_ending_date">Sin fecha de finalización</string>
+    <string name="budget_split_logic">¿Cómo quieres dividir el presupuesto?</string>
+    <string name="new_budget_period">Nuevo período presupuestario</string>
+
+
+    <string name="expense_deleted_format">%1$s eliminado</string>
+    <string name="generic_expense">Gastos</string>
+    <string name="hide_subscriptions_outside_period">Ocultar suscripciones fuera del período</string>
+    <string name="show_subscriptions_outside_period">Mostrar suscripciones fuera del periodo</string>
+    <string name="hide_past_period_expenses">Ocultar gastos del período pasado</string>
+    <string name="show_past_period_expenses">Mostrar gastos del período pasado</string>
+
+    <string name="add_new_category">Categoría</string>
+
+    <string name="budget_validation_major_zero">El presupuesto debe ser mayor que 0.</string>
+    <string name="budget_no_date_defined">No hay fecha de finalización definida</string>
+    <string name="budget_no_days_defined">No hay días definidos</string>
+    <string name="budget_less_than_one_day_validation">El presupuesto debe ser para al menos un día.</string>
+
+    <string name="analytics_title">Analítica</string>
+
+    <plurals name="days">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+
+    <plurals name="analytics_days_left">
+        <item quantity="one">%d día restante</item>
+        <item quantity="other">%d quedan días</item>
+    </plurals>
+
+    <string name="total_budget">Presupuesto total</string>
+    <string name="minimum_spent">Mínimo gastado</string>
+    <string name="maximum_spent">Máximo gastado</string>
+    <string name="average_spent">Promedio por día empleado</string>
+
+    <string name="days_remaining_label">Días\nrestantes</string>
+
+
+    <string name="widget_budget_overview_description">Vea el presupuesto gastado y restante de un vistazo</string>
+    <string name="widget_days_countdown_description">Días de cuenta regresiva restantes en el período presupuestario</string>
+    <string name="widget_budget_detail_description">Resumen completo del presupuesto con la categoría principal y los días restantes</string>
+    <string name="widget_heatmap_description">Calendario de mapas de calor para ver la distribución del gasto</string>
+    <string name="widget_month_heatmap_description">Calendario del mapa de calor del mes actual</string>
+    <string name="widget_add_expense_description">Acceso directo rápido para agregar un nuevo gasto</string>
+    <string name="widget_add_expense_label">Agregar nuevo gasto</string>
+    <string name="widget_add_expense_plus">+</string>
+
+
+    <string name="spent">Gastado</string>
+    <string name="left">Izquierda</string>
+    <string name="remaining">Restante</string>
+    <string name="total_spent">Total gastado</string>
+    <string name="days_left">días</string>
+    <string name="budget_overview">Resumen del presupuesto</string>
+
+    <string name="budget_period_daily">A diario</string>
+    <string name="budget_period_weekly">Semanalmente</string>
+    <string name="budget_period_biweekly">Quincenal</string>
+    <string name="budget_period_monthly">Mensual</string>
+
+    <string name="budget_period_label_today">Para hoy</string>
+    <string name="budget_period_label_this_week">Esta semana</string>
+    <string name="budget_period_label_this_biweek">Esta quincena</string>
+    <string name="budget_period_label_this_month">Este mes</string>
+
+    <string name="day_total_format">Total: %1$s</string>
+
+    <string name="onboarding_welcome_title">¡Bienvenidos a Menos!</string>
+    <string name="onboarding_welcome_subtitle">Hola y bienvenido, comencemos a ahorrar juntos.</string>
+    <string name="onboarding_step_1_title">Establecer un presupuesto</string>
+    <string name="onboarding_step_1_subtitle">Calcula cuánto dinero necesitas para un período y mantente informado sobre cuánto puedes ahorrar.</string>
+    <string name="onboarding_step_2_title">Seguimiento de cada gasto</string>
+    <string name="onboarding_step_2_subtitle">Esta aplicación te ayuda a calcular cuánto puedes gastar por día, semana, período quincenal o mes para mantener el rumbo y saber lo que queda.</string>
+    <string name="onboarding_step_3_title">Gasta sabiamente</string>
+    <string name="onboarding_step_3_subtitle">Con el tiempo, aprenderá cuánto puede ahorrar y cuánto puede gastar.</string>
+    <string name="onboarding_set_budget_button">Establecer un presupuesto</string>
+
+
+    <string name="onboarding_finish_date_selector_title">Selecciona el periodo</string>
+    <string name="onboarding_finish_date_selector_days_range">%1$d días · %2$s - %3$s</string>
+    <string name="onboarding_finish_date_selector_budget_view_question">¿Cómo quieres ver tu presupuesto?</string>
+
+
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_section_appearance">Apariencia</string>
+    <string name="settings_section_notifications">Notificaciones</string>
+    <string name="settings_section_app_info">Información de la aplicación</string>
+    <string name="settings_section_data_backup">Copia de seguridad de datos</string>
+    <string name="settings_section_tutorial">Tutorial</string>
+
+    <string name="settings_theme_title">Tema</string>
+    <string name="settings_theme_subtitle">Cambiar el estilo del tema de la aplicación</string>
+    <string name="settings_typography_title">Tipografía</string>
+    <string name="settings_typography_subtitle">Cambiar el estilo de tipografía de la aplicación</string>
+    <string name="settings_material_you_title">material usted</string>
+    <string name="settings_material_you_subtitle">Utilice colores de fondo de pantalla para aplicar un tema de aplicación dinámico</string>
+
+    <string name="settings_period_end_time_title">Hora de finalización del período</string>
+    <string name="settings_period_end_time_subtitle">La notificación se mostrará al día siguiente de finalizar el plazo.</string>
+    <string name="settings_exact_alarm_title">alarmas exactas</string>
+    <string name="settings_exact_alarm_enabled_subtitle">Habilitado para intentar mostrar notificaciones a la hora seleccionada.</string>
+    <string name="settings_exact_alarm_disabled_subtitle">Desactivado; Android puede retrasar la notificación</string>
+
+    <string name="settings_about_title">Acerca de</string>
+    <string name="settings_about_subtitle">Obtenga más información sobre la aplicación y su desarrollo.</string>
+    <string name="settings_bug_report_title">¿Encontraste un error?</string>
+    <string name="settings_bug_report_subtitle">Crea un informe de error y lo solucionaremos pronto.</string>
+    <string name="settings_version_title">Versión</string>
+
+    <string name="settings_backup_title">Copia de seguridad de datos</string>
+    <string name="settings_backup_subtitle">Realizar una copia de seguridad de los datos en minus_export.csv</string>
+    <string name="settings_import_csv_title">Importar CSV</string>
+    <string name="settings_import_csv_subtitle">Importar datos desde un archivo CSV</string>
+
+    <string name="settings_reset_tutorial_title">Restablecer tutorial</string>
+    <string name="settings_reset_tutorial_subtitle">Volverá a ver sugerencias de gestos, información y acciones en la aplicación.</string>
+
+    <string name="settings_theme_dialog_title">Tema de la aplicación</string>
+    <string name="settings_theme_light_title">Luz</string>
+    <string name="settings_theme_light_subtitle">Utilice siempre un tema claro</string>
+    <string name="settings_theme_dark_title">Oscuro</string>
+    <string name="settings_theme_dark_subtitle">Utilice siempre el tema oscuro</string>
+    <string name="settings_theme_system_title">Seguir sistema</string>
+    <string name="settings_theme_system_subtitle">Utilice la configuración del tema del sistema</string>
+
+    <string name="settings_typography_dialog_title">tipografía de aplicación</string>
+    <string name="settings_typography_default_title">Por defecto</string>
+    <string name="settings_typography_default_subtitle">Utiliza la tipografía base</string>
+    <string name="settings_typography_condensed_title">Condensado</string>
+    <string name="settings_typography_condensed_subtitle">Utilice tipografía compacta</string>
+    <string name="settings_typography_expressive_title">Expresivo</string>
+    <string name="settings_typography_expressive_subtitle">Utilice tipografía expresiva</string>
+
+    <string name="expand">Expandir</string>
+    <string name="collapse">Colapsar</string>
+
+
+    <string name="budget_pill_over_budget">Presupuesto agotado</string>
+    <string name="budget_pill_no_budget">Sin presupuesto</string>
+    <string name="budget_pill_exhausted_daily_label">a diario</string>
+    <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
+    <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
+    <string name="budget_pill_exhausted_single">%1$s presupuesto agotado</string>
+    <string name="budget_pill_exhausted_double">%1$s y %2$s presupuesto agotado</string>
+    <string name="budget_pill_exhausted_triple">%1$s, %2$s y %3$s presupuesto agotado</string>
+
+
+    <string name="spend_budget_card_spent_label">Gastado</string>
+    <string name="spend_budget_card_available_percent_format">Disponible: %1$s%%</string>
+
+
+    <string name="categories_chart_uncategorized">Sin categoría</string>
+    <string name="categories_chart_rest">Restante</string>
+    <string name="categories_chart_empty_title">Podemos\'No divida sus gastos por categorías</string>
+    <string name="categories_chart_empty_subtitle">Utilice etiquetas para ver el gráfico por categorías</string>
+
+
+    <string name="calendar_heatmap_info_text">Este gráfico muestra el dinero gastado por cada día del período.</string>
+
+
+    <string name="no_transactions_title">No hay gastos registrados</string>
+    <string name="no_transactions_subtitle">Agregue un gasto para comenzar</string>
+
+
+    <string name="recurrent_payments_divider_title_upcoming">Próximos pagos recurrentes</string>
+
+
+    <string name="upcoming_recurrent_today">Hoy</string>
+    <string name="upcoming_recurrent_tomorrow">Mañana</string>
+    <string name="upcoming_recurrent_in_days">En %1$d días</string>
+    <string name="upcoming_recurrent_in_weeks">En %1$d semanas</string>
+    <string name="upcoming_recurrent_unnamed_expense">Gasto recurrente sin nombre</string>
+
+
+    <string name="recurrent_ticket_unnamed_subscription">Suscripción sin nombre</string>
+    <string name="recurrent_ticket_frequency_weekly">Semanalmente</string>
+    <string name="recurrent_ticket_frequency_biweekly">Quincenal</string>
+    <string name="recurrent_ticket_frequency_monthly">Mensual</string>
+
+
+    <string name="rollover_dialog_period_finished_title">Periodo terminado</string>
+    <string name="rollover_dialog_question">¿Qué quieres hacer con el dinero restante?</string>
+    <string name="rollover_dialog_split_equally_title">Dividir en partes iguales</string>
+    <string name="rollover_dialog_split_equally_desc">Añadir %1$s al presupuesto para los próximos días</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">llevar a mañana</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Agregar %1$s al presupuesto\'de mañana</string>
+    <string name="rollover_dialog_view_analytics_title">Ver análisis</string>
+    <string name="rollover_dialog_view_analytics_desc">Revisar el resumen del periodo finalizado.</string>
+
+
+    <string name="finished_period_header_title">Periodo terminado</string>
+    <string name="finished_period_header_no_spends">¿Eh? No\'no gastaste nada este período</string>
+    <string name="finished_period_header_over_budget">¡Cuidado! Te excediste del presupuesto en este período</string>
+    <string name="finished_period_header_summary">Aquí están las estadísticas de todos sus gastos.</string>
+
+
+    <string name="savings_recommendation_title">Recomendación de ahorro</string>
+    <string name="savings_recommendation_method_brief">El método clásico 50/30/20 divide su presupuesto en 50 % de necesidades, 30 % de deseos y 20 % de ahorro, lo que le ayuda a controlar los gastos y ahorrar de forma constante.</string>
+    <string name="savings_recommendation_current_savings_label">Ahorros actuales</string>
+    <string name="savings_recommendation_available_format">Disponible: %1$s</string>
+    <string name="savings_recommendation_ideal_savings_format">Ahorros ideales: %1$s</string>
+    <string name="savings_recommendation_current_savings_format">Ahorros actuales: %1$s</string>
+    <string name="savings_recommendation_recurrent_expenses_label">Gastos recurrentes</string>
+    <string name="savings_recommendation_one_time_expenses_label">Gastos únicos</string>
+    <string name="savings_recommendation_six_month_example_intro">Si ahorras el 20% en cada período durante aproximadamente 6 meses, podrías construir:</string>
+    <string name="savings_recommendation_six_month_example_equation" translatable="false">%1$s × 6 = %2$s</string>
+
+
+    <string name="wavy_divider_show_all_past_period_expenses">Mostrar todos los gastos del período anterior...</string>
+</resources>
