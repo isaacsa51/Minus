@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
-import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetEditorIntent
 import logcat.logcat
 
 @Composable
@@ -34,7 +34,7 @@ fun EditorWithViewModel(
 		},
 		onFocus = {
 			if (uiState.numpadInput.isNotEmpty() && uiState.animState != AnimState.EDITING) {
-				viewModel.processIntent(BudgetUiIntent.SetAnimState(AnimState.EDITING))
+				viewModel.processIntent(BudgetEditorIntent.SetAnimState(AnimState.EDITING))
 			}
 		},
 		onOpenHistory = onOpenHistory,
@@ -50,7 +50,7 @@ fun EditorWithViewModel(
 			uiState.budgetSettings?.let { settings ->
 				val updated = settings.copy(period = newPeriod)
 				logcat("EditorWithViewModel") { "onChangePeriod -> dispatch UpdateSettings with $updated" }
-				viewModel.processIntent(BudgetUiIntent.UpdateSettings(updated))
+				viewModel.processIntent(BudgetEditorIntent.UpdateSettings(updated))
 			}
 		},
 		onSaveBudget = { newSettings ->
@@ -60,23 +60,23 @@ fun EditorWithViewModel(
 			)
 		},
 		onFinishBudgetEarly = {
-			viewModel.processIntent(BudgetUiIntent.FinishBudgetEarly)
+			viewModel.processIntent(BudgetEditorIntent.FinishBudgetEarly)
 		},
 		onCommentUpdate = { comment ->
-			viewModel.processIntent(BudgetUiIntent.CommentUpdated(comment))
+			viewModel.processIntent(BudgetEditorIntent.CommentUpdated(comment))
 		},
 		onDeleteTag = { tag ->
-			viewModel.processIntent(BudgetUiIntent.DeleteTag(tag))
+			viewModel.processIntent(BudgetEditorIntent.DeleteTag(tag))
 		},
 		onRecurrentToggle = { enabled ->
-			viewModel.processIntent(BudgetUiIntent.SetRecurrentEnabled(enabled))
+			viewModel.processIntent(BudgetEditorIntent.SetRecurrentEnabled(enabled))
 		},
 		onDismissRecurrentDialog = {
-			viewModel.processIntent(BudgetUiIntent.DismissRecurrentDialog)
+			viewModel.processIntent(BudgetEditorIntent.DismissRecurrentDialog)
 		},
 		onRecurrentExpenseConfirm = { frequency, endDate, subscriptionDay ->
 			viewModel.processIntent(
-				BudgetUiIntent.RecurrentExpenseApplied(
+				BudgetEditorIntent.RecurrentExpenseApplied(
 					frequency, endDate, subscriptionDay
 				)
 			)

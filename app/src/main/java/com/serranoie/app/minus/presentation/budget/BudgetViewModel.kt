@@ -1,50 +1,30 @@
 package com.serranoie.app.minus.presentation.budget
 
-import android.content.Context
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.BudgetRepository
-import com.serranoie.app.minus.BUDGET_END_DATE_KEY
-import com.serranoie.app.minus.CURRENT_PERIOD_ID_KEY
-import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY
-import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY
-import com.serranoie.app.minus.CURRENT_PERIOD_STARTED_AT_KEY
-import com.serranoie.app.minus.DEFAULT_NOTIFICATION_HOUR
-import com.serranoie.app.minus.DEFAULT_NOTIFICATION_MINUTE
-import com.serranoie.app.minus.EARLY_FINISH_ACTIVE_KEY
-import com.serranoie.app.minus.EARLY_FINISH_ACTUAL_DATE_KEY
-import com.serranoie.app.minus.EARLY_FINISH_ORIGINAL_END_DATE_KEY
-import com.serranoie.app.minus.NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_AMOUNT_KEY
-import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_STRATEGY_KEY
-import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
-import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.domain.time.TimeProvider
-import com.serranoie.app.minus.domain.usecase.AddTransactionUseCase
-import com.serranoie.app.minus.domain.usecase.DeleteTransactionUseCase
+import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
+import com.serranoie.app.minus.domain.usecase.FinishBudgetEarlyUseCase
+import com.serranoie.app.minus.domain.usecase.GetCurrentPeriodIdUseCase
+import com.serranoie.app.minus.domain.usecase.MarkOnboardingCompletedUseCase
+import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
+import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodRolloverUseCase
+import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
+import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiEffect
+import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetEditorIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetNumpadIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetSystemIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.editor.AnimState
 import com.serranoie.app.minus.presentation.editor.EditMode
 import com.serranoie.app.minus.presentation.notification.NotificationHelper
-import com.serranoie.app.minus.presentation.notification.NotificationScheduler
-import com.serranoie.app.minus.presentation.widget.updateExpenseWidget
-import com.serranoie.app.minus.presentation.widget.updateBudgetOverviewWidget
-import com.serranoie.app.minus.presentation.widget.updateDaysCountdownWidget
-import com.serranoie.app.minus.presentation.widget.updateHeatmapWidget
-import com.serranoie.app.minus.presentation.widget.DailySpending
-import com.serranoie.app.minus.presentation.widget.MonthHeatmapData
-import com.serranoie.app.minus.presentation.widget.updateMonthHeatmapWidget
-import com.serranoie.app.minus.settingsDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiEffect
-import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -53,18 +33,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.asLog
 import logcat.logcat
 import java.math.BigDecimal
-import java.math.RoundingMode
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 private const val TAG = "BudgetViewModel - ISAAC"
@@ -72,13 +47,19 @@ private const val TAG = "BudgetViewModel - ISAAC"
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
 	private val budgetRepository: BudgetRepository,
-	@ApplicationContext private val context: Context,
-	private val notificationScheduler: NotificationScheduler,
 	private val notificationHelper: NotificationHelper,
-	private val timeProvider: TimeProvider,
-	private val addTransactionUseCase: AddTransactionUseCase,
-	private val deleteTransactionUseCase: DeleteTransactionUseCase,
-	private val recurringExpenseCalculator: RecurringExpenseCalculator
+	private val transactionHandler: BudgetTransactionHandler,
+	private val budgetStateCalculator: BudgetStateCalculator,
+	private val budgetWidgetUpdater: BudgetWidgetUpdater,
+	private val budgetExpressionEvaluator: BudgetExpressionEvaluator,
+	private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase,
+	private val observeCurrentPeriodRolloverUseCase: ObserveCurrentPeriodRolloverUseCase,
+	private val getCurrentPeriodIdUseCase: GetCurrentPeriodIdUseCase,
+	private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
+	private val updatePeriodEndNotificationTimeUseCase: UpdatePeriodEndNotificationTimeUseCase,
+	private val finishBudgetEarlyUseCase: FinishBudgetEarlyUseCase,
+	private val clearEarlyFinishStateUseCase: ClearEarlyFinishStateUseCase,
+	private val markOnboardingCompletedUseCase: MarkOnboardingCompletedUseCase,
 ) : ViewModel() {
 
 	private val _uiState = MutableStateFlow(BudgetUiState.INITIAL)
@@ -94,8 +75,10 @@ class BudgetViewModel @Inject constructor(
 	private val _budgetState = MutableStateFlow<BudgetState?>(null)
 	val budgetState: StateFlow<BudgetState?> = _budgetState.asStateFlow()
 
-	private val _categories = MutableStateFlow<List<com.serranoie.app.minus.domain.model.Category>>(emptyList())
-	val categories: StateFlow<List<com.serranoie.app.minus.domain.model.Category>> = _categories.asStateFlow()
+	private val _categories =
+		MutableStateFlow<List<com.serranoie.app.minus.domain.model.Category>>(emptyList())
+	val categories: StateFlow<List<com.serranoie.app.minus.domain.model.Category>> =
+		_categories.asStateFlow()
 
 	private val _effects = MutableSharedFlow<BudgetUiEffect>()
 	val effects: SharedFlow<BudgetUiEffect> = _effects.asSharedFlow()
@@ -118,13 +101,7 @@ class BudgetViewModel @Inject constructor(
 				budgetRepository.getTransactions(),
 				buildPeriodBoundaryFlow(),
 				budgetRepository.getQueuedTransactions(),
-				context.settingsDataStore.data.map { prefs ->
-					val rolloverAmount = prefs[CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY]
-						?.toBigDecimalOrNull()
-						?: BigDecimal.ZERO
-					val rolloverCarryForward = prefs[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY] ?: false
-					rolloverAmount to rolloverCarryForward
-				}
+				observeCurrentPeriodRolloverUseCase()
 			) { settings, transactions, periodBoundary, queuedTransactions, rolloverInfo ->
 				createBaseUiState(
 					settings = settings,
@@ -183,11 +160,8 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-	private fun buildPeriodBoundaryFlow() = context.settingsDataStore.data.map { prefs ->
-		_pendingPeriodBoundaryOverride.value ?: Pair(
-			prefs[CURRENT_PERIOD_STARTED_AT_KEY] ?: 0L,
-			prefs[CURRENT_PERIOD_ID_KEY] ?: 0L
-		)
+	private fun buildPeriodBoundaryFlow() = observeCurrentPeriodBoundaryUseCase().map { boundary ->
+		_pendingPeriodBoundaryOverride.value ?: boundary
 	}
 
 	private fun createBaseUiState(
@@ -206,13 +180,13 @@ class BudgetViewModel @Inject constructor(
 		)
 		val budgetState = settingsWithRollover?.let { s ->
 			val today = LocalDate.now()
-			val periodTransactions = filterPeriodTransactions(
+			val periodTransactions = budgetStateCalculator.filterPeriodTransactions(
 				transactions = transactions,
 				settings = s,
 				currentPeriodId = currentPeriodId,
 				currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
 			)
-			calculateBudgetState(s, periodTransactions, today)
+			budgetStateCalculator.calculateBudgetState(s, periodTransactions, today)
 		}
 
 		return BudgetUiState(
@@ -239,28 +213,6 @@ class BudgetViewModel @Inject constructor(
 		)
 	}
 
-	private fun filterPeriodTransactions(
-		transactions: List<Transaction>,
-		settings: BudgetSettings,
-		currentPeriodId: Long,
-		currentPeriodStartedAtMillis: Long,
-	): List<Transaction> {
-		val periodEnd = settings.getPeriodEndDate()
-		return transactions.filter { transaction ->
-			if (currentPeriodId > 0L && transaction.periodId > 0L) {
-				return@filter transaction.periodId == currentPeriodId
-			}
-			val txDate = transaction.date?.toLocalDate() ?: return@filter false
-			if (txDate.isBefore(settings.startDate) || txDate.isAfter(periodEnd)) {
-				return@filter false
-			}
-			if (txDate.isEqual(settings.startDate) && currentPeriodStartedAtMillis > 0L) {
-				return@filter transaction.createdAt >= currentPeriodStartedAtMillis
-			}
-			true
-		}
-	}
-
 	private suspend fun applyBaseState(baseState: BudgetUiState) {
 		_uiState.update { current ->
 			baseState.copy(
@@ -280,127 +232,7 @@ class BudgetViewModel @Inject constructor(
 		_budgetSettings.value = baseState.budgetSettings
 		_budgetState.value = baseState.budgetState
 
-		updateWidgets(baseState)
-	}
-
-	private suspend fun updateWidgets(baseState: BudgetUiState) {
-		val budget = baseState.budgetState ?: return
-		val currency = baseState.budgetSettings?.currencyCode ?: "USD"
-		val totalSpent = budget.totalSpentInPeriod.toInt()
-		val totalBudget = baseState.budgetSettings?.totalBudget?.toInt() ?: 1
-		val daysLeft = budget.daysRemaining
-		val budgetAmount = budget.totalBudget.toInt()
-		val (startDate, endDate) = resolveBudgetPeriodDates(baseState)
-		val heatmapData = buildHeatmapData(baseState)
-
-		updateExpenseWidget(context, totalSpent, totalBudget, currency)
-		updateBudgetOverviewWidget(context, budgetAmount, currency, startDate, endDate, daysLeft)
-		updateDaysCountdownWidget(context, daysLeft, budget.totalBudget.toInt(), "days left")
-		updateHeatmapWidget(context, heatmapData.monthHeatmapData)
-		updateMonthHeatmapWidget(context, heatmapData.currentMonthHeatmap, heatmapData.currentMonthTotalSpent)
-	}
-
-	private fun resolveBudgetPeriodDates(baseState: BudgetUiState): Pair<java.util.Date, java.util.Date> {
-		val startDate = baseState.budgetSettings?.startDate?.let {
-			java.util.Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
-		} ?: java.util.Date()
-		val endDate = baseState.budgetSettings?.getPeriodEndDate()?.let {
-			java.util.Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
-		} ?: java.util.Date()
-		return startDate to endDate
-	}
-
-	private data class WidgetHeatmapData(
-		val monthHeatmapData: List<MonthHeatmapData>,
-		val currentMonthHeatmap: MonthHeatmapData,
-		val currentMonthTotalSpent: Int,
-	)
-
-	private fun buildHeatmapData(baseState: BudgetUiState): WidgetHeatmapData {
-		val now = LocalDate.now()
-		val groupedByDate = groupTransactionsForHeatmap(baseState.transactions, now)
-		val defaultBudget = baseState.budgetSettings?.totalBudget ?: BigDecimal.ONE
-		val monthHeatmapData = buildMultiMonthHeatmapData(now, groupedByDate, defaultBudget)
-		val (currentMonthHeatmap, currentMonthTotalSpent) = buildCurrentMonthHeatmap(now, groupedByDate, defaultBudget)
-		return WidgetHeatmapData(
-			monthHeatmapData = monthHeatmapData,
-			currentMonthHeatmap = currentMonthHeatmap,
-			currentMonthTotalSpent = currentMonthTotalSpent,
-		)
-	}
-
-	private fun groupTransactionsForHeatmap(
-		transactions: List<Transaction>,
-		now: LocalDate,
-	): Map<LocalDate, List<Transaction>> {
-		val startMonth = now.minusMonths(3).withDayOfMonth(1)
-		val endMonth = now.withDayOfMonth(now.lengthOfMonth())
-		return transactions
-			.filter { tx ->
-				!tx.isDeleted && tx.date != null &&
-					!tx.date!!.toLocalDate().isBefore(startMonth) &&
-					!tx.date!!.toLocalDate().isAfter(endMonth)
-			}
-			.groupBy { it.date!!.toLocalDate() }
-	}
-
-	private fun buildMultiMonthHeatmapData(
-		now: LocalDate,
-		groupedByDate: Map<LocalDate, List<Transaction>>,
-		defaultBudget: BigDecimal,
-	): List<MonthHeatmapData> {
-		return (0L..3L).map { monthOffset ->
-			val month = now.minusMonths(3 - monthOffset)
-			val days = (1..month.lengthOfMonth()).map { dayOfMonth ->
-				val day = month.withDayOfMonth(dayOfMonth)
-				val txs = groupedByDate[day].orEmpty()
-				DailySpending(
-					dayOfMonth = dayOfMonth,
-					spending = txs.sumOf { it.amount },
-					budget = defaultBudget,
-					transactionCount = txs.size,
-				)
-			}
-			MonthHeatmapData(
-				year = month.year,
-				month = month.monthValue,
-				days = days,
-			)
-		}
-	}
-
-	private fun buildCurrentMonthHeatmap(
-		now: LocalDate,
-		groupedByDate: Map<LocalDate, List<Transaction>>,
-		defaultBudget: BigDecimal,
-	): Pair<MonthHeatmapData, Int> {
-		val currentMonthDays = (1..now.lengthOfMonth()).map { dayOfMonth ->
-			val day = now.withDayOfMonth(dayOfMonth)
-			val txs = groupedByDate[day].orEmpty()
-			DailySpending(
-				dayOfMonth = dayOfMonth,
-				spending = txs.sumOf { it.amount },
-				budget = defaultBudget,
-				transactionCount = txs.size,
-			)
-		}
-		val currentMonthTotalSpent = currentMonthDays.sumOf { it.spending }.toInt()
-		val currentMonthHeatmap = MonthHeatmapData(
-			year = now.year,
-			month = now.monthValue,
-			days = currentMonthDays,
-		)
-		return currentMonthHeatmap to currentMonthTotalSpent
-	}
-
-	private suspend fun startNewPeriod(settings: BudgetSettings) {
-		val newStartDate = LocalDate.now()
-		val updatedSettings = settings.copy(
-			startDate = newStartDate,
-			rollOverCarryForward = false,
-			rollOverLimit = null
-		)
-		persistBudgetSettings(updatedSettings, forceNewPeriodBoundary = true)
+		budgetWidgetUpdater.update(baseState)
 	}
 
 	fun saveBudgetSettings(
@@ -414,80 +246,47 @@ class BudgetViewModel @Inject constructor(
 			persistBudgetSettings(settings, forceNewPeriodBoundary = forceNewPeriodBoundary)
 		}
 	}
-	
+
 	fun updatePeriodEndNotificationTime(hour: Int, minute: Int) {
 		viewModelScope.launch {
-			context.settingsDataStore.edit { prefs ->
-				prefs[NOTIFICATION_HOUR_KEY] = hour
-				prefs[NOTIFICATION_MINUTE_KEY] = minute
-			}
+			updatePeriodEndNotificationTimeUseCase(hour, minute)
 			logcat(TAG) { "Updated period end notification time to %02d:%02d".format(hour, minute) }
-			budgetRepository.getBudgetSettingsSync()?.let { settings ->
-				notificationScheduler.schedulePeriodEndNotification(settings.getPeriodEndDate())
-			}
 		}
 	}
 
-
 	fun finishBudgetEarly() {
 		viewModelScope.launch {
-			val settings = budgetRepository.getBudgetSettingsSync() ?: return@launch
-			val originalEndDate = settings.getPeriodEndDate()
-			val now = LocalDate.now()
-
-			context.settingsDataStore.edit { prefs ->
-				prefs[EARLY_FINISH_ACTIVE_KEY] = true
-				prefs[EARLY_FINISH_ACTUAL_DATE_KEY] = now.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-				prefs[EARLY_FINISH_ORIGINAL_END_DATE_KEY] = originalEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-			}
+			finishBudgetEarlyUseCase()
 		}
 	}
 
 	fun clearEarlyFinishState() {
 		viewModelScope.launch {
-			clearEarlyFinishStateSync()
-		}
-	}
-
-	private suspend fun clearEarlyFinishStateSync() {
-		context.settingsDataStore.edit { prefs ->
-			prefs[EARLY_FINISH_ACTIVE_KEY] = false
-			prefs.remove(EARLY_FINISH_ACTUAL_DATE_KEY)
-			prefs.remove(EARLY_FINISH_ORIGINAL_END_DATE_KEY)
+			clearEarlyFinishStateUseCase()
 		}
 	}
 
 	fun markFirstLaunchComplete() {
 		_uiState.update { it.copy(isFirstLaunch = false) }
-
 		viewModelScope.launch {
-			val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("onboarding_completed")
-			context.settingsDataStore.edit { prefs ->
-				prefs[ONBOARDING_COMPLETED_KEY] = true
-			}
+			markOnboardingCompletedUseCase()
 		}
 	}
 
 
 	fun triggerTestNotifications() {
 		viewModelScope.launch {
-			logcat(TAG) { "=== TRIGGERING TEST NOTIFICATIONS ===" }
-			
 			val settings = budgetRepository.getBudgetSettingsSync()
 			val currency = settings?.currencyCode ?: "USD"
-			
-			logcat(TAG) { "Currency: $currency, Settings: $settings" }
-			
+
 			try {
 				notificationHelper.showPeriodEndNotification(
-					remainingBudget = "150.00",
-					currency = currency
+					remainingBudget = "150.00", currency = currency
 				)
-				logcat(TAG) { "? Test period end notification triggered" }
 			} catch (e: Exception) {
 				logcat(TAG) { e.asLog() }
 			}
-			
+
 			try {
 				notificationHelper.showRecurrentExpenseNotification(
 					amount = "50.00",
@@ -495,43 +294,69 @@ class BudgetViewModel @Inject constructor(
 					frequency = "MONTHLY",
 					currency = currency
 				)
-				logcat(TAG) { "? Test recurrent expense notification triggered" }
 			} catch (e: Exception) {
 				logcat(TAG) { e.asLog() }
 			}
-			
-			logcat(TAG) { "=== TEST NOTIFICATIONS COMPLETE ===" }
 		}
 	}
 
 	fun processIntent(intent: BudgetUiIntent) {
 		when (intent) {
-			is BudgetUiIntent.NumberTapped -> handleNumberInput(intent.digit)
-			is BudgetUiIntent.DotTapped -> handleDotInput()
-			is BudgetUiIntent.BackspaceTapped -> handleBackspace()
-			is BudgetUiIntent.ApplyTapped -> handleApply()
-			is BudgetUiIntent.DeleteTransactionTapped -> handleDeleteTransaction(intent.transaction)
-			is BudgetUiIntent.RestoreTransactionTapped -> handleRestoreTransaction(intent.transaction)
-			is BudgetUiIntent.EditTransactionTapped -> handleEditTransaction(intent.updatedTransaction)
-			is BudgetUiIntent.DateSelected -> handleDateSelected(intent.date)
-			is BudgetUiIntent.UpdateSettings -> handleUpdateSettings(intent.settings)
-			is BudgetUiIntent.ResetInputTapped -> handleResetInput()
-			is BudgetUiIntent.SetEditMode -> handleSetEditMode(intent.mode)
-			is BudgetUiIntent.SetAnimState -> handleSetAnimState(intent.state)
-			is BudgetUiIntent.CommentUpdated -> handleCommentUpdate(intent.comment)
-			is BudgetUiIntent.DeleteTag -> handleDeleteTag(intent.tag)
-			is BudgetUiIntent.MarkFirstLaunchComplete -> markFirstLaunchComplete()
-			is BudgetUiIntent.SetRecurrentEnabled -> handleSetRecurrentEnabled(intent.enabled)
-			is BudgetUiIntent.DismissRecurrentDialog -> handleDismissRecurrentDialog()
-			is BudgetUiIntent.RecurrentExpenseApplied -> handleRecurrentExpenseApply(intent.frequency, intent.endDate, intent.subscriptionDay)
-			is BudgetUiIntent.FinishBudgetEarly -> handleFinishBudgetEarly()
-			is BudgetUiIntent.TriggerTestNotifications -> triggerTestNotifications()
-			is BudgetUiIntent.OperatorTapped -> handleOperatorInput(intent.operator)
-			is BudgetUiIntent.EqualsTapped -> handleEqualsInput()
-			is BudgetUiIntent.SetCalculationMode -> handleSetCalculationMode(intent.enabled)
-			is BudgetUiIntent.SetDragProgress -> handleDragProgress(intent.progress)
-			is BudgetUiIntent.SetLockSwipeable -> handleSetLockSwipeable(intent.locked)
-			is BudgetUiIntent.SetLockDraggable -> handleSetLockDraggable(intent.locked)
+			is BudgetNumpadIntent -> handleNumpadIntent(intent)
+			is BudgetTransactionIntent -> handleTransactionIntent(intent)
+			is BudgetEditorIntent -> handleEditorIntent(intent)
+			is BudgetSystemIntent -> handleSystemIntent(intent)
+		}
+	}
+
+	private fun handleNumpadIntent(intent: BudgetNumpadIntent) {
+		when (intent) {
+			is BudgetNumpadIntent.NumberTapped -> handleNumberInput(intent.digit)
+			is BudgetNumpadIntent.DotTapped -> handleDotInput()
+			is BudgetNumpadIntent.BackspaceTapped -> handleBackspace()
+			is BudgetNumpadIntent.ApplyTapped -> handleApply()
+			is BudgetNumpadIntent.ResetInputTapped -> handleResetInput()
+			is BudgetNumpadIntent.OperatorTapped -> handleOperatorInput(intent.operator)
+			is BudgetNumpadIntent.EqualsTapped -> handleEqualsInput()
+			is BudgetNumpadIntent.SetCalculationMode -> handleSetCalculationMode(intent.enabled)
+			is BudgetNumpadIntent.SetDragProgress -> handleDragProgress(intent.progress)
+			is BudgetNumpadIntent.TriggerTestNotifications -> triggerTestNotifications()
+		}
+	}
+
+	private fun handleTransactionIntent(intent: BudgetTransactionIntent) {
+		when (intent) {
+			is BudgetTransactionIntent.DeleteTransactionTapped -> handleDeleteTransaction(intent.transaction)
+			is BudgetTransactionIntent.RestoreTransactionTapped -> handleRestoreTransaction(intent.transaction)
+			is BudgetTransactionIntent.EditTransactionTapped -> handleEditTransaction(intent.updatedTransaction)
+		}
+	}
+
+	private fun handleEditorIntent(intent: BudgetEditorIntent) {
+		when (intent) {
+			is BudgetEditorIntent.DateSelected -> handleDateSelected(intent.date)
+			is BudgetEditorIntent.UpdateSettings -> handleUpdateSettings(intent.settings)
+			is BudgetEditorIntent.SetEditMode -> handleSetEditMode(intent.mode)
+			is BudgetEditorIntent.SetAnimState -> handleSetAnimState(intent.state)
+			is BudgetEditorIntent.CommentUpdated -> handleCommentUpdate(intent.comment)
+			is BudgetEditorIntent.DeleteTag -> handleDeleteTag(intent.tag)
+			is BudgetEditorIntent.SetRecurrentEnabled -> handleSetRecurrentEnabled(intent.enabled)
+			is BudgetEditorIntent.DismissRecurrentDialog -> handleDismissRecurrentDialog()
+			is BudgetEditorIntent.RecurrentExpenseApplied -> handleRecurrentExpenseApply(
+				intent.frequency,
+				intent.endDate,
+				intent.subscriptionDay,
+			)
+
+			is BudgetEditorIntent.FinishBudgetEarly -> handleFinishBudgetEarly()
+		}
+	}
+
+	private fun handleSystemIntent(intent: BudgetSystemIntent) {
+		when (intent) {
+			is BudgetSystemIntent.MarkFirstLaunchComplete -> markFirstLaunchComplete()
+			is BudgetSystemIntent.SetLockSwipeable -> handleSetLockSwipeable(intent.locked)
+			is BudgetSystemIntent.SetLockDraggable -> handleSetLockDraggable(intent.locked)
 		}
 	}
 
@@ -549,7 +374,7 @@ class BudgetViewModel @Inject constructor(
 		val isOperator = { c: Char? -> c != null && c in "+-×÷" }
 
 		if (currentInput.isEmpty() || isOperator(lastChar)) {
-			_numpadInput.value = "$currentInput" + "0."
+			_numpadInput.value = currentInput + "0."
 			return
 		}
 
@@ -584,8 +409,8 @@ class BudgetViewModel @Inject constructor(
 	private fun handleEqualsInput() {
 		val currentInput = _numpadInput.value
 		if (currentInput.isEmpty()) return
-		
-		val result = evaluateCalculation(currentInput)
+
+		val result = budgetExpressionEvaluator.evaluate(currentInput)
 		if (result != null) {
 			_numpadInput.value = result
 			if (!_uiState.value.isCalculation) {
@@ -594,64 +419,6 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-
-	private fun evaluateCalculation(input: String): String? {
-		if (input.isBlank()) return null
-
-		return try {
-			val normalized = input.trim()
-				.replace("×", "*")
-				.replace("÷", "/")
-
-			normalized.lastOrNull()?.let { if (it in "+-*/") return null }
-
-			val hasOperator = normalized.any { it in "+-*/" }
-
-			if (!hasOperator) {
-				val num = normalized.toBigDecimalOrNull() ?: return null
-				return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
-					num.toBigInteger().toString()
-				} else {
-					num.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
-				}
-			}
-
-			val tokenPattern = Regex("([+\\-*/])")
-			val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
-			val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
-
-			if (parts.isEmpty() || parts[0].isEmpty()) return null
-
-			if (operators.size > parts.size - 1) return null
-
-			var result = parts[0].toBigDecimalOrNull() ?: return null
-
-			for (i in operators.indices) {
-				if (i + 1 >= parts.size) break
-				val operator = operators[i]
-				val nextNum = parts[i + 1].toBigDecimalOrNull() ?: return null
-
-				result = when (operator) {
-					"+" -> result + nextNum
-					"-" -> result - nextNum
-					"*" -> result * nextNum
-					"/" -> {
-						if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null // Division by zero
-						result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
-					}
-					else -> return null
-				}
-			}
-
-			if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
-				result.toBigInteger().toString()
-			} else {
-				result.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
-			}
-		} catch (e: Exception) {
-			null
-		}
-	}
 
 	private fun handleSetCalculationMode(enabled: Boolean) {
 		_uiState.update { it.copy(isCalculation = enabled, dragProgress = 0f) }
@@ -670,84 +437,40 @@ class BudgetViewModel @Inject constructor(
 	}
 
 	private fun handleApply() {
-		var input = _numpadInput.value
-		
-		if (_uiState.value.isCalculation && input.any { it in "+-×÷" }) {
-			val calculatedResult = evaluateCalculation(input)
-			if (calculatedResult != null) {
-				input = calculatedResult
-				_numpadInput.value = calculatedResult
-			}
-		}
-		
-		if (!validateNumpadInput(input)) return
+		viewModelScope.launch {
+			when (val result = transactionHandler.applyTransaction(
+				input = _numpadInput.value,
+				isCalculation = _uiState.value.isCalculation,
+				isRecurrentEnabled = _uiState.value.isRecurrentEnabled,
+				comment = _currentComment.value,
+				budgetSettings = _uiState.value.budgetSettings,
+				resolveActivePeriodId = ::resolveActivePeriodId,
+			)) {
+				is ApplyTransactionResult.InvalidInput -> Unit
+				is ApplyTransactionResult.ShowRecurrentDialog -> {
+					_numpadInput.value = result.normalizedInput
+					_uiState.update {
+						it.copy(
+							showRecurrentDialog = true,
+							pendingRecurrentAmount = result.amount,
+							pendingRecurrentComment = _currentComment.value,
+						)
+					}
+				}
 
-		val amount = try {
-			BigDecimal(input)
-		} catch (e: NumberFormatException) {
-			return
-		}
-
-		if (amount < BigDecimal.ZERO) {
-			_numpadInput.value = ""
-			return
-		}
-
-		if (_uiState.value.isRecurrentEnabled) {
-			_uiState.update {
-				it.copy(
-					showRecurrentDialog = true,
-					pendingRecurrentAmount = amount,
-					pendingRecurrentComment = _currentComment.value
-				)
-			}
-			return
-		}
-
-		// Check if the period has ended - if so, show dialog instead of immediately saving
-		val settings = _uiState.value.budgetSettings
-		val today = LocalDate.now()
-		if (settings != null) {
-			val periodEndDate = settings.getPeriodEndDate()
-			if (today.isAfter(periodEndDate)) {
-				viewModelScope.launch {
-					val categoryId: Long? = if (_currentComment.value.isNotBlank()) {
-						budgetRepository.findOrCreateCategory(_currentComment.value.trim()).id
-					} else null
-					val pendingTransaction = Transaction.create(
-						amount = amount,
-						comment = _currentComment.value,
-						date = LocalDateTime.now(),
-						periodId = 0L,
-						categoryId = categoryId
-					)
-					budgetRepository.addQueuedTransaction(pendingTransaction)
+				is ApplyTransactionResult.QueuedForNextPeriod -> {
 					_numpadInput.value = ""
 					_currentComment.value = ""
 					_uiState.update { it.copy(isCalculation = false) }
 					_effects.emit(BudgetUiEffect.ShowMessage("Gasto en cola para el proximo periodo"))
 				}
-				return
+
+				is ApplyTransactionResult.Added -> {
+					_numpadInput.value = ""
+					_currentComment.value = ""
+					_uiState.update { it.copy(isCalculation = false) }
+				}
 			}
-		}
-
-		viewModelScope.launch {
-			val activePeriodId = resolveActivePeriodId()
-			val categoryId: Long? = if (_currentComment.value.isNotBlank()) {
-				budgetRepository.findOrCreateCategory(_currentComment.value.trim()).id
-			} else null
-
-			val transaction = Transaction.create(
-				amount = amount,
-				comment = _currentComment.value,
-				date = LocalDateTime.now(),
-				periodId = activePeriodId,
-				categoryId = categoryId
-			)
-			addTransactionUseCase(transaction)
-			_numpadInput.value = ""
-			_currentComment.value = ""
-			_uiState.update { it.copy(isCalculation = false) }
 		}
 	}
 
@@ -765,45 +488,26 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-	private fun handleRecurrentExpenseApply(frequency: RecurrentFrequency, endDate: LocalDate, subscriptionDay: Int?) {
-		val amount = _uiState.value.pendingRecurrentAmount ?: return
-		val rawComment = _uiState.value.pendingRecurrentComment.trim()
-		val now = LocalDateTime.now()
-
-		val fallbackComment = when (frequency) {
-			RecurrentFrequency.WEEKLY -> "Subscripción semanal sin nombre"
-			RecurrentFrequency.BIWEEKLY -> "Subscripción quincenal sin nombre"
-			RecurrentFrequency.MONTHLY -> "Subscripción mensual sin nombre"
-		}
-
-		val finalComment = rawComment.ifEmpty { fallbackComment }
-
+	private fun handleRecurrentExpenseApply(
+		frequency: RecurrentFrequency, endDate: LocalDate, subscriptionDay: Int?
+	) {
 		viewModelScope.launch {
-			val activePeriodId = resolveActivePeriodId()
-			val categoryId: Long? = if (finalComment.isNotBlank()) {
-				budgetRepository.findOrCreateCategory(finalComment.trim()).id
-			} else null
-
-			val transaction = Transaction.create(
-				amount = amount,
-				comment = finalComment,
-				date = now,
-				periodId = activePeriodId,
-				isRecurrent = true,
-				recurrentFrequency = frequency,
-				// Preserve current hour/minute instead of forcing 00:00
-				recurrentEndDate = endDate.atTime(now.toLocalTime()),
+			val applied = transactionHandler.applyRecurrentExpense(
+				pendingAmount = _uiState.value.pendingRecurrentAmount,
+				pendingComment = _uiState.value.pendingRecurrentComment,
+				frequency = frequency,
+				endDate = endDate,
 				subscriptionDay = subscriptionDay,
-				categoryId = categoryId
+				resolveActivePeriodId = ::resolveActivePeriodId,
 			)
-			addTransactionUseCase(transaction)
+			if (!applied) return@launch
 
 			_uiState.update {
 				it.copy(
 					showRecurrentDialog = false,
 					pendingRecurrentAmount = null,
 					pendingRecurrentComment = "",
-					isRecurrentEnabled = false // Reset toggle after saving
+					isRecurrentEnabled = false,
 				)
 			}
 			_numpadInput.value = ""
@@ -818,34 +522,29 @@ class BudgetViewModel @Inject constructor(
 	private fun handleDeleteTransaction(transaction: Transaction) {
 		logcat(TAG) { "handleDeleteTransaction called for transaction ${transaction.id}" }
 		viewModelScope.launch {
-			try {
-				deleteTransactionUseCase(transaction)
-				logcat(TAG) { "Transaction ${transaction.id} deleted successfully" }
-			} catch (e: Exception) {
-				logcat(TAG) { e.asLog() }
-				_effects.emit(BudgetUiEffect.ShowMessage("Could not delete transaction"))
-			}
+			transactionHandler.deleteTransaction(transaction).onSuccess {
+					logcat(TAG) { "Transaction ${transaction.id} deleted successfully" }
+				}.onFailure { error ->
+					logcat(TAG) { error.asLog() }
+					_effects.emit(BudgetUiEffect.ShowMessage("Could not delete transaction"))
+				}
 		}
 	}
 
 	private fun handleRestoreTransaction(transaction: Transaction) {
 		viewModelScope.launch {
-			try {
-				addTransactionUseCase(transaction)
-				logcat(TAG) { "Transaction ${transaction.id} restored successfully" }
-			} catch (e: Exception) {
-				logcat(TAG) { e.asLog() }
-				_effects.emit(BudgetUiEffect.ShowMessage("Could not restore transaction"))
-			}
+			transactionHandler.restoreTransaction(transaction).onSuccess {
+					logcat(TAG) { "Transaction ${transaction.id} restored successfully" }
+				}.onFailure { error ->
+					logcat(TAG) { error.asLog() }
+					_effects.emit(BudgetUiEffect.ShowMessage("Could not restore transaction"))
+				}
 		}
 	}
 
 	private fun handleEditTransaction(updatedTransaction: Transaction) {
-		if (updatedTransaction.amount < BigDecimal.ZERO) {
-			return
-		}
 		viewModelScope.launch {
-			budgetRepository.updateTransaction(updatedTransaction)
+			transactionHandler.editTransaction(updatedTransaction)
 		}
 	}
 
@@ -891,100 +590,30 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
-	private fun handleMarkFirstLaunchComplete() {
-		_uiState.update { it.copy(isFirstLaunch = false) }
-	}
-	
+
 	private suspend fun persistBudgetSettings(
 		settings: BudgetSettings,
 		forceNewPeriodBoundary: Boolean = false,
 	) {
-		val previousPrefs = context.settingsDataStore.data.first()
-		val pendingRolloverAmount = previousPrefs[PENDING_ROLLOVER_AMOUNT_KEY]?.toBigDecimalOrNull()
-		val pendingRolloverStrategy = previousPrefs[PENDING_ROLLOVER_STRATEGY_KEY]?.let {
-			runCatching { RemainingBudgetStrategy.valueOf(it) }.getOrNull()
+		logcat(TAG) {
+			"persistBudgetSettings START settings=$settings forceNewPeriodBoundary=$forceNewPeriodBoundary"
 		}
-		val shouldApplyPendingRollover =
-			forceNewPeriodBoundary && pendingRolloverAmount != null && pendingRolloverAmount > BigDecimal.ZERO
-		val appliedRolloverAmount = if (shouldApplyPendingRollover) pendingRolloverAmount else BigDecimal.ZERO
-		val appliedCarryForward = shouldApplyPendingRollover && pendingRolloverStrategy == RemainingBudgetStrategy.ADD_TO_FIRST_DAY
-		val effectiveSettings = if (shouldApplyPendingRollover && pendingRolloverStrategy != null) {
-			when (pendingRolloverStrategy) {
-				RemainingBudgetStrategy.SPLIT_EQUALLY -> settings.copy(
-					totalBudget = settings.totalBudget.add(pendingRolloverAmount),
-					rollOverCarryForward = false,
-					rollOverLimit = pendingRolloverAmount
-				)
-				RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> settings.copy(
-					rollOverCarryForward = true,
-					rollOverLimit = pendingRolloverAmount
-				)
-				RemainingBudgetStrategy.ASK_ALWAYS -> settings
-			}
-		} else {
-			settings
-		}
-		logcat(TAG) { "persistBudgetSettings START settings=$settings effectiveSettings=$effectiveSettings forceNewPeriodBoundary=$forceNewPeriodBoundary" }
-		clearEarlyFinishStateSync()
-		val previousSettings = budgetRepository.getBudgetSettingsSync()
-		logcat(TAG) { "persistBudgetSettings previousSettings=$previousSettings" }
-		logcat(TAG) { "persistBudgetSettings previousPrefs currentPeriodStartedAt=${previousPrefs[CURRENT_PERIOD_STARTED_AT_KEY]} currentPeriodId=${previousPrefs[CURRENT_PERIOD_ID_KEY]}" }
-		budgetRepository.saveBudgetSettings(effectiveSettings)
-		logcat(TAG) { "Budget settings saved to repository" }
-		val shouldCreateNewPeriodBoundary = forceNewPeriodBoundary ||
-			previousSettings == null ||
-			previousSettings.startDate != effectiveSettings.startDate
-		val periodStartMillis = if (shouldCreateNewPeriodBoundary) {
-			timeProvider.nowEpochMillis()
-		} else {
-			previousPrefs[CURRENT_PERIOD_STARTED_AT_KEY]
-				?: effectiveSettings.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-		}
-		val periodId = if (shouldCreateNewPeriodBoundary) {
-			periodStartMillis
-		} else {
-			previousPrefs[CURRENT_PERIOD_ID_KEY] ?: periodStartMillis
-		}
-		_pendingPeriodBoundaryOverride.value = periodStartMillis to periodId
+		val periodBoundary = persistBudgetSettingsUseCase(
+			settings = settings,
+			forceNewPeriodBoundary = forceNewPeriodBoundary,
+		)
+		_pendingPeriodBoundaryOverride.value =
+			periodBoundary.periodStartMillis to periodBoundary.periodId
 		_uiState.update {
 			it.copy(
-				currentPeriodStartedAtMillis = periodStartMillis,
-				currentPeriodId = periodId
+				currentPeriodStartedAtMillis = periodBoundary.periodStartMillis,
+				currentPeriodId = periodBoundary.periodId,
 			)
 		}
-		logcat(TAG) {
-			"persistBudgetSettings boundaryDecision shouldCreateNewPeriodBoundary=$shouldCreateNewPeriodBoundary periodStartMillis=$periodStartMillis periodId=$periodId"
-		}
-		val periodEndDate = effectiveSettings.getPeriodEndDate()
-		val millis = periodEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-		logcat(TAG) { "Saving end date to DataStore: $periodEndDate -> $millis" }
-		context.settingsDataStore.edit { prefs ->
-			prefs[BUDGET_END_DATE_KEY] = millis
-			prefs[CURRENT_PERIOD_STARTED_AT_KEY] = periodStartMillis
-			prefs[CURRENT_PERIOD_ID_KEY] = periodId
-			prefs[CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY] = appliedRolloverAmount.toPlainString()
-			prefs[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY] = appliedCarryForward
-			if (shouldApplyPendingRollover) {
-				prefs.remove(PENDING_ROLLOVER_AMOUNT_KEY)
-				prefs.remove(PENDING_ROLLOVER_STRATEGY_KEY)
-			}
-			if (!prefs.contains(NOTIFICATION_HOUR_KEY)) {
-				prefs[NOTIFICATION_HOUR_KEY] = DEFAULT_NOTIFICATION_HOUR
-			}
-			if (!prefs.contains(NOTIFICATION_MINUTE_KEY)) {
-				prefs[NOTIFICATION_MINUTE_KEY] = DEFAULT_NOTIFICATION_MINUTE
-			}
-		}
-		if (shouldCreateNewPeriodBoundary) {
-			budgetRepository.assignQueuedTransactionsToPeriod(periodId)
-		}
-		val afterPrefs = context.settingsDataStore.data.first()
 		_pendingPeriodBoundaryOverride.value = null
 		logcat(TAG) {
-			"persistBudgetSettings END savedSettingsPeriod=${effectiveSettings.period} savedSettingsDays=${effectiveSettings.daysInPeriod} savedSettingsStart=${effectiveSettings.startDate} savedSettingsEnd=${effectiveSettings.endDate} datastorePeriodStart=${afterPrefs[CURRENT_PERIOD_STARTED_AT_KEY]} datastorePeriodId=${afterPrefs[CURRENT_PERIOD_ID_KEY]}"
+			"persistBudgetSettings END periodStartMillis=${periodBoundary.periodStartMillis} periodId=${periodBoundary.periodId}"
 		}
-		notificationScheduler.schedulePeriodEndNotification(periodEndDate)
-		logcat(TAG) { "Period end notification scheduled for $periodEndDate" }
 	}
 
 	private suspend fun resolveActivePeriodId(): Long {
@@ -992,7 +621,7 @@ class BudgetViewModel @Inject constructor(
 			if (pendingPeriodId > 0L) return pendingPeriodId
 		}
 
-		val dataStorePeriodId = context.settingsDataStore.data.first()[CURRENT_PERIOD_ID_KEY] ?: 0L
+		val dataStorePeriodId = getCurrentPeriodIdUseCase()
 		if (dataStorePeriodId > 0L) return dataStorePeriodId
 
 		return _uiState.value.currentPeriodId
@@ -1004,81 +633,9 @@ class BudgetViewModel @Inject constructor(
 		return try {
 			val value = BigDecimal(input)
 			value > BigDecimal.ZERO
-		} catch (e: NumberFormatException) {
+		} catch (_: NumberFormatException) {
 			false
 		}
 	}
 
-	private fun calculateBudgetState(
-		settings: BudgetSettings, transactions: List<Transaction>, currentDate: LocalDate
-	): BudgetState {
-		val periodEnd = settings.getPeriodEndDate()
-		logcat(TAG) { "calculateBudgetState: periodEnd=$periodEnd (from endDate=${settings.endDate} or period calculation)" }
-
-		val daysRemaining = ChronoUnit.DAYS.between(currentDate, periodEnd).toInt() + 1
-		logcat(TAG) { "daysRemaining=$daysRemaining (from $currentDate to $periodEnd)" }
-
-		val originalTotalDays = ChronoUnit.DAYS.between(settings.startDate, periodEnd).toInt() + 1
-		logcat(TAG) { "originalTotalDays=$originalTotalDays (from ${settings.startDate} to $periodEnd)" }
-
-		val totalSpentInPeriod = transactions.filter { !it.isDeleted }.sumOf { it.amount }
-
-		val carryForFirstDay = if (
-			settings.rollOverCarryForward && currentDate.isEqual(settings.startDate)
-		) {
-			settings.rollOverLimit ?: BigDecimal.ZERO
-		} else {
-			BigDecimal.ZERO
-		}
-		val rolloverAmount = if (settings.rollOverCarryForward) {
-			settings.rollOverLimit ?: BigDecimal.ZERO
-		} else {
-			BigDecimal.ZERO
-		}
-		val effectiveTotalBudget = settings.totalBudget.add(rolloverAmount)
-
-		val remainingBudget = effectiveTotalBudget.subtract(totalSpentInPeriod)
-
-		val originalDailyBudget = if (originalTotalDays > 0) {
-			settings.totalBudget.divide(
-				BigDecimal(originalTotalDays), 2, RoundingMode.HALF_UP
-			)
-		} else {
-			BigDecimal.ZERO
-		}
-		logcat(TAG) { "originalDailyBudget=$originalDailyBudget (baseTotalBudget=${settings.totalBudget} / originalTotalDays=$originalTotalDays)" }
-
-		val regularSpentToday =
-			transactions.filter { !it.isDeleted && it.date?.toLocalDate() == currentDate }
-				.sumOf { it.amount }
-		
-		val recurringDueToday = recurringExpenseCalculator.calculateRecurringDueToday(transactions, currentDate)
-		
-		val spentToday = regularSpentToday.add(recurringDueToday)
-		logcat(TAG) { "spentToday=$spentToday (regular=$regularSpentToday + recurring=$recurringDueToday)" }
-
-		val remainingToday = originalDailyBudget.add(carryForFirstDay).subtract(spentToday)
-		logcat(TAG) { "remainingToday=$remainingToday (originalDailyBudget=$originalDailyBudget + carryForFirstDay=$carryForFirstDay - spentToday=$spentToday)" }
-
-		val progress = if (effectiveTotalBudget > BigDecimal.ZERO) {
-			totalSpentInPeriod.divide(effectiveTotalBudget, 4, RoundingMode.HALF_UP).toFloat()
-				.coerceIn(0f, 1f)
-		} else {
-			0f
-		}
-
-		return BudgetState(
-			remainingToday = remainingToday,
-			totalSpentToday = spentToday,
-			dailyBudget = originalDailyBudget,
-			daysRemaining = daysRemaining.coerceAtLeast(0),
-			progress = progress,
-			isOverBudget = remainingBudget < BigDecimal.ZERO,
-			totalBudget = effectiveTotalBudget,
-			totalSpentInPeriod = totalSpentInPeriod.add(recurringDueToday)
-		).also {
-			logcat(TAG) { "BudgetState created: $it" }
-		}
-	}
-	
 }

@@ -1,9 +1,11 @@
 package com.serranoie.app.minus.data.repository
 
+import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.model.UserSettings
 import kotlinx.coroutines.flow.Flow
+import java.math.BigDecimal
 
 /**
  * Repository for managing user settings and preferences.
@@ -11,53 +13,35 @@ import kotlinx.coroutines.flow.Flow
  */
 interface SettingsRepository {
 
-    /**
-     * Observe changes to user settings.
-     */
-    fun observeSettings(): Flow<UserSettings>
+	fun observeSettings(): Flow<UserSettings>
 
-    /**
-     * Get current settings synchronously (first emission).
-     */
-    suspend fun getSettings(): UserSettings
+	fun observeCurrentPeriodRollover(): Flow<Pair<BigDecimal, Boolean>>
 
-    /**
-     * Save whether onboarding has been completed.
-     */
-    suspend fun setOnboardingCompleted(completed: Boolean)
+	fun observeCurrentPeriodBoundary(): Flow<Pair<Long, Long>>
 
-    /**
-     * Save early finish state.
-     */
-    suspend fun setEarlyFinishActive(active: Boolean, actualDate: Long, originalEndDate: Long)
+	suspend fun getCurrentPeriodId(): Long
 
-    /**
-     * Save current period information.
-     */
-    suspend fun setCurrentPeriod(periodId: Long, startedAt: Long)
+	suspend fun getSettings(): UserSettings
 
-    /**
-     * Save notification time preferences.
-     */
-    suspend fun setNotificationTime(hour: Int, minute: Int)
+	suspend fun setOnboardingCompleted(completed: Boolean)
 
-    /**
-     * Save theme mode preference.
-     */
-    suspend fun setThemeMode(mode: ThemeMode)
+	suspend fun setEarlyFinishActive(active: Boolean, actualDate: Long, originalEndDate: Long)
 
-    /**
-     * Save typography mode preference.
-     */
-    suspend fun setTypographyMode(mode: TypographyMode)
+	suspend fun setCurrentPeriod(periodId: Long, startedAt: Long)
 
-    /**
-     * Save dynamic color preference.
-     */
-    suspend fun setDynamicColorEnabled(enabled: Boolean)
+	suspend fun setCurrentPeriodRollover(amount: BigDecimal, carryForward: Boolean)
 
-    /**
-     * Clear early finish state.
-     */
-    suspend fun clearEarlyFinish()
+	suspend fun setPendingRollover(amount: BigDecimal, strategy: RemainingBudgetStrategy)
+
+	suspend fun clearPendingRollover()
+
+	suspend fun setNotificationTime(hour: Int, minute: Int)
+
+	suspend fun setThemeMode(mode: ThemeMode)
+
+	suspend fun setTypographyMode(mode: TypographyMode)
+
+	suspend fun setDynamicColorEnabled(enabled: Boolean)
+
+	suspend fun clearEarlyFinish()
 }

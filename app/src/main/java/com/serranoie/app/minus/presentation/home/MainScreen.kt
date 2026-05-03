@@ -57,7 +57,9 @@ import com.serranoie.app.minus.LocalWindowSize
 import com.serranoie.app.minus.ONBOARDING_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.budget.NumpadWithViewModel
-import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetSystemIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetTransactionIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetEditorIntent
 import com.serranoie.app.minus.presentation.editor.AnimState
 import com.serranoie.app.minus.presentation.editor.EditorWithViewModel
 import com.serranoie.app.minus.presentation.history.History
@@ -126,7 +128,7 @@ fun MainScreen(
 	val snackbarHostState = remember { SnackbarHostState() }
 
 	fun executeDelete(transaction: com.serranoie.app.minus.domain.model.Transaction) {
-		budgetViewModel.processIntent(BudgetUiIntent.DeleteTransactionTapped(transaction))
+		budgetViewModel.processIntent(BudgetTransactionIntent.DeleteTransactionTapped(transaction))
 	}
 
 	fun cancelPendingDelete() {
@@ -135,7 +137,7 @@ fun MainScreen(
 		snackbarAutoDismissJob?.cancel()
 		snackbarAutoDismissJob = null
 		pendingDeleteTransaction?.let { tx ->
-			budgetViewModel.processIntent(BudgetUiIntent.RestoreTransactionTapped(tx))
+			budgetViewModel.processIntent(BudgetTransactionIntent.RestoreTransactionTapped(tx))
 		}
 		pendingDeleteTransaction = null
 		snackbarHostState.currentSnackbarData?.dismiss()
@@ -190,7 +192,7 @@ fun MainScreen(
 			totalDrag += dragAmount
 		}, onDragEnd = {
 			if (kotlin.math.abs(totalDrag) > 120f) {
-				budgetViewModel.processIntent(BudgetUiIntent.SetAnimState(AnimState.EDITING))
+				budgetViewModel.processIntent(BudgetEditorIntent.SetAnimState(AnimState.EDITING))
 				coroutineScope.launch {
 					runCatching { topSheetState.animateTo(TopSheetValue.HalfExpanded) }
 				}

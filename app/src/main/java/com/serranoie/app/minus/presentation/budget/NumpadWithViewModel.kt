@@ -9,7 +9,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorStat
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiEffect
-import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import android.util.Log
 
@@ -47,39 +47,39 @@ fun NumpadWithViewModel(
         ),
         isCalculation = uiState.value.isCalculation,
         onNumberInput = { digit ->
-            viewModel.processIntent(BudgetUiIntent.NumberTapped(digit.toString()))
+            viewModel.processIntent(BudgetNumpadIntent.NumberTapped(digit.toString()))
         },
         onDotInput = { 
-            viewModel.processIntent(BudgetUiIntent.DotTapped)
+            viewModel.processIntent(BudgetNumpadIntent.DotTapped)
         },
         onEqualsInput = {
-            viewModel.processIntent(BudgetUiIntent.EqualsTapped)
+            viewModel.processIntent(BudgetNumpadIntent.EqualsTapped)
         },
         onBackspace = {
-            viewModel.processIntent(BudgetUiIntent.BackspaceTapped)
+            viewModel.processIntent(BudgetNumpadIntent.BackspaceTapped)
         },
         onBackspaceLongPress = {
-            viewModel.processIntent(BudgetUiIntent.ResetInputTapped)
+            viewModel.processIntent(BudgetNumpadIntent.ResetInputTapped)
         },
         onApply = {
             Log.d("NumpadWithViewModel", "Apply button pressed, processing ApplyTapped intent")
-            viewModel.processIntent(BudgetUiIntent.ApplyTapped)
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
         },
         onDelete = { },
         onCalculationModeChanged = { isEnabled ->
-            viewModel.processIntent(BudgetUiIntent.SetCalculationMode(isEnabled))
+            viewModel.processIntent(BudgetNumpadIntent.SetCalculationMode(isEnabled))
         },
         onOperatorInput = { operator ->
-            viewModel.processIntent(BudgetUiIntent.OperatorTapped(operator))
+            viewModel.processIntent(BudgetNumpadIntent.OperatorTapped(operator))
         },
         onDragProgressChanged = { progress ->
-            viewModel.processIntent(BudgetUiIntent.SetDragProgress(progress))
+            viewModel.processIntent(BudgetNumpadIntent.SetDragProgress(progress))
         },
         onToggleDebug = null,
         onShowSnackbar = onShowSnackbar,
         onActivateTutorial = null,
         onTestNotifications = {
-            viewModel.processIntent(BudgetUiIntent.TriggerTestNotifications)
+            viewModel.processIntent(BudgetNumpadIntent.TriggerTestNotifications)
         },
         numberHintAnchorModifier = numberHintAnchorModifier,
         applyHintAnchorModifier = applyHintAnchorModifier,

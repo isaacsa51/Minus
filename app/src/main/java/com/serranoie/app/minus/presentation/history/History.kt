@@ -66,7 +66,8 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
-import com.serranoie.app.minus.presentation.budget.mvi.BudgetUiIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetSystemIntent
+import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
@@ -110,7 +111,7 @@ fun History(
 		}
 
 	LaunchedEffect(isAtEndOfList) {
-		viewModel.processIntent(BudgetUiIntent.SetLockSwipeable(!isAtEndOfList))
+		viewModel.processIntent(BudgetSystemIntent.SetLockSwipeable(!isAtEndOfList))
 	}
 
 	LaunchedEffect(isAtEndOfList) {
@@ -719,7 +720,7 @@ fun History(
 							subscriptionDay = newSubscriptionDay
 						)
 						viewModel.processIntent(
-							BudgetUiIntent.EditTransactionTapped(
+							BudgetTransactionIntent.EditTransactionTapped(
 								updatedTransaction
 							)
 						)
@@ -750,7 +751,7 @@ fun History(
 		}, confirmButton = {
 			Button(
 				onClick = {
-					viewModel.processIntent(BudgetUiIntent.DeleteTransactionTapped(transaction))
+					viewModel.processIntent(BudgetTransactionIntent.DeleteTransactionTapped(transaction))
 					showDeleteRecurrentDialog = false
 					recurrentToDelete = null
 				}, colors = ButtonDefaults.buttonColors(
@@ -799,7 +800,7 @@ fun History(
 							subscriptionDay = newSubscriptionDay
 						)
 						viewModel.processIntent(
-							BudgetUiIntent.EditTransactionTapped(
+							BudgetTransactionIntent.EditTransactionTapped(
 								updatedTransaction
 							)
 						)

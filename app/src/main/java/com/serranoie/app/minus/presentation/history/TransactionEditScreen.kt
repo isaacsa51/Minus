@@ -183,8 +183,8 @@ fun TransactionEditScreen(
 		) {
 			Text(
 				text = prettyDate(
-				editedDate.atStartOfDay(), forceShowDate = true, showTime = false, human = false
-			),
+					editedDate.atStartOfDay(), forceShowDate = true, showTime = false, human = false
+				),
 				style = MaterialTheme.typography.titleMedium,
 				color = MaterialTheme.colorScheme.onSurface,
 				modifier = Modifier
@@ -261,7 +261,9 @@ fun TransactionEditScreen(
 							modifier = Modifier.size(20.dp)
 						)
 						Text(
-							text = if (isRecurrent) stringResource(R.string.configure_recurrence) else stringResource(R.string.make_recurrent),
+							text = if (isRecurrent) stringResource(R.string.configure_recurrence) else stringResource(
+								R.string.make_recurrent
+							),
 							style = MaterialTheme.typography.bodyMedium
 						)
 					}
@@ -270,7 +272,10 @@ fun TransactionEditScreen(
 						val freqText = when (selectedFrequency) {
 							RecurrentFrequency.WEEKLY -> stringResource(R.string.weekly_with_desc)
 							RecurrentFrequency.BIWEEKLY -> stringResource(R.string.biweekly_with_desc)
-							RecurrentFrequency.MONTHLY -> stringResource(R.string.recurrent_frequency_monthly, subscriptionDay)
+							RecurrentFrequency.MONTHLY -> stringResource(
+								R.string.recurrent_frequency_monthly,
+								subscriptionDay
+							)
 						}
 						Text(
 							text = freqText,
@@ -503,7 +508,8 @@ private fun RecurrentConfigBottomSheetContent(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = stringResource(R.string.configure_recurrence), style = MaterialTheme.typography.headlineSmall
+				text = stringResource(R.string.configure_recurrence),
+				style = MaterialTheme.typography.headlineSmall
 			)
 
 			TextButton(onClick = onDismiss) {
@@ -519,7 +525,8 @@ private fun RecurrentConfigBottomSheetContent(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
-				text = stringResource(R.string.recurrent_expense), style = MaterialTheme.typography.bodyLarge
+				text = stringResource(R.string.recurrent_expense),
+				style = MaterialTheme.typography.bodyLarge
 			)
 			Switch(
 				checked = isRecurrent, onCheckedChange = onIsRecurrentChange
@@ -536,10 +543,13 @@ private fun RecurrentConfigBottomSheetContent(
 			) {
 				OutlinedTextField(
 					value = when (selectedFrequency) {
-					RecurrentFrequency.WEEKLY -> stringResource(R.string.weekly_with_desc)
-					RecurrentFrequency.BIWEEKLY -> stringResource(R.string.biweekly_with_desc)
-					RecurrentFrequency.MONTHLY -> stringResource(R.string.recurrent_frequency_monthly, subscriptionDay)
-				},
+						RecurrentFrequency.WEEKLY -> stringResource(R.string.weekly_with_desc)
+						RecurrentFrequency.BIWEEKLY -> stringResource(R.string.biweekly_with_desc)
+						RecurrentFrequency.MONTHLY -> stringResource(
+							R.string.recurrent_frequency_monthly,
+							subscriptionDay
+						)
+					},
 					onValueChange = {},
 					readOnly = true,
 					label = { Text(stringResource(R.string.frequency_label)) },
@@ -554,15 +564,26 @@ private fun RecurrentConfigBottomSheetContent(
 				ExposedDropdownMenu(
 					expanded = showFrequencyDropdown,
 					onDismissRequest = { showFrequencyDropdown = false }) {
-					DropdownMenuItem(text = { Text(stringResource(R.string.weekly_with_desc)) }, onClick = {
-						onFrequencyChange(RecurrentFrequency.WEEKLY)
-						showFrequencyDropdown = false
-					})
-					DropdownMenuItem(text = { Text(stringResource(R.string.biweekly_with_desc)) }, onClick = {
-						onFrequencyChange(RecurrentFrequency.BIWEEKLY)
-						showFrequencyDropdown = false
-					})
-					DropdownMenuItem(text = { Text(stringResource(R.string.recurrent_frequency_monthly, subscriptionDay)) }, onClick = {
+					DropdownMenuItem(
+						text = { Text(stringResource(R.string.weekly_with_desc)) },
+						onClick = {
+							onFrequencyChange(RecurrentFrequency.WEEKLY)
+							showFrequencyDropdown = false
+						})
+					DropdownMenuItem(
+						text = { Text(stringResource(R.string.biweekly_with_desc)) },
+						onClick = {
+							onFrequencyChange(RecurrentFrequency.BIWEEKLY)
+							showFrequencyDropdown = false
+						})
+					DropdownMenuItem(text = {
+						Text(
+							stringResource(
+								R.string.recurrent_frequency_monthly,
+								subscriptionDay
+							)
+						)
+					}, onClick = {
 						onFrequencyChange(RecurrentFrequency.MONTHLY)
 						showFrequencyDropdown = false
 					})
