@@ -29,15 +29,14 @@ import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
-import java.text.NumberFormat
-import java.util.Currency
 import java.util.Date
-import java.util.Locale
 
 data class CategoryAnalyticsState(
 	val periodFinished: Boolean = false,
@@ -70,9 +69,7 @@ fun CategoryAnalytics(
 
 	// Group category transactions by date for the history list
 	val groupedCategoryTransactions = remember(state.categorySpends) {
-		state.categorySpends
-			.sortedByDescending { it.date }
-			.groupBy { it.date?.toLocalDate() }
+		state.categorySpends.sortedByDescending { it.date }.groupBy { it.date?.toLocalDate() }
 			.toSortedMap(compareByDescending { it })
 	}
 
@@ -85,28 +82,25 @@ fun CategoryAnalytics(
 				.padding(bottom = navigationBarHeight)
 				.padding(horizontal = 16.dp)
 		) {
-			// Title and Category Name
 			Column(
 				modifier = Modifier.fillMaxWidth(),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				Text(
 					text = stringResource(R.string.analytics_title),
-					style = MaterialTheme.typography.headlineMedium,
-					fontWeight = FontWeight.Bold,
+					style = MaterialTheme.typography.titleMediumEmphasized,
 					color = MaterialTheme.colorScheme.onSurface
 				)
 				Spacer(modifier = Modifier.height(4.dp))
 				Text(
 					text = state.categoryName,
-					style = MaterialTheme.typography.titleMedium,
+					style = MaterialTheme.typography.titleSmallEmphasized,
 					color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
 				)
 			}
 
 			Spacer(modifier = Modifier.height(24.dp))
 
-			// Spends Chart for this category - requires at least 2 transactions
 			if (state.categorySpends.size >= 2) {
 				Surface(
 					modifier = Modifier
@@ -115,16 +109,15 @@ fun CategoryAnalytics(
 					color = MaterialTheme.colorScheme.surface
 				) {
 					SpendsChart(
-						spends = state.categorySpends,
-						modifier = Modifier.fillMaxWidth()
+						spends = state.categorySpends, modifier = Modifier.fillMaxWidth()
 					)
 				}
 
 				Spacer(modifier = Modifier.height(24.dp))
 			} else if (state.categorySpends.size == 1) {
-				// Show simple single transaction visualization
 				val transaction = state.categorySpends.first()
-				val currencyFormat = com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat("USD")
+				val currencyFormat =
+					symbolOnlyCurrencyFormat("USD")
 
 				Card(
 					modifier = Modifier
@@ -143,13 +136,13 @@ fun CategoryAnalytics(
 					) {
 						Text(
 							text = stringResource(R.string.single_expense),
-							style = MaterialTheme.typography.labelMedium,
+							style = MaterialTheme.typography.labelMediumCondensed,
 							color = MaterialTheme.colorScheme.onSurfaceVariant
 						)
 						Spacer(modifier = Modifier.height(8.dp))
 						Text(
 							text = currencyFormat.format(transaction.amount),
-							style = MaterialTheme.typography.headlineMedium,
+							style = MaterialTheme.typography.headlineSmallEmphasized,
 							fontWeight = FontWeight.Bold,
 							color = MaterialTheme.colorScheme.onSurface
 						)
@@ -159,15 +152,17 @@ fun CategoryAnalytics(
 				Spacer(modifier = Modifier.height(24.dp))
 			}
 
-			AverageSpendCard(
-				spends = state.categorySpends,
-				startDate = state.startPeriodDate,
-				finishDate = state.finishPeriodDate,
-				currency = "MXN",
-				modifier = Modifier.fillMaxWidth()
-			)
+			if (state.categorySpends.size > 1) {
+				AverageSpendCard(
+					spends = state.categorySpends,
+					startDate = state.startPeriodDate,
+					finishDate = state.finishPeriodDate,
+					currency = "MXN",
+					modifier = Modifier.fillMaxWidth()
+				)
 
-			Spacer(modifier = Modifier.height(24.dp))
+				Spacer(modifier = Modifier.height(24.dp))
+			}
 
 			if (state.categorySpends.isNotEmpty()) {
 				Text(
@@ -179,20 +174,18 @@ fun CategoryAnalytics(
 
 				Spacer(modifier = Modifier.height(8.dp))
 
-				// History of expenses for this category only
-				val currencyFormat = com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat("USD")
+				val currencyFormat =
+					symbolOnlyCurrencyFormat("USD")
 
 				groupedCategoryTransactions.forEach { (date, transactions) ->
 					HistoryDateDivider(date = date)
 
 					transactions.forEach { transaction ->
 						ExpenseItem(
-							transaction = transaction,
-							currencyFormat = currencyFormat
+							transaction = transaction, currencyFormat = currencyFormat
 						)
 					}
 
-					// Day total for this category
 					val dayTotal = transactions.sumOf { it.amount }
 					Box(
 						modifier = Modifier
@@ -237,19 +230,16 @@ private fun PreviewCategoryAnalytics() {
 	MinusTheme {
 		CategoryAnalytics(
 			state = CategoryAnalyticsState(
-				categoryName = "Comida",
-				categorySpends = listOf(
+				categoryName = "Comida", categorySpends = listOf(
 					Transaction(
 						amount = BigDecimal("150.00"),
 						comment = "Comida",
 						date = java.time.LocalDateTime.now().minusDays(2)
-					),
-					Transaction(
+					), Transaction(
 						amount = BigDecimal("85.50"),
 						comment = "Comida",
 						date = java.time.LocalDateTime.now().minusDays(1)
-					),
-					Transaction(
+					), Transaction(
 						amount = BigDecimal("120.00"),
 						comment = "Comida",
 						date = java.time.LocalDateTime.now()
@@ -266,8 +256,7 @@ private fun PreviewCategoryAnalyticsSingle() {
 	MinusTheme {
 		CategoryAnalytics(
 			state = CategoryAnalyticsState(
-				categoryName = "Comida",
-				categorySpends = listOf(
+				categoryName = "Comida", categorySpends = listOf(
 					Transaction(
 						amount = BigDecimal("4.00"),
 						comment = "comida",

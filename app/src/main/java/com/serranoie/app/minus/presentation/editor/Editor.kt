@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BarChart
@@ -416,10 +417,10 @@ private fun EditingContent(
 							modifier = Modifier.fillMaxWidth()
 						) {
 							AutoResizeBasicTextField(
-								value = displayContent,
-								onValueChange = {},
-								readOnly = true,
-								modifier = Modifier.fillMaxWidth(),
+							value = displayContent,
+							onValueChange = {},
+							readOnly = true,
+							modifier = Modifier.wrapContentWidth(Alignment.End),
 								textStyle = baseTextStyle.copy(
 									color = MaterialTheme.colorScheme.onSurface,
 									textAlign = TextAlign.End
@@ -430,16 +431,16 @@ private fun EditingContent(
 								containerSize = containerSizePx
 							)
 							AutoResizeBasicTextField(
-								value = "= ${currencySymbol}$calculationResult",
-								onValueChange = {},
-								readOnly = true,
-								modifier = Modifier
-									.fillMaxWidth()
-									.padding(top = 4.dp),
-								textStyle = MaterialTheme.typography.headlineMedium.copy(
-									color = MaterialTheme.colorScheme.onSurfaceVariant,
-									textAlign = TextAlign.End
-								),
+							value = "= ${currencySymbol}$calculationResult",
+							onValueChange = {},
+							readOnly = true,
+							modifier = Modifier
+								.wrapContentWidth(Alignment.End)
+								.padding(top = 4.dp),
+								textStyle = baseTextStyle.copy(
+								color = MaterialTheme.colorScheme.onSurfaceVariant,
+								textAlign = TextAlign.End
+							),
 								singleLine = true,
 								minFontSize = 16.sp,
 								maxFontSize = 36.sp,
@@ -448,11 +449,11 @@ private fun EditingContent(
 						}
 					} else {
 						AutoResizeBasicTextField(
-							value = displayContent,
-							onValueChange = {},
-							readOnly = true,
-							modifier = Modifier
-								.fillMaxWidth(),
+						value = displayContent,
+						onValueChange = {},
+						readOnly = true,
+						modifier = Modifier
+							.wrapContentWidth(Alignment.End),
 							textStyle = baseTextStyle.copy(
 								color = MaterialTheme.colorScheme.onSurface,
 								textAlign = TextAlign.End

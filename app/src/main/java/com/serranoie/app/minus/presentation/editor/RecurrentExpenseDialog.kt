@@ -118,7 +118,8 @@ fun RecurrentExpenseDialog(
 	AlertDialog(modifier = modifier, onDismissRequest = onDismiss, title = {
 		Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
 			Text(
-				text = stringResource(R.string.recurrent_expense), style = MaterialTheme.typography.titleLargeEmphasized
+				text = stringResource(R.string.recurrent_expense),
+				style = MaterialTheme.typography.titleLargeEmphasized
 			)
 			Text(
 				text = stringResource(R.string.recurrent_expense_details),
@@ -130,7 +131,10 @@ fun RecurrentExpenseDialog(
 		Column(
 			modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			Text(stringResource(R.string.recurrent_expense_frequency_subtitle), style = MaterialTheme.typography.labelMediumCondensed)
+			Text(
+				stringResource(R.string.recurrent_expense_frequency_subtitle),
+				style = MaterialTheme.typography.labelMediumCondensed
+			)
 
 			val options = listOf(
 				stringResource(R.string.recurrent_frequency_weekly),
@@ -244,7 +248,9 @@ fun RecurrentExpenseDialog(
 			OutlinedCard(
 				modifier = Modifier.fillMaxWidth(),
 				shape = MaterialTheme.shapes.large,
-				border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+				border = BorderStroke(
+					1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+				),
 				colors = CardDefaults.outlinedCardColors(
 					containerColor = Color.Transparent
 				),
@@ -283,11 +289,17 @@ fun RecurrentExpenseDialog(
 					if (selectedFrequency == RecurrentFrequency.MONTHLY) selectedDay else null
 				)
 			}) {
-			Text(stringResource(R.string.save))
+			Text(
+				stringResource(R.string.save),
+				style = MaterialTheme.typography.labelMediumEmphasized
+			)
 		}
 	}, dismissButton = {
 		TextButton(onClick = onDismiss) {
-			Text(stringResource(R.string.cancel))
+			Text(
+				stringResource(R.string.cancel),
+				style = MaterialTheme.typography.labelMediumEmphasized
+			)
 		}
 	})
 }
@@ -302,8 +314,13 @@ private fun buildRecurrentSummary(
 	val formattedDate = selectedEndDate.format(formatter)
 	return when (frequency) {
 		RecurrentFrequency.WEEKLY -> stringResource(R.string.summary_weekly_format, formattedDate)
-		RecurrentFrequency.BIWEEKLY -> stringResource(R.string.summary_biweekly_format, formattedDate)
-		RecurrentFrequency.MONTHLY -> stringResource(R.string.summary_monthly_format, selectedDay, formattedDate)
+		RecurrentFrequency.BIWEEKLY -> stringResource(
+			R.string.summary_biweekly_format, formattedDate
+		)
+
+		RecurrentFrequency.MONTHLY -> stringResource(
+			R.string.summary_monthly_format, selectedDay, formattedDate
+		)
 	}
 }
 

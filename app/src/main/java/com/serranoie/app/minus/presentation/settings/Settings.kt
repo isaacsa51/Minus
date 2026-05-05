@@ -237,7 +237,8 @@ fun Settings(
 							Text(
 								text = stringResource(R.string.settings_material_you_subtitle),
 								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
+								color = MaterialTheme.colorScheme.onSurfaceVariant,
+								modifier = Modifier.padding(end = 4.dp)
 							)
 						}
 						Switch(
@@ -464,40 +465,40 @@ fun Settings(
 					}
 				}
 			}
-
-			item {
-				PaddedListGroup(
-					title = stringResource(R.string.settings_section_tutorial)
-				) {
-					CustomPaddedListItem(
-						onClick = {
-							onResetTutorial()
-							view.toggleFeedback()
-						},
-						position = PaddedListItemPosition.Single,
-						modifier = Modifier.testTag("SettingsResetTutorialItem")
-					) {
-						Icon(
-							imageVector = Icons.Default.Refresh,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_reset_tutorial_title),
-								style = MaterialTheme.typography.bodyLarge,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_reset_tutorial_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
-				}
-			}
+//
+//			item {
+//				PaddedListGroup(
+//					title = stringResource(R.string.settings_section_tutorial)
+//				) {
+//					CustomPaddedListItem(
+//						onClick = {
+//							onResetTutorial()
+//							view.toggleFeedback()
+//						},
+//						position = PaddedListItemPosition.Single,
+//						modifier = Modifier.testTag("SettingsResetTutorialItem")
+//					) {
+//						Icon(
+//							imageVector = Icons.Default.Refresh,
+//							contentDescription = null,
+//							tint = MaterialTheme.colorScheme.primary
+//						)
+//						Spacer(modifier = Modifier.width(16.dp))
+//						Column(modifier = Modifier.weight(1f)) {
+//							Text(
+//								text = stringResource(R.string.settings_reset_tutorial_title),
+//								style = MaterialTheme.typography.bodyLarge,
+//								color = MaterialTheme.colorScheme.onSurface
+//							)
+//							Text(
+//								text = stringResource(R.string.settings_reset_tutorial_subtitle),
+//								style = MaterialTheme.typography.bodySmall,
+//								color = MaterialTheme.colorScheme.onSurfaceVariant
+//							)
+//						}
+//					}
+//				}
+//			}
 		}
 
 		if (showThemeDialog) {

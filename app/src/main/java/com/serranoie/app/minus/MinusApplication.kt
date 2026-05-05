@@ -4,15 +4,15 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import androidx.hilt.work.HiltWorkerFactory
-import com.serranoie.app.minus.wearsync.PhoneWearMessageListener
 import androidx.work.Configuration
+import com.serranoie.app.minus.wearsync.PhoneWearMessageListener
 import dagger.hilt.android.HiltAndroidApp
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import javax.inject.Inject
 
 @HiltAndroidApp
-class MinusApplication: Application(), Configuration.Provider {
+class MinusApplication : Application(), Configuration.Provider {
 
 	@Inject
 	lateinit var workerFactory: HiltWorkerFactory
@@ -24,7 +24,7 @@ class MinusApplication: Application(), Configuration.Provider {
 		get() = Configuration.Builder()
 			.setWorkerFactory(workerFactory)
 			.build()
-	
+
 	override fun onCreate() {
 		super.onCreate()
 		// Log all priorities in debug builds, no-op in release builds.

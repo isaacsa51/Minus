@@ -54,6 +54,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudge
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendsCountCard
 import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import java.math.BigDecimal
 import java.util.Date
 
@@ -270,7 +271,7 @@ Spacer(modifier = Modifier.height(16.dp))
 				) {
 					Text(
 						text = stringResource(R.string.new_budget),
-						style = MaterialTheme.typography.bodyLarge,
+						style = MaterialTheme.typography.labelMediumEmphasized,
 					)
 				}
 			}

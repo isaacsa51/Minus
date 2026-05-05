@@ -1,5 +1,7 @@
 package com.serranoie.app.minus.presentation.history
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,27 +15,36 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
@@ -46,7 +57,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,11 +73,13 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.launch
@@ -73,6 +90,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Transaction as NumpadTransaction
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -170,7 +189,9 @@ fun TransactionEditScreen(
 				),
 				style = MaterialTheme.typography.titleMediumEmphasized,
 				color = MaterialTheme.colorScheme.onSurface,
-				modifier = Modifier.padding(start = 8.dp)
+				modifier = Modifier
+					.padding(start = 8.dp)
+					.basicMarquee()
 			)
 		}
 
@@ -192,13 +213,13 @@ fun TransactionEditScreen(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null
 					) { showDatePicker = true }
-					.padding(horizontal = 8.dp, vertical = 4.dp))
+					.padding(horizontal = 2.dp, vertical = 4.dp))
 
 			Text(
-				text = "•",
+				text = "—",
 				style = MaterialTheme.typography.titleMedium,
 				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-				modifier = Modifier.padding(horizontal = 8.dp)
+				modifier = Modifier.padding(horizontal = 4.dp)
 			)
 
 			Text(
@@ -210,7 +231,7 @@ fun TransactionEditScreen(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null
 					) { showTimePicker = true }
-					.padding(horizontal = 8.dp, vertical = 4.dp))
+					.padding(horizontal = 2.dp, vertical = 4.dp))
 		}
 
 		Box(
@@ -263,8 +284,7 @@ fun TransactionEditScreen(
 						Text(
 							text = if (isRecurrent) stringResource(R.string.configure_recurrence) else stringResource(
 								R.string.make_recurrent
-							),
-							style = MaterialTheme.typography.bodyMedium
+							), style = MaterialTheme.typography.labelSmallEmphasized
 						)
 					}
 
@@ -273,14 +293,14 @@ fun TransactionEditScreen(
 							RecurrentFrequency.WEEKLY -> stringResource(R.string.weekly_with_desc)
 							RecurrentFrequency.BIWEEKLY -> stringResource(R.string.biweekly_with_desc)
 							RecurrentFrequency.MONTHLY -> stringResource(
-								R.string.recurrent_frequency_monthly,
-								subscriptionDay
+								R.string.recurrent_frequency_monthly, subscriptionDay
 							)
 						}
 						Text(
 							text = freqText,
 							style = MaterialTheme.typography.bodySmall,
-							color = MaterialTheme.colorScheme.primary
+							color = MaterialTheme.colorScheme.primary,
+							modifier = Modifier.basicMarquee()
 						)
 					}
 				}
@@ -359,7 +379,6 @@ fun TransactionEditScreen(
 			onCalculationModeChanged = { isCalculation = it },
 			onOperatorInput = { operator ->
 				val lastChar = editedAmount.lastOrNull()
-				// Only allow operator if last char is a number (not operator/dot)
 				if (editedAmount.isNotEmpty() && lastChar != null && lastChar !in "+-×÷" && lastChar != '.') {
 					editedAmount += operator.toString()
 				}
@@ -464,13 +483,15 @@ fun TransactionEditScreen(
 		) {
 			RecurrentConfigBottomSheetContent(
 				isRecurrent = isRecurrent,
-				onIsRecurrentChange = { isRecurrent = it },
 				selectedFrequency = selectedFrequency,
-				onFrequencyChange = { selectedFrequency = it },
 				subscriptionDay = subscriptionDay,
-				onSubscriptionDayChange = { subscriptionDay = it },
 				recurrentEndDate = recurrentEndDate,
-				onEndDateChange = { recurrentEndDate = it },
+				onSaveConfiguration = { newIsRecurrent, newFrequency, newSubscriptionDay, newEndDate ->
+					isRecurrent = newIsRecurrent
+					selectedFrequency = newFrequency
+					subscriptionDay = newSubscriptionDay
+					recurrentEndDate = newEndDate
+				},
 				onDismiss = {
 					scope.launch { sheetState.hide() }.invokeOnCompletion {
 						showRecurrentBottomSheet = false
@@ -480,22 +501,24 @@ fun TransactionEditScreen(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun RecurrentConfigBottomSheetContent(
 	isRecurrent: Boolean,
-	onIsRecurrentChange: (Boolean) -> Unit,
 	selectedFrequency: RecurrentFrequency,
-	onFrequencyChange: (RecurrentFrequency) -> Unit,
 	subscriptionDay: Int,
-	onSubscriptionDayChange: (Int) -> Unit,
 	recurrentEndDate: LocalDate,
-	onEndDateChange: (LocalDate) -> Unit,
+	onSaveConfiguration: (Boolean, RecurrentFrequency, Int, LocalDate) -> Unit,
 	onDismiss: () -> Unit
 ) {
-	var showFrequencyDropdown by remember { mutableStateOf(false) }
-	var showDayDropdown by remember { mutableStateOf(false) }
 	var showEndDatePicker by remember { mutableStateOf(false) }
+	var localIsRecurrent by remember(isRecurrent) { mutableStateOf(isRecurrent) }
+	var localSelectedFrequency by remember(selectedFrequency) { mutableStateOf(selectedFrequency) }
+	var localSubscriptionDay by remember(subscriptionDay) { mutableIntStateOf(subscriptionDay) }
+	var localRecurrentEndDate by remember(recurrentEndDate) { mutableStateOf(recurrentEndDate) }
+	val today = LocalDate.now()
+	val maxSelectableDate = today.plusMonths(12)
+	val dateFormatter = remember { DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault()) }
 
 	Column(
 		modifier = Modifier
@@ -509,11 +532,23 @@ private fun RecurrentConfigBottomSheetContent(
 		) {
 			Text(
 				text = stringResource(R.string.configure_recurrence),
-				style = MaterialTheme.typography.headlineSmall
+				style = MaterialTheme.typography.titleMediumEmphasized,
 			)
 
-			TextButton(onClick = onDismiss) {
-				Text(stringResource(R.string.done))
+			IconButton(onClick = {
+				onSaveConfiguration(
+					localIsRecurrent,
+					localSelectedFrequency,
+					localSubscriptionDay,
+					localRecurrentEndDate,
+				)
+				onDismiss()
+			}) {
+				Icon(
+					imageVector = Icons.Default.SaveAlt,
+					contentDescription = stringResource(R.string.save),
+					tint = MaterialTheme.colorScheme.onSurface
+				)
 			}
 		}
 
@@ -529,115 +564,168 @@ private fun RecurrentConfigBottomSheetContent(
 				style = MaterialTheme.typography.bodyLarge
 			)
 			Switch(
-				checked = isRecurrent, onCheckedChange = onIsRecurrentChange
+				checked = localIsRecurrent,
+				onCheckedChange = { localIsRecurrent = it }
 			)
 		}
 
-		if (isRecurrent) {
-			Spacer(modifier = Modifier.height(24.dp))
+		if (localIsRecurrent) {
+			Spacer(modifier = Modifier.height(16.dp))
 
-			ExposedDropdownMenuBox(
-				expanded = showFrequencyDropdown,
-				onExpandedChange = { showFrequencyDropdown = it },
-				modifier = Modifier.fillMaxWidth()
+			Text(
+				stringResource(R.string.recurrent_expense_frequency_subtitle),
+				style = MaterialTheme.typography.labelMediumCondensed
+			)
+
+			val options = listOf(
+				stringResource(R.string.recurrent_frequency_weekly),
+				stringResource(R.string.recurrent_frequency_biweekly),
+				stringResource(R.string.recurrent_frequency_monthly)
+			)
+			val frequencies = listOf(
+				RecurrentFrequency.WEEKLY,
+				RecurrentFrequency.BIWEEKLY,
+				RecurrentFrequency.MONTHLY,
+			)
+			val selectedIndex = frequencies.indexOf(localSelectedFrequency).coerceAtLeast(0)
+
+			Row(
+				Modifier.padding(horizontal = 8.dp),
+				horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
 			) {
-				OutlinedTextField(
-					value = when (selectedFrequency) {
-						RecurrentFrequency.WEEKLY -> stringResource(R.string.weekly_with_desc)
-						RecurrentFrequency.BIWEEKLY -> stringResource(R.string.biweekly_with_desc)
-						RecurrentFrequency.MONTHLY -> stringResource(
-							R.string.recurrent_frequency_monthly,
-							subscriptionDay
-						)
-					},
-					onValueChange = {},
-					readOnly = true,
-					label = { Text(stringResource(R.string.frequency_label)) },
-					trailingIcon = {
-						ExposedDropdownMenuDefaults.TrailingIcon(expanded = showFrequencyDropdown)
-					},
-					modifier = Modifier
-						.fillMaxWidth()
-						.menuAnchor(MenuAnchorType.PrimaryNotEditable)
-				)
+				val modifiers =
+					listOf(Modifier.weight(1f), Modifier.weight(1.5f), Modifier.weight(1f))
 
-				ExposedDropdownMenu(
-					expanded = showFrequencyDropdown,
-					onDismissRequest = { showFrequencyDropdown = false }) {
-					DropdownMenuItem(
-						text = { Text(stringResource(R.string.weekly_with_desc)) },
-						onClick = {
-							onFrequencyChange(RecurrentFrequency.WEEKLY)
-							showFrequencyDropdown = false
-						})
-					DropdownMenuItem(
-						text = { Text(stringResource(R.string.biweekly_with_desc)) },
-						onClick = {
-							onFrequencyChange(RecurrentFrequency.BIWEEKLY)
-							showFrequencyDropdown = false
-						})
-					DropdownMenuItem(text = {
-						Text(
-							stringResource(
-								R.string.recurrent_frequency_monthly,
-								subscriptionDay
-							)
-						)
-					}, onClick = {
-						onFrequencyChange(RecurrentFrequency.MONTHLY)
-						showFrequencyDropdown = false
-					})
+				options.forEachIndexed { index, label ->
+					ToggleButton(
+						checked = selectedIndex == index,
+						onCheckedChange = { localSelectedFrequency = frequencies[index] },
+						modifier = modifiers[index].semantics { role = Role.RadioButton },
+						shapes = when (index) {
+							0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+							options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+							else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+						},
+					) {
+						Text(label)
+					}
 				}
 			}
 
 			Spacer(modifier = Modifier.height(16.dp))
 
-			if (selectedFrequency == RecurrentFrequency.MONTHLY) {
-				ExposedDropdownMenuBox(
-					expanded = showDayDropdown,
-					onExpandedChange = { showDayDropdown = it },
-					modifier = Modifier.fillMaxWidth()
+			if (localSelectedFrequency == RecurrentFrequency.MONTHLY) {
+				Surface(
+					shape = MaterialTheme.shapes.medium,
+					color = MaterialTheme.colorScheme.surfaceContainer
 				) {
-					OutlinedTextField(
-						value = "$subscriptionDay",
-						onValueChange = {},
-						readOnly = true,
-						label = { Text(stringResource(R.string.billing_day)) },
-						trailingIcon = {
-							ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDayDropdown)
-						},
+					Row(
 						modifier = Modifier
 							.fillMaxWidth()
-							.menuAnchor(MenuAnchorType.PrimaryNotEditable)
-					)
+							.padding(horizontal = 8.dp, vertical = 4.dp),
+						verticalAlignment = Alignment.CenterVertically,
+						horizontalArrangement = Arrangement.SpaceBetween
+					) {
+						IconButton(onClick = {
+							localSubscriptionDay = (localSubscriptionDay - 1).coerceAtLeast(1)
+						}) {
+							Icon(
+								Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+								contentDescription = stringResource(R.string.previous_day),
+								modifier = Modifier.size(18.dp)
+							)
+						}
 
-					ExposedDropdownMenu(
-						expanded = showDayDropdown,
-						onDismissRequest = { showDayDropdown = false }) {
-						(1..31).forEach { day ->
-							DropdownMenuItem(text = { Text("$day") }, onClick = {
-								onSubscriptionDayChange(day)
-								showDayDropdown = false
-							})
+						Text(
+							text = stringResource(R.string.monthly_on_day_format, localSubscriptionDay),
+							style = MaterialTheme.typography.titleMedium
+						)
+
+						IconButton(onClick = {
+							localSubscriptionDay = (localSubscriptionDay + 1).coerceAtMost(31)
+						}) {
+							Icon(
+								Icons.AutoMirrored.Filled.KeyboardArrowRight,
+								contentDescription = stringResource(R.string.next_day),
+								modifier = Modifier.size(18.dp)
+							)
 						}
 					}
 				}
-
 				Spacer(modifier = Modifier.height(16.dp))
 			}
 
+			Text(
+				text = stringResource(R.string.limit_date),
+				style = MaterialTheme.typography.labelMediumCondensed,
+				modifier = Modifier.padding(bottom = 4.dp)
+			)
+
 			OutlinedTextField(
-				value = recurrentEndDate.toString(),
+				value = localRecurrentEndDate.format(dateFormatter),
 				onValueChange = {},
 				readOnly = true,
-				label = { Text(stringResource(R.string.end_date)) },
+				placeholder = { Text(stringResource(R.string.date_placeholder)) },
 				trailingIcon = {
-					TextButton(onClick = { showEndDatePicker = true }) {
-						Text(stringResource(R.string.change_date))
-					}
+					Icon(
+						imageVector = Icons.Default.CalendarToday,
+						contentDescription = null,
+						tint = MaterialTheme.colorScheme.outlineVariant,
+					)
 				},
-				modifier = Modifier.fillMaxWidth()
+				shape = RoundedCornerShape(14.dp),
+				colors = OutlinedTextFieldDefaults.colors(
+					focusedBorderColor = MaterialTheme.colorScheme.surfaceContainer,
+					unfocusedBorderColor = MaterialTheme.colorScheme.surfaceContainer,
+					focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+					unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+				),
+				modifier = Modifier.fillMaxWidth(),
+				singleLine = true,
 			)
+
+			TextButton(
+				onClick = { showEndDatePicker = true },
+				modifier = Modifier.align(Alignment.End)
+			) {
+				Text(stringResource(R.string.change_date))
+			}
+
+			OutlinedCard(
+				modifier = Modifier.fillMaxWidth(),
+				shape = MaterialTheme.shapes.large,
+				border = BorderStroke(
+					1.dp,
+					MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+				),
+				colors = CardDefaults.outlinedCardColors(
+					containerColor = Color.Transparent
+				),
+			) {
+				Row(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = 12.dp, vertical = 14.dp),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
+				) {
+					Icon(
+						imageVector = Icons.Default.Info,
+						contentDescription = null,
+						tint = MaterialTheme.colorScheme.outline,
+					)
+					Text(
+						text = buildRecurrentSummary(
+							frequency = localSelectedFrequency,
+							selectedDay = localSubscriptionDay,
+							selectedEndDate = localRecurrentEndDate,
+							formatter = dateFormatter,
+						),
+						style = MaterialTheme.typography.bodySmallCondensed,
+						color = MaterialTheme.colorScheme.onSurface,
+					)
+				}
+			}
 		}
 
 		Spacer(modifier = Modifier.height(32.dp))
@@ -645,21 +733,28 @@ private fun RecurrentConfigBottomSheetContent(
 
 	if (showEndDatePicker) {
 		val datePickerState = rememberDatePickerState(
-			initialSelectedDateMillis = recurrentEndDate.atStartOfDay(ZoneId.systemDefault())
-				.toInstant().toEpochMilli()
+			initialSelectedDateMillis = localRecurrentEndDate.atStartOfDay(ZoneId.systemDefault())
+				.toInstant().toEpochMilli(),
+			selectableDates = object : SelectableDates {
+				override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+					val date = Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneId.systemDefault())
+						.toLocalDate()
+					return date.isAfter(today) && !date.isAfter(maxSelectableDate)
+				}
+			}
 		)
 
 		DatePickerDialog(onDismissRequest = { showEndDatePicker = false }, confirmButton = {
 			TextButton(
 				onClick = {
 					datePickerState.selectedDateMillis?.let { millis ->
-						onEndDateChange(
+						localRecurrentEndDate =
 							Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
 								.toLocalDate()
-						)
 					}
 					showEndDatePicker = false
-				}) {
+				}
+			) {
 				Text(stringResource(R.string.accept))
 			}
 		}, dismissButton = {
@@ -716,6 +811,26 @@ fun TransactionEditScreenRecurringPreview() {
 	}
 }
 
+@Composable
+private fun buildRecurrentSummary(
+	frequency: RecurrentFrequency,
+	selectedDay: Int,
+	selectedEndDate: LocalDate,
+	formatter: DateTimeFormatter
+): String {
+	val formattedDate = selectedEndDate.format(formatter)
+	return when (frequency) {
+		RecurrentFrequency.WEEKLY -> stringResource(R.string.summary_weekly_format, formattedDate)
+		RecurrentFrequency.BIWEEKLY -> stringResource(
+			R.string.summary_biweekly_format, formattedDate
+		)
+
+		RecurrentFrequency.MONTHLY -> stringResource(
+			R.string.summary_monthly_format, selectedDay, formattedDate
+		)
+	}
+}
+
 private fun evaluateCalculation(input: String): String? {
 	if (input.isBlank()) return null
 
@@ -735,7 +850,7 @@ private fun evaluateCalculation(input: String): String? {
 			}
 		}
 
-		val tokenPattern = Regex("([+-*/])")
+		val tokenPattern = Regex("([+\\-*/])")
 		val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
 		val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
 

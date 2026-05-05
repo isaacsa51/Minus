@@ -76,12 +76,12 @@
     <string name="single_expense">Gasto único</string>
     <string name="add_expense">+ Agregar Gasto</string>
     <string name="finalize_period_question">¿Finalizar período?</string>
-    <string name="finalize_period">Finalizar el período presupuestario anticipadamente</string>
+    <string name="finalize_period">Finalizar periodo de ahorro temprano</string>
     <string name="finalize_period_confirm">Esto cerrará el período actual y comenzará uno nuevo. ¿Está seguro?</string>
     <string name="finalize_action">Finalizar</string>
     <string name="no_ending_date">Sin fecha de finalización</string>
     <string name="budget_split_logic">¿Cómo quieres dividir el presupuesto?</string>
-    <string name="new_budget_period">Nuevo período presupuestario</string>
+    <string name="new_budget_period">Nuevo período de ahorro</string>
 
 
     <string name="expense_deleted_format">%1$s eliminado</string>
@@ -98,7 +98,7 @@
     <string name="budget_no_days_defined">No hay días definidos</string>
     <string name="budget_less_than_one_day_validation">El presupuesto debe ser para al menos un día.</string>
 
-    <string name="analytics_title">Analítica</string>
+    <string name="analytics_title">Análisis</string>
 
     <plurals name="days">
         <item quantity="one">%d día</item>
@@ -106,8 +106,8 @@
     </plurals>
 
     <plurals name="analytics_days_left">
-        <item quantity="one">%d día restante</item>
-        <item quantity="other">%d quedan días</item>
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
     </plurals>
 
     <string name="total_budget">Presupuesto total</string>
@@ -174,12 +174,12 @@
     <string name="settings_theme_subtitle">Cambiar el estilo del tema de la aplicación</string>
     <string name="settings_typography_title">Tipografía</string>
     <string name="settings_typography_subtitle">Cambiar el estilo de tipografía de la aplicación</string>
-    <string name="settings_material_you_title">material usted</string>
+    <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Utilice colores de fondo de pantalla para aplicar un tema de aplicación dinámico</string>
 
     <string name="settings_period_end_time_title">Hora de finalización del período</string>
     <string name="settings_period_end_time_subtitle">La notificación se mostrará al día siguiente de finalizar el plazo.</string>
-    <string name="settings_exact_alarm_title">alarmas exactas</string>
+    <string name="settings_exact_alarm_title">Alarmas exactas</string>
     <string name="settings_exact_alarm_enabled_subtitle">Habilitado para intentar mostrar notificaciones a la hora seleccionada.</string>
     <string name="settings_exact_alarm_disabled_subtitle">Desactivado; Android puede retrasar la notificación</string>
 
@@ -198,7 +198,7 @@
     <string name="settings_reset_tutorial_subtitle">Volverá a ver sugerencias de gestos, información y acciones en la aplicación.</string>
 
     <string name="settings_theme_dialog_title">Tema de la aplicación</string>
-    <string name="settings_theme_light_title">Luz</string>
+    <string name="settings_theme_light_title">Claro</string>
     <string name="settings_theme_light_subtitle">Utilice siempre un tema claro</string>
     <string name="settings_theme_dark_title">Oscuro</string>
     <string name="settings_theme_dark_subtitle">Utilice siempre el tema oscuro</string>
@@ -233,8 +233,8 @@
 
     <string name="categories_chart_uncategorized">Sin categoría</string>
     <string name="categories_chart_rest">Restante</string>
-    <string name="categories_chart_empty_title">Podemos\'No divida sus gastos por categorías</string>
-    <string name="categories_chart_empty_subtitle">Utilice etiquetas para ver el gráfico por categorías</string>
+    <string name="categories_chart_empty_title">No podemos dividir los gastos sin categoría</string>
+    <string name="categories_chart_empty_subtitle">Agregue categorías para ver el gráfico</string>
 
 
     <string name="calendar_heatmap_info_text">Este gráfico muestra el dinero gastado por cada día del período.</string>

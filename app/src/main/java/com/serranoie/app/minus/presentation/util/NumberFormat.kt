@@ -3,13 +3,9 @@ package com.serranoie.app.minus.presentation.util
 import android.content.Context
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import java.math.BigDecimal
-import android.text.TextPaint
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.sp
 
 fun getFloatDivider(): String {
 	val numberFormat: NumberFormat = NumberFormat.getNumberInstance(Locale.getDefault())

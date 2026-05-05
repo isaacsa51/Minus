@@ -388,7 +388,7 @@ class BudgetViewModel @Inject constructor(
 	private fun handleBackspace() {
 		val updatedInput = _numpadInput.value.dropLast(1)
 		_numpadInput.value = updatedInput
-		if (updatedInput.none { it in "+-×÷" } && _uiState.value.isCalculation) {
+		if (updatedInput.isEmpty() && _uiState.value.isCalculation) {
 			_uiState.update { it.copy(isCalculation = false) }
 		}
 	}

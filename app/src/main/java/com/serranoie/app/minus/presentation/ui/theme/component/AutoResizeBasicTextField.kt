@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -66,7 +67,9 @@ fun AutoResizeBasicTextField(
 	}
 
 	val resolvedTextStyle = textStyle.copy(
-		fontSize = adaptiveFontSize, lineHeight = adaptiveFontSize
+		fontSize = adaptiveFontSize,
+		lineHeight = adaptiveFontSize,
+		platformStyle = PlatformTextStyle(includeFontPadding = false)
 	)
 
 	BasicTextField(

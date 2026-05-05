@@ -34,7 +34,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.DateRange
@@ -90,7 +89,6 @@ import com.serranoie.app.minus.presentation.onboarding.availablePeriodsFor
 import com.serranoie.app.minus.presentation.onboarding.budgetForPeriod
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
-import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
@@ -238,7 +236,12 @@ fun PeriodSwitcherSheet(
 	if (showFinishConfirm) {
 		AlertDialog(
 			onDismissRequest = { showFinishConfirm = false },
-			title = { Text(stringResource(R.string.finalize_period_question)) },
+			title = {
+				Text(
+					stringResource(R.string.finalize_period_question),
+					style = MaterialTheme.typography.titleMediumEmphasized
+				)
+			},
 			text = { Text(stringResource(R.string.finalize_period_confirm)) },
 			confirmButton = {
 				TextButton(
@@ -250,12 +253,18 @@ fun PeriodSwitcherSheet(
 				) {
 					Text(
 						stringResource(R.string.finalize_action),
-						color = MaterialTheme.colorScheme.error
+						color = MaterialTheme.colorScheme.error,
+						style = MaterialTheme.typography.labelMediumEmphasized
 					)
 				}
 			},
 			dismissButton = {
-				TextButton(onClick = { showFinishConfirm = false }) { Text("Cancelar") }
+				TextButton(onClick = { showFinishConfirm = false }) {
+					Text(
+						stringResource(R.string.cancel),
+						style = MaterialTheme.typography.labelMediumEmphasized
+					)
+				}
 			},
 		)
 	}
@@ -416,7 +425,7 @@ private fun ViewBudgetContent(
 			) {
 				Text(
 					text = stringResource(R.string.finalize_period),
-					style = MaterialTheme.typography.labelLargeEmphasized,
+					style = MaterialTheme.typography.labelMediumEmphasized,
 				)
 			}
 		}
@@ -645,7 +654,6 @@ fun EditBudgetContent(
 								Icon(
 									imageVector = Icons.Default.Check,
 									contentDescription = "Aplicar",
-									tint = colorBad
 								)
 							}
 						}
@@ -791,12 +799,7 @@ fun EditBudgetContent(
 				.heightIn(min = 56.dp),
 			enabled = canApply,
 		) {
-			Text(buttonLabel)
-			Spacer(modifier = Modifier.width(8.dp))
-			Icon(
-				imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-				contentDescription = null,
-			)
+			Text(buttonLabel, style = MaterialTheme.typography.labelMediumEmphasized)
 		}
 	}
 
@@ -931,7 +934,12 @@ private fun CurrencyPickerDialog(
 			}
 		},
 		confirmButton = {
-			TextButton(onClick = onDismiss) { Text("Cerrar") }
+			TextButton(onClick = onDismiss) {
+				Text(
+					stringResource(R.string.close),
+					style = MaterialTheme.typography.labelMediumEmphasized
+				)
+			}
 		},
 	)
 }
@@ -1016,7 +1024,12 @@ private fun StrategyPickerDialog(
 			}
 		},
 		confirmButton = {
-			TextButton(onClick = onDismiss) { Text("Cerrar") }
+			TextButton(onClick = onDismiss) {
+				Text(
+					stringResource(R.string.close),
+					style = MaterialTheme.typography.labelMediumEmphasized
+				)
+			}
 		},
 	)
 }
