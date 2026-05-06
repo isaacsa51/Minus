@@ -35,6 +35,7 @@ class MinusCsvExporter {
                         "",
                         "",
                         "",
+                        "",
                         s.totalBudget.toPlainString(),
                         s.period.name,
                         s.startDate.format(dateFormatter),
@@ -46,6 +47,7 @@ class MinusCsvExporter {
                         s.remainingBudgetStrategy.name,
                         meta.currentPeriodStartedAtMillis.toString(),
                         meta.currentPeriodId.toString(),
+                        s.creditCardCutoffDay?.toString().orEmpty(),
                     )
                 }
 
@@ -64,6 +66,8 @@ class MinusCsvExporter {
                         endDate,
                         subDay,
                         tx.id.toString(),
+                        if (tx.isCredit) "1" else "0",
+                        "",
                         "",
                         "",
                         "",

@@ -41,6 +41,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_ID_KEY_NAME
 import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_STARTED_AT_KEY_NAME
+import com.serranoie.app.minus.data.repository.CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME
 import com.serranoie.app.minus.data.repository.DYNAMIC_COLOR_KEY_NAME
 import com.serranoie.app.minus.data.repository.EARLY_FINISH_ACTIVE_KEY_NAME
 import com.serranoie.app.minus.data.repository.EARLY_FINISH_ACTUAL_DATE_KEY_NAME
@@ -87,6 +88,7 @@ val NOTIFICATION_MINUTE_KEY = intPreferencesKey(NOTIFICATION_MINUTE_KEY_NAME)
 val THEME_MODE_KEY = stringPreferencesKey(THEME_MODE_KEY_NAME)
 val TYPOGRAPHY_MODE_KEY = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
 val DYNAMIC_COLOR_KEY = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
+val CREDIT_QUICK_TOGGLE_FEATURE_KEY = booleanPreferencesKey(CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME)
 val EARLY_FINISH_ACTIVE_KEY = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
 val EARLY_FINISH_ACTUAL_DATE_KEY = longPreferencesKey(EARLY_FINISH_ACTUAL_DATE_KEY_NAME)
 val EARLY_FINISH_ORIGINAL_END_DATE_KEY = longPreferencesKey(EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME)

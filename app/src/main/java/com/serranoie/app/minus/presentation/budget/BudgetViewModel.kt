@@ -24,6 +24,7 @@ import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetTransactionI
 import com.serranoie.app.minus.presentation.editor.AnimState
 import com.serranoie.app.minus.presentation.editor.EditMode
 import com.serranoie.app.minus.presentation.notification.NotificationHelper
+import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +41,8 @@ import logcat.asLog
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 
 private const val TAG = "BudgetViewModel - ISAAC"
@@ -48,6 +51,7 @@ private const val TAG = "BudgetViewModel - ISAAC"
 class BudgetViewModel @Inject constructor(
 	private val budgetRepository: BudgetRepository,
 	private val notificationHelper: NotificationHelper,
+	private val notificationScheduler: NotificationScheduler,
 	private val transactionHandler: BudgetTransactionHandler,
 	private val budgetStateCalculator: BudgetStateCalculator,
 	private val budgetWidgetUpdater: BudgetWidgetUpdater,
@@ -203,6 +207,8 @@ class BudgetViewModel @Inject constructor(
 			currentComment = _currentComment.value,
 			tags = _categories.value.map { it.name },
 			isFirstLaunch = settings == null,
+			isCreditEnabled = _uiState.value.isCreditEnabled,
+			showCreditCutoffDialog = _uiState.value.showCreditCutoffDialog,
 			pendingExpensesForNextPeriod = queuedTransactions,
 			currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
 			currentPeriodId = currentPeriodId,
@@ -297,6 +303,29 @@ class BudgetViewModel @Inject constructor(
 			} catch (e: Exception) {
 				logcat(TAG) { e.asLog() }
 			}
+
+			try {
+				val cutoffDay = settings?.creditCardCutoffDay
+				if (cutoffDay != null) {
+					val today = LocalDate.now()
+					val cutoffDate = runCatching { today.withDayOfMonth(cutoffDay) }
+						.getOrElse { today.withDayOfMonth(today.lengthOfMonth()) }
+					val formatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault())
+					notificationHelper.showCreditCutoffNotification(
+						totalAmount = "123.45",
+						cutoffDateText = cutoffDate.format(formatter),
+						currency = currency
+					)
+				}
+			} catch (e: Exception) {
+				logcat(TAG) { e.asLog() }
+			}
+
+			try {
+				notificationScheduler.runRecurrentExpenseCheckNow()
+			} catch (e: Exception) {
+				logcat(TAG) { e.asLog() }
+			}
 		}
 	}
 
@@ -341,12 +370,15 @@ class BudgetViewModel @Inject constructor(
 			is BudgetEditorIntent.CommentUpdated -> handleCommentUpdate(intent.comment)
 			is BudgetEditorIntent.DeleteTag -> handleDeleteTag(intent.tag)
 			is BudgetEditorIntent.SetRecurrentEnabled -> handleSetRecurrentEnabled(intent.enabled)
+			is BudgetEditorIntent.SetCreditEnabled -> handleSetCreditEnabled(intent.enabled)
 			is BudgetEditorIntent.DismissRecurrentDialog -> handleDismissRecurrentDialog()
+			is BudgetEditorIntent.DismissCreditCutoffDialog -> handleDismissCreditCutoffDialog()
 			is BudgetEditorIntent.RecurrentExpenseApplied -> handleRecurrentExpenseApply(
 				intent.frequency,
 				intent.endDate,
 				intent.subscriptionDay,
 			)
+			is BudgetEditorIntent.CreditCutoffDayConfirmed -> handleCreditCutoffDayConfirmed(intent.cutoffDay)
 
 			is BudgetEditorIntent.FinishBudgetEarly -> handleFinishBudgetEarly()
 		}
@@ -442,6 +474,7 @@ class BudgetViewModel @Inject constructor(
 				input = _numpadInput.value,
 				isCalculation = _uiState.value.isCalculation,
 				isRecurrentEnabled = _uiState.value.isRecurrentEnabled,
+				isCreditEnabled = _uiState.value.isCreditEnabled,
 				comment = _currentComment.value,
 				budgetSettings = _uiState.value.budgetSettings,
 				resolveActivePeriodId = ::resolveActivePeriodId,
@@ -461,14 +494,14 @@ class BudgetViewModel @Inject constructor(
 				is ApplyTransactionResult.QueuedForNextPeriod -> {
 					_numpadInput.value = ""
 					_currentComment.value = ""
-					_uiState.update { it.copy(isCalculation = false) }
+					_uiState.update { it.copy(isCalculation = false, isCreditEnabled = false) }
 					_effects.emit(BudgetUiEffect.ShowMessage("Gasto en cola para el proximo periodo"))
 				}
 
 				is ApplyTransactionResult.Added -> {
 					_numpadInput.value = ""
 					_currentComment.value = ""
-					_uiState.update { it.copy(isCalculation = false) }
+					_uiState.update { it.copy(isCalculation = false, isCreditEnabled = false) }
 				}
 			}
 		}
@@ -476,6 +509,21 @@ class BudgetViewModel @Inject constructor(
 
 	private fun handleSetRecurrentEnabled(enabled: Boolean) {
 		_uiState.update { it.copy(isRecurrentEnabled = enabled) }
+	}
+
+	private fun handleSetCreditEnabled(enabled: Boolean) {
+		if (!enabled) {
+			_uiState.update { it.copy(isCreditEnabled = false, showCreditCutoffDialog = false) }
+			return
+		}
+
+		val hasCutoff = _uiState.value.budgetSettings?.creditCardCutoffDay != null
+		_uiState.update {
+			it.copy(
+				isCreditEnabled = enabled,
+				showCreditCutoffDialog = !hasCutoff
+			)
+		}
 	}
 
 	private fun handleDismissRecurrentDialog() {
@@ -486,6 +534,10 @@ class BudgetViewModel @Inject constructor(
 				pendingRecurrentComment = ""
 			)
 		}
+	}
+
+	private fun handleDismissCreditCutoffDialog() {
+		_uiState.update { it.copy(showCreditCutoffDialog = false, isCreditEnabled = false) }
 	}
 
 	private fun handleRecurrentExpenseApply(
@@ -499,6 +551,7 @@ class BudgetViewModel @Inject constructor(
 				endDate = endDate,
 				subscriptionDay = subscriptionDay,
 				resolveActivePeriodId = ::resolveActivePeriodId,
+				isCredit = _uiState.value.isCreditEnabled,
 			)
 			if (!applied) return@launch
 
@@ -508,10 +561,23 @@ class BudgetViewModel @Inject constructor(
 					pendingRecurrentAmount = null,
 					pendingRecurrentComment = "",
 					isRecurrentEnabled = false,
+					isCreditEnabled = false,
 				)
 			}
 			_numpadInput.value = ""
 			_currentComment.value = ""
+		}
+	}
+
+	private fun handleCreditCutoffDayConfirmed(cutoffDay: Int) {
+		if (cutoffDay !in 1..31) return
+		val currentSettings = _uiState.value.budgetSettings ?: return
+		viewModelScope.launch {
+			persistBudgetSettings(
+				currentSettings.copy(creditCardCutoffDay = cutoffDay),
+				forceNewPeriodBoundary = false,
+			)
+			_uiState.update { it.copy(showCreditCutoffDialog = false, isCreditEnabled = true) }
 		}
 	}
 

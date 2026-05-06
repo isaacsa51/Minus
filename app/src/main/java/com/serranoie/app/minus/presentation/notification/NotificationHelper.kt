@@ -31,9 +31,11 @@ class NotificationHelper @Inject constructor(
     companion object {
         const val CHANNEL_PERIOD_END = "budget_period_end"
         const val CHANNEL_RECURRENT = "recurrent_expenses"
+        const val CHANNEL_CREDIT = "credit_expenses"
 
         const val NOTIFICATION_ID_PERIOD_END = 1001
         const val NOTIFICATION_ID_RECURRENT = 1002
+        const val NOTIFICATION_ID_CREDIT = 1003
     }
 
     init {
@@ -62,8 +64,18 @@ class NotificationHelper @Inject constructor(
                 enableVibration(true)
             }
 
+            val creditChannel = NotificationChannel(
+                CHANNEL_CREDIT,
+                "Credit Card Reminders",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Reminders before credit card cutoff date"
+                enableVibration(true)
+            }
+
             notificationManager.createNotificationChannel(periodEndChannel)
             notificationManager.createNotificationChannel(recurrentChannel)
+            notificationManager.createNotificationChannel(creditChannel)
             logcat { "Notification channels created" }
         }
     }
@@ -194,9 +206,9 @@ class NotificationHelper @Inject constructor(
 
         val title = "Suscripción próxima"
         val message = if (comment.isNotBlank()) {
-            "Tu suscripción \"$comment\" de \"$$amount\" se cobrará $daysText. Prepárate para el cargo."
+            "Tu suscripción \"$comment\" de \"$amount\" se cobrará $daysText. Prepárate para el cargo."
         } else {
-            "Tienes una suscripción de \"$$amount\" que se cobrará $daysText."
+            "Tienes una suscripción de \"$amount\" que se cobrará $daysText."
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_RECURRENT)
@@ -214,6 +226,41 @@ class NotificationHelper @Inject constructor(
         val notificationId = NOTIFICATION_ID_RECURRENT + daysUntil.toInt()
         NotificationManagerCompat.from(context).notify(notificationId, notification)
         logcat { "Upcoming subscription notification shown: $message" }
+    }
+
+    fun showCreditCutoffNotification(totalAmount: String, cutoffDateText: String, currency: String) {
+        val hasPermission = checkNotificationPermission()
+        if (!hasPermission) {
+            logcat { "Cannot show credit notification - permission not granted" }
+            return
+        }
+
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            3,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val message = "Tu fecha de corte es el $cutoffDateText. Se recomienda saldar $totalAmount para evitar intereses."
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_CREDIT)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Pago de tarjeta próximo")
+            .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .build()
+
+        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_CREDIT, notification)
     }
 
     fun cancelAllNotifications() {

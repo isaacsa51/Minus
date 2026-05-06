@@ -59,7 +59,8 @@ class BudgetRepositoryImpl @Inject constructor(
 			LocalDateTime.ofEpochSecond(it / 1000, 0, ZoneOffset.UTC)
 		},
 		subscriptionDay = this.subscriptionDay,
-		categoryId = this.categoryId
+		categoryId = this.categoryId,
+		isCredit = this.isCredit
 	)
 
 	private fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
@@ -74,7 +75,8 @@ class BudgetRepositoryImpl @Inject constructor(
 		recurrentFrequency = this.recurrentFrequency?.name,
 		recurrentEndDate = this.recurrentEndDate?.toEpochSecond(ZoneOffset.UTC)?.times(1000),
 		subscriptionDay = this.subscriptionDay,
-		categoryId = this.categoryId
+		categoryId = this.categoryId,
+		isCredit = this.isCredit
 	)
 
 	private fun QueuedTransactionEntity.toDomain(): Transaction = Transaction(
@@ -90,7 +92,8 @@ class BudgetRepositoryImpl @Inject constructor(
 		recurrentFrequency = null,
 		recurrentEndDate = null,
 		subscriptionDay = null,
-		categoryId = this.categoryId
+		categoryId = this.categoryId,
+		isCredit = this.isCredit
 	)
 
 	private fun Transaction.toQueuedEntity(): QueuedTransactionEntity = QueuedTransactionEntity(
@@ -99,7 +102,8 @@ class BudgetRepositoryImpl @Inject constructor(
 		comment = this.comment,
 		date = this.date!!.toEpochSecond(ZoneOffset.UTC) * 1000,
 		createdAt = this.createdAt,
-		categoryId = this.categoryId
+		categoryId = this.categoryId,
+		isCredit = this.isCredit
 	)
 
 	private fun BudgetSettingsEntity.toDomain(): BudgetSettings {
@@ -116,7 +120,8 @@ class BudgetRepositoryImpl @Inject constructor(
 				RemainingBudgetStrategy.valueOf(this.remainingBudgetStrategy)
 			} catch (_: Exception) {
 				RemainingBudgetStrategy.ASK_ALWAYS
-			}
+			},
+			creditCardCutoffDay = this.creditCardCutoffDay
 		)
 		logcat { "toDomain: entity=$this -> domain=$domain" }
 		return domain
@@ -133,7 +138,8 @@ class BudgetRepositoryImpl @Inject constructor(
 			daysInPeriod = this.daysInPeriod,
 			rollOverEnabled = this.rollOverEnabled,
 			rollOverCarryForward = this.rollOverCarryForward,
-			remainingBudgetStrategy = this.remainingBudgetStrategy.name
+			remainingBudgetStrategy = this.remainingBudgetStrategy.name,
+			creditCardCutoffDay = this.creditCardCutoffDay
 		)
 		logcat { "toEntity: domain=$this -> entity=$entity" }
 		return entity

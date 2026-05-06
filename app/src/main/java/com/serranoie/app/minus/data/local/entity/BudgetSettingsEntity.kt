@@ -19,5 +19,6 @@ data class BudgetSettingsEntity(
     val daysInPeriod: Int = 1,
     val rollOverEnabled: Boolean = false,
     val rollOverCarryForward: Boolean = false,
-    val remainingBudgetStrategy: String = "ASK_ALWAYS" // RemainingBudgetStrategy.name()
+    val remainingBudgetStrategy: String = "ASK_ALWAYS", // RemainingBudgetStrategy.name()
+    val creditCardCutoffDay: Int? = null
 )

@@ -65,6 +65,7 @@ data class BudgetSettings(
 	val rollOverLimit: BigDecimal? = null,
 	val rollOverCarryForward: Boolean = false,
 	val remainingBudgetStrategy: RemainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
+	val creditCardCutoffDay: Int? = null,
 ) {
 	fun getDaysForPeriod(): Int {
 		return when (period) {
@@ -100,6 +101,7 @@ data class BudgetSettings(
 			rollOverLimit = null,
 			rollOverCarryForward = false,
 			remainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
+			creditCardCutoffDay = null,
 		)
 	}
 }

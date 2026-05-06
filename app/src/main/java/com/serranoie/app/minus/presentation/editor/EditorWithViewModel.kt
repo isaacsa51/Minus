@@ -3,10 +3,14 @@ package com.serranoie.app.minus.presentation.editor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.serranoie.app.minus.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.budget.mvi.intent.BudgetEditorIntent
+import com.serranoie.app.minus.settingsDataStore
 import logcat.logcat
 
 @Composable
@@ -25,6 +29,9 @@ fun EditorWithViewModel(
 	modifier: Modifier = Modifier
 ) {
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+	val context = LocalContext.current
+	val preferences by context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences())
+	val showCreditQuickToggleFeature = preferences[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false
 
 	Editor(
 		uiState = uiState,
@@ -71,8 +78,18 @@ fun EditorWithViewModel(
 		onRecurrentToggle = { enabled ->
 			viewModel.processIntent(BudgetEditorIntent.SetRecurrentEnabled(enabled))
 		},
+		onCreditToggle = { enabled ->
+			viewModel.processIntent(BudgetEditorIntent.SetCreditEnabled(enabled))
+		},
+		showCreditQuickToggleFeature = showCreditQuickToggleFeature,
 		onDismissRecurrentDialog = {
 			viewModel.processIntent(BudgetEditorIntent.DismissRecurrentDialog)
+		},
+		onDismissCreditCutoffDialog = {
+			viewModel.processIntent(BudgetEditorIntent.DismissCreditCutoffDialog)
+		},
+		onCreditCutoffConfirm = { cutoffDay ->
+			viewModel.processIntent(BudgetEditorIntent.CreditCutoffDayConfirmed(cutoffDay))
 		},
 		onRecurrentExpenseConfirm = { frequency, endDate, subscriptionDay ->
 			viewModel.processIntent(

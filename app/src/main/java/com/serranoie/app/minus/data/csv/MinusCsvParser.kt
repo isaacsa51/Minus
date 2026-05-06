@@ -84,6 +84,8 @@ class MinusCsvParser {
             ?.coerceAtLeast(0L)
             ?: 0L
 
+        val isCredit = raw.valueOf(MinusCsvContract.COL_IS_CREDIT).trim() == "1"
+
         return CsvTransactionRow(
             id = id,
             date = date,
@@ -93,6 +95,7 @@ class MinusCsvParser {
             frequency = frequency,
             endDate = endDate,
             subscriptionDay = subDay,
+            isCredit = isCredit,
         )
     }
 
@@ -137,6 +140,9 @@ class MinusCsvParser {
                 rollOverEnabled = rollOverEnabled,
                 rollOverCarryForward = rollOverCarryForward,
                 remainingBudgetStrategy = strategy,
+                creditCardCutoffDay = raw.valueOf(MinusCsvContract.COL_CREDIT_CARD_CUTOFF_DAY)
+                    .toIntOrNull()
+                    ?.takeIf { it in 1..31 },
             ),
             currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             currentPeriodId = currentPeriodId,

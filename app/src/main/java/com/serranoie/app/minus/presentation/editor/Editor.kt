@@ -16,6 +16,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,9 +32,12 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Card
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -41,7 +45,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,13 +60,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import logcat.logcat
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -105,8 +114,12 @@ fun Editor(
 	onCommentUpdate: (String) -> Unit = {},
 	onDeleteTag: (String) -> Unit = {},
 	onRecurrentToggle: (Boolean) -> Unit = {},
+	onCreditToggle: (Boolean) -> Unit = {},
+	showCreditQuickToggleFeature: Boolean = false,
 	onDismissRecurrentDialog: () -> Unit = {},
+	onDismissCreditCutoffDialog: () -> Unit = {},
 	onRecurrentExpenseConfirm: (com.serranoie.app.minus.domain.model.RecurrentFrequency, LocalDate, Int?) -> Unit = { _, _, _ -> },
+	onCreditCutoffConfirm: (Int) -> Unit = {},
 	budgetPillHintAnchorModifier: Modifier = Modifier,
 	analyticsHintAnchorModifier: Modifier = Modifier,
 	modifier: Modifier = Modifier,
@@ -141,6 +154,13 @@ fun Editor(
 			budgetSettings = uiState.budgetSettings,
 			onDismiss = onDismissRecurrentDialog,
 			onConfirm = onRecurrentExpenseConfirm
+		)
+	}
+
+	if (uiState.showCreditCutoffDialog) {
+		CreditCutoffDayDialog(
+			onDismiss = onDismissCreditCutoffDialog,
+			onConfirm = onCreditCutoffConfirm
 		)
 	}
 
@@ -187,10 +207,23 @@ fun Editor(
 				}, label = "topBarTrailingSwitch"
 			) { isEditing ->
 				if (isEditing) {
-					RecurrenceModeToggle(
-						isRecurrentEnabled = uiState.isRecurrentEnabled,
-						onRecurrentToggle = onRecurrentToggle,
-					)
+					Row(verticalAlignment = Alignment.CenterVertically) {
+						RecurrenceModeToggle(
+							isEnabled = uiState.isRecurrentEnabled,
+							onToggle = onRecurrentToggle,
+							icon = Icons.Rounded.EventRepeat,
+							contentDescription = "Recurrent payment",
+						)
+						Spacer(modifier = Modifier.size(8.dp))
+						if (showCreditQuickToggleFeature) {
+							RecurrenceModeToggle(
+								isEnabled = uiState.isCreditEnabled,
+								onToggle = onCreditToggle,
+								icon = Icons.Rounded.CreditCard,
+								contentDescription = "Credit card payment",
+							)
+						}
+					}
 				} else {
 					Row(verticalAlignment = Alignment.CenterVertically) {
 						IconButton(
@@ -546,8 +579,10 @@ private fun evaluateCalculation(input: String): String? {
 
 @Composable
 private fun RecurrenceModeToggle(
-	isRecurrentEnabled: Boolean,
-	onRecurrentToggle: (Boolean) -> Unit,
+	isEnabled: Boolean,
+	onToggle: (Boolean) -> Unit,
+	icon: ImageVector,
+	contentDescription: String,
 	modifier: Modifier = Modifier,
 ) {
 	val containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
@@ -558,23 +593,62 @@ private fun RecurrenceModeToggle(
 		modifier = modifier.height(50.dp), shape = CircleShape, colors = CardDefaults.cardColors(
 			containerColor = containerColor,
 			contentColor = contentColor,
-		), onClick = { onRecurrentToggle(!isRecurrentEnabled) }) {
+		), onClick = { onToggle(!isEnabled) }) {
 		Box(
 			modifier = Modifier
 				.fillMaxHeight()
 				.padding(horizontal = 6.dp, vertical = 6.dp)
 				.clip(CircleShape)
-				.background(if (isRecurrentEnabled) selectedColor else Color.Transparent)
+				.background(if (isEnabled) selectedColor else Color.Transparent)
 				.padding(horizontal = 14.dp, vertical = 8.dp),
 			contentAlignment = Alignment.Center,
 		) {
 			Icon(
-				imageVector = Icons.Rounded.EventRepeat,
-				contentDescription = "Recurrent payment",
+				imageVector = icon,
+				contentDescription = contentDescription,
 				modifier = Modifier.size(24.dp)
 			)
 		}
 	}
+}
+
+@Composable
+private fun CreditCutoffDayDialog(
+	onDismiss: () -> Unit,
+	onConfirm: (Int) -> Unit,
+) {
+	var cutoffDayInput by remember { mutableStateOf("15") }
+	val cutoffDay = cutoffDayInput.toIntOrNull()
+	val isValid = cutoffDay != null && cutoffDay in 1..31
+
+	AlertDialog(
+		onDismissRequest = onDismiss,
+		title = { Text(text = stringResource(R.string.credit_cutoff_dialog_title)) },
+		text = {
+			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+				Text(text = stringResource(R.string.credit_cutoff_dialog_message))
+				OutlinedTextField(
+					value = cutoffDayInput,
+					onValueChange = { value ->
+						cutoffDayInput = value.filter { it.isDigit() }.take(2)
+					},
+					label = { Text(stringResource(R.string.credit_cutoff_dialog_label)) },
+					singleLine = true,
+					isError = cutoffDayInput.isNotBlank() && !isValid,
+				)
+			}
+		},
+		confirmButton = {
+			Button(onClick = { cutoffDay?.let(onConfirm) }, enabled = isValid) {
+				Text(stringResource(R.string.save))
+			}
+		},
+		dismissButton = {
+			TextButton(onClick = onDismiss) {
+				Text(stringResource(R.string.cancel))
+			}
+		}
+	)
 }
 
 @Composable
@@ -633,8 +707,11 @@ fun EditorPreview_Idle() {
 			onCommentUpdate = {},
 			onDeleteTag = {},
 			onRecurrentToggle = {},
+			onCreditToggle = {},
 			onDismissRecurrentDialog = {},
-			onRecurrentExpenseConfirm = { _, _, _ -> })
+			onDismissCreditCutoffDialog = {},
+			onRecurrentExpenseConfirm = { _, _, _ -> },
+			onCreditCutoffConfirm = {})
 	}
 }
 
@@ -668,7 +745,10 @@ fun EditorPreview_Editing() {
 			onCommentUpdate = {},
 			onDeleteTag = {},
 			onRecurrentToggle = {},
+			onCreditToggle = {},
 			onDismissRecurrentDialog = {},
-			onRecurrentExpenseConfirm = { _, _, _ -> })
+			onDismissCreditCutoffDialog = {},
+			onRecurrentExpenseConfirm = { _, _, _ -> },
+			onCreditCutoffConfirm = {})
 	}
 }
