@@ -1,6 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
 import android.content.res.Configuration
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -59,6 +61,8 @@ fun RolloverDialog(
 	val formattedRemaining = currencyFormat.format(remainingAmount)
 	val formattedSpent = currencyFormat.format(spentAmount)
 
+	val scrollState = rememberScrollState()
+
 	Dialog(onDismissRequest = onDismiss) {
 		Card(
 			modifier = Modifier
@@ -70,6 +74,7 @@ fun RolloverDialog(
 			Column(
 				modifier = Modifier
 					.fillMaxWidth()
+					.verticalScroll(scrollState)
 					.padding(24.dp),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
