@@ -15,11 +15,14 @@ sealed interface BudgetEditorIntent : BudgetUiIntent {
     data class CommentUpdated(val comment: String) : BudgetEditorIntent
     data class DeleteTag(val tag: String) : BudgetEditorIntent
     data class SetRecurrentEnabled(val enabled: Boolean) : BudgetEditorIntent
+    data class SetCreditEnabled(val enabled: Boolean) : BudgetEditorIntent
     data object DismissRecurrentDialog : BudgetEditorIntent
+    data object DismissCreditCutoffDialog : BudgetEditorIntent
     data class RecurrentExpenseApplied(
         val frequency: RecurrentFrequency,
         val endDate: LocalDate,
         val subscriptionDay: Int? = null,
     ) : BudgetEditorIntent
+    data class CreditCutoffDayConfirmed(val cutoffDay: Int) : BudgetEditorIntent
     data object FinishBudgetEarly : BudgetEditorIntent
 }

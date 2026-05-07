@@ -36,6 +36,9 @@
     <string name="summary_weekly_format">Se cobrará todas las semanas hasta %1$s.</string>
     <string name="summary_biweekly_format">Se cobrará cada dos semanas hasta %1$s.</string>
     <string name="summary_monthly_format">Se cobrará todos los meses en el día %1$d hasta %2$s.</string>
+    <string name="credit_cutoff_dialog_title">Fecha de corte de tarjeta</string>
+    <string name="credit_cutoff_dialog_message">Para rastrear gastos a crédito, define el día de corte (1–31).</string>
+    <string name="credit_cutoff_dialog_label">Día de corte</string>
 
 
     <string name="period_finished">Periodo terminado</string>
@@ -125,7 +128,6 @@
     <string name="widget_month_heatmap_description">Calendario del mapa de calor del mes actual</string>
     <string name="widget_add_expense_description">Acceso directo rápido para agregar un nuevo gasto</string>
     <string name="widget_add_expense_label">Agregar nuevo gasto</string>
-    <string name="widget_add_expense_plus">+</string>
 
 
     <string name="spent">Gastado</string>
@@ -166,6 +168,7 @@
     <string name="settings_title">Ajustes</string>
     <string name="settings_section_appearance">Apariencia</string>
     <string name="settings_section_notifications">Notificaciones</string>
+    <string name="settings_section_features">Funciones</string>
     <string name="settings_section_app_info">Información de la aplicación</string>
     <string name="settings_section_data_backup">Copia de seguridad de datos</string>
     <string name="settings_section_tutorial">Tutorial</string>
@@ -176,6 +179,10 @@
     <string name="settings_typography_subtitle">Cambiar el estilo de tipografía de la aplicación</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Utilice colores de fondo de pantalla para aplicar un tema de aplicación dinámico</string>
+    <string name="settings_feature_credit_toggle_title">Utilizar Tarjeta de Crédito como pago</string>
+    <string name="settings_feature_credit_toggle_subtitle">Toca para ver los detalles</string>
+    <string name="settings_feature_credit_toggle_details">Cuando está activado, ahora podrás marcar pagos hechos con tarjeta de crédito.\\nDeclarando una fecha de corte sabrás cuanto pagarle a tu banco antes que tengas que pagar intereses mediante una notificiación independiente del periodo que estes.</string>
+    <string name="settings_feature_credit_toggle_switch_label">Habilitar uso de TDC</string>
 
     <string name="settings_period_end_time_title">Hora de finalización del período</string>
     <string name="settings_period_end_time_subtitle">La notificación se mostrará al día siguiente de finalizar el plazo.</string>
@@ -205,7 +212,7 @@
     <string name="settings_theme_system_title">Seguir sistema</string>
     <string name="settings_theme_system_subtitle">Utilice la configuración del tema del sistema</string>
 
-    <string name="settings_typography_dialog_title">tipografía de aplicación</string>
+    <string name="settings_typography_dialog_title">Tipo de tipografía</string>
     <string name="settings_typography_default_title">Por defecto</string>
     <string name="settings_typography_default_subtitle">Utiliza la tipografía base</string>
     <string name="settings_typography_condensed_title">Condensado</string>
@@ -264,7 +271,7 @@
     <string name="rollover_dialog_question">¿Qué quieres hacer con el dinero restante?</string>
     <string name="rollover_dialog_split_equally_title">Dividir en partes iguales</string>
     <string name="rollover_dialog_split_equally_desc">Añadir %1$s al presupuesto para los próximos días</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">llevar a mañana</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">Llevar a mañana</string>
     <string name="rollover_dialog_carry_to_tomorrow_desc">Agregar %1$s al presupuesto\'de mañana</string>
     <string name="rollover_dialog_view_analytics_title">Ver análisis</string>
     <string name="rollover_dialog_view_analytics_desc">Revisar el resumen del periodo finalizado.</string>
@@ -285,7 +292,6 @@
     <string name="savings_recommendation_recurrent_expenses_label">Gastos recurrentes</string>
     <string name="savings_recommendation_one_time_expenses_label">Gastos únicos</string>
     <string name="savings_recommendation_six_month_example_intro">Si ahorras el 20% en cada período durante aproximadamente 6 meses, podrías construir:</string>
-    <string name="savings_recommendation_six_month_example_equation" translatable="false">%1$s × 6 = %2$s</string>
 
 
     <string name="wavy_divider_show_all_past_period_expenses">Mostrar todos los gastos del período anterior...</string>

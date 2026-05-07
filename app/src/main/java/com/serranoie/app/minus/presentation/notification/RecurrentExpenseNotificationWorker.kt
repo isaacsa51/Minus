@@ -1,11 +1,10 @@
 package com.serranoie.app.minus.presentation.notification
 
 import android.content.Context
-import logcat.asLog
-import logcat.logcat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import dagger.hilt.EntryPoint
@@ -13,8 +12,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
+import logcat.asLog
+import logcat.logcat
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 /**
  * Worker that checks for recurrent expenses that should trigger a new occurrence.
@@ -61,6 +64,13 @@ class RecurrentExpenseNotificationWorker(
             val transactions = budgetRepository.getTransactions().first()
             val today = LocalDate.now()
             val budgetEndDate = settings.getPeriodEndDate()
+
+            maybeSendCreditCutoffReminder(
+                settings = settings,
+                transactions = transactions,
+                today = today,
+                notificationHelper = notificationHelper
+            )
 
             val recurrentTransactions = transactions.filter { transaction ->
                 val frequency = transaction.recurrentFrequency
@@ -114,6 +124,42 @@ class RecurrentExpenseNotificationWorker(
             Result.failure()
         }
     }
+    private fun maybeSendCreditCutoffReminder(
+	    settings: BudgetSettings,
+	    transactions: List<Transaction>,
+	    today: LocalDate,
+	    notificationHelper: NotificationHelper
+    ) {
+        val cutoffDay = settings.creditCardCutoffDay ?: return
+
+        val cutoffThisMonth = runCatching { today.withDayOfMonth(cutoffDay) }.getOrElse {
+            today.withDayOfMonth(today.lengthOfMonth())
+        }
+
+        val daysUntilCutoff = ChronoUnit.DAYS.between(today, cutoffThisMonth)
+        if (daysUntilCutoff != 3L) return
+
+        val creditTotal = transactions
+            .filter { tx ->
+                tx.isCredit &&
+                    !tx.isDeleted &&
+                    tx.date != null &&
+                    tx.date.toLocalDate().month == cutoffThisMonth.month &&
+                    tx.date.toLocalDate().year == cutoffThisMonth.year &&
+                    !tx.date.toLocalDate().isAfter(cutoffThisMonth)
+            }
+            .sumOf { it.amount }
+
+        if (creditTotal <= java.math.BigDecimal.ZERO) return
+
+        val formatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault())
+        notificationHelper.showCreditCutoffNotification(
+            totalAmount = creditTotal.toPlainString(),
+            cutoffDateText = cutoffThisMonth.format(formatter),
+            currency = settings.currencyCode
+        )
+    }
+
     private fun isDueToday(transaction: Transaction, today: LocalDate, frequency: RecurrentFrequency): Boolean {
         val startDate = transaction.date?.toLocalDate() ?: return false
         

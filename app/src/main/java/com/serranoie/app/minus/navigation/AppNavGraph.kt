@@ -34,6 +34,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.serranoie.app.minus.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.DEFAULT_NOTIFICATION_HOUR
 import com.serranoie.app.minus.DEFAULT_NOTIFICATION_MINUTE
 import com.serranoie.app.minus.EARLY_FINISH_ACTIVE_KEY
@@ -444,6 +445,7 @@ fun AppNavGraph(
 
             val preferences = context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences()).value
             val currentThemeMode = context.appTheme
+            val isCreditQuickToggleFeatureEnabled = preferences[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false
             val notificationHour = preferences[NOTIFICATION_HOUR_KEY] ?: DEFAULT_NOTIFICATION_HOUR
             val notificationMinute = preferences[NOTIFICATION_MINUTE_KEY] ?: DEFAULT_NOTIFICATION_MINUTE
             val exactAlarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -469,6 +471,7 @@ fun AppNavGraph(
                 currentTheme = currentThemeString,
                 currentTypography = currentTypographyString,
                 isMaterialYouEnabled = context.dynamicColorEnabled,
+                isCreditQuickToggleFeatureEnabled = isCreditQuickToggleFeatureEnabled,
                 notificationHour = notificationHour,
                 notificationMinute = notificationMinute,
                 exactAlarmEnabled = exactAlarmEnabled,
@@ -506,6 +509,14 @@ fun AppNavGraph(
                     scope.launch {
                         context.settingsDataStore.edit { prefs ->
                             prefs[com.serranoie.app.minus.DYNAMIC_COLOR_KEY] = newValue
+                        }
+                    }
+                },
+                onCreditQuickToggleFeatureToggle = {
+                    val newValue = !isCreditQuickToggleFeatureEnabled
+                    scope.launch {
+                        context.settingsDataStore.edit { prefs ->
+                            prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY] = newValue
                         }
                     }
                 },

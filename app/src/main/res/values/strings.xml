@@ -37,6 +37,9 @@
     <string name="summary_weekly_format">It will be charged every week until %1$s.</string>
     <string name="summary_biweekly_format">It will be charged every two weeks until %1$s.</string>
     <string name="summary_monthly_format">It will be charged every month on day %1$d until %2$s.</string>
+    <string name="credit_cutoff_dialog_title">Credit card cutoff date</string>
+    <string name="credit_cutoff_dialog_message">To track credit expenses, set the billing cutoff day (1-31).</string>
+    <string name="credit_cutoff_dialog_label">Cutoff day</string>
 
     <!-- Rollover Dialog -->
     <string name="period_finished">Period finished</string>
@@ -126,7 +129,7 @@
     <string name="widget_month_heatmap_description">Current month heatmap calendar</string>
     <string name="widget_add_expense_description">Quick shortcut to add a new expense</string>
     <string name="widget_add_expense_label">Add new expense</string>
-    <string name="widget_add_expense_plus">+</string>
+    <string name="widget_add_expense_plus" translatable="false">+</string>
 
     <!-- Widget Labels -->
     <string name="spent">Spent</string>
@@ -167,6 +170,7 @@
     <string name="settings_title">Settings</string>
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>
     <string name="settings_section_data_backup">Data backup</string>
     <string name="settings_section_tutorial">Tutorial</string>
@@ -177,6 +181,10 @@
     <string name="settings_typography_subtitle">Change the app typography style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Use wallpaper colors to apply a dynamic app theme</string>
+    <string name="settings_feature_credit_toggle_title">Use Credit Card as payment</string>
+    <string name="settings_feature_credit_toggle_subtitle">Tap to see more details</string>
+    <string name="settings_feature_credit_toggle_details">When activated, you can now mark payments made with a credit card. \nBy declaring a billing date, you\'ll know how much to pay your bank before you have to pay interest, through a notification separate from the billing period.</string>
+    <string name="settings_feature_credit_toggle_switch_label">Enable CC usage</string>
 
     <string name="settings_period_end_time_title">Period end time</string>
     <string name="settings_period_end_time_subtitle">The notification will be shown the day after the period ends</string>

@@ -47,6 +47,8 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.colorOnButton
+import com.serranoie.app.minus.presentation.ui.theme.displayMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.displaySmallCondensed
 
 enum class NumpadButtonType { DEFAULT, PRIMARY, SECONDARY, TERTIARY, DELETE, OPERATOR }
 
@@ -61,7 +63,7 @@ fun NumpadButton(
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 	val isPressed by interactionSource.collectIsPressedAsState()
-	val baseTextStyle = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.W600)
+	val baseTextStyle = MaterialTheme.typography.displaySmallCondensed.copy(fontWeight = FontWeight.W600)
 	val emphasizedTextStyle = MaterialTheme.typography.displayMediumEmphasized
 
 	val radius by animateDpAsState(

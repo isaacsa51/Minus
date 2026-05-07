@@ -120,7 +120,7 @@ fun ListItem(
 			Column(modifier = Modifier.weight(1f)) {
 				Text(
 					text = title,
-					style = MaterialTheme.typography.titleMedium,
+					style = MaterialTheme.typography.bodyMediumEmphasized,
 					color = MaterialTheme.colorScheme.onSurface
 				)
 
@@ -243,7 +243,7 @@ fun PaddedListItem(
 			Icon(imageVector = icon, contentDescription = null)
 			Spacer(modifier = Modifier.width(16.dp))
 			Column {
-				Text(text = title, style = MaterialTheme.typography.bodyLarge)
+				Text(text = title, style = MaterialTheme.typography.bodyMediumEmphasized)
 				subtitle?.let {
 					Text(
 						text = it,
@@ -470,7 +470,7 @@ fun FlexibleSettingsGroupPreview() {
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = "Advanced Settings",
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -549,7 +549,7 @@ fun PaddedListGroupPreview() {
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = "Custom Padded Item",
-								style = MaterialTheme.typography.bodyLarge
+								style = MaterialTheme.typography.bodyMediumEmphasized
 							)
 							Text(
 								text = "This shows custom layout with padding",

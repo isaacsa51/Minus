@@ -11,5 +11,6 @@ data class QueuedTransactionEntity(
     val comment: String,
     val date: Long,
     val createdAt: Long = System.currentTimeMillis(),
-    val categoryId: Long? = null
+    val categoryId: Long? = null,
+    val isCredit: Boolean = false
 )

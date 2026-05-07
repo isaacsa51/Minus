@@ -11,6 +11,7 @@ object MinusCsvContract {
     const val COL_END_DATE = "end_date"
     const val COL_SUB_DAY = "sub_day"
     const val COL_ID = "id"
+    const val COL_IS_CREDIT = "is_credit"
 
     // Budget metadata (repeated in a metadata row, and compatible with older exports)
     const val COL_BUDGET_TOTAL = "budget_total"
@@ -24,6 +25,7 @@ object MinusCsvContract {
     const val COL_REMAINING_BUDGET_STRATEGY = "remaining_budget_strategy"
     const val COL_CURRENT_PERIOD_STARTED_AT = "current_period_started_at_millis"
     const val COL_CURRENT_PERIOD_ID = "current_period_id"
+    const val COL_CREDIT_CARD_CUTOFF_DAY = "credit_card_cutoff_day"
 
     val HEADERS = arrayOf(
         COL_DATE,
@@ -34,6 +36,7 @@ object MinusCsvContract {
         COL_END_DATE,
         COL_SUB_DAY,
         COL_ID,
+        COL_IS_CREDIT,
         COL_BUDGET_TOTAL,
         COL_BUDGET_PERIOD,
         COL_BUDGET_START_DATE,
@@ -45,5 +48,6 @@ object MinusCsvContract {
         COL_REMAINING_BUDGET_STRATEGY,
         COL_CURRENT_PERIOD_STARTED_AT,
         COL_CURRENT_PERIOD_ID,
+        COL_CREDIT_CARD_CUTOFF_DAY,
     )
 }

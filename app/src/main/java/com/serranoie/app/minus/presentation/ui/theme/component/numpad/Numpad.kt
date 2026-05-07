@@ -42,6 +42,7 @@ import logcat.logcat
 import java.util.Date
 
 val BUTTON_GAP = 4.dp
+private const val TEST_NOTIFICATION_TAP_COUNT = 5
 
 enum class EditMode { ADD, EDIT }
 
@@ -86,6 +87,16 @@ fun Numpad(
 ) {
 	val haptic = LocalHapticFeedback.current
 	var debugProgress by remember { mutableIntStateOf(0) }
+	val shouldTriggerTestNotifications: () -> Boolean = {
+		if (debugProgress >= TEST_NOTIFICATION_TAP_COUNT) {
+			onTestNotifications?.invoke()
+			onShowSnackbar?.invoke("Test notifications triggered!")
+			debugProgress = 0
+			true
+		} else {
+			false
+		}
+	}
 
 	val hasOperators by remember {
 		derivedStateOf { editorState.rawSpentValue.any { it in "+-×÷" } }
@@ -321,14 +332,8 @@ fun Numpad(
 								type = NumpadButtonType.PRIMARY,
 								icon = Icons.Default.Done,
 								onClick = {
-									if (debugProgress == -1) {
-										onTestNotifications?.invoke()
-										onShowSnackbar?.invoke("Test notifications triggered!")
-										debugProgress = 0
-										return@NumpadButton
-									}
-
-									debugProgress = 0
+									if (shouldTriggerTestNotifications()) return@NumpadButton
+							debugProgress = 0
 									onApplyPressedForTutorial?.invoke()
 									onApply()
 									haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -360,7 +365,7 @@ fun Numpad(
 							text = getFloatDivider(),
 							onClick = {
 								onDotInput()
-								debugProgress = if (debugProgress == 7) -1 else (debugProgress + 1)
+								debugProgress = (debugProgress + 1).coerceAtMost(TEST_NOTIFICATION_TAP_COUNT)
 								haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 							})
 						NumpadButton(
@@ -450,8 +455,7 @@ fun Numpad(
 								text = getFloatDivider(),
 								onClick = {
 									onDotInput()
-									debugProgress =
-										if (debugProgress == 7) -1 else (debugProgress + 1)
+									debugProgress = (debugProgress + 1).coerceAtMost(TEST_NOTIFICATION_TAP_COUNT)
 									haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 								})
 						}
@@ -493,6 +497,7 @@ fun Numpad(
 									type = NumpadButtonType.PRIMARY,
 									icon = Icons.Default.Check,
 									onClick = {
+										if (shouldTriggerTestNotifications()) return@NumpadButton
 										debugProgress = 0
 										onApplyPressedForTutorial?.invoke()
 										onApply()

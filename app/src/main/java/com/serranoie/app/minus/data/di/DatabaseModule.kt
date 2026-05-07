@@ -31,6 +31,7 @@ object DatabaseModule {
         )
             .addMigrations(AppDatabaseMigrations.MIGRATION_6_7)
             .addMigrations(AppDatabaseMigrations.MIGRATION_8_9)
+            .addMigrations(AppDatabaseMigrations.MIGRATION_9_10)
             .fallbackToDestructiveMigration()
             .build()
 	}

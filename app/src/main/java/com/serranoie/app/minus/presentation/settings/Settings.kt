@@ -22,7 +22,10 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
@@ -66,6 +69,7 @@ import androidx.compose.ui.window.Dialog
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
@@ -83,12 +87,14 @@ fun Settings(
 	currentTheme: String,
 	currentTypography: String,
 	isMaterialYouEnabled: Boolean,
+	isCreditQuickToggleFeatureEnabled: Boolean,
 	notificationHour: Int,
 	notificationMinute: Int,
 	exactAlarmEnabled: Boolean,
 	onThemeChange: (String) -> Unit,
 	onTypographyChange: (String) -> Unit,
 	onMaterialYouToggle: () -> Unit,
+	onCreditQuickToggleFeatureToggle: () -> Unit,
 	onNotificationTimeChange: (Int, Int) -> Unit,
 	onOpenExactAlarmSettings: () -> Unit,
 	periodMappingMode: PeriodMappingMode,
@@ -101,6 +107,7 @@ fun Settings(
 	var showThemeDialog by remember { mutableStateOf(false) }
 	var showTypographyDialog by remember { mutableStateOf(false) }
 	var showNotificationTimePicker by remember { mutableStateOf(false) }
+	var isCreditFeatureExpanded by remember { mutableStateOf(false) }
 	val dismissThemeDialog = { showThemeDialog = false }
 	val dismissTypographyDialog = { showTypographyDialog = false }
 	val dismissNotificationTimePicker = { showNotificationTimePicker = false }
@@ -165,7 +172,7 @@ fun Settings(
 
 							Text(
 								text = stringResource(R.string.settings_theme_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -201,7 +208,7 @@ fun Settings(
 
 							Text(
 								text = stringResource(R.string.settings_typography_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -231,7 +238,7 @@ fun Settings(
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = stringResource(R.string.settings_material_you_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -248,6 +255,70 @@ fun Settings(
 							}, modifier = Modifier.testTag("SettingsMaterialYouSwitch")
 						)
 					}
+				}
+			}
+
+			item {
+				PaddedListGroup(
+					title = stringResource(R.string.settings_section_features)
+				) {
+					CustomPaddedExpandableItem(
+						isExpanded = isCreditFeatureExpanded,
+						onToggleExpanded = { isCreditFeatureExpanded = !isCreditFeatureExpanded },
+						position = PaddedListItemPosition.Single,
+						modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureItem"),
+						defaultContent = {
+							Icon(
+								imageVector = Icons.Default.CreditCard,
+								contentDescription = null,
+								tint = MaterialTheme.colorScheme.primary
+							)
+							Spacer(modifier = Modifier.width(16.dp))
+							Column(modifier = Modifier.weight(1f)) {
+								Text(
+									text = stringResource(R.string.settings_feature_credit_toggle_title),
+									style = MaterialTheme.typography.bodyMediumEmphasized,
+									color = MaterialTheme.colorScheme.onSurface
+								)
+								Text(
+									text = stringResource(R.string.settings_feature_credit_toggle_subtitle),
+									style = MaterialTheme.typography.bodySmall,
+									color = MaterialTheme.colorScheme.onSurfaceVariant
+								)
+							}
+							Icon(
+								imageVector = if (isCreditFeatureExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+								contentDescription = null,
+								tint = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						},
+						expandedContent = {
+							Text(
+								text = stringResource(R.string.settings_feature_credit_toggle_details),
+								style = MaterialTheme.typography.bodySmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant,
+								modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+							)
+							Row(
+								modifier = Modifier
+									.fillMaxWidth()
+									.padding(top = 8.dp, start = 6.dp, end = 6.dp),
+								verticalAlignment = Alignment.CenterVertically
+							) {
+								Text(
+									text = stringResource(R.string.settings_feature_credit_toggle_switch_label),
+									style = MaterialTheme.typography.bodyMedium,
+									color = MaterialTheme.colorScheme.onSurface,
+									modifier = Modifier.weight(1f)
+								)
+								Switch(
+									checked = isCreditQuickToggleFeatureEnabled,
+									onCheckedChange = { onCreditQuickToggleFeatureToggle() },
+									modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureSwitch")
+								)
+							}
+						}
+					)
 				}
 			}
 
@@ -271,7 +342,7 @@ fun Settings(
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = stringResource(R.string.settings_period_end_time_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -305,7 +376,7 @@ fun Settings(
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = stringResource(R.string.settings_exact_alarm_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -341,7 +412,7 @@ fun Settings(
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = stringResource(R.string.settings_about_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -369,7 +440,7 @@ fun Settings(
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = stringResource(R.string.settings_bug_report_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -395,7 +466,7 @@ fun Settings(
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = stringResource(R.string.settings_version_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -427,7 +498,7 @@ fun Settings(
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = stringResource(R.string.settings_backup_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -453,7 +524,7 @@ fun Settings(
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = stringResource(R.string.settings_import_csv_title),
-								style = MaterialTheme.typography.bodyLarge,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
@@ -487,7 +558,7 @@ fun Settings(
 //						Column(modifier = Modifier.weight(1f)) {
 //							Text(
 //								text = stringResource(R.string.settings_reset_tutorial_title),
-//								style = MaterialTheme.typography.bodyLarge,
+//								style = MaterialTheme.typography.bodyMediumEmphasized,
 //								color = MaterialTheme.colorScheme.onSurface
 //							)
 //							Text(
@@ -624,7 +695,7 @@ private fun ThemeOption(
 		Column(modifier = Modifier.weight(1f)) {
 			Text(
 				text = title,
-				style = MaterialTheme.typography.bodyLarge,
+				style = MaterialTheme.typography.bodyMediumEmphasized,
 				fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
 				color = if (isSelected) {
 					MaterialTheme.colorScheme.onPrimaryContainer
@@ -758,12 +829,14 @@ private fun PreviewSettings() {
 			currentTheme = "System",
 			currentTypography = "Expressive",
 			isMaterialYouEnabled = true,
+			isCreditQuickToggleFeatureEnabled = false,
 			notificationHour = 9,
 			notificationMinute = 0,
 			exactAlarmEnabled = true,
 			onThemeChange = {},
 			onTypographyChange = {},
 			onMaterialYouToggle = {},
+			onCreditQuickToggleFeatureToggle = {},
 			onNotificationTimeChange = { _, _ -> },
 			onOpenExactAlarmSettings = {},
 			periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,

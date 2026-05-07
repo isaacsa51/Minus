@@ -39,6 +39,7 @@ class BudgetTransactionHandler @Inject constructor(
 		input: String,
 		isCalculation: Boolean,
 		isRecurrentEnabled: Boolean,
+		isCreditEnabled: Boolean,
 		comment: String,
 		budgetSettings: BudgetSettings?,
 		resolveActivePeriodId: suspend () -> Long,
@@ -83,6 +84,7 @@ class BudgetTransactionHandler @Inject constructor(
 				date = LocalDateTime.now(),
 				periodId = 0L,
 				categoryId = categoryId,
+				isCredit = isCreditEnabled,
 			)
 			budgetRepository.addQueuedTransaction(pendingTransaction)
 			return ApplyTransactionResult.QueuedForNextPeriod(normalizedInput = normalizedInput)
@@ -101,6 +103,7 @@ class BudgetTransactionHandler @Inject constructor(
 			date = LocalDateTime.now(),
 			periodId = activePeriodId,
 			categoryId = categoryId,
+			isCredit = isCreditEnabled,
 		)
 		addTransactionUseCase(transaction)
 		return ApplyTransactionResult.Added(normalizedInput = normalizedInput)
@@ -113,6 +116,7 @@ class BudgetTransactionHandler @Inject constructor(
 		endDate: LocalDate,
 		subscriptionDay: Int?,
 		resolveActivePeriodId: suspend () -> Long,
+		isCredit: Boolean = false,
 	): Boolean {
 		val amount = pendingAmount ?: return false
 		val rawComment = pendingComment.trim()
@@ -143,6 +147,7 @@ class BudgetTransactionHandler @Inject constructor(
 			recurrentEndDate = endDate.atTime(now.toLocalTime()),
 			subscriptionDay = subscriptionDay,
 			categoryId = categoryId,
+			isCredit = isCredit,
 		)
 		addTransactionUseCase(transaction)
 		return true

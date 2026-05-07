@@ -10,6 +10,7 @@ import logcat.logcat
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.serranoie.app.minus.DEFAULT_NOTIFICATION_HOUR
@@ -203,6 +204,12 @@ class NotificationScheduler @Inject constructor(
             ExistingPeriodicWorkPolicy.KEEP,
             workRequest
         )
+    }
+
+    fun runRecurrentExpenseCheckNow() {
+        val immediateWork = OneTimeWorkRequestBuilder<RecurrentExpenseNotificationWorker>().build()
+        workManager.enqueue(immediateWork)
+        logcat { "Queued immediate recurrent expense check" }
     }
 
     fun cancelAllNotifications() {
