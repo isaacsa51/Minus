@@ -144,7 +144,7 @@
     <string name="budget_period_biweekly">Biweekly</string>
     <string name="budget_period_monthly">Monthly</string>
 
-    <string name="budget_period_label_today">Today\'s budget</string>
+    <string name="budget_period_label_today">Today</string>
     <string name="budget_period_label_this_week">This week</string>
     <string name="budget_period_label_this_biweek">This fortnight</string>
     <string name="budget_period_label_this_month">This month</string>

@@ -183,6 +183,7 @@ fun Editor(
 				budgetSettings = uiState.budgetSettings,
 				viewPeriod = selectedViewPeriod,
 				currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+				centerRemainingAmount = animState == AnimState.EDITING,
 				onOpenSettings = onOpenSettings,
 				onOpenBudgetSheet = {
 					onBudgetPillClickForTutorial()
