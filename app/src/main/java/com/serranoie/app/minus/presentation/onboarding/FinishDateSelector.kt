@@ -1,5 +1,10 @@
 package com.serranoie.app.minus.presentation.onboarding
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,9 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -18,22 +25,25 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.res.stringResource
-import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
-import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.PeriodOptionChip
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -142,8 +152,6 @@ fun FinishDateSelector(
 	onBackPressed: () -> Unit,
 	onApply: (startDate: LocalDate, endDate: LocalDate, period: BudgetPeriod) -> Unit,
 ) {
-	val localBottomSheetScrollState = LocalBottomSheetScrollState.current
-	val windowInsets = LocalWindowInsets.current
 	val dateFormatter = remember { DateTimeFormatter.ofPattern("dd MMM") }
 
 	val dateRangePickerState = rememberDateRangePickerState()
@@ -159,16 +167,24 @@ fun FinishDateSelector(
 	val available = if (totalDays > 0) availablePeriodsFor(totalDays) else emptyList()
 
 	var selectedPeriod by remember { mutableStateOf<BudgetPeriod?>(null) }
-	LaunchedEffect(startDate, endDate) { selectedPeriod = null }
+	// Auto-select first available period when date range changes
+	LaunchedEffect(startDate, endDate, available) {
+		if (selectedPeriod == null && available.isNotEmpty()) {
+			selectedPeriod = available.first()
+		} else if (selectedPeriod !in available) {
+			selectedPeriod = available.firstOrNull()
+		}
+	}
+
+	var pickerVisible by remember { mutableStateOf(false) }
+	LaunchedEffect(Unit) {
+		pickerVisible = true
+	}
 
 	Surface(
 		modifier = Modifier
 			.fillMaxSize()
-			.padding(
-				top = maxOf(
-					windowInsets.calculateTopPadding(), localBottomSheetScrollState.topPadding
-				)
-			),
+			.systemBarsPadding(),
 	) {
 		Column(modifier = Modifier.fillMaxSize()) {
 			Row(
@@ -184,7 +200,7 @@ fun FinishDateSelector(
 				Column(horizontalAlignment = Alignment.CenterHorizontally) {
 					Text(
 						text = stringResource(R.string.onboarding_finish_date_selector_title),
-						style = MaterialTheme.typography.titleMedium,
+						style = MaterialTheme.typography.titleSmallEmphasized,
 					)
 					if (totalDays > 0) {
 						Text(
@@ -210,15 +226,26 @@ fun FinishDateSelector(
 				) { Text(stringResource(R.string.apply)) }
 			}
 
-			DateRangePicker(
-				state = dateRangePickerState,
-				modifier = Modifier
-					.fillMaxWidth()
-					.weight(1f),
-				title = null,
-				headline = null,
-				showModeToggle = false,
-			)
+			AnimatedVisibility(
+				visible = pickerVisible,
+				enter = fadeIn(animationSpec = tween(300, delayMillis = 50)) +
+					scaleIn(initialScale = 0.95f, animationSpec = tween(300, delayMillis = 50)),
+			) {
+				DateRangePicker(
+					state = dateRangePickerState,
+					colors = DatePickerDefaults.colors(
+						titleContentColor = MaterialTheme.colorScheme.onSurface,
+						headlineContentColor = MaterialTheme.colorScheme.onSurface,
+						containerColor = MaterialTheme.colorScheme.surfaceVariant,
+					),
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f),
+					title = null,
+					headline = null,
+					showModeToggle = false,
+				)
+			}
 
 			if (hasRange && available.isNotEmpty()) {
 				HorizontalDivider()
@@ -253,6 +280,31 @@ fun FinishDateSelector(
 					}
 				}
 			}
+		}
+	}
+}
+
+@Preview(
+	showBackground = true,
+	device = Devices.NEXUS_5X,
+	widthDp = 412,
+	heightDp = 860,
+)
+@Composable
+private fun FinishDateSelectorPreview() {
+	MaterialTheme {
+		Surface(
+			modifier = Modifier.fillMaxSize(),
+			color = MaterialTheme.colorScheme.background,
+		) {
+			FinishDateSelector(
+				totalBudget = BigDecimal("5000"),
+				currencyCode = "USD",
+				onBackPressed = {},
+				onApply = { start, end, period ->
+					println("Apply: start=$start, end=$end, period=$period")
+				},
+			)
 		}
 	}
 }

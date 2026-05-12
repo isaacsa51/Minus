@@ -4,6 +4,7 @@ package com.serranoie.app.minus.presentation.analytics
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,7 +31,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
-import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
+import com.serranoie.app.minus.presentation.ui.theme.component.charts.OutlinedSpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
@@ -73,152 +74,147 @@ fun CategoryAnalytics(
 			.toSortedMap(compareByDescending { it })
 	}
 
-	Surface(
-		modifier = modifier
+	Column(
+		modifier = Modifier
+			.verticalScroll(scrollState)
+			.padding(bottom = navigationBarHeight)
+			.padding(horizontal = 16.dp)
 	) {
 		Column(
-			Modifier
-				.verticalScroll(scrollState)
-				.padding(bottom = navigationBarHeight)
-				.padding(horizontal = 16.dp)
+			modifier = Modifier.fillMaxWidth(),
+			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			Column(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalAlignment = Alignment.CenterHorizontally
+			Text(
+				text = stringResource(R.string.analytics_title),
+				style = MaterialTheme.typography.titleMediumEmphasized,
+				color = MaterialTheme.colorScheme.onSurface
+			)
+			Spacer(modifier = Modifier.height(4.dp))
+			Text(
+				text = state.categoryName,
+				style = MaterialTheme.typography.titleSmallEmphasized,
+				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+			)
+		}
+
+		Spacer(modifier = Modifier.height(24.dp))
+
+		if (state.categorySpends.size >= 2) {
+			Surface(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(200.dp),
+				color = MaterialTheme.colorScheme.surface
 			) {
-				Text(
-					text = stringResource(R.string.analytics_title),
-					style = MaterialTheme.typography.titleMediumEmphasized,
-					color = MaterialTheme.colorScheme.onSurface
-				)
-				Spacer(modifier = Modifier.height(4.dp))
-				Text(
-					text = state.categoryName,
-					style = MaterialTheme.typography.titleSmallEmphasized,
-					color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+				OutlinedSpendsChart(
+					spends = state.categorySpends,
+					modifier = Modifier.fillMaxWidth(),
+					chartPadding = PaddingValues(
+						horizontal = 16.dp,
+						vertical = 12.dp,
+					),
+					graphBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+					graphOutlineColor = MaterialTheme.colorScheme.outline,
+					graphColor = MaterialTheme.colorScheme.primary,
 				)
 			}
 
 			Spacer(modifier = Modifier.height(24.dp))
+		} else if (state.categorySpends.size == 1) {
+			val transaction = state.categorySpends.first()
+			val currencyFormat =
+				symbolOnlyCurrencyFormat("USD")
 
-			if (state.categorySpends.size >= 2) {
-				Surface(
+			Card(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(horizontal = 16.dp),
+				shape = RoundedCornerShape(16.dp),
+				colors = CardDefaults.cardColors(
+					containerColor = MaterialTheme.colorScheme.surfaceVariant
+				)
+			) {
+				Column(
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(200.dp),
-					color = MaterialTheme.colorScheme.surface
+						.padding(16.dp),
+					horizontalAlignment = Alignment.CenterHorizontally
 				) {
-					SpendsChart(
-						spends = state.categorySpends, modifier = Modifier.fillMaxWidth()
+					Text(
+						text = stringResource(R.string.single_expense),
+						style = MaterialTheme.typography.labelMediumCondensed,
+						color = MaterialTheme.colorScheme.onSurfaceVariant
 					)
-				}
-
-				Spacer(modifier = Modifier.height(24.dp))
-			} else if (state.categorySpends.size == 1) {
-				val transaction = state.categorySpends.first()
-				val currencyFormat =
-					symbolOnlyCurrencyFormat("USD")
-
-				Card(
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(horizontal = 16.dp),
-					shape = RoundedCornerShape(16.dp),
-					colors = CardDefaults.cardColors(
-						containerColor = MaterialTheme.colorScheme.surfaceVariant
-					)
-				) {
-					Column(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(16.dp),
-						horizontalAlignment = Alignment.CenterHorizontally
-					) {
-						Text(
-							text = stringResource(R.string.single_expense),
-							style = MaterialTheme.typography.labelMediumCondensed,
-							color = MaterialTheme.colorScheme.onSurfaceVariant
-						)
-						Spacer(modifier = Modifier.height(8.dp))
-						Text(
-							text = currencyFormat.format(transaction.amount),
-							style = MaterialTheme.typography.headlineSmallEmphasized,
-							fontWeight = FontWeight.Bold,
-							color = MaterialTheme.colorScheme.onSurface
-						)
-					}
-				}
-
-				Spacer(modifier = Modifier.height(24.dp))
-			}
-
-			if (state.categorySpends.size > 1) {
-				AverageSpendCard(
-					spends = state.categorySpends,
-					startDate = state.startPeriodDate,
-					finishDate = state.finishPeriodDate,
-					currency = "MXN",
-					modifier = Modifier.fillMaxWidth()
-				)
-
-				Spacer(modifier = Modifier.height(24.dp))
-			}
-
-			if (state.categorySpends.isNotEmpty()) {
-				Text(
-					text = stringResource(R.string.expenses_history),
-					style = MaterialTheme.typography.titleMedium,
-					fontWeight = FontWeight.Medium,
-					modifier = Modifier.padding(vertical = 8.dp)
-				)
-
-				Spacer(modifier = Modifier.height(8.dp))
-
-				val currencyFormat =
-					symbolOnlyCurrencyFormat("USD")
-
-				groupedCategoryTransactions.forEach { (date, transactions) ->
-					HistoryDateDivider(date = date)
-
-					transactions.forEach { transaction ->
-						ExpenseItem(
-							transaction = transaction, currencyFormat = currencyFormat
-						)
-					}
-
-					val dayTotal = transactions.sumOf { it.amount }
-					Box(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(horizontal = 16.dp, vertical = 4.dp)
-					) {
-						Text(
-							text = "Total: ${currencyFormat.format(dayTotal)}",
-							style = MaterialTheme.typography.labelLarge,
-							color = MaterialTheme.colorScheme.onSurfaceVariant,
-							modifier = Modifier.align(Alignment.CenterEnd)
-						)
-					}
-
 					Spacer(modifier = Modifier.height(8.dp))
+					Text(
+						text = currencyFormat.format(transaction.amount),
+						style = MaterialTheme.typography.headlineSmallEmphasized,
+						fontWeight = FontWeight.Bold,
+						color = MaterialTheme.colorScheme.onSurface
+					)
 				}
-
-				Spacer(modifier = Modifier.height(32.dp))
 			}
 
-			if (state.categorySpends.isEmpty()) {
+			Spacer(modifier = Modifier.height(24.dp))
+		}
+
+		if (state.categorySpends.size > 1) {
+			AverageSpendCard(
+				spends = state.categorySpends,
+				startDate = state.startPeriodDate,
+				finishDate = state.finishPeriodDate,
+				currency = "MXN",
+				modifier = Modifier.fillMaxWidth()
+			)
+
+			Spacer(modifier = Modifier.height(24.dp))
+		}
+
+		if (state.categorySpends.isNotEmpty()) {
+			val currencyFormat =
+				symbolOnlyCurrencyFormat("USD")
+
+			groupedCategoryTransactions.forEach { (date, transactions) ->
+				HistoryDateDivider(date = date)
+
+				transactions.forEach { transaction ->
+					ExpenseItem(
+						transaction = transaction, currencyFormat = currencyFormat
+					)
+				}
+
+				val dayTotal = transactions.sumOf { it.amount }
 				Box(
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(200.dp),
-					contentAlignment = Alignment.Center
+						.padding(horizontal = 16.dp, vertical = 4.dp)
 				) {
 					Text(
-						text = "No hay gastos en esta categoria",
-						style = MaterialTheme.typography.bodyLarge,
-						color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+						text = "Total: ${currencyFormat.format(dayTotal)}",
+						style = MaterialTheme.typography.labelLarge,
+						color = MaterialTheme.colorScheme.onSurfaceVariant,
+						modifier = Modifier.align(Alignment.CenterEnd)
 					)
 				}
+
+				Spacer(modifier = Modifier.height(8.dp))
+			}
+
+			Spacer(modifier = Modifier.height(32.dp))
+		}
+
+		if (state.categorySpends.isEmpty()) {
+			Box(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(200.dp),
+				contentAlignment = Alignment.Center
+			) {
+				Text(
+					text = "No hay gastos en esta categoria",
+					style = MaterialTheme.typography.bodyLarge,
+					color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+				)
 			}
 		}
 	}

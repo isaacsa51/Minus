@@ -12,7 +12,7 @@
     <string name="save">Guardar</string>
     <string name="delete">Borrar</string>
     <string name="edit">Editar</string>
-    <string name="close">Cerca</string>
+    <string name="close">Cerrar</string>
     <string name="done">Hecho</string>
     <string name="add">Agregar</string>
     <string name="remove">Eliminar</string>
@@ -40,7 +40,6 @@
     <string name="credit_cutoff_dialog_message">Para rastrear gastos a crédito, define el día de corte (1–31).</string>
     <string name="credit_cutoff_dialog_label">Día de corte</string>
 
-
     <string name="period_finished">Periodo terminado</string>
     <string name="remaining_budget">Presupuesto restante</string>
     <string name="rollover_question">¿Qué quieres hacer con el dinero restante?</string>
@@ -50,7 +49,6 @@
     <string name="carry_to_next_day_desc">Agregar %1$s al presupuesto\'de mañana</string>
     <string name="view_analytics">Ver análisis</string>
     <string name="view_analytics_desc">Revisar el resumen del periodo finalizado.</string>
-
 
     <string name="edit_recurrent_expense_title">Editar gasto recurrente</string>
     <string name="edit_expense_title">Editar gasto</string>
@@ -86,7 +84,6 @@
     <string name="budget_split_logic">¿Cómo quieres dividir el presupuesto?</string>
     <string name="new_budget_period">Nuevo período de ahorro</string>
 
-
     <string name="expense_deleted_format">%1$s eliminado</string>
     <string name="generic_expense">Gastos</string>
     <string name="hide_subscriptions_outside_period">Ocultar suscripciones fuera del período</string>
@@ -120,7 +117,6 @@
 
     <string name="days_remaining_label">Días\nrestantes</string>
 
-
     <string name="widget_budget_overview_description">Vea el presupuesto gastado y restante de un vistazo</string>
     <string name="widget_days_countdown_description">Días de cuenta regresiva restantes en el período presupuestario</string>
     <string name="widget_budget_detail_description">Resumen completo del presupuesto con la categoría principal y los días restantes</string>
@@ -128,7 +124,6 @@
     <string name="widget_month_heatmap_description">Calendario del mapa de calor del mes actual</string>
     <string name="widget_add_expense_description">Acceso directo rápido para agregar un nuevo gasto</string>
     <string name="widget_add_expense_label">Agregar nuevo gasto</string>
-
 
     <string name="spent">Gastado</string>
     <string name="left">Izquierda</string>
@@ -159,11 +154,9 @@
     <string name="onboarding_step_3_subtitle">Con el tiempo, aprenderá cuánto puede ahorrar y cuánto puede gastar.</string>
     <string name="onboarding_set_budget_button">Establecer un presupuesto</string>
 
-
     <string name="onboarding_finish_date_selector_title">Selecciona el periodo</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d días · %2$s - %3$s</string>
     <string name="onboarding_finish_date_selector_budget_view_question">¿Cómo quieres ver tu presupuesto?</string>
-
 
     <string name="settings_title">Ajustes</string>
     <string name="settings_section_appearance">Apariencia</string>
@@ -223,7 +216,6 @@
     <string name="expand">Expandir</string>
     <string name="collapse">Colapsar</string>
 
-
     <string name="budget_pill_over_budget">Presupuesto agotado</string>
     <string name="budget_pill_no_budget">Sin presupuesto</string>
     <string name="budget_pill_exhausted_daily_label">a diario</string>
@@ -233,26 +225,20 @@
     <string name="budget_pill_exhausted_double">%1$s y %2$s presupuesto agotado</string>
     <string name="budget_pill_exhausted_triple">%1$s, %2$s y %3$s presupuesto agotado</string>
 
-
     <string name="spend_budget_card_spent_label">Gastado</string>
     <string name="spend_budget_card_available_percent_format">Disponible: %1$s%%</string>
-
 
     <string name="categories_chart_uncategorized">Sin categoría</string>
     <string name="categories_chart_rest">Restante</string>
     <string name="categories_chart_empty_title">No podemos dividir los gastos sin categoría</string>
     <string name="categories_chart_empty_subtitle">Agregue categorías para ver el gráfico</string>
 
-
     <string name="calendar_heatmap_info_text">Este gráfico muestra el dinero gastado por cada día del período.</string>
-
 
     <string name="no_transactions_title">No hay gastos registrados</string>
     <string name="no_transactions_subtitle">Agregue un gasto para comenzar</string>
 
-
     <string name="recurrent_payments_divider_title_upcoming">Próximos pagos recurrentes</string>
-
 
     <string name="upcoming_recurrent_today">Hoy</string>
     <string name="upcoming_recurrent_tomorrow">Mañana</string>
@@ -260,12 +246,10 @@
     <string name="upcoming_recurrent_in_weeks">En %1$d semanas</string>
     <string name="upcoming_recurrent_unnamed_expense">Gasto recurrente sin nombre</string>
 
-
     <string name="recurrent_ticket_unnamed_subscription">Suscripción sin nombre</string>
     <string name="recurrent_ticket_frequency_weekly">Semanalmente</string>
     <string name="recurrent_ticket_frequency_biweekly">Quincenal</string>
     <string name="recurrent_ticket_frequency_monthly">Mensual</string>
-
 
     <string name="rollover_dialog_period_finished_title">Periodo terminado</string>
     <string name="rollover_dialog_question">¿Qué quieres hacer con el dinero restante?</string>
@@ -276,15 +260,13 @@
     <string name="rollover_dialog_view_analytics_title">Ver análisis</string>
     <string name="rollover_dialog_view_analytics_desc">Revisar el resumen del periodo finalizado.</string>
 
-
     <string name="finished_period_header_title">Periodo terminado</string>
     <string name="finished_period_header_no_spends">¿Eh? No\'no gastaste nada este período</string>
     <string name="finished_period_header_over_budget">¡Cuidado! Te excediste del presupuesto en este período</string>
     <string name="finished_period_header_summary">Aquí están las estadísticas de todos sus gastos.</string>
 
-
     <string name="savings_recommendation_title">Recomendación de ahorro</string>
-    <string name="savings_recommendation_method_brief">El método clásico 50/30/20 divide su presupuesto en 50 % de necesidades, 30 % de deseos y 20 % de ahorro, lo que le ayuda a controlar los gastos y ahorrar de forma constante.</string>
+    <string name="savings_recommendation_method_brief" formatted="false">El método clásico 50/30/20 divide su presupuesto en 50 % de necesidades, 30 % de deseos y 20 % de ahorro, lo que le ayuda a controlar los gastos y ahorrar de forma constante.</string>
     <string name="savings_recommendation_current_savings_label">Ahorros actuales</string>
     <string name="savings_recommendation_available_format">Disponible: %1$s</string>
     <string name="savings_recommendation_ideal_savings_format">Ahorros ideales: %1$s</string>
@@ -293,6 +275,22 @@
     <string name="savings_recommendation_one_time_expenses_label">Gastos únicos</string>
     <string name="savings_recommendation_six_month_example_intro">Si ahorras el 20% en cada período durante aproximadamente 6 meses, podrías construir:</string>
 
-
     <string name="wavy_divider_show_all_past_period_expenses">Mostrar todos los gastos del período anterior...</string>
+
+    <!-- Edit Budget Settings -->
+    <string name="use_previous_period_days">Usar %d días</string>
+    <string name="remaining_budget_label">Sobrante</string>
+    <string name="currency_label">Divisa</string>
+    <string name="select_currency">Seleccionar divisa</string>
+    <string name="currency_selected">Seleccionado</string>
+
+    <!-- Remaining Budget Strategy -->
+    <string name="strategy_dialog_title">Sobrante del presupuesto</string>
+    <string name="strategy_dialog_description">Puedes elegir como distribuir el balance del presupuesto al final de cada día.\n\nPor ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: puedes repartir 100 en los días que queda, o gastar 600 (presupuesto por día + sobrante del periodo anterior) hoy.</string>
+    <string name="strategy_ask_always">Preguntarme siempre</string>
+    <string name="strategy_ask_always_desc">Al final del período te preguntaremos qué hacer con el sobrante</string>
+    <string name="strategy_split_equally">Repartir entre todos los días</string>
+    <string name="strategy_split_equally_desc">El sobrante se divide equitativamente entre todos los días del nuevo período</string>
+    <string name="strategy_add_to_first_day">Agregar al primer día</string>
+    <string name="strategy_add_to_first_day_desc">Todo el sobrante se suma al primer día del nuevo período</string>
 </resources>

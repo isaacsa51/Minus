@@ -298,4 +298,21 @@
 
     <!-- Wavy Divider -->
     <string name="wavy_divider_show_all_past_period_expenses">Show all expenses from the previous period…</string>
+
+    <!-- Edit Budget Settings -->
+    <string name="use_previous_period_days">Use %d days</string>
+    <string name="remaining_budget_label">Remaining</string>
+    <string name="currency_label">Currency</string>
+    <string name="select_currency">Select currency</string>
+    <string name="currency_selected">Selected</string>
+
+    <!-- Remaining Budget Strategy -->
+    <string name="strategy_dialog_title">Budget surplus</string>
+    <string name="strategy_dialog_description" formatted="false">You can choose how to distribute your budget balance at the end of each day.\n\nFor example, you have a budget of 500 per day, and yesterday you spent 400: you can spread the 100 across the remaining days, or spend 600 today (daily budget + surplus from previous period).</string>
+    <string name="strategy_ask_always">Ask me always</string>
+    <string name="strategy_ask_always_desc">At the end of the period we will ask you what to do with the surplus</string>
+    <string name="strategy_split_equally">Spread across all days</string>
+    <string name="strategy_split_equally_desc">The surplus is divided equally among all days of the new period</string>
+    <string name="strategy_add_to_first_day">Add to first day</string>
+    <string name="strategy_add_to_first_day_desc">All surplus is added to the first day of the new period</string>
 </resources>

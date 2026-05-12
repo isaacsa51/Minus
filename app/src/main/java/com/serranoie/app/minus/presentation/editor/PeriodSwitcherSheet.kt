@@ -361,7 +361,8 @@ private fun ViewBudgetContent(
 					) {
 						Text(
 							text = stringResource(R.string.no_ending_date),
-							style = MaterialTheme.typography.bodySmall,
+							style = MaterialTheme.typography.bodySmallEmphasized,
+							textAlign = TextAlign.Center,
 							color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
 							modifier = Modifier.padding(16.dp)
 						)
@@ -667,9 +668,9 @@ fun EditBudgetContent(
 		SettingsRow(
 			icon = Icons.Outlined.DateRange,
 			label = if (endCache != null) {
-				"${startCache.format(dateFormatter)} a ${endCache?.format(dateFormatter)}"
+				"${startCache.format(dateFormatter)} — ${endCache?.format(dateFormatter)}"
 			} else {
-				"Sin fecha final definida"
+				stringResource(R.string.budget_no_date_defined)
 			},
 			onClick = { showDateSelector = true },
 		)
@@ -682,7 +683,13 @@ fun EditBudgetContent(
 						startCache = LocalDate.now()
 						endCache = LocalDate.now().plusDays(previousPeriodDays.toLong() - 1)
 					},
-					label = { Text("Usar $previousPeriodDays días") },
+					label = {
+						Text(
+							stringResource(
+								R.string.use_previous_period_days, previousPeriodDays
+							)
+						)
+					},
 					leadingIcon = {
 						Icon(
 							Icons.Rounded.Sync,
@@ -702,11 +709,11 @@ fun EditBudgetContent(
 
 		SettingsRow(
 			icon = Icons.Default.Check,
-			label = "Sobrante",
+			label = stringResource(R.string.remaining_budget_label),
 			trailingText = when (strategyCache) {
-				RemainingBudgetStrategy.ASK_ALWAYS -> "Preguntarme siempre"
-				RemainingBudgetStrategy.SPLIT_EQUALLY -> "Repartir entre días"
-				RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> "Agregar al primer día"
+				RemainingBudgetStrategy.ASK_ALWAYS -> stringResource(R.string.strategy_ask_always)
+				RemainingBudgetStrategy.SPLIT_EQUALLY -> stringResource(R.string.strategy_split_equally)
+				RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> stringResource(R.string.strategy_add_to_first_day)
 			},
 			onClick = { showStrategyPicker = true },
 		)
@@ -716,7 +723,7 @@ fun EditBudgetContent(
 		val currencyDisplay = SupportedCurrency.findByCode(currencyCache)
 		SettingsRow(
 			icon = Icons.Default.Edit,
-			label = "Divisa",
+			label = stringResource(R.string.currency_label),
 			trailingText = if (currencyDisplay != null) {
 				"${currencyDisplay.symbol} ${currencyDisplay.code}"
 			} else {
@@ -883,7 +890,7 @@ private fun CurrencyPickerDialog(
 ) {
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text("Seleccionar divisa") },
+		title = { Text(stringResource(R.string.select_currency)) },
 		text = {
 			Column(
 				modifier = Modifier
@@ -924,7 +931,7 @@ private fun CurrencyPickerDialog(
 						if (isSelected) {
 							Icon(
 								imageVector = Icons.Default.Check,
-								contentDescription = "Seleccionado",
+								contentDescription = stringResource(R.string.currency_selected),
 								tint = MaterialTheme.colorScheme.primary,
 								modifier = Modifier.size(20.dp),
 							)
@@ -950,37 +957,35 @@ private fun StrategyPickerDialog(
 	onDismiss: () -> Unit,
 	onSelect: (RemainingBudgetStrategy) -> Unit,
 ) {
-	val options = listOf(
-		Triple(
-			RemainingBudgetStrategy.ASK_ALWAYS,
-			"Preguntarme siempre",
-			"Al final del período te preguntaremos qué hacer con el sobrante"
-		),
-		Triple(
-			RemainingBudgetStrategy.SPLIT_EQUALLY,
-			"Repartir entre todos los días",
-			"El sobrante se divide equitativamente entre todos los días del nuevo período"
-		),
-		Triple(
-			RemainingBudgetStrategy.ADD_TO_FIRST_DAY,
-			"Agregar al primer día",
-			"Todo el sobrante se suma al primer día del nuevo período"
-		),
+	val strategies = listOf(
+		RemainingBudgetStrategy.ASK_ALWAYS,
+		RemainingBudgetStrategy.SPLIT_EQUALLY,
+		RemainingBudgetStrategy.ADD_TO_FIRST_DAY,
 	)
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text("Sobrante del presupuesto") },
+		title = { Text(stringResource(R.string.strategy_dialog_title)) },
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 				Text(
-					text = "Puedes elegir como distribuir el balance del presupuesto al final de cada día.\n\n" + "Por ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: " + "puedes repartir 100 en los días que queda, o gastar 600 " + "(presupuesto por día + sobrante del periodo anterior) hoy.",
+					text = stringResource(R.string.strategy_dialog_description),
 					style = MaterialTheme.typography.bodySmall,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 				)
 				Spacer(modifier = Modifier.height(4.dp))
-				options.forEach { (strategy, title, description) ->
+				strategies.forEach { strategy ->
 					val isSelected = strategy == currentStrategy
+					val title = when (strategy) {
+						RemainingBudgetStrategy.ASK_ALWAYS -> stringResource(R.string.strategy_ask_always)
+						RemainingBudgetStrategy.SPLIT_EQUALLY -> stringResource(R.string.strategy_split_equally)
+						RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> stringResource(R.string.strategy_add_to_first_day)
+					}
+					val description = when (strategy) {
+						RemainingBudgetStrategy.ASK_ALWAYS -> stringResource(R.string.strategy_ask_always_desc)
+						RemainingBudgetStrategy.SPLIT_EQUALLY -> stringResource(R.string.strategy_split_equally_desc)
+						RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> stringResource(R.string.strategy_add_to_first_day_desc)
+					}
 					OutlinedCard(
 						onClick = { onSelect(strategy) },
 						modifier = Modifier.fillMaxWidth(),
