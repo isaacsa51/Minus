@@ -314,32 +314,6 @@ fun CommentEditor(
     }
 }
 
-@Composable
-fun TaggingToolbarWithViewModel(
-    viewModel: BudgetViewModel = hiltViewModel(),
-    editorFocusController: FocusController,
-    modifier: Modifier = Modifier
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    CategoryToolbar(
-        tags = uiState.tags,
-        currentComment = uiState.currentComment,
-        stage = if (uiState.numpadInput.isNotEmpty()) EditStage.EDIT_SPENT else EditStage.IDLE,
-        onCommentUpdate = { comment ->
-            viewModel.processIntent(BudgetEditorIntent.CommentUpdated(comment))
-        },
-        editorFocusController = editorFocusController,
-        onDeleteTag = { tag ->
-            viewModel.processIntent(BudgetEditorIntent.DeleteTag(tag))
-        },
-        onSaveExpense = {
-            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
-        },
-        modifier = modifier
-    )
-}
-
 @Preview(name = "Tagging Toolbar", showSystemUi = false, showBackground = false)
 @Composable
 private fun CategoryToolbarPreview() {

@@ -11,13 +11,11 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -78,325 +76,341 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditableCategoryTag(
-	currentComment: String,
-	tags: List<String>,
-	onCommentUpdate: (String) -> Unit,
-	editorFocusController: FocusController,
-	extendWidth: Dp = 0.dp,
-	onlyIcon: Boolean = false,
-	onEdit: (Boolean) -> Unit = {},
-	onSaveExpense: () -> Unit = {},
-	onDeleteTag: (String) -> Unit = {},
+    currentComment: String,
+    tags: List<String>,
+    onCommentUpdate: (String) -> Unit,
+    editorFocusController: FocusController,
+    extendWidth: Dp = 0.dp,
+    onlyIcon: Boolean = false,
+    onEdit: (Boolean) -> Unit = {},
+    onSaveExpense: () -> Unit = {},
+    onDeleteTag: (String) -> Unit = {},
 ) {
-	val focusManager = LocalFocusManager.current
-	val localDensity = LocalDensity.current
-	val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+    val localDensity = LocalDensity.current
+    val scope = rememberCoroutineScope()
 
-	var isEdit by remember { mutableStateOf(false) }
-	var value by remember(currentComment) {
-		mutableStateOf(
-			TextFieldValue(
-				currentComment,
-				TextRange(currentComment.length),
-			)
-		)
-	}
-	var isShowSuggestions by remember { mutableStateOf(false) }
-	var renderPopup by remember { mutableStateOf(false) }
+    var isEdit by remember { mutableStateOf(false) }
+    var value by remember(currentComment) {
+        mutableStateOf(
+            TextFieldValue(
+                currentComment,
+                TextRange(currentComment.length),
+            )
+        )
+    }
+    var isShowSuggestions by remember { mutableStateOf(false) }
+    var renderPopup by remember { mutableStateOf(false) }
 
-	val close = {
-		isEdit = false
-		isShowSuggestions = false
-		onEdit(false)
-		onCommentUpdate(value.text.trim())
-		focusManager.clearFocus()
-	}
+    LaunchedEffect(currentComment) {
+        if (currentComment.isBlank()) {
+            isEdit = false
+            isShowSuggestions = false
+            renderPopup = false
+            onEdit(false)
+            focusManager.clearFocus()
+        }
+    }
 
-	val saveAndClose = {
-		onSaveExpense()
-		close()
-	}
+    val close = {
+        isEdit = false
+        isShowSuggestions = false
+        renderPopup = false
+        onEdit(false)
+        onCommentUpdate(value.text.trim())
+        focusManager.clearFocus()
+    }
 
-	ExposedDropdownMenuBox(expanded = isShowSuggestions, onExpandedChange = {}) {
-		Surface(
-			shape = CircleShape,
-			color = MaterialTheme.colorScheme.surface,
-			contentColor = MaterialTheme.colorScheme.onSurface,
-			modifier = Modifier
-				.menuAnchor()
-				.clip(CircleShape)
-				.then(
-					if (isEdit) {
-						Modifier
-					} else {
-						Modifier.clickable {
-							editorFocusController.blur()
-							focusManager.clearFocus()
-							scope.launch {
-								delay(120)
-								isEdit = true
-								onEdit(true)
-							}
-						}
-					})) {
-			Row(
-				modifier = Modifier
-					.widthIn(0.dp, extendWidth)
-					.heightIn(min = 44.dp)
-					.padding(start = 12.dp),
-				verticalAlignment = Alignment.CenterVertically,
-			) {
-				AnimatedVisibility(
-					visible = isEdit,
-					enter = scaleIn(tween(durationMillis = 150)),
-					exit = scaleOut(tween(durationMillis = 150)),
-				) {
-					Spacer(Modifier.width(8.dp))
-				}
+    val saveAndClose = {
+        close()
+        onSaveExpense()
+    }
 
-				Icon(
-					modifier = Modifier.size(20.dp),
-					imageVector = Icons.Default.Label,
-					contentDescription = null,
-				)
+    ExposedDropdownMenuBox(expanded = isShowSuggestions, onExpandedChange = {}) {
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier
+                .menuAnchor()
+                .clip(CircleShape)
+                .then(
+                    if (isEdit) {
+                        Modifier
+                    } else {
+                        Modifier.clickable {
+                            editorFocusController.blur()
+                            focusManager.clearFocus()
+                            scope.launch {
+                                delay(120)
+                                isEdit = true
+                                onEdit(true)
+                            }
+                        }
+                    })) {
+            Row(
+                modifier = Modifier
+                    .widthIn(0.dp, extendWidth)
+                    .heightIn(min = 44.dp)
+                    .padding(start = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AnimatedVisibility(
+                    visible = isEdit,
+                    enter = scaleIn(tween(durationMillis = 150)),
+                    exit = scaleOut(tween(durationMillis = 150)),
+                ) {
+                    Spacer(Modifier.width(8.dp))
+                }
 
-				AnimatedVisibility(
-					visible = !isEdit,
-					enter = scaleIn(tween(durationMillis = 150)),
-					exit = scaleOut(tween(durationMillis = 150)),
-				) {
-					if (onlyIcon) {
-						Spacer(Modifier.width(12.dp))
-					} else {
-						Spacer(Modifier.width(4.dp))
-					}
-				}
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = Icons.Default.Label,
+                    contentDescription = null,
+                )
 
-				AnimatedContent(
-					label = "openCloseTaggingEditor", targetState = isEdit, transitionSpec = {
-						(fadeIn(
-							tween(durationMillis = 250)
-						) togetherWith fadeOut(
-							tween(durationMillis = 250)
-						)).using(
-							SizeTransform(clip = false)
-						)
-					}) { targetIsEdit ->
-					if (this.transition.currentState == this.transition.targetState && targetIsEdit) {
-						renderPopup = true
-					}
+                AnimatedVisibility(
+                    visible = !isEdit,
+                    enter = scaleIn(tween(durationMillis = 150)),
+                    exit = scaleOut(tween(durationMillis = 150)),
+                ) {
+                    if (onlyIcon) {
+                        Spacer(Modifier.width(12.dp))
+                    } else {
+                        Spacer(Modifier.width(4.dp))
+                    }
+                }
 
-					if (targetIsEdit) {
-						CommentEditor(
-							value = value,
-							onChange = { value = it },
-							onApply = { saveAndClose() })
-					} else if (!onlyIcon || value.text.isNotEmpty()) {
-						Text(
-							modifier = Modifier
-								.padding(
-									start = 4.dp, top = 8.dp, bottom = 8.dp, end = 12.dp
-								)
-								.heightIn(min = 28.dp)
-								.wrapContentHeight(align = Alignment.CenterVertically),
-							text = value.text.ifEmpty { stringResource(R.string.add_new_category) },
-							style = MaterialTheme.typography.bodyMediumCondensed,
-							softWrap = false,
-							overflow = TextOverflow.Ellipsis,
-						)
-					}
-				}
-			}
-		}
+                AnimatedContent(
+                    label = "openCloseTaggingEditor", targetState = isEdit, transitionSpec = {
+                        (fadeIn(
+                            tween(durationMillis = 250)
+                        ) togetherWith fadeOut(
+                            tween(durationMillis = 250)
+                        )).using(
+                            SizeTransform(clip = false)
+                        )
+                    }) { targetIsEdit ->
+                    if (this.transition.currentState == this.transition.targetState && targetIsEdit) {
+                        renderPopup = true
+                    }
 
-		// Suggestions popup
-		if (renderPopup) {
-			val filteredItems = tags.filter { tag ->
-				tag.contains(value.text, ignoreCase = true) && tag != value.text
-			}
+                    if (targetIsEdit) {
+                        CommentEditor(
+                            value = value,
+                            onChange = { value = it },
+                            onApply = { saveAndClose() })
+                    } else if (!onlyIcon || value.text.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier
+                                .padding(
+                                    start = 4.dp, top = 8.dp, bottom = 8.dp, end = 12.dp
+                                )
+                                .heightIn(min = 28.dp)
+                                .wrapContentHeight(align = Alignment.CenterVertically),
+                            text = value.text.ifEmpty { stringResource(R.string.add_new_category) },
+                            style = MaterialTheme.typography.bodyMediumCondensed,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+            }
+        }
 
-			val topBarHeight = LocalWindowInsets.current.calculateTopPadding()
+        val trimmedValue = value.text.trim()
+        val filteredItems = if (trimmedValue.isBlank()) {
+            emptyList()
+        } else {
+            tags.filter { tag ->
+                tag.contains(trimmedValue, ignoreCase = true) && tag != trimmedValue
+            }
+        }
 
-			val height = remember { mutableStateOf(1000.dp) }
-			val popupPositionProvider = DropdownMenuPositionProvider(
-				DpOffset(0.dp, 8.dp),
-				localDensity,
-				topBarHeight,
-			) { _, menuBounds ->
-				height.value = with(localDensity) { menuBounds.height.toDp() }
-			}
+        LaunchedEffect(renderPopup, filteredItems.isNotEmpty()) {
+            isShowSuggestions = renderPopup && filteredItems.isNotEmpty()
+        }
 
-			Popup(
-				popupPositionProvider = popupPositionProvider,
-				onDismissRequest = { },
-			) {
-				val dismissEvent = remember { mutableStateOf(false) }
-				Box(
-					modifier = Modifier
-						.fillMaxWidth()
-						.height(height.value)
-						.pointerInput(Unit) {
-							detectTapGestures(
-								onTap = {
-									if (!dismissEvent.value) close()
-									dismissEvent.value = false
-								})
-						},
-					contentAlignment = Alignment.BottomCenter,
-				) {
-					AnimatedVisibility(
-						visible = isShowSuggestions,
-						enter = expandVertically(tween(150)),
-						exit = shrinkVertically(tween(150)),
-					) {
-						val filteredSize = filteredItems.size
-						if (filteredSize > 0) {
-							Surface(
-								modifier = Modifier
-									.width(extendWidth)
-									.pointerInput(Unit) {
-										detectTapGestures {
-											dismissEvent.value = true
-										}
-									}, shape = RoundedCornerShape(16.dp)
-							) {
-								LazyColumn(
-									userScrollEnabled = true,
-									contentPadding = PaddingValues(vertical = 8.dp),
-								) {
-									filteredItems.forEach { item ->
-										itemSuggest(
-											name = item,
-											onClick = {
-												dismissEvent.value = true
-												value = TextFieldValue(
-													item,
-													TextRange(item.length),
-												)
-											},
-											onDelete = {
-												dismissEvent.value = true
-												onDeleteTag(item)
-											}
-										)
-									}
-								}
-							}
-						}
+        if (renderPopup && filteredItems.isNotEmpty()) {
+            val topBarHeight = LocalWindowInsets.current.calculateTopPadding()
 
-						DisposableEffect(Unit) {
-							onDispose {
-								renderPopup = false
-							}
-						}
-					}
-				}
-			}
+            val height = remember { mutableStateOf(1000.dp) }
+            val popupPositionProvider = DropdownMenuPositionProvider(
+                DpOffset(0.dp, 8.dp),
+                localDensity,
+                topBarHeight,
+            ) { _, menuBounds ->
+                height.value = with(localDensity) { menuBounds.height.toDp() }
+            }
 
-			LaunchedEffect(Unit) {
-				isShowSuggestions = true
-			}
-		}
-	}
+            Popup(
+                popupPositionProvider = popupPositionProvider,
+                onDismissRequest = { },
+            ) {
+                val dismissEvent = remember { mutableStateOf(false) }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(height.value)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    if (!dismissEvent.value) close()
+                                    dismissEvent.value = false
+                                })
+                        },
+                    contentAlignment = Alignment.BottomCenter,
+                ) {
+                    AnimatedVisibility(
+                        visible = isShowSuggestions,
+                        enter = expandVertically(tween(150)),
+                        exit = shrinkVertically(tween(150)),
+                    ) {
+                        val filteredSize = filteredItems.size
+                        if (filteredSize > 0) {
+                            Surface(
+                                modifier = Modifier
+                                    .width(extendWidth)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures {
+                                            dismissEvent.value = true
+                                        }
+                                    }, shape = RoundedCornerShape(16.dp)
+                            ) {
+                                LazyColumn(
+                                    userScrollEnabled = true,
+                                    contentPadding = PaddingValues(vertical = 8.dp),
+                                ) {
+                                    filteredItems.forEach { item ->
+                                        itemSuggest(
+                                            name = item,
+                                            onClick = {
+                                                dismissEvent.value = true
+                                                value = TextFieldValue(
+                                                    item,
+                                                    TextRange(item.length),
+                                                )
+                                            },
+                                            onDelete = {
+                                                dismissEvent.value = true
+                                                onDeleteTag(item)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                renderPopup = false
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    }
 }
 
 fun LazyListScope.itemSuggest(
-	name: String,
-	onClick: () -> Unit,
-	onDelete: () -> Unit,
+    name: String,
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
 ) {
-	item(name) {
-		var showDelete by remember { mutableStateOf(false) }
+    item(name) {
+        var showDelete by remember { mutableStateOf(false) }
 
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.SpaceBetween,
-			modifier = Modifier
-				.combinedClickable(
-					onClick = {
-						if (!showDelete) {
-							onClick()
-						}
-					},
-					onLongClick = {
-						showDelete = true
-					}
-				)
-				.fillMaxWidth()
-				.heightIn(42.dp)
-				.padding(start = 24.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-		) {
-			Text(
-				text = name,
-				overflow = TextOverflow.Ellipsis,
-				softWrap = false,
-				modifier = Modifier.weight(1f)
-			)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .combinedClickable(
+                    onClick = {
+                        if (!showDelete) {
+                            onClick()
+                        }
+                    },
+                    onLongClick = {
+                        showDelete = true
+                    }
+                )
+                .fillMaxWidth()
+                .heightIn(42.dp)
+                .padding(start = 24.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+        ) {
+            Text(
+                text = name,
+                overflow = TextOverflow.Ellipsis,
+                softWrap = false,
+                modifier = Modifier.weight(1f)
+            )
 
-			if (showDelete) {
-				IconButton(
-					onClick = {
-						onDelete()
-						showDelete = false
-					},
-					modifier = Modifier.size(28.dp),
-					colors = IconButtonDefaults.iconButtonColors(
-						contentColor = MaterialTheme.colorScheme.error,
-					),
-				) {
-					Icon(
-						imageVector = Icons.Default.Close,
-						contentDescription = "Delete",
-						modifier = Modifier.size(16.dp),
-					)
-				}
-			}
-		}
-	}
+            if (showDelete) {
+                IconButton(
+                    onClick = {
+                        onDelete()
+                        showDelete = false
+                    },
+                    modifier = Modifier.size(28.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Delete",
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
+            }
+        }
+    }
 }
 
 suspend fun PointerInputScope.detectTapUnconsumed(
-	onTap: () -> Unit
+    onTap: () -> Unit
 ) {
-	awaitPointerEventScope {
-		while (true) {
-			val event = awaitPointerEvent()
-			if (event.changes.all { !it.isConsumed }) {
-				onTap()
-			}
-		}
-	}
+    awaitPointerEventScope {
+        while (true) {
+            val event = awaitPointerEvent()
+            if (event.changes.all { !it.isConsumed }) {
+                onTap()
+            }
+        }
+    }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun EditableCategoryTagPreview() {
-	MinusTheme {
-		Box(modifier = Modifier.padding(16.dp)) {
-			EditableCategoryTag(
-				currentComment = "Groceries",
-				tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
-				onCommentUpdate = {},
-				editorFocusController = remember { FocusController() },
-				extendWidth = 300.dp
-			)
-		}
-	}
+    MinusTheme {
+        Box(modifier = Modifier.padding(8.dp)) {
+            EditableCategoryTag(
+                currentComment = "Groceries",
+                tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
+                onCommentUpdate = {},
+                editorFocusController = remember { FocusController() },
+                extendWidth = 300.dp
+            )
+        }
+    }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun EditableCategoryTagOnlyIconPreview() {
-	MinusTheme {
-		Box(modifier = Modifier.padding(16.dp)) {
-			EditableCategoryTag(
-				currentComment = "",
-				tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
-				onCommentUpdate = {},
-				editorFocusController = remember { FocusController() },
-				extendWidth = 300.dp,
-				onlyIcon = true
-			)
-		}
-	}
+    MinusTheme {
+        Box(modifier = Modifier.padding(8.dp)) {
+            EditableCategoryTag(
+                currentComment = "",
+                tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
+                onCommentUpdate = {},
+                editorFocusController = remember { FocusController() },
+                extendWidth = 300.dp,
+                onlyIcon = true
+            )
+        }
+    }
 }
