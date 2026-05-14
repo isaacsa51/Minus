@@ -125,7 +125,6 @@ fun budgetForPeriod(
 	if (totalBudget == BigDecimal.ZERO || totalDays <= 0) return BigDecimal.ZERO
 	
 	val periodDays = period.toDays()
-	// Calculate how many full periods fit in the total days (floor division)
 	val numPeriods = totalDays / periodDays
 	
 	return totalBudget.divide(BigDecimal(numPeriods), 2, RoundingMode.HALF_UP)
@@ -167,7 +166,7 @@ fun FinishDateSelector(
 	val available = if (totalDays > 0) availablePeriodsFor(totalDays) else emptyList()
 
 	var selectedPeriod by remember { mutableStateOf<BudgetPeriod?>(null) }
-	// Auto-select first available period when date range changes
+
 	LaunchedEffect(startDate, endDate, available) {
 		if (selectedPeriod == null && available.isNotEmpty()) {
 			selectedPeriod = available.first()

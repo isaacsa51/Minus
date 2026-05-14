@@ -38,9 +38,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +60,8 @@ import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleLargeCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.calcAdaptiveFont
 import java.math.BigDecimal
@@ -195,6 +199,11 @@ fun BudgetPill(
 		animationSpec = tween(500),
 		label = "progress"
 	)
+	val centeredAmountScale by animateFloatAsState(
+		targetValue = if (shouldCenterRemainingAmount) 1.25f else 1f,
+		animationSpec = tween(220),
+		label = "centeredAmountScale"
+	)
 
 	Column(
 		modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
@@ -252,10 +261,15 @@ fun BudgetPill(
 						) {
 							AdaptiveSingleLineText(
 								text = currencyFormat.format(periodRemaining),
-								style = MaterialTheme.typography.titleSmallCondensed,
+								style = MaterialTheme.typography.titleMediumCondensed,
 								color = contentColor,
 								minFontSize = 16.sp,
-								modifier = Modifier.fillMaxWidth(),
+								modifier = Modifier
+									.fillMaxWidth()
+									.graphicsLayer {
+										scaleX = centeredAmountScale
+										scaleY = centeredAmountScale
+									},
 								textAlign = TextAlign.Center,
 							)
 						}
@@ -283,7 +297,7 @@ fun BudgetPill(
 							if (!isCurrentPeriodOverBudget && !bigVariant) {
 								AdaptiveSingleLineText(
 									text = currencyFormat.format(periodRemaining),
-									style = MaterialTheme.typography.titleSmallCondensed,
+									style = MaterialTheme.typography.titleMediumCondensed,
 									color = contentColor,
 									minFontSize = 16.sp,
 									modifier = Modifier.weight(0.45f),
@@ -345,9 +359,9 @@ private fun StatusLabel(
 				style = if (bigVariant) {
 					MaterialTheme.typography.titleMediumEmphasized
 				} else if (isOverBudget) {
-					MaterialTheme.typography.titleSmallEmphasized
+					MaterialTheme.typography.titleMediumEmphasized
 				} else {
-					MaterialTheme.typography.bodyLargeCondensed
+					MaterialTheme.typography.titleMediumCondensed
 				},
 				color = textColor,
 				minFontSize = if (bigVariant) 14.sp else 12.sp,
@@ -386,7 +400,7 @@ private fun AdaptiveSingleLineText(
 		val density = LocalDensity.current
 		val availableWidth = with(density) { maxWidth.toPx() }
 		val maxFontSize = style.fontSize.takeIf { it != TextUnit.Unspecified }
-			?: MaterialTheme.typography.bodyMedium.fontSize
+			?: MaterialTheme.typography.bodyLarge.fontSize
 		val adaptiveFontSize = calcAdaptiveFont(
 			height = with(density) { maxFontSize.toPx() },
 			width = availableWidth,
