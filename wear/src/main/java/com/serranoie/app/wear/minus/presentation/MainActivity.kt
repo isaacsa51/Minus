@@ -109,6 +109,9 @@ private fun WearCalculatorContent(
 				onBackspace = {
 					amountState.value = amountState.value.dropLast(1)
 				},
+				onClear = {
+					amountState.value = ""
+				},
 				onContinue = {
 					if (amountState.value.isBlank()) return@NumpadEntryScreen
 					step.value = EntryStep.CATEGORY

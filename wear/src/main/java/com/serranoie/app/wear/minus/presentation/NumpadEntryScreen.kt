@@ -1,6 +1,7 @@
 package com.serranoie.app.wear.minus.presentation
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,23 +16,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import java.math.BigDecimal
-import java.text.NumberFormat
-import java.util.Locale
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
-import androidx.wear.compose.material3.TextButton
-import androidx.wear.compose.material3.TextButtonDefaults
 import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.FilledIconButton
 import androidx.wear.compose.material3.IconButtonDefaults
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.TextButton
+import androidx.wear.compose.material3.TextButtonDefaults
 import com.serranoie.app.wear.minus.presentation.theme.MinusTheme
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 internal fun NumpadEntryScreen(
@@ -39,6 +39,7 @@ internal fun NumpadEntryScreen(
 	onDigit: (String) -> Unit,
 	onDot: () -> Unit,
 	onBackspace: () -> Unit,
+	onClear: () -> Unit,
 	onContinue: () -> Unit
 ) {
 	val listState = rememberTransformingLazyColumnState()
@@ -61,8 +62,8 @@ internal fun NumpadEntryScreen(
 				item {
 					Text(
 						text = visualTransformationAsCurrency(amount),
-						style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-						color = MaterialTheme.colorScheme.onSurface
+						style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Black),
+						color = MaterialTheme.colorScheme.primary
 					)
 				}
 
@@ -95,7 +96,13 @@ internal fun NumpadEntryScreen(
 								text = "0", modifier = slot
 							) { onDigit("0") }
 						},
-						right = { slot -> DeleteKey(modifier = slot) { onBackspace() } },
+						right = { slot ->
+							DeleteKey(
+								modifier = slot,
+								onClick = onBackspace,
+								onLongClick = onClear
+							)
+						},
 					)
 				}
 			}
@@ -130,29 +137,43 @@ private fun NumberKey(text: String, modifier: Modifier = Modifier, onClick: () -
 			.width(32.dp),
 		colors = TextButtonDefaults.textButtonColors(
 			containerColor = MaterialTheme.colorScheme.surfaceContainer,
-			contentColor = MaterialTheme.colorScheme.primary
+			contentColor = MaterialTheme.colorScheme.onSurface
 		),
 		shapes = TextButtonDefaults.animatedShapes(),
 	) {
-		Text(
-			text = text,
-			modifier.fillMaxSize(),
-			textAlign = TextAlign.Center,
-			style = MaterialTheme.typography.labelMedium
-		)
+		Box(
+			modifier = Modifier.fillMaxSize(),
+			contentAlignment = Alignment.Center
+		) {
+			Text(
+				text = text,
+				textAlign = TextAlign.Center,
+				style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+			)
+		}
 	}
 }
 
 @Composable
-private fun DeleteKey(modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun DeleteKey(
+	modifier: Modifier = Modifier,
+	onClick: () -> Unit,
+	onLongClick: () -> Unit
+) {
 	FilledIconButton(
 		onClick = onClick,
+		onLongClick = onLongClick,
+		onLongClickLabel = "Clear amount",
+		colors = IconButtonDefaults.filledIconButtonColors(
+			containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+			contentColor = MaterialTheme.colorScheme.tertiary
+		),
 		shapes = IconButtonDefaults.animatedShapes(),
 		modifier = modifier
-			.height(38.dp)
-			.width(38.dp)
+			.height(32.dp)
+			.width(32.dp)
 	) {
-		Text(text = "⌫", fontSize = 18.sp)
+		Text(text = "⌫", style = MaterialTheme.typography.titleMedium)
 	}
 }
 
@@ -175,6 +196,7 @@ private fun NumpadEntryScreenPreview() {
 			onDigit = {},
 			onDot = {},
 			onBackspace = {},
+			onClear = {},
 			onContinue = {})
 	}
 }
