@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import java.math.BigDecimal
 import java.text.NumberFormat
 
@@ -26,8 +27,7 @@ fun DayTotalItem(
 ) {
 	Row(
 		modifier = modifier
-			.fillMaxWidth()
-			.padding(horizontal = 16.dp),
+			.fillMaxWidth(),
 		horizontalArrangement = Arrangement.End
 	) {
 		Text(
@@ -36,7 +36,7 @@ fun DayTotalItem(
 			} else {
 				currencyFormat.format(total)
 			},
-			style = MaterialTheme.typography.bodySmallCondensed,
+			style = MaterialTheme.typography.labelMediumCondensed,
 			color = MaterialTheme.colorScheme.onSurfaceVariant
 		)
 	}

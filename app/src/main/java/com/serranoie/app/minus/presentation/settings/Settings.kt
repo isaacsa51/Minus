@@ -395,92 +395,6 @@ fun Settings(
 
 			item {
 				PaddedListGroup(
-					title = stringResource(R.string.settings_section_app_info)
-				) {
-					CustomPaddedListItem(
-						onClick = {
-							Utils.openWebLink(context, "https://www.github.com/isaacsa51/Sorter")
-							view.weakHapticFeedback()
-						}, position = PaddedListItemPosition.First
-					) {
-						Icon(
-							imageVector = Icons.Default.Info,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_about_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_about_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
-
-					CustomPaddedListItem(
-						onClick = {
-							Utils.openWebLink(
-								context, "https://www.github.com/isaacsa51/Sorter/issues/new"
-							)
-							view.weakHapticFeedback()
-						}, position = PaddedListItemPosition.Middle
-					) {
-						Icon(
-							imageVector = Icons.Default.BugReport,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_bug_report_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_bug_report_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
-
-
-					CustomPaddedListItem(
-						onClick = {
-							view.weakHapticFeedback()
-						}, position = PaddedListItemPosition.Last
-					) {
-						Icon(
-							imageVector = Icons.Default.Info,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_version_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = "v0.5.1",
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
-				}
-			}
-
-			item {
-				PaddedListGroup(
 					title = stringResource(R.string.settings_section_data_backup)
 				) {
 					CustomPaddedListItem(
@@ -536,6 +450,93 @@ fun Settings(
 					}
 				}
 			}
+
+			item {
+				PaddedListGroup(
+					title = stringResource(R.string.settings_section_app_info)
+				) {
+					CustomPaddedListItem(
+						onClick = {
+							Utils.openWebLink(context, "https://www.github.com/isaacsa51/Minus")
+							view.weakHapticFeedback()
+						}, position = PaddedListItemPosition.First
+					) {
+						Icon(
+							imageVector = Icons.Default.Info,
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.primary
+						)
+						Spacer(modifier = Modifier.width(16.dp))
+						Column(modifier = Modifier.weight(1f)) {
+							Text(
+								text = stringResource(R.string.settings_about_title),
+								style = MaterialTheme.typography.bodyMediumEmphasized,
+								color = MaterialTheme.colorScheme.onSurface
+							)
+							Text(
+								text = stringResource(R.string.settings_about_subtitle),
+								style = MaterialTheme.typography.bodySmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+					}
+
+					CustomPaddedListItem(
+						onClick = {
+							Utils.openWebLink(
+								context, "https://www.github.com/isaacsa51/Minus/issues/new"
+							)
+							view.weakHapticFeedback()
+						}, position = PaddedListItemPosition.Middle
+					) {
+						Icon(
+							imageVector = Icons.Default.BugReport,
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.primary
+						)
+						Spacer(modifier = Modifier.width(16.dp))
+						Column(modifier = Modifier.weight(1f)) {
+							Text(
+								text = stringResource(R.string.settings_bug_report_title),
+								style = MaterialTheme.typography.bodyMediumEmphasized,
+								color = MaterialTheme.colorScheme.onSurface
+							)
+							Text(
+								text = stringResource(R.string.settings_bug_report_subtitle),
+								style = MaterialTheme.typography.bodySmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+					}
+
+
+					CustomPaddedListItem(
+						onClick = {
+							view.weakHapticFeedback()
+						}, position = PaddedListItemPosition.Last
+					) {
+						Icon(
+							imageVector = Icons.Default.Info,
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.primary
+						)
+						Spacer(modifier = Modifier.width(16.dp))
+						Column(modifier = Modifier.weight(1f)) {
+							Text(
+								text = stringResource(R.string.settings_version_title),
+								style = MaterialTheme.typography.bodyMediumEmphasized,
+								color = MaterialTheme.colorScheme.onSurface
+							)
+							Text(
+								text = "v0.5.1",
+								style = MaterialTheme.typography.bodySmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+					}
+				}
+			}
+
 //
 //			item {
 //				PaddedListGroup(
