@@ -19,10 +19,14 @@
 </p>
 
 <p align="center">
+  <img src="assets/screenshot_1.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/>
   <img src="assets/screenshot_2.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/>
   <img src="assets/screenshot_3.png" alt="Screenshot 2" width="200" style="border-radius:26px;"/>
   <img src="assets/screenshot_4.png" alt="Screenshot 3" width="200" style="border-radius:26px;"/>
   <img src="assets/screenshot_5.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/>
+  <img src="assets/screenshot_6.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/>
+  <img src="assets/screenshot_7.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/>
+  <img src="assets/screenshot_8.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/>
 </p>
 
 ---
@@ -66,7 +70,15 @@ Minus follows Modern Android Development (MAD) practices and a Clean Architectur
 *   Wear OS Integration: Provides a companion app for quick expense entry on wearable devices.
 *   MVI (Model-View-Intent) Architecture: Used for state management and event handling.
 
+---
+
 ## Wear OS Integration _(still very early on development, may not work properly)_
+
+
+<p align="center">
+  <img src="assets/wear_1.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/>
+  <img src="assets/wear_2.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/>
+</p>
 
 Minus includes a companion Wear OS application. The wearable version provides:
 *   Similar numpad interface for quick expense entry.
