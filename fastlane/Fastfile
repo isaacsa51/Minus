@@ -1,0 +1,22 @@
+default_platform(:android)
+
+platform :android do
+  desc "Genera el APK Release firmado y crea un Release en GitHub"
+  lane :publish_github do
+    version_tag = ENV.fetch("VERSION_TAG")
+
+    gradle(
+      task: "assemble",
+      build_type: "Release"
+    )
+
+    set_github_release(
+      repository_name: "isaacsa51/Minus",
+      api_token: ENV.fetch("GITHUB_TOKEN"),
+      name: "Minus #{version_tag}",
+      tag_name: version_tag,
+      description: "Nuevo lanzamiento de Minus.",
+      upload_assets: ["app/build/outputs/apk/release/app-release.apk"]
+    )
+  end
+end

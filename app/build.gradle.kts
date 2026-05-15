@@ -14,6 +14,14 @@ android {
 		version = release(36)
 	}
 
+	val releaseStoreFile = System.getenv("MINUS_RELEASE_STORE_FILE")
+	val hasReleaseSigningConfig = listOf(
+		releaseStoreFile,
+		System.getenv("MINUS_RELEASE_STORE_PASSWORD"),
+		System.getenv("MINUS_RELEASE_KEY_ALIAS"),
+		System.getenv("MINUS_RELEASE_KEY_PASSWORD")
+	).all { !it.isNullOrBlank() }
+
 	defaultConfig {
 		applicationId = "com.serranoie.app.minus"
 		minSdk = 27
@@ -22,6 +30,17 @@ android {
 		versionName = "1.0"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+	}
+
+	signingConfigs {
+		if (hasReleaseSigningConfig) {
+			create("release") {
+				storeFile = file(releaseStoreFile!!)
+				storePassword = System.getenv("MINUS_RELEASE_STORE_PASSWORD")
+				keyAlias = System.getenv("MINUS_RELEASE_KEY_ALIAS")
+				keyPassword = System.getenv("MINUS_RELEASE_KEY_PASSWORD")
+			}
+		}
 	}
 
 	buildTypes {
@@ -34,6 +53,9 @@ android {
 			buildConfigField("Boolean", "SHOW_LOGS", "false")
 			buildConfigField("Boolean", "DEBUG_FEATURES", "false")
 			isMinifyEnabled = true
+			if (hasReleaseSigningConfig) {
+				signingConfig = signingConfigs.getByName("release")
+			}
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"

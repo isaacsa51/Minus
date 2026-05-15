@@ -1,0 +1,2 @@
+# Plugins used by Fastlane for Minus release automation.
+gem "fastlane-plugin-github_action", "~> 1.7"
