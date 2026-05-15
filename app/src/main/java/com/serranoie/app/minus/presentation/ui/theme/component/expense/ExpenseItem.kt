@@ -1,19 +1,21 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.expense
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
-import com.serranoie.app.minus.presentation.util.prettyDate
-import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
+import com.serranoie.app.minus.presentation.util.prettyDate
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.util.Locale
@@ -34,7 +36,7 @@ fun ExpenseItem(
 	) {
 		Column(modifier = Modifier.weight(1f)) {
 			Text(
-				text = transaction.comment.ifEmpty { "Gasto sin nombre" },
+				text = transaction.comment.ifEmpty { stringResource(R.string.expense_item_unnamed_expense) },
 				style = MaterialTheme.typography.titleMediumCondensed,
 				color = MaterialTheme.colorScheme.onSurface,
 				fontWeight = FontWeight.Medium
@@ -42,7 +44,11 @@ fun ExpenseItem(
 			val timeText = prettyDate(
 				date = transaction.date, showTime = true, forceHideDate = true
 			)
-			val subtitle = if (transaction.isRecurrent) "Gasto recurrente - $timeText" else timeText
+			val subtitle = if (transaction.isRecurrent) {
+				stringResource(R.string.expense_item_recurrent_subtitle_format, timeText)
+			} else {
+				timeText
+			}
 			Text(
 				text = subtitle,
 				style = MaterialTheme.typography.bodySmall,

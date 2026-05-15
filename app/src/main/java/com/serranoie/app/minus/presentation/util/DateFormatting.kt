@@ -134,7 +134,7 @@ fun prettyDate(
 	val timeFormatter = if (DateFormat.is24HourFormat(LocalContext.current)) {
 		DateTimeFormatter.ofPattern("HH:mm", locale)
 	} else {
-		DateTimeFormatter.ofPattern("KK:mm", locale)
+		DateTimeFormatter.ofPattern("hh:mm a", locale)
 	}
 
 
