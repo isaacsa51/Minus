@@ -27,20 +27,20 @@
 
 ---
 
+## Project Overview
+
+The primary goal of Minus is to provide an easy and familiar interface for recording daily spending. By mimicking the layout of a standard calculator interface that reduces it's complexity, that way any user can easy and quickly enter their expenses.
+
 ### Core Features
 
 - Easy Expense Entry: Log expenses directly through a Numpad interface.
-- Splitting Functionality: Built-in functionality to split checks among multiple people directly on demand.
 - CSV Export: Securely export expense data to the device Downloads folder for backup or further analysis in spreadsheet software.
 - Undo & Batch Actions: Restore individual expenses or delete all at once.
 - Wear OS Integration: Provides a companion app for quick expense entry on wearable devices.
 - Subscription Management: Easily manage and track subscriptions.
-- Material Design 3: Dynamic colors, smooth animations, predictive back gestures.
-- Customizable Settings: Light/Dark/System themes, Material You colors.
+- Customizable Settings: Light/Dark/System themes, Material You colors and typography styles.
+- Make calculations on the fly: Need to split a expense amount among multiple people? Swipe up to reveal the operator button, make an operation and press equals to see the result and directly save that expense amount.
 
-## Project Overview
-
-The primary goal of Minus is to provide a "zero-friction" interface for recording daily spending. By mimicking the layout of a standard calculator interface that reduces it's complexity, that way any user can easy and quickly enter their expenses.
 
 ## Technology Stack
 
@@ -55,12 +55,6 @@ The primary goal of Minus is to provide a "zero-friction" interface for recordin
 | Navigation             | Compose Navigation            | Type-safe in-app navigation                          |
 | Design System          | Material 3 Expressive (Alpha) | Modern UI components and dynamic theming             |
 
-### Key Features
-
-*   Calculator-First Entry: Log expenses directly through a Numpad interface.
-*   Check Splitting: Built-in functionality to split checks among multiple people directly on demand.
-*   CSV Export: Securely export expense data to the device Downloads folder for backup or further analysis in spreadsheet software.
-
 ## Architecture
 
 Minus follows Modern Android Development (MAD) practices and a Clean Architecture approach:
@@ -72,15 +66,33 @@ Minus follows Modern Android Development (MAD) practices and a Clean Architectur
 *   Wear OS Integration: Provides a companion app for quick expense entry on wearable devices.
 *   MVI (Model-View-Intent) Architecture: Used for state management and event handling.
 
-## UI Components and Widgets
-
-*   Numpad: A highly optimized custom grid layout using weight-based animations for mode transitions.
-*   NumpadButton: Custom buttons with smooth, state-aware corner radius transitions (Circle to Rounded Square).
-*   WavyDivider: A custom drawing component that uses BoxWithConstraints to ensure consistent rendering across different aspect ratios and accessibility settings.
-
-## Wear OS Integration
+## Wear OS Integration _(still very early on development, may not work properly)_
 
 Minus includes a companion Wear OS application. The wearable version provides:
-*   Quick-add functionality for common expense amounts.
+*   Similar numpad interface for quick expense entry.
 *   Glanceable history of recent entries.
+*   Notification sync through system.
 *   Optimization for round and square watch faces using the latest Wear OS Compose libraries.
+
+### Disclaimer
+This project is still in its early stages of development. While the core features are functional, the Wear OS integration is still under active development and may not work as expected. Please report any issues or feedback you have.
+
+### Contributing
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more information.
+
+### Translations
+Any contributions to translate Minus into other languages are greatly appreciated. Please submit a pull request with your translations.
+
+Current Translation Status:
+- [x] English
+- [x] Spanish
+- [?] French (WIP)
+- [ ] German
+- [ ] Italian
+- [ ] Portuguese
+- [ ] Russian
+- [ ] Chinese
+- [ ] Japanese
+- [ ] Korean
+
+Made with ❤️ by [Isaac Serrano](https://linkedin.com/in/serranoie)
