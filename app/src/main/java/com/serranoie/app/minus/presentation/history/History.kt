@@ -223,21 +223,18 @@ fun History(
 	}
 
 	val groupedCurrentTransactions = remember(
-		currentPeriodTransactions, budgetStartDate, budgetEndDate
+		currentPeriodTransactions, displayTransactions, budgetStartDate, budgetEndDate
 	) {
 		val today = LocalDate.now()
-
-		val withVirtualRecurrent = currentPeriodTransactions.flatMap { transaction ->
-			if (transaction.isRecurrent && !transaction.isDeleted) {
-				val charges =
-					getRecurringChargesInPeriod(transaction, budgetStartDate, budgetEndDate, today)
-				if (charges.isEmpty()) listOf(transaction) else charges
-			} else {
-				listOf(transaction)
+		val regularTransactions = currentPeriodTransactions.filterNot { it.isRecurrent }
+		val recurrentCharges = displayTransactions
+			.filter { it.isRecurrent && !it.isDeleted }
+			.flatMap { transaction ->
+				getRecurringChargesInPeriod(transaction, budgetStartDate, budgetEndDate, today)
 			}
-		}
 
-		withVirtualRecurrent.groupBy { it.date?.toLocalDate() }
+		(regularTransactions + recurrentCharges)
+			.groupBy { it.date?.toLocalDate() }
 			.toSortedMap(compareByDescending { it })
 	}
 
@@ -1284,7 +1281,9 @@ private fun getRecurringChargesInPeriod(
 	transaction: Transaction, periodStart: LocalDate, periodEnd: LocalDate, today: LocalDate
 ): List<Transaction> {
 	val frequency = transaction.recurrentFrequency ?: return emptyList()
-	val startDate = transaction.date?.toLocalDate() ?: return emptyList()
+	val originalDateTime = transaction.date ?: return emptyList()
+	val startDate = originalDateTime.toLocalDate()
+	val originalTime = originalDateTime.toLocalTime()
 	val subscriptionEnd = transaction.recurrentEndDate?.toLocalDate() ?: periodEnd.plusMonths(1)
 
 	val virtualTransactions = mutableListOf<Transaction>()
@@ -1297,7 +1296,7 @@ private fun getRecurringChargesInPeriod(
 		) {
 			virtualTransactions.add(
 				transaction.copy(
-					date = chargeDate.atStartOfDay(),
+					date = chargeDate.atTime(originalTime),
 					id = transaction.id * 1000000 + chargeDate.toEpochDay()
 				)
 			)

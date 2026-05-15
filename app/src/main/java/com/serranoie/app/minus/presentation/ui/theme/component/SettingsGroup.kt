@@ -229,7 +229,7 @@ fun PaddedListItem(
 
 	Surface(
 		shape = shape,
-		tonalElevation = 4.dp,
+		tonalElevation = 2.dp,
 		color = MaterialTheme.colorScheme.surfaceVariant,
 		modifier = Modifier
 			.fillMaxWidth()
@@ -270,7 +270,7 @@ fun CustomPaddedListItem(
 	onClick: () -> Unit,
 	position: PaddedListItemPosition = PaddedListItemPosition.Middle,
 	modifier: Modifier = Modifier,
-	background: Color = MaterialTheme.colorScheme.surfaceVariant,
+	background: Color = MaterialTheme.colorScheme.surfaceContainer,
 	contentColor: Color = MaterialTheme.colorScheme.onSurface,
 	content: @Composable RowScope.() -> Unit
 ) {
@@ -338,7 +338,7 @@ fun CustomPaddedExpandableItem(
 	Surface(
 		shape = shape,
 		tonalElevation = 4.dp,
-		color = MaterialTheme.colorScheme.surfaceVariant,
+		color = MaterialTheme.colorScheme.surfaceContainer,
 		modifier = modifier
 			.fillMaxWidth()
 			.clip(shape)
@@ -383,7 +383,6 @@ fun FlexibleSettingsGroupPreview() {
 	MinusTheme {
 		LazyColumn {
 			item {
-				// Example 1: Using standard SettingsGroupItem
 				FlexibleListGroup(
 					title = "Standard Items"
 				) {

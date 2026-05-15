@@ -90,6 +90,8 @@
     <!-- History -->
     <string name="expense_deleted_format">%1$s deleted</string>
     <string name="generic_expense">Expense</string>
+    <string name="expense_item_unnamed_expense">Unnamed expense</string>
+    <string name="expense_item_recurrent_subtitle_format">Recurrent expense — %1$s</string>
     <string name="hide_subscriptions_outside_period">Hide subscriptions outside of the period</string>
     <string name="show_subscriptions_outside_period">Show subscriptions outside of the period</string>
     <string name="hide_past_period_expenses">Hide past period expenses</string>

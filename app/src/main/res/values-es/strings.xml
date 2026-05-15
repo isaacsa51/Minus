@@ -86,6 +86,8 @@
 
     <string name="expense_deleted_format">%1$s eliminado</string>
     <string name="generic_expense">Gastos</string>
+    <string name="expense_item_unnamed_expense">Gasto sin nombre</string>
+    <string name="expense_item_recurrent_subtitle_format">Gasto recurrente — %1$s</string>
     <string name="hide_subscriptions_outside_period">Ocultar suscripciones fuera del período</string>
     <string name="show_subscriptions_outside_period">Mostrar suscripciones fuera del periodo</string>
     <string name="hide_past_period_expenses">Ocultar gastos del período pasado</string>
