@@ -9,9 +9,14 @@ plugins {
 }
 
 fun gitOutput(vararg args: String): String? {
-	return providers.exec {
-		commandLine("git", *args)
-	}.standardOutput.asText.get().trim().takeIf { it.isNotBlank() }
+	return runCatching {
+		val process = ProcessBuilder("git", *args)
+			.directory(rootDir)
+			.redirectErrorStream(true)
+			.start()
+		val output = process.inputStream.bufferedReader().readText().trim()
+		if (process.waitFor() == 0) output.takeIf { it.isNotBlank() } else null
+	}.getOrNull()
 }
 
 fun normalizedVersionTag(tag: String?): String? {
