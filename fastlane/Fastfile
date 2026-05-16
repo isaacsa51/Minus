@@ -10,12 +10,15 @@ platform :android do
       build_type: "Release"
     )
 
+    apk_path = lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+    UI.user_error!("No se encontró el APK generado por Gradle") unless apk_path && File.exist?(apk_path)
+
     sh(
       "gh",
       "release",
       "create",
       version_tag,
-      "app/build/outputs/apk/release/app-release.apk",
+      apk_path,
       "--repo",
       ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
       "--title",
