@@ -10,13 +10,18 @@ platform :android do
       build_type: "Release"
     )
 
-    set_github_release(
-      repository_name: ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
-      api_token: ENV.fetch("GITHUB_API_TOKEN"),
-      name: "Minus #{version_tag}",
-      tag_name: version_tag,
-      description: "Nuevo lanzamiento de Minus.",
-      upload_assets: ["app/build/outputs/apk/release/app-release.apk"]
+    sh(
+      "gh",
+      "release",
+      "create",
+      version_tag,
+      "app/build/outputs/apk/release/app-release.apk",
+      "--repo",
+      ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
+      "--title",
+      "Minus #{version_tag}",
+      "--notes",
+      "Nuevo lanzamiento de Minus."
     )
   end
 end

@@ -60,7 +60,7 @@ jobs:
 
       - name: Run Fastlane release lane
         env:
-          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_TAG: ${{ github.ref_name }}
           MINUS_RELEASE_STORE_FILE: ${{ github.workspace }}/release-keystore.jks
