@@ -11,8 +11,8 @@ platform :android do
     )
 
     set_github_release(
-      repository_name: "isaacsa51/Minus",
-      api_token: ENV.fetch("GITHUB_TOKEN"),
+      repository_name: ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
+      api_token: ENV.fetch("GITHUB_API_TOKEN"),
       name: "Minus #{version_tag}",
       tag_name: version_tag,
       description: "Nuevo lanzamiento de Minus.",

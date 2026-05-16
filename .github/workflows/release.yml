@@ -37,7 +37,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.3'
           bundler-cache: true
 
       - name: Validate release signing secrets
@@ -60,6 +60,7 @@ jobs:
 
       - name: Run Fastlane release lane
         env:
+          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_TAG: ${{ github.ref_name }}
           MINUS_RELEASE_STORE_FILE: ${{ github.workspace }}/release-keystore.jks
