@@ -8,6 +8,41 @@ plugins {
 	id("com.google.devtools.ksp")
 }
 
+fun gitOutput(vararg args: String): String? {
+	return providers.exec {
+		commandLine("git", *args)
+	}.standardOutput.asText.get().trim().takeIf { it.isNotBlank() }
+}
+
+fun normalizedVersionTag(tag: String?): String? {
+	val normalizedTag = tag?.removePrefix("refs/tags/") ?: return null
+	return normalizedTag.takeIf { it.matches(Regex("^v?\\d+\\.\\d+\\.\\d+(-[A-Za-z0-9.-]+)?$")) }
+}
+
+fun releaseVersionName(): String {
+	val tag = normalizedVersionTag(System.getenv("VERSION_TAG"))
+		?: normalizedVersionTag(System.getenv("GITHUB_REF_NAME"))
+		?: normalizedVersionTag(gitOutput("describe", "--tags", "--exact-match"))
+		?: normalizedVersionTag(gitOutput("describe", "--tags", "--abbrev=0"))
+		?: "v0.0.0-dev"
+
+	return tag.removePrefix("v")
+}
+
+fun versionCodeFrom(versionName: String): Int {
+	val parts = versionName.split("-", limit = 2).first()
+		.split(".")
+		.map { it.toIntOrNull() ?: 0 }
+	val major = parts.getOrElse(0) { 0 }
+	val minor = parts.getOrElse(1) { 0 }
+	val patch = parts.getOrElse(2) { 0 }
+
+	return major * 10_000 + minor * 100 + patch
+}
+
+val appVersionName = releaseVersionName()
+val appVersionCode = versionCodeFrom(appVersionName)
+
 android {
 	namespace = "com.serranoie.app.minus"
 	compileSdk {
@@ -26,8 +61,8 @@ android {
 		applicationId = "com.serranoie.app.minus"
 		minSdk = 27
 		targetSdk = 36
-		versionCode = 1
-		versionName = "1.0"
+		versionCode = appVersionCode
+		versionName = appVersionName
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 	}

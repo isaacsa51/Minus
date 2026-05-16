@@ -66,6 +66,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -116,6 +117,7 @@ fun Settings(
 	val context = LocalContext.current
 	val view = LocalView.current
 	val snackbarHostState = remember { SnackbarHostState() }
+	val appVersionName = "v${BuildConfig.VERSION_NAME}"
 
 	Scaffold(
 		modifier = modifier
@@ -528,7 +530,7 @@ fun Settings(
 								color = MaterialTheme.colorScheme.onSurface
 							)
 							Text(
-								text = "v0.5.1",
+								text = appVersionName,
 								style = MaterialTheme.typography.bodySmall,
 								color = MaterialTheme.colorScheme.onSurfaceVariant
 							)
