@@ -23,8 +23,7 @@ platform :android do
       ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
       "--title",
       "Minus #{version_tag}",
-      "--notes",
-      "Nuevo lanzamiento de Minus."
+      "--generate-notes"
     )
   end
 end
