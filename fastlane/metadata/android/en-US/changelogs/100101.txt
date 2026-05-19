@@ -1,0 +1,3 @@
+Chore version
+
+ - Added missing icon launcher into app.

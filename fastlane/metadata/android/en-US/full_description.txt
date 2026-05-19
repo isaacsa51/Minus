@@ -1,0 +1,14 @@
+Minus is a familiar calculator-style budget tracking app for Android.
+
+It focuses on making daily spending easy to record with a simple numpad interface, quick calculations, local expense history, and practical tools for managing budgets and recurring expenses.
+
+Core features:
+- Log expenses quickly through a calculator-style numpad.
+- Track budgets, daily averages, subscriptions, and recurring expenses.
+- Export expense data as CSV for backup or spreadsheet analysis.
+- Undo entries and manage multiple expenses efficiently.
+- Customize the experience with light, dark, system theme, Material You colors, and typography options.
+- Use home screen widgets for quick expense views and actions.
+- Pair with the Wear OS companion app for fast expense entry from your watch.
+
+Minus is built with Kotlin, Jetpack Compose, Material Design 3, Room, Hilt, and modern Android development practices.

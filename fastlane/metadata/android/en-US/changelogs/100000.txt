@@ -1,0 +1,8 @@
+Initial public release.
+
+- Calculator-style expense entry.
+- Budget and recurring expense tracking.
+- CSV export support.
+- Widgets for quick expense information and actions.
+- Wear OS companion app integration.
+- Automatic GitHub release publishing from tagged builds.

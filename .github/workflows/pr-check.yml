@@ -1,4 +1,4 @@
-name: Android PR Checks
+name: Build App for PR
 
 on:
   pull_request:
@@ -33,4 +33,4 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Compile and test
-        run: ./gradlew :app:compileDebugKotlin :wear:compileDebugKotlin :sync-contract:compileKotlin :app:testDebugUnitTest
+        run: ./gradlew :app:compileFossDebugKotlin :app:compileWearDebugKotlin :wear:compileDebugKotlin :sync-contract:compileKotlin :app:testFossDebugUnitTest :app:testWearDebugUnitTest

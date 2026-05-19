@@ -1,0 +1,8 @@
+Lanzamiento público inicial.
+
+- Registro de gastos con interfaz tipo calculadora.
+- Control de presupuesto y gastos recurrentes.
+- Exportación CSV.
+- Widgets para consultar información y acciones rápidas.
+- Integración con app complementaria para Wear OS.
+- Publicación automática de releases de GitHub desde tags.

@@ -21,5 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Minus"
 include(":app")
-include(":wear")
+if (providers.gradleProperty("minus.includeWearModule").orNull != "false") {
+	include(":wear")
+}
 include(":sync-contract")

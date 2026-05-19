@@ -6,19 +6,23 @@ platform :android do
     version_tag = ENV.fetch("VERSION_TAG")
 
     gradle(
-      task: "assemble",
-      build_type: "Release"
+      task: ":app:assembleWearRelease"
+    )
+    gradle(
+      task: ":app:assembleFossRelease"
     )
 
-    apk_path = lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
-    UI.user_error!("No se encontró el APK generado por Gradle") unless apk_path && File.exist?(apk_path)
+    apk_paths = Dir[
+      File.expand_path("../app/build/outputs/apk/{wear,foss}/release/*.apk", __dir__)
+    ].select { |path| File.exist?(path) }
+    UI.user_error!("No se encontraron APKs generados por Gradle") if apk_paths.empty?
 
     sh(
       "gh",
       "release",
       "create",
       version_tag,
-      apk_path,
+      *apk_paths,
       "--repo",
       ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
       "--title",

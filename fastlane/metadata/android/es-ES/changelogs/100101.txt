@@ -1,0 +1,3 @@
+Versión de tarea
+
+ - Agregada icono launcher faltante dentro de la app.

@@ -72,6 +72,16 @@ android {
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 	}
 
+	flavorDimensions += "distribution"
+	productFlavors {
+		create("foss") {
+			dimension = "distribution"
+		}
+		create("wear") {
+			dimension = "distribution"
+		}
+	}
+
 	signingConfigs {
 		if (hasReleaseSigningConfig) {
 			create("release") {
@@ -89,6 +99,7 @@ android {
 			buildConfigField("Boolean", "DEBUG_FEATURES", "true")
 			isMinifyEnabled = false
 		}
+
 		release {
 			buildConfigField("Boolean", "SHOW_LOGS", "false")
 			buildConfigField("Boolean", "DEBUG_FEATURES", "false")
@@ -164,8 +175,8 @@ dependencies {
 	implementation("androidx.room:room-paging:2.7.2")
 	implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 	implementation("androidx.navigation:navigation-compose:2.7.7")
-	implementation("com.google.android.gms:play-services-wearable:19.0.0")
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
+	"wearImplementation"("com.google.android.gms:play-services-wearable:19.0.0")
+	"wearImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
 	implementation("androidx.glance:glance-appwidget:1.1.1")
 	implementation("androidx.glance:glance-appwidget-preview:1.1.1")
