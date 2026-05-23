@@ -10,6 +10,16 @@
 </p>
 
 <p align="center">
+  <a href="https://apt.izzysoft.de/packages/com.serranoie.app.minus">
+    <img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder_nofont.png" height="50" alt="Get it at IzzyOnDroid">
+  </a>
+
+  <a href="https://github.com/isaacsa51/Minus/releases">
+    <img src="assets/badge_github" height="50" alt="Get it at GitHub">
+  </a>
+</p>
+
+<p align="center">
   <a href="https://github.com/isaacsa51/Sorter/releases">
     <img src="https://img.shields.io/github/v/release/isaacsa51/Minus?include_prereleases" alt="Release">
   </a>
