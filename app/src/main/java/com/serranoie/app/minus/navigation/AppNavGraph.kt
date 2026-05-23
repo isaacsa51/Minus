@@ -1,9 +1,11 @@
 package com.serranoie.app.minus.navigation
 
 import android.app.AlarmManager
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,6 +21,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.datastore.preferences.core.edit
@@ -32,6 +36,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
@@ -46,27 +51,29 @@ import com.serranoie.app.minus.presentation.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.presentation.NOTIFICATION_MINUTE_KEY
 import com.serranoie.app.minus.presentation.THEME_MODE_KEY
 import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
-import com.serranoie.app.minus.presentation.ui.BugReportForm
+import com.serranoie.app.minus.presentation.appTheme
+import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.dynamicColorEnabled
+import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.analytics.Analytics
 import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsActions
 import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsState
-import com.serranoie.app.minus.presentation.appTheme
-import com.serranoie.app.minus.presentation.appTypography
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
-import com.serranoie.app.minus.presentation.dynamicColorEnabled
 import com.serranoie.app.minus.presentation.ui.home.MainScreen
 import com.serranoie.app.minus.presentation.ui.onboarding.OnboardingScreen
 import com.serranoie.app.minus.presentation.ui.settings.CsvTransferEntryPoint
 import com.serranoie.app.minus.presentation.ui.settings.Settings
-import com.serranoie.app.minus.presentation.settingsDataStore
-import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
-import com.serranoie.app.minus.presentation.ui.tutorial.PERIOD_MAPPING_MODE_KEY
-import com.serranoie.app.minus.presentation.ui.tutorial.periodMappingModeFlow
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportForm
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportViewModel
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiEffect
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
 import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
+import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
+import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
+import com.serranoie.app.minus.presentation.ui.tutorial.PERIOD_MAPPING_MODE_KEY
+import com.serranoie.app.minus.presentation.ui.tutorial.periodMappingModeFlow
 import com.serranoie.app.minus.presentation.ui.wallet.Wallet
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
@@ -571,7 +578,48 @@ fun AppNavGraph(
         }
 
         composable(Screen.BugReport.route) {
+            val context = LocalContext.current
+            val shareTitle = stringResource(com.serranoie.app.minus.R.string.bug_report_share_title)
+            val recipientEmail = stringResource(R.string.bug_report_recipient_email)
+            val emailSubject = stringResource(R.string.bug_report_email_subject)
+            val emailBody = stringResource(R.string.bug_report_email_body)
+            val viewModel: BugReportViewModel = hiltViewModel()
+            val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+            LaunchedEffect(viewModel) {
+                viewModel.effects.collect { effect ->
+                    when (effect) {
+                        is BugReportUiEffect.OpenEmailComposer -> {
+                            val emailSelector = Intent(Intent.ACTION_SENDTO).apply {
+                                data = "mailto:".toUri()
+                            }
+                            val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "application/zip"
+                                selector = emailSelector
+                                putExtra(Intent.EXTRA_EMAIL, arrayOf(recipientEmail))
+                                putExtra(Intent.EXTRA_SUBJECT, emailSubject)
+                                putExtra(Intent.EXTRA_TEXT, emailBody)
+                                putExtra(Intent.EXTRA_STREAM, effect.uri)
+                                putExtra(Intent.EXTRA_TITLE, effect.fileName)
+                                clipData = ClipData.newUri(
+                                    context.contentResolver,
+                                    effect.fileName,
+                                    effect.uri,
+                                )
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(Intent.createChooser(emailIntent, shareTitle))
+                        }
+                        is BugReportUiEffect.ShowError -> {
+                            Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+
             BugReportForm(
+                uiState = uiState,
+                onIntent = viewModel::onIntent,
                 onBackClick = {
                     navController.popBackStack()
                 }

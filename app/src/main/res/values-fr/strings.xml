@@ -209,6 +209,9 @@
     <string name="bug_report_other_information_placeholder">Tout contexte supplémentaire ou suggestion…</string>
     <string name="bug_report_attachments_label">Pièces jointes</string>
     <string name="bug_report_submit">Envoyer le rapport</string>
+    <string name="bug_report_share_title">Envoyer le rapport</string>
+    <string name="bug_report_email_subject">Rapport Minus</string>
+    <string name="bug_report_email_body">Bonjour, vous trouverez ci-joint mon rapport Minus généré.</string>
     <string name="bug_report_help_title">Aidez-nous à nous améliorer</string>
     <string name="bug_report_help_message_prefix">Remplir ce formulaire générera un fichier .zip avec le contenu du rapport et les pièces jointes afin que vous puissiez l’envoyer par e-mail.\nSi vous avez un compte GitHub, vous pouvez aussi ouvrir </string>
     <string name="bug_report_help_github_issues">GitHub Issues</string>

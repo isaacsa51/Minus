@@ -212,6 +212,10 @@
     <string name="bug_report_other_information_placeholder">Any additional context or suggestions…</string>
     <string name="bug_report_attachments_label">Attachments</string>
     <string name="bug_report_submit">Submit Report</string>
+    <string name="bug_report_share_title">Send bug report</string>
+    <string name="bug_report_recipient_email" translatable="false">serranoie99@gmail.com</string>
+    <string name="bug_report_email_subject">Minus bug report</string>
+    <string name="bug_report_email_body">Hi, attached is my generated Minus report.</string>
     <string name="bug_report_help_title">Help us improve</string>
     <string name="bug_report_help_message_prefix">Filling out this form will generate a .zip file with the report content and any attachments, so you can send it via email.\nIf you have a GitHub account, you can also open </string>
     <string name="bug_report_help_github_issues">GitHub Issues</string>

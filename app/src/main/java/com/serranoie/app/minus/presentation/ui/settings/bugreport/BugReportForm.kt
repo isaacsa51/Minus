@@ -1,8 +1,7 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 
-package com.serranoie.app.minus.presentation.ui
+package com.serranoie.app.minus.presentation.ui.settings.bugreport
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -64,12 +63,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -99,38 +94,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.permission.PermissionHandler
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportIssueType
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiIntent
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import kotlinx.coroutines.delay
 
-private enum class BugReportIssueType {
-	BugReport, FeatureRequest
-}
-
-private data class ReproductionStep(
-	val id: Long, val value: String = "", val visible: Boolean = true
-)
-
 @Composable
 fun BugReportForm(
+	uiState: BugReportUiState,
+	onIntent: (BugReportUiIntent) -> Unit,
 	modifier: Modifier = Modifier,
 	onBackClick: () -> Unit = {},
-	onSubmitClick: () -> Unit = {},
 	permissionHandler: PermissionHandler = remember { PermissionHandler() },
-	onSelectAttachments: (List<Uri>) -> Unit = {}
 ) {
 	val scrollBehavior =
 		TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-	var selectedIssueType by remember { mutableStateOf(BugReportIssueType.BugReport) }
-	var currentBehavior by remember { mutableStateOf("") }
-	var nextStepId by remember { mutableLongStateOf(3L) }
-	val reproductionSteps = remember {
-		mutableStateListOf(
-			ReproductionStep(id = 0L), ReproductionStep(id = 1L), ReproductionStep(id = 2L)
-		)
-	}
-	var additionalInfo by remember { mutableStateOf("") }
-	var selectedAttachmentUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
 	val context = LocalContext.current
 	val attachmentPickerLauncher = rememberLauncherForActivityResult(
 		contract = ActivityResultContracts.OpenMultipleDocuments(),
@@ -139,8 +119,7 @@ fun BugReportForm(
 				context = context,
 				uris = uris,
 				onAttachmentsSelected = { selectedUris ->
-					selectedAttachmentUris = selectedUris
-					onSelectAttachments(selectedUris)
+					onIntent(BugReportUiIntent.SelectAttachments(selectedUris))
 				}
 			)
 		}
@@ -189,50 +168,43 @@ fun BugReportForm(
 			Spacer(modifier = Modifier.height(8.dp))
 
 			IssueTypeSelector(
-				selectedIssueType = selectedIssueType,
-				onIssueTypeChange = { selectedIssueType = it },
+				selectedIssueType = uiState.selectedIssueType,
+				onIssueTypeChange = { onIntent(BugReportUiIntent.SelectIssueType(it)) },
 				modifier = Modifier.fillMaxWidth()
 			)
 
 			Spacer(modifier = Modifier.height(28.dp))
 
 			FormField(
-				label = if (selectedIssueType == BugReportIssueType.FeatureRequest) {
+				label = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
 					stringResource(R.string.bug_report_change_label)
 				} else {
 					stringResource(R.string.bug_report_current_behavior_label)
 				},
 				placeholder = stringResource(R.string.bug_report_current_behavior_placeholder),
-				value = currentBehavior,
-				onValueChange = { currentBehavior = it },
+				value = uiState.currentBehavior,
+				onValueChange = { onIntent(BugReportUiIntent.ChangeCurrentBehavior(it)) },
 				minHeight = 118.dp
 			)
 
 			Spacer(modifier = Modifier.height(24.dp))
 
 			StepsToReproduceField(
-				stepCount = reproductionSteps.size,
-				stepIdAt = { index -> reproductionSteps[index].id },
-				stepValueAt = { index -> reproductionSteps[index].value },
-				stepVisibleAt = { index -> reproductionSteps[index].visible },
+				stepCount = uiState.reproductionSteps.size,
+				stepIdAt = { index -> uiState.reproductionSteps[index].id },
+				stepValueAt = { index -> uiState.reproductionSteps[index].value },
+				stepVisibleAt = { index -> uiState.reproductionSteps[index].visible },
 				onStepChange = { index, value ->
-					val step = reproductionSteps[index]
-					reproductionSteps[index] = step.copy(value = value)
+					onIntent(BugReportUiIntent.ChangeStep(index, value))
 				},
 				onAddStep = {
-					reproductionSteps.add(ReproductionStep(id = nextStepId++))
+					onIntent(BugReportUiIntent.AddStep)
 				},
 				onRemoveStep = { index ->
-					if (reproductionSteps.size > 1) {
-						val step = reproductionSteps[index]
-						reproductionSteps[index] = step.copy(visible = false)
-					} else {
-						val step = reproductionSteps[index]
-						reproductionSteps[index] = step.copy(value = "")
-					}
+					onIntent(BugReportUiIntent.RemoveStep(index))
 				},
 				onStepExitFinish = { stepId ->
-					reproductionSteps.removeAll { step -> step.id == stepId && !step.visible }
+					onIntent(BugReportUiIntent.FinishStepExit(stepId))
 				})
 
 			Spacer(modifier = Modifier.height(24.dp))
@@ -240,8 +212,8 @@ fun BugReportForm(
 			FormField(
 				label = stringResource(R.string.bug_report_other_information_label),
 				placeholder = stringResource(R.string.bug_report_other_information_placeholder),
-				value = additionalInfo,
-				onValueChange = { additionalInfo = it },
+				value = uiState.additionalInfo,
+				onValueChange = { onIntent(BugReportUiIntent.ChangeAdditionalInfo(it)) },
 				minHeight = 94.dp
 			)
 
@@ -250,7 +222,7 @@ fun BugReportForm(
 			SectionLabel(text = stringResource(R.string.bug_report_attachments_label))
 			Spacer(modifier = Modifier.height(8.dp))
 			AttachmentDropZone(
-				attachmentCount = selectedAttachmentUris.size,
+				attachmentCount = uiState.attachmentCount,
 				modifier = Modifier.fillMaxWidth(),
 				onClick = {
 					permissionHandler.requestAttachmentPickerPermissionIfNeeded(attachmentPickerLauncher)
@@ -260,7 +232,8 @@ fun BugReportForm(
 			Spacer(modifier = Modifier.height(24.dp))
 
 			Button(
-				onClick = onSubmitClick,
+				onClick = { onIntent(BugReportUiIntent.SubmitReport) },
+				enabled = !uiState.isGeneratingReport,
 				shape = RoundedCornerShape(20.dp),
 				colors = ButtonDefaults.buttonColors(
 					containerColor = MaterialTheme.colorScheme.primary,
@@ -673,6 +646,9 @@ private fun SectionLabel(text: String) {
 @Composable
 private fun PreviewBugReportForm() {
 	MinusTheme {
-		BugReportForm()
+		BugReportForm(
+			uiState = BugReportUiState(),
+			onIntent = {},
+		)
 	}
 }
