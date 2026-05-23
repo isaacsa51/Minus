@@ -1,8 +1,8 @@
 package com.serranoie.app.minus.domain.usecase
 
 import com.serranoie.app.minus.domain.model.BudgetSettings
-import com.serranoie.app.minus.presentation.budget.BudgetPeriodManager
-import com.serranoie.app.minus.presentation.budget.PeriodBoundaryResult
+import com.serranoie.app.minus.presentation.ui.budget.BudgetPeriodManager
+import com.serranoie.app.minus.presentation.ui.budget.PeriodBoundaryResult
 import javax.inject.Inject
 
 class PersistBudgetSettingsUseCase @Inject constructor(

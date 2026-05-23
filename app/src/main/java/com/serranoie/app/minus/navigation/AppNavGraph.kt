@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.provider.Settings as AndroidSettings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,12 +20,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dagger.hilt.android.EntryPointAccessors
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -34,39 +32,43 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.serranoie.app.minus.CREDIT_QUICK_TOGGLE_FEATURE_KEY
-import com.serranoie.app.minus.DEFAULT_NOTIFICATION_HOUR
-import com.serranoie.app.minus.DEFAULT_NOTIFICATION_MINUTE
-import com.serranoie.app.minus.EARLY_FINISH_ACTIVE_KEY
-import com.serranoie.app.minus.EARLY_FINISH_ACTUAL_DATE_KEY
-import com.serranoie.app.minus.EARLY_FINISH_ORIGINAL_END_DATE_KEY
+import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
-import com.serranoie.app.minus.domain.model.PeriodMappingMode
-import com.serranoie.app.minus.NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.TYPOGRAPHY_MODE_KEY
-import com.serranoie.app.minus.appTheme
-import com.serranoie.app.minus.appTypography
-import com.serranoie.app.minus.dynamicColorEnabled
-import com.serranoie.app.minus.presentation.analytics.Analytics
-import com.serranoie.app.minus.presentation.analytics.AnalyticsActions
-import com.serranoie.app.minus.presentation.analytics.AnalyticsState
-import com.serranoie.app.minus.presentation.budget.BudgetViewModel
-import com.serranoie.app.minus.presentation.home.MainScreen
-import com.serranoie.app.minus.presentation.onboarding.OnboardingScreen
-import com.serranoie.app.minus.presentation.settings.CsvTransferEntryPoint
-import com.serranoie.app.minus.presentation.settings.Settings
-import com.serranoie.app.minus.presentation.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
-import com.serranoie.app.minus.presentation.tutorial.FirstLaunchTutorialStage
-import com.serranoie.app.minus.presentation.tutorial.PERIOD_MAPPING_MODE_KEY
-import com.serranoie.app.minus.presentation.tutorial.periodMappingModeFlow
+import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
+import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_HOUR
+import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_MINUTE
+import com.serranoie.app.minus.presentation.DYNAMIC_COLOR_KEY
+import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTIVE_KEY
+import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
+import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
+import com.serranoie.app.minus.presentation.NOTIFICATION_HOUR_KEY
+import com.serranoie.app.minus.presentation.NOTIFICATION_MINUTE_KEY
+import com.serranoie.app.minus.presentation.THEME_MODE_KEY
+import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
+import com.serranoie.app.minus.presentation.ui.BugReportForm
+import com.serranoie.app.minus.presentation.ui.analytics.Analytics
+import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsActions
+import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsState
+import com.serranoie.app.minus.presentation.appTheme
+import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
+import com.serranoie.app.minus.presentation.dynamicColorEnabled
+import com.serranoie.app.minus.presentation.ui.home.MainScreen
+import com.serranoie.app.minus.presentation.ui.onboarding.OnboardingScreen
+import com.serranoie.app.minus.presentation.ui.settings.CsvTransferEntryPoint
+import com.serranoie.app.minus.presentation.ui.settings.Settings
+import com.serranoie.app.minus.presentation.settingsDataStore
+import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
+import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
+import com.serranoie.app.minus.presentation.ui.tutorial.PERIOD_MAPPING_MODE_KEY
+import com.serranoie.app.minus.presentation.ui.tutorial.periodMappingModeFlow
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
-import com.serranoie.app.minus.presentation.wallet.Wallet
 import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
-import com.serranoie.app.minus.settingsDataStore
+import com.serranoie.app.minus.presentation.ui.wallet.Wallet
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.math.BigDecimal
@@ -74,6 +76,7 @@ import java.math.RoundingMode
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Date
+import android.provider.Settings as AndroidSettings
 
 /**
  * Returns direction-aware screen transition animations based on navigation direction.
@@ -485,7 +488,7 @@ fun AppNavGraph(
                     context.appTheme = newThemeMode
                     scope.launch {
                         context.settingsDataStore.edit { prefs ->
-                            prefs[com.serranoie.app.minus.THEME_MODE_KEY] = newThemeMode.toString()
+                            prefs[THEME_MODE_KEY] = newThemeMode.toString()
                         }
                     }
                 },
@@ -508,7 +511,7 @@ fun AppNavGraph(
                     context.dynamicColorEnabled = newValue
                     scope.launch {
                         context.settingsDataStore.edit { prefs ->
-                            prefs[com.serranoie.app.minus.DYNAMIC_COLOR_KEY] = newValue
+                            prefs[DYNAMIC_COLOR_KEY] = newValue
                         }
                     }
                 },
@@ -558,7 +561,18 @@ fun AppNavGraph(
                         }
                     }
                 },
+                onBugReportClick = {
+                    navController.navigate(Screen.BugReport.route)
+                },
                 onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.BugReport.route) {
+            BugReportForm(
+                onBackClick = {
                     navController.popBackStack()
                 }
             )

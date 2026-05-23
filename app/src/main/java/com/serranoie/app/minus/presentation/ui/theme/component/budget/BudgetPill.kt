@@ -53,7 +53,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
-import com.serranoie.app.minus.presentation.onboarding.periodLabel
+import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorBad

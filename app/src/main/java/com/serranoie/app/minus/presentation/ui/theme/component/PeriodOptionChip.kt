@@ -27,9 +27,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.BudgetPeriod
-import com.serranoie.app.minus.presentation.onboarding.availablePeriodsFor
-import com.serranoie.app.minus.presentation.onboarding.budgetForPeriod
-import com.serranoie.app.minus.presentation.onboarding.label
+import com.serranoie.app.minus.presentation.ui.onboarding.availablePeriodsFor
+import com.serranoie.app.minus.presentation.ui.onboarding.budgetForPeriod
+import com.serranoie.app.minus.presentation.ui.onboarding.label
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import java.math.BigDecimal
 

@@ -14,7 +14,7 @@ import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY_NA
 import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY_NAME
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_AMOUNT_KEY_NAME
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_STRATEGY_KEY_NAME
-import com.serranoie.app.minus.settingsDataStore
+import com.serranoie.app.minus.presentation.settingsDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

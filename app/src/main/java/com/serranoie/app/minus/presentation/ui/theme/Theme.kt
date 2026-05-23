@@ -11,11 +11,11 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.preferences.core.edit
-import com.serranoie.app.minus.THEME_MODE_KEY
-import com.serranoie.app.minus.TYPOGRAPHY_MODE_KEY
-import com.serranoie.app.minus.appTheme
-import com.serranoie.app.minus.appTypography
-import com.serranoie.app.minus.settingsDataStore
+import com.serranoie.app.minus.presentation.THEME_MODE_KEY
+import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
+import com.serranoie.app.minus.presentation.appTheme
+import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.settingsDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 

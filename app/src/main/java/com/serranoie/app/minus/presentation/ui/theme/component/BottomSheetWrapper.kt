@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.serranoie.app.minus.LocalWindowInsets
+import com.serranoie.app.minus.presentation.LocalWindowInsets
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 

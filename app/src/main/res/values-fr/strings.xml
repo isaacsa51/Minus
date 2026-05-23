@@ -197,6 +197,33 @@
     <string name="settings_bug_report_subtitle">Create a bug report and we will fix it soon</string>
     <string name="settings_version_title">Version</string>
 
+    <!-- Bug Report -->
+    <string name="bug_report_title">Commentaires et assistance</string>
+    <string name="bug_report_type_label">Type de rapport</string>
+    <string name="bug_report_type_bug_report">Rapport de bug</string>
+    <string name="bug_report_type_feature_request">Demande de fonctionnalité</string>
+    <string name="bug_report_change_label">Que faudrait-il changer ?</string>
+    <string name="bug_report_current_behavior_label">Que se passe-t-il ?</string>
+    <string name="bug_report_current_behavior_placeholder">Décrivez le comportement actuel en détail…</string>
+    <string name="bug_report_other_information_label">Autres informations</string>
+    <string name="bug_report_other_information_placeholder">Tout contexte supplémentaire ou suggestion…</string>
+    <string name="bug_report_attachments_label">Pièces jointes</string>
+    <string name="bug_report_submit">Envoyer le rapport</string>
+    <string name="bug_report_help_title">Aidez-nous à nous améliorer</string>
+    <string name="bug_report_help_message_prefix">Remplir ce formulaire générera un fichier .zip avec le contenu du rapport et les pièces jointes afin que vous puissiez l’envoyer par e-mail.\nSi vous avez un compte GitHub, vous pouvez aussi ouvrir </string>
+    <string name="bug_report_help_github_issues">GitHub Issues</string>
+    <string name="bug_report_help_message_suffix"> pour ce dépôt.</string>
+    <string name="bug_report_steps_to_reproduce_label">Étapes pour reproduire</string>
+    <string name="bug_report_add_step">Ajouter une étape</string>
+    <string name="bug_report_step_placeholder_wallet">Ouvrez l’écran du portefeuille</string>
+    <string name="bug_report_step_placeholder_transfer">Appuyez sur \'Transférer\'</string>
+    <string name="bug_report_step_placeholder_crash">Observez le plantage…</string>
+    <string name="bug_report_step_placeholder_format">Décrivez l’étape %1$d…</string>
+    <string name="bug_report_step_number_format">%1$d.</string>
+    <string name="bug_report_upload_assets">Importer des fichiers</string>
+    <string name="bug_report_upload_assets_subtitle">Captures d’écran ou vidéos (jusqu’à 10 Mo)</string>
+    <string name="bug_report_upload_assets_selected_count">%1$d pièce(s) jointe(s) sélectionnée(s)</string>
+
     <string name="settings_backup_title">Back up data</string>
     <string name="settings_backup_subtitle">Back up data to minus_export.csv</string>
     <string name="settings_import_csv_title">Import CSV</string>

@@ -3,14 +3,12 @@
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import logcat.asLog
-import logcat.logcat
 import androidx.datastore.preferences.core.edit
+import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.domain.time.MIDNIGHT_TRANSITION_OCCURRED_KEY
 import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
-import com.serranoie.app.minus.settingsDataStore
-import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.presentation.settingsDataStore
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -19,6 +17,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import logcat.asLog
+import logcat.logcat
 import java.time.LocalDate
 import java.time.ZoneId
 

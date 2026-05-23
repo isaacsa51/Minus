@@ -200,6 +200,34 @@
     <string name="settings_bug_report_subtitle">Create a bug report and we will fix it soon</string>
     <string name="settings_version_title">Version</string>
 
+    <!-- Bug Report -->
+    <string name="bug_report_title">Feedback &amp; Support</string>
+    <string name="bug_report_type_label">Report type</string>
+    <string name="bug_report_type_bug_report">Bug Report</string>
+    <string name="bug_report_type_feature_request">Feature Request</string>
+    <string name="bug_report_change_label">What you should change?</string>
+    <string name="bug_report_current_behavior_label">What is happening?</string>
+    <string name="bug_report_current_behavior_placeholder">Describe the current behavior in detail…</string>
+    <string name="bug_report_other_information_label">Other information</string>
+    <string name="bug_report_other_information_placeholder">Any additional context or suggestions…</string>
+    <string name="bug_report_attachments_label">Attachments</string>
+    <string name="bug_report_submit">Submit Report</string>
+    <string name="bug_report_help_title">Help us improve</string>
+    <string name="bug_report_help_message_prefix">Filling out this form will generate a .zip file with the report content and any attachments, so you can send it via email.\nIf you have a GitHub account, you can also open </string>
+    <string name="bug_report_help_github_issues">GitHub Issues</string>
+    <string name="bug_report_help_message_suffix"> for this repository.</string>
+    <string name="bug_report_github_issues_url" translatable="false">https://github.com/isaacsa51/Minus/issues</string>
+    <string name="bug_report_steps_to_reproduce_label">Steps to reproduce</string>
+    <string name="bug_report_add_step">Add Step</string>
+    <string name="bug_report_step_placeholder_wallet">Open the wallet screen</string>
+    <string name="bug_report_step_placeholder_transfer">Click on \'Transfer\'</string>
+    <string name="bug_report_step_placeholder_crash">Observe the crash…</string>
+    <string name="bug_report_step_placeholder_format">Describe step %1$d…</string>
+    <string name="bug_report_step_number_format">%1$d.</string>
+    <string name="bug_report_upload_assets">Upload Assets</string>
+    <string name="bug_report_upload_assets_subtitle">Screenshots or videos (up to 10MB)</string>
+    <string name="bug_report_upload_assets_selected_count">%1$d attachment(s) selected</string>
+
     <string name="settings_backup_title">Back up data</string>
     <string name="settings_backup_subtitle">Back up data to minus_export.csv</string>
     <string name="settings_import_csv_title">Import CSV</string>

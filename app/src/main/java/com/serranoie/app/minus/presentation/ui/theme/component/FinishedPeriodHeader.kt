@@ -35,9 +35,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.serranoie.app.minus.LocalWindowInsets
 import com.serranoie.app.minus.R
-import com.serranoie.app.minus.presentation.analytics.Size
+import com.serranoie.app.minus.presentation.LocalWindowInsets
+import com.serranoie.app.minus.presentation.ui.analytics.Size
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.util.combineColors
 

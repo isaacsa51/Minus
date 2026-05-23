@@ -8,13 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import logcat.logcat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.serranoie.app.minus.MainActivity
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.presentation.MainActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
+import logcat.logcat
 import javax.inject.Inject
 import javax.inject.Singleton
 
