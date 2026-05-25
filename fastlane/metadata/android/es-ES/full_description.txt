@@ -1,14 +1,1 @@
-Minus es una app Android para controlar tu presupuesto con una interfaz familiar inspirada en una calculadora.
-
-Está pensada para registrar gastos diarios de forma rápida usando un teclado numérico simple, cálculos rápidos, historial local y herramientas prácticas para administrar presupuestos y gastos recurrentes.
-
-Funciones principales:
-- Registra gastos rápidamente con una interfaz tipo calculadora.
-- Controla presupuestos, promedios diarios, suscripciones y gastos recurrentes.
-- Exporta tus datos en CSV para respaldo o análisis en hojas de cálculo.
-- Deshaz registros y administra varios gastos de forma eficiente.
-- Personaliza la app con tema claro, oscuro, sistema, colores Material You y opciones de tipografía.
-- Usa widgets para consultar información y acciones rápidas.
-- Sincroniza con la app complementaria para Wear OS y registra gastos desde tu reloj.
-
-Minus está construida con Kotlin, Jetpack Compose, Material Design 3, Room, Hilt y prácticas modernas de desarrollo Android.
+<p>Minus es una app Android para controlar tu presupuesto con una interfaz familiar inspirada en una calculadora.</p><p>Está pensada para registrar gastos diarios de forma rápida usando un teclado numérico simple, cálculos rápidos, historial local y herramientas prácticas para administrar presupuestos y gastos recurrentes.</p><p><b>Funciones principales:</b></p><ul><li>Registra gastos rápidamente con una interfaz tipo calculadora.</li><li>Controla presupuestos, promedios diarios, suscripciones y gastos recurrentes.</li><li>Exporta tus datos en CSV para respaldo o análisis en hojas de cálculo.</li><li>Deshaz registros y administra varios gastos de forma eficiente.</li><li>Personaliza la app con tema claro, oscuro, sistema, colores Material You y opciones de tipografía.</li><li>Usa widgets para consultar información y acciones rápidas.</li><li>Sincroniza con la app complementaria para Wear OS y registra gastos desde tu reloj.</li></ul><p>Minus está construida con Kotlin, Jetpack Compose, Material Design 3, Room, Hilt y prácticas modernas de desarrollo Android.</p>

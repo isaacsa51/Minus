@@ -1,10 +1,10 @@
 package com.serranoie.app.minus.presentation.ui.theme
 
 import android.content.Context
-import com.serranoie.app.minus.appTheme
-import com.serranoie.app.minus.appTypography
 import com.serranoie.app.minus.domain.model.UserSettings
-import com.serranoie.app.minus.dynamicColorEnabled
+import com.serranoie.app.minus.presentation.appTheme
+import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.dynamicColorEnabled
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.serranoie.app.minus.domain.model.ThemeMode as DomainThemeMode

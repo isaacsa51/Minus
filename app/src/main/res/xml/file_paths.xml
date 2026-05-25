@@ -3,4 +3,7 @@
     <cache-path
         name="csv_cache"
         path="exports/" />
+    <cache-path
+        name="bug_report_cache"
+        path="bug_reports/" />
 </paths>

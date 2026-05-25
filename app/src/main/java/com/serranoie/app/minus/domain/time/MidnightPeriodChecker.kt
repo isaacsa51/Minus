@@ -2,10 +2,10 @@ package com.serranoie.app.minus.domain.time
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
-import com.serranoie.app.minus.BUDGET_END_DATE_KEY
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
-import com.serranoie.app.minus.settingsDataStore
+import com.serranoie.app.minus.presentation.BUDGET_END_DATE_KEY
+import com.serranoie.app.minus.presentation.settingsDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

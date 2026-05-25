@@ -2,11 +2,11 @@ package com.serranoie.app.minus.data.csv
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
-import com.serranoie.app.minus.CURRENT_PERIOD_ID_KEY
-import com.serranoie.app.minus.CURRENT_PERIOD_STARTED_AT_KEY
-import com.serranoie.app.minus.ONBOARDING_COMPLETED_KEY
 import com.serranoie.app.minus.data.repository.BudgetRepository
-import com.serranoie.app.minus.settingsDataStore
+import com.serranoie.app.minus.presentation.CURRENT_PERIOD_ID_KEY
+import com.serranoie.app.minus.presentation.CURRENT_PERIOD_STARTED_AT_KEY
+import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
+import com.serranoie.app.minus.presentation.settingsDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import java.io.InputStream

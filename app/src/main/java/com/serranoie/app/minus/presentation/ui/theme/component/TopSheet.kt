@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
-import logcat.logcat
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -41,10 +40,11 @@ import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.SwipeableState
 import androidx.wear.compose.material.rememberSwipeableState
 import androidx.wear.compose.material.swipeable
-import com.serranoie.app.minus.LocalWindowInsets
+import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.colorEditor
 import kotlinx.coroutines.launch
+import logcat.logcat
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.max
 import kotlin.math.roundToInt

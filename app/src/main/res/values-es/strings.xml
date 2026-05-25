@@ -63,7 +63,7 @@
     <string name="biweekly_with_desc">Quincenal (cada 14 días)</string>
 
     <string name="edit_budget">Editar presupuesto</string>
-    <string name="new_budget">Nuevo de ahorro</string>
+    <string name="new_budget">Nuevo periodo de ahorro</string>
     <plurals name="pending_expense">
         <item quantity="one">%d gasto para el siguiente periodo</item>
         <item quantity="other">%d gastos para el próximo período</item>
@@ -190,6 +190,37 @@
     <string name="settings_bug_report_title">¿Encontraste un error?</string>
     <string name="settings_bug_report_subtitle">Crea un informe de error y lo solucionaremos pronto.</string>
     <string name="settings_version_title">Versión</string>
+
+    <!-- Bug Report -->
+    <string name="bug_report_title">Comentarios y soporte</string>
+    <string name="bug_report_type_label">Tipo de reporte</string>
+    <string name="bug_report_type_bug_report">Reporte de error</string>
+    <string name="bug_report_type_feature_request">Solicitud de función</string>
+    <string name="bug_report_change_label">¿Qué debería cambiar?</string>
+    <string name="bug_report_current_behavior_label">¿Qué está pasando?</string>
+    <string name="bug_report_current_behavior_placeholder">Describe el comportamiento actual en detalle…</string>
+    <string name="bug_report_current_behavior_required">Describe qué está pasando antes de enviar.</string>
+    <string name="bug_report_other_information_label">Otra información</string>
+    <string name="bug_report_other_information_placeholder">Cualquier contexto adicional o sugerencia…</string>
+    <string name="bug_report_attachments_label">Archivos adjuntos</string>
+    <string name="bug_report_submit">Enviar reporte</string>
+    <string name="bug_report_share_title">Enviar reporte</string>
+    <string name="bug_report_email_subject">Reporte de Minus</string>
+    <string name="bug_report_email_body">Hola, adjunto mi reporte generado de Minus.</string>
+    <string name="bug_report_help_title">Ayúdanos a mejorar</string>
+    <string name="bug_report_help_message_prefix">Completar este formulario generará un archivo .zip con el contenido del reporte y los archivos adjuntos para que puedas enviarlo por correo electrónico.\nSi tienes una cuenta de GitHub, también puedes abrir </string>
+    <string name="bug_report_help_github_issues">" GitHub Issues "</string>
+    <string name="bug_report_help_message_suffix"> para este repositorio.</string>
+    <string name="bug_report_steps_to_reproduce_label">Pasos para reproducir</string>
+    <string name="bug_report_add_step">Agregar paso</string>
+    <string name="bug_report_step_placeholder_wallet">Abre la pantalla de billetera</string>
+    <string name="bug_report_step_placeholder_transfer">Toca \'Transferir\'</string>
+    <string name="bug_report_step_placeholder_crash">Observa el cierre inesperado…</string>
+    <string name="bug_report_step_placeholder_format">Describe el paso %1$d…</string>
+    <string name="bug_report_step_number_format">%1$d.</string>
+    <string name="bug_report_upload_assets">Subir archivos</string>
+    <string name="bug_report_upload_assets_subtitle">Capturas o videos (hasta 10 MB)</string>
+    <string name="bug_report_upload_assets_selected_count">%1$d archivo(s) seleccionado(s)</string>
 
     <string name="settings_backup_title">Copia de seguridad de datos</string>
     <string name="settings_backup_subtitle">Realizar una copia de seguridad de los datos en minus_export.csv</string>

@@ -32,4 +32,7 @@ sealed class Screen(val route: String) {
 
     /** Settings screen for app preferences. */
     data object Settings : Screen("settings")
+
+    /** Feedback and bug report form. */
+    data object BugReport : Screen("bug_report")
 }
