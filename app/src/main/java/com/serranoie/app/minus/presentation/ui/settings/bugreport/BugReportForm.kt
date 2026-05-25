@@ -18,7 +18,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,7 +34,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -559,40 +557,27 @@ private fun ReproductionStepRow(
 			modifier = Modifier.width(22.dp)
 		)
 
-		Box(
+		OutlinedTextField(
+			value = value,
+			onValueChange = onValueChange,
+			placeholder = {
+				Text(
+					text = placeholder,
+					style = MaterialTheme.typography.bodyMedium,
+					color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f)
+				)
+			},
+			textStyle = textStyle,
+			shape = RoundedCornerShape(16.dp),
 			modifier = Modifier
 				.weight(1f)
-				.heightIn(min = 56.dp)
-				.border(
-					width = 1.dp,
-					color = MaterialTheme.colorScheme.outline,
-					shape = RoundedCornerShape(16.dp)
-				)
-				.padding(horizontal = 16.dp, vertical = 16.dp),
-			contentAlignment = Alignment.CenterStart
-		) {
-			BasicTextField(
-				value = value,
-				onValueChange = onValueChange,
-				textStyle = textStyle,
-				modifier = Modifier.fillMaxWidth(),
-				keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-				keyboardActions = KeyboardActions(
-					onNext = { focusManager.moveFocus(FocusDirection.Next) }
-				),
-				decorationBox = { innerTextField ->
-					Box(modifier = Modifier.fillMaxWidth()) {
-						if (value.isEmpty()) {
-							Text(
-								text = placeholder,
-								style = MaterialTheme.typography.bodyMedium,
-								color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f)
-							)
-						}
-						innerTextField()
-					}
-				})
-		}
+				.heightIn(min = 56.dp),
+			keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+			keyboardActions = KeyboardActions(
+				onNext = { focusManager.moveFocus(FocusDirection.Next) }
+			),
+			singleLine = true,
+		)
 
 		IconButton(
 			onClick = onRemoveClick, modifier = Modifier.size(40.dp)
