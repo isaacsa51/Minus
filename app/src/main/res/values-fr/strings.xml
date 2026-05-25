@@ -215,7 +215,7 @@
     <string name="bug_report_email_body">Bonjour, vous trouverez ci-joint mon rapport Minus généré.</string>
     <string name="bug_report_help_title">Aidez-nous à nous améliorer</string>
     <string name="bug_report_help_message_prefix">Remplir ce formulaire générera un fichier .zip avec le contenu du rapport et les pièces jointes afin que vous puissiez l’envoyer par e-mail.\nSi vous avez un compte GitHub, vous pouvez aussi ouvrir </string>
-    <string name="bug_report_help_github_issues">GitHub Issues</string>
+    <string name="bug_report_help_github_issues">" GitHub Issues "</string>
     <string name="bug_report_help_message_suffix"> pour ce dépôt.</string>
     <string name="bug_report_steps_to_reproduce_label">Étapes pour reproduire</string>
     <string name="bug_report_add_step">Ajouter une étape</string>
