@@ -15,7 +15,7 @@
   </a>
 
   <a href="https://github.com/isaacsa51/Minus/releases">
-    <img src="assets/badge_github.png" height="50" alt="Get it at GitHub">
+    <img src="assets/badge_github.png" height="80" alt="Get it at GitHub">
   </a>
 </p>
 
