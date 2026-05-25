@@ -47,9 +47,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,6 +68,7 @@ import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetSystemIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
@@ -79,7 +79,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransac
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.RecurrentTicketCard
-import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TicketView
+import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TicketCard
+import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
@@ -102,6 +103,7 @@ fun History(
 	onCancelPendingDelete: () -> Unit = {},
 	onShowInfoSnackbar: (message: String) -> Unit = {},
 ) {
+	val view = LocalView.current
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val scrollState = rememberLazyListState()
 
@@ -227,14 +229,12 @@ fun History(
 	) {
 		val today = LocalDate.now()
 		val regularTransactions = currentPeriodTransactions.filterNot { it.isRecurrent }
-		val recurrentCharges = displayTransactions
-			.filter { it.isRecurrent && !it.isDeleted }
-			.flatMap { transaction ->
-				getRecurringChargesInPeriod(transaction, budgetStartDate, budgetEndDate, today)
-			}
+		val recurrentCharges =
+			displayTransactions.filter { it.isRecurrent && !it.isDeleted }.flatMap { transaction ->
+					getRecurringChargesInPeriod(transaction, budgetStartDate, budgetEndDate, today)
+				}
 
-		(regularTransactions + recurrentCharges)
-			.groupBy { it.date?.toLocalDate() }
+		(regularTransactions + recurrentCharges).groupBy { it.date?.toLocalDate() }
 			.toSortedMap(compareByDescending { it })
 	}
 
@@ -258,13 +258,10 @@ fun History(
 
 	fun queueDeleteWithUndo(transaction: Transaction) {
 		pendingRemovedTransactions = pendingRemovedTransactions + (transaction.id to transaction)
-		onQueueDeleteWithUndo(
-			transaction,
-			"${transaction.comment.ifEmpty { "Gasto" }} eliminado",
-			{
-				pendingRemovedTransactions = pendingRemovedTransactions - transaction.id
-				onCancelPendingDelete()
-			})
+		onQueueDeleteWithUndo(transaction, "${transaction.comment.ifEmpty { "Gasto" }} eliminado", {
+			pendingRemovedTransactions = pendingRemovedTransactions - transaction.id
+			onCancelPendingDelete()
+		})
 	}
 
 	Box(modifier = modifier.fillMaxSize()) {
@@ -273,7 +270,6 @@ fun History(
 			modifier = Modifier
 				.fillMaxSize()
 				.animateContentSize()
-				.then(if (selectedTransaction != null) Modifier.blur(10.dp) else Modifier)
 				.statusBarsPadding()
 				.padding(horizontal = 16.dp)
 		) {
@@ -312,9 +308,7 @@ fun History(
 
 				item("date-$date") {
 					HistoryDateDivider(
-						date = date,
-						isExpanded = isExpanded,
-						onToggleClick = {
+						date = date, isExpanded = isExpanded, onToggleClick = {
 							date?.let { dateKey ->
 								expandedDates = if (isExpanded) {
 									expandedDates.minus(dateKey)
@@ -322,9 +316,7 @@ fun History(
 									expandedDates.plus(dateKey)
 								}
 							}
-						},
-						totalAmount = dayTotal,
-						currencyCode = currencyCode ?: "$"
+						}, totalAmount = dayTotal, currencyCode = currencyCode ?: "$"
 					)
 				}
 
@@ -352,9 +344,9 @@ fun History(
 										enter = EnterTransition.None,
 										exit = slideOutHorizontally(
 											animationSpec = tween(durationMillis = 280),
-											targetOffsetX = { fullWidth -> fullWidth }
-										) + fadeOut(animationSpec = tween(durationMillis = 280))
-									) {
+											targetOffsetX = { fullWidth -> fullWidth }) + fadeOut(
+											animationSpec = tween(durationMillis = 280)
+										)) {
 										SwipeableExpenseItem(
 											transaction = transaction,
 											currencyFormat = currencyFormat,
@@ -365,7 +357,10 @@ fun History(
 											},
 											onEdit = { editingTransaction = transaction },
 											readOnly = readOnly,
-											onClick = { selectedTransaction = transaction })
+											onClick = {
+												view.weakHapticFeedback()
+												selectedTransaction = transaction
+											})
 									}
 
 									if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {
@@ -393,34 +388,26 @@ fun History(
 						modifier = Modifier
 							.fillMaxWidth()
 							.clickable(
-								interactionSource = interactionSource,
-								indication = null
+								interactionSource = interactionSource, indication = null
 							) {
 								showOutOfPeriodSubscriptions = !showOutOfPeriodSubscriptions
-							}
-					) {
+							}) {
 						WavyDivider(
 							text = if (showOutOfPeriodSubscriptions) {
 								"Ocultar subscripciones fuera del periodo"
 							} else {
 								"Mostrar subscripciones fuera del periodo"
-							},
-							amplitude = 4f,
-							wavelength = 45f
+							}, amplitude = 4f, wavelength = 45f
 						)
 					}
 				}
 
 				item("future-recurrent-content") {
 					AnimatedVisibility(
-						visible = showOutOfPeriodSubscriptions,
-						enter = expandVertically(
-							animationSpec = tween(300),
-							expandFrom = Alignment.Top
-						) + fadeIn(animationSpec = tween(300)),
-						exit = shrinkVertically(
-							animationSpec = tween(300),
-							shrinkTowards = Alignment.Top
+						visible = showOutOfPeriodSubscriptions, enter = expandVertically(
+							animationSpec = tween(300), expandFrom = Alignment.Top
+						) + fadeIn(animationSpec = tween(300)), exit = shrinkVertically(
+							animationSpec = tween(300), shrinkTowards = Alignment.Top
 						) + fadeOut(animationSpec = tween(300))
 					) {
 						LazyRow(
@@ -432,8 +419,7 @@ fun History(
 						) {
 							itemsIndexed(
 								items = futureRecurrentOutOfPeriod,
-								key = { _, item -> "future-${item.transaction.id}" }
-							) { _, item ->
+								key = { _, item -> "future-${item.transaction.id}" }) { _, item ->
 								RecurrentTicketCard(
 									title = item.transaction.comment,
 									amountFormatted = currencyFormat.format(item.transaction.amount),
@@ -460,12 +446,10 @@ fun History(
 						modifier = Modifier
 							.fillMaxWidth()
 							.clickable(
-								interactionSource = interactionSource,
-								indication = null
+								interactionSource = interactionSource, indication = null
 							) {
 								showPastPeriod = !showPastPeriod
-							}
-					) {
+							}) {
 						WavyDivider(
 							text = if (showPastPeriod) "Ocultar gastos del periodo pasado" else "Mostrar gastos del periodo pasado",
 							amplitude = 4f,
@@ -482,9 +466,7 @@ fun History(
 
 					item("past-date-$date") {
 						HistoryDateDivider(
-							date = date,
-							isExpanded = isExpanded,
-							onToggleClick = {
+							date = date, isExpanded = isExpanded, onToggleClick = {
 								date?.let { dateKey ->
 									expandedDates = if (isExpanded) {
 										expandedDates.minus(dateKey)
@@ -492,9 +474,7 @@ fun History(
 										expandedDates.plus(dateKey)
 									}
 								}
-							},
-							totalAmount = dayTotal,
-							currencyCode = currencyCode ?: "$"
+							}, totalAmount = dayTotal, currencyCode = currencyCode ?: "$"
 						)
 					}
 
@@ -523,9 +503,9 @@ fun History(
 											enter = EnterTransition.None,
 											exit = slideOutHorizontally(
 												animationSpec = tween(durationMillis = 280),
-												targetOffsetX = { fullWidth -> fullWidth }
-											) + fadeOut(animationSpec = tween(durationMillis = 280))
-										) {
+												targetOffsetX = { fullWidth -> fullWidth }) + fadeOut(
+												animationSpec = tween(durationMillis = 280)
+											)) {
 											SwipeableExpenseItem(
 												transaction = transaction,
 												currencyFormat = currencyFormat,
@@ -625,13 +605,6 @@ fun History(
 				enter = EnterTransition.None,
 				exit = ExitTransition.None
 			) {
-				var showDialogInnerContent by remember(transaction.id) { mutableStateOf(false) }
-				LaunchedEffect(transaction.id) {
-					showDialogInnerContent = false
-					delay(90)
-					showDialogInnerContent = true
-				}
-
 				Box(
 					modifier = Modifier.fillMaxSize()
 				) {
@@ -648,41 +621,30 @@ fun History(
 									selectedTransaction = null
 								}
 							})
-					TicketView(
-						backgroundColor = MaterialTheme.colorScheme.background,
-						teethWidthDp = 20f,
-						teethHeightDp = 4f,
+					TransactionDetailTicketCard(
+						transaction = transaction,
+						totalAmountText = currencyFormat.format(transaction.amount),
+						details = details,
+						onMarkAsPaid = { selectedTransaction = null },
+						onEdit = {
+							selectedTransaction = null
+							editingTransaction = transaction
+						},
+						onDelete = {
+							selectedTransaction = null
+							if (transaction.isRecurrent) {
+								recurrentToDelete = transaction
+								showDeleteRecurrentDialog = true
+							} else {
+								queueDeleteWithUndo(transaction)
+							}
+						},
+						readOnly = readOnly,
 						modifier = Modifier
 							.fillMaxWidth()
 							.padding(horizontal = 24.dp)
 							.align(Alignment.Center)
-					) {
-						TransactionDetailContent(
-							transaction = transaction,
-							isRecurrentExpense = transaction.isRecurrent,
-							operationNumber = "#${transaction.id}",
-							operationTime = transactionDateText,
-							totalAmountText = currencyFormat.format(transaction.amount),
-							details = details,
-							onMarkAsPaid = if (transaction.isRecurrent) {
-								{ selectedTransaction = null }
-							} else null,
-							onEdit = {
-								selectedTransaction = null
-								editingTransaction = transaction
-							},
-							onDelete = {
-								selectedTransaction = null
-								if (transaction.isRecurrent) {
-									recurrentToDelete = transaction
-									showDeleteRecurrentDialog = true
-								} else {
-									queueDeleteWithUndo(transaction)
-								}
-							},
-							readOnly = readOnly
-						)
-					}
+					)
 				}
 			}
 		}
@@ -748,7 +710,11 @@ fun History(
 		}, confirmButton = {
 			Button(
 				onClick = {
-					viewModel.processIntent(BudgetTransactionIntent.DeleteTransactionTapped(transaction))
+					viewModel.processIntent(
+						BudgetTransactionIntent.DeleteTransactionTapped(
+							transaction
+						)
+					)
 					showDeleteRecurrentDialog = false
 					recurrentToDelete = null
 				}, colors = ButtonDefaults.buttonColors(
@@ -804,6 +770,130 @@ fun History(
 						onShowInfoSnackbar("${updatedTransaction.comment.ifEmpty { "Gasto" }} ha sido modificado")
 						recurrentToEdit = null
 					})
+			}
+		}
+	}
+}
+
+@Composable
+private fun TransactionDetailTicketCard(
+	transaction: Transaction,
+	totalAmountText: String,
+	details: List<Pair<String, String>>,
+	onMarkAsPaid: () -> Unit,
+	onEdit: () -> Unit,
+	onDelete: () -> Unit,
+	readOnly: Boolean,
+	modifier: Modifier = Modifier,
+) {
+	TicketCard(
+		backgroundColor = MaterialTheme.colorScheme.background,
+		teethWidthDp = 20f,
+		teethHeightDp = 4f,
+		modifier = modifier
+	) {
+		Column(
+			modifier = Modifier.padding(16.dp),
+			verticalArrangement = Arrangement.spacedBy(8.dp),
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
+			Box(
+				modifier = Modifier
+					.background(Color.Black)
+					.padding(vertical = 8.dp, horizontal = 18.dp)
+			) {
+				Text(
+					text = if (transaction.isRecurrent) "GASTO RECURRENTE" else "GASTO",
+					color = Color.White,
+					style = MaterialTheme.typography.labelLargeEmphasized,
+					textAlign = TextAlign.Center,
+					fontWeight = FontWeight.Bold,
+					fontSize = TextUnit(26f, TextUnitType.Sp),
+				)
+			}
+
+			Text(
+				text = "Num. de Operación: #${transaction.id}",
+				style = MaterialTheme.typography.bodyMediumCondensed,
+				color = MaterialTheme.colorScheme.onSurface,
+				textAlign = TextAlign.Center
+			)
+
+			HorizontalDivider()
+
+			Text(
+				text = "MONTO TOTAL",
+				style = MaterialTheme.typography.labelLargeEmphasized,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+				textAlign = TextAlign.Center
+			)
+
+			Text(
+				text = totalAmountText,
+				style = MaterialTheme.typography.headlineLargeEmphasized,
+				color = MaterialTheme.colorScheme.error,
+				fontWeight = FontWeight.Bold,
+				textAlign = TextAlign.Center
+			)
+
+			HorizontalDivider()
+
+			details.forEach { (label, value) ->
+				Box(modifier = Modifier.fillMaxWidth()) {
+					Text(
+						text = label,
+						style = MaterialTheme.typography.bodyMediumCondensed,
+						color = MaterialTheme.colorScheme.onSurfaceVariant,
+						modifier = Modifier.align(Alignment.CenterStart)
+					)
+					Text(
+						text = value,
+						style = MaterialTheme.typography.bodyMediumCondensed,
+						color = MaterialTheme.colorScheme.onSurface,
+						modifier = Modifier.align(Alignment.CenterEnd)
+					)
+				}
+			}
+
+			if (transaction.isRecurrent) {
+				Button(
+					onClick = onMarkAsPaid, colors = ButtonDefaults.buttonColors(
+						containerColor = MaterialTheme.colorScheme.secondary,
+						contentColor = MaterialTheme.colorScheme.onSecondary
+					), modifier = Modifier.fillMaxWidth()
+				) {
+					Text(
+						text = "Marcar como pagado",
+						style = MaterialTheme.typography.labelSmallEmphasized
+					)
+				}
+			}
+
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(8.dp)
+			) {
+				Button(
+					colors = ButtonDefaults.buttonColors(
+						containerColor = MaterialTheme.colorScheme.surfaceVariant,
+						contentColor = MaterialTheme.colorScheme.primary
+					), onClick = onEdit, modifier = Modifier.weight(1f)
+				) {
+					Text("Editar", style = MaterialTheme.typography.labelSmallEmphasized)
+				}
+
+				if (!readOnly) {
+					Button(
+						onClick = onDelete,
+						modifier = Modifier.weight(1f),
+						colors = ButtonDefaults.buttonColors(
+							containerColor = MaterialTheme.colorScheme.error,
+							contentColor = MaterialTheme.colorScheme.onError
+						)
+					) {
+						Text("Eliminar", style = MaterialTheme.typography.labelSmallEmphasized)
+					}
+				}
 			}
 		}
 	}
@@ -868,12 +958,43 @@ private fun calculateNextChargeDate(transaction: Transaction, today: LocalDate):
 	return result
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun TransactionDetailTicketCardPreview() {
+	MinusTheme {
+		TransactionDetailTicketCard(
+			transaction = Transaction(
+				id = 2048L,
+				amount = BigDecimal("129.99"),
+				comment = "Internet hogar",
+				date = LocalDateTime.now(),
+				isRecurrent = true,
+				recurrentFrequency = RecurrentFrequency.MONTHLY,
+				subscriptionDay = 15,
+				recurrentEndDate = LocalDateTime.now().plusMonths(6),
+			),
+			totalAmountText = "$129.99",
+			details = listOf(
+				"Descripción" to "Internet hogar",
+				"Fecha" to "Hoy, 8:30 PM",
+				"Frecuencia" to "Mensual",
+				"Día de cobro" to "Día 15",
+				"Fin recurrencia" to "En 6 meses",
+			),
+			onMarkAsPaid = {},
+			onEdit = {},
+			onDelete = {},
+			readOnly = false,
+			modifier = Modifier.padding(24.dp)
+		)
+	}
+}
+
 @Preview
 @Composable
 fun HistoryPreview() {
 	MinusTheme {
 		Column {
-
 			HistoryDateDivider(
 				date = LocalDate.now(),
 				isExpanded = true,
@@ -957,11 +1078,8 @@ private fun HistoryFullContentPreview() {
 						isRecurrent = true,
 						recurrentFrequency = RecurrentFrequency.MONTHLY,
 						subscriptionDay = 12
-					),
-					nextChargeDate = LocalDate.now().plusDays(2),
-					isInCurrentPeriod = true
-				),
-				UpcomingRecurrentItem(
+					), nextChargeDate = LocalDate.now().plusDays(2), isInCurrentPeriod = true
+				), UpcomingRecurrentItem(
 					transaction = Transaction(
 						id = 9002L,
 						amount = BigDecimal("5.00"),
@@ -969,9 +1087,7 @@ private fun HistoryFullContentPreview() {
 						date = LocalDateTime.now().minusDays(6),
 						isRecurrent = true,
 						recurrentFrequency = RecurrentFrequency.WEEKLY
-					),
-					nextChargeDate = LocalDate.now().plusDays(4),
-					isInCurrentPeriod = true
+					), nextChargeDate = LocalDate.now().plusDays(4), isInCurrentPeriod = true
 				)
 			)
 
@@ -985,11 +1101,8 @@ private fun HistoryFullContentPreview() {
 						isRecurrent = true,
 						recurrentFrequency = RecurrentFrequency.MONTHLY,
 						subscriptionDay = 2
-					),
-					nextChargeDate = LocalDate.now().plusDays(20),
-					isInCurrentPeriod = false
-				),
-				UpcomingRecurrentItem(
+					), nextChargeDate = LocalDate.now().plusDays(20), isInCurrentPeriod = false
+				), UpcomingRecurrentItem(
 					transaction = Transaction(
 						id = 9011L,
 						amount = BigDecimal("14.99"),
@@ -997,9 +1110,7 @@ private fun HistoryFullContentPreview() {
 						date = LocalDateTime.now().minusDays(25),
 						isRecurrent = true,
 						recurrentFrequency = RecurrentFrequency.BIWEEKLY
-					),
-					nextChargeDate = LocalDate.now().plusDays(28),
-					isInCurrentPeriod = false
+					), nextChargeDate = LocalDate.now().plusDays(28), isInCurrentPeriod = false
 				)
 			)
 
@@ -1009,8 +1120,7 @@ private fun HistoryFullContentPreview() {
 					amount = BigDecimal("23.40"),
 					comment = "Supermercado",
 					date = LocalDateTime.now().minusHours(2)
-				),
-				Transaction(
+				), Transaction(
 					id = 1002L,
 					amount = BigDecimal("12.00"),
 					comment = "Café",
@@ -1024,8 +1134,7 @@ private fun HistoryFullContentPreview() {
 					amount = BigDecimal("70.00"),
 					comment = "Combustible",
 					date = LocalDateTime.now().minusDays(35)
-				),
-				Transaction(
+				), Transaction(
 					id = 2002L,
 					amount = BigDecimal("31.50"),
 					comment = "Comida",
@@ -1034,8 +1143,7 @@ private fun HistoryFullContentPreview() {
 			)
 
 			LazyColumn(
-				modifier = Modifier.fillMaxSize(),
-				contentPadding = PaddingValues(bottom = 24.dp)
+				modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)
 			) {
 				item {
 					BudgetDisplay(
@@ -1124,9 +1232,7 @@ private fun HistoryFullContentPreview() {
 				}
 				itemsIndexed(currentTx, key = { _, tx -> tx.id }) { index, tx ->
 					ExpenseItem(
-						transaction = tx,
-						currencyFormat = currencyFormat,
-						position = when {
+						transaction = tx, currencyFormat = currencyFormat, position = when {
 							currentTx.size == 1 -> PaddedListItemPosition.Single
 							index == 0 -> PaddedListItemPosition.First
 							index == currentTx.lastIndex -> PaddedListItemPosition.Last
@@ -1137,9 +1243,7 @@ private fun HistoryFullContentPreview() {
 
 				item {
 					WavyDivider(
-						text = "Mostrar gastos del periodo pasado",
-						amplitude = 4f,
-						wavelength = 45f
+						text = "Mostrar gastos del periodo pasado", amplitude = 4f, wavelength = 45f
 					)
 				}
 				item {
@@ -1153,124 +1257,13 @@ private fun HistoryFullContentPreview() {
 				}
 				itemsIndexed(pastTx, key = { _, tx -> tx.id }) { index, tx ->
 					ExpenseItem(
-						transaction = tx,
-						currencyFormat = currencyFormat,
-						position = when {
+						transaction = tx, currencyFormat = currencyFormat, position = when {
 							pastTx.size == 1 -> PaddedListItemPosition.Single
 							index == 0 -> PaddedListItemPosition.First
 							index == pastTx.lastIndex -> PaddedListItemPosition.Last
 							else -> PaddedListItemPosition.Middle
 						}
 					)
-				}
-			}
-		}
-	}
-}
-
-@Composable
-private fun TransactionDetailContent(
-	transaction: Transaction,
-	isRecurrentExpense: Boolean,
-	operationNumber: String,
-	operationTime: String,
-	totalAmountText: String,
-	details: List<Pair<String, String>>,
-	onMarkAsPaid: (() -> Unit)?,
-	onEdit: () -> Unit,
-	onDelete: () -> Unit,
-	readOnly: Boolean
-) {
-	Column(
-		modifier = Modifier.padding(16.dp),
-		verticalArrangement = Arrangement.spacedBy(12.dp),
-		horizontalAlignment = Alignment.CenterHorizontally
-	) {
-		Box(
-			modifier = Modifier
-				.background(Color.Black)
-				.padding(vertical = 8.dp, horizontal = 18.dp)
-		) {
-			Text(
-				text = if (isRecurrentExpense) "GASTO RECURRENTE" else "GASTO",
-				color = Color.White,
-				style = MaterialTheme.typography.labelLarge,
-				fontWeight = FontWeight.Bold,
-				fontSize = TextUnit(26f, TextUnitType.Sp),
-				fontFamily = FontFamily.Monospace
-			)
-		}
-
-		Text(
-			text = "Num. de Operación: $operationNumber",
-			style = MaterialTheme.typography.bodyMedium,
-			color = MaterialTheme.colorScheme.onSurface,
-			textAlign = TextAlign.Center
-		)
-
-		HorizontalDivider()
-
-		Text(
-			text = "MONTO TOTAL",
-			style = MaterialTheme.typography.labelLarge,
-			color = MaterialTheme.colorScheme.onSurfaceVariant,
-			textAlign = TextAlign.Center
-		)
-
-		Text(
-			text = totalAmountText,
-			style = MaterialTheme.typography.headlineLarge,
-			color = MaterialTheme.colorScheme.error,
-			fontWeight = FontWeight.Bold,
-			textAlign = TextAlign.Center
-		)
-
-		HorizontalDivider()
-
-		details.forEach { (label, value) ->
-			Box(modifier = Modifier.fillMaxWidth()) {
-				Text(
-					text = label,
-					style = MaterialTheme.typography.bodyMedium,
-					color = MaterialTheme.colorScheme.onSurfaceVariant,
-					modifier = Modifier.align(Alignment.CenterStart)
-				)
-				Text(
-					text = value,
-					style = MaterialTheme.typography.bodyMedium,
-					color = MaterialTheme.colorScheme.onSurface,
-					modifier = Modifier.align(Alignment.CenterEnd)
-				)
-			}
-		}
-
-		if (isRecurrentExpense && onMarkAsPaid != null) {
-			Button(
-				onClick = onMarkAsPaid, modifier = Modifier.fillMaxWidth()
-			) {
-				Text(text = "Marcar como pagado")
-			}
-		}
-
-		Row(
-			modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
-		) {
-			Button(
-				onClick = onEdit, modifier = Modifier.weight(1f)
-			) {
-				Text("Editar")
-			}
-
-			if (!readOnly) {
-				Button(
-					onClick = onDelete,
-					modifier = Modifier.weight(1f),
-					colors = ButtonDefaults.buttonColors(
-						containerColor = MaterialTheme.colorScheme.error,
-						contentColor = MaterialTheme.colorScheme.onError
-					)
-				) {
-					Text("Eliminar")
 				}
 			}
 		}

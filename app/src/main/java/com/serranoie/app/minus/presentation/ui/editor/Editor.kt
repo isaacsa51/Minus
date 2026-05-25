@@ -62,6 +62,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +73,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
@@ -82,6 +84,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTe
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
+import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -115,12 +118,13 @@ fun Editor(
 	showCreditQuickToggleFeature: Boolean = false,
 	onDismissRecurrentDialog: () -> Unit = {},
 	onDismissCreditCutoffDialog: () -> Unit = {},
-	onRecurrentExpenseConfirm: (com.serranoie.app.minus.domain.model.RecurrentFrequency, LocalDate, Int?) -> Unit = { _, _, _ -> },
+	onRecurrentExpenseConfirm: (RecurrentFrequency, LocalDate, Int?) -> Unit = { _, _, _ -> },
 	onCreditCutoffConfirm: (Int) -> Unit = {},
 	budgetPillHintAnchorModifier: Modifier = Modifier,
 	analyticsHintAnchorModifier: Modifier = Modifier,
 	modifier: Modifier = Modifier,
 ) {
+	val view = LocalView.current
 	val scope = rememberCoroutineScope()
 	val sheetState = rememberModalBottomSheetState()
 	var showBottomSheet by remember { mutableStateOf(false) }
@@ -156,8 +160,7 @@ fun Editor(
 
 	if (uiState.showCreditCutoffDialog) {
 		CreditCutoffDayDialog(
-			onDismiss = onDismissCreditCutoffDialog,
-			onConfirm = onCreditCutoffConfirm
+			onDismiss = onDismissCreditCutoffDialog, onConfirm = onCreditCutoffConfirm
 		)
 	}
 
@@ -183,7 +186,8 @@ fun Editor(
 				centerRemainingAmount = animState == AnimState.EDITING,
 				onOpenSettings = onOpenSettings,
 				onOpenBudgetSheet = {
-					onBudgetPillClickForTutorial()
+//					onBudgetPillClickForTutorial()
+					view.weakHapticFeedback()
 					showBottomSheet = true
 				},
 				modifier = Modifier
@@ -227,6 +231,7 @@ fun Editor(
 						IconButton(
 							onClick = {
 								onAnalyticsClickForTutorial()
+								view.weakHapticFeedback()
 								onOpenAnalytics()
 							}, modifier = Modifier
 								.size(48.dp)
@@ -241,7 +246,10 @@ fun Editor(
 						}
 
 						IconButton(
-							onClick = { onOpenSettings() }, modifier = Modifier.size(48.dp)
+							onClick = {
+								onOpenSettings()
+								view.weakHapticFeedback()
+							}, modifier = Modifier.size(48.dp)
 						) {
 							Icon(
 								imageVector = Icons.Rounded.Settings,
@@ -414,8 +422,7 @@ private fun EditingContent(
 		val containerSizePx = remember(availableWidth, amountSlotHeight, density) {
 			with(density) {
 				androidx.compose.ui.unit.IntSize(
-					width = availableWidth.toPx().toInt(),
-					height = amountSlotHeight.toPx().toInt()
+					width = availableWidth.toPx().toInt(), height = amountSlotHeight.toPx().toInt()
 				)
 			}
 		}
@@ -427,8 +434,7 @@ private fun EditingContent(
 				modifier = Modifier
 					.fillMaxWidth()
 					.height(amountSlotHeight)
-					.padding(start = 16.dp, end = 16.dp),
-				contentAlignment = Alignment.TopEnd
+					.padding(start = 16.dp, end = 16.dp), contentAlignment = Alignment.TopEnd
 			) {
 				AnimatedContent(
 					targetState = if (showCalculationUi && calculationResult != null) "result" else "input",
@@ -444,14 +450,13 @@ private fun EditingContent(
 				) { state ->
 					if (state == "result" && showCalculationUi && calculationResult != null) {
 						Column(
-							horizontalAlignment = Alignment.End,
-							modifier = Modifier.fillMaxWidth()
+							horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()
 						) {
 							AutoResizeBasicTextField(
-							value = displayContent,
-							onValueChange = {},
-							readOnly = true,
-							modifier = Modifier.wrapContentWidth(Alignment.End),
+								value = displayContent,
+								onValueChange = {},
+								readOnly = true,
+								modifier = Modifier.wrapContentWidth(Alignment.End),
 								textStyle = baseTextStyle.copy(
 									color = MaterialTheme.colorScheme.onSurface,
 									textAlign = TextAlign.End
@@ -462,16 +467,16 @@ private fun EditingContent(
 								containerSize = containerSizePx
 							)
 							AutoResizeBasicTextField(
-							value = "= ${currencySymbol}$calculationResult",
-							onValueChange = {},
-							readOnly = true,
-							modifier = Modifier
-								.wrapContentWidth(Alignment.End)
-								.padding(top = 4.dp),
+								value = "= ${currencySymbol}$calculationResult",
+								onValueChange = {},
+								readOnly = true,
+								modifier = Modifier
+									.wrapContentWidth(Alignment.End)
+									.padding(top = 4.dp),
 								textStyle = baseTextStyle.copy(
-								color = MaterialTheme.colorScheme.onSurfaceVariant,
-								textAlign = TextAlign.End
-							),
+									color = MaterialTheme.colorScheme.onSurfaceVariant,
+									textAlign = TextAlign.End
+								),
 								singleLine = true,
 								minFontSize = 16.sp,
 								maxFontSize = 36.sp,
@@ -480,11 +485,10 @@ private fun EditingContent(
 						}
 					} else {
 						AutoResizeBasicTextField(
-						value = displayContent,
-						onValueChange = {},
-						readOnly = true,
-						modifier = Modifier
-							.wrapContentWidth(Alignment.End),
+							value = displayContent,
+							onValueChange = {},
+							readOnly = true,
+							modifier = Modifier.wrapContentWidth(Alignment.End),
 							textStyle = baseTextStyle.copy(
 								color = MaterialTheme.colorScheme.onSurface,
 								textAlign = TextAlign.End
@@ -495,8 +499,7 @@ private fun EditingContent(
 							containerSize = containerSizePx,
 							decorationBox = { innerTextField ->
 								Box { innerTextField() }
-							}
-						)
+							})
 					}
 				}
 			}
@@ -645,8 +648,7 @@ private fun CreditCutoffDayDialog(
 			TextButton(onClick = onDismiss) {
 				Text(stringResource(R.string.cancel))
 			}
-		}
-	)
+		})
 }
 
 @Composable
@@ -681,22 +683,22 @@ fun EditorPreview_Idle() {
 	MinusTheme {
 		Editor(
 			uiState = BudgetUiState(
-				budgetSettings = BudgetSettings(
-					totalBudget = BigDecimal("500.00"),
-					period = BudgetPeriod.DAILY,
-					startDate = LocalDate.now(),
-					currencyCode = "USD"
-				), budgetState = BudgetState(
-					remainingToday = BigDecimal("110.00"),
-					totalSpentToday = BigDecimal("12.50"),
-					dailyBudget = BigDecimal("122.50"),
-					daysRemaining = 15,
-					progress = 0.1f,
-					isOverBudget = false,
-					totalBudget = BigDecimal("500.00"),
-					totalSpentInPeriod = BigDecimal("12.50")
-				), transactions = emptyList(), numpadInput = "", isNumpadValid = false
-			),
+			budgetSettings = BudgetSettings(
+				totalBudget = BigDecimal("500.00"),
+				period = BudgetPeriod.DAILY,
+				startDate = LocalDate.now(),
+				currencyCode = "USD"
+			), budgetState = BudgetState(
+				remainingToday = BigDecimal("110.00"),
+				totalSpentToday = BigDecimal("12.50"),
+				dailyBudget = BigDecimal("122.50"),
+				daysRemaining = 15,
+				progress = 0.1f,
+				isOverBudget = false,
+				totalBudget = BigDecimal("500.00"),
+				totalSpentInPeriod = BigDecimal("12.50")
+			), transactions = emptyList(), numpadInput = "", isNumpadValid = false
+		),
 			animState = AnimState.IDLE,
 			onFocus = {},
 			onOpenHistory = {},
@@ -719,22 +721,22 @@ fun EditorPreview_Editing() {
 	MinusTheme {
 		Editor(
 			uiState = BudgetUiState(
-				budgetSettings = BudgetSettings(
-					totalBudget = BigDecimal("500.00"),
-					period = BudgetPeriod.DAILY,
-					startDate = LocalDate.now(),
-					currencyCode = "USD"
-				), budgetState = BudgetState(
-					remainingToday = BigDecimal("110.00"),
-					totalSpentToday = BigDecimal("12.50"),
-					dailyBudget = BigDecimal("122.50"),
-					daysRemaining = 15,
-					progress = 0.1f,
-					isOverBudget = false,
-					totalBudget = BigDecimal("500.00"),
-					totalSpentInPeriod = BigDecimal("12.50")
-				), transactions = emptyList(), numpadInput = "250", isNumpadValid = true
-			),
+			budgetSettings = BudgetSettings(
+				totalBudget = BigDecimal("500.00"),
+				period = BudgetPeriod.DAILY,
+				startDate = LocalDate.now(),
+				currencyCode = "USD"
+			), budgetState = BudgetState(
+				remainingToday = BigDecimal("110.00"),
+				totalSpentToday = BigDecimal("12.50"),
+				dailyBudget = BigDecimal("122.50"),
+				daysRemaining = 15,
+				progress = 0.1f,
+				isOverBudget = false,
+				totalBudget = BigDecimal("500.00"),
+				totalSpentInPeriod = BigDecimal("12.50")
+			), transactions = emptyList(), numpadInput = "250", isNumpadValid = true
+		),
 			animState = AnimState.EDITING,
 			onFocus = {},
 			onOpenHistory = {},

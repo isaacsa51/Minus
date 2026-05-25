@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,15 +54,13 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.bodyLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
-import com.serranoie.app.minus.presentation.ui.theme.titleLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
-import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.calcAdaptiveFont
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -81,8 +78,7 @@ fun BudgetPill(
 	modifier: Modifier = Modifier,
 ) {
 
-	val currencyFormat =
-		com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat(currencyCode)
+	val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
 
 	val dailyBudget = budgetState?.dailyBudget ?: BigDecimal.ZERO
 	val totalSpentInPeriod = budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO

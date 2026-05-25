@@ -26,6 +26,9 @@ data class BugReportUiState(
 	val isGeneratingReport: Boolean = false,
 ) {
 	val attachmentCount: Int = selectedAttachmentUris.size
+	val hasCurrentBehavior: Boolean = currentBehavior.isNotBlank()
+	val hasReproductionSteps: Boolean = reproductionSteps.any { it.visible && it.value.isNotBlank() }
+	val canSubmit: Boolean = hasCurrentBehavior && hasReproductionSteps && !isGeneratingReport
 }
 
 sealed interface BugReportUiIntent {

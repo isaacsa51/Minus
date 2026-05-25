@@ -90,7 +90,7 @@ class BugReportViewModel @Inject constructor(
 
 	private fun submitReport() {
 		val currentState = _uiState.value
-		if (currentState.isGeneratingReport) return
+		if (!currentState.canSubmit) return
 
 		viewModelScope.launch {
 			_uiState.update { it.copy(isGeneratingReport = true) }

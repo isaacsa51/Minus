@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.navigation
 
 import android.app.AlarmManager
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
@@ -590,12 +591,13 @@ fun AppNavGraph(
                 viewModel.effects.collect { effect ->
                     when (effect) {
                         is BugReportUiEffect.OpenEmailComposer -> {
-                            val emailSelector = Intent(Intent.ACTION_SENDTO).apply {
+                            val mailToIntent = Intent(Intent.ACTION_SENDTO).apply {
                                 data = "mailto:".toUri()
                             }
+                            val defaultEmailPackage = mailToIntent.resolveActivity(context.packageManager)?.packageName
                             val emailIntent = Intent(Intent.ACTION_SEND).apply {
                                 type = "application/zip"
-                                selector = emailSelector
+                                defaultEmailPackage?.let(::setPackage)
                                 putExtra(Intent.EXTRA_EMAIL, arrayOf(recipientEmail))
                                 putExtra(Intent.EXTRA_SUBJECT, emailSubject)
                                 putExtra(Intent.EXTRA_TEXT, emailBody)
@@ -608,7 +610,12 @@ fun AppNavGraph(
                                 )
                                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             }
-                            context.startActivity(Intent.createChooser(emailIntent, shareTitle))
+
+                            try {
+                                context.startActivity(emailIntent)
+                            } catch (_: ActivityNotFoundException) {
+                                context.startActivity(Intent.createChooser(emailIntent.setPackage(null), shareTitle))
+                            }
                         }
                         is BugReportUiEffect.ShowError -> {
                             Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()

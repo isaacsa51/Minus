@@ -208,6 +208,7 @@
     <string name="bug_report_change_label">What you should change?</string>
     <string name="bug_report_current_behavior_label">What is happening?</string>
     <string name="bug_report_current_behavior_placeholder">Describe the current behavior in detail…</string>
+    <string name="bug_report_current_behavior_required">Describe what is happening before submitting.</string>
     <string name="bug_report_other_information_label">Other information</string>
     <string name="bug_report_other_information_placeholder">Any additional context or suggestions…</string>
     <string name="bug_report_attachments_label">Attachments</string>

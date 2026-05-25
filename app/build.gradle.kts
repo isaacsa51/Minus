@@ -130,6 +130,13 @@ android {
 		resources.excludes += "/META-INF/LGPL2.1"
 	}
 	namespace = "com.serranoie.app.minus"
+
+	dependenciesInfo {
+		// Disables dependency metadata when building APKs (for IzzyOnDroid/F-Droid)
+		includeInApk = false
+		// Disables dependency metadata when building Android App Bundles (for Google Play)
+		includeInBundle = false
+	}
 }
 
 dependencies {

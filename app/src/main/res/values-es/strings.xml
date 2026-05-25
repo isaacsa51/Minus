@@ -63,7 +63,7 @@
     <string name="biweekly_with_desc">Quincenal (cada 14 días)</string>
 
     <string name="edit_budget">Editar presupuesto</string>
-    <string name="new_budget">Nuevo de ahorro</string>
+    <string name="new_budget">Nuevo periodo de ahorro</string>
     <plurals name="pending_expense">
         <item quantity="one">%d gasto para el siguiente periodo</item>
         <item quantity="other">%d gastos para el próximo período</item>
@@ -199,6 +199,7 @@
     <string name="bug_report_change_label">¿Qué debería cambiar?</string>
     <string name="bug_report_current_behavior_label">¿Qué está pasando?</string>
     <string name="bug_report_current_behavior_placeholder">Describe el comportamiento actual en detalle…</string>
+    <string name="bug_report_current_behavior_required">Describe qué está pasando antes de enviar.</string>
     <string name="bug_report_other_information_label">Otra información</string>
     <string name="bug_report_other_information_placeholder">Cualquier contexto adicional o sugerencia…</string>
     <string name="bug_report_attachments_label">Archivos adjuntos</string>

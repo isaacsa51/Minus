@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.settings.bugreport
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
 import com.serranoie.app.minus.BuildConfig
@@ -13,6 +14,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.Normalizer
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.zip.ZipEntry
@@ -80,14 +82,19 @@ class BugReportZipGenerator @Inject constructor(
 			.mapIndexed { index, uri -> "- attachments/${buildAttachmentEntryName(index, uri)}" }
 			.ifEmpty { listOf("No attachments selected.") }
 			.joinToString(separator = "\n")
+		val deviceMetadata = buildDeviceMetadata()
 
 		return buildString {
 			appendLine("# Minus Feedback Report")
 			appendLine()
 			appendLine("## Metadata")
 			appendLine("- Issue type: $issueType")
-			appendLine("- App version: v${BuildConfig.VERSION_NAME}")
+			appendLine("- App version: v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+			appendLine("- Package name: ${context.packageName}")
 			appendLine("- Generated on: ${LocalDate.now()}")
+			deviceMetadata.forEach { (label, value) ->
+				appendLine("- $label: $value")
+			}
 			appendLine()
 			appendLine("## $behaviorTitle")
 			appendLine(state.currentBehavior.takeIf { it.isNotBlank() }?.trim() ?: "No description provided.")
@@ -101,6 +108,25 @@ class BugReportZipGenerator @Inject constructor(
 			appendLine("## Attachments")
 			appendLine(attachments)
 		}
+	}
+
+	private fun buildDeviceMetadata(): List<Pair<String, String>> {
+		return listOf(
+			"Device" to listOf(Build.MANUFACTURER, Build.MODEL)
+				.filter { it.isNotBlank() }
+				.distinctBy { it.lowercase(Locale.US) }
+				.joinToString(separator = " ")
+				.ifBlank { "Unknown" },
+			"Android version" to "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
+			"Android codename" to Build.VERSION.CODENAME,
+			"Brand" to Build.BRAND,
+			"Product" to Build.PRODUCT,
+			"Device name" to Build.DEVICE,
+			"Hardware" to Build.HARDWARE,
+			"Supported ABIs" to Build.SUPPORTED_ABIS.joinToString(separator = ", "),
+			"Locale" to Locale.getDefault().toLanguageTag(),
+			"Timezone" to ZoneId.systemDefault().id,
+		)
 	}
 
 	private fun buildAttachmentEntryName(index: Int, uri: Uri): String {

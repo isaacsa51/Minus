@@ -36,6 +36,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -57,6 +59,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -72,11 +75,15 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -99,6 +106,7 @@ import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportU
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
+import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
 import kotlinx.coroutines.delay
 
 @Composable
@@ -112,6 +120,7 @@ fun BugReportForm(
 	val scrollBehavior =
 		TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 	val context = LocalContext.current
+	val showCurrentBehaviorError = uiState.hasReproductionSteps && !uiState.hasCurrentBehavior
 	val attachmentPickerLauncher = rememberLauncherForActivityResult(
 		contract = ActivityResultContracts.OpenMultipleDocuments(),
 		onResult = { uris ->
@@ -184,7 +193,9 @@ fun BugReportForm(
 				placeholder = stringResource(R.string.bug_report_current_behavior_placeholder),
 				value = uiState.currentBehavior,
 				onValueChange = { onIntent(BugReportUiIntent.ChangeCurrentBehavior(it)) },
-				minHeight = 118.dp
+				minHeight = 118.dp,
+				isError = showCurrentBehaviorError,
+				errorText = stringResource(R.string.bug_report_current_behavior_required)
 			)
 
 			Spacer(modifier = Modifier.height(24.dp))
@@ -232,8 +243,12 @@ fun BugReportForm(
 			Spacer(modifier = Modifier.height(24.dp))
 
 			Button(
-				onClick = { onIntent(BugReportUiIntent.SubmitReport) },
-				enabled = !uiState.isGeneratingReport,
+				onClick = {
+					if (uiState.canSubmit) {
+						onIntent(BugReportUiIntent.SubmitReport)
+					}
+				},
+				enabled = uiState.canSubmit,
 				shape = RoundedCornerShape(20.dp),
 				colors = ButtonDefaults.buttonColors(
 					containerColor = MaterialTheme.colorScheme.primary,
@@ -267,6 +282,7 @@ private fun IssueTypeSelector(
 		BugReportIssueType.FeatureRequest,
 	)
 	val selectedIndex = issueTypes.indexOf(selectedIssueType).coerceAtLeast(0)
+	val view = LocalView.current
 
 	Row(
 		modifier = modifier.padding(horizontal = 8.dp),
@@ -275,10 +291,21 @@ private fun IssueTypeSelector(
 		options.forEachIndexed { index, label ->
 			ToggleButton(
 				checked = selectedIndex == index,
-				onCheckedChange = { onIssueTypeChange(issueTypes[index]) },
+				onCheckedChange = {
+					view.confirmFeedback()
+					onIssueTypeChange(issueTypes[index])
+				},
 				modifier = Modifier
 					.weight(1f)
 					.semantics { role = Role.RadioButton },
+				colors = ToggleButtonDefaults.toggleButtonColors(
+					containerColor = MaterialTheme.colorScheme.surface,
+					contentColor = MaterialTheme.colorScheme.tertiary,
+					checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+					checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+					disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+					disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+				),
 				shapes = when (index) {
 					0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
 					options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
@@ -352,7 +379,9 @@ private fun FormField(
 	onValueChange: (String) -> Unit,
 	minHeight: Dp,
 	modifier: Modifier = Modifier,
-	rounded: Boolean = false
+	rounded: Boolean = false,
+	isError: Boolean = false,
+	errorText: String? = null,
 ) {
 	Column(modifier = modifier.fillMaxWidth()) {
 		AnimatedContent(
@@ -373,6 +402,7 @@ private fun FormField(
 		OutlinedTextField(
 			value = value,
 			onValueChange = onValueChange,
+			isError = isError,
 			placeholder = {
 				Text(
 					text = placeholder,
@@ -387,6 +417,15 @@ private fun FormField(
 				.heightIn(min = minHeight),
 			minLines = 4,
 		)
+
+		AnimatedVisibility(visible = isError && !errorText.isNullOrBlank()) {
+			Text(
+				text = errorText.orEmpty(),
+				style = MaterialTheme.typography.bodySmall,
+				color = MaterialTheme.colorScheme.error,
+				modifier = Modifier.padding(top = 4.dp, start = 16.dp)
+			)
+		}
 	}
 }
 
@@ -497,6 +536,7 @@ private fun ReproductionStepRow(
 	onRemoveClick: () -> Unit,
 	modifier: Modifier = Modifier
 ) {
+	val focusManager = LocalFocusManager.current
 	val textStyle = MaterialTheme.typography.bodyMedium.merge(
 		TextStyle(color = MaterialTheme.colorScheme.onSurface)
 	)
@@ -536,6 +576,10 @@ private fun ReproductionStepRow(
 				onValueChange = onValueChange,
 				textStyle = textStyle,
 				modifier = Modifier.fillMaxWidth(),
+				keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+				keyboardActions = KeyboardActions(
+					onNext = { focusManager.moveFocus(FocusDirection.Next) }
+				),
 				decorationBox = { innerTextField ->
 					Box(modifier = Modifier.fillMaxWidth()) {
 						if (value.isEmpty()) {

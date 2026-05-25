@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -54,6 +55,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendsCoun
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.CategoriesChartCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarHeatmap
+import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
+import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import java.math.BigDecimal
 import java.util.Date
 
@@ -88,6 +91,7 @@ fun Analytics(
 	actions: AnalyticsActions = AnalyticsActions(),
 	activityResultRegistryOwner: ActivityResultRegistryOwner? = null,
 ) {
+	val view = LocalView.current
 	val scrollState = rememberScrollState()
 	var showHistorySheet by remember { mutableStateOf(false) }
 	val sheetState = rememberModalBottomSheetState()
@@ -128,105 +132,110 @@ fun Analytics(
 
 				Spacer(modifier = Modifier.height(16.dp))
 				BudgetDisplay(
-						budget = state.wholeBudget,
-						currencyCode = state.currencyCode,
-						startDate = state.startPeriodDate,
-						finishDate = state.finishPeriodDate,
-						actualFinishDate = state.finishPeriodActualDate,
-						extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
-						modifier = Modifier.padding(horizontal = 16.dp),
-						budgetState = state.budgetStateForDisplay,
-						budgetSettings = state.budgetSettingsForDisplay,
-						showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
-					)
-Spacer(modifier = Modifier.height(16.dp))
-					Row(
-						Modifier
-							.fillMaxWidth()
-							.padding(horizontal = 16.dp)
-					) {
-						if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
-							CalendarHeatmap(
-								transactions = state.transactions,
-								budget = state.wholeBudget,
-								startDate = state.startPeriodDate,
-								finishDate = state.finishPeriodDate,
-								modifier = Modifier
-.weight(1f)
-									.wrapContentHeight(),
-							)
-						}
-					}
-					SpendsChart(
-						spends = state.spends,
-						modifier = Modifier
-							.fillMaxWidth()
-							.heightIn(0.dp, 400.dp)
-							.padding(horizontal = 16.dp),
-					)
-					Spacer(modifier = Modifier.height(16.dp))
-					Row(
-						Modifier
-							.fillMaxWidth()
-							.height(IntrinsicSize.Min)
-							.padding(horizontal = 16.dp)
-					) {
-						MinMaxSpentCard(
-							isMin = true,
-							spends = state.spends,
-							currency = "MXN",
-							modifier = Modifier
-								.weight(1f)
-								.fillMaxHeight(),
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						MinMaxSpentCard(
-							isMin = false,
-							spends = state.spends,
-							currency = "MXN",
-							modifier = Modifier
-								.weight(1f)
-								.fillMaxHeight(),
-						)
-					}
-					Spacer(modifier = Modifier.height(16.dp))
-					Row(
-						Modifier
-							.fillMaxWidth()
-							.height(IntrinsicSize.Min)
-							.padding(horizontal = 16.dp)
-					) {
-						SpendsCountCard(
-							count = state.spends.size,
-							onClick = { showHistorySheet = true },
-							modifier = Modifier
-								.weight(1f)
-								.fillMaxHeight(),
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						AverageSpendCard(
-							spends = state.spends,
+					budget = state.wholeBudget,
+					currencyCode = state.currencyCode,
+					startDate = state.startPeriodDate,
+					finishDate = state.finishPeriodDate,
+					actualFinishDate = state.finishPeriodActualDate,
+					extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
+					modifier = Modifier.padding(horizontal = 16.dp),
+					budgetState = state.budgetStateForDisplay,
+					budgetSettings = state.budgetSettingsForDisplay,
+					showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
+				)
+				Spacer(modifier = Modifier.height(16.dp))
+				Row(
+					Modifier
+						.fillMaxWidth()
+						.padding(horizontal = 16.dp)
+				) {
+					if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
+						CalendarHeatmap(
+							transactions = state.transactions,
+							budget = state.wholeBudget,
 							startDate = state.startPeriodDate,
 							finishDate = state.finishPeriodDate,
-							currency = "MXN",
 							modifier = Modifier
 								.weight(1f)
-								.fillMaxHeight(),
+								.wrapContentHeight(),
 						)
 					}
-					Spacer(modifier = Modifier.height(16.dp))
-					SpendBudgetCard(
-						budget = state.wholeBudget,
-						spend = state.spends.sumOf { it.amount },
+				}
+				SpendsChart(
+					spends = state.spends,
+					modifier = Modifier
+						.fillMaxWidth()
+						.heightIn(0.dp, 400.dp)
+						.padding(horizontal = 16.dp),
+				)
+				Spacer(modifier = Modifier.height(16.dp))
+				Row(
+					Modifier
+						.fillMaxWidth()
+						.height(IntrinsicSize.Min)
+						.padding(horizontal = 16.dp)
+				) {
+					MinMaxSpentCard(
+						isMin = true,
+						spends = state.spends,
+						currency = "MXN",
 						modifier = Modifier
-							.fillMaxWidth()
-							.padding(horizontal = 16.dp),
+							.weight(1f)
+							.fillMaxHeight(),
 					)
-					Spacer(modifier = Modifier.height(16.dp))
-					CategoriesChartCard(
+					Spacer(modifier = Modifier.width(16.dp))
+					MinMaxSpentCard(
+						isMin = false,
+						spends = state.spends,
+						currency = "MXN",
+						modifier = Modifier
+							.weight(1f)
+							.fillMaxHeight(),
+					)
+				}
+				Spacer(modifier = Modifier.height(16.dp))
+				Row(
+					Modifier
+						.fillMaxWidth()
+						.height(IntrinsicSize.Min)
+						.padding(horizontal = 16.dp)
+				) {
+					SpendsCountCard(
+						count = state.spends.size,
+						onClick = {
+							showHistorySheet = true
+							view.weakHapticFeedback()
+						},
+						modifier = Modifier
+							.weight(1f)
+							.fillMaxHeight(),
+					)
+					Spacer(modifier = Modifier.width(16.dp))
+					AverageSpendCard(
+						spends = state.spends,
+						startDate = state.startPeriodDate,
+						finishDate = state.finishPeriodDate,
+						currency = "MXN",
+						modifier = Modifier
+							.weight(1f)
+							.fillMaxHeight(),
+					)
+				}
+				Spacer(modifier = Modifier.height(16.dp))
+				SpendBudgetCard(
+					budget = state.wholeBudget,
+					spend = state.spends.sumOf { it.amount },
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = 16.dp),
+				)
+				Spacer(modifier = Modifier.height(16.dp))
+				CategoriesChartCard(
 					spends = state.spends,
 					currency = "MXN",
-					modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+					modifier = Modifier
+						.padding(horizontal = 16.dp)
+						.fillMaxWidth(),
 					onCategoryClick = { categoryName, categorySpends ->
 						selectedCategory = CategoryAnalyticsState(
 							periodFinished = state.periodFinished,
@@ -240,6 +249,7 @@ Spacer(modifier = Modifier.height(16.dp))
 							categoryName = categoryName,
 							categorySpends = categorySpends
 						)
+						view.weakHapticFeedback()
 					}
 				)
 				Spacer(modifier = Modifier.height(16.dp))
@@ -265,6 +275,7 @@ Spacer(modifier = Modifier.height(16.dp))
 						.fillMaxWidth()
 						.heightIn(60.dp),
 					onClick = {
+						view.strongHapticFeedback()
 						actions.onCreateNewPeriod()
 					},
 				) {

@@ -205,6 +205,7 @@
     <string name="bug_report_change_label">Que faudrait-il changer ?</string>
     <string name="bug_report_current_behavior_label">Que se passe-t-il ?</string>
     <string name="bug_report_current_behavior_placeholder">Décrivez le comportement actuel en détail…</string>
+    <string name="bug_report_current_behavior_required">Décrivez ce qui se passe avant d’envoyer.</string>
     <string name="bug_report_other_information_label">Autres informations</string>
     <string name="bug_report_other_information_placeholder">Tout contexte supplémentaire ou suggestion…</string>
     <string name="bug_report_attachments_label">Pièces jointes</string>
