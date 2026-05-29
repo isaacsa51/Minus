@@ -67,6 +67,7 @@ import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
 import com.serranoie.app.minus.presentation.util.lockScreenOrientation
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -308,6 +309,28 @@ class MainActivity : ComponentActivity() {
 										onDismiss = {
 											midnightTransitionManager.onTransitionDialogDismissed()
 										})
+								}
+							}
+
+							val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()
+							LaunchedEffect(needsBudgetSetup) {
+								if (needsBudgetSetup) {
+									logcat(tag) { "needsBudgetSetup detected, navigating to wallet setup" }
+									midnightTransitionManager.onBudgetSetupHandled()
+									// Only force edit mode if no budget has ever been created.
+									// Use BUDGET_END_DATE_KEY as a proxy: if it's null, no budget was ever saved.
+									// If a budget exists, open wallet in view mode so user sees period info.
+									val prefs = context.settingsDataStore.data.first()
+									val hasBudget = prefs[BUDGET_END_DATE_KEY] != null
+									navController.navigate(
+										Screen.Main.createRoute(
+											openWallet = true,
+											forceWalletSetup = !hasBudget
+										)
+									) {
+										popUpTo(Screen.Main.route) { inclusive = true }
+										launchSingleTop = true
+									}
 								}
 							}
 						}

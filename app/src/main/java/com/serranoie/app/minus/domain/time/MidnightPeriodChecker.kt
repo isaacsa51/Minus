@@ -49,6 +49,9 @@ class MidnightPeriodChecker @Inject constructor(
 	private val _shouldShowTransitionDialog = MutableStateFlow(false)
 	val shouldShowTransitionDialog: StateFlow<Boolean> = _shouldShowTransitionDialog.asStateFlow()
 
+	private val _needsBudgetSetup = MutableStateFlow(false)
+	val needsBudgetSetup: StateFlow<Boolean> = _needsBudgetSetup.asStateFlow()
+
 	companion object {
 	}
 
@@ -56,6 +59,12 @@ class MidnightPeriodChecker @Inject constructor(
 		val endingPeriodState = resolveEndingPeriodState()
 		if (!endingPeriodState.shouldHandleEndingPeriod) {
 			logcat { "No ending period to handle" }
+			// Check if no budget is set - if so, signal UI to show budget setup
+			val budgetSettings = budgetRepository.getBudgetSettingsSync()
+			if (budgetSettings == null) {
+				logcat { "No budget settings found, triggering budget setup prompt" }
+				_needsBudgetSetup.value = true
+			}
 			return
 		}
 
@@ -205,6 +214,10 @@ class MidnightPeriodChecker @Inject constructor(
 	fun onTransitionDialogDismissed() {
 		_shouldShowTransitionDialog.value = false
 		_midnightTransitionData.value = null
+	}
+
+	fun onBudgetSetupHandled() {
+		_needsBudgetSetup.value = false
 	}
 
 	suspend fun rollRemainingSplitEqually() {
