@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -69,6 +70,7 @@ import androidx.compose.ui.window.Dialog
 import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
+import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
@@ -89,6 +91,7 @@ fun Settings(
 	currentTypography: String,
 	isMaterialYouEnabled: Boolean,
 	isCreditQuickToggleFeatureEnabled: Boolean,
+	recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
 	notificationHour: Int,
 	notificationMinute: Int,
 	exactAlarmEnabled: Boolean,
@@ -96,6 +99,7 @@ fun Settings(
 	onTypographyChange: (String) -> Unit,
 	onMaterialYouToggle: () -> Unit,
 	onCreditQuickToggleFeatureToggle: () -> Unit,
+	onRecurrentPaymentsViewModeChange: (RecurrentPaymentsViewMode) -> Unit,
 	onNotificationTimeChange: (Int, Int) -> Unit,
 	onOpenExactAlarmSettings: () -> Unit,
 	periodMappingMode: PeriodMappingMode,
@@ -108,10 +112,12 @@ fun Settings(
 ) {
 	var showThemeDialog by remember { mutableStateOf(false) }
 	var showTypographyDialog by remember { mutableStateOf(false) }
+	var showRecurrentPaymentsViewModeDialog by remember { mutableStateOf(false) }
 	var showNotificationTimePicker by remember { mutableStateOf(false) }
 	var isCreditFeatureExpanded by remember { mutableStateOf(false) }
 	val dismissThemeDialog = { showThemeDialog = false }
 	val dismissTypographyDialog = { showTypographyDialog = false }
+	val dismissRecurrentPaymentsViewModeDialog = { showRecurrentPaymentsViewModeDialog = false }
 	val dismissNotificationTimePicker = { showNotificationTimePicker = false }
 	val scrollBehavior =
 		TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -268,7 +274,7 @@ fun Settings(
 					CustomPaddedExpandableItem(
 						isExpanded = isCreditFeatureExpanded,
 						onToggleExpanded = { isCreditFeatureExpanded = !isCreditFeatureExpanded },
-						position = PaddedListItemPosition.Single,
+						position = PaddedListItemPosition.First,
 						modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureItem"),
 						defaultContent = {
 							Icon(
@@ -322,6 +328,39 @@ fun Settings(
 							}
 						}
 					)
+
+					CustomPaddedListItem(
+						onClick = {
+							showRecurrentPaymentsViewModeDialog = true
+							view.weakHapticFeedback()
+						},
+						position = PaddedListItemPosition.Last,
+						modifier = Modifier.testTag("SettingsRecurrentPaymentsViewModeItem")
+					) {
+						Icon(
+							imageVector = Icons.Default.Repeat,
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.primary
+						)
+						Spacer(modifier = Modifier.width(16.dp))
+						Column(modifier = Modifier.weight(1f)) {
+							Text(
+								text = stringResource(R.string.settings_recurrent_payments_view_mode_title),
+								style = MaterialTheme.typography.bodyMediumEmphasized,
+								color = MaterialTheme.colorScheme.onSurface
+							)
+							Text(
+								text = stringResource(R.string.settings_recurrent_payments_view_mode_subtitle),
+								style = MaterialTheme.typography.bodySmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+						Text(
+							text = recurrentPaymentsViewMode.label(),
+							style = MaterialTheme.typography.labelLarge,
+							color = MaterialTheme.colorScheme.primary
+						)
+					}
 				}
 			}
 
@@ -590,6 +629,14 @@ fun Settings(
 			)
 		}
 
+		if (showRecurrentPaymentsViewModeDialog) {
+			RecurrentPaymentsViewModePickerDialog(
+				currentMode = recurrentPaymentsViewMode,
+				onModeSelected = onRecurrentPaymentsViewModeChange,
+				onDismiss = dismissRecurrentPaymentsViewModeDialog,
+			)
+		}
+
 		if (showNotificationTimePicker) {
 			NotificationTimePickerDialog(
 				initialHour = notificationHour,
@@ -794,6 +841,60 @@ fun TypographyPickerDialog(
 }
 
 @Composable
+fun RecurrentPaymentsViewModePickerDialog(
+	currentMode: RecurrentPaymentsViewMode,
+	onModeSelected: (RecurrentPaymentsViewMode) -> Unit,
+	onDismiss: () -> Unit,
+) {
+	Dialog(onDismissRequest = onDismiss) {
+		Surface(
+			shape = RoundedCornerShape(28.dp),
+			color = MaterialTheme.colorScheme.surfaceContainerHigh,
+			tonalElevation = 6.dp,
+			modifier = Modifier.testTag("RecurrentPaymentsViewModePickerDialog")
+		) {
+			Column(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(24.dp)
+			) {
+				Text(
+					text = stringResource(R.string.settings_recurrent_payments_view_mode_dialog_title),
+					style = MaterialTheme.typography.headlineSmall,
+					fontWeight = FontWeight.Bold,
+					color = MaterialTheme.colorScheme.onSurface,
+					modifier = Modifier.padding(bottom = 16.dp)
+				)
+
+				ThemeOption(
+					title = stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_title),
+					subtitle = stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_subtitle),
+					icon = Icons.Default.Repeat,
+					isSelected = currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST,
+					onClick = {
+						onModeSelected(RecurrentPaymentsViewMode.HORIZONTAL_LIST)
+						onDismiss()
+					}
+				)
+
+				Spacer(modifier = Modifier.height(8.dp))
+
+				ThemeOption(
+					title = stringResource(R.string.settings_recurrent_payments_view_mode_vertical_title),
+					subtitle = stringResource(R.string.settings_recurrent_payments_view_mode_vertical_subtitle),
+					icon = Icons.Default.Repeat,
+					isSelected = currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST,
+					onClick = {
+						onModeSelected(RecurrentPaymentsViewMode.VERTICAL_LIST)
+						onDismiss()
+					}
+				)
+			}
+		}
+	}
+}
+
+@Composable
 private fun NotificationTimePickerDialog(
 	initialHour: Int, initialMinute: Int, onDismiss: () -> Unit, onTimeSelected: (Int, Int) -> Unit
 ) {
@@ -815,6 +916,14 @@ private fun NotificationTimePickerDialog(
 	}
 }
 
+@Composable
+private fun RecurrentPaymentsViewMode.label(): String {
+	return when (this) {
+		RecurrentPaymentsViewMode.HORIZONTAL_LIST -> stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_title)
+		RecurrentPaymentsViewMode.VERTICAL_LIST -> stringResource(R.string.settings_recurrent_payments_view_mode_vertical_title)
+	}
+}
+
 private fun formatNotificationTime(
 	context: android.content.Context, hour: Int, minute: Int
 ): String {
@@ -832,6 +941,7 @@ private fun PreviewSettings() {
 			currentTypography = "Expressive",
 			isMaterialYouEnabled = true,
 			isCreditQuickToggleFeatureEnabled = false,
+			recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
 			notificationHour = 9,
 			notificationMinute = 0,
 			exactAlarmEnabled = true,
@@ -839,6 +949,7 @@ private fun PreviewSettings() {
 			onTypographyChange = {},
 			onMaterialYouToggle = {},
 			onCreditQuickToggleFeatureToggle = {},
+			onRecurrentPaymentsViewModeChange = {},
 			onNotificationTimeChange = { _, _ -> },
 			onOpenExactAlarmSettings = {},
 			periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,

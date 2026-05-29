@@ -187,6 +187,13 @@
     <string name="settings_feature_credit_toggle_subtitle">Tap to see more details</string>
     <string name="settings_feature_credit_toggle_details">When activated, you can now mark payments made with a credit card. \nBy declaring a billing date, you\'ll know how much to pay your bank before you have to pay interest, through a notification separate from the billing period.</string>
     <string name="settings_feature_credit_toggle_switch_label">Enable CC usage</string>
+    <string name="settings_recurrent_payments_view_mode_title">Recurrent payments view mode</string>
+    <string name="settings_recurrent_payments_view_mode_subtitle">Change the type of display to show your recurrent payments</string>
+    <string name="settings_recurrent_payments_view_mode_dialog_title">Recurrent payments view mode</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Show recurrent payments as horizontal cards</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Show recurrent payments as a regular expenses list</string>
 
     <string name="settings_period_end_time_title">Period end time</string>
     <string name="settings_period_end_time_subtitle">The notification will be shown the day after the period ends</string>

@@ -43,6 +43,8 @@ interface BudgetRepository {
 
 	suspend fun getBudgetSettingsSync(): BudgetSettings?
 
+	suspend fun getTransactionById(transactionId: Long): Transaction?
+
 	fun calculateBudgetState(settings: BudgetSettings, currentDate: LocalDate): Flow<BudgetState>
 
 	fun getActiveCategories(): Flow<List<com.serranoie.app.minus.domain.model.Category>>

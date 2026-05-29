@@ -262,6 +262,10 @@ class BudgetRepositoryImpl @Inject constructor(
 		return settingsDao.getSettingsSync()?.toDomain()
 	}
 
+	override suspend fun getTransactionById(transactionId: Long): Transaction? {
+		return transactionDao.getTransactionById(transactionId)?.toDomain()
+	}
+
 	override fun calculateBudgetState(
 		settings: BudgetSettings, currentDate: LocalDate
 	): Flow<BudgetState> {

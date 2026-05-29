@@ -30,6 +30,7 @@ class MidnightTransitionManager @Inject constructor(
 ) {
 	val shouldShowTransitionDialog: StateFlow<Boolean> = midnightPeriodChecker.shouldShowTransitionDialog
 	val midnightTransitionData: StateFlow<MidnightTransitionData?> = midnightPeriodChecker.midnightTransitionData
+	val needsBudgetSetup: StateFlow<Boolean> = midnightPeriodChecker.needsBudgetSetup
 
 	suspend fun handleAppStart() {
 		midnightPeriodChecker.handleEndingPeriod()
@@ -41,6 +42,10 @@ class MidnightTransitionManager @Inject constructor(
 
 	fun onTransitionDialogDismissed() {
 		midnightPeriodChecker.onTransitionDialogDismissed()
+	}
+
+	fun onBudgetSetupHandled() {
+		midnightPeriodChecker.onBudgetSetupHandled()
 	}
 
 	suspend fun rollRemainingSplitEqually() {

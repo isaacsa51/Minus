@@ -10,6 +10,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
+import logcat.logcat
 
 sealed interface ApplyTransactionResult {
 	data class ShowRecurrentDialog(
@@ -34,6 +35,9 @@ class BudgetTransactionHandler @Inject constructor(
 	private val deleteTransactionUseCase: DeleteTransactionUseCase,
 	private val budgetExpressionEvaluator: BudgetExpressionEvaluator,
 ) {
+	companion object {
+		private const val TAG = "BudgetTransactionHandler"
+	}
 
 	suspend fun applyTransaction(
 		input: String,
@@ -155,7 +159,19 @@ class BudgetTransactionHandler @Inject constructor(
 
 	suspend fun deleteTransaction(transaction: Transaction): Result<Unit> {
 		return runCatching {
-			deleteTransactionUseCase(transaction)
+			// For virtual recurrent occurrences, use sourceTransactionId to delete the real saved transaction
+			val realId = transaction.sourceTransactionId ?: transaction.id
+			val transactionToDelete = if (transaction.sourceTransactionId != null) {
+				transaction.copy(id = realId, sourceTransactionId = null)
+			} else {
+				transaction
+			}
+			deleteTransactionUseCase(transactionToDelete)
+			val stillExists = budgetRepository.getTransactionById(realId)
+			if (stillExists != null && !stillExists.isDeleted) {
+				logcat(TAG) { "deleteTransaction failed: row with id $realId still exists after delete" }
+				throw IllegalStateException("Delete operation did not remove the transaction")
+			}
 		}
 	}
 

@@ -49,6 +49,7 @@ import com.serranoie.app.minus.data.repository.EARLY_FINISH_ORIGINAL_END_DATE_KE
 import com.serranoie.app.minus.data.repository.NOTIFICATION_HOUR_KEY_NAME
 import com.serranoie.app.minus.data.repository.NOTIFICATION_MINUTE_KEY_NAME
 import com.serranoie.app.minus.data.repository.ONBOARDING_COMPLETED_KEY_NAME
+import com.serranoie.app.minus.data.repository.RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME
 import com.serranoie.app.minus.data.repository.SETTINGS_DATASTORE_NAME
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.data.repository.THEME_MODE_KEY_NAME
@@ -66,6 +67,7 @@ import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
 import com.serranoie.app.minus.presentation.util.lockScreenOrientation
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -89,6 +91,7 @@ val THEME_MODE_KEY = stringPreferencesKey(THEME_MODE_KEY_NAME)
 val TYPOGRAPHY_MODE_KEY = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
 val DYNAMIC_COLOR_KEY = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
 val CREDIT_QUICK_TOGGLE_FEATURE_KEY = booleanPreferencesKey(CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME)
+val RECURRENT_PAYMENTS_VIEW_MODE_KEY = stringPreferencesKey(RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME)
 val EARLY_FINISH_ACTIVE_KEY = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
 val EARLY_FINISH_ACTUAL_DATE_KEY = longPreferencesKey(EARLY_FINISH_ACTUAL_DATE_KEY_NAME)
 val EARLY_FINISH_ORIGINAL_END_DATE_KEY = longPreferencesKey(EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME)
@@ -306,6 +309,28 @@ class MainActivity : ComponentActivity() {
 										onDismiss = {
 											midnightTransitionManager.onTransitionDialogDismissed()
 										})
+								}
+							}
+
+							val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()
+							LaunchedEffect(needsBudgetSetup) {
+								if (needsBudgetSetup) {
+									logcat(tag) { "needsBudgetSetup detected, navigating to wallet setup" }
+									midnightTransitionManager.onBudgetSetupHandled()
+									// Only force edit mode if no budget has ever been created.
+									// Use BUDGET_END_DATE_KEY as a proxy: if it's null, no budget was ever saved.
+									// If a budget exists, open wallet in view mode so user sees period info.
+									val prefs = context.settingsDataStore.data.first()
+									val hasBudget = prefs[BUDGET_END_DATE_KEY] != null
+									navController.navigate(
+										Screen.Main.createRoute(
+											openWallet = true,
+											forceWalletSetup = !hasBudget
+										)
+									) {
+										popUpTo(Screen.Main.route) { inclusive = true }
+										launchSingleTop = true
+									}
 								}
 							}
 						}
