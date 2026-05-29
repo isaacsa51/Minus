@@ -4,6 +4,7 @@ package com.serranoie.app.minus.presentation.ui.editor
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,9 +25,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -71,7 +69,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -163,9 +160,7 @@ fun PeriodSwitcherSheet(
 	}
 
 	Box(
-		modifier = Modifier
-			.fillMaxSize()
-			.windowInsetsPadding(WindowInsets.statusBars)
+		modifier = Modifier.fillMaxSize()
 	) {
 		AnimatedContent(
 			targetState = isEditMode, transitionSpec = {
@@ -501,7 +496,6 @@ fun EditBudgetContent(
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(horizontal = 16.dp)
-			.padding(top = 4.dp, bottom = 32.dp)
 			.navigationBarsPadding()
 			.verticalScroll(rememberScrollState()),
 	) {
@@ -528,14 +522,14 @@ fun EditBudgetContent(
 					budgetText = filtered
 				},
 				visualTransformation = CurrencyAmountInputVisualTransformation(),
-				textStyle = TextStyle(
+				textStyle = MaterialTheme.typography.titleMediumCondensed.copy(
 					fontSize = 48.sp,
 					fontWeight = FontWeight.Bold,
 					color = MaterialTheme.colorScheme.onSurface,
 					textAlign = TextAlign.Center,
 				),
 				singleLine = true,
-				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 				cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
 				decorationBox = { innerTextField ->
 					Row(
@@ -547,11 +541,10 @@ fun EditBudgetContent(
 							if (budgetText.isEmpty()) {
 								Text(
 									text = currencySymbol + "",
-									style = TextStyle(
-										fontSize = 48.sp,
-										fontWeight = FontWeight.Bold,
-										color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+									style = MaterialTheme.typography.titleMediumCondensed.copy(
+										fontSize = 48.sp
 									),
+									color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
 								)
 							}
 							innerTextField()
@@ -747,7 +740,7 @@ fun EditBudgetContent(
 				Spacer(modifier = Modifier.width(8.dp))
 				Text(
 					text = pendingNotificationText,
-					style = MaterialTheme.typography.bodySmall,
+					style = MaterialTheme.typography.bodySmallCondensed,
 					color = MaterialTheme.colorScheme.outline,
 				)
 			}
@@ -810,7 +803,17 @@ fun EditBudgetContent(
 		}
 	}
 
-	if (showDateSelector) {
+	AnimatedVisibility(
+		visible = showDateSelector,
+		enter = fadeIn(animationSpec = tween(220)) + slideInHorizontally(
+			animationSpec = tween(300),
+			initialOffsetX = { fullWidth -> fullWidth },
+		),
+		exit = fadeOut(animationSpec = tween(160)) + slideOutHorizontally(
+			animationSpec = tween(240),
+			targetOffsetX = { fullWidth -> fullWidth },
+		),
+	) {
 		FinishDateSelector(
 			totalBudget = parsedBudget,
 			currencyCode = currencyCache,
@@ -890,7 +893,7 @@ private fun CurrencyPickerDialog(
 ) {
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text(stringResource(R.string.select_currency)) },
+		title = { Text(stringResource(R.string.select_currency), style = MaterialTheme.typography.titleLargeEmphasized) },
 		text = {
 			Column(
 				modifier = Modifier
@@ -910,21 +913,21 @@ private fun CurrencyPickerDialog(
 					) {
 						Text(
 							text = currency.symbol,
-							style = MaterialTheme.typography.titleMedium,
+							style = MaterialTheme.typography.titleMediumEmphasized,
 							fontWeight = FontWeight.Bold,
 							modifier = Modifier.width(40.dp),
 						)
 						Column(modifier = Modifier.weight(1f)) {
 							Text(
 								text = currency.code,
-								style = MaterialTheme.typography.bodyMedium,
+								style = MaterialTheme.typography.bodyMediumEmphasized,
 								fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
 								color = if (isSelected) MaterialTheme.colorScheme.primary
 								else MaterialTheme.colorScheme.onSurface,
 							)
 							Text(
 								text = currency.name,
-								style = MaterialTheme.typography.bodySmall,
+								style = MaterialTheme.typography.bodySmallCondensed,
 								color = MaterialTheme.colorScheme.onSurfaceVariant,
 							)
 						}
@@ -965,12 +968,12 @@ private fun StrategyPickerDialog(
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text(stringResource(R.string.strategy_dialog_title)) },
+		title = { Text(stringResource(R.string.strategy_dialog_title), style = MaterialTheme.typography.titleLargeEmphasized) },
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 				Text(
 					text = stringResource(R.string.strategy_dialog_description),
-					style = MaterialTheme.typography.bodySmall,
+					style = MaterialTheme.typography.bodySmallCondensed,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 				)
 				Spacer(modifier = Modifier.height(4.dp))
@@ -1005,7 +1008,7 @@ private fun StrategyPickerDialog(
 							Row(verticalAlignment = Alignment.CenterVertically) {
 								Text(
 									text = title,
-									style = MaterialTheme.typography.bodyMedium,
+									style = MaterialTheme.typography.bodyMediumEmphasized,
 									fontWeight = FontWeight.Medium,
 									modifier = Modifier.weight(1f),
 								)
@@ -1140,7 +1143,7 @@ private fun PeriodSwitcherSheetPreview() {
 }
 
 @Preview(
-	showBackground = true, device = "spec:width=1080px,height=2340px,dpi=440,cutout=double"
+	showBackground = true, device = "spec:width=1080px,height=2340px,dpi=440"
 )
 @Composable
 private fun EditModePreview() {

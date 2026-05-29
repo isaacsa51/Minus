@@ -18,8 +18,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CreditCard
@@ -29,7 +31,8 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Publish
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,7 +67,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.serranoie.app.minus.BuildConfig
@@ -76,6 +79,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpan
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
+import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.Utils
 import com.serranoie.app.minus.presentation.util.Utils.toggleFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
@@ -192,7 +196,7 @@ fun Settings(
 						}
 						Text(
 							text = currentTheme,
-							style = MaterialTheme.typography.labelLarge,
+							style = MaterialTheme.typography.labelLargeCondensed,
 							color = MaterialTheme.colorScheme.primary
 						)
 					}
@@ -228,7 +232,7 @@ fun Settings(
 						}
 						Text(
 							text = currentTypography,
-							style = MaterialTheme.typography.labelLarge,
+							style = MaterialTheme.typography.labelLargeCondensed,
 							color = MaterialTheme.colorScheme.primary
 						)
 					}
@@ -338,7 +342,7 @@ fun Settings(
 						modifier = Modifier.testTag("SettingsRecurrentPaymentsViewModeItem")
 					) {
 						Icon(
-							imageVector = Icons.Default.Repeat,
+							imageVector = Icons.AutoMirrored.Filled.ViewList,
 							contentDescription = null,
 							tint = MaterialTheme.colorScheme.primary
 						)
@@ -357,7 +361,7 @@ fun Settings(
 						}
 						Text(
 							text = recurrentPaymentsViewMode.label(),
-							style = MaterialTheme.typography.labelLarge,
+							style = MaterialTheme.typography.labelLargeCondensed,
 							color = MaterialTheme.colorScheme.primary
 						)
 					}
@@ -397,7 +401,7 @@ fun Settings(
 							text = formatNotificationTime(
 								context, notificationHour, notificationMinute
 							),
-							style = MaterialTheme.typography.labelLarge,
+							style = MaterialTheme.typography.labelLargeCondensed,
 							color = MaterialTheme.colorScheme.primary
 						)
 					}
@@ -446,7 +450,7 @@ fun Settings(
 						}, position = PaddedListItemPosition.First
 					) {
 						Icon(
-							imageVector = Icons.Default.Info,
+							imageVector = Icons.Default.Backup,
 							contentDescription = null,
 							tint = MaterialTheme.colorScheme.primary
 						)
@@ -472,7 +476,7 @@ fun Settings(
 						}, position = PaddedListItemPosition.Last
 					) {
 						Icon(
-							imageVector = Icons.Default.Refresh,
+							imageVector = Icons.Default.Publish,
 							contentDescription = null,
 							tint = MaterialTheme.colorScheme.primary
 						)
@@ -504,7 +508,7 @@ fun Settings(
 						}, position = PaddedListItemPosition.First
 					) {
 						Icon(
-							imageVector = Icons.Default.Info,
+							imageVector = Icons.Default.QuestionMark,
 							contentDescription = null,
 							tint = MaterialTheme.colorScheme.primary
 						)
@@ -932,7 +936,7 @@ private fun formatNotificationTime(
 		.format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
 }
 
-@Preview
+@PreviewScreenSizes
 @Composable
 private fun PreviewSettings() {
 	MinusTheme {

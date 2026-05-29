@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.PeriodOptionChip
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -218,7 +219,7 @@ fun FinishDateSelector(
 						}
 					},
 					enabled = hasRange && selectedPeriod != null,
-				) { Text(stringResource(R.string.apply)) }
+				) { Text(stringResource(R.string.apply), style = MaterialTheme.typography.labelMediumEmphasized) }
 			}
 
 			AnimatedVisibility(
@@ -231,7 +232,7 @@ fun FinishDateSelector(
 					colors = DatePickerDefaults.colors(
 						titleContentColor = MaterialTheme.colorScheme.onSurface,
 						headlineContentColor = MaterialTheme.colorScheme.onSurface,
-						containerColor = MaterialTheme.colorScheme.surfaceVariant,
+						containerColor = MaterialTheme.colorScheme.surface,
 					),
 					modifier = Modifier
 						.fillMaxWidth()
@@ -287,7 +288,7 @@ fun FinishDateSelector(
 )
 @Composable
 private fun FinishDateSelectorPreview() {
-	MaterialTheme {
+	MinusTheme {
 		Surface(
 			modifier = Modifier.fillMaxSize(),
 			color = MaterialTheme.colorScheme.background,
