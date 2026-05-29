@@ -50,6 +50,7 @@ import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
 import com.serranoie.app.minus.presentation.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.presentation.NOTIFICATION_MINUTE_KEY
+import com.serranoie.app.minus.presentation.RECURRENT_PAYMENTS_VIEW_MODE_KEY
 import com.serranoie.app.minus.presentation.THEME_MODE_KEY
 import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
 import com.serranoie.app.minus.presentation.appTheme
@@ -60,6 +61,7 @@ import com.serranoie.app.minus.presentation.ui.analytics.Analytics
 import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsActions
 import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsState
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
+import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.home.MainScreen
 import com.serranoie.app.minus.presentation.ui.onboarding.OnboardingScreen
 import com.serranoie.app.minus.presentation.ui.settings.CsvTransferEntryPoint
@@ -457,6 +459,7 @@ fun AppNavGraph(
             val preferences = context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences()).value
             val currentThemeMode = context.appTheme
             val isCreditQuickToggleFeatureEnabled = preferences[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false
+            val recurrentPaymentsViewMode = RecurrentPaymentsViewMode.fromName(preferences[RECURRENT_PAYMENTS_VIEW_MODE_KEY])
             val notificationHour = preferences[NOTIFICATION_HOUR_KEY] ?: DEFAULT_NOTIFICATION_HOUR
             val notificationMinute = preferences[NOTIFICATION_MINUTE_KEY] ?: DEFAULT_NOTIFICATION_MINUTE
             val exactAlarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -483,6 +486,7 @@ fun AppNavGraph(
                 currentTypography = currentTypographyString,
                 isMaterialYouEnabled = context.dynamicColorEnabled,
                 isCreditQuickToggleFeatureEnabled = isCreditQuickToggleFeatureEnabled,
+                recurrentPaymentsViewMode = recurrentPaymentsViewMode,
                 notificationHour = notificationHour,
                 notificationMinute = notificationMinute,
                 exactAlarmEnabled = exactAlarmEnabled,
@@ -528,6 +532,13 @@ fun AppNavGraph(
                     scope.launch {
                         context.settingsDataStore.edit { prefs ->
                             prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY] = newValue
+                        }
+                    }
+                },
+                onRecurrentPaymentsViewModeChange = { mode ->
+                    scope.launch {
+                        context.settingsDataStore.edit { prefs ->
+                            prefs[RECURRENT_PAYMENTS_VIEW_MODE_KEY] = mode.name
                         }
                     }
                 },

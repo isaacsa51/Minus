@@ -20,7 +20,8 @@ data class Transaction(
 	val recurrentEndDate: LocalDateTime? = null,
 	val subscriptionDay: Int? = null, // Day of month (1-31) for monthly subscriptions
 	val categoryId: Long? = null,
-	val isCredit: Boolean = false
+	val isCredit: Boolean = false,
+	val sourceTransactionId: Long? = null
 ) {
     companion object {
         fun create(

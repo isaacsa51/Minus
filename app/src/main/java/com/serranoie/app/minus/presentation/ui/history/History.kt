@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,6 +58,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.domain.model.BudgetPeriod
@@ -64,6 +66,8 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.RECURRENT_PAYMENTS_VIEW_MODE_KEY
+import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetSystemIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
@@ -92,6 +96,17 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 
+enum class RecurrentPaymentsViewMode {
+	HORIZONTAL_LIST,
+	VERTICAL_LIST;
+
+	companion object {
+		fun fromName(value: String?): RecurrentPaymentsViewMode = runCatching {
+			value?.let(::valueOf)
+		}.getOrNull() ?: HORIZONTAL_LIST
+	}
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun History(
@@ -103,8 +118,13 @@ fun History(
 	onCancelPendingDelete: () -> Unit = {},
 	onShowInfoSnackbar: (message: String) -> Unit = {},
 ) {
+	val context = LocalContext.current
 	val view = LocalView.current
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+	val preferences by context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences())
+	val recurrentPaymentsViewMode = remember(preferences) {
+		RecurrentPaymentsViewMode.fromName(preferences[RECURRENT_PAYMENTS_VIEW_MODE_KEY])
+	}
 	val scrollState = rememberLazyListState()
 
 	val isAtEndOfList: Boolean =
@@ -397,7 +417,10 @@ fun History(
 								"Ocultar subscripciones fuera del periodo"
 							} else {
 								"Mostrar subscripciones fuera del periodo"
-							}, amplitude = 4f, wavelength = 45f
+							},
+							horizontalPadding = 0.dp,
+							amplitude = 4f,
+							wavelength = 45f
 						)
 					}
 				}
@@ -410,29 +433,47 @@ fun History(
 							animationSpec = tween(300), shrinkTowards = Alignment.Top
 						) + fadeOut(animationSpec = tween(300))
 					) {
-						LazyRow(
-							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(8.dp),
-							contentPadding = androidx.compose.foundation.layout.PaddingValues(
-								horizontal = 16.dp
-							)
-						) {
-							itemsIndexed(
-								items = futureRecurrentOutOfPeriod,
-								key = { _, item -> "future-${item.transaction.id}" }) { _, item ->
-								RecurrentTicketCard(
-									title = item.transaction.comment,
-									amountFormatted = currencyFormat.format(item.transaction.amount),
-									nextChargeDate = prettyDate(
-										item.nextChargeDate.atStartOfDay(),
-										showTime = false,
-										forceShowDate = false
-									),
-									frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()
-										?.replaceFirstChar { it.uppercase() },
-									onClick = { selectedTransaction = item.transaction },
-									modifier = Modifier.fillParentMaxWidth(0.45f)
-								)
+						if (recurrentPaymentsViewMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
+							Column(modifier = Modifier.fillMaxWidth()) {
+								futureRecurrentOutOfPeriod.forEachIndexed { index, item ->
+									ExpenseItem(
+										transaction = item.transaction,
+										currencyFormat = currencyFormat,
+										position = when {
+											futureRecurrentOutOfPeriod.size == 1 -> PaddedListItemPosition.Single
+											index == 0 -> PaddedListItemPosition.First
+											index == futureRecurrentOutOfPeriod.lastIndex -> PaddedListItemPosition.Last
+											else -> PaddedListItemPosition.Middle
+										}
+									)
+									if (index < futureRecurrentOutOfPeriod.lastIndex) {
+										Spacer(modifier = Modifier.height(2.dp))
+									}
+								}
+							}
+						} else {
+							LazyRow(
+								modifier = Modifier.fillMaxWidth(),
+								horizontalArrangement = Arrangement.spacedBy(8.dp),
+								contentPadding = PaddingValues(horizontal = 16.dp)
+							) {
+								itemsIndexed(
+									items = futureRecurrentOutOfPeriod,
+									key = { _, item -> "future-${item.transaction.id}" }) { _, item ->
+									RecurrentTicketCard(
+										title = item.transaction.comment,
+										amountFormatted = currencyFormat.format(item.transaction.amount),
+										nextChargeDate = prettyDate(
+											item.nextChargeDate.atStartOfDay(),
+											showTime = false,
+											forceShowDate = false
+										),
+										frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()
+											?.replaceFirstChar { it.uppercase() },
+										onClick = { selectedTransaction = item.transaction },
+										modifier = Modifier.fillParentMaxWidth(0.45f)
+									)
+								}
 							}
 						}
 					}
@@ -452,6 +493,7 @@ fun History(
 							}) {
 						WavyDivider(
 							text = if (showPastPeriod) "Ocultar gastos del periodo pasado" else "Mostrar gastos del periodo pasado",
+							horizontalPadding = 0.dp,
 							amplitude = 4f,
 							wavelength = 45f
 						)
@@ -670,13 +712,15 @@ fun History(
 					onCancel = { editingTransaction = null },
 					onSave = { newAmount, newComment, newDateTime, newIsRecurrent, newFrequency, newEndDate, newSubscriptionDay ->
 						val updatedTransaction = transaction.copy(
+							id = transaction.sourceTransactionId ?: transaction.id,
 							amount = newAmount,
 							comment = newComment,
 							date = newDateTime,
 							isRecurrent = newIsRecurrent,
 							recurrentFrequency = newFrequency,
 							recurrentEndDate = newEndDate?.atStartOfDay(),
-							subscriptionDay = newSubscriptionDay
+							subscriptionDay = newSubscriptionDay,
+							sourceTransactionId = null
 						)
 						viewModel.processIntent(
 							BudgetTransactionIntent.EditTransactionTapped(
@@ -754,13 +798,15 @@ fun History(
 					onCancel = { recurrentToEdit = null },
 					onSave = { newAmount, newComment, newDateTime, newIsRecurrent, newFrequency, newEndDate, newSubscriptionDay ->
 						val updatedTransaction = transaction.copy(
+							id = transaction.sourceTransactionId ?: transaction.id,
 							amount = newAmount,
 							comment = newComment,
 							date = newDateTime,
 							isRecurrent = newIsRecurrent,
 							recurrentFrequency = newFrequency,
 							recurrentEndDate = newEndDate?.atStartOfDay(),
-							subscriptionDay = newSubscriptionDay
+							subscriptionDay = newSubscriptionDay,
+							sourceTransactionId = null
 						)
 						viewModel.processIntent(
 							BudgetTransactionIntent.EditTransactionTapped(
@@ -1192,6 +1238,7 @@ private fun HistoryFullContentPreview() {
 				item {
 					WavyDivider(
 						text = "Mostrar subscripciones fuera del periodo",
+						horizontalPadding = 0.dp,
 						amplitude = 4f,
 						wavelength = 45f
 					)
@@ -1243,7 +1290,10 @@ private fun HistoryFullContentPreview() {
 
 				item {
 					WavyDivider(
-						text = "Mostrar gastos del periodo pasado", amplitude = 4f, wavelength = 45f
+						text = "Mostrar gastos del periodo pasado",
+						horizontalPadding = 0.dp,
+						amplitude = 4f,
+						wavelength = 45f
 					)
 				}
 				item {
@@ -1290,7 +1340,8 @@ private fun getRecurringChargesInPeriod(
 			virtualTransactions.add(
 				transaction.copy(
 					date = chargeDate.atTime(originalTime),
-					id = transaction.id * 1000000 + chargeDate.toEpochDay()
+					id = transaction.id * 1000000 + chargeDate.toEpochDay(),
+					sourceTransactionId = transaction.sourceTransactionId ?: transaction.id
 				)
 			)
 		}
