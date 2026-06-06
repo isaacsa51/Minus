@@ -59,7 +59,8 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 	@Composable
 	private fun WidgetContent() {
 		val prefs = currentState<Preferences>()
-		val budgetAmount = prefs[androidx.datastore.preferences.core.intPreferencesKey("budget_amount")] ?: 0
+		val budgetAmount =
+			prefs[androidx.datastore.preferences.core.intPreferencesKey("budget_amount")] ?: 0
 		val currency = prefs[stringPreferencesKey("currency_code")] ?: "USD"
 		val startDate = prefs[stringPreferencesKey("start_date")] ?: "-"
 		val endDate = prefs[stringPreferencesKey("end_date")] ?: "-"
@@ -76,36 +77,32 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 		endDate: String,
 		daysCount: String
 	) {
-		Box(
+		Column(
 			modifier = GlanceModifier.fillMaxSize().background(GlanceTheme.colors.surface)
 				.clickable(actionRunCallback<OpenAppAction>())
 				.padding(horizontal = 16.dp, vertical = 2.dp),
-			contentAlignment = Alignment.CenterStart
+			verticalAlignment = Alignment.CenterVertically,
 		) {
-			Column {
-				// Budget amount
-				Text(
-					text = formatWidgetCurrency(currency, budgetAmount), style = TextStyle(
-						fontSize = MaterialTheme.typography.h4.fontSize,
-						fontWeight = FontWeight.Bold, color = GlanceTheme.colors.onSurface
-					)
+			// Budget amount
+			Text(
+				text = formatWidgetCurrency(currency, budgetAmount), style = TextStyle(
+					fontSize = MaterialTheme.typography.h4.fontSize,
+					fontWeight = FontWeight.Bold, color = GlanceTheme.colors.onSurface
 				)
+			)
 
-				Spacer(modifier = GlanceModifier.height(2.dp))
-
-				// Label
-				Text(
-					text = "Total Budget", style = TextStyle(
-						color = GlanceTheme.colors.onSurfaceVariant,
-						fontSize = MaterialTheme.typography.subtitle1.fontSize
-					)
+			// Label
+			Text(
+				text = "Total Budget", style = TextStyle(
+					color = GlanceTheme.colors.onSurfaceVariant,
+					fontSize = MaterialTheme.typography.subtitle1.fontSize
 				)
+			)
 
-				Spacer(modifier = GlanceModifier.height(12.dp))
+			Spacer(modifier = GlanceModifier.height(12.dp))
 
-				// Date range with arrow and days chip
-				DateRangeRow(startDate, endDate, daysCount)
-			}
+			// Date range with arrow and days chip
+			DateRangeRow(startDate, endDate, daysCount)
 		}
 	}
 
@@ -114,7 +111,6 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 		Row(
 			verticalAlignment = Alignment.CenterVertically, modifier = GlanceModifier.fillMaxWidth()
 		) {
-			// Start date
 			Text(
 				text = startDate, style = TextStyle(
 					fontSize = MaterialTheme.typography.subtitle2.fontSize,
@@ -125,28 +121,23 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 
 			Spacer(modifier = GlanceModifier.width(8.dp))
 
-			// Arrow line with days chip
 			Box(
 				modifier = GlanceModifier.defaultWeight().height(20.dp),
 				contentAlignment = Alignment.Center
 			) {
-				// Horizontal line and arrow in a row
 				Row(
 					modifier = GlanceModifier.fillMaxWidth().height(2.dp),
 					verticalAlignment = Alignment.CenterVertically
 				) {
-					// Horizontal line (arrow body)
 					Box(
 						modifier = GlanceModifier.defaultWeight().fillMaxHeight()
 							.background(GlanceTheme.colors.onSurfaceVariant)
 					) {}
 				}
 
-				// Days count chip positioned above the line with rounded corners
 				if (daysCount != "-") {
 					Box(
 						modifier = GlanceModifier.fillMaxWidth(),
-//							.padding(bottom = 1.dp),
 						contentAlignment = Alignment.TopCenter
 					) {
 						Box(
@@ -169,7 +160,6 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 
 			Spacer(modifier = GlanceModifier.width(8.dp))
 
-			// End date
 			Text(
 				text = endDate, style = TextStyle(
 					fontSize = MaterialTheme.typography.subtitle2.fontSize,
@@ -225,7 +215,8 @@ suspend fun updateBudgetOverviewWidget(
 
 	glanceIds.forEach { glanceId ->
 		updateAppWidgetState(context, glanceId) { prefs ->
-			prefs[androidx.datastore.preferences.core.intPreferencesKey("budget_amount")] = budgetAmount
+			prefs[androidx.datastore.preferences.core.intPreferencesKey("budget_amount")] =
+				budgetAmount
 			prefs[stringPreferencesKey("currency_code")] = currency
 			prefs[stringPreferencesKey("start_date")] = dateFormat.format(startDate)
 			prefs[stringPreferencesKey("end_date")] = dateFormat.format(endDate)

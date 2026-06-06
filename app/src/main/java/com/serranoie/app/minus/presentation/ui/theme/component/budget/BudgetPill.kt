@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -65,6 +66,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BudgetPill(
 	budgetState: BudgetState?,
@@ -177,12 +179,13 @@ fun BudgetPill(
 	} else 0f
 
 	val containerColor = when {
-		isCurrentPeriodOverBudget -> colorBad.let { if (bigVariant) it else it.copy(alpha = 0.25f) }
-		spendProgress > 0.65f -> colorNotGood.copy(alpha = 0.25f)
+		isCurrentPeriodOverBudget -> colorBad.let { if (bigVariant) it else it.copy(alpha = 0.15f) }
+		spendProgress > 0.5f -> colorNotGood.copy(alpha = 0.15f)
 		else -> if (bigVariant) MaterialTheme.colorScheme.secondaryContainer else colorGood.copy(
-			alpha = 0.25f
+			alpha = 0.15f
 		)
 	}
+//	val containerColor = MaterialTheme.colorScheme.surfaceVariant
 
 	val contentColor = when {
 		isCurrentPeriodOverBudget -> if (bigVariant) Color.White else colorBad
@@ -196,7 +199,7 @@ fun BudgetPill(
 		label = "progress"
 	)
 	val centeredAmountScale by animateFloatAsState(
-		targetValue = if (shouldCenterRemainingAmount) 1.25f else 1f,
+		targetValue = if (shouldCenterRemainingAmount) 1.30f else 1f,
 		animationSpec = tween(220),
 		label = "centeredAmountScale"
 	)
@@ -226,6 +229,22 @@ fun BudgetPill(
 						color = contentColor.copy(alpha = 0.5f),
 						trackColor = Color.Transparent,
 						drawStopIndicator = {})
+
+//					val density  = LocalDensity.current
+//					val strokeWidthPx = with(density) { 28.dp.toPx() }
+
+//					LinearWavyProgressIndicator(
+//						progress = { animatedProgress },
+//						modifier = Modifier
+//							.fillMaxSize()
+//							.padding(horizontal = 16.dp),
+//						color = contentColor.copy(alpha = 0.65f),
+//						trackColor = containerColor.copy(alpha = 0.15f),
+//						trackStroke = Stroke(width = 36f, cap = StrokeCap.Round),
+//						amplitude = { 1f },
+//						wavelength = 48.dp,
+//						stroke = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
+//					)
 				}
 
 				AnimatedContent(
@@ -471,8 +490,7 @@ private fun PreviewBudgetPillEditingCentered() {
 			viewPeriod = BudgetPeriod.DAILY,
 			currencyCode = "MXN",
 			centerRemainingAmount = true,
-			modifier = Modifier
-				.fillMaxWidth(),
+			modifier = Modifier.fillMaxWidth(),
 			onOpenSettings = { },
 			onOpenBudgetSheet = { },
 		)

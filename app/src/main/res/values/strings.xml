@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Minus</string>
 
-    <string name="empty" translatable="false">-</string>
+    <string name="empty" translatable="false">—</string>
 
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
@@ -191,9 +191,9 @@
     <string name="settings_recurrent_payments_view_mode_subtitle">Change the type of display to show your recurrent payments</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Recurrent payments view mode</string>
     <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Show recurrent payments as horizontal cards</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Show recurring payments as horizontal cards</string>
     <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Show recurrent payments as a regular expenses list</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Show recurring payments as a regular expenses list</string>
 
     <string name="settings_period_end_time_title">Period end time</string>
     <string name="settings_period_end_time_subtitle">The notification will be shown the day after the period ends</string>
@@ -296,6 +296,7 @@
 
     <!-- Recurrent Payments Divider -->
     <string name="recurrent_payments_divider_title_upcoming">Upcoming recurrent payments</string>
+    <string name="recurrent_payments_divider_title_current_period">Recurrent Payments on this period</string>
 
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">Today</string>
@@ -303,6 +304,10 @@
     <string name="upcoming_recurrent_in_days">In %1$d days</string>
     <string name="upcoming_recurrent_in_weeks">In %1$d weeks</string>
     <string name="upcoming_recurrent_unnamed_expense">Unnamed recurrent expense</string>
+    <string name="delete_recurrent_expense_title">Delete recurrent expense</string>
+    <string name="delete_recurrent_expense_fallback_name">this recurrent expense</string>
+    <string name="delete_recurrent_expense_message">Are you sure you want to delete "%1$s"?</string>
+    <string name="delete_recurrent_expense_warning">This action will remove the whole recurrent expense configuration and you will not receive more notifications.</string>
 
     <!-- Recurrent Ticket -->
     <string name="recurrent_ticket_unnamed_subscription">Unnamed subscription</string>

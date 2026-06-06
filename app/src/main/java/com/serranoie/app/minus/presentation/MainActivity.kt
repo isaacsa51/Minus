@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation
 
 import android.content.Context
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
@@ -65,7 +64,6 @@ import com.serranoie.app.minus.presentation.ui.theme.ThemeManager
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
 import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
-import com.serranoie.app.minus.presentation.util.lockScreenOrientation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -102,9 +100,6 @@ const val DEFAULT_NOTIFICATION_MINUTE = 0
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-	private val tag = "MainActivity - ISAAC"
-
 	private val isDone: MutableState<Boolean> = mutableStateOf(false)
 	private val isReady: MutableState<Boolean> = mutableStateOf(false)
 	private val dataStoreLoaded: MutableState<Boolean> = mutableStateOf(false)
@@ -159,11 +154,11 @@ class MainActivity : ComponentActivity() {
 			try {
 				runCatching {
 					val nodeIds = wearableService.getReachableSenderNodeIds()
-					logcat(tag) {
+					logcat {
 						"wear capability minus_wear_sender reachableNodes=${nodeIds.size} ids=${nodeIds.joinToString()}"
 					}
 				}.onFailure {
-					logcat(tag) { it.asLog() }
+					logcat { it.asLog() }
 				}
 
 				val userSettings = settingsRepository.getSettings()
@@ -182,7 +177,7 @@ class MainActivity : ComponentActivity() {
 		}
 
 		settingsRepository.observeSettings().onEach { settings ->
-			logcat(tag) {
+			logcat {
 				"Settings observer -> onboarding_completed=${settings.onboardingCompleted}"
 			}
 			onboardingComplete.value = settings.onboardingCompleted
@@ -214,9 +209,10 @@ class MainActivity : ComponentActivity() {
 
 			val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
 
-			if (widthSizeClass == WindowWidthSizeClass.Compact) {
-				lockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-			}
+			// INFO: Seems like this is not needed anymore since we support tablet layouts.
+//			if (widthSizeClass == WindowWidthSizeClass.Compact) {
+//				lockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+//			}
 
 			val windowInsets = WindowInsets.systemBars.asPaddingValues()
 
@@ -245,7 +241,7 @@ class MainActivity : ComponentActivity() {
 									navController = navController,
 									onOnboardingComplete = {
 										lifecycleScope.launch {
-											logcat(tag) {
+											logcat {
 												"onOnboardingComplete -> writing onboarding_completed=true"
 											}
 											settingsRepository.setOnboardingCompleted(true)
@@ -315,7 +311,7 @@ class MainActivity : ComponentActivity() {
 							val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()
 							LaunchedEffect(needsBudgetSetup) {
 								if (needsBudgetSetup) {
-									logcat(tag) { "needsBudgetSetup detected, navigating to wallet setup" }
+									logcat { "needsBudgetSetup detected, navigating to wallet setup" }
 									midnightTransitionManager.onBudgetSetupHandled()
 									// Only force edit mode if no budget has ever been created.
 									// Use BUDGET_END_DATE_KEY as a proxy: if it's null, no budget was ever saved.

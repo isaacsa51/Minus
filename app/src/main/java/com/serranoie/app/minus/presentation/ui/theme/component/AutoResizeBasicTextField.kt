@@ -36,7 +36,7 @@ fun AutoResizeBasicTextField(
 	modifier: Modifier = Modifier,
 	textStyle: TextStyle = MaterialTheme.typography.displayLarge,
 	minFontSize: TextUnit = 20.sp,
-	maxFontSize: TextUnit = 88.sp,
+	maxFontSize: TextUnit = 76.sp,
 	cursorBrush: Brush = SolidColor(MaterialTheme.colorScheme.primary),
 	singleLine: Boolean = true,
 	enabled: Boolean = true,

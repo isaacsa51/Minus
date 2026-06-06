@@ -134,6 +134,11 @@ class BudgetTransactionHandler @Inject constructor(
 
 		val finalComment = rawComment.ifEmpty { fallbackComment }
 		val activePeriodId = resolveActivePeriodId()
+		val transactionDate = resolveRecurrentTransactionDate(
+			frequency = frequency,
+			subscriptionDay = subscriptionDay,
+			now = now
+		)
 
 		val categoryId: Long? = if (finalComment.isNotBlank()) {
 			budgetRepository.findOrCreateCategory(finalComment.trim()).id
@@ -144,7 +149,7 @@ class BudgetTransactionHandler @Inject constructor(
 		val transaction = Transaction.create(
 			amount = amount,
 			comment = finalComment,
-			date = now,
+			date = transactionDate,
 			periodId = activePeriodId,
 			isRecurrent = true,
 			recurrentFrequency = frequency,
@@ -155,6 +160,19 @@ class BudgetTransactionHandler @Inject constructor(
 		)
 		addTransactionUseCase(transaction)
 		return true
+	}
+
+	private fun resolveRecurrentTransactionDate(
+		frequency: RecurrentFrequency,
+		subscriptionDay: Int?,
+		now: LocalDateTime,
+	): LocalDateTime {
+		if (frequency != RecurrentFrequency.MONTHLY || subscriptionDay == null) {
+			return now
+		}
+
+		val targetDay = subscriptionDay.coerceIn(1, now.toLocalDate().lengthOfMonth())
+		return now.withDayOfMonth(targetDay)
 	}
 
 	suspend fun deleteTransaction(transaction: Transaction): Result<Unit> {

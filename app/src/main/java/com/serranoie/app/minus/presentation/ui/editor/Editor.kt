@@ -67,6 +67,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
@@ -410,7 +411,8 @@ private fun EditingContent(
 	}
 
 	val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
-		fontWeight = FontWeight.W500
+		fontWeight = FontWeight.W500,
+		fontSize = 86.sp,
 	)
 
 	BoxWithConstraints(
@@ -421,7 +423,7 @@ private fun EditingContent(
 		val amountSlotHeight = 124.dp
 		val containerSizePx = remember(availableWidth, amountSlotHeight, density) {
 			with(density) {
-				androidx.compose.ui.unit.IntSize(
+				IntSize(
 					width = availableWidth.toPx().toInt(), height = amountSlotHeight.toPx().toInt()
 				)
 			}
@@ -494,8 +496,6 @@ private fun EditingContent(
 								textAlign = TextAlign.End
 							),
 							singleLine = true,
-							minFontSize = 20.sp,
-							maxFontSize = 57.sp,
 							containerSize = containerSizePx,
 							decorationBox = { innerTextField ->
 								Box { innerTextField() }

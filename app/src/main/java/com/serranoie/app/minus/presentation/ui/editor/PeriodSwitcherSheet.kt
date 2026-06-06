@@ -505,7 +505,7 @@ fun EditBudgetContent(
 			fontWeight = FontWeight.W500,
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(vertical = 16.dp),
+				.padding(top = 16.dp),
 			textAlign = TextAlign.Center,
 		)
 

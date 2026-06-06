@@ -284,6 +284,7 @@
 
     <!-- Recurrent Payments Divider -->
     <string name="recurrent_payments_divider_title_upcoming">Upcoming recurrent payments</string>
+    <string name="recurrent_payments_divider_title_current_period">Recurrent Payments on this period</string>
 
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">Today</string>
@@ -291,6 +292,10 @@
     <string name="upcoming_recurrent_in_days">In %1$d days</string>
     <string name="upcoming_recurrent_in_weeks">In %1$d weeks</string>
     <string name="upcoming_recurrent_unnamed_expense">Unnamed recurrent expense</string>
+    <string name="delete_recurrent_expense_title">Delete recurrent expense</string>
+    <string name="delete_recurrent_expense_fallback_name">this recurrent expense</string>
+    <string name="delete_recurrent_expense_message">Are you sure you want to delete "%1$s"?</string>
+    <string name="delete_recurrent_expense_warning">This action will remove the whole recurrent expense configuration and you will not receive more notifications.</string>
 
     <!-- Recurrent Ticket -->
     <string name="recurrent_ticket_unnamed_subscription">Unnamed subscription</string>

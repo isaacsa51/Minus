@@ -31,8 +31,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -43,8 +45,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
@@ -52,29 +56,45 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.rememberSwipeableState
+import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
 import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
+import com.serranoie.app.minus.presentation.settingsDataStore
+import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
-import com.serranoie.app.minus.presentation.ui.budget.NumpadWithViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
+import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
-import com.serranoie.app.minus.presentation.ui.editor.EditorWithViewModel
+import com.serranoie.app.minus.presentation.ui.editor.Editor
 import com.serranoie.app.minus.presentation.ui.history.History
-import com.serranoie.app.minus.presentation.settingsDataStore
-import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
-import com.serranoie.app.minus.presentation.ui.tutorial.firstLaunchTutorialStageFlow
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.colorEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetLayout
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetValue
+import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
+import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
+import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
+import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
+import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
+import com.serranoie.app.minus.presentation.ui.tutorial.firstLaunchTutorialStageFlow
+import com.serranoie.app.minus.presentation.util.StatusBarPadding
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.time.LocalDate
+import kotlin.time.Duration.Companion.milliseconds
+import com.serranoie.app.minus.presentation.ui.editor.EditMode as EditorEditMode
+import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode as NumpadEditMode
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalWearMaterialApi::class)
 @Composable
@@ -86,15 +106,9 @@ fun MainScreen(
 	forceWalletSetup: Boolean = false,
 	budgetViewModel: BudgetViewModel = hiltViewModel()
 ) {
-	val topSheetState = rememberSwipeableState(TopSheetValue.HalfExpanded)
-	var nightMode by remember { mutableStateOf(false) }
+	val budgetUiState by budgetViewModel.uiState.collectAsStateWithLifecycle()
 	val context = LocalContext.current
 	val coroutineScope = rememberCoroutineScope()
-	val budgetUiState by budgetViewModel.uiState.collectAsStateWithLifecycle()
-
-	val localDensity = LocalDensity.current
-	val windowSizeClass = LocalWindowSize.current
-	val windowInsets = LocalWindowInsets.current
 
 	val onboardingCompletedFlow = remember(context) {
 		context.settingsDataStore.data.map { it[ONBOARDING_COMPLETED_KEY] ?: false }
@@ -103,22 +117,72 @@ fun MainScreen(
 	val tutorialStage by context.firstLaunchTutorialStageFlow()
 		.collectAsStateWithLifecycle(initialValue = FirstLaunchTutorialStage.COMPLETED)
 
-	var shownStage by remember { mutableStateOf<FirstLaunchTutorialStage?>(null) }
-
-	fun advanceTutorialIfCurrent(expected: FirstLaunchTutorialStage) {
-		if (tutorialStage != expected) return
-		coroutineScope.launch {
-			context.settingsDataStore.edit { prefs ->
-				prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] = expected.next().name
+	MainScreenContent(
+		budgetUiState = budgetUiState,
+		onboardingCompleted = onboardingCompleted,
+		tutorialStage = tutorialStage,
+		onNavigateToAnalytics = onNavigateToAnalytics,
+		onNavigateToSettings = onNavigateToSettings,
+		onNavigateToWallet = onNavigateToWallet,
+		openWalletOnStart = openWalletOnStart,
+		forceWalletSetup = forceWalletSetup,
+		onProcessIntent = { intent ->
+			when (intent) {
+				is BudgetEditorIntent -> budgetViewModel.processIntent(intent)
+				is BudgetTransactionIntent -> budgetViewModel.processIntent(intent)
+				is BudgetNumpadIntent -> budgetViewModel.processIntent(intent)
 			}
-		}
-	}
+		},
+		onAdvanceTutorial = { expected ->
+			if (tutorialStage != expected) return@MainScreenContent
+			coroutineScope.launch {
+				context.settingsDataStore.edit { prefs ->
+					prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] = expected.next().name
+				}
+			}
+		},
+		history = { modifier, onQueueDeleteWithUndo, onCancelPendingDelete, onShowInfoSnackbar ->
+			History(
+				modifier = modifier.background(colorButton),
+				onQueueDeleteWithUndo = onQueueDeleteWithUndo,
+				onCancelPendingDelete = onCancelPendingDelete,
+				onShowInfoSnackbar = onShowInfoSnackbar
+			)
+		})
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalWearMaterialApi::class)
+@Composable
+private fun MainScreenContent(
+	budgetUiState: BudgetUiState,
+	onboardingCompleted: Boolean,
+	tutorialStage: FirstLaunchTutorialStage,
+	onNavigateToAnalytics: () -> Unit,
+	onNavigateToSettings: () -> Unit,
+	onNavigateToWallet: () -> Unit,
+	openWalletOnStart: Boolean,
+	forceWalletSetup: Boolean,
+	onProcessIntent: (Any) -> Unit,
+	onAdvanceTutorial: (FirstLaunchTutorialStage) -> Unit,
+	history: @Composable (
+		Modifier, onQueueDeleteWithUndo: (transaction: Transaction, message: String, onUndo: () -> Unit) -> Unit, onCancelPendingDelete: () -> Unit, onShowInfoSnackbar: (message: String) -> Unit
+	) -> Unit
+) {
+	val topSheetState = rememberSwipeableState(TopSheetValue.HalfExpanded)
+	var nightMode by remember { mutableStateOf(false) }
+	val coroutineScope = rememberCoroutineScope()
+
+	val localDensity = LocalDensity.current
+	val windowSizeClass = LocalWindowSize.current
+	val windowInsets = LocalWindowInsets.current
+
+	var shownStage by remember { mutableStateOf<FirstLaunchTutorialStage?>(null) }
 
 	val isHistoryVisible =
 		windowSizeClass != WindowWidthSizeClass.Compact || topSheetState.currentValue == TopSheetValue.Expanded
 
 	var pendingDeleteTransaction by remember {
-		mutableStateOf<com.serranoie.app.minus.domain.model.Transaction?>(
+		mutableStateOf<Transaction?>(
 			null
 		)
 	}
@@ -126,8 +190,8 @@ fun MainScreen(
 	var pendingDeleteJob by remember { mutableStateOf<Job?>(null) }
 	val snackbarHostState = remember { SnackbarHostState() }
 
-	fun executeDelete(transaction: com.serranoie.app.minus.domain.model.Transaction) {
-		budgetViewModel.processIntent(BudgetTransactionIntent.DeleteTransactionTapped(transaction))
+	fun executeDelete(transaction: Transaction) {
+		onProcessIntent(BudgetTransactionIntent.DeleteTransactionTapped(transaction))
 	}
 
 	fun cancelPendingDelete() {
@@ -136,14 +200,14 @@ fun MainScreen(
 		snackbarAutoDismissJob?.cancel()
 		snackbarAutoDismissJob = null
 		pendingDeleteTransaction?.let { tx ->
-			budgetViewModel.processIntent(BudgetTransactionIntent.RestoreTransactionTapped(tx))
+			onProcessIntent(BudgetTransactionIntent.RestoreTransactionTapped(tx))
 		}
 		pendingDeleteTransaction = null
 		snackbarHostState.currentSnackbarData?.dismiss()
 	}
 
 	fun queueDeleteWithUndo(
-		transaction: com.serranoie.app.minus.domain.model.Transaction, message: String
+		transaction: Transaction, message: String
 	) {
 		pendingDeleteJob?.cancel()
 		snackbarAutoDismissJob?.cancel()
@@ -163,15 +227,10 @@ fun MainScreen(
 		}
 
 		pendingDeleteJob = coroutineScope.launch {
-			delay(3500L)
+			delay(3500L.milliseconds)
 			pendingDeleteTransaction = null
 			pendingDeleteJob = null
 		}
-	}
-
-	fun hideGlobalSnackbar() {
-		snackbarAutoDismissJob?.cancel()
-		snackbarAutoDismissJob = null
 	}
 
 	fun showInfoSnackbar(message: String) {
@@ -179,7 +238,7 @@ fun MainScreen(
 		coroutineScope.launch {
 			snackbarHostState.showSnackbar(
 				message = message,
-				duration = androidx.compose.material3.SnackbarDuration.Short,
+				duration = SnackbarDuration.Short,
 			)
 		}
 	}
@@ -191,7 +250,7 @@ fun MainScreen(
 			totalDrag += dragAmount
 		}, onDragEnd = {
 			if (kotlin.math.abs(totalDrag) > 120f) {
-				budgetViewModel.processIntent(BudgetEditorIntent.SetAnimState(AnimState.EDITING))
+				onProcessIntent(BudgetEditorIntent.SetAnimState(AnimState.EDITING))
 				coroutineScope.launch {
 					runCatching { topSheetState.animateTo(TopSheetValue.HalfExpanded) }
 				}
@@ -302,18 +361,15 @@ fun MainScreen(
 						.navigationBarsPadding(),
 				) {
 					Box {
-						History(
-							modifier = (if (tutorialStage == FirstLaunchTutorialStage.HISTORY_GESTURES) {
-								Modifier
-							} else {
-								Modifier
-							}).then(quickLogSwipeModifier),
-							onQueueDeleteWithUndo = { transaction, message, _ ->
-								queueDeleteWithUndo(transaction, message)
-							},
-							onCancelPendingDelete = { cancelPendingDelete() },
-							onShowInfoSnackbar = { message -> showInfoSnackbar(message) })
-						StatusBarStub()
+						history(
+							(if (tutorialStage == FirstLaunchTutorialStage.HISTORY_GESTURES) {
+							Modifier
+						} else {
+							Modifier
+						}).then(quickLogSwipeModifier), { transaction, message, _ ->
+							queueDeleteWithUndo(transaction, message)
+						}, { cancelPendingDelete() }, { message -> showInfoSnackbar(message) })
+						StatusBarPadding()
 					}
 				}
 				Spacer(
@@ -364,15 +420,52 @@ fun MainScreen(
 									.fillMaxSize()
 									.navigationBarsPadding()
 							) {
-								NumpadWithViewModel(
+								val editorState = remember(budgetUiState) {
+									EditorState(
+										mode = when (budgetUiState.editMode) {
+											EditorEditMode.ADD -> NumpadEditMode.ADD
+											EditorEditMode.EDIT -> NumpadEditMode.EDIT
+										},
+										rawSpentValue = budgetUiState.numpadInput,
+										stage = if (budgetUiState.numpadInput.isNotEmpty()) EditStage.EDIT_SPENT else EditStage.IDLE,
+										currentSpent = budgetUiState.numpadInput,
+										currentComment = budgetUiState.currentComment,
+										editedTransaction = null
+									)
+								}
+								Numpad(
+									editorState = editorState,
 									numberHintAnchorModifier = Modifier,
 									applyHintAnchorModifier = Modifier,
-									onAnyNumberTapped = {
-										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
+									onNumberInput = { digit ->
+										onProcessIntent(BudgetNumpadIntent.NumberTapped(digit.toString()))
+										onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
 									},
-									onApplyTapped = {
+									onDotInput = { onProcessIntent(BudgetNumpadIntent.DotTapped) },
+									onBackspace = { onProcessIntent(BudgetNumpadIntent.BackspaceTapped) },
+									onOperatorInput = { op ->
+										onProcessIntent(
+											BudgetNumpadIntent.OperatorTapped(
+												op
+											)
+										)
+									},
+									onEqualsInput = { onProcessIntent(BudgetNumpadIntent.EqualsTapped) },
+									onApply = {
 										Log.d("MainScreen", "Numpad check/save button pressed")
-										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+										onProcessIntent(BudgetNumpadIntent.ApplyTapped)
+										onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+									},
+									onDragProgressChanged = { progress ->
+										onProcessIntent(BudgetNumpadIntent.SetDragProgress(progress))
+									},
+									isCalculation = budgetUiState.isCalculation,
+									onCalculationModeChanged = { enabled ->
+										onProcessIntent(
+											BudgetNumpadIntent.SetCalculationMode(
+												enabled
+											)
+										)
 									},
 									onShowSnackbar = { message ->
 										coroutineScope.launch {
@@ -392,7 +485,9 @@ fun MainScreen(
 						isLockDraggable = { budgetUiState.lockDraggable },
 						onDismiss = {},
 						sheetContentHalfExpand = {
-							EditorWithViewModel(
+							Editor(
+								uiState = budgetUiState,
+								animState = budgetUiState.animState,
 								modifier = Modifier.requiredHeight(currentEditorHeight),
 								onOpenHistory = {},
 								onOpenSettings = onNavigateToSettings,
@@ -401,26 +496,84 @@ fun MainScreen(
 								openWalletOnStart = openWalletOnStart,
 								forceWalletSetup = forceWalletSetup,
 								onBudgetPillClickForTutorial = {
-									advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
+									onAdvanceTutorial(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
 								},
 								onAnalyticsClickForTutorial = {
-									advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANALYTICS)
+									onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANALYTICS)
+								},
+								onFocus = {
+									if (budgetUiState.numpadInput.isNotEmpty() && budgetUiState.animState != AnimState.EDITING) {
+										onProcessIntent(BudgetEditorIntent.SetAnimState(AnimState.EDITING))
+									}
+								},
+								onCommentClick = {},
+								onCommentUpdate = { comment ->
+									onProcessIntent(
+										BudgetEditorIntent.CommentUpdated(
+											comment
+										)
+									)
+								},
+								onDeleteTag = { tag ->
+									onProcessIntent(
+										BudgetEditorIntent.DeleteTag(
+											tag
+										)
+									)
+								},
+								onRecurrentToggle = { enabled ->
+									onProcessIntent(
+										BudgetEditorIntent.SetRecurrentEnabled(
+											enabled
+										)
+									)
+								},
+								onCreditToggle = { enabled ->
+									onProcessIntent(
+										BudgetEditorIntent.SetCreditEnabled(
+											enabled
+										)
+									)
+								},
+								onDismissRecurrentDialog = { onProcessIntent(BudgetEditorIntent.DismissRecurrentDialog) },
+								onDismissCreditCutoffDialog = { onProcessIntent(BudgetEditorIntent.DismissCreditCutoffDialog) },
+								onRecurrentExpenseConfirm = { freq, date, day ->
+									onProcessIntent(
+										BudgetEditorIntent.RecurrentExpenseApplied(
+											freq, date, day
+										)
+									)
+								},
+								onCreditCutoffConfirm = { day ->
+									onProcessIntent(
+										BudgetEditorIntent.CreditCutoffDayConfirmed(
+											day
+										)
+									)
+								},
+								onFinishBudgetEarly = { onProcessIntent(BudgetEditorIntent.FinishBudgetEarly) },
+								onSaveBudget = { settings ->
+									onProcessIntent(
+										BudgetEditorIntent.UpdateSettings(
+											settings
+										)
+									)
 								},
 								budgetPillHintAnchorModifier = Modifier,
 								analyticsHintAnchorModifier = Modifier
 							)
 						},
 						sheetContentExpand = {
-							History(
-								modifier = Modifier.then(quickLogSwipeModifier),
-								onQueueDeleteWithUndo = { transaction, message, _ ->
+							history(
+								Modifier.then(quickLogSwipeModifier),
+								{ transaction, message, _ ->
 									queueDeleteWithUndo(transaction, message)
 								},
-								onCancelPendingDelete = { cancelPendingDelete() },
-								onShowInfoSnackbar = { message -> showInfoSnackbar(message) })
+								{ cancelPendingDelete() },
+								{ message -> showInfoSnackbar(message) })
 						})
 
-					StatusBarStub()
+					StatusBarPadding()
 				} else {
 					// Tablet layout - Editor on top, Numpad below
 					Column(
@@ -434,7 +587,9 @@ fun MainScreen(
 							),
 							modifier = Modifier.weight(1f)
 						) {
-							EditorWithViewModel(
+							Editor(
+								uiState = budgetUiState,
+								animState = budgetUiState.animState,
 								modifier = Modifier.fillMaxSize(),
 								onOpenHistory = {},
 								onOpenSettings = onNavigateToSettings,
@@ -443,10 +598,68 @@ fun MainScreen(
 								openWalletOnStart = openWalletOnStart,
 								forceWalletSetup = forceWalletSetup,
 								onBudgetPillClickForTutorial = {
-									advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
+									onAdvanceTutorial(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
 								},
 								onAnalyticsClickForTutorial = {
-									advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANALYTICS)
+									onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANALYTICS)
+								},
+								onFocus = {
+									if (budgetUiState.numpadInput.isNotEmpty() && budgetUiState.animState != AnimState.EDITING) {
+										onProcessIntent(BudgetEditorIntent.SetAnimState(AnimState.EDITING))
+									}
+								},
+								onCommentClick = {},
+								onCommentUpdate = { comment ->
+									onProcessIntent(
+										BudgetEditorIntent.CommentUpdated(
+											comment
+										)
+									)
+								},
+								onDeleteTag = { tag ->
+									onProcessIntent(
+										BudgetEditorIntent.DeleteTag(
+											tag
+										)
+									)
+								},
+								onRecurrentToggle = { enabled ->
+									onProcessIntent(
+										BudgetEditorIntent.SetRecurrentEnabled(
+											enabled
+										)
+									)
+								},
+								onCreditToggle = { enabled ->
+									onProcessIntent(
+										BudgetEditorIntent.SetCreditEnabled(
+											enabled
+										)
+									)
+								},
+								onDismissRecurrentDialog = { onProcessIntent(BudgetEditorIntent.DismissRecurrentDialog) },
+								onDismissCreditCutoffDialog = { onProcessIntent(BudgetEditorIntent.DismissCreditCutoffDialog) },
+								onRecurrentExpenseConfirm = { freq, date, day ->
+									onProcessIntent(
+										BudgetEditorIntent.RecurrentExpenseApplied(
+											freq, date, day
+										)
+									)
+								},
+								onCreditCutoffConfirm = { day ->
+									onProcessIntent(
+										BudgetEditorIntent.CreditCutoffDayConfirmed(
+											day
+										)
+									)
+								},
+								onFinishBudgetEarly = { onProcessIntent(BudgetEditorIntent.FinishBudgetEarly) },
+								onSaveBudget = { settings ->
+									onProcessIntent(
+										BudgetEditorIntent.UpdateSettings(
+											settings
+										)
+									)
 								},
 								budgetPillHintAnchorModifier = Modifier,
 								analyticsHintAnchorModifier = Modifier
@@ -470,15 +683,52 @@ fun MainScreen(
 									.fillMaxSize()
 									.navigationBarsPadding()
 							) {
-								NumpadWithViewModel(
+								val editorState = remember(budgetUiState) {
+									EditorState(
+										mode = when (budgetUiState.editMode) {
+											EditorEditMode.ADD -> NumpadEditMode.ADD
+											EditorEditMode.EDIT -> NumpadEditMode.EDIT
+										},
+										rawSpentValue = budgetUiState.numpadInput,
+										stage = if (budgetUiState.numpadInput.isNotEmpty()) EditStage.EDIT_SPENT else EditStage.IDLE,
+										currentSpent = budgetUiState.numpadInput,
+										currentComment = budgetUiState.currentComment,
+										editedTransaction = null
+									)
+								}
+								Numpad(
+									editorState = editorState,
 									numberHintAnchorModifier = Modifier,
 									applyHintAnchorModifier = Modifier,
-									onAnyNumberTapped = {
-										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
+									onNumberInput = { digit ->
+										onProcessIntent(BudgetNumpadIntent.NumberTapped(digit.toString()))
+										onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
 									},
-									onApplyTapped = {
+									onDotInput = { onProcessIntent(BudgetNumpadIntent.DotTapped) },
+									onBackspace = { onProcessIntent(BudgetNumpadIntent.BackspaceTapped) },
+									onOperatorInput = { op ->
+										onProcessIntent(
+											BudgetNumpadIntent.OperatorTapped(
+												op
+											)
+										)
+									},
+									onEqualsInput = { onProcessIntent(BudgetNumpadIntent.EqualsTapped) },
+									onApply = {
 										Log.d("MainScreen", "Numpad check/save button pressed")
-										advanceTutorialIfCurrent(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+										onProcessIntent(BudgetNumpadIntent.ApplyTapped)
+										onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+									},
+									onDragProgressChanged = { progress ->
+										onProcessIntent(BudgetNumpadIntent.SetDragProgress(progress))
+									},
+									isCalculation = budgetUiState.isCalculation,
+									onCalculationModeChanged = { enabled ->
+										onProcessIntent(
+											BudgetNumpadIntent.SetCalculationMode(
+												enabled
+											)
+										)
 									},
 									onShowSnackbar = { message ->
 										coroutineScope.launch {
@@ -504,14 +754,55 @@ fun MainScreen(
 	}
 }
 
+@PreviewScreenSizes
 @Composable
-fun StatusBarStub() {
-	Box(
-		modifier = Modifier
-			.fillMaxWidth()
-			.requiredHeight(
-				LocalWindowInsets.current.calculateTopPadding()
-			)
-			.background(colorEditor)
-	)
+private fun MainScreenPreview() {
+	val configuration = LocalConfiguration.current
+	val windowSizeClass = when {
+		configuration.screenWidthDp < 600 -> WindowWidthSizeClass.Compact
+		configuration.screenWidthDp < 840 -> WindowWidthSizeClass.Medium
+		else -> WindowWidthSizeClass.Expanded
+	}
+
+	CompositionLocalProvider(LocalWindowSize provides windowSizeClass) {
+		MinusTheme {
+			MainScreenContent(
+				budgetUiState = BudgetUiState(
+					budgetSettings = BudgetSettings(
+						totalBudget = BigDecimal("500.00"),
+						period = BudgetPeriod.DAILY,
+						startDate = LocalDate.now(),
+						currencyCode = "USD"
+					), budgetState = BudgetState(
+						remainingToday = BigDecimal("110.00"),
+						totalSpentToday = BigDecimal("12.50"),
+						dailyBudget = BigDecimal("122.50"),
+						daysRemaining = 15,
+						progress = 0.1f,
+						isOverBudget = false,
+						totalBudget = BigDecimal("500.00"),
+						totalSpentInPeriod = BigDecimal("12.50")
+					), transactions = emptyList(), numpadInput = "", isNumpadValid = false
+				),
+				onboardingCompleted = true,
+				tutorialStage = FirstLaunchTutorialStage.COMPLETED,
+				onNavigateToAnalytics = {},
+				onNavigateToSettings = {},
+				onNavigateToWallet = {},
+				openWalletOnStart = false,
+				forceWalletSetup = false,
+				onProcessIntent = {},
+				onAdvanceTutorial = {},
+				history = { modifier, _, _, _ ->
+					Box(
+						modifier = modifier
+							.fillMaxSize()
+							.background(colorButton),
+						contentAlignment = Alignment.Center
+					) {
+						Text("History Placeholder")
+					}
+				})
+		}
+	}
 }

@@ -179,6 +179,7 @@
     <string name="settings_feature_credit_toggle_details">Cuando está activado, ahora podrás marcar pagos hechos con tarjeta de crédito.\\nDeclarando una fecha de corte sabrás cuanto pagarle a tu banco antes que tengas que pagar intereses mediante una notificiación independiente del periodo que estes.</string>
     <string name="settings_feature_credit_toggle_switch_label">Habilitar uso de TDC</string>
 
+    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Mostrar los pagos recurrentes como una lista de gastos regulares.</string>
     <string name="settings_period_end_time_title">Hora de finalización del período</string>
     <string name="settings_period_end_time_subtitle">La notificación se mostrará al día siguiente de finalizar el plazo.</string>
     <string name="settings_exact_alarm_title">Alarmas exactas</string>
@@ -272,12 +273,17 @@
     <string name="no_transactions_subtitle">Agregue un gasto para comenzar</string>
 
     <string name="recurrent_payments_divider_title_upcoming">Próximos pagos recurrentes</string>
+    <string name="recurrent_payments_divider_title_current_period">Pago recurrentes en este periodo</string>
 
     <string name="upcoming_recurrent_today">Hoy</string>
     <string name="upcoming_recurrent_tomorrow">Mañana</string>
     <string name="upcoming_recurrent_in_days">En %1$d días</string>
     <string name="upcoming_recurrent_in_weeks">En %1$d semanas</string>
     <string name="upcoming_recurrent_unnamed_expense">Gasto recurrente sin nombre</string>
+    <string name="delete_recurrent_expense_title">Eliminar gasto recurrente</string>
+    <string name="delete_recurrent_expense_fallback_name">este gasto recurrente</string>
+    <string name="delete_recurrent_expense_message">¿Estás seguro de que deseas eliminar "%1$s"?</string>
+    <string name="delete_recurrent_expense_warning">Esta acción eliminará toda la configuración de este gasto recurrente y no recibirás más notificaciones.</string>
 
     <string name="recurrent_ticket_unnamed_subscription">Suscripción sin nombre</string>
     <string name="recurrent_ticket_frequency_weekly">Semanalmente</string>
@@ -326,4 +332,10 @@
     <string name="strategy_split_equally_desc">El sobrante se divide equitativamente entre todos los días del nuevo período</string>
     <string name="strategy_add_to_first_day">Agregar al primer día</string>
     <string name="strategy_add_to_first_day_desc">Todo el sobrante se suma al primer día del nuevo período</string>
+    <string name="settings_recurrent_payments_view_mode_title">Modo de visualización de pagos recurrentes</string>
+    <string name="settings_recurrent_payments_view_mode_subtitle">Cambia el tipo de visualización para mostrar tus pagos recurrentes.</string>
+    <string name="settings_recurrent_payments_view_mode_dialog_title">Modo de visualización de pagos recurrentes</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Mostrar los pagos recurrentes como tarjetas horizontales</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
 </resources>
