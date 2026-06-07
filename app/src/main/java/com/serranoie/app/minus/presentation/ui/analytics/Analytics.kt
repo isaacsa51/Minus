@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.analytics
 
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -58,6 +60,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarHeat
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.util.Calendar
 import java.util.Date
 
 data class AnalyticsState(
@@ -100,7 +104,6 @@ fun Analytics(
 
 	val navigationBarHeight =
 		LocalWindowInsets.current.calculateBottomPadding().coerceAtLeast(16.dp)
-	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
 
 	Scaffold(
 		modifier = Modifier.fillMaxSize(),
@@ -112,11 +115,13 @@ fun Analytics(
 			}
 		},
 	) { paddingValues ->
-		Box(
+		BoxWithConstraints(
 			modifier = Modifier
 				.fillMaxSize()
 				.padding(paddingValues)
 		) {
+			val useWideAnalyticsLayout = maxWidth >= 840.dp
+
 			Column(
 				Modifier
 					.fillMaxSize()
@@ -144,111 +149,15 @@ fun Analytics(
 					showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
 				)
 				Spacer(modifier = Modifier.height(16.dp))
-				Row(
-					Modifier
-						.fillMaxWidth()
-						.padding(horizontal = 16.dp)
-				) {
-					if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
-						CalendarHeatmap(
-							transactions = state.transactions,
-							budget = state.wholeBudget,
-							startDate = state.startPeriodDate,
-							finishDate = state.finishPeriodDate,
-							modifier = Modifier
-								.weight(1f)
-								.wrapContentHeight(),
-						)
-					}
-				}
-				SpendsChart(
-					spends = state.spends,
-					modifier = Modifier
-						.fillMaxWidth()
-						.heightIn(0.dp, 400.dp)
-						.padding(horizontal = 16.dp),
-				)
-				Spacer(modifier = Modifier.height(16.dp))
-				Row(
-					Modifier
-						.fillMaxWidth()
-						.height(IntrinsicSize.Min)
-						.padding(horizontal = 16.dp)
-				) {
-					MinMaxSpentCard(
-						isMin = true,
-						spends = state.spends,
-						currency = "MXN",
-						modifier = Modifier
-							.weight(1f)
-							.fillMaxHeight(),
-					)
-					Spacer(modifier = Modifier.width(16.dp))
-					MinMaxSpentCard(
-						isMin = false,
-						spends = state.spends,
-						currency = "MXN",
-						modifier = Modifier
-							.weight(1f)
-							.fillMaxHeight(),
-					)
-				}
-				Spacer(modifier = Modifier.height(16.dp))
-				Row(
-					Modifier
-						.fillMaxWidth()
-						.height(IntrinsicSize.Min)
-						.padding(horizontal = 16.dp)
-				) {
-					SpendsCountCard(
-						count = state.spends.size,
-						onClick = {
-							showHistorySheet = true
-							view.weakHapticFeedback()
-						},
-						modifier = Modifier
-							.weight(1f)
-							.fillMaxHeight(),
-					)
-					Spacer(modifier = Modifier.width(16.dp))
-					AverageSpendCard(
-						spends = state.spends,
-						startDate = state.startPeriodDate,
-						finishDate = state.finishPeriodDate,
-						currency = "MXN",
-						modifier = Modifier
-							.weight(1f)
-							.fillMaxHeight(),
-					)
-				}
-				Spacer(modifier = Modifier.height(16.dp))
-				SpendBudgetCard(
-					budget = state.wholeBudget,
-					spend = state.spends.sumOf { it.amount },
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(horizontal = 16.dp),
-				)
-				Spacer(modifier = Modifier.height(16.dp))
-				CategoriesChartCard(
-					spends = state.spends,
-					currency = "MXN",
-					modifier = Modifier
-						.padding(horizontal = 16.dp)
-						.fillMaxWidth(),
+				AnalyticsResponsiveLayout(
+					useTabletLayout = useWideAnalyticsLayout,
+					state = state,
+					onShowHistory = {
+						showHistorySheet = true
+						view.weakHapticFeedback()
+					},
 					onCategoryClick = { categoryName, categorySpends ->
-						selectedCategory = CategoryAnalyticsState(
-							periodFinished = state.periodFinished,
-							transactions = state.transactions,
-							spends = state.spends,
-							wholeBudget = state.wholeBudget,
-							finishPeriodActualDate = state.finishPeriodActualDate,
-							startPeriodDate = state.startPeriodDate,
-							finishPeriodDate = state.finishPeriodDate,
-							isLoading = state.isLoading,
-							categoryName = categoryName,
-							categorySpends = categorySpends
-						)
+						selectedCategory = state.toCategoryAnalyticsState(categoryName, categorySpends)
 						view.weakHapticFeedback()
 					}
 				)
@@ -319,42 +228,314 @@ fun Analytics(
 	}
 }
 
+@Composable
+private fun AnalyticsResponsiveLayout(
+	useTabletLayout: Boolean,
+	state: AnalyticsState,
+	onShowHistory: () -> Unit,
+	onCategoryClick: (String, List<Transaction>) -> Unit,
+) {
+	if (useTabletLayout) {
+		AnalyticsTabletLayout(
+			state = state,
+			onShowHistory = onShowHistory,
+			onCategoryClick = onCategoryClick,
+		)
+	} else {
+		AnalyticsCompactLayout(
+			state = state,
+			onShowHistory = onShowHistory,
+			onCategoryClick = onCategoryClick,
+		)
+	}
+}
+
+@Composable
+private fun AnalyticsCompactLayout(
+	state: AnalyticsState,
+	onShowHistory: () -> Unit,
+	onCategoryClick: (String, List<Transaction>) -> Unit,
+) {
+	Column {
+		Row(
+			Modifier
+				.fillMaxWidth()
+				.padding(horizontal = 16.dp)
+		) {
+			if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
+				CalendarHeatmap(
+					transactions = state.transactions,
+					budget = state.wholeBudget,
+					startDate = state.startPeriodDate,
+					finishDate = state.finishPeriodDate,
+					modifier = Modifier
+						.weight(1f)
+						.wrapContentHeight(),
+				)
+			}
+		}
+		SpendsChart(
+			spends = state.spends,
+			modifier = Modifier
+				.fillMaxWidth()
+				.heightIn(0.dp, 400.dp)
+				.padding(horizontal = 16.dp),
+		)
+		Spacer(modifier = Modifier.height(16.dp))
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(horizontal = 16.dp)
+		) {
+			MinMaxSpentCard(
+				isMin = true,
+				spends = state.spends,
+				currency = "MXN",
+				modifier = Modifier
+					.weight(1f)
+					.fillMaxHeight(),
+			)
+			Spacer(modifier = Modifier.width(16.dp))
+			MinMaxSpentCard(
+				isMin = false,
+				spends = state.spends,
+				currency = "MXN",
+				modifier = Modifier
+					.weight(1f)
+					.fillMaxHeight(),
+			)
+		}
+		Spacer(modifier = Modifier.height(16.dp))
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(horizontal = 16.dp)
+		) {
+			SpendsCountCard(
+				count = state.spends.size,
+				onClick = onShowHistory,
+				modifier = Modifier
+					.weight(1f)
+					.fillMaxHeight(),
+			)
+			Spacer(modifier = Modifier.width(16.dp))
+			AverageSpendCard(
+				spends = state.spends,
+				startDate = state.startPeriodDate,
+				finishDate = state.finishPeriodDate,
+				currency = "MXN",
+				modifier = Modifier
+					.weight(1f)
+					.fillMaxHeight(),
+			)
+		}
+		Spacer(modifier = Modifier.height(16.dp))
+		SpendBudgetCard(
+			budget = state.wholeBudget,
+			spend = state.spends.sumOf { it.amount },
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(horizontal = 16.dp),
+		)
+		Spacer(modifier = Modifier.height(16.dp))
+		CategoriesChartCard(
+			spends = state.spends,
+			currency = "MXN",
+			modifier = Modifier
+				.padding(horizontal = 16.dp)
+				.fillMaxWidth(),
+			onCategoryClick = onCategoryClick
+		)
+	}
+}
+
+@Composable
+private fun AnalyticsTabletLayout(
+	state: AnalyticsState,
+	onShowHistory: () -> Unit,
+	onCategoryClick: (String, List<Transaction>) -> Unit,
+) {
+	Column(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(horizontal = 16.dp)
+	) {
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(IntrinsicSize.Min)
+				.requiredHeightIn(min = 180.dp)
+		) {
+			Box(
+				modifier = Modifier
+					.weight(1f)
+					.fillMaxHeight()
+			) {
+				if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
+					CalendarHeatmap(
+						transactions = state.transactions,
+						budget = state.wholeBudget,
+						startDate = state.startPeriodDate,
+						finishDate = state.finishPeriodDate,
+						modifier = Modifier
+							.fillMaxWidth()
+							.fillMaxHeight(),
+					)
+				}
+			}
+			Spacer(modifier = Modifier.width(16.dp))
+			Row(
+				modifier = Modifier
+					.weight(1f)
+					.fillMaxHeight()
+			) {
+				MinMaxSpentCard(
+					isMin = true,
+					spends = state.spends,
+					currency = "MXN",
+					modifier = Modifier
+						.weight(1f)
+						.fillMaxHeight(),
+				)
+				Spacer(modifier = Modifier.width(16.dp))
+				MinMaxSpentCard(
+					isMin = false,
+					spends = state.spends,
+					currency = "MXN",
+					modifier = Modifier
+						.weight(1f)
+						.fillMaxHeight(),
+				)
+			}
+		}
+		Spacer(modifier = Modifier.height(16.dp))
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(IntrinsicSize.Min)
+		) {
+			SpendBudgetCard(
+				budget = state.wholeBudget,
+				spend = state.spends.sumOf { it.amount },
+				modifier = Modifier.weight(1f),
+			)
+			Spacer(modifier = Modifier.width(16.dp))
+			Row(
+				modifier = Modifier
+					.weight(1f)
+					.fillMaxHeight()
+			) {
+				SpendsCountCard(
+					count = state.spends.size,
+					onClick = onShowHistory,
+					modifier = Modifier
+						.weight(1f)
+						.fillMaxHeight(),
+				)
+				Spacer(modifier = Modifier.width(8.dp))
+				AverageSpendCard(
+					spends = state.spends,
+					startDate = state.startPeriodDate,
+					finishDate = state.finishPeriodDate,
+					currency = "MXN",
+					modifier = Modifier.weight(1f),
+				)
+			}
+		}
+		Spacer(modifier = Modifier.height(8.dp))
+		CategoriesChartCard(
+			spends = state.spends,
+			currency = "MXN",
+			modifier = Modifier.fillMaxWidth(),
+			onCategoryClick = onCategoryClick
+		)
+	}
+}
+
+private fun AnalyticsState.toCategoryAnalyticsState(
+	categoryName: String,
+	categorySpends: List<Transaction>,
+): CategoryAnalyticsState = CategoryAnalyticsState(
+	periodFinished = periodFinished,
+	transactions = transactions,
+	spends = spends,
+	wholeBudget = wholeBudget,
+	finishPeriodActualDate = finishPeriodActualDate,
+	startPeriodDate = startPeriodDate,
+	finishPeriodDate = finishPeriodDate,
+	isLoading = isLoading,
+	categoryName = categoryName,
+	categorySpends = categorySpends
+)
+
+private val previewStartDate: Date
+	get() = Calendar.getInstance().apply {
+		add(Calendar.DAY_OF_MONTH, -34)
+	}.time
+
+private val previewFinishDate: Date
+	get() = Calendar.getInstance().apply {
+		add(Calendar.DAY_OF_MONTH, 7)
+	}.time
+
+private fun previewAnalyticsTransactions(): List<Transaction> {
+	val categories = listOf(
+		"Comida",
+		"Transporte",
+		"Entretenimiento",
+		"Salud",
+		"Servicios",
+		"Compras",
+		"Café",
+		"Mascotas",
+		"Gimnasio",
+		"Regalos",
+	)
+
+	return categories.flatMapIndexed { index, category ->
+		listOf(
+			Transaction(
+				amount = BigDecimal(45 + index * 18),
+				date = LocalDateTime.now().minusDays((index * 3L) + 1),
+				comment = category,
+			),
+			Transaction(
+				amount = BigDecimal(30 + index * 11),
+				date = LocalDateTime.now().minusDays((index * 3L) + 2),
+				comment = category,
+			),
+		)
+	} + listOf(
+		Transaction(
+			amount = BigDecimal(180),
+			date = LocalDateTime.now().minusDays(31),
+			comment = "",
+		),
+		Transaction(
+			amount = BigDecimal(96),
+			date = LocalDateTime.now().minusDays(27),
+			comment = "Comida",
+		),
+	)
+}
+
+private fun previewAnalyticsState(periodFinished: Boolean): AnalyticsState = AnalyticsState(
+	periodFinished = periodFinished,
+	transactions = previewAnalyticsTransactions(),
+	spends = previewAnalyticsTransactions(),
+	wholeBudget = BigDecimal(2400),
+	startPeriodDate = previewStartDate,
+	finishPeriodDate = if (periodFinished) Date() else previewFinishDate,
+	finishPeriodActualDate = if (periodFinished) Date() else null,
+)
+
 @PreviewScreenSizes
 @Composable
 private fun PreviewAnalyticsNotFinished() {
 	MinusTheme {
 		Surface {
 			Analytics(
-				state = AnalyticsState(
-					periodFinished = false,
-					spends = listOf(
-						Transaction(
-							amount = BigDecimal(150),
-							date = java.time.LocalDateTime.now().minusDays(2),
-							comment = "Comida",
-						),
-						Transaction(
-							amount = BigDecimal(80),
-							date = java.time.LocalDateTime.now().minusDays(1),
-							comment = "Transporte",
-						),
-						Transaction(
-							amount = BigDecimal(200),
-							date = java.time.LocalDateTime.now(),
-							comment = "Comida",
-						),
-						Transaction(
-							amount = BigDecimal(50),
-							date = java.time.LocalDateTime.now(),
-							comment = "Entretenimiento",
-						),
-					),
-					wholeBudget = BigDecimal(500),
-					startPeriodDate = Date(),
-					finishPeriodDate = java.util.Calendar.getInstance().apply {
-						add(java.util.Calendar.DAY_OF_MONTH, 15)
-					}.time,
-				),
+				state = previewAnalyticsState(periodFinished = false),
 			)
 		}
 	}
@@ -366,47 +547,7 @@ private fun PreviewAnalyticsFinished() {
 	MinusTheme {
 		Surface {
 			Analytics(
-				state = AnalyticsState(
-					periodFinished = true,
-					spends = listOf(
-						Transaction(
-							amount = BigDecimal(150),
-							date = java.time.LocalDateTime.now().minusDays(14),
-							comment = "Comida",
-						),
-						Transaction(
-							amount = BigDecimal(80),
-							date = java.time.LocalDateTime.now().minusDays(10),
-							comment = "Transporte",
-						),
-						Transaction(
-							amount = BigDecimal(200),
-							date = java.time.LocalDateTime.now().minusDays(7),
-							comment = "Comida",
-						),
-						Transaction(
-							amount = BigDecimal(50),
-							date = java.time.LocalDateTime.now().minusDays(5),
-							comment = "Entretenimiento",
-						),
-						Transaction(
-							amount = BigDecimal(120),
-							date = java.time.LocalDateTime.now().minusDays(2),
-							comment = "Salud",
-						),
-						Transaction(
-							amount = BigDecimal(300),
-							date = java.time.LocalDateTime.now().minusDays(1),
-							comment = "",
-						),
-					),
-					wholeBudget = BigDecimal(500),
-					startPeriodDate = java.util.Calendar.getInstance().apply {
-						add(java.util.Calendar.DAY_OF_MONTH, -15)
-					}.time,
-					finishPeriodDate = Date(),
-					finishPeriodActualDate = Date(),
-				),
+				state = previewAnalyticsState(periodFinished = true),
 			)
 		}
 	}

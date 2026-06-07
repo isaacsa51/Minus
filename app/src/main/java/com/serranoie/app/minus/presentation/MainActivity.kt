@@ -142,6 +142,7 @@ class MainActivity : ComponentActivity() {
 		val context = this.applicationContext
 
 		WindowCompat.setDecorFitsSystemWindows(window, false)
+
 		installSplashScreen().setKeepOnScreenCondition {
 			val keepOn = !dataStoreLoaded.value || !isDone.value
 			keepOn

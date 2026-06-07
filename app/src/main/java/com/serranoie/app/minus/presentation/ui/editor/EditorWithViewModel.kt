@@ -24,6 +24,8 @@ fun EditorWithViewModel(
 	forceWalletSetup: Boolean = false,
 	onBudgetPillClickForTutorial: () -> Unit = {},
 	onAnalyticsClickForTutorial: () -> Unit = {},
+	showAnalyticsButton: Boolean = true,
+	showSettingsButton: Boolean = true,
 	budgetPillHintAnchorModifier: Modifier = Modifier,
 	analyticsHintAnchorModifier: Modifier = Modifier,
 	modifier: Modifier = Modifier
@@ -53,6 +55,8 @@ fun EditorWithViewModel(
 		onCommentClick = { /* TODO: Open comment dialog */ },
 		onBudgetPillClickForTutorial = onBudgetPillClickForTutorial,
 		onAnalyticsClickForTutorial = onAnalyticsClickForTutorial,
+		showAnalyticsButton = showAnalyticsButton,
+		showSettingsButton = showSettingsButton,
 		onChangePeriod = { newPeriod ->
 			uiState.budgetSettings?.let { settings ->
 				val updated = settings.copy(period = newPeriod)

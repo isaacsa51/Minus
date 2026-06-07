@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
@@ -41,7 +41,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.harmonizeWithColor
 import com.serranoie.app.minus.presentation.util.numberFormat
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -85,7 +84,7 @@ private fun DrawScope.drawWavyPattern(
             
             if (startY < height && endY > startY) {
                 val midY = (startY + endY) / 2
-                quadraticBezierTo(
+                quadraticTo(
                     x1 = waveX,
                     y1 = midY,
                     x2 = edgeX,
@@ -160,13 +159,10 @@ fun SpendBudgetCard(
     val periodPx = remember { with(density) { 30.dp.toPx() } }
     val amplitudePx = remember { with(density) { 4.dp.toPx() } }
 
-    val contentColor = LocalContentColor.current
-    val currencyFormatter = remember { symbolOnlyCurrencyFormat("USD") }
-
 	StatCard(
 		modifier = modifier
 			.fillMaxWidth()
-			.heightIn(min = 80.dp, max = 120.dp),
+			.heightIn(min = 80.dp),
 		colors = CardDefaults.cardColors(
 			containerColor = harmonizedColor.container,
 			contentColor = harmonizedColor.onContainer,
@@ -177,6 +173,7 @@ fun SpendBudgetCard(
 			"MXN"
 		),
 		label = stringResource(R.string.spend_budget_card_spent_label),
+		horizontalAlignment = Alignment.CenterHorizontally,
 		content = {
 			Spacer(modifier = Modifier.height(6.dp))
 			Text(

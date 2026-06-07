@@ -121,6 +121,8 @@ fun Editor(
 	onDismissCreditCutoffDialog: () -> Unit = {},
 	onRecurrentExpenseConfirm: (RecurrentFrequency, LocalDate, Int?) -> Unit = { _, _, _ -> },
 	onCreditCutoffConfirm: (Int) -> Unit = {},
+	showAnalyticsButton: Boolean = true,
+	showSettingsButton: Boolean = true,
 	budgetPillHintAnchorModifier: Modifier = Modifier,
 	analyticsHintAnchorModifier: Modifier = Modifier,
 	modifier: Modifier = Modifier,
@@ -229,35 +231,39 @@ fun Editor(
 					}
 				} else {
 					Row(verticalAlignment = Alignment.CenterVertically) {
-						IconButton(
-							onClick = {
-								onAnalyticsClickForTutorial()
-								view.weakHapticFeedback()
-								onOpenAnalytics()
-							}, modifier = Modifier
-								.size(48.dp)
-								.then(analyticsHintAnchorModifier)
-						) {
-							Icon(
-								imageVector = Icons.Rounded.BarChart,
-								contentDescription = "Analytics",
-								tint = MaterialTheme.colorScheme.onSurface,
-								modifier = Modifier.size(28.dp),
-							)
+						if (showAnalyticsButton) {
+							IconButton(
+								onClick = {
+									onAnalyticsClickForTutorial()
+									view.weakHapticFeedback()
+									onOpenAnalytics()
+								}, modifier = Modifier
+									.size(48.dp)
+									.then(analyticsHintAnchorModifier)
+							) {
+								Icon(
+									imageVector = Icons.Rounded.BarChart,
+									contentDescription = "Analytics",
+									tint = MaterialTheme.colorScheme.onSurface,
+									modifier = Modifier.size(28.dp),
+								)
+							}
 						}
 
-						IconButton(
-							onClick = {
-								onOpenSettings()
-								view.weakHapticFeedback()
-							}, modifier = Modifier.size(48.dp)
-						) {
-							Icon(
-								imageVector = Icons.Rounded.Settings,
-								contentDescription = "Settings",
-								tint = MaterialTheme.colorScheme.onSurface,
-								modifier = Modifier.size(28.dp),
-							)
+						if (showSettingsButton) {
+							IconButton(
+								onClick = {
+									onOpenSettings()
+									view.weakHapticFeedback()
+								}, modifier = Modifier.size(48.dp)
+							) {
+								Icon(
+									imageVector = Icons.Rounded.Settings,
+									contentDescription = "Settings",
+									tint = MaterialTheme.colorScheme.onSurface,
+									modifier = Modifier.size(28.dp),
+								)
+							}
 						}
 					}
 				}

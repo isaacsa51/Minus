@@ -2,18 +2,19 @@ package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -37,29 +38,33 @@ fun SpendsCountCard(
 	onClick: () -> Unit = {},
 ) {
 	Card(
-		modifier = modifier.height(IntrinsicSize.Min),
+		modifier = modifier.heightIn(min = 56.dp),
 		shape = CircleShape,
+		colors = CardDefaults.cardColors(
+			containerColor = MaterialTheme.colorScheme.surfaceDim,
+			contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+		),
 		onClick = onClick
 	) {
 		val textColor = LocalContentColor.current
 
-		Row(
+		Box(
 			modifier = Modifier
-				.padding(24.dp, 0.dp)
-				.fillMaxWidth(),
-			verticalAlignment = Alignment.CenterVertically,
+				.padding(horizontal = 24.dp)
+				.fillMaxWidth()
+				.fillMaxHeight(),
+			contentAlignment = Alignment.Center,
 		) {
-			Spacer(modifier = Modifier.width(24.dp))
-
 			Column(
 				Modifier
-					.padding(14.dp, 8.dp)
-					.weight(1f),
+					.fillMaxWidth()
+					.padding(14.dp, 8.dp),
 				verticalArrangement = Arrangement.Center,
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				Text(
 					text = count.toString(),
+					modifier = Modifier.fillMaxWidth(),
 					style = MaterialTheme.typography.titleLargeEmphasized,
 					overflow = TextOverflow.Ellipsis,
 					softWrap = true,
@@ -67,7 +72,9 @@ fun SpendsCountCard(
 				)
 				Text(
 					text = stringResource(R.string.total_expenses),
-					modifier = Modifier.basicMarquee(),
+					modifier = Modifier
+						.fillMaxWidth()
+						.basicMarquee(),
 					style = MaterialTheme.typography.labelMediumCondensed,
 					color = textColor.copy(alpha = 0.6f),
 					softWrap = true,
@@ -77,7 +84,8 @@ fun SpendsCountCard(
 			}
 
 			Icon(
-				imageVector = Icons.Rounded.ArrowForward,
+				modifier = Modifier.align(Alignment.CenterEnd),
+				imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
 				contentDescription = null,
 			)
 		}
