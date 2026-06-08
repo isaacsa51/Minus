@@ -286,6 +286,7 @@ private fun AnalyticsCompactLayout(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(horizontal = 16.dp)
+				.height(IntrinsicSize.Min)
 		) {
 			MinMaxSpentCard(
 				isMin = true,

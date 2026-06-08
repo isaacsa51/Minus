@@ -97,10 +97,10 @@ fun StatCard(
 							modifier = Modifier.align(valueAlignment)
 						) {
 							Text(
-							text = crossedValue,
-							style = valueFontStyle.copy(fontWeight = FontWeight.Light),
-							fontSize = valueFontSize,
-							color = crossedValueColor ?: textColor.copy(alpha = 0.18f),
+								text = crossedValue,
+								style = valueFontStyle.copy(fontWeight = FontWeight.Light),
+								fontSize = valueFontSize,
+								color = crossedValueColor ?: textColor.copy(alpha = 0.18f),
 								overflow = TextOverflow.Ellipsis,
 								softWrap = false,
 								lineHeight = TextUnit(0.2f, TextUnitType.Em),
@@ -133,7 +133,9 @@ fun StatCard(
 				}
 				Text(
 					text = label,
-					modifier = Modifier.fillMaxWidth().basicMarquee(),
+					modifier = Modifier
+						.fillMaxWidth()
+						.basicMarquee(),
 					style = labelFontStyle,
 					color = textColor.copy(alpha = 0.6f),
 					overflow = TextOverflow.Ellipsis,
@@ -173,7 +175,8 @@ private fun PreviewStatCard() {
 	}
 }
 
-@Preview(device = "spec:width=800px,height=350px,dpi=480",
+@Preview(
+	device = "spec:width=800px,height=350px,dpi=480",
 	uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable

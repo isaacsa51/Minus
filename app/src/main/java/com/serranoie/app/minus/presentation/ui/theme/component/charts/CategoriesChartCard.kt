@@ -102,7 +102,6 @@ fun CategoriesChartCard(
 				)
 			}.sortedBy { it.amount }.reversed().toList()
 
-		// Move without tag to the end if list will be overflow
 		if (result.size > maxDisplay) {
 			result.find { it.name == labelWithoutTag }?.let {
 				result = result.filter { tagUsage -> tagUsage.name != labelWithoutTag }
@@ -110,7 +109,6 @@ fun CategoriesChartCard(
 			}
 		}
 
-		// Set colors
 		result.subList(0, result.size.coerceAtMost(maxDisplay)).forEachIndexed { index, tagUsage ->
 			tagUsage.color = if (tagUsage.name == labelWithoutTag) {
 				offsetColor++
@@ -118,7 +116,6 @@ fun CategoriesChartCard(
 			} else colors.getOrNull(index - offsetColor) ?: colors.last()
 		}
 
-		// Combine rest tags to one
 		if (result.size > maxDisplay) {
 			result = result.slice(0..<maxDisplay) + CategoryUsage(
 				name = labelRest,

@@ -130,9 +130,9 @@ fun SpendsChart(
 				0.5f
 			} else {
 				1f - markedTransaction.amount
-				.minus(minSpentValue)
-				.divide(range, 2, RoundingMode.HALF_EVEN)
-				.toFloat()
+					.minus(minSpentValue)
+					.divide(range, 2, RoundingMode.HALF_EVEN)
+					.toFloat()
 			}
 
 			colors.mapIndexed { index, color ->

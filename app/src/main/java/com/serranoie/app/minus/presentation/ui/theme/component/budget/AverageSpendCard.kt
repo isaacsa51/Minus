@@ -1,6 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -12,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
+import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.numberFormat
 import java.math.RoundingMode
 import java.time.LocalDateTime
@@ -61,6 +64,13 @@ fun AverageSpendCard(
 		} else {
 			stringResource(R.string.empty)
 		},
+		colors = CardDefaults.cardColors(
+			containerColor = combineColors(
+				MaterialTheme.colorScheme.surface,
+				MaterialTheme.colorScheme.surfaceVariant,
+				angle = 0.3f,
+			),
+		),
 		label = stringResource(R.string.daily_average),
 		contentPadding = PaddingValues(vertical = 8.dp, horizontal = 32.dp),
 		horizontalAlignment = Alignment.CenterHorizontally

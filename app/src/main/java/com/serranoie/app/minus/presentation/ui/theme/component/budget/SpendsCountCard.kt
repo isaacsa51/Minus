@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
+import com.serranoie.app.minus.presentation.util.combineColors
 
 @Composable
 fun SpendsCountCard(
@@ -41,8 +42,11 @@ fun SpendsCountCard(
 		modifier = modifier.heightIn(min = 56.dp),
 		shape = CircleShape,
 		colors = CardDefaults.cardColors(
-			containerColor = MaterialTheme.colorScheme.surfaceDim,
-			contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+			containerColor = combineColors(
+				MaterialTheme.colorScheme.surface,
+				MaterialTheme.colorScheme.surfaceVariant,
+				angle = 0.3f,
+			),
 		),
 		onClick = onClick
 	) {
@@ -93,8 +97,8 @@ fun SpendsCountCard(
 }
 
 
-@Preview(name = "SpendsCountCard",
-	device = "spec:width=500px,height=300px"
+@Preview(
+	name = "SpendsCountCard", device = "spec:width=500px,height=300px"
 )
 @Composable
 private fun PreviewSpendsCountCard() {

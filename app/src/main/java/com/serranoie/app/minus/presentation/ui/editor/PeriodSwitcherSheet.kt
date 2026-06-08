@@ -34,6 +34,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Repartition
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Sync
@@ -85,9 +86,11 @@ import com.serranoie.app.minus.presentation.ui.onboarding.FinishDateSelector
 import com.serranoie.app.minus.presentation.ui.onboarding.availablePeriodsFor
 import com.serranoie.app.minus.presentation.ui.onboarding.budgetForPeriod
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
@@ -319,6 +322,15 @@ private fun ViewBudgetContent(
 		logcat(PERIOD_SWITCHER_TAG) {
 			"BudgetDisplay input totalBudget=$totalBudget budgetStateTotal=${budgetState?.totalBudget} budgetSettingsTotal=${budgetSettings?.totalBudget} rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward}"
 		}
+
+		SpendBudgetCard(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(bottom = 8.dp),
+			budget = totalBudget,
+			spend = totalSpent,
+		)
+
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -701,7 +713,7 @@ fun EditBudgetContent(
 		Spacer(modifier = Modifier.height(8.dp))
 
 		SettingsRow(
-			icon = Icons.Default.Check,
+			icon = Icons.Default.Repartition,
 			label = stringResource(R.string.remaining_budget_label),
 			trailingText = when (strategyCache) {
 				RemainingBudgetStrategy.ASK_ALWAYS -> stringResource(R.string.strategy_ask_always)
@@ -735,12 +747,13 @@ fun EditBudgetContent(
 					imageVector = Icons.Outlined.Info,
 					contentDescription = null,
 					tint = MaterialTheme.colorScheme.outline,
-					modifier = Modifier.size(20.dp),
+					modifier = Modifier.size(24.dp),
 				)
 				Spacer(modifier = Modifier.width(8.dp))
 				Text(
 					text = pendingNotificationText,
-					style = MaterialTheme.typography.bodySmallCondensed,
+					style = MaterialTheme.typography.bodyMediumCondensed,
+					fontWeight = FontWeight.Medium,
 					color = MaterialTheme.colorScheme.outline,
 				)
 			}
@@ -893,7 +906,12 @@ private fun CurrencyPickerDialog(
 ) {
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text(stringResource(R.string.select_currency), style = MaterialTheme.typography.titleLargeEmphasized) },
+		title = {
+			Text(
+				stringResource(R.string.select_currency),
+				style = MaterialTheme.typography.titleLargeEmphasized
+			)
+		},
 		text = {
 			Column(
 				modifier = Modifier
@@ -968,7 +986,12 @@ private fun StrategyPickerDialog(
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text(stringResource(R.string.strategy_dialog_title), style = MaterialTheme.typography.titleLargeEmphasized) },
+		title = {
+			Text(
+				stringResource(R.string.strategy_dialog_title),
+				style = MaterialTheme.typography.titleLargeEmphasized
+			)
+		},
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 				Text(

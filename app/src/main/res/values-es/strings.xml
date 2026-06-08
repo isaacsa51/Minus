@@ -252,7 +252,7 @@
 
     <string name="budget_pill_over_budget">Presupuesto agotado</string>
     <string name="budget_pill_no_budget">Sin presupuesto</string>
-    <string name="budget_pill_exhausted_daily_label">a diario</string>
+    <string name="budget_pill_exhausted_daily_label"></string>
     <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
     <string name="budget_pill_exhausted_single">%1$s presupuesto agotado</string>
