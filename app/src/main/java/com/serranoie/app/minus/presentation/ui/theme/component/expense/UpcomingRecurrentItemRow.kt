@@ -18,6 +18,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListI
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
+import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.prettyDate
 import java.text.NumberFormat
 import java.time.LocalDate
@@ -94,7 +95,8 @@ fun UpcomingRecurrentItemRow(
 				text = currencyFormat.format(transaction.amount),
 				style = MaterialTheme.typography.titleSmallEmphasized,
 				color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-				fontWeight = FontWeight.SemiBold
+				fontWeight = FontWeight.SemiBold,
+				modifier = Modifier.censor()
 			)
 		}
 	}

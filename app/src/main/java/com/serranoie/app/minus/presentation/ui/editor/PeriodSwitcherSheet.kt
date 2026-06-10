@@ -96,6 +96,7 @@ import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.CurrencyAmountInputVisualTransformation
+import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import logcat.logcat
 import java.math.BigDecimal
@@ -1120,7 +1121,8 @@ private fun CompactPeriodCard(
 				text = currencyFormat.format(budgetAmount),
 				style = MaterialTheme.typography.bodySmallCondensed,
 				fontWeight = FontWeight.Bold,
-				color = if (isSelected) MaterialTheme.colorScheme.primary else textColor.copy(alpha = 0.7f)
+				color = if (isSelected) MaterialTheme.colorScheme.primary else textColor.copy(alpha = 0.7f),
+				modifier = Modifier.censor()
 			)
 		}
 	}

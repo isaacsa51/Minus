@@ -69,7 +69,7 @@ fun DaysLeftCard(
 	) {
 		CircularWavyProgressIndicator(
 			// Subtract a tiny amount to show animation when completed
-			progress = { restDays / days.toFloat() - 0.01f },
+			progress = { 1f - (restDays / days.toFloat()) - 0.01f },
 			modifier = modifier.fillMaxSize(),
 			color = MaterialTheme.colorScheme.primary,
 			trackColor = MaterialTheme.colorScheme.surfaceVariant,

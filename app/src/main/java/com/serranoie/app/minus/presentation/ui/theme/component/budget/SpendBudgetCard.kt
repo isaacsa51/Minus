@@ -41,6 +41,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleLargeCondensed
+import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.harmonizeWithColor
 import com.serranoie.app.minus.presentation.util.numberFormat
@@ -197,6 +198,7 @@ fun SpendBudgetCard(
 					overflow = TextOverflow.Ellipsis,
 					softWrap = false,
 					lineHeight = TextUnit(0.2f, TextUnitType.Em),
+					modifier = Modifier.censor()
 				)
 
 				Text(
@@ -221,7 +223,8 @@ fun SpendBudgetCard(
 							R.string.spend_budget_card_available_percent_format,
 							percentFormatted
 						),
-						style = MaterialTheme.typography.bodySmallCondensed.copy(fontWeight = FontWeight.Light)
+						style = MaterialTheme.typography.bodySmallCondensed.copy(fontWeight = FontWeight.Light),
+						modifier = Modifier.censor()
 					)
 				}
 			}

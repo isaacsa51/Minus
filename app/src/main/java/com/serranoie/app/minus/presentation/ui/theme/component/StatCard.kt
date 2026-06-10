@@ -36,6 +36,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.Cross
 import com.serranoie.app.minus.presentation.ui.theme.displayMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
+import com.serranoie.app.minus.presentation.util.censor
 
 @Composable
 fun StatCard(
@@ -94,7 +95,9 @@ fun StatCard(
 
 					if (crossedValue != null) {
 						Cross(
-							modifier = Modifier.align(valueAlignment)
+							modifier = Modifier
+								.align(valueAlignment)
+								.censor()
 						) {
 							Text(
 								text = crossedValue,
@@ -117,7 +120,8 @@ fun StatCard(
 										.offset(y = valueOffsetWhenCrossedY.dp)
 										.rotate(2f)
 								} else Modifier
-							),
+							)
+							.censor(),
 						style = valueFontStyle,
 						fontSize = valueFontSize,
 						overflow = TextOverflow.Ellipsis,

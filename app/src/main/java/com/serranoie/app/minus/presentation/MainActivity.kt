@@ -64,6 +64,8 @@ import com.serranoie.app.minus.presentation.ui.theme.ThemeManager
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
 import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
+import com.serranoie.app.minus.presentation.util.CensorManager
+import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -119,6 +121,9 @@ class MainActivity : ComponentActivity() {
 	lateinit var themeManager: ThemeManager
 
 	@Inject
+	lateinit var censorManager: CensorManager
+
+	@Inject
 	lateinit var wearableService: WearableService
 
 	@Inject
@@ -135,6 +140,16 @@ class MainActivity : ComponentActivity() {
 			activity = this,
 			launcher = requestNotificationPermissionLauncher,
 		)
+	}
+
+	override fun onResume() {
+		super.onResume()
+		censorManager.start()
+	}
+
+	override fun onPause() {
+		super.onPause()
+		censorManager.stop()
 	}
 
 	@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -219,6 +234,8 @@ class MainActivity : ComponentActivity() {
 
 			if (isReady.value && dataStoreLoaded.value) {
 				val dynamicColor = context.dynamicColorEnabled
+				val isCensored by censorManager.isCensored.collectAsStateWithLifecycle()
+
 				val startDestination = when {
 					earlyFinishPending.value -> Screen.Analytics.route
 					!onboardingComplete.value -> Screen.Onboarding.route
@@ -229,6 +246,7 @@ class MainActivity : ComponentActivity() {
 					CompositionLocalProvider(
 						LocalWindowSize provides widthSizeClass,
 						LocalWindowInsets provides windowInsets,
+						LocalCensorMode provides isCensored,
 					) {
 						Surface(
 							color = MaterialTheme.colorScheme.background

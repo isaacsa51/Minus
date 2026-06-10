@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
@@ -192,7 +193,7 @@ internal fun MonthHeader(modifier: Modifier = Modifier, yearMonth: YearMonth) {
 	Row(modifier = modifier.height(CELL_SIZE), verticalAlignment = Alignment.Bottom) {
 		Text(
 			modifier = Modifier
-				.padding(start = 12.dp)
+				.padding(start = 8.dp)
 				.weight(1f),
 			text = prettyYearMonth(yearMonth),
 			style = MaterialTheme.typography.titleMediumEmphasized,
@@ -253,39 +254,6 @@ internal fun DaysOfWeek(modifier: Modifier = Modifier) {
 data class Week(
 	val number: Int, val yearMonth: YearMonth
 )
-
-@Composable
-fun Week(
-	calendarUiState: CalendarUiState,
-	week: Week,
-	onDayClicked: (LocalDate) -> Unit,
-	modifier: Modifier = Modifier
-) {
-	val beginningWeek = week.yearMonth.atDay(1).plusWeeks(week.number.toLong())
-	var currentDay = beginningWeek.with(TemporalAdjusters.previousOrSame(getWeek()[0]))
-
-	Box(Modifier.fillMaxWidth()) {
-		Row(modifier = modifier) {
-			for (i in 0..6) {
-				if (currentDay.month == week.yearMonth.month) {
-					Day(
-						modifier = Modifier.weight(1f),
-						calendarState = calendarUiState,
-						day = currentDay,
-						onDayClicked = onDayClicked,
-					)
-				} else {
-					Box(
-						modifier = Modifier
-							.size(CELL_SIZE)
-							.weight(1f)
-					)
-				}
-				currentDay = currentDay.plusDays(1)
-			}
-		}
-	}
-}
 
 @Composable
 fun WeekRow(
@@ -481,12 +449,12 @@ internal fun DayCell(
 			.border(
 				width = if (current) 2.dp else 1.dp,
 				color = if (current) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
-				shape = RoundedCornerShape(8.dp)
+				shape = RoundedCornerShape(4.dp)
 			), contentAlignment = Alignment.Center
 	) {
 		Text(
 			text = day.dayOfMonth.toString(),
-			style = MaterialTheme.typography.bodyMediumEmphasized,
+			style = MaterialTheme.typography.bodyMediumCondensed,
 			color = when {
 				disabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
 				hasSpending && spendingRatio > 1.0f -> MaterialTheme.colorScheme.onError
@@ -497,7 +465,7 @@ internal fun DayCell(
 	}
 }
 
-internal val CELL_SIZE = 48.dp
+internal val CELL_SIZE = 32.dp
 
 data class CalendarUiState(
 	val disabledBefore: LocalDate? = null,

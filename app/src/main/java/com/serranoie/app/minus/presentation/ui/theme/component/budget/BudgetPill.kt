@@ -61,6 +61,7 @@ import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.calcAdaptiveFont
+import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -284,7 +285,8 @@ fun BudgetPill(
 									.graphicsLayer {
 										scaleX = centeredAmountScale
 										scaleY = centeredAmountScale
-									},
+									}
+									.censor(),
 								textAlign = TextAlign.Center,
 							)
 						}
@@ -315,7 +317,9 @@ fun BudgetPill(
 									style = MaterialTheme.typography.titleMediumCondensed,
 									color = contentColor,
 									minFontSize = 16.sp,
-									modifier = Modifier.weight(0.45f),
+									modifier = Modifier
+										.weight(0.45f)
+										.censor(),
 									textAlign = TextAlign.End,
 								)
 							}

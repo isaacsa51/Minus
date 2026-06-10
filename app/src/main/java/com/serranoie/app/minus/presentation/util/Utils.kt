@@ -50,6 +50,43 @@ object Utils {
 		this.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
 	}
 
+	fun View.swipedVibration() {
+		try {
+			val vibrator = this.context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+			vibrator?.let {
+				// A smoother 10-pulse Ease-In ramp for a "mechanical lock" feel
+				val pulses = 10
+				val timings = LongArray(pulses * 2)
+				val amplitudes = IntArray(pulses * 2)
+
+				for (i in 0 until pulses) {
+					val t = (i + 1).toFloat() / pulses
+					// Quadratic ease-in for amplitude
+					val amplitude = (255 * t * t).toInt().coerceIn(1, 255)
+					// Gaps shrink as we reach the "peak"
+					val gap = (10 * (1 - t)).toLong().coerceAtLeast(1L)
+					// Pulse duration grows for a heavier finish
+					val duration = (8 + 12 * t).toLong()
+
+					timings[i * 2] = gap
+					timings[i * 2 + 1] = duration
+					amplitudes[i * 2] = 0
+					amplitudes[i * 2 + 1] = amplitude
+				}
+
+				val effect = VibrationEffect.createWaveform(timings, amplitudes, -1)
+				it.vibrate(effect)
+			}
+		} catch (e: Exception) {
+			this.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+			logcat("Utils") { e.asLog() }
+		}
+	}
+
+	fun View.abortFeedback() {
+		this.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+	}
+
 	fun View.errorFeedback() {
 		try {
 			val vibrator = this.context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
