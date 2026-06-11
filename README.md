@@ -1,4 +1,4 @@
-# Minus
+# Minus - An easy to use, budget tracking app
 
 <p align="center">
   <img src="app/src/main/ic_launcher-playstore.png" alt="App Icon" width="128"/>
@@ -10,9 +10,17 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/isaacsa51/Minus/releases">
+    <img src="https://img.shields.io/github/v/release/1372Slash/Zenith?label=Download%20Minus&style=for-the-badge&color=89db4a&logo=android&logoColor=white">
+  </a>
+
+  <br>
+  
   <a href="https://apt.izzysoft.de/packages/com.serranoie.app.minus">
     <img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder_nofont.png" height="50" alt="Get it at IzzyOnDroid">
   </a>
+
+  <br>
 
   <a href="https://github.com/isaacsa51/Minus/releases">
     <img src="assets/badge_github.png" height="80" alt="Get it at GitHub">
@@ -20,12 +28,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/isaacsa51/Sorter/releases">
-    <img src="https://img.shields.io/github/v/release/isaacsa51/Minus?include_prereleases" alt="Release">
-  </a>
-  <img src="https://img.shields.io/badge/Platform-Android-green.svg" alt="Platform">
-  <img src="https://img.shields.io/badge/API-31%2B-brightgreen.svg" alt="API">
-  <img src="https://img.shields.io/badge/Kotlin-2.1.0-blue.svg" alt="Kotlin">
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Android/android2.svg">
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/AndroidStudio/androidstudio3.svg">
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Kotlin/kotlin1.svg">
+  <img src="https://m3-markdown-badges.vercel.app/stars/1/3/isaacsa51/Minus">
+  <img src="https://m3-markdown-badges.vercel.app/issues/1/2/isaacsa51/Minus">
 </p>
 
 <p align="center">
