@@ -50,6 +50,36 @@ object Utils {
 		this.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
 	}
 
+	/**
+	 * Invoke intensifying haptic feedback based on gesture progress (0.0 to 1.0).
+	 * When progress reaches 1.0, calls [toggleFeedback] as confirmation.
+	 *
+	 * @param progress The current gesture progress from 0.0 (start) to 1.0 (complete)
+	 * @param onThresholdReached Optional callback when progress reaches completion
+	 */
+	fun View.progressHapticFeedback(progress: Float, onThresholdReached: (() -> Unit)? = null) {
+		val clampedProgress = progress.coerceIn(0f, 1f)
+		if (clampedProgress >= 1f) {
+			toggleFeedback()
+			onThresholdReached?.invoke()
+			return
+		}
+		// Map progress to haptic intensity thresholds
+		val thresholds = listOf(0.2f, 0.4f, 0.6f, 0.8f)
+		val hapticTypes = listOf(
+			HapticFeedbackConstants.TEXT_HANDLE_MOVE,
+			HapticFeedbackConstants.CLOCK_TICK,
+			HapticFeedbackConstants.LONG_PRESS,
+			HapticFeedbackConstants.CONFIRM
+		)
+		for (i in thresholds.indices) {
+			if (clampedProgress >= thresholds[i]) {
+				this.performHapticFeedback(hapticTypes[i])
+				return
+			}
+		}
+	}
+
 	fun View.swipedVibration() {
 		try {
 			val vibrator = this.context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator

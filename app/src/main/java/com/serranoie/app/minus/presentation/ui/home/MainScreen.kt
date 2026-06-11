@@ -1,6 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.home
 
 import android.util.Log
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -45,6 +47,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,6 +58,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.coerceAtLeast
@@ -95,6 +100,7 @@ import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_ST
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.ui.tutorial.firstLaunchTutorialStageFlow
 import com.serranoie.app.minus.presentation.util.StatusBarPadding
+import com.serranoie.app.minus.presentation.util.Utils.toggleFeedback
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
@@ -422,13 +428,16 @@ private fun PhoneLayout(
 	snackbarHostState: SnackbarHostState,
 ) {
 	val coroutineScope = rememberCoroutineScope()
-	val keyboardAdditionalOffset =
-		windowInsets.calculateBottomPadding().minus(16.dp).coerceAtLeast(0.dp)
+	val navigationBarOffset = windowInsets.calculateBottomPadding()
+	val navBarHeightPx = with(localDensity) { navigationBarOffset.toPx() }
 
-	val navigationBarOffset = windowInsets.calculateBottomPadding().coerceAtLeast(16.dp)
-
-	val defaultInternalKeyboardHeight =
+	val defaultInternalKeyboardHeightBase =
 		contentWidth.coerceAtMost(with(localDensity) { 500.dp.toPx() }).coerceAtMost(contentHeight / 2)
+	val rowHeightPx = defaultInternalKeyboardHeightBase / 4
+	val defaultInternalKeyboardHeight = rowHeightPx * 4
+	val calcModeKeyboardHeight = rowHeightPx * 5
+
+	var localDragProgress by remember { mutableFloatStateOf(0f) }
 
 	val systemKeyboardHeight = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
 	val systemKeyboardHeightPx = with(localDensity) { systemKeyboardHeight.toPx() }
@@ -445,14 +454,10 @@ private fun PhoneLayout(
 		}
 	}
 
-	val calcModeKeyboardHeight =
-		(contentHeight * 0.50f).coerceAtMost(contentHeight - with(localDensity) { navigationBarOffset.toPx() })
-
-	val dragProgress = budgetUiState.dragProgress
 	val effectiveProgress = if (budgetUiState.isCalculation) {
-		1f - dragProgress
+		1f - localDragProgress
 	} else {
-		dragProgress
+		localDragProgress
 	}
 
 	val internalKeyboardTarget =
@@ -466,50 +471,62 @@ private fun PhoneLayout(
 	val editorHeight by remember(
 		contentHeight,
 		targetKeyboardHeight,
-		keyboardAdditionalOffset,
-		navigationBarOffset,
+		navBarHeightPx,
 		budgetUiState.isCalculation,
-		dragProgress
+		localDragProgress
 	) {
 		derivedStateOf {
 			contentHeight.minus(
-				targetKeyboardHeight.plus(with(localDensity) {
-					keyboardAdditionalOffset.toPx()
-				}).coerceAtLeast(0f)
+				targetKeyboardHeight.plus(navBarHeightPx).coerceAtLeast(0f)
 			)
-				.coerceAtMost(contentHeight - with(localDensity) { navigationBarOffset.toPx() + 96.dp.toPx() })
+				.coerceAtMost(contentHeight - (navBarHeightPx + with(localDensity) { 96.dp.toPx() }))
+		}
+	}
+
+	val keyboardAnimationSpec = remember<AnimationSpec<Float>>(localDragProgress) {
+		if (localDragProgress > 0f && localDragProgress < 1f) {
+			tween(durationMillis = 0)
+		} else {
+			tween(durationMillis = 200, easing = FastOutSlowInEasing)
 		}
 	}
 
 	val editorHeightAnimated by animateFloatAsState(
 		label = "editorHeightAnimatedValue",
 		targetValue = editorHeight,
-		animationSpec = tween(durationMillis = 120),
+		animationSpec = keyboardAnimationSpec,
 	)
 
 	val keyboardHeightAnimated by animateFloatAsState(
 		label = "keyboardHeightAnimatedValue",
 		targetValue = targetKeyboardHeight,
-		animationSpec = tween(durationMillis = 50),
+		animationSpec = keyboardAnimationSpec,
 	)
 
 	val currentEditorHeight = with(localDensity) {
 		val halfExpanedOffset =
-			(-contentHeight + navigationBarOffset.toPx() + 16.dp.toPx() + editorHeightAnimated).coerceAtMost(
+			(-contentHeight + navBarHeightPx + with(localDensity) { 16.dp.toPx() } + editorHeightAnimated).coerceAtMost(
 				0f
 			)
 
 		(topSheetState.offset.value.coerceIn(
 			halfExpanedOffset, 0f
-		) + contentHeight - navigationBarOffset.toPx() - 16.dp.toPx()).toDp()
+		) + contentHeight - navBarHeightPx - with(localDensity) { 16.dp.toPx() }).toDp()
 	}
 
 	Box(
-		modifier = Modifier
-			.fillMaxSize()
-			.padding(bottom = keyboardAdditionalOffset),
+		modifier = Modifier.fillMaxSize(),
 		contentAlignment = Alignment.BottomCenter,
 	) {
+		val halfExpandedOffsetPx = with(localDensity) {
+			(-contentHeight + navBarHeightPx + 16.dp.toPx() + editorHeightAnimated).coerceAtMost(0f)
+		}
+		val isSheetExpanding by remember(halfExpandedOffsetPx) {
+			derivedStateOf {
+				topSheetState.offset.value > halfExpandedOffsetPx + 10f
+			}
+		}
+
 		Card(
 			shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
 			colors = CardDefaults.cardColors(
@@ -519,13 +536,13 @@ private fun PhoneLayout(
 			modifier = Modifier
 				.fillMaxWidth()
 				.height(with(localDensity) {
-					keyboardHeightAnimated.toDp().coerceAtLeast(220.dp)
+					(keyboardHeightAnimated + navBarHeightPx).toDp()
 				})
+				.zIndex(if (isSheetExpanding) 0f else 1f)
 		) {
 			Box(
-				modifier = Modifier
-					.fillMaxSize()
-					.navigationBarsPadding()
+				modifier = Modifier.fillMaxSize(),
+				contentAlignment = Alignment.BottomCenter
 			) {
 				val editorState = remember(budgetUiState) {
 					EditorState(
@@ -565,8 +582,9 @@ private fun PhoneLayout(
 						onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
 					},
 					onDragProgressChanged = { progress ->
-						onProcessIntent(BudgetNumpadIntent.SetDragProgress(progress))
+						localDragProgress = progress
 					},
+					dragProgress = effectiveProgress,
 					isCalculation = budgetUiState.isCalculation,
 					onCalculationModeChanged = { enabled ->
 						onProcessIntent(
@@ -581,105 +599,117 @@ private fun PhoneLayout(
 								message = message, duration = SnackbarDuration.Short
 							)
 						}
-					})
+					},
+					rowHeight = with(localDensity) { rowHeightPx.toDp() }
+				)
 			}
 		}
-	}
 
-	TopSheetLayout(
-		swipeableState = topSheetState,
-		customHalfHeight = editorHeightAnimated,
-		isLockSwipeable = { budgetUiState.lockSwipeable },
-		isLockDraggable = { budgetUiState.lockDraggable },
-		onDismiss = {},
-		sheetContentHalfExpand = {
-			Editor(
-				uiState = budgetUiState,
-				animState = budgetUiState.animState,
-				modifier = Modifier.requiredHeight(currentEditorHeight),
-				onOpenHistory = {},
-				onOpenSettings = onNavigateToSettings,
-				onOpenAnalytics = onNavigateToAnalytics,
-				onOpenWallet = onNavigateToWallet,
-				openWalletOnStart = openWalletOnStart,
-				forceWalletSetup = forceWalletSetup,
-				onBudgetPillClickForTutorial = {
-					onAdvanceTutorial(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
-				},
-				onAnalyticsClickForTutorial = {
-					onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANALYTICS)
-				},
-				onFocus = {
-					if (budgetUiState.numpadInput.isNotEmpty() && budgetUiState.animState != AnimState.EDITING) {
-						onProcessIntent(BudgetEditorIntent.SetAnimState(AnimState.EDITING))
-					}
-				},
-				onCommentClick = {},
-				onCommentUpdate = { comment ->
-					onProcessIntent(
-						BudgetEditorIntent.CommentUpdated(
-							comment
+		TopSheetLayout(
+			swipeableState = topSheetState,
+			customHalfHeight = editorHeightAnimated,
+			isLockSwipeable = {
+				budgetUiState.lockSwipeable || localDragProgress > 0f || (budgetUiState.isCalculation && effectiveProgress < 1f) || (!budgetUiState.isCalculation && effectiveProgress > 0f)
+			},
+			isLockDraggable = {
+				budgetUiState.lockDraggable || localDragProgress > 0f || (budgetUiState.isCalculation && effectiveProgress < 1f) || (!budgetUiState.isCalculation && effectiveProgress > 0f)
+			},
+			onDismiss = {},
+			sheetContentHalfExpand = {
+				Editor(
+					uiState = budgetUiState,
+					animState = budgetUiState.animState,
+					modifier = Modifier.requiredHeight(currentEditorHeight),
+					onOpenHistory = {},
+					onOpenSettings = onNavigateToSettings,
+					onOpenAnalytics = onNavigateToAnalytics,
+					onOpenWallet = onNavigateToWallet,
+					openWalletOnStart = openWalletOnStart,
+					forceWalletSetup = forceWalletSetup,
+					onBudgetPillClickForTutorial = {
+						onAdvanceTutorial(FirstLaunchTutorialStage.TAP_BUDGET_PILL)
+					},
+					onAnalyticsClickForTutorial = {
+						onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANALYTICS)
+					},
+					onFocus = {
+						if (budgetUiState.numpadInput.isNotEmpty() && budgetUiState.animState != AnimState.EDITING) {
+							onProcessIntent(BudgetEditorIntent.SetAnimState(AnimState.EDITING))
+						}
+					},
+					onCommentClick = {},
+					onCommentUpdate = { comment ->
+						onProcessIntent(
+							BudgetEditorIntent.CommentUpdated(
+								comment
+							)
 						)
-					)
-				},
-				onDeleteTag = { tag ->
-					onProcessIntent(
-						BudgetEditorIntent.DeleteTag(
-							tag
+					},
+					onDeleteTag = { tag ->
+						onProcessIntent(
+							BudgetEditorIntent.DeleteTag(
+								tag
+							)
 						)
-					)
-				},
-				onRecurrentToggle = { enabled ->
-					onProcessIntent(
-						BudgetEditorIntent.SetRecurrentEnabled(
-							enabled
+					},
+					onRecurrentToggle = { enabled ->
+						onProcessIntent(
+							BudgetEditorIntent.SetRecurrentEnabled(
+								enabled
+							)
 						)
-					)
-				},
-				onCreditToggle = { enabled ->
-					onProcessIntent(
-						BudgetEditorIntent.SetCreditEnabled(
-							enabled
+					},
+					onCreditToggle = { enabled ->
+						onProcessIntent(
+							BudgetEditorIntent.SetCreditEnabled(
+								enabled
+							)
 						)
-					)
-				},
-				onDismissRecurrentDialog = { onProcessIntent(BudgetEditorIntent.DismissRecurrentDialog) },
-				onDismissCreditCutoffDialog = { onProcessIntent(BudgetEditorIntent.DismissCreditCutoffDialog) },
-				onRecurrentExpenseConfirm = { freq, date, day ->
-					onProcessIntent(
-						BudgetEditorIntent.RecurrentExpenseApplied(
-							freq, date, day
+					},
+					onDismissRecurrentDialog = { onProcessIntent(BudgetEditorIntent.DismissRecurrentDialog) },
+					onDismissCreditCutoffDialog = { onProcessIntent(BudgetEditorIntent.DismissCreditCutoffDialog) },
+					onRecurrentExpenseConfirm = { freq, date, day ->
+						onProcessIntent(
+							BudgetEditorIntent.RecurrentExpenseApplied(
+								freq, date, day
+							)
 						)
-					)
-				},
-				onCreditCutoffConfirm = { day ->
-					onProcessIntent(
-						BudgetEditorIntent.CreditCutoffDayConfirmed(
-							day
+					},
+					onCreditCutoffConfirm = { day ->
+						onProcessIntent(
+							BudgetEditorIntent.CreditCutoffDayConfirmed(
+								day
+							)
 						)
-					)
-				},
-				onFinishBudgetEarly = { onProcessIntent(BudgetEditorIntent.FinishBudgetEarly) },
-				onSaveBudget = { settings ->
-					onProcessIntent(
-						BudgetEditorIntent.UpdateSettings(
-							settings
+					},
+					onFinishBudgetEarly = { onProcessIntent(BudgetEditorIntent.FinishBudgetEarly) },
+					onSaveBudget = { settings ->
+						onProcessIntent(
+							BudgetEditorIntent.UpdateSettings(
+								settings
+							)
 						)
-					)
-				},
-				budgetPillHintAnchorModifier = Modifier,
-				analyticsHintAnchorModifier = Modifier
-			)
-		},
-		sheetContentExpand = {
-			history(
-				Modifier.then(quickLogSwipeModifier),
-				{ transaction, message, _ ->
-					queueDeleteWithUndo(transaction, message)
-				},
-				{ cancelPendingDelete() },
-				{ message -> showInfoSnackbar(message) })
-		})
+					},
+					budgetPillHintAnchorModifier = Modifier,
+					analyticsHintAnchorModifier = Modifier
+				)
+			},
+			sheetContentExpand = {
+				if (topSheetState.targetValue == TopSheetValue.Expanded || topSheetState.currentValue == TopSheetValue.Expanded) {
+					history(
+						Modifier.then(quickLogSwipeModifier),
+						{ transaction, message, _ ->
+							queueDeleteWithUndo(transaction, message)
+						},
+						{ cancelPendingDelete() },
+						{ message -> showInfoSnackbar(message) })
+				}
+			})
+
+		LaunchedEffect(budgetUiState.isCalculation) {
+			localDragProgress = 0f
+		}
+	}
 
 	StatusBarPadding()
 }
@@ -710,29 +740,39 @@ private fun TabletLayout(
 	snackbarHostState: SnackbarHostState,
 ) {
 	val coroutineScope = rememberCoroutineScope()
-	val navigationBarOffset = windowInsets.calculateBottomPadding().coerceAtLeast(16.dp)
+	val navigationBarOffset = windowInsets.calculateBottomPadding()
+	val navBarHeightPx = with(localDensity) { navigationBarOffset.toPx() }
 
-	val defaultInternalKeyboardHeight =
+	val defaultInternalKeyboardHeightBase =
 		(contentWidth / 2f).coerceAtMost(with(localDensity) { 500.dp.toPx() }).coerceAtMost(contentHeight / 2)
+	val rowHeightPx = defaultInternalKeyboardHeightBase / 4
+	val defaultInternalKeyboardHeight = rowHeightPx * 4
+	val calcModeKeyboardHeight = rowHeightPx * 5
 
-	val calcModeKeyboardHeight =
-		(contentHeight * 0.50f).coerceAtMost(contentHeight - with(localDensity) { navigationBarOffset.toPx() })
+	var localDragProgress by remember { mutableFloatStateOf(0f) }
 
-	val dragProgress = budgetUiState.dragProgress
 	val effectiveProgress = if (budgetUiState.isCalculation) {
-		1f - dragProgress
+		1f - localDragProgress
 	} else {
-		dragProgress
+		localDragProgress
 	}
 
 	val internalKeyboardTarget =
 		defaultInternalKeyboardHeight + (calcModeKeyboardHeight - defaultInternalKeyboardHeight) * effectiveProgress
 	val targetKeyboardHeight = internalKeyboardTarget
 
+	val keyboardAnimationSpec = remember<AnimationSpec<Float>>(localDragProgress) {
+		if (localDragProgress > 0f && localDragProgress < 1f) {
+			tween(durationMillis = 0)
+		} else {
+			tween(durationMillis = 200, easing = FastOutSlowInEasing)
+		}
+	}
+
 	val keyboardHeightAnimated by animateFloatAsState(
 		label = "keyboardHeightAnimatedValue",
 		targetValue = targetKeyboardHeight,
-		animationSpec = tween(durationMillis = 50),
+		animationSpec = keyboardAnimationSpec,
 	)
 
 	Row(modifier = Modifier.fillMaxSize()) {
@@ -823,13 +863,12 @@ private fun TabletLayout(
 				modifier = Modifier
 					.fillMaxWidth()
 					.height(with(localDensity) {
-						keyboardHeightAnimated.toDp().coerceAtLeast(220.dp)
+						(keyboardHeightAnimated + navBarHeightPx).toDp()
 					})
 			) {
 				Box(
-					modifier = Modifier
-						.fillMaxSize()
-						.navigationBarsPadding()
+					modifier = Modifier.fillMaxSize(),
+					contentAlignment = Alignment.BottomCenter
 				) {
 					val editorState = remember(budgetUiState) {
 						EditorState(
@@ -863,11 +902,13 @@ private fun TabletLayout(
 							onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
 						},
 						onDragProgressChanged = { progress ->
-							onProcessIntent(BudgetNumpadIntent.SetDragProgress(progress))
+							localDragProgress = progress
 						},
+						dragProgress = localDragProgress,
 						isCalculation = budgetUiState.isCalculation,
 						onCalculationModeChanged = { enabled ->
 							onProcessIntent(BudgetNumpadIntent.SetCalculationMode(enabled))
+							localDragProgress = 0f
 						},
 						onShowSnackbar = { message ->
 							coroutineScope.launch {
@@ -875,13 +916,16 @@ private fun TabletLayout(
 									message = message, duration = SnackbarDuration.Short
 								)
 							}
-						})
+						},
+						rowHeight = with(localDensity) { rowHeightPx.toDp() }
+					)
 				}
 			}
 		}
 	}
 }
 
+@Preview
 @PreviewScreenSizes
 @Composable
 private fun MainScreenPreview() {

@@ -1,12 +1,15 @@
-# Minus - An easy to use, budget tracking app
-
 <p align="center">
   <img src="app/src/main/ic_launcher-playstore.png" alt="App Icon" width="128"/>
 </p>
 
+# Minus - An easy to use, budget tracking app
+
 <p align="center">
-  <strong>Familiar calculator-style budget tracking app for Android.</strong><br>
-  Built with Jetpack Compose and Material Design 3 Expressive
+  <img src="assets/banner.png" alt="App Banner" width="100%">
+</p>
+
+<p align="center">
+  <strong>Minus</strong> is an easy to use & powerful budget tracking app. <br/>Register, calculate and make reminders for your recurring expenses alongside credit card due dates.
 </p>
 
 <p align="center">
@@ -103,25 +106,14 @@ Minus includes a companion Wear OS application. The wearable version provides:
 *   Notification sync through system.
 *   Optimization for round and square watch faces using the latest Wear OS Compose libraries.
 
-### Disclaimer
-This project is still in its early stages of development. While the core features are functional, the Wear OS integration is still under active development and may not work as expected. Please report any issues or feedback you have.
-
 ### Contributing
 Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more information.
 
 ### Translations
 Any contributions to translate Minus into other languages are greatly appreciated. Please submit a pull request with your translations.
 
-Current Translation Status:
-- [x] English
-- [x] Spanish
-- [?] French (WIP)
-- [ ] German
-- [ ] Italian
-- [ ] Portuguese
-- [ ] Russian
-- [ ] Chinese
-- [ ] Japanese
-- [ ] Korean
+
+#### Disclaimer
+This app is still on the heavy side of development, while the core features works as expected. Any issues or feedback can be generated inside the app or here: [GitHub Issues](https://github.com/isaacsa51/Minus/issues).
 
 Made with ❤️ by [Isaac Serrano](https://linkedin.com/in/serranoie)

@@ -67,7 +67,7 @@ fun NumpadButton(
 	val emphasizedTextStyle = MaterialTheme.typography.displayMediumEmphasized
 
 	val radius by animateDpAsState(
-		targetValue = if (isPressed) 24.dp else 100.dp, animationSpec = if (isPressed) {
+		targetValue = if (isPressed) 24.dp else 80.dp, animationSpec = if (isPressed) {
 			tween(durationMillis = 60, easing = LinearOutSlowInEasing)
 		} else {
 			tween(durationMillis = 620, easing = LinearEasing)
