@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -94,7 +94,7 @@ fun Numpad(
 	onApplyPressedForTutorial: (() -> Unit)? = null,
 	onDragProgressChanged: (Float) -> Unit = {},
 	dragProgress: Float = 0f,
-	rowHeight: Dp = 55.dp,
+	rowHeight: Dp = 55.dp, // Still kept for backward compatibility but internal logic now uses weights
 ) {
 	val view = LocalView.current
 	val haptic = LocalHapticFeedback.current
@@ -186,14 +186,14 @@ fun Numpad(
 			Box(
 				Modifier
 					.fillMaxWidth()
-					.height(rowHeight * effectiveDragProgress)
+					.weight(effectiveDragProgress.coerceAtLeast(0.01f)) // Ensure weight > 0 to prevent crash
 					.clipToBounds(),
 				contentAlignment = androidx.compose.ui.Alignment.BottomCenter
 			) {
 				Row(
 					Modifier
 						.fillMaxWidth()
-						.height(rowHeight)
+						.fillMaxHeight()
 						.graphicsLayer(alpha = effectiveDragProgress)
 				) {
 					val operators = listOf('÷', '×', '+', '-')
@@ -216,7 +216,7 @@ fun Numpad(
 		Row(
 			Modifier
 				.fillMaxWidth()
-				.height(rowHeight * 4)
+				.weight(4f) // Use weight instead of fixed height
 		) {
 			Column(
 				modifier = Modifier
@@ -279,7 +279,6 @@ fun Numpad(
 							text = i.toString(),
 							onClick = {
 								onNumberInput(i)
-								onNumberPressedForTutorial?.invoke()
 								debugProgress = 0
 								haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 							})

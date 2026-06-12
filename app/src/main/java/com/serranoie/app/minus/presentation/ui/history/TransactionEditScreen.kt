@@ -58,6 +58,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -140,6 +141,10 @@ fun TransactionEditScreen(
 
 	var isCalculation by remember { mutableStateOf(false) }
 
+	// Calculate dynamic target height for numpad to take 48% of screen height
+	val configuration = LocalConfiguration.current
+	val screenHeight = configuration.screenHeightDp.dp
+	val targetNumpadHeight = screenHeight * 0.48f
 
 	val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
 		fontWeight = FontWeight.W500
@@ -330,7 +335,7 @@ fun TransactionEditScreen(
 		Numpad(
 			modifier = Modifier
 				.fillMaxWidth()
-				.weight(2f),
+				.height(targetNumpadHeight),
 			editorState = editorState,
 			onNumberInput = { digit ->
 				editedAmount = if (editedAmount == "0") {
