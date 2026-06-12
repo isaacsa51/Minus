@@ -4,9 +4,9 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,11 +20,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.RECURRENT_PAYMENTS_VIEW_MODE_KEY
 import com.serranoie.app.minus.presentation.settingsDataStore
@@ -59,6 +61,7 @@ fun History(
 	onShowInfoSnackbar: (message: String) -> Unit = {},
 ) {
 	val context = LocalContext.current
+	val resources = LocalResources.current
 	val view = LocalView.current
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val preferences by context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences())
@@ -67,9 +70,10 @@ fun History(
 	}
 	val scrollState = rememberLazyListState()
 
-	val isAtEndOfList = remember(scrollState.canScrollForward, scrollState.layoutInfo.visibleItemsInfo) {
-		!scrollState.canScrollForward && scrollState.layoutInfo.visibleItemsInfo.lastOrNull() != null
-	}
+	val isAtEndOfList =
+		remember(scrollState.canScrollForward, scrollState.layoutInfo.visibleItemsInfo) {
+			!scrollState.canScrollForward && scrollState.layoutInfo.visibleItemsInfo.lastOrNull() != null
+		}
 
 	LaunchedEffect(isAtEndOfList) {
 		viewModel.processIntent(BudgetSystemIntent.SetLockSwipeable(!isAtEndOfList))
@@ -176,10 +180,16 @@ fun History(
 
 	fun queueDeleteWithUndo(transaction: Transaction) {
 		pendingRemovedTransactions = pendingRemovedTransactions + (transaction.id to transaction)
-		onQueueDeleteWithUndo(transaction, "${transaction.comment.ifEmpty { "Gasto" }} eliminado", {
+		onQueueDeleteWithUndo(
+			transaction,
+			resources.getString(
+				R.string.expense_deleted_format,
+				transaction.comment.ifEmpty { resources.getString(R.string.generic_expense) },
+			),
+		) {
 			pendingRemovedTransactions = pendingRemovedTransactions - transaction.id
 			onCancelPendingDelete()
-		})
+		}
 	}
 
 	fun toggleExpandedDate(date: LocalDate) {
@@ -194,7 +204,12 @@ fun History(
 		viewModel.processIntent(
 			BudgetTransactionIntent.EditTransactionTapped(updatedTransaction)
 		)
-		onShowInfoSnackbar("${updatedTransaction.comment.ifEmpty { "Gasto" }} ha sido modificado")
+		onShowInfoSnackbar(
+			resources.getString(
+				R.string.expense_modified_format,
+				updatedTransaction.comment.ifEmpty { resources.getString(R.string.generic_expense) },
+			),
+		)
 		onSaved()
 	}
 

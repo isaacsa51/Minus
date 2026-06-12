@@ -85,7 +85,8 @@
     <string name="new_budget_period">Nuevo período de ahorro</string>
 
     <string name="expense_deleted_format">%1$s eliminado</string>
-    <string name="generic_expense">Gastos</string>
+    <string name="expense_modified_format">%1$s ha sido modificado</string>
+    <string name="generic_expense">Gasto</string>
     <string name="expense_item_unnamed_expense">Gasto sin nombre</string>
     <string name="expense_item_recurrent_subtitle_format">Gasto recurrente — %1$s</string>
     <string name="hide_subscriptions_outside_period">Ocultar suscripciones fuera del período</string>
@@ -108,8 +109,8 @@
     </plurals>
 
     <plurals name="analytics_days_left">
-        <item quantity="one">%d día</item>
-        <item quantity="other">%d días</item>
+        <item quantity="one">%d día left</item>
+        <item quantity="other">%d días left</item>
     </plurals>
 
     <string name="total_budget">Presupuesto total</string>
@@ -325,7 +326,7 @@
 
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">Sobrante del presupuesto</string>
-    <string name="strategy_dialog_description">Puedes elegir como distribuir el balance del presupuesto al final de cada día.\n\nPor ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: puedes repartir 100 en los días que queda, o gastar 600 (presupuesto por día + sobrante del periodo anterior) hoy.</string>
+    <string name="strategy_dialog_description">Puedes elegir como distribuir el balance del presupuesto al final de cada día.\n\nFor ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: puedes repartir 100 en los días que queda, o gastar 600 (presupuesto por día + sobrante del periodo anterior) hoy.</string>
     <string name="strategy_ask_always">Preguntarme siempre</string>
     <string name="strategy_ask_always_desc">Al final del período te preguntaremos qué hacer con el sobrante</string>
     <string name="strategy_split_equally">Repartir entre todos los días</string>
