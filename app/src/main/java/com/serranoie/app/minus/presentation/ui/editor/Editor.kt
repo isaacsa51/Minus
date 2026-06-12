@@ -630,7 +630,12 @@ private fun CreditCutoffDayDialog(
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text(text = stringResource(R.string.credit_cutoff_dialog_title)) },
+		title = {
+			Text(
+				text = stringResource(R.string.credit_cutoff_dialog_title),
+				style = MaterialTheme.typography.titleMediumEmphasized
+			)
+		},
 		text = {
 			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 				Text(text = stringResource(R.string.credit_cutoff_dialog_message))
@@ -647,12 +652,18 @@ private fun CreditCutoffDayDialog(
 		},
 		confirmButton = {
 			Button(onClick = { cutoffDay?.let(onConfirm) }, enabled = isValid) {
-				Text(stringResource(R.string.save))
+				Text(
+					stringResource(R.string.save),
+					style = MaterialTheme.typography.labelSmallEmphasized
+				)
 			}
 		},
 		dismissButton = {
 			TextButton(onClick = onDismiss) {
-				Text(stringResource(R.string.cancel))
+				Text(
+					stringResource(R.string.cancel),
+					style = MaterialTheme.typography.labelSmallEmphasized
+				)
 			}
 		})
 }
@@ -689,22 +700,22 @@ fun EditorPreview_Idle() {
 	MinusTheme {
 		Editor(
 			uiState = BudgetUiState(
-			budgetSettings = BudgetSettings(
-				totalBudget = BigDecimal("500.00"),
-				period = BudgetPeriod.DAILY,
-				startDate = LocalDate.now(),
-				currencyCode = "USD"
-			), budgetState = BudgetState(
-				remainingToday = BigDecimal("110.00"),
-				totalSpentToday = BigDecimal("12.50"),
-				dailyBudget = BigDecimal("122.50"),
-				daysRemaining = 15,
-				progress = 0.1f,
-				isOverBudget = false,
-				totalBudget = BigDecimal("500.00"),
-				totalSpentInPeriod = BigDecimal("12.50")
-			), transactions = emptyList(), numpadInput = "", isNumpadValid = false
-		),
+				budgetSettings = BudgetSettings(
+					totalBudget = BigDecimal("500.00"),
+					period = BudgetPeriod.DAILY,
+					startDate = LocalDate.now(),
+					currencyCode = "USD"
+				), budgetState = BudgetState(
+					remainingToday = BigDecimal("110.00"),
+					totalSpentToday = BigDecimal("12.50"),
+					dailyBudget = BigDecimal("122.50"),
+					daysRemaining = 15,
+					progress = 0.1f,
+					isOverBudget = false,
+					totalBudget = BigDecimal("500.00"),
+					totalSpentInPeriod = BigDecimal("12.50")
+				), transactions = emptyList(), numpadInput = "", isNumpadValid = false
+			),
 			animState = AnimState.IDLE,
 			onFocus = {},
 			onOpenHistory = {},
@@ -727,22 +738,22 @@ fun EditorPreview_Editing() {
 	MinusTheme {
 		Editor(
 			uiState = BudgetUiState(
-			budgetSettings = BudgetSettings(
-				totalBudget = BigDecimal("500.00"),
-				period = BudgetPeriod.DAILY,
-				startDate = LocalDate.now(),
-				currencyCode = "USD"
-			), budgetState = BudgetState(
-				remainingToday = BigDecimal("110.00"),
-				totalSpentToday = BigDecimal("12.50"),
-				dailyBudget = BigDecimal("122.50"),
-				daysRemaining = 15,
-				progress = 0.1f,
-				isOverBudget = false,
-				totalBudget = BigDecimal("500.00"),
-				totalSpentInPeriod = BigDecimal("12.50")
-			), transactions = emptyList(), numpadInput = "250", isNumpadValid = true
-		),
+				budgetSettings = BudgetSettings(
+					totalBudget = BigDecimal("500.00"),
+					period = BudgetPeriod.DAILY,
+					startDate = LocalDate.now(),
+					currencyCode = "USD"
+				), budgetState = BudgetState(
+					remainingToday = BigDecimal("110.00"),
+					totalSpentToday = BigDecimal("12.50"),
+					dailyBudget = BigDecimal("122.50"),
+					daysRemaining = 15,
+					progress = 0.1f,
+					isOverBudget = false,
+					totalBudget = BigDecimal("500.00"),
+					totalSpentInPeriod = BigDecimal("12.50")
+				), transactions = emptyList(), numpadInput = "250", isNumpadValid = true
+			),
 			animState = AnimState.EDITING,
 			onFocus = {},
 			onOpenHistory = {},
