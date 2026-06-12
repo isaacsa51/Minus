@@ -17,6 +17,7 @@
     <string name="done">Done</string>
     <string name="add">Add</string>
     <string name="remove">Remove</string>
+    <string name="undo">UNDO</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
     <string name="period">Period</string>

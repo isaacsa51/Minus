@@ -16,6 +16,7 @@
     <string name="done">Hecho</string>
     <string name="add">Agregar</string>
     <string name="remove">Eliminar</string>
+    <string name="undo">DESHACER</string>
     <string name="back">Atrás</string>
     <string name="next">Próximo</string>
     <string name="period">Período</string>

@@ -15,6 +15,7 @@
     <string name="done">Terminé</string>
     <string name="add">Ajouter</string>
     <string name="remove">Retirer</string>
+    <string name="undo">ANNULER</string>
     <string name="back">Retour</string>
     <string name="next">Suivant</string>
     <string name="period">Période</string>

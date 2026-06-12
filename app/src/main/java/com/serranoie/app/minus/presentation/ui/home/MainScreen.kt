@@ -35,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -58,18 +59,19 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.zIndex
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.SwipeableState
 import androidx.wear.compose.material.rememberSwipeableState
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -101,7 +103,6 @@ import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_ST
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.ui.tutorial.firstLaunchTutorialStageFlow
 import com.serranoie.app.minus.presentation.util.StatusBarPadding
-import com.serranoie.app.minus.presentation.util.Utils.toggleFeedback
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
@@ -217,6 +218,7 @@ private fun MainScreenContent(
 	var snackbarAutoDismissJob by remember { mutableStateOf<Job?>(null) }
 	var pendingDeleteJob by remember { mutableStateOf<Job?>(null) }
 	val snackbarHostState = remember { SnackbarHostState() }
+	val undoSnackbarActionLabel = stringResource(R.string.undo)
 
 	fun executeDelete(transaction: Transaction) {
 		onProcessIntent(BudgetTransactionIntent.DeleteTransactionTapped(transaction))
@@ -246,7 +248,7 @@ private fun MainScreenContent(
 		coroutineScope.launch {
 			val result = snackbarHostState.showSnackbar(
 				message = message,
-				actionLabel = "",
+				actionLabel = undoSnackbarActionLabel,
 				duration = SnackbarDuration.Short,
 			)
 			if (result == SnackbarResult.ActionPerformed) {
@@ -370,8 +372,13 @@ private fun MainScreenContent(
 				modifier = Modifier
 					.align(Alignment.BottomCenter)
 					.padding(horizontal = 16.dp, vertical = 20.dp)
-					.navigationBarsPadding()
-			)
+					.navigationBarsPadding(),
+			) { snackbarData ->
+				Snackbar(
+					snackbarData = snackbarData,
+					actionColor = MaterialTheme.colorScheme.tertiaryContainer,
+				)
+			}
 		}
 	}
 }
