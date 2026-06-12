@@ -1,9 +1,56 @@
 default_platform(:android)
 
 platform :android do
+  desc "Genera los changelogs basados en los commits de git entre el tag actual y el anterior"
+  lane :generate_changelog do |options|
+    version_tag = options[:version_tag] || ENV.fetch("VERSION_TAG", `git describe --tags --abbrev=0`.strip rescue "v0.0.0")
+
+    # Extraer versión limpia (ej: v1.2.6 -> 1.2.6)
+    clean_version = version_tag.gsub(/^v/, "")
+
+    # Calcular Version Code (siguiendo tu lógica de build.gradle.kts: major * 10000 + minor * 100 + patch)
+    parts = clean_version.split("-")[0].split(".").map(&:to_i)
+    major = parts[0] || 0
+    minor = parts[1] || 0
+    patch = parts[2] || 0
+
+    version_code = (major * 10_000) + (minor * 100) + patch
+    version_code = 1 if version_code <= 0 # Coincidir con la lógica de build.gradle.kts
+
+    # Obtener el tag anterior
+    previous_tag = `git describe --tags --abbrev=0 #{version_tag}^`.strip rescue nil
+
+    if previous_tag.nil? || previous_tag.empty?
+      UI.message("No se encontró un tag anterior, usando todos los commits.")
+      changelog_content = `git log #{version_tag} --pretty=format:"- %s"`.strip rescue "- Initial release."
+    else
+      UI.message("Generando changelog para #{version_tag} (Code: #{version_code}) desde #{previous_tag}")
+      changelog_content = `git log #{previous_tag}..#{version_tag} --pretty=format:"- %s"`.strip
+    end
+
+    if changelog_content.empty?
+      changelog_content = "- Minor improvements and bug fixes."
+    end
+
+    # Ruta del archivo
+    changelog_path = "metadata/android/en-US/changelogs/#{version_code}.txt"
+
+    # Asegurar que el directorio existe
+    FileUtils.mkdir_p(File.dirname(changelog_path))
+
+    # Escribir el archivo
+    File.write(changelog_path, changelog_content)
+
+    UI.success("Changelog generado en: #{changelog_path}")
+    changelog_content
+  end
+
   desc "Genera el APK Release firmado y crea un Release en GitHub"
   lane :publish_github do
     version_tag = ENV.fetch("VERSION_TAG")
+
+    # Generar changelog automáticamente
+    generate_changelog(version_tag: version_tag)
 
     gradle(
       task: ":app:assembleWearRelease"

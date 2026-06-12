@@ -42,7 +42,8 @@ fun versionCodeFrom(versionName: String): Int {
 	val minor = parts.getOrElse(1) { 0 }
 	val patch = parts.getOrElse(2) { 0 }
 
-	return major * 10_000 + minor * 100 + patch
+	val code = major * 10_000 + minor * 100 + patch
+	return if (code > 0) code else 1
 }
 
 val appVersionName = releaseVersionName()

@@ -74,6 +74,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
 import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
@@ -132,10 +133,15 @@ fun MainScreen(
 	val tutorialStage by context.firstLaunchTutorialStageFlow()
 		.collectAsStateWithLifecycle(initialValue = FirstLaunchTutorialStage.COMPLETED)
 
+	val showCreditQuickToggleFeature by remember(context) {
+		context.settingsDataStore.data.map { it[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false }
+	}.collectAsStateWithLifecycle(initialValue = false)
+
 	MainScreenContent(
 		budgetUiState = budgetUiState,
 		onboardingCompleted = onboardingCompleted,
 		tutorialStage = tutorialStage,
+		showCreditQuickToggleFeature = showCreditQuickToggleFeature,
 		onNavigateToAnalytics = onNavigateToAnalytics,
 		onNavigateToSettings = onNavigateToSettings,
 		onNavigateToWallet = onNavigateToWallet,
@@ -172,6 +178,7 @@ private fun MainScreenContent(
 	budgetUiState: BudgetUiState,
 	onboardingCompleted: Boolean,
 	tutorialStage: FirstLaunchTutorialStage,
+	showCreditQuickToggleFeature: Boolean,
 	onNavigateToAnalytics: () -> Unit,
 	onNavigateToSettings: () -> Unit,
 	onNavigateToWallet: () -> Unit,
@@ -321,6 +328,7 @@ private fun MainScreenContent(
 					contentWidth = contentWidth,
 					localDensity = localDensity,
 					windowInsets = windowInsets,
+					showCreditQuickToggleFeature = showCreditQuickToggleFeature,
 					onNavigateToSettings = onNavigateToSettings,
 					onNavigateToAnalytics = onNavigateToAnalytics,
 					onNavigateToWallet = onNavigateToWallet,
@@ -342,6 +350,7 @@ private fun MainScreenContent(
 					contentWidth = contentWidth,
 					localDensity = localDensity,
 					windowInsets = windowInsets,
+					showCreditQuickToggleFeature = showCreditQuickToggleFeature,
 					onNavigateToWallet = onNavigateToWallet,
 					openWalletOnStart = openWalletOnStart,
 					forceWalletSetup = forceWalletSetup,
@@ -408,6 +417,7 @@ private fun PhoneLayout(
 	contentWidth: Float,
 	localDensity: Density,
 	windowInsets: PaddingValues,
+	showCreditQuickToggleFeature: Boolean,
 	onNavigateToSettings: () -> Unit,
 	onNavigateToAnalytics: () -> Unit,
 	onNavigateToWallet: () -> Unit,
@@ -666,6 +676,7 @@ private fun PhoneLayout(
 							)
 						)
 					},
+					showCreditQuickToggleFeature = showCreditQuickToggleFeature,
 					onDismissRecurrentDialog = { onProcessIntent(BudgetEditorIntent.DismissRecurrentDialog) },
 					onDismissCreditCutoffDialog = { onProcessIntent(BudgetEditorIntent.DismissCreditCutoffDialog) },
 					onRecurrentExpenseConfirm = { freq, date, day ->
@@ -722,6 +733,7 @@ private fun TabletLayout(
 	contentWidth: Float,
 	localDensity: Density,
 	windowInsets: PaddingValues,
+	showCreditQuickToggleFeature: Boolean,
 	onNavigateToWallet: () -> Unit,
 	openWalletOnStart: Boolean,
 	forceWalletSetup: Boolean,
@@ -839,6 +851,7 @@ private fun TabletLayout(
 					onDeleteTag = { tag -> onProcessIntent(BudgetEditorIntent.DeleteTag(tag)) },
 					onRecurrentToggle = { enabled -> onProcessIntent(BudgetEditorIntent.SetRecurrentEnabled(enabled)) },
 					onCreditToggle = { enabled -> onProcessIntent(BudgetEditorIntent.SetCreditEnabled(enabled)) },
+					showCreditQuickToggleFeature = showCreditQuickToggleFeature,
 					onDismissRecurrentDialog = { onProcessIntent(BudgetEditorIntent.DismissRecurrentDialog) },
 					onDismissCreditCutoffDialog = { onProcessIntent(BudgetEditorIntent.DismissCreditCutoffDialog) },
 					onRecurrentExpenseConfirm = { freq, date, day ->
@@ -954,7 +967,7 @@ private fun MainScreenPreview() {
 						isOverBudget = false,
 						totalBudget = BigDecimal("500.00"),
 						totalSpentInPeriod = BigDecimal("12.50")
-					), transactions = emptyList(), numpadInput = "", isNumpadValid = false
+					), transactions = emptyList(), numpadInput = "12", isNumpadValid = false
 				),
 				onboardingCompleted = true,
 				tutorialStage = FirstLaunchTutorialStage.COMPLETED,
@@ -965,6 +978,7 @@ private fun MainScreenPreview() {
 				forceWalletSetup = false,
 				onProcessIntent = {},
 				onAdvanceTutorial = {},
+				showCreditQuickToggleFeature = true,
 				history = { modifier, _, _, _ ->
 					Box(
 						modifier = modifier
