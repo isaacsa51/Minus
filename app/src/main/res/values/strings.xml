@@ -89,6 +89,7 @@
 
     <!-- History -->
     <string name="expense_deleted_format">%1$s deleted</string>
+    <string name="expense_modified_format">%1$s has been modified</string>
     <string name="generic_expense">Expense</string>
     <string name="expense_item_unnamed_expense">Unnamed expense</string>
     <string name="expense_item_recurrent_subtitle_format">Recurrent expense — %1$s</string>
