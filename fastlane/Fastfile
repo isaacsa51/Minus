@@ -3,7 +3,7 @@ default_platform(:android)
 platform :android do
   desc "Genera los changelogs basados en los commits de git entre el tag actual y el anterior"
   lane :generate_changelog do |options|
-    version_tag = options[:version_tag] || ENV.fetch("VERSION_TAG", `git describe --tags --abbrev=0`.strip rescue "v0.0.0")
+    version_tag = options[:version_tag] || ENV["VERSION_TAG"] || (`git describe --tags --abbrev=0`.strip rescue "v0.0.0")
 
     # Extraer versión limpia (ej: v1.2.6 -> 1.2.6)
     clean_version = version_tag.gsub(/^v/, "")
