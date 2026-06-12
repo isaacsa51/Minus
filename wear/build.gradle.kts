@@ -5,6 +5,47 @@ plugins {
 	alias(libs.plugins.kotlin.serialization)
 }
 
+fun gitOutput(vararg args: String): String? {
+	return runCatching {
+		val process = ProcessBuilder("git", *args)
+			.directory(rootDir)
+			.redirectErrorStream(true)
+			.start()
+		val output = process.inputStream.bufferedReader().readText().trim()
+		if (process.waitFor() == 0) output.takeIf { it.isNotBlank() } else null
+	}.getOrNull()
+}
+
+fun normalizedVersionTag(tag: String?): String? {
+	val normalizedTag = tag?.removePrefix("refs/tags/") ?: return null
+	return normalizedTag.takeIf { it.matches(Regex("^v?\\d+\\.\\d+\\.\\d+(-[A-Za-z0-9.-]+)?$")) }
+}
+
+fun releaseVersionName(): String {
+	val tag = normalizedVersionTag(System.getenv("VERSION_TAG"))
+		?: normalizedVersionTag(System.getenv("GITHUB_REF_NAME"))
+		?: normalizedVersionTag(gitOutput("describe", "--tags", "--exact-match"))
+		?: normalizedVersionTag(gitOutput("describe", "--tags", "--abbrev=0"))
+		?: "v0.0.0-dev"
+
+	return tag.removePrefix("v")
+}
+
+fun versionCodeFrom(versionName: String): Int {
+	val parts = versionName.split("-", limit = 2).first()
+		.split(".")
+		.map { it.toIntOrNull() ?: 0 }
+	val major = parts.getOrElse(0) { 0 }
+	val minor = parts.getOrElse(1) { 0 }
+	val patch = parts.getOrElse(2) { 0 }
+
+	val code = major * 10_000 + minor * 100 + patch
+	return if (code > 0) code else 1
+}
+
+val appVersionName = releaseVersionName()
+val appVersionCode = versionCodeFrom(appVersionName)
+
 android {
 	namespace = "com.serranoie.app.wear.minus"
 	compileSdk {
@@ -15,9 +56,8 @@ android {
 		applicationId = "com.serranoie.app.minus"
 		minSdk = 30
 		targetSdk = 36
-		versionCode = 1
-		versionName = "1.0"
-
+		versionCode = appVersionCode
+		versionName = appVersionName
 	}
 
 	buildTypes {
