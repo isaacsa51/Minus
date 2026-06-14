@@ -593,7 +593,7 @@ fun AppNavGraph(
             val context = LocalContext.current
             val shareTitle = stringResource(com.serranoie.app.minus.R.string.bug_report_share_title)
             val recipientEmail = stringResource(R.string.bug_report_recipient_email)
-            val emailSubject = stringResource(R.string.bug_report_email_subject)
+            val emailSubjectTemplate = stringResource(R.string.bug_report_email_subject)
             val emailBody = stringResource(R.string.bug_report_email_body)
             val viewModel: BugReportViewModel = hiltViewModel()
             val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -610,7 +610,7 @@ fun AppNavGraph(
                                 type = "application/zip"
                                 defaultEmailPackage?.let(::setPackage)
                                 putExtra(Intent.EXTRA_EMAIL, arrayOf(recipientEmail))
-                                putExtra(Intent.EXTRA_SUBJECT, emailSubject)
+                                putExtra(Intent.EXTRA_SUBJECT, emailSubjectTemplate.format(effect.title))
                                 putExtra(Intent.EXTRA_TEXT, emailBody)
                                 putExtra(Intent.EXTRA_STREAM, effect.uri)
                                 putExtra(Intent.EXTRA_TITLE, effect.fileName)

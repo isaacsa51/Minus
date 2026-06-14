@@ -14,7 +14,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.Normalizer
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.zip.ZipEntry
@@ -65,68 +64,90 @@ class BugReportZipGenerator @Inject constructor(
 	}
 
 	private fun buildMarkdown(state: BugReportUiState): String {
-		val issueType = when (state.selectedIssueType) {
-			BugReportIssueType.BugReport -> "Bug Report"
-			BugReportIssueType.FeatureRequest -> "Feature Request"
-		}
-		val behaviorTitle = when (state.selectedIssueType) {
-			BugReportIssueType.BugReport -> "What is happening?"
-			BugReportIssueType.FeatureRequest -> "What should change?"
-		}
-		val steps = state.reproductionSteps
-			.filter { it.visible && it.value.isNotBlank() }
-			.mapIndexed { index, step -> "${index + 1}. ${step.value.trim()}" }
-			.ifEmpty { listOf("No steps provided.") }
-			.joinToString(separator = "\n")
-		val attachments = state.selectedAttachmentUris
-			.mapIndexed { index, uri -> "- attachments/${buildAttachmentEntryName(index, uri)}" }
-			.ifEmpty { listOf("No attachments selected.") }
-			.joinToString(separator = "\n")
-		val deviceMetadata = buildDeviceMetadata()
-
-		return buildString {
-			appendLine("# Minus Feedback Report")
-			appendLine()
-			appendLine("## Metadata")
-			appendLine("- Issue type: $issueType")
-			appendLine("- App version: v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
-			appendLine("- Package name: ${context.packageName}")
-			appendLine("- Generated on: ${LocalDate.now()}")
-			deviceMetadata.forEach { (label, value) ->
-				appendLine("- $label: $value")
-			}
-			appendLine()
-			appendLine("## $behaviorTitle")
-			appendLine(state.currentBehavior.takeIf { it.isNotBlank() }?.trim() ?: "No description provided.")
-			appendLine()
-			appendLine("## Steps to reproduce")
-			appendLine(steps)
-			appendLine()
-			appendLine("## Other information")
-			appendLine(state.additionalInfo.takeIf { it.isNotBlank() }?.trim() ?: "No additional information provided.")
-			appendLine()
-			appendLine("## Attachments")
-			appendLine(attachments)
+		return when (state.selectedIssueType) {
+			BugReportIssueType.BugReport -> buildBugReportMarkdown(state)
+			BugReportIssueType.FeatureRequest -> buildFeatureRequestMarkdown(state)
 		}
 	}
 
-	private fun buildDeviceMetadata(): List<Pair<String, String>> {
-		return listOf(
-			"Device" to listOf(Build.MANUFACTURER, Build.MODEL)
-				.filter { it.isNotBlank() }
-				.distinctBy { it.lowercase(Locale.US) }
-				.joinToString(separator = " ")
-				.ifBlank { "Unknown" },
-			"Android version" to "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
-			"Android codename" to Build.VERSION.CODENAME,
-			"Brand" to Build.BRAND,
-			"Product" to Build.PRODUCT,
-			"Device name" to Build.DEVICE,
-			"Hardware" to Build.HARDWARE,
-			"Supported ABIs" to Build.SUPPORTED_ABIS.joinToString(separator = ", "),
-			"Locale" to Locale.getDefault().toLanguageTag(),
-			"Timezone" to ZoneId.systemDefault().id,
-		)
+	private fun buildBugReportMarkdown(state: BugReportUiState): String {
+		val steps = if (state.showReproductionSteps) {
+			state.reproductionSteps
+				.filter { it.visible && it.value.isNotBlank() }
+				.mapIndexed { index, step -> "${index + 1}. ${step.value.trim()}" }
+				.ifEmpty { listOf("1. ", "2. ", "3. ") }
+				.joinToString(separator = "\n")
+		} else {
+			"1. \n2. \n3. "
+		}
+
+		val attachments = state.selectedAttachmentUris
+			.mapIndexed { index, uri -> "- attachments/${buildAttachmentEntryName(index, uri)}" }
+			.ifEmpty { emptyList() }
+			.joinToString(separator = "\n")
+
+		return buildString {
+			appendLine("# [Bug]: ${state.title}")
+			appendLine()
+			appendLine("## Description")
+			appendLine("<!-- What happened? What did you expect to happen? -->")
+			appendLine(state.description.takeIf { it.isNotBlank() }?.trim() ?: "")
+			appendLine()
+			appendLine("## Steps to reproduce")
+			appendLine()
+			appendLine(steps)
+			appendLine()
+			appendLine("## Screenshots or recordings")
+			appendLine("<!-- Add screenshots or videos if this is a UI issue. -->")
+			if (attachments.isNotBlank()) {
+				appendLine(attachments)
+			}
+			appendLine()
+			appendLine("## Environment")
+			appendLine("<!-- You can get this holding tap on the version section of the app, if not this sections is populated when creating the bug report from the Bug Report from the app. -->")
+			appendLine()
+			appendLine(buildAppEnvironmentMetadata())
+			appendLine()
+			appendLine("## Additional context")
+			appendLine("<!-- Logs, exported data details, recurrence/budget period setup, or anything else useful. -->")
+			appendLine(state.additionalInfo.takeIf { it.isNotBlank() }?.trim() ?: "")
+		}
+	}
+
+	private fun buildFeatureRequestMarkdown(state: BugReportUiState): String {
+		val attachments = state.selectedAttachmentUris
+			.mapIndexed { index, uri -> "- attachments/${buildAttachmentEntryName(index, uri)}" }
+			.ifEmpty { emptyList() }
+			.joinToString(separator = "\n")
+
+		return buildString {
+			appendLine("# [Feature]: ${state.title}")
+			appendLine()
+			appendLine("## Problem")
+			appendLine("<!-- What problem or workflow would this improve? -->")
+			appendLine(state.description.takeIf { it.isNotBlank() }?.trim() ?: "")
+			appendLine()
+			appendLine("## Proposed solution")
+			appendLine("<!-- Describe the change you would like to see. -->")
+			appendLine(state.proposedSolution.takeIf { it.isNotBlank() }?.trim() ?: "")
+			appendLine()
+			appendLine("## Alternatives considered")
+			appendLine("<!-- Optional: other ways this could work. -->")
+			appendLine(state.alternativesConsidered.takeIf { it.isNotBlank() }?.trim() ?: "")
+			appendLine()
+			appendLine("## Additional context")
+			appendLine("<!-- Mockups, screenshots, examples, or related issues. -->")
+			appendLine(state.additionalInfo.takeIf { it.isNotBlank() }?.trim() ?: "")
+			if (attachments.isNotBlank()) {
+				appendLine()
+				appendLine("### Screenshots or recordings")
+				appendLine(attachments)
+			}
+			appendLine()
+			appendLine("### Metadata")
+			appendLine("- App version: v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+			appendLine("- Generated on: ${LocalDate.now()}")
+		}
 	}
 
 	private fun buildAttachmentEntryName(index: Int, uri: Uri): String {
@@ -163,3 +184,30 @@ data class GeneratedBugReport(
 	val uri: Uri,
 	val fileName: String,
 )
+
+fun buildAppEnvironmentMetadata(): String {
+	return buildString {
+		appendLine("- App version: v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+		buildDeviceMetadata().forEach { (label, value) ->
+			appendLine("- $label: $value")
+		}
+	}.trimEnd()
+}
+
+private fun buildDeviceMetadata(): List<Pair<String, String>> {
+	return listOf(
+		"Device" to listOf(Build.MANUFACTURER, Build.MODEL)
+			.filter { it.isNotBlank() }
+			.distinctBy { it.lowercase(Locale.US) }
+			.joinToString(separator = " ")
+			.ifBlank { "Unknown" },
+		"Android version" to "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
+		"Android codename" to Build.VERSION.CODENAME,
+		"Brand" to Build.BRAND,
+		"Product" to Build.PRODUCT,
+		"Device name" to Build.DEVICE,
+		"Hardware" to Build.HARDWARE,
+		"Supported ABIs" to Build.SUPPORTED_ABIS.joinToString(separator = ", "),
+		"Locale" to Locale.getDefault().toLanguageTag(),
+	)
+}

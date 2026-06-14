@@ -15,7 +15,11 @@ data class BugReportStep(
 
 data class BugReportUiState(
 	val selectedIssueType: BugReportIssueType = BugReportIssueType.BugReport,
-	val currentBehavior: String = "",
+	val title: String = "",
+	val description: String = "",
+	val proposedSolution: String = "",
+	val alternativesConsidered: String = "",
+	val showReproductionSteps: Boolean = true,
 	val reproductionSteps: List<BugReportStep> = listOf(
 		BugReportStep(id = 0L),
 		BugReportStep(id = 1L),
@@ -26,14 +30,24 @@ data class BugReportUiState(
 	val isGeneratingReport: Boolean = false,
 ) {
 	val attachmentCount: Int = selectedAttachmentUris.size
-	val hasCurrentBehavior: Boolean = currentBehavior.isNotBlank()
+	val hasTitle: Boolean = title.isNotBlank()
+	val hasDescription: Boolean = description.isNotBlank()
+	val hasProposedSolution: Boolean = proposedSolution.isNotBlank()
 	val hasReproductionSteps: Boolean = reproductionSteps.any { it.visible && it.value.isNotBlank() }
-	val canSubmit: Boolean = hasCurrentBehavior && hasReproductionSteps && !isGeneratingReport
+	
+	val canSubmit: Boolean = hasTitle && hasDescription && 
+			(selectedIssueType != BugReportIssueType.FeatureRequest || hasProposedSolution) &&
+			(selectedIssueType != BugReportIssueType.BugReport || !showReproductionSteps || hasReproductionSteps) && 
+			!isGeneratingReport
 }
 
 sealed interface BugReportUiIntent {
 	data class SelectIssueType(val issueType: BugReportIssueType) : BugReportUiIntent
-	data class ChangeCurrentBehavior(val value: String) : BugReportUiIntent
+	data class ChangeTitle(val value: String) : BugReportUiIntent
+	data class ChangeDescription(val value: String) : BugReportUiIntent
+	data class ChangeProposedSolution(val value: String) : BugReportUiIntent
+	data class ChangeAlternativesConsidered(val value: String) : BugReportUiIntent
+	data class ToggleReproductionSteps(val visible: Boolean) : BugReportUiIntent
 	data class ChangeStep(val index: Int, val value: String) : BugReportUiIntent
 	data object AddStep : BugReportUiIntent
 	data class RemoveStep(val index: Int) : BugReportUiIntent
@@ -44,6 +58,6 @@ sealed interface BugReportUiIntent {
 }
 
 sealed interface BugReportUiEffect {
-	data class OpenEmailComposer(val uri: Uri, val fileName: String) : BugReportUiEffect
+	data class OpenEmailComposer(val uri: Uri, val fileName: String, val title: String) : BugReportUiEffect
 	data class ShowError(val message: String) : BugReportUiEffect
 }

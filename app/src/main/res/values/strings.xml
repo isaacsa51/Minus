@@ -143,6 +143,8 @@
     <string name="days_left">days left</string>
     <string name="budget_overview">Budget Overview</string>
 
+    <string name="spent_per_day">Spent per day</string>
+
     <string name="budget_period_daily">Daily</string>
     <string name="budget_period_weekly">Weekly</string>
     <string name="budget_period_biweekly">Biweekly</string>
@@ -208,30 +210,44 @@
     <string name="settings_bug_report_title">Found a bug?</string>
     <string name="settings_bug_report_subtitle">Create a bug report and we will fix it soon</string>
     <string name="settings_version_title">Version</string>
+    <string name="settings_version_metadata_copied">App and device metadata copied to clipboard</string>
 
     <!-- Bug Report -->
     <string name="bug_report_title">Feedback &amp; Support</string>
     <string name="bug_report_type_label">Report type</string>
     <string name="bug_report_type_bug_report">Bug Report</string>
     <string name="bug_report_type_feature_request">Feature Request</string>
-    <string name="bug_report_change_label">What you should change?</string>
-    <string name="bug_report_current_behavior_label">What is happening?</string>
-    <string name="bug_report_current_behavior_placeholder">Describe the current behavior in detail…</string>
-    <string name="bug_report_current_behavior_required">Describe what is happening before submitting.</string>
-    <string name="bug_report_other_information_label">Other information</string>
-    <string name="bug_report_other_information_placeholder">Any additional context or suggestions…</string>
+    <string name="bug_report_title_label">Title</string>
+    <string name="bug_report_title_placeholder">Summarize the issue or request…</string>
+    <string name="bug_report_title_required">A title is required to submit.</string>
+    <string name="bug_report_description_label">Description</string>
+    <string name="bug_report_description_placeholder">What happened? What did you expect to happen?</string>
+    <string name="bug_report_description_required">A description is required to submit.</string>
+    <string name="bug_report_problem_label">Problem</string>
+    <string name="bug_report_problem_placeholder">What problem or workflow would this improve?</string>
+    <string name="bug_report_problem_required">A problem description is required.</string>
+    <string name="bug_report_proposed_solution_label">Proposed solution</string>
+    <string name="bug_report_proposed_solution_placeholder">Describe the change you would like to see…</string>
+    <string name="bug_report_proposed_solution_required">A proposed solution is required for feature requests.</string>
+    <string name="bug_report_alternatives_considered_label">Alternatives considered</string>
+    <string name="bug_report_alternatives_considered_placeholder">Optional: other ways this could work…</string>
+    <string name="bug_report_additional_context_label">Additional context</string>
+    <string name="bug_report_additional_context_placeholder_bug">Logs, exported data details, recurrence/budget period setup, or anything else useful.</string>
+    <string name="bug_report_additional_context_placeholder_feature">Any extra info if necessary</string>
     <string name="bug_report_attachments_label">Attachments</string>
+    <string name="bug_report_attachments_label_bug">Screenshots or recordings</string>
     <string name="bug_report_submit">Submit Report</string>
-    <string name="bug_report_share_title">Send bug report</string>
+    <string name="bug_report_share_title">Send report</string>
     <string name="bug_report_recipient_email" translatable="false">serranoie99@gmail.com</string>
-    <string name="bug_report_email_subject">Minus bug report</string>
+    <string name="bug_report_email_subject">%1$s</string>
     <string name="bug_report_email_body">Hi, attached is my generated Minus report.</string>
-    <string name="bug_report_help_title">Help us improve</string>
-    <string name="bug_report_help_message_prefix">Filling out this form will generate a .zip file with the report content and any attachments, so you can send it via email.\nIf you have a GitHub account, you can also open </string>
+    <string name="bug_report_help_title">Help us make Minus better</string>
+    <string name="bug_report_help_message_prefix">"Reporting issues or suggesting improvements helps us make Minus better for everyone.\n\nThis guided form helps you package all the necessary details into a report, automatically attaching device metadata and app diagnostics to speed up our investigation.\n\nOnce prepared, you can send the report via email or contribute via "</string>
     <string name="bug_report_help_github_issues">" GitHub Issues "</string>
-    <string name="bug_report_help_message_suffix"> for this repository.</string>
+    <string name="bug_report_help_message_suffix"> directly on our repository.</string>
     <string name="bug_report_github_issues_url" translatable="false">https://github.com/isaacsa51/Minus/issues</string>
     <string name="bug_report_steps_to_reproduce_label">Steps to reproduce</string>
+    <string name="bug_report_include_steps_label">Include reproduction steps</string>
     <string name="bug_report_add_step">Add Step</string>
     <string name="bug_report_step_placeholder_wallet">Open the wallet screen</string>
     <string name="bug_report_step_placeholder_transfer">Click on \'Transfer\'</string>

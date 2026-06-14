@@ -39,10 +39,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.UploadFile
-import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Feedback
+import androidx.compose.material.icons.outlined.Help
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
@@ -55,6 +57,7 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
@@ -118,7 +121,6 @@ fun BugReportForm(
 	val scrollBehavior =
 		TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 	val context = LocalContext.current
-	val showCurrentBehaviorError = uiState.hasReproductionSteps && !uiState.hasCurrentBehavior
 	val attachmentPickerLauncher = rememberLauncherForActivityResult(
 		contract = ActivityResultContracts.OpenMultipleDocuments(),
 		onResult = { uris ->
@@ -168,7 +170,7 @@ fun BugReportForm(
 				accentColor = MaterialTheme.colorScheme.primary
 			)
 
-			Spacer(modifier = Modifier.height(16.dp))
+			Spacer(modifier = Modifier.height(24.dp))
 
 			SectionLabel(text = stringResource(R.string.bug_report_type_label))
 
@@ -183,44 +185,114 @@ fun BugReportForm(
 			Spacer(modifier = Modifier.height(28.dp))
 
 			FormField(
-				label = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
-					stringResource(R.string.bug_report_change_label)
-				} else {
-					stringResource(R.string.bug_report_current_behavior_label)
-				},
-				placeholder = stringResource(R.string.bug_report_current_behavior_placeholder),
-				value = uiState.currentBehavior,
-				onValueChange = { onIntent(BugReportUiIntent.ChangeCurrentBehavior(it)) },
-				minHeight = 118.dp,
-				isError = showCurrentBehaviorError,
-				errorText = stringResource(R.string.bug_report_current_behavior_required)
+				label = stringResource(R.string.bug_report_title_label),
+				placeholder = stringResource(R.string.bug_report_title_placeholder),
+				value = uiState.title,
+				onValueChange = { onIntent(BugReportUiIntent.ChangeTitle(it)) },
+				minHeight = 56.dp,
+				isError = uiState.description.isNotBlank() && !uiState.hasTitle,
+				errorText = stringResource(R.string.bug_report_title_required),
+				singleLine = true
 			)
 
 			Spacer(modifier = Modifier.height(24.dp))
 
-			StepsToReproduceField(
-				stepCount = uiState.reproductionSteps.size,
-				stepIdAt = { index -> uiState.reproductionSteps[index].id },
-				stepValueAt = { index -> uiState.reproductionSteps[index].value },
-				stepVisibleAt = { index -> uiState.reproductionSteps[index].visible },
-				onStepChange = { index, value ->
-					onIntent(BugReportUiIntent.ChangeStep(index, value))
+			FormField(
+				label = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
+					stringResource(R.string.bug_report_problem_label)
+				} else {
+					stringResource(R.string.bug_report_description_label)
 				},
-				onAddStep = {
-					onIntent(BugReportUiIntent.AddStep)
+				placeholder = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
+					stringResource(R.string.bug_report_problem_placeholder)
+				} else {
+					stringResource(R.string.bug_report_description_placeholder)
 				},
-				onRemoveStep = { index ->
-					onIntent(BugReportUiIntent.RemoveStep(index))
-				},
-				onStepExitFinish = { stepId ->
-					onIntent(BugReportUiIntent.FinishStepExit(stepId))
-				})
+				value = uiState.description,
+				onValueChange = { onIntent(BugReportUiIntent.ChangeDescription(it)) },
+				minHeight = 118.dp,
+				isError = uiState.hasTitle && !uiState.hasDescription,
+				errorText = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
+					stringResource(R.string.bug_report_problem_required)
+				} else {
+					stringResource(R.string.bug_report_description_required)
+				}
+			)
 
 			Spacer(modifier = Modifier.height(24.dp))
 
+			if (uiState.selectedIssueType == BugReportIssueType.BugReport) {
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.SpaceBetween
+				) {
+					SectionLabel(text = stringResource(R.string.bug_report_include_steps_label))
+					Switch(
+						checked = uiState.showReproductionSteps,
+						onCheckedChange = { onIntent(BugReportUiIntent.ToggleReproductionSteps(it)) }
+					)
+				}
+
+				AnimatedVisibility(
+					visible = uiState.showReproductionSteps,
+					enter = expandVertically() + fadeIn(),
+					exit = shrinkVertically() + fadeOut()
+				) {
+					Column {
+						Spacer(modifier = Modifier.height(16.dp))
+						StepsToReproduceField(
+							stepCount = uiState.reproductionSteps.size,
+							stepIdAt = { index -> uiState.reproductionSteps[index].id },
+							stepValueAt = { index -> uiState.reproductionSteps[index].value },
+							stepVisibleAt = { index -> uiState.reproductionSteps[index].visible },
+							onStepChange = { index, value ->
+								onIntent(BugReportUiIntent.ChangeStep(index, value))
+							},
+							onAddStep = {
+								onIntent(BugReportUiIntent.AddStep)
+							},
+							onRemoveStep = { index ->
+								onIntent(BugReportUiIntent.RemoveStep(index))
+							},
+							onStepExitFinish = { stepId ->
+								onIntent(BugReportUiIntent.FinishStepExit(stepId))
+							}
+						)
+					}
+				}
+				Spacer(modifier = Modifier.height(24.dp))
+			} else {
+				FormField(
+					label = stringResource(R.string.bug_report_proposed_solution_label),
+					placeholder = stringResource(R.string.bug_report_proposed_solution_placeholder),
+					value = uiState.proposedSolution,
+					onValueChange = { onIntent(BugReportUiIntent.ChangeProposedSolution(it)) },
+					minHeight = 118.dp,
+					isError = uiState.hasTitle && !uiState.hasProposedSolution,
+					errorText = stringResource(R.string.bug_report_proposed_solution_required)
+				)
+
+				Spacer(modifier = Modifier.height(24.dp))
+
+				FormField(
+					label = stringResource(R.string.bug_report_alternatives_considered_label),
+					placeholder = stringResource(R.string.bug_report_alternatives_considered_placeholder),
+					value = uiState.alternativesConsidered,
+					onValueChange = { onIntent(BugReportUiIntent.ChangeAlternativesConsidered(it)) },
+					minHeight = 94.dp
+				)
+
+				Spacer(modifier = Modifier.height(24.dp))
+			}
+
 			FormField(
-				label = stringResource(R.string.bug_report_other_information_label),
-				placeholder = stringResource(R.string.bug_report_other_information_placeholder),
+				label = stringResource(R.string.bug_report_additional_context_label),
+				placeholder = if (uiState.selectedIssueType == BugReportIssueType.BugReport) {
+					stringResource(R.string.bug_report_additional_context_placeholder_bug)
+				} else {
+					stringResource(R.string.bug_report_additional_context_placeholder_feature)
+				},
 				value = uiState.additionalInfo,
 				onValueChange = { onIntent(BugReportUiIntent.ChangeAdditionalInfo(it)) },
 				minHeight = 94.dp
@@ -228,7 +300,13 @@ fun BugReportForm(
 
 			Spacer(modifier = Modifier.height(24.dp))
 
-			SectionLabel(text = stringResource(R.string.bug_report_attachments_label))
+			SectionLabel(
+				text = if (uiState.selectedIssueType == BugReportIssueType.BugReport) {
+					stringResource(R.string.bug_report_attachments_label_bug)
+				} else {
+					stringResource(R.string.bug_report_attachments_label)
+				}
+			)
 			Spacer(modifier = Modifier.height(8.dp))
 			AttachmentDropZone(
 				attachmentCount = uiState.attachmentCount,
@@ -329,7 +407,7 @@ private fun HelpBanner(
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Icon(
-				imageVector = Icons.Outlined.Info,
+				imageVector = Icons.AutoMirrored.Outlined.Help,
 				contentDescription = null,
 				tint = MaterialTheme.colorScheme.outline,
 				modifier = Modifier.size(20.dp)
@@ -380,6 +458,7 @@ private fun FormField(
 	rounded: Boolean = false,
 	isError: Boolean = false,
 	errorText: String? = null,
+	singleLine: Boolean = false
 ) {
 	Column(modifier = modifier.fillMaxWidth()) {
 		AnimatedContent(
@@ -413,7 +492,8 @@ private fun FormField(
 			modifier = Modifier
 				.fillMaxWidth()
 				.heightIn(min = minHeight),
-			minLines = 4,
+			minLines = if (singleLine) 1 else 4,
+			singleLine = singleLine
 		)
 
 		AnimatedVisibility(visible = isError && !errorText.isNullOrBlank()) {
@@ -445,12 +525,6 @@ private fun StepsToReproduceField(
 			.animateContentSize(animationSpec = tween(240)),
 		verticalArrangement = Arrangement.spacedBy(10.dp)
 	) {
-		Text(
-			text = stringResource(R.string.bug_report_steps_to_reproduce_label),
-			style = MaterialTheme.typography.labelLargeEmphasized,
-			color = MaterialTheme.colorScheme.onBackground
-		)
-
 		repeat(stepCount) { index ->
 			val stepId = stepIdAt(index)
 			key(stepId) {

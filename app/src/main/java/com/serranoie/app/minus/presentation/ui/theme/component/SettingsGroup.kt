@@ -5,7 +5,9 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -265,6 +267,7 @@ fun PaddedListItem(
  * @param contentColor The content color for the item
  * @param content The custom content layout
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CustomPaddedListItem(
 	onClick: () -> Unit,
@@ -272,6 +275,7 @@ fun CustomPaddedListItem(
 	modifier: Modifier = Modifier,
 	background: Color = MaterialTheme.colorScheme.surfaceContainer,
 	contentColor: Color = MaterialTheme.colorScheme.onSurface,
+	onLongClick: (() -> Unit)? = null,
 	content: @Composable RowScope.() -> Unit
 ) {
 	val shape = when (position) {
@@ -297,7 +301,10 @@ fun CustomPaddedListItem(
 	) {
 		Row(
 			modifier = Modifier
-				.clickable { onClick() }
+				.combinedClickable(
+					onClick = onClick,
+					onLongClick = onLongClick,
+				)
 				.padding(horizontal = 16.dp, vertical = 12.dp),
 			verticalAlignment = Alignment.CenterVertically,
 			content = content)
