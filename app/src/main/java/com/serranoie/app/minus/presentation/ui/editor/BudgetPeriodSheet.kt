@@ -16,9 +16,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -108,10 +108,10 @@ import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
 
-private const val PERIOD_SWITCHER_TAG = "PeriodSwitcherSheet - ISAAC"
+private const val BUDGET_PERIOD_SHEET_TAG = "BudgetPeriodSheet - ISAAC"
 
 @Composable
-fun PeriodSwitcherSheet(
+fun BudgetPeriodSheet(
 	budgetSettings: BudgetSettings?,
 	budgetState: BudgetState?,
 	selectedPeriod: BudgetPeriod = budgetSettings?.period ?: BudgetPeriod.DAILY,
@@ -163,71 +163,67 @@ fun PeriodSwitcherSheet(
 		}
 	}
 
-	Box(
-		modifier = Modifier.fillMaxSize()
-	) {
-		AnimatedContent(
-			targetState = isEditMode, transitionSpec = {
-				if (targetState) {
-					// Forward: entering edit mode
-					(slideInHorizontally(
-						initialOffsetX = { it / 3 }, animationSpec = tween(300)
-					) + fadeIn(tween(250, delayMillis = 50))).togetherWith(
-						slideOutHorizontally(
-							targetOffsetX = { -it / 3 }, animationSpec = tween(300)
-						) + fadeOut(tween(200))
-					)
-				} else {
-					// Backward: exiting edit mode
-					(slideInHorizontally(
-						initialOffsetX = { -it / 3 }, animationSpec = tween(300)
-					) + fadeIn(tween(250, delayMillis = 50))).togetherWith(
-						slideOutHorizontally(
-							targetOffsetX = { it / 3 }, animationSpec = tween(300)
-						) + fadeOut(tween(200))
-					)
-				}
-			}, label = "sheetContent"
-		) { editMode ->
-			if (editMode) {
-				EditBudgetContent(
-					budgetSettings = budgetSettings,
-					onBack = { isEditMode = false },
-					onApply = { newSettings ->
-						onSaveBudget?.invoke(newSettings)
-						isEditMode = false
-					},
-					pendingExpensesCount = pendingExpensesCount,
+	AnimatedContent(
+		targetState = isEditMode, transitionSpec = {
+			if (targetState) {
+				// Forward: entering edit mode
+				(slideInHorizontally(
+					initialOffsetX = { it / 3 }, animationSpec = tween(300)
+				) + fadeIn(tween(250, delayMillis = 50))).togetherWith(
+					slideOutHorizontally(
+						targetOffsetX = { -it / 3 }, animationSpec = tween(300)
+					) + fadeOut(tween(200))
 				)
 			} else {
-				ViewBudgetContent(
-					budgetSettings = budgetSettings,
-					budgetState = budgetState,
-					periodCache = periodCache,
-					currencyFormat = currencyFormat,
-					currencyCode = currencyCode,
-					totalBudget = totalBudget,
-					totalSpent = totalSpent,
-					totalDays = totalDays,
-					startDateAsDate = startDateAsDate,
-					endDateAsDate = endDateAsDate,
-					available = available,
-					onPeriodSelected = { p ->
-						logcat { "User selected period chip: $p (previous=$periodCache)" }
-						periodCache = p
-						onPeriodSelected(p)
-					},
-					onEditClick = {
-						if (onSaveBudget != null) {
-							isEditMode = true
-						} else {
-							onEditBudget?.invoke()
-						}
-					},
-					onFinishEarlyClick = { showFinishConfirm = true },
-					showFinishEarly = onFinishEarly != null && budgetSettings != null,
+				// Backward: exiting edit mode
+				(slideInHorizontally(
+					initialOffsetX = { -it / 3 }, animationSpec = tween(300)
+				) + fadeIn(tween(250, delayMillis = 50))).togetherWith(
+					slideOutHorizontally(
+						targetOffsetX = { it / 3 }, animationSpec = tween(300)
+					) + fadeOut(tween(200))
 				)
 			}
+		}, label = "sheetContent"
+	) { editMode ->
+		if (editMode) {
+			EditBudgetContent(
+				budgetSettings = budgetSettings,
+				onBack = { isEditMode = false },
+				onApply = { newSettings ->
+					onSaveBudget?.invoke(newSettings)
+					isEditMode = false
+				},
+				pendingExpensesCount = pendingExpensesCount,
+			)
+		} else {
+			ViewBudgetContent(
+				budgetSettings = budgetSettings,
+				budgetState = budgetState,
+				periodCache = periodCache,
+				currencyFormat = currencyFormat,
+				currencyCode = currencyCode,
+				totalBudget = totalBudget,
+				totalSpent = totalSpent,
+				totalDays = totalDays,
+				startDateAsDate = startDateAsDate,
+				endDateAsDate = endDateAsDate,
+				available = available,
+				onPeriodSelected = { p ->
+					logcat { "User selected period chip: $p (previous=$periodCache)" }
+					periodCache = p
+					onPeriodSelected(p)
+				},
+				onEditClick = {
+					if (onSaveBudget != null) {
+						isEditMode = true
+					} else {
+						onEditBudget?.invoke()
+					}
+				},
+				onFinishEarlyClick = { showFinishConfirm = true },
+				showFinishEarly = onFinishEarly != null && budgetSettings != null,
+			)
 		}
 	}
 
@@ -292,8 +288,7 @@ private fun ViewBudgetContent(
 			.fillMaxWidth()
 			.padding(horizontal = 16.dp)
 			.padding(top = 4.dp, bottom = 32.dp)
-			.navigationBarsPadding()
-			.verticalScroll(rememberScrollState()),
+			.navigationBarsPadding(),
 	) {
 		Row(
 			modifier = Modifier
@@ -320,20 +315,23 @@ private fun ViewBudgetContent(
 
 		Spacer(modifier = Modifier.height(8.dp))
 
-		logcat(PERIOD_SWITCHER_TAG) {
+		logcat(BUDGET_PERIOD_SHEET_TAG) {
 			"BudgetDisplay input totalBudget=$totalBudget budgetStateTotal=${budgetState?.totalBudget} budgetSettingsTotal=${budgetSettings?.totalBudget} rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward}"
 		}
 
 		SpendBudgetCard(
 			modifier = Modifier
 				.fillMaxWidth()
+				.height(IntrinsicSize.Min)
 				.padding(bottom = 8.dp),
 			budget = totalBudget,
 			spend = totalSpent,
 		)
 
 		Row(
-			modifier = Modifier.fillMaxWidth(),
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(120.dp),
 			horizontalArrangement = Arrangement.spacedBy(8.dp),
 			verticalAlignment = Alignment.CenterVertically,
 		) {
@@ -343,22 +341,30 @@ private fun ViewBudgetContent(
 				budgetSettings = budgetSettings,
 				currencyCode = currencyCode,
 				bigVariant = false,
-				modifier = Modifier.weight(1.5f),
+				modifier = Modifier
+					.weight(1.5f)
+					.height(120.dp),
 				startDate = startDateAsDate,
 				finishDate = endDateAsDate
 			)
 
 			if (endDateAsDate != null) {
-				DaysLeftCard(
-					startDate = startDateAsDate,
-					finishDate = endDateAsDate,
-					modifier = Modifier.weight(1f)
-				)
+				Box(
+					modifier = Modifier
+						.weight(1f)
+						.height(120.dp),
+					contentAlignment = Alignment.Center,
+				) {
+					DaysLeftCard(
+						startDate = startDateAsDate,
+						finishDate = endDateAsDate,
+					)
+				}
 			} else {
 				Card(
 					modifier = Modifier
 						.weight(1f)
-						.heightIn(min = 100.dp),
+						.height(120.dp),
 					colors = CardDefaults.cardColors(
 						containerColor = MaterialTheme.colorScheme.surfaceVariant
 					),
@@ -509,8 +515,7 @@ fun EditBudgetContent(
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(horizontal = 16.dp)
-			.navigationBarsPadding()
-			.verticalScroll(rememberScrollState()),
+			.navigationBarsPadding(),
 	) {
 		Text(
 			text = title,
@@ -1133,10 +1138,10 @@ private fun CompactPeriodCard(
 	uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
-private fun PeriodSwitcherSheetPreview() {
+private fun BudgetPeriodSheetPreview() {
 	MinusTheme {
 		Surface {
-			PeriodSwitcherSheet(
+			BudgetPeriodSheet(
 				budgetSettings = BudgetSettings(
 					totalBudget = BigDecimal("17725"),
 					period = BudgetPeriod.DAILY,
