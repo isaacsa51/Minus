@@ -22,12 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -42,16 +37,14 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
-import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActions
-import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActionsConfig
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.RecurrentPaymentsDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableExpenseItem
+import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableUpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
-import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItemRow
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.RecurrentTicketCard
 import com.serranoie.app.minus.presentation.util.prettyDate
 import logcat.logcat
@@ -132,7 +125,7 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
 				recurrentPaymentsViewMode = recurrentPaymentsViewMode,
 				currencyFormat = currencyFormat,
 				verticalItem = { _, item, position ->
-					SwipeableRecurrentPeriodItem(
+					SwipeableUpcomingRecurrentItem(
 						item = item,
 						currencyFormat = currencyFormat,
 						position = position,
@@ -239,6 +232,8 @@ internal fun LazyListScope.futureRecurrentSection(
 	onToggleShowOutOfPeriodSubscriptions: () -> Unit,
 	recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
 	currencyFormat: NumberFormat,
+	onDelete: (Transaction) -> Unit,
+	onEdit: (Transaction) -> Unit,
 	onClick: (Transaction) -> Unit,
 ) {
 	if (futureRecurrentOutOfPeriod.isEmpty()) return
@@ -285,12 +280,12 @@ internal fun LazyListScope.futureRecurrentSection(
 				recurrentPaymentsViewMode = recurrentPaymentsViewMode,
 				currencyFormat = currencyFormat,
 				verticalItem = { _, item, position ->
-					SwipeableRecurrentPeriodItem(
+					SwipeableUpcomingRecurrentItem(
 						item = item,
 						currencyFormat = currencyFormat,
 						position = position,
-						onDelete = {},
-						onEdit = {},
+						onDelete = { onDelete(item.transaction) },
+						onEdit = { onEdit(item.transaction) },
 						onClick = { onClick(item.transaction) },
 					)
 				},
@@ -486,61 +481,4 @@ private fun paddedListItemPosition(
 	index == 0 -> PaddedListItemPosition.First
 	index == lastIndex -> PaddedListItemPosition.Last
 	else -> PaddedListItemPosition.Middle
-}
-
-@Composable
-private fun SwipeableRecurrentPeriodItem(
-	item: UpcomingRecurrentItem,
-	currencyFormat: NumberFormat,
-	position: PaddedListItemPosition,
-	onDelete: () -> Unit,
-	onEdit: () -> Unit,
-	onClick: () -> Unit,
-) {
-	val shape = when (position) {
-		PaddedListItemPosition.First -> RoundedCornerShape(
-			topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
-		)
-		PaddedListItemPosition.Last -> RoundedCornerShape(
-			bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
-		)
-		PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
-		PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
-	}
-
-	Surface(
-		shape = shape,
-		color = MaterialTheme.colorScheme.surfaceContainer,
-		modifier = Modifier.fillMaxWidth(),
-	) {
-		SwipeActions(
-			modifier = Modifier.fillMaxWidth(),
-			shape = shape,
-			startActionsConfig = SwipeActionsConfig(
-				threshold = 0.25f,
-				icon = Icons.Default.Edit,
-				iconTint = MaterialTheme.colorScheme.onPrimary,
-				background = MaterialTheme.colorScheme.primary,
-				backgroundActive = MaterialTheme.colorScheme.primary,
-				stayDismissed = false,
-				onDismiss = onEdit,
-			),
-			endActionsConfig = SwipeActionsConfig(
-				threshold = 0.25f,
-				icon = Icons.Default.Delete,
-				iconTint = MaterialTheme.colorScheme.onError,
-				background = MaterialTheme.colorScheme.error,
-				backgroundActive = MaterialTheme.colorScheme.error,
-				stayDismissed = true,
-				onDismiss = onDelete,
-			),
-		) {
-			UpcomingRecurrentItemRow(
-				item = item,
-				currencyFormat = currencyFormat,
-				position = position,
-				onClick = onClick,
-			)
-		}
-	}
 }

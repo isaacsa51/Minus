@@ -269,6 +269,11 @@ fun History(
 				},
 				recurrentPaymentsViewMode = recurrentPaymentsViewMode,
 				currencyFormat = currencyFormat,
+				onDelete = { transaction ->
+					recurrentToDelete = transaction
+					showDeleteRecurrentDialog = true
+				},
+				onEdit = { transaction -> recurrentToEdit = transaction },
 				onClick = { transaction -> selectedTransaction = transaction },
 			)
 
