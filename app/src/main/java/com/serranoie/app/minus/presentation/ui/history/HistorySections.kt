@@ -41,7 +41,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
-import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.RecurrentPaymentsDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableUpcomingRecurrentItem
@@ -233,6 +232,8 @@ internal fun LazyListScope.futureRecurrentSection(
 	onToggleShowOutOfPeriodSubscriptions: () -> Unit,
 	recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
 	currencyFormat: NumberFormat,
+	onDelete: (Transaction) -> Unit,
+	onEdit: (Transaction) -> Unit,
 	onClick: (Transaction) -> Unit,
 ) {
 	if (futureRecurrentOutOfPeriod.isEmpty()) return
@@ -279,10 +280,13 @@ internal fun LazyListScope.futureRecurrentSection(
 				recurrentPaymentsViewMode = recurrentPaymentsViewMode,
 				currencyFormat = currencyFormat,
 				verticalItem = { _, item, position ->
-					ExpenseItem(
-						transaction = item.transaction,
+					SwipeableUpcomingRecurrentItem(
+						item = item,
 						currencyFormat = currencyFormat,
 						position = position,
+						onDelete = { onDelete(item.transaction) },
+						onEdit = { onEdit(item.transaction) },
+						onClick = { onClick(item.transaction) },
 					)
 				},
 				horizontalKeyPrefix = "future",
