@@ -22,22 +22,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.RECURRENT_PAYMENTS_VIEW_MODE_KEY
 import com.serranoie.app.minus.presentation.settingsDataStore
+import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetSystemIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransactionsView
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
+import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 enum class RecurrentPaymentsViewMode {
 	HORIZONTAL_LIST, VERTICAL_LIST;
@@ -60,10 +68,36 @@ fun History(
 	onCancelPendingDelete: () -> Unit = {},
 	onShowInfoSnackbar: (message: String) -> Unit = {},
 ) {
+	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+	History(
+		uiState = uiState,
+		modifier = modifier,
+		readOnly = readOnly,
+		onClose = onClose,
+		onQueueDeleteWithUndo = onQueueDeleteWithUndo,
+		onCancelPendingDelete = onCancelPendingDelete,
+		onShowInfoSnackbar = onShowInfoSnackbar,
+		onProcessIntent = viewModel::processIntent,
+		onProcessSystemIntent = viewModel::processIntent
+	)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun History(
+	uiState: BudgetUiState,
+	modifier: Modifier = Modifier,
+	readOnly: Boolean = false,
+	onClose: () -> Unit = {},
+	onQueueDeleteWithUndo: (transaction: Transaction, message: String, onUndo: () -> Unit) -> Unit = { _, _, _ -> },
+	onCancelPendingDelete: () -> Unit = {},
+	onShowInfoSnackbar: (message: String) -> Unit = {},
+	onProcessIntent: (BudgetTransactionIntent) -> Unit = {},
+	onProcessSystemIntent: (BudgetSystemIntent) -> Unit = {},
+) {
 	val context = LocalContext.current
 	val resources = LocalResources.current
 	val view = LocalView.current
-	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val preferences by context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences())
 	val recurrentPaymentsViewMode = remember(preferences) {
 		RecurrentPaymentsViewMode.fromName(preferences[RECURRENT_PAYMENTS_VIEW_MODE_KEY])
@@ -76,7 +110,7 @@ fun History(
 		}
 
 	LaunchedEffect(isAtEndOfList) {
-		viewModel.processIntent(BudgetSystemIntent.SetLockSwipeable(!isAtEndOfList))
+		onProcessSystemIntent(BudgetSystemIntent.SetLockSwipeable(!isAtEndOfList))
 	}
 
 	LaunchedEffect(isAtEndOfList) {
@@ -201,7 +235,7 @@ fun History(
 	}
 
 	fun saveEditedTransaction(updatedTransaction: Transaction, onSaved: () -> Unit) {
-		viewModel.processIntent(
+		onProcessIntent(
 			BudgetTransactionIntent.EditTransactionTapped(updatedTransaction)
 		)
 		onShowInfoSnackbar(
@@ -357,7 +391,7 @@ fun History(
 			recurrentToDelete = null
 		},
 		onConfirm = { transaction ->
-			viewModel.processIntent(BudgetTransactionIntent.DeleteTransactionTapped(transaction))
+			onProcessIntent(BudgetTransactionIntent.DeleteTransactionTapped(transaction))
 			showDeleteRecurrentDialog = false
 			recurrentToDelete = null
 		},
@@ -375,4 +409,37 @@ fun History(
 			}
 		},
 	)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HistoryPreview() {
+	MinusTheme {
+		History(
+			uiState = BudgetUiState(
+				budgetSettings = BudgetSettings(
+					totalBudget = BigDecimal("1000.00"),
+					period = BudgetPeriod.MONTHLY,
+					startDate = LocalDate.now().minusDays(15),
+					currencyCode = "USD"
+				),
+				transactions = listOf(
+					Transaction(
+						id = 1L,
+						amount = BigDecimal("50.00"),
+						comment = "Groceries",
+						date = LocalDateTime.now().minusDays(1)
+					),
+					Transaction(
+						id = 2L,
+						amount = BigDecimal("15.00"),
+						comment = "Netflix",
+						date = LocalDateTime.now().minusDays(2),
+						isRecurrent = true,
+						recurrentFrequency = RecurrentFrequency.MONTHLY
+					)
+				)
+			)
+		)
+	}
 }

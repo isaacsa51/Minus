@@ -110,8 +110,8 @@
     </plurals>
 
     <plurals name="analytics_days_left">
-        <item quantity="one">%d día left</item>
-        <item quantity="other">%d días left</item>
+        <item quantity="one">falta %d día</item>
+        <item quantity="other">faltan %d días</item>
     </plurals>
 
     <string name="total_budget">Presupuesto total</string>
@@ -130,7 +130,7 @@
     <string name="widget_add_expense_label">Agregar nuevo gasto</string>
 
     <string name="spent">Gastado</string>
-    <string name="left">Izquierda</string>
+    <string name="left">Restante</string>
     <string name="remaining">Restante</string>
     <string name="total_spent">Total gastado</string>
     <string name="days_left">días</string>
@@ -166,8 +166,8 @@
 
     <string name="settings_title">Ajustes</string>
     <string name="settings_section_appearance">Apariencia</string>
-    <string name="settings_section_notifications">Notifications</string>
-    <string name="settings_section_features">Features</string>
+    <string name="settings_section_notifications">Notificaciones</string>
+    <string name="settings_section_features">Funciones</string>
     <string name="settings_section_app_info">Información de la aplicación</string>
     <string name="settings_section_data_backup">Copia de seguridad de datos</string>
     <string name="settings_section_tutorial">Tutorial</string>
@@ -228,7 +228,7 @@
     <string name="bug_report_email_subject">%1$s</string>
     <string name="bug_report_email_body">Hola, adjunto mi reporte generado de Minus.</string>
     <string name="bug_report_help_title">Ayúdanos a mejorar</string>
-    <string name="bug_report_help_message_prefix">"¿Encontraste un error o tienes una gran idea?\n\nEsta pantalla nos ayuda a crear todos los detalles necesarios en un reporte. Incluiremos automáticamente diagnósticos técnicos sobre tu dispositivo y la versión de la aplicación para ayudarnos a solucionar problemas más rápido.\n\nUna vez finalizado, puedes enviar el reporte por correo electrónico o publicarlo en "</string>
+    <string name="bug_report_help_message_prefix">"¿Encontraste un error o tienes una gran idea?\n\nEsta pantalla nos ayuda a crear todos los detalles necesarios en un reporte. Incluiremos automáticamente diagnósticos técnicos sobre tu dispositivo y la version de la aplicación para ayudarnos a solucionar problemas más rápido.\n\nUna vez finalizado, puedes enviar el reporte por correo electrónico o publicarlo en "</string>
     <string name="bug_report_help_github_issues">" GitHub Issues "</string>
     <string name="bug_report_help_message_suffix"> directamente en nuestro repositorio.</string>
     <string name="bug_report_steps_to_reproduce_label">Pasos para reproducir</string>
@@ -320,7 +320,7 @@
     <string name="rollover_dialog_view_analytics_desc">Revisar el resumen del periodo finalizado.</string>
 
     <string name="finished_period_header_title">Periodo terminado</string>
-    <string name="finished_period_header_no_spends">¿Eh? No\'no gastaste nada este período</string>
+    <string name="finished_period_header_no_spends">¿Eh? No gastaste nada este período</string>
     <string name="finished_period_header_over_budget">¡Cuidado! Te excediste del presupuesto en este período</string>
     <string name="finished_period_header_summary">Aquí están las estadísticas de todos sus gastos.</string>
 
@@ -345,7 +345,7 @@
 
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">Sobrante del presupuesto</string>
-    <string name="strategy_dialog_description">Puedes elegir como distribuir el balance del presupuesto al final de cada día.\n\nFor ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: puedes repartir 100 en los días que queda, o gastar 600 (presupuesto por día + sobrante del periodo anterior) hoy.</string>
+    <string name="strategy_dialog_description">Puedes elegir como distribuir el balance del presupuesto al final de cada día.\\n\\nFor ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: puedes repartir 100 en los días que queda, o gastar 600 (presupuesto por día + sobrante del periodo anterior) hoy.</string>
     <string name="strategy_ask_always">Preguntarme siempre</string>
     <string name="strategy_ask_always_desc">Al final del período te preguntaremos qué hacer con el sobrante</string>
     <string name="strategy_split_equally">Repartir entre todos los días</string>

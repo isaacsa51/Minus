@@ -124,7 +124,7 @@ fun BudgetDisplay(
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Box(
-					modifier = Modifier.width(60.dp), contentAlignment = Alignment.CenterStart
+					modifier = Modifier.width(64.dp), contentAlignment = Alignment.CenterStart
 				) {
 					Text(
 						text = prettyDate(
@@ -132,7 +132,7 @@ fun BudgetDisplay(
 							pattern = "dd MMM",
 							simplifyIfToday = false,
 						),
-						softWrap = false,
+						softWrap = true,
 						overflow = TextOverflow.Ellipsis,
 						style = MaterialTheme.typography.bodyMediumCondensed,
 					)
@@ -175,7 +175,7 @@ fun BudgetDisplay(
 				}
 
 				Box(
-					modifier = Modifier.width(60.dp), contentAlignment = Alignment.CenterEnd
+					modifier = Modifier.width(64.dp), contentAlignment = Alignment.CenterEnd
 				) {
 					if (actualFinishDate !== null) {
 						Column(horizontalAlignment = Alignment.End) {
@@ -352,7 +352,9 @@ private fun PreviewCross() {
 	}
 }
 
-@Preview(device = "spec:width=800px,height=500px")
+@Preview(device = "spec:width=800px,height=500px", locale = "es")
+@Preview(device = "spec:width=800px,height=500px", locale = "en")
+@Preview(device = "spec:width=800px,height=500px", locale = "fr")
 @Composable
 private fun BudgetDisplayPreview_HealthyBudget() {
 	MinusTheme {
