@@ -175,7 +175,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalWearMaterialApi::class)
 @Composable
-private fun MainScreenContent(
+internal fun MainScreenContent(
 	budgetUiState: BudgetUiState,
 	onboardingCompleted: Boolean,
 	tutorialStage: FirstLaunchTutorialStage,
