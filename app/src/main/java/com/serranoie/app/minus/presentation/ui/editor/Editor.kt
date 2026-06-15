@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -129,7 +128,7 @@ fun Editor(
 ) {
 	val view = LocalView.current
 	val scope = rememberCoroutineScope()
-	val sheetState = rememberModalBottomSheetState()
+	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var showBottomSheet by remember { mutableStateOf(false) }
 	var hasAutoOpenedWalletSheet by remember { mutableStateOf(false) }
 
@@ -328,45 +327,40 @@ fun Editor(
 			onDismissRequest = { showBottomSheet = false },
 			sheetState = sheetState,
 		) {
-			Box(
-				modifier = Modifier
-					.fillMaxWidth()
-					.heightIn(max = 600.dp)
-			) {
-				val shouldForceSetupMode = forceWalletSetup
-				logcat {
-					"Opening PeriodSwitcherSheet: forceWalletSetup=$forceWalletSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$shouldForceSetupMode"
-				}
-				PeriodSwitcherSheet(
-					budgetSettings = uiState.budgetSettings,
-					budgetState = uiState.budgetState,
-					selectedPeriod = selectedViewPeriod,
-					pendingExpensesCount = uiState.pendingExpensesForNextPeriod.size,
-					currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-					startInEditMode = shouldForceSetupMode,
-					onPeriodSelected = { newPeriod ->
-						logcat { "PeriodSwitcher onPeriodSelected -> newPeriod=$newPeriod, previousSelectedViewPeriod=$selectedViewPeriod" }
-						selectedViewPeriod = newPeriod
-						onChangePeriod(newPeriod)
-					},
-					onSaveBudget = { newSettings ->
-						logcat { "PeriodSwitcher onSaveBudget -> $newSettings" }
-						onSaveBudget(newSettings)
-						scope.launch { sheetState.hide() }
-						showBottomSheet = false
-					},
-					onEditBudget = {
-						onOpenWallet()
-						scope.launch { sheetState.hide() }
-						showBottomSheet = false
-					},
-					onFinishEarly = {
-						onFinishBudgetEarly()
-						onOpenAnalytics()
-						scope.launch { sheetState.hide() }
-						showBottomSheet = false
-					})
+			val shouldForceSetupMode = forceWalletSetup
+			logcat {
+				"Opening BudgetPeriodSheet: forceWalletSetup=$forceWalletSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$shouldForceSetupMode"
 			}
+			BudgetPeriodSheet(
+				budgetSettings = uiState.budgetSettings,
+				budgetState = uiState.budgetState,
+				selectedPeriod = selectedViewPeriod,
+				pendingExpensesCount = uiState.pendingExpensesForNextPeriod.size,
+				currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+				startInEditMode = shouldForceSetupMode,
+				onPeriodSelected = { newPeriod ->
+					logcat { "BudgetPeriodSheet onPeriodSelected -> newPeriod=$newPeriod, previousSelectedViewPeriod=$selectedViewPeriod" }
+					selectedViewPeriod = newPeriod
+					onChangePeriod(newPeriod)
+				},
+				onSaveBudget = { newSettings ->
+					logcat { "BudgetPeriodSheet onSaveBudget -> $newSettings" }
+					onSaveBudget(newSettings)
+					scope.launch { sheetState.hide() }
+					showBottomSheet = false
+				},
+				onEditBudget = {
+					onOpenWallet()
+					scope.launch { sheetState.hide() }
+					showBottomSheet = false
+				},
+				onFinishEarly = {
+					onFinishBudgetEarly()
+					onOpenAnalytics()
+					scope.launch { sheetState.hide() }
+					showBottomSheet = false
+				},
+			)
 		}
 	}
 }
