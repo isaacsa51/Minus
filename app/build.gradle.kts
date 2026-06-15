@@ -3,6 +3,7 @@ plugins {
 	alias(libs.plugins.kotlin.android)
 	alias(libs.plugins.kotlin.compose)
 	alias(libs.plugins.kotlin.serialization)
+	alias(libs.plugins.paparazzi)
 
 	id("dagger.hilt.android.plugin")
 	id("com.google.devtools.ksp")
@@ -118,8 +119,10 @@ android {
 		sourceCompatibility = JavaVersion.VERSION_17
 		targetCompatibility = JavaVersion.VERSION_17
 	}
-	kotlinOptions {
-		jvmTarget = "17"
+	kotlin {
+		compilerOptions {
+			jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+		}
 	}
 	buildFeatures {
 		compose = true
@@ -162,6 +165,8 @@ dependencies {
 	implementation(libs.androidx.foundation)
 	implementation(libs.androidx.ui)
 	testImplementation(libs.junit)
+	testImplementation(libs.touchrobot.core)
+	testImplementation(libs.touchrobot.paparazzi)
 	androidTestImplementation(libs.androidx.junit)
 	androidTestImplementation(libs.androidx.espresso.core)
 	androidTestImplementation(platform(libs.androidx.compose.bom))

@@ -69,6 +69,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -108,7 +109,16 @@ import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
 
-private const val BUDGET_PERIOD_SHEET_TAG = "BudgetPeriodSheet - ISAAC"
+const val BUDGET_PERIOD_SHEET_TAG = "BudgetPeriodSheet"
+const val BUDGET_PERIOD_EDIT_BUTTON_TAG = "BudgetPeriodSheet.EditButton"
+const val BUDGET_PERIOD_FINISH_EARLY_BUTTON_TAG = "BudgetPeriodSheet.FinishEarlyButton"
+const val BUDGET_PERIOD_APPLY_BUTTON_TAG = "BudgetPeriodSheet.ApplyButton"
+const val BUDGET_PERIOD_BUDGET_INPUT_TAG = "BudgetPeriodSheet.BudgetInput"
+const val BUDGET_PERIOD_PREVIOUS_VALUES_TAG = "BudgetPeriodSheet.PreviousValues"
+const val BUDGET_PERIOD_DATE_ROW_TAG = "BudgetPeriodSheet.DateRow"
+const val BUDGET_PERIOD_STRATEGY_ROW_TAG = "BudgetPeriodSheet.StrategyRow"
+const val BUDGET_PERIOD_CURRENCY_ROW_TAG = "BudgetPeriodSheet.CurrencyRow"
+fun budgetPeriodCardTag(period: BudgetPeriod) = "BudgetPeriodSheet.Period.${period.name}"
 
 @Composable
 fun BudgetPeriodSheet(
@@ -164,6 +174,7 @@ fun BudgetPeriodSheet(
 	}
 
 	AnimatedContent(
+		modifier = Modifier.testTag(BUDGET_PERIOD_SHEET_TAG),
 		targetState = isEditMode, transitionSpec = {
 			if (targetState) {
 				// Forward: entering edit mode
@@ -303,7 +314,10 @@ private fun ViewBudgetContent(
 				fontWeight = FontWeight.W500,
 			)
 			IconButton(
-				onClick = onEditClick, modifier = Modifier.size(40.dp)
+				onClick = onEditClick,
+				modifier = Modifier
+					.size(40.dp)
+					.testTag(BUDGET_PERIOD_EDIT_BUTTON_TAG)
 			) {
 				Icon(
 					imageVector = Icons.Default.Edit,
@@ -413,7 +427,9 @@ private fun ViewBudgetContent(
 								currencyFormat = currencyFormat,
 								isSelected = isSelected,
 								onClick = { onPeriodSelected(p) },
-								modifier = Modifier.weight(1f)
+								modifier = Modifier
+									.weight(1f)
+									.testTag(budgetPeriodCardTag(p))
 							)
 						}
 						if (rowPeriods.size == 1) {
@@ -433,7 +449,9 @@ private fun ViewBudgetContent(
 		if (showFinishEarly) {
 			OutlinedButton(
 				onClick = onFinishEarlyClick,
-				modifier = Modifier.fillMaxWidth(),
+				modifier = Modifier
+					.fillMaxWidth()
+					.testTag(BUDGET_PERIOD_FINISH_EARLY_BUTTON_TAG),
 				colors = ButtonDefaults.outlinedButtonColors(
 					contentColor = MaterialTheme.colorScheme.error,
 				),
@@ -569,7 +587,9 @@ fun EditBudgetContent(
 						}
 					}
 				},
-				modifier = Modifier.fillMaxWidth(),
+				modifier = Modifier
+					.fillMaxWidth()
+					.testTag(BUDGET_PERIOD_BUDGET_INPUT_TAG),
 			)
 		}
 
@@ -579,6 +599,7 @@ fun EditBudgetContent(
 			) {
 				AssistChip(
 					onClick = { showPreviousValues = !showPreviousValues },
+					modifier = Modifier.testTag(BUDGET_PERIOD_PREVIOUS_VALUES_TAG),
 					label = {
 						Text(
 							stringResource(R.string.previous_values),
@@ -677,6 +698,7 @@ fun EditBudgetContent(
 		Spacer(modifier = Modifier.height(16.dp))
 
 		SettingsRow(
+			modifier = Modifier.testTag(BUDGET_PERIOD_DATE_ROW_TAG),
 			icon = Icons.Outlined.DateRange,
 			label = if (endCache != null) {
 				"${startCache.format(dateFormatter)} — ${endCache?.format(dateFormatter)}"
@@ -719,6 +741,7 @@ fun EditBudgetContent(
 		Spacer(modifier = Modifier.height(8.dp))
 
 		SettingsRow(
+			modifier = Modifier.testTag(BUDGET_PERIOD_STRATEGY_ROW_TAG),
 			icon = Icons.Default.Repartition,
 			label = stringResource(R.string.remaining_budget_label),
 			trailingText = when (strategyCache) {
@@ -733,6 +756,7 @@ fun EditBudgetContent(
 
 		val currencyDisplay = SupportedCurrency.findByCode(currencyCache)
 		SettingsRow(
+			modifier = Modifier.testTag(BUDGET_PERIOD_CURRENCY_ROW_TAG),
 			icon = Icons.Default.Edit,
 			label = stringResource(R.string.currency_label),
 			trailingText = if (currencyDisplay != null) {
@@ -815,7 +839,8 @@ fun EditBudgetContent(
 			},
 			modifier = Modifier
 				.fillMaxWidth()
-				.heightIn(min = 56.dp),
+				.heightIn(min = 56.dp)
+				.testTag(BUDGET_PERIOD_APPLY_BUTTON_TAG),
 			enabled = canApply,
 		) {
 			Text(buttonLabel, style = MaterialTheme.typography.labelMediumEmphasized)
@@ -872,9 +897,10 @@ private fun SettingsRow(
 	label: String,
 	trailingText: String? = null,
 	onClick: () -> Unit,
+	modifier: Modifier = Modifier,
 ) {
 	Row(
-		modifier = Modifier
+		modifier = modifier
 			.fillMaxWidth()
 			.clip(RoundedCornerShape(12.dp))
 			.clickable(onClick = onClick)

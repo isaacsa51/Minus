@@ -1,6 +1,8 @@
 package com.serranoie.app.minus.presentation.notification
 
 import android.content.Context
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.serranoie.app.minus.data.repository.BudgetRepository
@@ -11,6 +13,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import com.serranoie.app.minus.presentation.settingsDataStore
 import kotlinx.coroutines.flow.first
 import logcat.asLog
 import logcat.logcat
@@ -34,6 +37,9 @@ class RecurrentExpenseNotificationWorker(
 
     companion object {
         const val WORK_NAME = "recurrent_expense_notification"
+        const val KEY_TRANSACTION_ID = "transaction_id"
+        const val TAG_RECURRENT_NOTIFICATION = "recurrent_expense_notification_tag"
+        private const val LAST_RECURRENT_NOTIFICATION_PREFIX = "last_recurrent_notification_"
     }
     
     @EntryPoint
@@ -41,6 +47,7 @@ class RecurrentExpenseNotificationWorker(
     interface RecurrentExpenseWorkerEntryPoint {
         fun budgetRepository(): BudgetRepository
         fun notificationHelper(): NotificationHelper
+        fun notificationScheduler(): NotificationScheduler
     }
 
     override suspend fun doWork(): Result {
@@ -52,6 +59,7 @@ class RecurrentExpenseNotificationWorker(
         )
         val budgetRepository = entryPoint.budgetRepository()
         val notificationHelper = entryPoint.notificationHelper()
+        val notificationScheduler = entryPoint.notificationScheduler()
 
         return try {
             val settings = budgetRepository.getBudgetSettingsSync()
@@ -61,62 +69,33 @@ class RecurrentExpenseNotificationWorker(
                 return Result.success()
             }
 
-            val transactions = budgetRepository.getTransactions().first()
             val today = LocalDate.now()
-            val budgetEndDate = settings.getPeriodEndDate()
+            val transactionId = inputData.getLong(KEY_TRANSACTION_ID, 0L)
+            if (transactionId > 0L) {
+                val transaction = budgetRepository.getTransactionById(transactionId)
+                if (transaction == null || transaction.isDeleted || !transaction.isRecurrent) {
+                    logcat { "Recurrent notification skipped; transaction missing, deleted, or not recurrent: transactionId=$transactionId" }
+                    return Result.success()
+                }
 
+                notifyRecurrentTransactionIfDue(
+                    transaction = transaction,
+                    settings = settings,
+                    today = today,
+                    notificationHelper = notificationHelper,
+                )
+                notificationScheduler.scheduleRecurrentExpenseNotification(transaction)
+                return Result.success()
+            }
+
+            val transactions = budgetRepository.getTransactions().first()
             maybeSendCreditCutoffReminder(
                 settings = settings,
                 transactions = transactions,
                 today = today,
                 notificationHelper = notificationHelper
             )
-
-            val recurrentTransactions = transactions.filter { transaction ->
-                val frequency = transaction.recurrentFrequency
-                val date = transaction.date
-                transaction.isRecurrent &&
-                frequency != null &&
-                date != null &&
-                isDueToday(transaction, today, frequency)
-            }
-
-            val upcomingSubscriptions = transactions.filter { transaction ->
-                shouldWarnUpcoming(transaction, today, budgetEndDate)
-            }
-
-            logcat { "Found ${recurrentTransactions.size} recurrent expenses due today" }
-            logcat { "Found ${upcomingSubscriptions.size} upcoming subscriptions this period" }
-
-            for (transaction in recurrentTransactions) {
-                val amount = transaction.amount.toPlainString()
-                val comment = transaction.comment
-                val frequency = transaction.recurrentFrequency?.name ?: "RECURRENT"
-
-                notificationHelper.showRecurrentExpenseNotification(
-                    amount = amount,
-                    comment = comment,
-                    frequency = frequency,
-                    currency = settings.currencyCode
-                )
-
-                logcat { "Recurrent expense notification shown for: $amount $comment ($frequency)" }
-            }
-
-            // Send notifications for upcoming subscriptions (charging in 1-3 days)
-            for (transaction in upcomingSubscriptions) {
-                val daysUntilCharge = calculateDaysUntilCharge(transaction, today)
-                if (daysUntilCharge != null && daysUntilCharge in 1..3) {
-                    notificationHelper.showUpcomingSubscriptionNotification(
-                        amount = transaction.amount.toPlainString(),
-                        comment = transaction.comment,
-                        daysUntil = daysUntilCharge,
-                        currency = settings.currencyCode
-                    )
-                    logcat { "Upcoming subscription notification: ${transaction.comment} in $daysUntilCharge days" }
-                }
-            }
-
+            logcat { "Legacy recurrent scan completed without sending app-open notifications" }
             Result.success()
 
         } catch (e: Exception) {
@@ -160,6 +139,40 @@ class RecurrentExpenseNotificationWorker(
         )
     }
 
+    private suspend fun notifyRecurrentTransactionIfDue(
+        transaction: Transaction,
+        settings: BudgetSettings,
+        today: LocalDate,
+        notificationHelper: NotificationHelper,
+    ) {
+        val frequency = transaction.recurrentFrequency ?: return
+        if (!isDueToday(transaction, today, frequency)) {
+            logcat { "Recurrent notification worker fired but transaction is not due today: transactionId=${transaction.id} today=$today" }
+            return
+        }
+
+        val dedupeKey = recurrentNotificationDedupeKey(transaction, today)
+        val preferences = applicationContext.settingsDataStore.data.first()
+        if (preferences[dedupeKey] == today.toString()) {
+            logcat { "Skipping duplicate recurrent notification: transactionId=${transaction.id} date=$today" }
+            return
+        }
+
+        notificationHelper.showRecurrentExpenseNotification(
+            amount = transaction.amount.toPlainString(),
+            comment = transaction.comment,
+            frequency = frequency.name,
+            currency = settings.currencyCode
+        )
+        applicationContext.settingsDataStore.edit { prefs ->
+            prefs[dedupeKey] = today.toString()
+        }
+        logcat { "Recurrent expense notification shown for transactionId=${transaction.id} date=$today" }
+    }
+
+    private fun recurrentNotificationDedupeKey(transaction: Transaction, date: LocalDate) =
+        stringPreferencesKey("$LAST_RECURRENT_NOTIFICATION_PREFIX${transaction.id}_${date}")
+
     private fun isDueToday(transaction: Transaction, today: LocalDate, frequency: RecurrentFrequency): Boolean {
         val startDate = transaction.date?.toLocalDate() ?: return false
         
@@ -175,11 +188,11 @@ class RecurrentExpenseNotificationWorker(
         return when (frequency) {
             RecurrentFrequency.WEEKLY -> {
                 val daysBetween = ChronoUnit.DAYS.between(startDate, today).toInt()
-                daysBetween > 0 && daysBetween % 7 == 0
+                daysBetween >= 0 && daysBetween % 7 == 0
             }
             RecurrentFrequency.BIWEEKLY -> {
                 val daysBetween = ChronoUnit.DAYS.between(startDate, today).toInt()
-                daysBetween > 0 && daysBetween % 14 == 0
+                daysBetween >= 0 && daysBetween % 14 == 0
             }
             RecurrentFrequency.MONTHLY -> {
                 val billingDay = transaction.subscriptionDay ?: startDate.dayOfMonth
@@ -197,31 +210,4 @@ class RecurrentExpenseNotificationWorker(
         }
     }
 
-    private fun shouldWarnUpcoming(transaction: Transaction, today: LocalDate, budgetEndDate: LocalDate): Boolean {
-        if (!transaction.isRecurrent) return false
-        if (transaction.recurrentFrequency != RecurrentFrequency.MONTHLY) return false
-        
-        val subscriptionDay = transaction.subscriptionDay ?: transaction.date?.toLocalDate()?.dayOfMonth ?: return false
-        
-        var nextChargeDate = today.withDayOfMonth(subscriptionDay)
-        if (nextChargeDate.isBefore(today) || nextChargeDate.isEqual(today)) {
-            nextChargeDate = nextChargeDate.plusMonths(1)
-        }
-        
-        return !nextChargeDate.isAfter(budgetEndDate) &&
-               ChronoUnit.DAYS.between(today, nextChargeDate) in 1..3
-    }
-
-    private fun calculateDaysUntilCharge(transaction: Transaction, today: LocalDate): Long? {
-        if (transaction.recurrentFrequency != RecurrentFrequency.MONTHLY) return null
-        
-        val subscriptionDay = transaction.subscriptionDay ?: transaction.date?.toLocalDate()?.dayOfMonth ?: return null
-        
-        var nextChargeDate = today.withDayOfMonth(subscriptionDay)
-        if (nextChargeDate.isBefore(today) || nextChargeDate.isEqual(today)) {
-            nextChargeDate = nextChargeDate.plusMonths(1)
-        }
-        
-        return ChronoUnit.DAYS.between(today, nextChargeDate)
-    }
 }

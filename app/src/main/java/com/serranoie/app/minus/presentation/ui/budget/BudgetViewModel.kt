@@ -260,6 +260,13 @@ class BudgetViewModel @Inject constructor(
 		}
 	}
 
+	fun updateRecurrentNotificationTime(hour: Int, minute: Int) {
+		viewModelScope.launch {
+			updatePeriodEndNotificationTimeUseCase.updateRecurrentNotificationTime(hour, minute)
+			logcat(TAG) { "Updated recurrent notification time to %02d:%02d".format(hour, minute) }
+		}
+	}
+
 	fun finishBudgetEarly() {
 		viewModelScope.launch {
 			finishBudgetEarlyUseCase()

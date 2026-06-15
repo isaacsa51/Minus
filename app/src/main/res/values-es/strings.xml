@@ -185,7 +185,9 @@
 
     <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Mostrar los pagos recurrentes como una lista de gastos regulares.</string>
     <string name="settings_period_end_time_title">Hora de finalización del período</string>
-    <string name="settings_period_end_time_subtitle">La notificación se mostrará al día siguiente de finalizar el plazo.</string>
+    <string name="settings_period_end_time_subtitle">La notificación se mostrará el día que termina el período a esta hora.</string>
+    <string name="settings_recurrent_notification_time_title">Hora de pagos recurrentes</string>
+    <string name="settings_recurrent_notification_time_subtitle">La revisión diaria de pagos recurrentes se ejecuta a esta hora.</string>
     <string name="settings_exact_alarm_title">Alarmas exactas</string>
     <string name="settings_exact_alarm_enabled_subtitle">Habilitado para intentar mostrar notificaciones a la hora seleccionada.</string>
     <string name="settings_exact_alarm_disabled_subtitle">Desactivado; Android puede retrasar la notificación</string>

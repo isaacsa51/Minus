@@ -9,4 +9,8 @@ class UpdatePeriodEndNotificationTimeUseCase @Inject constructor(
     suspend operator fun invoke(hour: Int, minute: Int) {
         periodManager.updatePeriodEndNotificationTime(hour, minute)
     }
+
+    suspend fun updateRecurrentNotificationTime(hour: Int, minute: Int) {
+        periodManager.updateRecurrentNotificationTime(hour, minute)
+    }
 }

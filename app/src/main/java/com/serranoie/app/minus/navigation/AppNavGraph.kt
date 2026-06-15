@@ -44,12 +44,16 @@ import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_HOUR
 import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_MINUTE
+import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_HOUR
+import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_MINUTE
 import com.serranoie.app.minus.presentation.DYNAMIC_COLOR_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTIVE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
 import com.serranoie.app.minus.presentation.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.presentation.NOTIFICATION_MINUTE_KEY
+import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
+import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_MINUTE_KEY
 import com.serranoie.app.minus.presentation.RECURRENT_PAYMENTS_VIEW_MODE_KEY
 import com.serranoie.app.minus.presentation.THEME_MODE_KEY
 import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
@@ -462,6 +466,8 @@ fun AppNavGraph(
             val recurrentPaymentsViewMode = RecurrentPaymentsViewMode.fromName(preferences[RECURRENT_PAYMENTS_VIEW_MODE_KEY])
             val notificationHour = preferences[NOTIFICATION_HOUR_KEY] ?: DEFAULT_NOTIFICATION_HOUR
             val notificationMinute = preferences[NOTIFICATION_MINUTE_KEY] ?: DEFAULT_NOTIFICATION_MINUTE
+            val recurrentNotificationHour = preferences[RECURRENT_NOTIFICATION_HOUR_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_HOUR
+            val recurrentNotificationMinute = preferences[RECURRENT_NOTIFICATION_MINUTE_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_MINUTE
             val exactAlarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 alarmManager.canScheduleExactAlarms()
@@ -489,6 +495,8 @@ fun AppNavGraph(
                 recurrentPaymentsViewMode = recurrentPaymentsViewMode,
                 notificationHour = notificationHour,
                 notificationMinute = notificationMinute,
+                recurrentNotificationHour = recurrentNotificationHour,
+                recurrentNotificationMinute = recurrentNotificationMinute,
                 exactAlarmEnabled = exactAlarmEnabled,
                 onThemeChange = { themeMode ->
                     logcat(tag) { "Theme changed to: $themeMode" }
@@ -544,6 +552,9 @@ fun AppNavGraph(
                 },
                 onNotificationTimeChange = { hour, minute ->
                     viewModel.updatePeriodEndNotificationTime(hour, minute)
+                },
+                onRecurrentNotificationTimeChange = { hour, minute ->
+                    viewModel.updateRecurrentNotificationTime(hour, minute)
                 },
                 onOpenExactAlarmSettings = {
                     val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

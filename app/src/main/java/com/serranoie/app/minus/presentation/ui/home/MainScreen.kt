@@ -617,6 +617,9 @@ private fun PhoneLayout(
 							)
 						}
 					},
+					onTestNotifications = {
+						onProcessIntent(BudgetNumpadIntent.TriggerTestNotifications)
+					},
 					rowHeight = with(localDensity) { rowHeightPx.toDp() }
 				)
 			}
@@ -936,6 +939,9 @@ private fun TabletLayout(
 									message = message, duration = SnackbarDuration.Short
 								)
 							}
+						},
+						onTestNotifications = {
+							onProcessIntent(BudgetNumpadIntent.TriggerTestNotifications)
 						},
 						rowHeight = with(localDensity) { rowHeightPx.toDp() }
 					)

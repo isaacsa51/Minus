@@ -48,6 +48,8 @@ import com.serranoie.app.minus.data.repository.EARLY_FINISH_ORIGINAL_END_DATE_KE
 import com.serranoie.app.minus.data.repository.NOTIFICATION_HOUR_KEY_NAME
 import com.serranoie.app.minus.data.repository.NOTIFICATION_MINUTE_KEY_NAME
 import com.serranoie.app.minus.data.repository.ONBOARDING_COMPLETED_KEY_NAME
+import com.serranoie.app.minus.data.repository.RECURRENT_NOTIFICATION_HOUR_KEY_NAME
+import com.serranoie.app.minus.data.repository.RECURRENT_NOTIFICATION_MINUTE_KEY_NAME
 import com.serranoie.app.minus.data.repository.RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME
 import com.serranoie.app.minus.data.repository.SETTINGS_DATASTORE_NAME
 import com.serranoie.app.minus.data.repository.SettingsRepository
@@ -87,6 +89,8 @@ val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NA
 val BUDGET_END_DATE_KEY = longPreferencesKey("budget_end_date_millis")
 val NOTIFICATION_HOUR_KEY = intPreferencesKey(NOTIFICATION_HOUR_KEY_NAME)
 val NOTIFICATION_MINUTE_KEY = intPreferencesKey(NOTIFICATION_MINUTE_KEY_NAME)
+val RECURRENT_NOTIFICATION_HOUR_KEY = intPreferencesKey(RECURRENT_NOTIFICATION_HOUR_KEY_NAME)
+val RECURRENT_NOTIFICATION_MINUTE_KEY = intPreferencesKey(RECURRENT_NOTIFICATION_MINUTE_KEY_NAME)
 val THEME_MODE_KEY = stringPreferencesKey(THEME_MODE_KEY_NAME)
 val TYPOGRAPHY_MODE_KEY = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
 val DYNAMIC_COLOR_KEY = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
@@ -99,6 +103,8 @@ val CURRENT_PERIOD_STARTED_AT_KEY = longPreferencesKey(CURRENT_PERIOD_STARTED_AT
 val CURRENT_PERIOD_ID_KEY = longPreferencesKey(CURRENT_PERIOD_ID_KEY_NAME)
 const val DEFAULT_NOTIFICATION_HOUR = 9
 const val DEFAULT_NOTIFICATION_MINUTE = 0
+const val DEFAULT_RECURRENT_NOTIFICATION_HOUR = 8
+const val DEFAULT_RECURRENT_NOTIFICATION_MINUTE = 0
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

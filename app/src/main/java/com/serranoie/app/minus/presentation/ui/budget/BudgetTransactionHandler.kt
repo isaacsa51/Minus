@@ -6,6 +6,7 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.usecase.AddTransactionUseCase
 import com.serranoie.app.minus.domain.usecase.DeleteTransactionUseCase
+import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -34,6 +35,7 @@ class BudgetTransactionHandler @Inject constructor(
 	private val addTransactionUseCase: AddTransactionUseCase,
 	private val deleteTransactionUseCase: DeleteTransactionUseCase,
 	private val budgetExpressionEvaluator: BudgetExpressionEvaluator,
+	private val notificationScheduler: NotificationScheduler,
 ) {
 	companion object {
 		private const val TAG = "BudgetTransactionHandler"
@@ -159,6 +161,7 @@ class BudgetTransactionHandler @Inject constructor(
 			isCredit = isCredit,
 		)
 		addTransactionUseCase(transaction)
+		notificationScheduler.rescheduleRecurrentExpenseNotifications()
 		return true
 	}
 
@@ -184,6 +187,7 @@ class BudgetTransactionHandler @Inject constructor(
 			} else {
 				transaction
 			}
+			notificationScheduler.cancelRecurrentExpenseNotification(transactionToDelete)
 			deleteTransactionUseCase(transactionToDelete)
 			val stillExists = budgetRepository.getTransactionById(realId)
 			if (stillExists != null && !stillExists.isDeleted) {
@@ -196,12 +200,20 @@ class BudgetTransactionHandler @Inject constructor(
 	suspend fun restoreTransaction(transaction: Transaction): Result<Unit> {
 		return runCatching {
 			addTransactionUseCase(transaction)
+			if (transaction.isRecurrent) {
+				notificationScheduler.rescheduleRecurrentExpenseNotifications()
+			}
 		}
 	}
 
 	suspend fun editTransaction(updatedTransaction: Transaction): Boolean {
 		if (updatedTransaction.amount < BigDecimal.ZERO) return false
 		budgetRepository.updateTransaction(updatedTransaction)
+		if (updatedTransaction.isRecurrent) {
+			notificationScheduler.scheduleRecurrentExpenseNotification(updatedTransaction)
+		} else {
+			notificationScheduler.cancelRecurrentExpenseNotification(updatedTransaction)
+		}
 		return true
 	}
 

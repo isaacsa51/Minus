@@ -189,7 +189,9 @@
     <string name="settings_feature_credit_toggle_switch_label">Activer l\'usage CC</string>
 
     <string name="settings_period_end_time_title">Heure de fin de période</string>
-    <string name="settings_period_end_time_subtitle">La notification sera affichée le lendemain de la fin de la période</string>
+    <string name="settings_period_end_time_subtitle">La notification sera affichée le jour de fin de période à cette heure</string>
+    <string name="settings_recurrent_notification_time_title">Heure des paiements récurrents</string>
+    <string name="settings_recurrent_notification_time_subtitle">La vérification quotidienne des paiements récurrents s’exécute à cette heure</string>
     <string name="settings_exact_alarm_title">Alarmes exactes</string>
     <string name="settings_exact_alarm_enabled_subtitle">Activé pour essayer d\'afficher les notifications à l\'heure sélectionnée</string>
     <string name="settings_exact_alarm_disabled_subtitle">Désactivé ; Android peut retarder la notification</string>

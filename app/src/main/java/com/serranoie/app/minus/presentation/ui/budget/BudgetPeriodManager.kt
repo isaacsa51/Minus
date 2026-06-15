@@ -15,11 +15,15 @@ import com.serranoie.app.minus.presentation.CURRENT_PERIOD_ID_KEY
 import com.serranoie.app.minus.presentation.CURRENT_PERIOD_STARTED_AT_KEY
 import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_HOUR
 import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_MINUTE
+import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_HOUR
+import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_MINUTE
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTIVE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
 import com.serranoie.app.minus.presentation.NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.presentation.NOTIFICATION_MINUTE_KEY
+import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
+import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_MINUTE_KEY
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.settingsDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -49,6 +53,14 @@ class BudgetPeriodManager @Inject constructor(
 		budgetRepository.getBudgetSettingsSync()?.let { settings ->
 			notificationScheduler.schedulePeriodEndNotification(settings.getPeriodEndDate())
 		}
+	}
+
+	suspend fun updateRecurrentNotificationTime(hour: Int, minute: Int) {
+		context.settingsDataStore.edit { prefs ->
+			prefs[RECURRENT_NOTIFICATION_HOUR_KEY] = hour
+			prefs[RECURRENT_NOTIFICATION_MINUTE_KEY] = minute
+		}
+		notificationScheduler.rescheduleRecurrentExpenseNotifications()
 	}
 
 	suspend fun finishBudgetEarly() {
@@ -146,6 +158,12 @@ class BudgetPeriodManager @Inject constructor(
 			}
 			if (!prefs.contains(NOTIFICATION_MINUTE_KEY)) {
 				prefs[NOTIFICATION_MINUTE_KEY] = DEFAULT_NOTIFICATION_MINUTE
+			}
+			if (!prefs.contains(RECURRENT_NOTIFICATION_HOUR_KEY)) {
+				prefs[RECURRENT_NOTIFICATION_HOUR_KEY] = DEFAULT_RECURRENT_NOTIFICATION_HOUR
+			}
+			if (!prefs.contains(RECURRENT_NOTIFICATION_MINUTE_KEY)) {
+				prefs[RECURRENT_NOTIFICATION_MINUTE_KEY] = DEFAULT_RECURRENT_NOTIFICATION_MINUTE
 			}
 		}
 

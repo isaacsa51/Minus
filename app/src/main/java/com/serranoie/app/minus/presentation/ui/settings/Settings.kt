@@ -105,6 +105,8 @@ fun Settings(
 	recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
 	notificationHour: Int,
 	notificationMinute: Int,
+	recurrentNotificationHour: Int,
+	recurrentNotificationMinute: Int,
 	exactAlarmEnabled: Boolean,
 	onThemeChange: (String) -> Unit,
 	onTypographyChange: (String) -> Unit,
@@ -112,6 +114,7 @@ fun Settings(
 	onCreditQuickToggleFeatureToggle: () -> Unit,
 	onRecurrentPaymentsViewModeChange: (RecurrentPaymentsViewMode) -> Unit,
 	onNotificationTimeChange: (Int, Int) -> Unit,
+	onRecurrentNotificationTimeChange: (Int, Int) -> Unit,
 	onOpenExactAlarmSettings: () -> Unit,
 	periodMappingMode: PeriodMappingMode,
 	onPeriodMappingModeChange: (PeriodMappingMode) -> Unit,
@@ -125,11 +128,13 @@ fun Settings(
 	var showTypographyDialog by remember { mutableStateOf(false) }
 	var showRecurrentPaymentsViewModeDialog by remember { mutableStateOf(false) }
 	var showNotificationTimePicker by remember { mutableStateOf(false) }
+	var showRecurrentNotificationTimePicker by remember { mutableStateOf(false) }
 	var isCreditFeatureExpanded by remember { mutableStateOf(false) }
 	val dismissThemeDialog = { showThemeDialog = false }
 	val dismissTypographyDialog = { showTypographyDialog = false }
 	val dismissRecurrentPaymentsViewModeDialog = { showRecurrentPaymentsViewModeDialog = false }
 	val dismissNotificationTimePicker = { showNotificationTimePicker = false }
+	val dismissRecurrentNotificationTimePicker = { showRecurrentNotificationTimePicker = false }
 	val scrollBehavior =
 		TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 	val context = LocalContext.current
@@ -417,6 +422,40 @@ fun Settings(
 
 					CustomPaddedListItem(
 						onClick = {
+							showRecurrentNotificationTimePicker = true
+							view.weakHapticFeedback()
+						},
+						position = PaddedListItemPosition.Middle,
+					) {
+						Icon(
+							imageVector = Icons.Default.Repeat,
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.primary
+						)
+						Spacer(modifier = Modifier.width(16.dp))
+						Column(modifier = Modifier.weight(1f)) {
+							Text(
+								text = stringResource(R.string.settings_recurrent_notification_time_title),
+								style = MaterialTheme.typography.bodyMediumEmphasized,
+								color = MaterialTheme.colorScheme.onSurface
+							)
+							Text(
+								text = stringResource(R.string.settings_recurrent_notification_time_subtitle),
+								style = MaterialTheme.typography.bodySmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+						Text(
+							text = formatNotificationTime(
+								context, recurrentNotificationHour, recurrentNotificationMinute
+							),
+							style = MaterialTheme.typography.labelLargeCondensed,
+							color = MaterialTheme.colorScheme.primary
+						)
+					}
+
+					CustomPaddedListItem(
+						onClick = {
 							onOpenExactAlarmSettings()
 							view.weakHapticFeedback()
 						},
@@ -669,6 +708,17 @@ fun Settings(
 				onTimeSelected = { hour, minute ->
 					onNotificationTimeChange(hour, minute)
 					dismissNotificationTimePicker()
+				})
+		}
+
+		if (showRecurrentNotificationTimePicker) {
+			NotificationTimePickerDialog(
+				initialHour = recurrentNotificationHour,
+				initialMinute = recurrentNotificationMinute,
+				onDismiss = dismissRecurrentNotificationTimePicker,
+				onTimeSelected = { hour, minute ->
+					onRecurrentNotificationTimeChange(hour, minute)
+					dismissRecurrentNotificationTimePicker()
 				})
 		}
 	}
@@ -978,6 +1028,8 @@ private fun PreviewSettings() {
 			recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
 			notificationHour = 9,
 			notificationMinute = 0,
+			recurrentNotificationHour = 8,
+			recurrentNotificationMinute = 0,
 			exactAlarmEnabled = true,
 			onThemeChange = {},
 			onTypographyChange = {},
@@ -985,6 +1037,7 @@ private fun PreviewSettings() {
 			onCreditQuickToggleFeatureToggle = {},
 			onRecurrentPaymentsViewModeChange = {},
 			onNotificationTimeChange = { _, _ -> },
+			onRecurrentNotificationTimeChange = { _, _ -> },
 			onOpenExactAlarmSettings = {},
 			periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
 			onPeriodMappingModeChange = {})

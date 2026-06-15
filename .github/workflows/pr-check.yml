@@ -36,3 +36,6 @@ jobs:
 
       - name: Compile App
         run: ./gradlew :app:compileFossDebugKotlin :app:compileWearDebugKotlin :wear:compileDebugKotlin :sync-contract:compileKotlin
+
+      - name: Verify screenshots
+        run: ./gradlew :app:verifyPaparazziFossDebug
