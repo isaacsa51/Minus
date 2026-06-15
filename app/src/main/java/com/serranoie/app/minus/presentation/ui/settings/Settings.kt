@@ -3,6 +3,9 @@
 package com.serranoie.app.minus.presentation.ui.settings
 
 import android.app.TimePickerDialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -44,6 +47,7 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -56,6 +60,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,6 +79,7 @@ import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.buildAppEnvironmentMetadata
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
@@ -86,6 +92,7 @@ import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -128,7 +135,9 @@ fun Settings(
 	val context = LocalContext.current
 	val view = LocalView.current
 	val snackbarHostState = remember { SnackbarHostState() }
+	val coroutineScope = rememberCoroutineScope()
 	val appVersionName = "v${BuildConfig.VERSION_NAME}"
+	val metadataCopiedMessage = stringResource(R.string.settings_version_metadata_copied)
 
 	Scaffold(
 		modifier = modifier
@@ -557,7 +566,18 @@ fun Settings(
 					CustomPaddedListItem(
 						onClick = {
 							view.weakHapticFeedback()
-						}, position = PaddedListItemPosition.Last
+						},
+						position = PaddedListItemPosition.Last,
+						onLongClick = {
+							context.copyAppEnvironmentMetadataToClipboard()
+							view.toggleFeedback()
+							coroutineScope.launch {
+								snackbarHostState.showSnackbar(
+									message = metadataCopiedMessage,
+									duration = SnackbarDuration.Short,
+								)
+							}
+						},
 					) {
 						Icon(
 							imageVector = Icons.Default.Info,
@@ -928,8 +948,18 @@ private fun RecurrentPaymentsViewMode.label(): String {
 	}
 }
 
+private fun Context.copyAppEnvironmentMetadataToClipboard() {
+	val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+	clipboard.setPrimaryClip(
+		ClipData.newPlainText(
+			"Minus app environment metadata",
+			buildAppEnvironmentMetadata(),
+		)
+	)
+}
+
 private fun formatNotificationTime(
-	context: android.content.Context, hour: Int, minute: Int
+	context: Context, hour: Int, minute: Int
 ): String {
 	val pattern = if (android.text.format.DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a"
 	return LocalTime.of(hour, minute)

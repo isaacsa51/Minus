@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.settings.bugreport
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportIssueType
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportStep
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiEffect
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiIntent
@@ -35,10 +36,25 @@ class BugReportViewModel @Inject constructor(
 	fun onIntent(intent: BugReportUiIntent) {
 		when (intent) {
 			is BugReportUiIntent.SelectIssueType -> _uiState.update {
-				it.copy(selectedIssueType = intent.issueType)
+				it.copy(
+					selectedIssueType = intent.issueType,
+					showReproductionSteps = intent.issueType == BugReportIssueType.BugReport
+				)
 			}
-			is BugReportUiIntent.ChangeCurrentBehavior -> _uiState.update {
-				it.copy(currentBehavior = intent.value)
+			is BugReportUiIntent.ChangeTitle -> _uiState.update {
+				it.copy(title = intent.value)
+			}
+			is BugReportUiIntent.ChangeDescription -> _uiState.update {
+				it.copy(description = intent.value)
+			}
+			is BugReportUiIntent.ChangeProposedSolution -> _uiState.update {
+				it.copy(proposedSolution = intent.value)
+			}
+			is BugReportUiIntent.ChangeAlternativesConsidered -> _uiState.update {
+				it.copy(alternativesConsidered = intent.value)
+			}
+			is BugReportUiIntent.ToggleReproductionSteps -> _uiState.update {
+				it.copy(showReproductionSteps = intent.visible)
 			}
 			is BugReportUiIntent.ChangeStep -> updateStep(intent.index, intent.value)
 			BugReportUiIntent.AddStep -> addStep()
@@ -96,7 +112,18 @@ class BugReportViewModel @Inject constructor(
 			_uiState.update { it.copy(isGeneratingReport = true) }
 			runCatching { zipGenerator.generate(currentState) }
 				.onSuccess { report ->
-					_effects.emit(BugReportUiEffect.OpenEmailComposer(report.uri, report.fileName))
+					val titlePrefix = if (currentState.selectedIssueType == BugReportIssueType.BugReport) {
+						"[Bug]: "
+					} else {
+						"[Feature]: "
+					}
+					_effects.emit(
+						BugReportUiEffect.OpenEmailComposer(
+							uri = report.uri,
+							fileName = report.fileName,
+							title = "$titlePrefix${currentState.title}"
+						)
+					)
 				}
 				.onFailure { throwable ->
 					logcat { "Failed to generate bug report: ${throwable.asLog()}" }
