@@ -121,6 +121,28 @@
         </receiver>
 
         <receiver
+            android:name=".presentation.widget.MinMaxSpentWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_min_max_spent_info" />
+        </receiver>
+
+        <receiver
+            android:name=".presentation.widget.AverageSpendWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_average_spend_info" />
+        </receiver>
+
+        <receiver
             android:name=".presentation.widget.AddExpenseWidgetReceiver"
             android:exported="true">
             <intent-filter>

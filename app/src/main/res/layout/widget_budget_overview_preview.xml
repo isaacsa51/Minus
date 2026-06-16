@@ -2,92 +2,71 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/background"
+    android:background="#111318"
+    android:gravity="center_vertical"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="16dp">
 
-    <!-- Budget Amount -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="$500"
-        android:textColor="?android:attr/colorPrimary"
-        android:textSize="28sp"
+        android:text="@string/widget_budget_overview_preview_amount"
+        android:textColor="#F5F7FB"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
-    <!-- Label -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Total Budget"
-        android:textColor="?android:attr/textColorSecondary"
+        android:layout_marginTop="2dp"
+        android:text="@string/total_budget"
+        android:textColor="#A3A6AD"
         android:textSize="14sp" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="12dp" />
-
-    <!-- Date Range Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <!-- Start Date -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="06 Mar"
-            android:textColor="?android:attr/textColorSecondary"
+            android:text="@string/widget_budget_overview_preview_start"
+            android:textColor="#A3A6AD"
             android:textSize="12sp" />
 
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="1dp" />
-
-        <!-- Horizontal Line with Days Chip and Arrow -->
-        <LinearLayout
+        <View
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="2dp"
+            android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:background="#5F6673" />
 
-            <!-- Days Chip (Rounded) -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="16 día(s)"
-                android:textColor="?android:attr/textColorHint"
-                android:textSize="12sp"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp" />
-
-            <Space
-                android:layout_width="4dp"
-                android:layout_height="1dp" />
-
-            <!-- Horizontal Line -->
-            <View
-                android:layout_width="0dp"
-                android:layout_height="2dp"
-                android:layout_weight="1"
-                android:background="?android:attr/textColorSecondary" />
-        </LinearLayout>
-
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="1dp" />
-
-        <!-- End Date -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="21 Mar"
-            android:textColor="?android:attr/textColorSecondary"
+            android:background="#A3A6AD"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="@string/widget_budget_overview_preview_days"
+            android:textColor="#111318"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:background="#5F6673" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/widget_budget_overview_preview_end"
+            android:textColor="#A3A6AD"
             android:textSize="12sp" />
-
     </LinearLayout>
-
 </LinearLayout>

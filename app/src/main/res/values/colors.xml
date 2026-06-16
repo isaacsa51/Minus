@@ -15,4 +15,12 @@
     <color name="widget_heatmap_empty_dark">#26FFFFFF</color>
     <color name="widget_heatmap_day_text">#A3A6AD</color>
     <color name="widget_heatmap_month_text">#8F949D</color>
+
+    <!-- Min/max spent widget colors -->
+    <color name="widget_min_spent_container">#263F7DD5</color>
+    <color name="widget_max_spent_container">#26DD1414</color>
+    <color name="widget_min_max_spent_on_container">#F2FFFFFF</color>
+    <color name="widget_min_spent_chart">#663F7DD5</color>
+    <color name="widget_mid_spent_chart">#66A96776</color>
+    <color name="widget_max_spent_chart">#66DD1414</color>
 </resources>

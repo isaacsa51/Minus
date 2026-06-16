@@ -131,6 +131,22 @@
     <string name="widget_budget_detail_description">Full budget overview with top category and days left</string>
     <string name="widget_heatmap_description">Heatmap calendar to see spending distribution</string>
     <string name="widget_month_heatmap_description">Current month heatmap calendar</string>
+    <string name="widget_min_max_spent_description" translatable="false">See your minimum and maximum expenses at a glance</string>
+    <string name="widget_average_spend_description" translatable="false">See average spending per day at a glance</string>
+    <string name="widget_average_spend_preview_amount" translatable="false">$72</string>
+    <string name="widget_average_spend_preview_meta" translatable="false">8 · 12 days</string>
+    <string name="widget_min_max_spent_preview_min_amount" translatable="false">$42</string>
+    <string name="widget_min_max_spent_preview_max_amount" translatable="false">$186</string>
+    <string name="widget_min_max_spent_preview_min_date" translatable="false">14 Jun 2026 10:20</string>
+    <string name="widget_min_max_spent_preview_max_date" translatable="false">15 Jun 2026 18:45</string>
+    <string name="widget_budget_overview_preview_amount" translatable="false">$500</string>
+    <string name="widget_budget_overview_preview_start" translatable="false">06 Mar</string>
+    <string name="widget_budget_overview_preview_days" translatable="false">16 days</string>
+    <string name="widget_budget_overview_preview_end" translatable="false">21 Mar</string>
+    <string name="widget_heatmap_preview_mar" translatable="false">MAR</string>
+    <string name="widget_heatmap_preview_apr" translatable="false">APR</string>
+    <string name="widget_heatmap_preview_months" translatable="false">4 months</string>
+    <string name="widget_month_heatmap_preview_month" translatable="false">JUNE</string>
     <string name="widget_add_expense_description">Quick shortcut to add a new expense</string>
     <string name="widget_add_expense_label">Add new expense</string>
     <string name="widget_add_expense_plus" translatable="false">+</string>

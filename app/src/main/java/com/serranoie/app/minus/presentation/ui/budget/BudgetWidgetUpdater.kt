@@ -4,10 +4,12 @@ import android.content.Context
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.widget.DailySpending
 import com.serranoie.app.minus.presentation.widget.MonthHeatmapData
+import com.serranoie.app.minus.presentation.widget.updateAverageSpendWidget
 import com.serranoie.app.minus.presentation.widget.updateBudgetOverviewWidget
 import com.serranoie.app.minus.presentation.widget.updateDaysCountdownWidget
 import com.serranoie.app.minus.presentation.widget.updateExpenseWidget
 import com.serranoie.app.minus.presentation.widget.updateHeatmapWidget
+import com.serranoie.app.minus.presentation.widget.updateMinMaxSpentWidget
 import com.serranoie.app.minus.presentation.widget.updateMonthHeatmapWidget
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.math.BigDecimal
@@ -29,12 +31,39 @@ class BudgetWidgetUpdater @Inject constructor(
         val budgetAmount = budget.totalBudget.toInt()
         val (startDate, endDate) = resolveBudgetPeriodDates(baseState)
         val heatmapData = buildHeatmapData(baseState)
+        val currentPeriodTransactions = filterCurrentPeriodTransactions(baseState)
 
         updateExpenseWidget(context, totalSpent, totalBudget, currency)
         updateBudgetOverviewWidget(context, budgetAmount, currency, startDate, endDate, daysLeft)
         updateDaysCountdownWidget(context, daysLeft, budget.totalBudget.toInt(), "days left")
         updateHeatmapWidget(context, heatmapData.monthHeatmapData)
         updateMonthHeatmapWidget(context, heatmapData.currentMonthHeatmap, heatmapData.currentMonthTotalSpent)
+        updateMinMaxSpentWidget(context, currentPeriodTransactions, currency)
+        updateAverageSpendWidget(context, currentPeriodTransactions, currency, startDate, endDate)
+    }
+
+    private fun filterCurrentPeriodTransactions(baseState: BudgetUiState): List<Transaction> {
+        val settings = baseState.budgetSettings ?: return emptyList()
+        val periodEnd = settings.getPeriodEndDate()
+        val currentPeriodId = baseState.currentPeriodId
+        val currentPeriodStartedAtMillis = baseState.currentPeriodStartedAtMillis
+
+        return baseState.transactions.filter { transaction ->
+            if (currentPeriodId > 0L && transaction.periodId > 0L) {
+                return@filter transaction.periodId == currentPeriodId
+            }
+
+            val txDate = transaction.date?.toLocalDate() ?: return@filter false
+            if (txDate.isBefore(settings.startDate) || txDate.isAfter(periodEnd)) {
+                return@filter false
+            }
+
+            if (txDate.isEqual(settings.startDate) && currentPeriodStartedAtMillis > 0L) {
+                return@filter transaction.createdAt >= currentPeriodStartedAtMillis
+            }
+
+            true
+        }
     }
 
     private fun resolveBudgetPeriodDates(baseState: BudgetUiState): Pair<Date, Date> {
