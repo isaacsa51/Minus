@@ -2,121 +2,51 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
-    android:gravity="center"
+    android:background="#111318"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="10dp">
 
-    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="3dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/widget_heatmap_preview_mar" android:textColor="#A3A6AD" android:textSize="11sp" android:textStyle="bold" />
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:orientation="vertical">
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal"><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_1" /></LinearLayout>
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal"><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_2" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_2" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /></LinearLayout>
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal"><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_2" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" /></LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="3dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/widget_heatmap_preview_apr" android:textColor="#A3A6AD" android:textSize="11sp" android:textStyle="bold" />
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:orientation="vertical">
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal"><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_2" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /></LinearLayout>
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal"><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_2" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_2" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /></LinearLayout>
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal"><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_2" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" /><View android:layout_width="8dp" android:layout_height="8dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_1" /></LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Spending Heatmap"
-        android:textColor="?android:attr/colorPrimary"
-        android:textSize="14sp"
-        android:textStyle="bold" />
-
-    <!-- Heatmap Grid Preview (simplified 7x5 representation) -->
-    <GridLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:columnCount="7"
-        android:rowCount="5">
-
-        <!-- Row 1 -->
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#6681C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#8081C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#99FFB74D" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#B3E57373" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#CCE57373" />
-
-        <!-- Row 2 -->
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#8081C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#99FFB74D" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#B3FFB74D" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#CCE57373" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#E57373" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-
-        <!-- Row 3 -->
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#6681C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#80FFB74D" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#99E57373" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#B3E57373" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#8081C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-
-        <!-- Row 4 -->
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#80FFB74D" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#99E57373" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#B3E57373" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#CCE57373" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#6681C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-
-        <!-- Row 5 -->
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#6681C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#8081C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#99FFB74D" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-        <View android:layout_width="16dp" android:layout_height="16dp" android:layout_margin="1dp" android:background="#4D81C784" />
-
-    </GridLayout>
-
-    <!-- Legend -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <View
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:background="#81C784" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="Low"
-            android:textSize="10sp" />
-
-        <View
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginStart="8dp"
-            android:background="#FFB74D" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="Medium"
-            android:textSize="10sp" />
-
-        <View
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginStart="8dp"
-            android:background="#E57373" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="High"
-            android:textSize="10sp" />
-
-    </LinearLayout>
-
+        android:layout_gravity="center_horizontal"
+        android:text="@string/widget_heatmap_preview_months"
+        android:textColor="#A3A6AD"
+        android:textSize="11sp" />
 </LinearLayout>
