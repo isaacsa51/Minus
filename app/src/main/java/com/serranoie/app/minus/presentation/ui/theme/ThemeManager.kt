@@ -22,15 +22,16 @@ class ThemeManager @Inject constructor() {
 	private fun DomainThemeMode.toPresentationThemeMode(): ThemeMode {
 		return when (this) {
 			DomainThemeMode.LIGHT -> ThemeMode.LIGHT
-			DomainThemeMode.DARK -> ThemeMode.NIGHT
+			DomainThemeMode.NIGHT -> ThemeMode.NIGHT
 			DomainThemeMode.SYSTEM -> ThemeMode.SYSTEM
 		}
 	}
 
 	private fun DomainTypographyMode.toPresentationTypographyMode(): TypographyMode {
 		return when (this) {
+			DomainTypographyMode.DEFAULT -> TypographyMode.DEFAULT
+			DomainTypographyMode.CONDENSED -> TypographyMode.CONDENSED
 			DomainTypographyMode.EXPRESSIVE -> TypographyMode.EXPRESSIVE
-			DomainTypographyMode.COMPACT -> TypographyMode.CONDENSED
 		}
 	}
 }

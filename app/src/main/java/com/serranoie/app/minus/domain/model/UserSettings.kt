@@ -27,11 +27,12 @@ data class UserSettings(
 
 enum class ThemeMode {
     LIGHT,
-    DARK,
+    NIGHT,
     SYSTEM
 }
 
 enum class TypographyMode {
-    EXPRESSIVE,
-    COMPACT
+    DEFAULT,
+    CONDENSED,
+    EXPRESSIVE
 }

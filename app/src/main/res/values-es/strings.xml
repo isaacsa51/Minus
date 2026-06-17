@@ -275,9 +275,9 @@
     <string name="budget_pill_exhausted_daily_label">diario</string>
     <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
-    <string name="budget_pill_exhausted_single">%1$s presupuesto agotado</string>
-    <string name="budget_pill_exhausted_double">%1$s y %2$s presupuesto agotado</string>
-    <string name="budget_pill_exhausted_triple">%1$s, %2$s y %3$s presupuesto agotado</string>
+    <string name="budget_pill_exhausted_single">Presupuesto %1$s agotado</string>
+    <string name="budget_pill_exhausted_double">Presupuesto %1$s y %2$s agotado</string>
+    <string name="budget_pill_exhausted_triple">Presupuesto %1$s, %2$s y %3$s agotado</string>
 
     <string name="spend_budget_card_spent_label">Gastado</string>
     <string name="spend_budget_card_available_percent_format">Disponible: %1$s%%</string>
