@@ -106,6 +106,8 @@ android {
 			buildConfigField("Boolean", "SHOW_LOGS", "false")
 			buildConfigField("Boolean", "DEBUG_FEATURES", "false")
 			isMinifyEnabled = true
+            isShrinkResources = true
+
 			if (hasReleaseSigningConfig) {
 				signingConfig = signingConfigs.getByName("release")
 			}
