@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="app/src/main/ic_launcher-playstore.png" alt="App Icon" width="128"/>
+  <img src="assets/app_icon.png" alt="App Icon" width="128"/>
 </p>
 
 # Minus - An easy to use, budget tracking app
 
 <p align="center">
-  <img src="assets/app_icon.png" alt="App Banner" width="100%">
+  <img src="assets/banner.png" alt="App Banner" width="100%">
 </p>
 
 <p align="center">
