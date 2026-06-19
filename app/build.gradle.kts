@@ -185,7 +185,6 @@ dependencies {
 	implementation(libs.androidx.compose.animation)
 	implementation(libs.androidx.compose.ui.tooling.preview.v106)
 	implementation(libs.androidx.datastore.preferences)
-	implementation(libs.androidx.recyclerview)
 	implementation(libs.androidx.room.runtime)
 	implementation(libs.androidx.room.ktx)
 	implementation(libs.androidx.room.paging)
@@ -197,6 +196,7 @@ dependencies {
 	implementation(libs.androidx.glance.appwidget)
 	implementation(libs.androidx.glance.appwidget.preview)
 	implementation(libs.androidx.glance.preview)
+	implementation(libs.androidx.glance.material3)
 	implementation(libs.androidx.core.splashscreen)
 	implementation(libs.accompanist.systemuicontroller)
 	implementation(libs.dagger)
@@ -207,10 +207,6 @@ dependencies {
 	ksp(libs.androidx.hilt.compiler)
 	ksp(libs.dagger.compiler)
 	ksp(libs.hilt.androidcompiler)
-
-	// Glance
-	implementation(libs.androidx.glance.appwidget)
-	implementation(libs.androidx.glance.material3)
 
 	// WorkManager for notifications
 	implementation(libs.androidx.work.runtime.ktx)
@@ -223,6 +219,4 @@ dependencies {
 
 	debugImplementation(libs.androidx.compose.ui.tooling.v106)
 	debugImplementation(libs.androidx.compose.ui.testmanifest.v183)
-
-	implementation(libs.androidx.compose.material3.windowsize)
 }
