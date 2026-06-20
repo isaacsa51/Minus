@@ -34,8 +34,8 @@ private const val TAG = "AppNavGraph"
 /**
  * Direction-aware screen transition animations.
  *
- * Forward navigation  (e.g. Onboarding → Main):  slide + fade in from right, out to left
- * Backward navigation (e.g. Settings → Analytics): slide + fade in from left, out to right
+ * Forward navigation  (e.g. Onboarding -> Main):  slide + fade in from right, out to left
+ * Backward navigation (e.g. Settings -> Analytics): slide + fade in from left, out to right
  */
 private fun getScreenTransitions(
     initialState: NavBackStackEntry,
@@ -184,7 +184,6 @@ fun AppNavGraph(
 
             MainScreen(
                 openWalletOnStart = openWallet,
-                forceWalletSetup = forceWalletSetup,
                 onNavigateToAnalytics = {
                     navController.navigate(Screen.Analytics.route)
                 },

@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.presentation.ui.theme
 
-import android.graphics.fonts.FontVariationAxis
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -595,3 +594,6 @@ val Typography.labelSmallCondensed: TextStyle get() = labelSmall.copy(fontFamily
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 val ExpressiveTypography = Typography.withEmphasizedStyles()
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+val CondensedTypography = Typography.withCondensedStyles()

@@ -23,6 +23,7 @@ import com.serranoie.app.minus.presentation.LocalWindowSize
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.home.MainScreenContent
+import com.serranoie.app.minus.presentation.ui.home.MainScreenUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
@@ -106,17 +107,21 @@ private fun MainScreenPreviewContent(
 	) {
 		MinusTheme {
 			MainScreenContent(
+				mainScreenState = MainScreenUiState(),
 				budgetUiState = budgetUiState,
 				onboardingCompleted = true,
 				tutorialStage = FirstLaunchTutorialStage.COMPLETED,
 				showCreditQuickToggleFeature = true,
+				onProcessIntent = {},
 				onNavigateToAnalytics = {},
 				onNavigateToSettings = {},
 				onNavigateToWallet = {},
 				openWalletOnStart = false,
-				forceWalletSetup = false,
-				onProcessIntent = {},
-				onAdvanceTutorial = {},
+				showBudgetPeriodSheet = false,
+				forceBudgetPeriodSheetSetup = false,
+				selectedViewPeriod = BudgetPeriod.DAILY,
+				settingsDataStore = null,
+				undoSnackbarActionLabel = "Undo",
 				history = { modifier, _, _, _ ->
 					Box(
 						modifier = modifier
