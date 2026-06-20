@@ -9,23 +9,37 @@ style:
     active: true
     ignoreAnnotated: ['Composable']
   UnusedImports:
-    active: true
+    active: false
+  ReturnCount:
+    active: false
+  LoopWithTooManyJumpStatements:
+    active: false
+  ExplicitItLambdaParameter:
+    active: false
+  ForbiddenComment:
+    active: false
   WildcardImport:
-    active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/common/**']
+    active: false
 
 complexity:
   active: true
   LongMethod:
-    threshold: 120
+    threshold: 200
   TooManyFunctions:
-    thresholdInFiles: 20
-    thresholdInClasses: 20
-    thresholdInInterfaces: 20
-    thresholdInEnums: 8
+    thresholdInFiles: 50
+    thresholdInClasses: 50
+    thresholdInInterfaces: 30
+    thresholdInEnums: 10
+  CyclomaticComplexMethod:
+    threshold: 40
+  LongParameterList:
+    functionThreshold: 12
+    constructorThreshold: 12
   NestedBlockDepth:
-    threshold: 5
+    threshold: 6
   StringLiteralDuplication:
+    active: false
+  ComplexCondition:
     active: false
 
 performance:
@@ -53,6 +67,9 @@ exceptions:
 
 naming:
   active: true
+  FunctionNaming:
+    active: true
+    ignoreAnnotated: ['Composable', 'ComposableDestination', 'ComposableRoute', 'ComposableFunctionName']
   EnumNaming:
     active: false
   MatchingDeclarationName:

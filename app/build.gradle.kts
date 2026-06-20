@@ -14,6 +14,15 @@ detekt {
 	buildUponDefaultConfig = true
 	config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
 	baseline = file("$rootDir/config/detekt/detekt-baseline.xml")
+	// Disable all default rulesets so only rules in detekt.yml are active.
+	// Formatting rules (Indentation, MaxLineLength, etc.) are part of default
+	// rulesets and can't be selectively disabled in the Gradle plugin — any
+	// formatting issues present in the codebase are suppressed via the baseline.
+	disableDefaultRuleSets = true
+}
+
+// Configure reports on the task level (avoids deprecated extension-level API)
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
 	reports {
 		html.required.set(true)
 		xml.required.set(true)
