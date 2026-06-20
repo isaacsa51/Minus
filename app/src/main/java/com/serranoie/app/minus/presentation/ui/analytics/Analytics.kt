@@ -44,7 +44,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
-import com.serranoie.app.minus.presentation.ui.history.History
+import com.serranoie.app.minus.presentation.ui.history.HistoryScreen
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHeader
 import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeader
@@ -220,9 +220,8 @@ fun Analytics(
 				BottomSheetDefaults.DragHandle()
 			}
 		) {
-			History(
+			HistoryScreen(
 				readOnly = true,
-				onClose = { showHistorySheet = false }
 			)
 		}
 	}

@@ -21,3 +21,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+./.agent
+./.android-testing-skills-source
+./.firebender
+./.angent-rules
