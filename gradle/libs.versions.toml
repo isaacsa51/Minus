@@ -1,5 +1,6 @@
 [versions]
 agp = "8.13.2"
+detekt = "1.23.7"
 kotlin = "2.3.10"
 coreKtx = "1.17.0"
 junit = "4.13.2"
@@ -120,3 +121,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 paparazzi = { id = "app.cash.paparazzi", version.ref = "paparazzi" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

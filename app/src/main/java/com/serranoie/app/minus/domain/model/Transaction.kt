@@ -7,21 +7,21 @@ import java.time.LocalDateTime
  * Represents a single transaction (expense) in the budget tracker.
  */
 data class Transaction(
-	val id: Long = 0,
-	val amount: BigDecimal,
-	val comment: String = "",
-	val date: LocalDateTime?,
-	val createdAt: Long = System.currentTimeMillis(),
-	val clientGeneratedId: String? = null,
-	val periodId: Long = 0L,
-	val isDeleted: Boolean = false,
-	val isRecurrent: Boolean = false,
-	val recurrentFrequency: RecurrentFrequency? = null,
-	val recurrentEndDate: LocalDateTime? = null,
-	val subscriptionDay: Int? = null, // Day of month (1-31) for monthly subscriptions
-	val categoryId: Long? = null,
-	val isCredit: Boolean = false,
-	val sourceTransactionId: Long? = null
+    val id: Long = 0,
+    val amount: BigDecimal,
+    val comment: String = "",
+    val date: LocalDateTime?,
+    val createdAt: Long = System.currentTimeMillis(),
+    val clientGeneratedId: String? = null,
+    val periodId: Long = 0L,
+    val isDeleted: Boolean = false,
+    val isRecurrent: Boolean = false,
+    val recurrentFrequency: RecurrentFrequency? = null,
+    val recurrentEndDate: LocalDateTime? = null,
+    val subscriptionDay: Int? = null, // Day of month (1-31) for monthly subscriptions
+    val categoryId: Long? = null,
+    val isCredit: Boolean = false,
+    val sourceTransactionId: Long? = null
 ) {
     companion object {
         fun create(
@@ -58,7 +58,7 @@ data class Transaction(
  * Enum representing the frequency of a recurrent expense.
  */
 enum class RecurrentFrequency {
-    WEEKLY,      // Every 7 days from start date
-    BIWEEKLY,    // Every 14 days from start date
-    MONTHLY      // Specific day of month (use subscriptionDay)
+    WEEKLY, // Every 7 days from start date
+    BIWEEKLY, // Every 14 days from start date
+    MONTHLY // Specific day of month (use subscriptionDay)
 }

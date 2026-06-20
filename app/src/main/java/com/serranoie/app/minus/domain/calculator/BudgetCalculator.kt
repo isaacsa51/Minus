@@ -1,22 +1,16 @@
 package com.serranoie.app.minus.domain.calculator
 
-import logcat.logcat
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
+import logcat.logcat
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
-private const val TAG = "BudgetCalculator - ISAAC"
-
-/**
- * Calculates budget state based on settings, transactions, and current date.
- * Pure business logic - no Android dependencies.
- */
 class BudgetCalculator @Inject constructor() {
 
     /**
@@ -34,30 +28,23 @@ class BudgetCalculator @Inject constructor() {
     ): BudgetState {
         logcat { "calculate called: settings=$settings, currentDate=$currentDate" }
 
-        // Calculate period end date - use actual endDate from settings if available
         val periodEnd = settings.endDate ?: calculatePeriodEnd(settings.startDate, settings.period)
         logcat { "periodEnd calculated: $periodEnd (from endDate=${settings.endDate} or period=${settings.period})" }
 
-        // Calculate total days in the period
         val totalDaysInPeriod = ChronoUnit.DAYS.between(settings.startDate, periodEnd).toInt() + 1
         logcat { "totalDaysInPeriod: $totalDaysInPeriod (from ${settings.startDate} to $periodEnd)" }
 
-        // Calculate days remaining (including today)
         val daysRemaining = ChronoUnit.DAYS.between(currentDate, periodEnd).toInt() + 1
         logcat { "daysRemaining: $daysRemaining (from $currentDate to $periodEnd)" }
 
-        // Calculate total spent in period (excluding deleted transactions)
         val totalSpentInPeriod = transactions
             .filter { !it.isDeleted }
             .sumOf { it.amount }
         logcat { "totalSpentInPeriod: $totalSpentInPeriod" }
 
-        // Calculate remaining budget for the entire period
         val remainingBudget = settings.totalBudget.subtract(totalSpentInPeriod)
         logcat { "remainingBudget: $remainingBudget" }
 
-        // Calculate daily budget based on TOTAL budget and TOTAL days in period
-        // This should be constant throughout the period, not changing based on remaining days
         val dailyBudget = if (totalDaysInPeriod > 0) {
             settings.totalBudget.divide(
                 BigDecimal(totalDaysInPeriod),
@@ -69,7 +56,6 @@ class BudgetCalculator @Inject constructor() {
         }
         logcat { "dailyBudget: $dailyBudget (totalBudget=${settings.totalBudget} / totalDaysInPeriod=$totalDaysInPeriod)" }
 
-        // Calculate spent today
         val spentToday = transactions
             .filter {
                 !it.isDeleted && it.date?.toLocalDate() == currentDate
@@ -77,11 +63,9 @@ class BudgetCalculator @Inject constructor() {
             .sumOf { it.amount }
         logcat { "spentToday: $spentToday" }
 
-        // Calculate remaining for today
         val remainingToday = dailyBudget.subtract(spentToday)
         logcat { "remainingToday: $remainingToday (dailyBudget=$dailyBudget - spentToday=$spentToday)" }
 
-        // Calculate progress percentage
         val progress = if (settings.totalBudget > BigDecimal.ZERO) {
             totalSpentInPeriod
                 .divide(settings.totalBudget, 4, RoundingMode.HALF_UP)
@@ -105,9 +89,6 @@ class BudgetCalculator @Inject constructor() {
         }
     }
 
-    /**
-     * Calculate the end date of a budget period.
-     */
     private fun calculatePeriodEnd(start: LocalDate, period: BudgetPeriod): LocalDate {
         return when (period) {
             BudgetPeriod.DAILY -> start
@@ -117,9 +98,6 @@ class BudgetCalculator @Inject constructor() {
         }
     }
 
-    /**
-     * Get the display label for a budget period.
-     */
     fun getPeriodLabel(period: BudgetPeriod): String {
         return when (period) {
             BudgetPeriod.DAILY -> "Daily"

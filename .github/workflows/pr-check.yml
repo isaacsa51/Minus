@@ -34,6 +34,9 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
+      - name: Run Detekt
+        run: ./gradlew detekt
+
       - name: Compile App
         run: ./gradlew :app:compileFossDebugKotlin :app:compileWearDebugKotlin :wear:compileDebugKotlin :sync-contract:compileKotlin
 

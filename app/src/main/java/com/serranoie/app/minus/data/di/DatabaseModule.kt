@@ -19,12 +19,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
-	@Provides
-	@Singleton
-	fun provideAppDatabase(
-		@ApplicationContext context: Context
-	): AppDatabase {
-		return Room.databaseBuilder(
+    @Provides
+    @Singleton
+    fun provideAppDatabase(
+        @ApplicationContext context: Context
+    ): AppDatabase {
+        return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
@@ -34,25 +34,25 @@ object DatabaseModule {
             .addMigrations(AppDatabaseMigrations.MIGRATION_9_10)
             .fallbackToDestructiveMigration()
             .build()
-	}
+    }
 
-	@Provides
-	fun provideTransactionDao(database: AppDatabase): TransactionDao {
-		return database.transactionDao()
-	}
+    @Provides
+    fun provideTransactionDao(database: AppDatabase): TransactionDao {
+        return database.transactionDao()
+    }
 
-	@Provides
-	fun provideBudgetSettingsDao(database: AppDatabase): BudgetSettingsDao {
-		return database.budgetSettingsDao()
-	}
+    @Provides
+    fun provideBudgetSettingsDao(database: AppDatabase): BudgetSettingsDao {
+        return database.budgetSettingsDao()
+    }
 
-	@Provides
-	fun provideCategoryDao(database: AppDatabase): CategoryDao {
-		return database.categoryDao()
-	}
+    @Provides
+    fun provideCategoryDao(database: AppDatabase): CategoryDao {
+        return database.categoryDao()
+    }
 
-	@Provides
-	fun provideQueuedTransactionDao(database: AppDatabase): QueuedTransactionDao {
-		return database.queuedTransactionDao()
-	}
+    @Provides
+    fun provideQueuedTransactionDao(database: AppDatabase): QueuedTransactionDao {
+        return database.queuedTransactionDao()
+    }
 }

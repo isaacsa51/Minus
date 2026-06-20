@@ -3,6 +3,7 @@ plugins {
 	alias(libs.plugins.kotlin.android)
 	alias(libs.plugins.kotlin.compose)
 	alias(libs.plugins.kotlin.serialization)
+	alias(libs.plugins.detekt)
 }
 
 fun gitOutput(vararg args: String): String? {
@@ -118,4 +119,10 @@ dependencies {
 
 	// Logcat
 	implementation("com.squareup.logcat:logcat:0.4")
+}
+
+detekt {
+	buildUponDefaultConfig = true
+	config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+	baseline = file("$rootDir/config/detekt/detekt-baseline.xml")
 }

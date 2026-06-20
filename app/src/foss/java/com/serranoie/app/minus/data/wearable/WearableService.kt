@@ -5,5 +5,5 @@ import javax.inject.Singleton
 
 @Singleton
 class WearableService @Inject constructor() {
-	fun getReachableSenderNodeIds(): List<String> = emptyList()
+    fun getReachableSenderNodeIds(): List<String> = emptyList()
 }

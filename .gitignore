@@ -22,7 +22,6 @@
 .cxx
 local.properties
 
-./.agent
-./.android-testing-skills-source
-./.firebender
-./.angent-rules
+# Detekt
+config/detekt/detekt-baseline.xml
+build/reports/detekt/

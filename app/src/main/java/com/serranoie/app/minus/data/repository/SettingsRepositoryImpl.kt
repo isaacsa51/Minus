@@ -40,12 +40,11 @@ const val EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME = "early_finish_original_end_d
 const val CURRENT_PERIOD_STARTED_AT_KEY_NAME = "current_period_started_at_millis"
 const val CURRENT_PERIOD_ID_KEY_NAME = "current_period_id"
 
-// Preference Keys
 private val ONBOARDING_COMPLETED = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NAME)
 private val EARLY_FINISH_ACTIVE = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
 private val EARLY_FINISH_ACTUAL_DATE = longPreferencesKey(EARLY_FINISH_ACTUAL_DATE_KEY_NAME)
 private val EARLY_FINISH_ORIGINAL_END_DATE =
-	longPreferencesKey(EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME)
+    longPreferencesKey(EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME)
 private val CURRENT_PERIOD_STARTED_AT = longPreferencesKey(CURRENT_PERIOD_STARTED_AT_KEY_NAME)
 private val CURRENT_PERIOD_ID = longPreferencesKey(CURRENT_PERIOD_ID_KEY_NAME)
 private val NOTIFICATION_HOUR = intPreferencesKey(NOTIFICATION_HOUR_KEY_NAME)
@@ -54,156 +53,156 @@ private val THEME_MODE = stringPreferencesKey(THEME_MODE_KEY_NAME)
 private val TYPOGRAPHY_MODE = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
 private val DYNAMIC_COLOR = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
 private val CURRENT_PERIOD_ROLLOVER_AMOUNT =
-	stringPreferencesKey(CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY_NAME)
+    stringPreferencesKey(CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY_NAME)
 private val CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD =
-	booleanPreferencesKey(CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY_NAME)
+    booleanPreferencesKey(CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY_NAME)
 private val PENDING_ROLLOVER_AMOUNT = stringPreferencesKey(PENDING_ROLLOVER_AMOUNT_KEY_NAME)
 private val PENDING_ROLLOVER_STRATEGY = stringPreferencesKey(PENDING_ROLLOVER_STRATEGY_KEY_NAME)
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
-	@ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : SettingsRepository {
 
-	override fun observeSettings(): Flow<UserSettings> {
-		return context.settingsDataStore.data.map { preferences ->
-			UserSettings(
-				onboardingCompleted = preferences[ONBOARDING_COMPLETED] ?: false,
-				earlyFinishActive = preferences[EARLY_FINISH_ACTIVE] ?: false,
-				earlyFinishActualDate = preferences[EARLY_FINISH_ACTUAL_DATE] ?: 0L,
-				earlyFinishOriginalEndDate = preferences[EARLY_FINISH_ORIGINAL_END_DATE] ?: 0L,
-				currentPeriodStartedAt = preferences[CURRENT_PERIOD_STARTED_AT] ?: 0L,
-				currentPeriodId = preferences[CURRENT_PERIOD_ID] ?: 0L,
-				notificationHour = preferences[NOTIFICATION_HOUR]
-					?: UserSettings.DEFAULT_NOTIFICATION_HOUR,
-				notificationMinute = preferences[NOTIFICATION_MINUTE]
-					?: UserSettings.DEFAULT_NOTIFICATION_MINUTE,
-				themeMode = preferences[THEME_MODE]?.toThemeMode() ?: ThemeMode.SYSTEM,
-				typographyMode = preferences[TYPOGRAPHY_MODE]?.toTypographyMode()
-					?: TypographyMode.EXPRESSIVE,
-				dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false
-			)
-		}
-	}
+    override fun observeSettings(): Flow<UserSettings> {
+        return context.settingsDataStore.data.map { preferences ->
+            UserSettings(
+                onboardingCompleted = preferences[ONBOARDING_COMPLETED] ?: false,
+                earlyFinishActive = preferences[EARLY_FINISH_ACTIVE] ?: false,
+                earlyFinishActualDate = preferences[EARLY_FINISH_ACTUAL_DATE] ?: 0L,
+                earlyFinishOriginalEndDate = preferences[EARLY_FINISH_ORIGINAL_END_DATE] ?: 0L,
+                currentPeriodStartedAt = preferences[CURRENT_PERIOD_STARTED_AT] ?: 0L,
+                currentPeriodId = preferences[CURRENT_PERIOD_ID] ?: 0L,
+                notificationHour = preferences[NOTIFICATION_HOUR]
+                    ?: UserSettings.DEFAULT_NOTIFICATION_HOUR,
+                notificationMinute = preferences[NOTIFICATION_MINUTE]
+                    ?: UserSettings.DEFAULT_NOTIFICATION_MINUTE,
+                themeMode = preferences[THEME_MODE]?.toThemeMode() ?: ThemeMode.SYSTEM,
+                typographyMode = preferences[TYPOGRAPHY_MODE]?.toTypographyMode()
+                    ?: TypographyMode.EXPRESSIVE,
+                dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false
+            )
+        }
+    }
 
-	override suspend fun getSettings(): UserSettings {
-		return observeSettings().first()
-	}
+    override suspend fun getSettings(): UserSettings {
+        return observeSettings().first()
+    }
 
-	override fun observeCurrentPeriodRollover(): Flow<Pair<BigDecimal, Boolean>> {
-		return context.settingsDataStore.data.map { preferences ->
-			val amount = preferences[CURRENT_PERIOD_ROLLOVER_AMOUNT]
-				?.toBigDecimalOrNull()
-				?: BigDecimal.ZERO
-			val carryForward = preferences[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD] ?: false
-			amount to carryForward
-		}
-	}
+    override fun observeCurrentPeriodRollover(): Flow<Pair<BigDecimal, Boolean>> {
+        return context.settingsDataStore.data.map { preferences ->
+            val amount = preferences[CURRENT_PERIOD_ROLLOVER_AMOUNT]
+                ?.toBigDecimalOrNull()
+                ?: BigDecimal.ZERO
+            val carryForward = preferences[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD] ?: false
+            amount to carryForward
+        }
+    }
 
-	override fun observeCurrentPeriodBoundary(): Flow<Pair<Long, Long>> {
-		return context.settingsDataStore.data.map { preferences ->
-			val startedAt = preferences[CURRENT_PERIOD_STARTED_AT] ?: 0L
-			val periodId = preferences[CURRENT_PERIOD_ID] ?: 0L
-			startedAt to periodId
-		}
-	}
+    override fun observeCurrentPeriodBoundary(): Flow<Pair<Long, Long>> {
+        return context.settingsDataStore.data.map { preferences ->
+            val startedAt = preferences[CURRENT_PERIOD_STARTED_AT] ?: 0L
+            val periodId = preferences[CURRENT_PERIOD_ID] ?: 0L
+            startedAt to periodId
+        }
+    }
 
-	override suspend fun getCurrentPeriodId(): Long {
-		return context.settingsDataStore.data.first()[CURRENT_PERIOD_ID] ?: 0L
-	}
+    override suspend fun getCurrentPeriodId(): Long {
+        return context.settingsDataStore.data.first()[CURRENT_PERIOD_ID] ?: 0L
+    }
 
-	override suspend fun setOnboardingCompleted(completed: Boolean) {
-		context.settingsDataStore.edit { preferences ->
-			preferences[ONBOARDING_COMPLETED] = completed
-		}
-	}
+    override suspend fun setOnboardingCompleted(completed: Boolean) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[ONBOARDING_COMPLETED] = completed
+        }
+    }
 
-	override suspend fun setEarlyFinishActive(
-		active: Boolean,
-		actualDate: Long,
-		originalEndDate: Long
-	) {
-		context.settingsDataStore.edit { preferences ->
-			preferences[EARLY_FINISH_ACTIVE] = active
-			preferences[EARLY_FINISH_ACTUAL_DATE] = actualDate
-			preferences[EARLY_FINISH_ORIGINAL_END_DATE] = originalEndDate
-		}
-	}
+    override suspend fun setEarlyFinishActive(
+        active: Boolean,
+        actualDate: Long,
+        originalEndDate: Long
+    ) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[EARLY_FINISH_ACTIVE] = active
+            preferences[EARLY_FINISH_ACTUAL_DATE] = actualDate
+            preferences[EARLY_FINISH_ORIGINAL_END_DATE] = originalEndDate
+        }
+    }
 
-	override suspend fun setCurrentPeriod(periodId: Long, startedAt: Long) {
-		context.settingsDataStore.edit { preferences ->
-			preferences[CURRENT_PERIOD_ID] = periodId
-			preferences[CURRENT_PERIOD_STARTED_AT] = startedAt
-		}
-	}
+    override suspend fun setCurrentPeriod(periodId: Long, startedAt: Long) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[CURRENT_PERIOD_ID] = periodId
+            preferences[CURRENT_PERIOD_STARTED_AT] = startedAt
+        }
+    }
 
-	override suspend fun setCurrentPeriodRollover(amount: BigDecimal, carryForward: Boolean) {
-		context.settingsDataStore.edit { preferences ->
-			preferences[CURRENT_PERIOD_ROLLOVER_AMOUNT] = amount.toPlainString()
-			preferences[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD] = carryForward
-		}
-	}
+    override suspend fun setCurrentPeriodRollover(amount: BigDecimal, carryForward: Boolean) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[CURRENT_PERIOD_ROLLOVER_AMOUNT] = amount.toPlainString()
+            preferences[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD] = carryForward
+        }
+    }
 
-	override suspend fun setPendingRollover(amount: BigDecimal, strategy: RemainingBudgetStrategy) {
-		context.settingsDataStore.edit { preferences ->
-			preferences[PENDING_ROLLOVER_AMOUNT] = amount.toPlainString()
-			preferences[PENDING_ROLLOVER_STRATEGY] = strategy.name
-		}
-	}
+    override suspend fun setPendingRollover(amount: BigDecimal, strategy: RemainingBudgetStrategy) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[PENDING_ROLLOVER_AMOUNT] = amount.toPlainString()
+            preferences[PENDING_ROLLOVER_STRATEGY] = strategy.name
+        }
+    }
 
-	override suspend fun clearPendingRollover() {
-		context.settingsDataStore.edit { preferences ->
-			preferences.remove(PENDING_ROLLOVER_AMOUNT)
-			preferences.remove(PENDING_ROLLOVER_STRATEGY)
-		}
-	}
+    override suspend fun clearPendingRollover() {
+        context.settingsDataStore.edit { preferences ->
+            preferences.remove(PENDING_ROLLOVER_AMOUNT)
+            preferences.remove(PENDING_ROLLOVER_STRATEGY)
+        }
+    }
 
-	override suspend fun setNotificationTime(hour: Int, minute: Int) {
-		context.settingsDataStore.edit { preferences ->
-			preferences[NOTIFICATION_HOUR] = hour
-			preferences[NOTIFICATION_MINUTE] = minute
-		}
-	}
+    override suspend fun setNotificationTime(hour: Int, minute: Int) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[NOTIFICATION_HOUR] = hour
+            preferences[NOTIFICATION_MINUTE] = minute
+        }
+    }
 
-	override suspend fun setThemeMode(mode: ThemeMode) {
-		context.settingsDataStore.edit { preferences ->
-			preferences[THEME_MODE] = mode.name
-		}
-	}
+    override suspend fun setThemeMode(mode: ThemeMode) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[THEME_MODE] = mode.name
+        }
+    }
 
-	override suspend fun setTypographyMode(mode: TypographyMode) {
-		context.settingsDataStore.edit { preferences ->
-			preferences[TYPOGRAPHY_MODE] = mode.name
-		}
-	}
+    override suspend fun setTypographyMode(mode: TypographyMode) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[TYPOGRAPHY_MODE] = mode.name
+        }
+    }
 
-	override suspend fun setDynamicColorEnabled(enabled: Boolean) {
-		context.settingsDataStore.edit { preferences ->
-			preferences[DYNAMIC_COLOR] = enabled
-		}
-	}
+    override suspend fun setDynamicColorEnabled(enabled: Boolean) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[DYNAMIC_COLOR] = enabled
+        }
+    }
 
-	override suspend fun clearEarlyFinish() {
-		context.settingsDataStore.edit { preferences ->
-			preferences[EARLY_FINISH_ACTIVE] = false
-			preferences[EARLY_FINISH_ACTUAL_DATE] = 0L
-			preferences[EARLY_FINISH_ORIGINAL_END_DATE] = 0L
-		}
-	}
+    override suspend fun clearEarlyFinish() {
+        context.settingsDataStore.edit { preferences ->
+            preferences[EARLY_FINISH_ACTIVE] = false
+            preferences[EARLY_FINISH_ACTUAL_DATE] = 0L
+            preferences[EARLY_FINISH_ORIGINAL_END_DATE] = 0L
+        }
+    }
 
-	private fun String.toThemeMode(): ThemeMode {
-		return try {
-			ThemeMode.valueOf(this)
-		} catch (_: Exception) {
-			ThemeMode.SYSTEM
-		}
-	}
+    private fun String.toThemeMode(): ThemeMode {
+        return try {
+            ThemeMode.valueOf(this)
+        } catch (_: Exception) {
+            ThemeMode.SYSTEM
+        }
+    }
 
-	private fun String.toTypographyMode(): TypographyMode {
-		return try {
-			TypographyMode.valueOf(this)
-		} catch (_: Exception) {
-			TypographyMode.EXPRESSIVE
-		}
-	}
+    private fun String.toTypographyMode(): TypographyMode {
+        return try {
+            TypographyMode.valueOf(this)
+        } catch (_: Exception) {
+            TypographyMode.EXPRESSIVE
+        }
+    }
 }

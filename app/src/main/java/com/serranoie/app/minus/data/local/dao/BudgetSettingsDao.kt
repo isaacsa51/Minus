@@ -7,10 +7,6 @@ import androidx.room.Query
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Data Access Object for budget settings.
- * Uses single-row pattern (id = 1).
- */
 @Dao
 interface BudgetSettingsDao {
 

@@ -4,9 +4,20 @@ plugins {
 	alias(libs.plugins.kotlin.compose)
 	alias(libs.plugins.kotlin.serialization)
 	alias(libs.plugins.paparazzi)
+	alias(libs.plugins.detekt)
 
 	id("dagger.hilt.android.plugin")
 	id("com.google.devtools.ksp")
+}
+
+detekt {
+	buildUponDefaultConfig = true
+	config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+	baseline = file("$rootDir/config/detekt/detekt-baseline.xml")
+	reports {
+		html.required.set(true)
+		xml.required.set(true)
+	}
 }
 
 fun gitOutput(vararg args: String): String? {

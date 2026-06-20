@@ -1,0 +1,66 @@
+build:
+  maxIssues: 0
+
+style:
+  active: true
+  MagicNumber:
+    active: false
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated: ['Composable']
+  UnusedImports:
+    active: true
+  WildcardImport:
+    active: true
+    excludes: ['**/test/**', '**/androidTest/**', '**/common/**']
+
+complexity:
+  active: true
+  LongMethod:
+    threshold: 120
+  TooManyFunctions:
+    thresholdInFiles: 20
+    thresholdInClasses: 20
+    thresholdInInterfaces: 20
+    thresholdInEnums: 8
+  NestedBlockDepth:
+    threshold: 5
+  StringLiteralDuplication:
+    active: false
+
+performance:
+  active: true
+  CouldBeSequence:
+    active: false
+
+potential-bugs:
+  active: true
+  UnreachableCode:
+    active: true
+  UnsafeCast:
+    active: true
+  ExplicitGarbageCollectionCall:
+    active: true
+
+exceptions:
+  active: true
+  SwallowedException:
+    active: false
+  PrintStackTrace:
+    active: false
+  InstanceOfCheckForException:
+    active: false
+
+naming:
+  active: true
+  EnumNaming:
+    active: false
+  MatchingDeclarationName:
+    active: false
+
+coroutines:
+  active: true
+  GlobalCoroutineUsage:
+    active: false
+  InjectDispatcher:
+    active: false

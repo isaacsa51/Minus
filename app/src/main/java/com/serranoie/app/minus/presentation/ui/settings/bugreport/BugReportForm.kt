@@ -43,7 +43,6 @@ import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.UploadFile
-import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.Help
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -72,11 +71,11 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -84,7 +83,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -92,6 +90,7 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewFontScale
@@ -112,634 +111,651 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun BugReportForm(
-	uiState: BugReportUiState,
-	onIntent: (BugReportUiIntent) -> Unit,
-	modifier: Modifier = Modifier,
-	onBackClick: () -> Unit = {},
-	permissionHandler: PermissionHandler = remember { PermissionHandler() },
+    uiState: BugReportUiState,
+    onIntent: (BugReportUiIntent) -> Unit,
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {},
+    permissionHandler: PermissionHandler = remember { PermissionHandler() },
 ) {
-	val scrollBehavior =
-		TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-	val context = LocalContext.current
-	val attachmentPickerLauncher = rememberLauncherForActivityResult(
-		contract = ActivityResultContracts.OpenMultipleDocuments(),
-		onResult = { uris ->
-			permissionHandler.onAttachmentPickerResult(
-				context = context,
-				uris = uris,
-				onAttachmentsSelected = { selectedUris ->
-					onIntent(BugReportUiIntent.SelectAttachments(selectedUris))
-				}
-			)
-		}
-	)
+    val scrollBehavior =
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val context = LocalContext.current
+    val attachmentPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenMultipleDocuments(),
+        onResult = { uris ->
+            permissionHandler.onAttachmentPickerResult(
+                context = context,
+                uris = uris,
+                onAttachmentsSelected = { selectedUris ->
+                    onIntent(BugReportUiIntent.SelectAttachments(selectedUris))
+                }
+            )
+        }
+    )
 
-	Scaffold(
-		modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-		containerColor = MaterialTheme.colorScheme.background,
-		topBar = {
-			MediumTopAppBar(
-				title = {
-					Text(
-						text = stringResource(R.string.bug_report_title),
-						style = MaterialTheme.typography.titleLargeEmphasized,
-					)
-				}, navigationIcon = {
-					IconButton(onClick = onBackClick) {
-						Icon(
-							imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-							contentDescription = null
-						)
-					}
-				}, colors = TopAppBarDefaults.topAppBarColors(
-					containerColor = MaterialTheme.colorScheme.surface,
-					titleContentColor = MaterialTheme.colorScheme.onSurface
-				), scrollBehavior = scrollBehavior
-			)
-		}) { paddingValues ->
-		Column(
-			modifier = Modifier
-				.fillMaxSize()
-				.padding(paddingValues)
-				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 14.dp, vertical = 16.dp)
-		) {
-			HelpBanner(
-				modifier = Modifier.fillMaxWidth(),
-				backgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
-				accentColor = MaterialTheme.colorScheme.primary
-			)
+    Scaffold(
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            MediumTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.bug_report_title),
+                        style = MaterialTheme.typography.titleLargeEmphasized,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                ),
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 14.dp, vertical = 16.dp)
+        ) {
+            HelpBanner(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
+                accentColor = MaterialTheme.colorScheme.primary
+            )
 
-			Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-			SectionLabel(text = stringResource(R.string.bug_report_type_label))
+            SectionLabel(text = stringResource(R.string.bug_report_type_label))
 
-			Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-			IssueTypeSelector(
-				selectedIssueType = uiState.selectedIssueType,
-				onIssueTypeChange = { onIntent(BugReportUiIntent.SelectIssueType(it)) },
-				modifier = Modifier.fillMaxWidth()
-			)
+            IssueTypeSelector(
+                selectedIssueType = uiState.selectedIssueType,
+                onIssueTypeChange = { onIntent(BugReportUiIntent.SelectIssueType(it)) },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-			Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-			FormField(
-				label = stringResource(R.string.bug_report_title_label),
-				placeholder = stringResource(R.string.bug_report_title_placeholder),
-				value = uiState.title,
-				onValueChange = { onIntent(BugReportUiIntent.ChangeTitle(it)) },
-				minHeight = 56.dp,
-				isError = uiState.description.isNotBlank() && !uiState.hasTitle,
-				errorText = stringResource(R.string.bug_report_title_required),
-				singleLine = true
-			)
+            FormField(
+                label = stringResource(R.string.bug_report_title_label),
+                placeholder = stringResource(R.string.bug_report_title_placeholder),
+                value = uiState.title,
+                onValueChange = { onIntent(BugReportUiIntent.ChangeTitle(it)) },
+                minHeight = 56.dp,
+                isError = uiState.description.isNotBlank() && !uiState.hasTitle,
+                errorText = stringResource(R.string.bug_report_title_required),
+                singleLine = true
+            )
 
-			Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-			FormField(
-				label = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
-					stringResource(R.string.bug_report_problem_label)
-				} else {
-					stringResource(R.string.bug_report_description_label)
-				},
-				placeholder = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
-					stringResource(R.string.bug_report_problem_placeholder)
-				} else {
-					stringResource(R.string.bug_report_description_placeholder)
-				},
-				value = uiState.description,
-				onValueChange = { onIntent(BugReportUiIntent.ChangeDescription(it)) },
-				minHeight = 118.dp,
-				isError = uiState.hasTitle && !uiState.hasDescription,
-				errorText = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
-					stringResource(R.string.bug_report_problem_required)
-				} else {
-					stringResource(R.string.bug_report_description_required)
-				}
-			)
+            FormField(
+                label = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
+                    stringResource(R.string.bug_report_problem_label)
+                } else {
+                    stringResource(R.string.bug_report_description_label)
+                },
+                placeholder = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
+                    stringResource(R.string.bug_report_problem_placeholder)
+                } else {
+                    stringResource(R.string.bug_report_description_placeholder)
+                },
+                value = uiState.description,
+                onValueChange = { onIntent(BugReportUiIntent.ChangeDescription(it)) },
+                minHeight = 118.dp,
+                isError = uiState.hasTitle && !uiState.hasDescription,
+                errorText = if (uiState.selectedIssueType == BugReportIssueType.FeatureRequest) {
+                    stringResource(R.string.bug_report_problem_required)
+                } else {
+                    stringResource(R.string.bug_report_description_required)
+                }
+            )
 
-			Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-			if (uiState.selectedIssueType == BugReportIssueType.BugReport) {
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.SpaceBetween
-				) {
-					SectionLabel(text = stringResource(R.string.bug_report_include_steps_label))
-					Switch(
-						checked = uiState.showReproductionSteps,
-						onCheckedChange = { onIntent(BugReportUiIntent.ToggleReproductionSteps(it)) }
-					)
-				}
+            if (uiState.selectedIssueType == BugReportIssueType.BugReport) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    SectionLabel(text = stringResource(R.string.bug_report_include_steps_label))
+                    Switch(
+                        checked = uiState.showReproductionSteps,
+                        onCheckedChange = { onIntent(BugReportUiIntent.ToggleReproductionSteps(it)) }
+                    )
+                }
 
-				AnimatedVisibility(
-					visible = uiState.showReproductionSteps,
-					enter = expandVertically() + fadeIn(),
-					exit = shrinkVertically() + fadeOut()
-				) {
-					Column {
-						Spacer(modifier = Modifier.height(16.dp))
-						StepsToReproduceField(
-							stepCount = uiState.reproductionSteps.size,
-							stepIdAt = { index -> uiState.reproductionSteps[index].id },
-							stepValueAt = { index -> uiState.reproductionSteps[index].value },
-							stepVisibleAt = { index -> uiState.reproductionSteps[index].visible },
-							onStepChange = { index, value ->
-								onIntent(BugReportUiIntent.ChangeStep(index, value))
-							},
-							onAddStep = {
-								onIntent(BugReportUiIntent.AddStep)
-							},
-							onRemoveStep = { index ->
-								onIntent(BugReportUiIntent.RemoveStep(index))
-							},
-							onStepExitFinish = { stepId ->
-								onIntent(BugReportUiIntent.FinishStepExit(stepId))
-							}
-						)
-					}
-				}
-				Spacer(modifier = Modifier.height(24.dp))
-			} else {
-				FormField(
-					label = stringResource(R.string.bug_report_proposed_solution_label),
-					placeholder = stringResource(R.string.bug_report_proposed_solution_placeholder),
-					value = uiState.proposedSolution,
-					onValueChange = { onIntent(BugReportUiIntent.ChangeProposedSolution(it)) },
-					minHeight = 118.dp,
-					isError = uiState.hasTitle && !uiState.hasProposedSolution,
-					errorText = stringResource(R.string.bug_report_proposed_solution_required)
-				)
+                AnimatedVisibility(
+                    visible = uiState.showReproductionSteps,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    Column {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        StepsToReproduceField(
+                            stepCount = uiState.reproductionSteps.size,
+                            stepIdAt = { index -> uiState.reproductionSteps[index].id },
+                            stepValueAt = { index -> uiState.reproductionSteps[index].value },
+                            stepVisibleAt = { index -> uiState.reproductionSteps[index].visible },
+                            onStepChange = { index, value ->
+                                onIntent(BugReportUiIntent.ChangeStep(index, value))
+                            },
+                            onAddStep = {
+                                onIntent(BugReportUiIntent.AddStep)
+                            },
+                            onRemoveStep = { index ->
+                                onIntent(BugReportUiIntent.RemoveStep(index))
+                            },
+                            onStepExitFinish = { stepId ->
+                                onIntent(BugReportUiIntent.FinishStepExit(stepId))
+                            }
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+            } else {
+                FormField(
+                    label = stringResource(R.string.bug_report_proposed_solution_label),
+                    placeholder = stringResource(R.string.bug_report_proposed_solution_placeholder),
+                    value = uiState.proposedSolution,
+                    onValueChange = { onIntent(BugReportUiIntent.ChangeProposedSolution(it)) },
+                    minHeight = 118.dp,
+                    isError = uiState.hasTitle && !uiState.hasProposedSolution,
+                    errorText = stringResource(R.string.bug_report_proposed_solution_required)
+                )
 
-				Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-				FormField(
-					label = stringResource(R.string.bug_report_alternatives_considered_label),
-					placeholder = stringResource(R.string.bug_report_alternatives_considered_placeholder),
-					value = uiState.alternativesConsidered,
-					onValueChange = { onIntent(BugReportUiIntent.ChangeAlternativesConsidered(it)) },
-					minHeight = 94.dp
-				)
+                FormField(
+                    label = stringResource(R.string.bug_report_alternatives_considered_label),
+                    placeholder = stringResource(R.string.bug_report_alternatives_considered_placeholder),
+                    value = uiState.alternativesConsidered,
+                    onValueChange = { onIntent(BugReportUiIntent.ChangeAlternativesConsidered(it)) },
+                    minHeight = 94.dp
+                )
 
-				Spacer(modifier = Modifier.height(24.dp))
-			}
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
-			FormField(
-				label = stringResource(R.string.bug_report_additional_context_label),
-				placeholder = if (uiState.selectedIssueType == BugReportIssueType.BugReport) {
-					stringResource(R.string.bug_report_additional_context_placeholder_bug)
-				} else {
-					stringResource(R.string.bug_report_additional_context_placeholder_feature)
-				},
-				value = uiState.additionalInfo,
-				onValueChange = { onIntent(BugReportUiIntent.ChangeAdditionalInfo(it)) },
-				minHeight = 94.dp
-			)
+            FormField(
+                label = stringResource(R.string.bug_report_additional_context_label),
+                placeholder = if (uiState.selectedIssueType == BugReportIssueType.BugReport) {
+                    stringResource(R.string.bug_report_additional_context_placeholder_bug)
+                } else {
+                    stringResource(R.string.bug_report_additional_context_placeholder_feature)
+                },
+                value = uiState.additionalInfo,
+                onValueChange = { onIntent(BugReportUiIntent.ChangeAdditionalInfo(it)) },
+                minHeight = 94.dp
+            )
 
-			Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-			SectionLabel(
-				text = if (uiState.selectedIssueType == BugReportIssueType.BugReport) {
-					stringResource(R.string.bug_report_attachments_label_bug)
-				} else {
-					stringResource(R.string.bug_report_attachments_label)
-				}
-			)
-			Spacer(modifier = Modifier.height(8.dp))
-			AttachmentDropZone(
-				attachmentCount = uiState.attachmentCount,
-				modifier = Modifier.fillMaxWidth(),
-				onClick = {
-					permissionHandler.requestAttachmentPickerPermissionIfNeeded(attachmentPickerLauncher)
-				}
-			)
+            SectionLabel(
+                text = if (uiState.selectedIssueType == BugReportIssueType.BugReport) {
+                    stringResource(R.string.bug_report_attachments_label_bug)
+                } else {
+                    stringResource(R.string.bug_report_attachments_label)
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            AttachmentDropZone(
+                attachmentCount = uiState.attachmentCount,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    permissionHandler.requestAttachmentPickerPermissionIfNeeded(attachmentPickerLauncher)
+                }
+            )
 
-			Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-			Button(
-				onClick = {
-					if (uiState.canSubmit) {
-						onIntent(BugReportUiIntent.SubmitReport)
-					}
-				},
-				enabled = uiState.canSubmit,
-				shape = RoundedCornerShape(20.dp),
-				colors = ButtonDefaults.buttonColors(
-					containerColor = MaterialTheme.colorScheme.primary,
-					contentColor = MaterialTheme.colorScheme.onPrimary
-				),
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(58.dp)
-			) {
-				Text(
-					text = stringResource(R.string.bug_report_submit),
-					style = MaterialTheme.typography.labelLargeEmphasized
-				)
-			}
-		}
-	}
+            Button(
+                onClick = {
+                    if (uiState.canSubmit) {
+                        onIntent(BugReportUiIntent.SubmitReport)
+                    }
+                },
+                enabled = uiState.canSubmit,
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.bug_report_submit),
+                    style = MaterialTheme.typography.labelLargeEmphasized
+                )
+            }
+        }
+    }
 }
 
 @Composable
 private fun IssueTypeSelector(
-	selectedIssueType: BugReportIssueType,
-	onIssueTypeChange: (BugReportIssueType) -> Unit,
-	modifier: Modifier = Modifier
+    selectedIssueType: BugReportIssueType,
+    onIssueTypeChange: (BugReportIssueType) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-	val options = listOf(
-		stringResource(R.string.bug_report_type_bug_report),
-		stringResource(R.string.bug_report_type_feature_request)
-	)
-	val issueTypes = listOf(
-		BugReportIssueType.BugReport,
-		BugReportIssueType.FeatureRequest,
-	)
-	val selectedIndex = issueTypes.indexOf(selectedIssueType).coerceAtLeast(0)
-	val view = LocalView.current
+    val options = listOf(
+        stringResource(R.string.bug_report_type_bug_report),
+        stringResource(R.string.bug_report_type_feature_request)
+    )
+    val issueTypes = listOf(
+        BugReportIssueType.BugReport,
+        BugReportIssueType.FeatureRequest,
+    )
+    val selectedIndex = issueTypes.indexOf(selectedIssueType).coerceAtLeast(0)
+    val view = LocalView.current
 
-	Row(
-		modifier = modifier.padding(horizontal = 8.dp),
-		horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-	) {
-		options.forEachIndexed { index, label ->
-			ToggleButton(
-				checked = selectedIndex == index,
-				onCheckedChange = {
-					view.confirmFeedback()
-					onIssueTypeChange(issueTypes[index])
-				},
-				modifier = Modifier
-					.weight(1f)
-					.semantics { role = Role.RadioButton },
-				colors = ToggleButtonDefaults.toggleButtonColors(
-					containerColor = MaterialTheme.colorScheme.surface,
-					contentColor = MaterialTheme.colorScheme.tertiary,
-					checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-					checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-					disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-					disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-				),
-				shapes = when (index) {
-					0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-					options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-					else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-				},
-			) {
-				Text(label, modifier = Modifier.basicMarquee())
-			}
-		}
-	}
+    Row(
+        modifier = modifier.padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+    ) {
+        options.forEachIndexed { index, label ->
+            ToggleButton(
+                checked = selectedIndex == index,
+                onCheckedChange = {
+                    view.confirmFeedback()
+                    onIssueTypeChange(issueTypes[index])
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics { role = Role.RadioButton },
+                colors = ToggleButtonDefaults.toggleButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.tertiary,
+                    checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+                shapes = when (index) {
+                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                    options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                },
+            ) {
+                Text(label, modifier = Modifier.basicMarquee())
+            }
+        }
+    }
 }
 
 @Composable
 private fun HelpBanner(
-	backgroundColor: Color, accentColor: Color, modifier: Modifier = Modifier
+    backgroundColor: Color,
+    accentColor: Color,
+    modifier: Modifier = Modifier
 ) {
-	Column(
-		modifier = modifier
-			.clip(RoundedCornerShape(20.dp))
-			.background(backgroundColor)
-			.padding(horizontal = 16.dp, vertical = 13.dp),
-		verticalArrangement = Arrangement.spacedBy(8.dp)
-	) {
-		Row(verticalAlignment = Alignment.CenterVertically) {
-			Icon(
-				imageVector = Icons.AutoMirrored.Outlined.Help,
-				contentDescription = null,
-				tint = MaterialTheme.colorScheme.outline,
-				modifier = Modifier.size(20.dp)
-			)
-			Spacer(modifier = Modifier.width(8.dp))
-			Text(
-				text = stringResource(R.string.bug_report_help_title),
-				style = MaterialTheme.typography.bodySmallCondensed,
-				color = MaterialTheme.colorScheme.outline
-			)
-		}
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(backgroundColor)
+            .padding(horizontal = 16.dp, vertical = 13.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.Help,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.bug_report_help_title),
+                style = MaterialTheme.typography.bodySmallCondensed,
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
 
-		val helpMessagePrefix = stringResource(R.string.bug_report_help_message_prefix)
-		val helpLinkLabel = stringResource(R.string.bug_report_help_github_issues)
-		val helpMessageSuffix = stringResource(R.string.bug_report_help_message_suffix)
-		val githubIssuesUrl = stringResource(R.string.bug_report_github_issues_url)
+        val helpMessagePrefix = stringResource(R.string.bug_report_help_message_prefix)
+        val helpLinkLabel = stringResource(R.string.bug_report_help_github_issues)
+        val helpMessageSuffix = stringResource(R.string.bug_report_help_message_suffix)
+        val githubIssuesUrl = stringResource(R.string.bug_report_github_issues_url)
 
-		Text(
-			text = buildAnnotatedString {
-				append(helpMessagePrefix)
-				withLink(
-					LinkAnnotation.Url(
-						url = githubIssuesUrl, styles = TextLinkStyles(
-							style = SpanStyle(color = accentColor, fontWeight = FontWeight.Bold)
-						)
-					)
-				) {
-					append(helpLinkLabel)
-				}
-				append(helpMessageSuffix)
-			},
-			style = MaterialTheme.typography.bodySmall,
-			color = MaterialTheme.colorScheme.onSurfaceVariant,
-			lineHeight = 14.sp,
-			modifier = Modifier.fillMaxWidth()
-		)
-	}
+        Text(
+            text = buildAnnotatedString {
+                append(helpMessagePrefix)
+                withLink(
+                    LinkAnnotation.Url(
+                        url = githubIssuesUrl,
+                        styles = TextLinkStyles(
+                            style = SpanStyle(color = accentColor, fontWeight = FontWeight.Bold)
+                        )
+                    )
+                ) {
+                    append(helpLinkLabel)
+                }
+                append(helpMessageSuffix)
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            lineHeight = 14.sp,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 @Composable
 private fun FormField(
-	label: String,
-	placeholder: String,
-	value: String,
-	onValueChange: (String) -> Unit,
-	minHeight: Dp,
-	modifier: Modifier = Modifier,
-	rounded: Boolean = false,
-	isError: Boolean = false,
-	errorText: String? = null,
-	singleLine: Boolean = false
+    label: String,
+    placeholder: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    minHeight: Dp,
+    modifier: Modifier = Modifier,
+    rounded: Boolean = false,
+    isError: Boolean = false,
+    errorText: String? = null,
+    singleLine: Boolean = false
 ) {
-	Column(modifier = modifier.fillMaxWidth()) {
-		AnimatedContent(
-			targetState = label, transitionSpec = {
-				(slideInVertically(animationSpec = tween(220)) { height -> height / 2 } + fadeIn()).togetherWith(
-					slideOutVertically(animationSpec = tween(180)) { height -> -height / 2 } + fadeOut())
-			}, label = "FormFieldLabelAnimation"
-		) { animatedLabel ->
-			Text(
-				text = animatedLabel,
-				style = MaterialTheme.typography.labelLargeEmphasized,
-				color = MaterialTheme.colorScheme.onBackground
-			)
-		}
+    Column(modifier = modifier.fillMaxWidth()) {
+        AnimatedContent(
+            targetState = label,
+            transitionSpec = {
+                (slideInVertically(animationSpec = tween(220)) { height -> height / 2 } + fadeIn()).togetherWith(
+                    slideOutVertically(animationSpec = tween(180)) { height -> -height / 2 } + fadeOut()
+                )
+            },
+            label = "FormFieldLabelAnimation"
+        ) { animatedLabel ->
+            Text(
+                text = animatedLabel,
+                style = MaterialTheme.typography.labelLargeEmphasized,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
 
-		Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
-		OutlinedTextField(
-			value = value,
-			onValueChange = onValueChange,
-			isError = isError,
-			placeholder = {
-				Text(
-					text = placeholder,
-					style = MaterialTheme.typography.bodyMedium,
-					color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f)
-				)
-			},
-			textStyle = MaterialTheme.typography.bodyMedium,
-			shape = if (rounded) RoundedCornerShape(20.dp) else MaterialTheme.shapes.large,
-			modifier = Modifier
-				.fillMaxWidth()
-				.heightIn(min = minHeight),
-			minLines = if (singleLine) 1 else 4,
-			singleLine = singleLine
-		)
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            isError = isError,
+            placeholder = {
+                Text(
+                    text = placeholder,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f)
+                )
+            },
+            textStyle = MaterialTheme.typography.bodyMedium,
+            shape = if (rounded) RoundedCornerShape(20.dp) else MaterialTheme.shapes.large,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = minHeight),
+            minLines = if (singleLine) 1 else 4,
+            singleLine = singleLine
+        )
 
-		AnimatedVisibility(visible = isError && !errorText.isNullOrBlank()) {
-			Text(
-				text = errorText.orEmpty(),
-				style = MaterialTheme.typography.bodySmall,
-				color = MaterialTheme.colorScheme.error,
-				modifier = Modifier.padding(top = 4.dp, start = 16.dp)
-			)
-		}
-	}
+        AnimatedVisibility(visible = isError && !errorText.isNullOrBlank()) {
+            Text(
+                text = errorText.orEmpty(),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 4.dp, start = 16.dp)
+            )
+        }
+    }
 }
 
 @Composable
 private fun StepsToReproduceField(
-	stepCount: Int,
-	stepIdAt: (Int) -> Long,
-	stepValueAt: (Int) -> String,
-	stepVisibleAt: (Int) -> Boolean,
-	onStepChange: (Int, String) -> Unit,
-	onAddStep: () -> Unit,
-	onRemoveStep: (Int) -> Unit,
-	onStepExitFinish: (Long) -> Unit,
-	modifier: Modifier = Modifier
+    stepCount: Int,
+    stepIdAt: (Int) -> Long,
+    stepValueAt: (Int) -> String,
+    stepVisibleAt: (Int) -> Boolean,
+    onStepChange: (Int, String) -> Unit,
+    onAddStep: () -> Unit,
+    onRemoveStep: (Int) -> Unit,
+    onStepExitFinish: (Long) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-	Column(
-		modifier = modifier
-			.fillMaxWidth()
-			.animateContentSize(animationSpec = tween(240)),
-		verticalArrangement = Arrangement.spacedBy(10.dp)
-	) {
-		repeat(stepCount) { index ->
-			val stepId = stepIdAt(index)
-			key(stepId) {
-				AnimatedStepRow(
-					visible = stepVisibleAt(index),
-					stepId = stepId,
-					stepNumber = index + 1,
-					value = stepValueAt(index),
-					onValueChange = { onStepChange(index, it) },
-					onRemoveClick = { onRemoveStep(index) },
-					onExitFinish = onStepExitFinish
-				)
-			}
-		}
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(animationSpec = tween(240)),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        repeat(stepCount) { index ->
+            val stepId = stepIdAt(index)
+            key(stepId) {
+                AnimatedStepRow(
+                    visible = stepVisibleAt(index),
+                    stepId = stepId,
+                    stepNumber = index + 1,
+                    value = stepValueAt(index),
+                    onValueChange = { onStepChange(index, it) },
+                    onRemoveClick = { onRemoveStep(index) },
+                    onExitFinish = onStepExitFinish
+                )
+            }
+        }
 
-		OutlinedButton(
-			onClick = onAddStep, border = null, colors = ButtonDefaults.outlinedButtonColors(
-				containerColor = Color.Transparent, contentColor = MaterialTheme.colorScheme.primary
-			), contentPadding = ButtonDefaults.TextButtonContentPadding
-		) {
-			Icon(
-				imageVector = Icons.Default.Add,
-				contentDescription = null,
-				modifier = Modifier.size(18.dp)
-			)
-			Spacer(modifier = Modifier.width(8.dp))
-			Text(
-				text = stringResource(R.string.bug_report_add_step),
-				style = MaterialTheme.typography.labelLargeEmphasized
-			)
-		}
-	}
+        OutlinedButton(
+            onClick = onAddStep,
+            border = null,
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.primary
+            ),
+            contentPadding = ButtonDefaults.TextButtonContentPadding
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.bug_report_add_step),
+                style = MaterialTheme.typography.labelLargeEmphasized
+            )
+        }
+    }
 }
 
 @Composable
 private fun AnimatedStepRow(
-	visible: Boolean,
-	stepId: Long,
-	stepNumber: Int,
-	value: String,
-	onValueChange: (String) -> Unit,
-	onRemoveClick: () -> Unit,
-	onExitFinish: (Long) -> Unit,
-	modifier: Modifier = Modifier
+    visible: Boolean,
+    stepId: Long,
+    stepNumber: Int,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onRemoveClick: () -> Unit,
+    onExitFinish: (Long) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-	val currentOnExitFinish by rememberUpdatedState(onExitFinish)
+    val currentOnExitFinish by rememberUpdatedState(onExitFinish)
 
-	LaunchedEffect(visible, stepId) {
-		if (!visible) {
-			delay(240)
-			currentOnExitFinish(stepId)
-		}
-	}
+    LaunchedEffect(visible, stepId) {
+        if (!visible) {
+            delay(240)
+            currentOnExitFinish(stepId)
+        }
+    }
 
-	AnimatedVisibility(
-		visible = visible,
-		enter = fadeIn(animationSpec = tween(180)) + expandVertically(
-			animationSpec = tween(240),
-			expandFrom = Alignment.Top
-		) + slideInVertically(animationSpec = tween(240)) { height -> height / 2 },
-		exit = fadeOut(animationSpec = tween(140)) + shrinkVertically(
-			animationSpec = tween(220),
-			shrinkTowards = Alignment.Top
-		) + slideOutVertically(animationSpec = tween(220)) { height -> -height / 3 },
-		modifier = modifier
-	) {
-		ReproductionStepRow(
-			stepNumber = stepNumber,
-			value = value,
-			onValueChange = onValueChange,
-			onRemoveClick = onRemoveClick
-		)
-	}
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(animationSpec = tween(180)) + expandVertically(
+            animationSpec = tween(240),
+            expandFrom = Alignment.Top
+        ) + slideInVertically(animationSpec = tween(240)) { height -> height / 2 },
+        exit = fadeOut(animationSpec = tween(140)) + shrinkVertically(
+            animationSpec = tween(220),
+            shrinkTowards = Alignment.Top
+        ) + slideOutVertically(animationSpec = tween(220)) { height -> -height / 3 },
+        modifier = modifier
+    ) {
+        ReproductionStepRow(
+            stepNumber = stepNumber,
+            value = value,
+            onValueChange = onValueChange,
+            onRemoveClick = onRemoveClick
+        )
+    }
 }
 
 @Composable
 private fun ReproductionStepRow(
-	stepNumber: Int,
-	value: String,
-	onValueChange: (String) -> Unit,
-	onRemoveClick: () -> Unit,
-	modifier: Modifier = Modifier
+    stepNumber: Int,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onRemoveClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-	val focusManager = LocalFocusManager.current
-	val textStyle = MaterialTheme.typography.bodyMedium.merge(
-		TextStyle(color = MaterialTheme.colorScheme.onSurface)
-	)
-	val placeholder = when (stepNumber) {
-		1 -> stringResource(R.string.bug_report_step_placeholder_wallet)
-		2 -> stringResource(R.string.bug_report_step_placeholder_transfer)
-		3 -> stringResource(R.string.bug_report_step_placeholder_crash)
-		else -> stringResource(R.string.bug_report_step_placeholder_format, stepNumber)
-	}
+    val focusManager = LocalFocusManager.current
+    val textStyle = MaterialTheme.typography.bodyMedium.merge(
+        TextStyle(color = MaterialTheme.colorScheme.onSurface)
+    )
+    val placeholder = when (stepNumber) {
+        1 -> stringResource(R.string.bug_report_step_placeholder_wallet)
+        2 -> stringResource(R.string.bug_report_step_placeholder_transfer)
+        3 -> stringResource(R.string.bug_report_step_placeholder_crash)
+        else -> stringResource(R.string.bug_report_step_placeholder_format, stepNumber)
+    }
 
-	Row(
-		modifier = modifier.fillMaxWidth(),
-		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(10.dp)
-	) {
-		Text(
-			text = stringResource(R.string.bug_report_step_number_format, stepNumber),
-			style = MaterialTheme.typography.labelLargeEmphasized,
-			color = MaterialTheme.colorScheme.primary,
-			modifier = Modifier.width(22.dp)
-		)
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.bug_report_step_number_format, stepNumber),
+            style = MaterialTheme.typography.labelLargeEmphasized,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.width(22.dp)
+        )
 
-		OutlinedTextField(
-			value = value,
-			onValueChange = onValueChange,
-			placeholder = {
-				Text(
-					text = placeholder,
-					style = MaterialTheme.typography.bodyMedium,
-					color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f)
-				)
-			},
-			textStyle = textStyle,
-			shape = RoundedCornerShape(16.dp),
-			modifier = Modifier
-				.weight(1f)
-				.heightIn(min = 56.dp),
-			keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-			keyboardActions = KeyboardActions(
-				onNext = { focusManager.moveFocus(FocusDirection.Next) }
-			),
-			singleLine = true,
-		)
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = {
+                Text(
+                    text = placeholder,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f)
+                )
+            },
+            textStyle = textStyle,
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = 56.dp),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Next) }
+            ),
+            singleLine = true,
+        )
 
-		IconButton(
-			onClick = onRemoveClick, modifier = Modifier.size(40.dp)
-		) {
-			Icon(
-				imageVector = Icons.Default.Close,
-				contentDescription = null,
-				tint = MaterialTheme.colorScheme.primary
-			)
-		}
-	}
+        IconButton(
+            onClick = onRemoveClick,
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
 }
 
 @Composable
 private fun AttachmentDropZone(
-	attachmentCount: Int,
-	onClick: () -> Unit,
-	modifier: Modifier = Modifier
+    attachmentCount: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-	val outlineColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.9f)
+    val outlineColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.9f)
 
-	Box(
-		modifier = modifier
-			.fillMaxWidth()
-			.height(164.dp)
-			.clip(RoundedCornerShape(18.dp))
-			.clickable(onClick = onClick), contentAlignment = Alignment.Center
-	) {
-		Canvas(modifier = Modifier.matchParentSize()) {
-			val stroke = Stroke(
-				width = 3f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-			)
-			drawRoundRect(
-				color = outlineColor,
-				style = stroke,
-				cornerRadius = CornerRadius(18.dp.toPx())
-			)
-		}
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(164.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Canvas(modifier = Modifier.matchParentSize()) {
+            val stroke = Stroke(
+                width = 3f,
+                pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+            )
+            drawRoundRect(
+                color = outlineColor,
+                style = stroke,
+                cornerRadius = CornerRadius(18.dp.toPx())
+            )
+        }
 
-		val subtitle = if (attachmentCount > 0) {
-			stringResource(R.string.bug_report_upload_assets_selected_count, attachmentCount)
-		} else {
-			stringResource(R.string.bug_report_upload_assets_subtitle)
-		}
+        val subtitle = if (attachmentCount > 0) {
+            stringResource(R.string.bug_report_upload_assets_selected_count, attachmentCount)
+        } else {
+            stringResource(R.string.bug_report_upload_assets_subtitle)
+        }
 
-		Column(
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.Center,
-			modifier = Modifier.fillMaxWidth()
-		) {
-			Box(
-				modifier = Modifier
-					.size(60.dp)
-					.clip(CircleShape)
-					.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f)),
-				contentAlignment = Alignment.Center
-			) {
-				Icon(
-					imageVector = Icons.Default.UploadFile,
-					contentDescription = null,
-					tint = MaterialTheme.colorScheme.secondary,
-					modifier = Modifier.size(32.dp)
-				)
-			}
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.UploadFile,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
 
-			Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-			Text(
-				text = stringResource(R.string.bug_report_upload_assets),
-				style = MaterialTheme.typography.titleSmallEmphasized,
-				color = MaterialTheme.colorScheme.secondary
-			)
-			Text(
-				text = subtitle,
-				style = MaterialTheme.typography.labelSmall,
-				color = MaterialTheme.colorScheme.onSurfaceVariant
-			)
-		}
-	}
+            Text(
+                text = stringResource(R.string.bug_report_upload_assets),
+                style = MaterialTheme.typography.titleSmallEmphasized,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
 }
 
 @Composable
 private fun SectionLabel(text: String) {
-	Text(
-		text = text,
-		style = MaterialTheme.typography.labelLargeEmphasized,
-		color = MaterialTheme.colorScheme.onBackground
-	)
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLargeEmphasized,
+        color = MaterialTheme.colorScheme.onBackground
+    )
 }
 
 @Preview(name = "BugReportForm", showBackground = true, device = "id:pixel_5")
@@ -748,10 +764,10 @@ private fun SectionLabel(text: String) {
 @PreviewScreenSizes
 @Composable
 private fun PreviewBugReportForm() {
-	MinusTheme {
-		BugReportForm(
-			uiState = BugReportUiState(),
-			onIntent = {},
-		)
-	}
+    MinusTheme {
+        BugReportForm(
+            uiState = BugReportUiState(),
+            onIntent = {},
+        )
+    }
 }

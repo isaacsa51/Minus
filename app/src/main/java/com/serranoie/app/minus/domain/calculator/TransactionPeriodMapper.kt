@@ -44,11 +44,13 @@ object TransactionPeriodMapper {
                 val offsetWeeks = kotlin.math.floor(daysDiff / 7.0).toLong()
                 baseStart.plusWeeks(offsetWeeks)
             }
+
             BudgetPeriod.BIWEEKLY -> {
                 val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(baseStart, date)
                 val offsetBiWeeks = kotlin.math.floor(daysDiff / 14.0).toLong()
                 baseStart.plusWeeks(offsetBiWeeks * 2)
             }
+
             BudgetPeriod.MONTHLY -> {
                 val monthsDiff = java.time.temporal.ChronoUnit.MONTHS.between(
                     baseStart.withDayOfMonth(1),
@@ -75,9 +77,11 @@ object TransactionPeriodMapper {
             BudgetPeriod.WEEKLY -> date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
             BudgetPeriod.BIWEEKLY -> {
                 val weekStart = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                val weekOfYear = java.time.temporal.WeekFields.ISO.weekOfWeekBasedYear().let { date.get(it) }
+                val weekOfYear =
+                    java.time.temporal.WeekFields.ISO.weekOfWeekBasedYear().let { date.get(it) }
                 if (weekOfYear % 2 == 0) weekStart.minusWeeks(1) else weekStart
             }
+
             BudgetPeriod.MONTHLY -> date.withDayOfMonth(1)
         }
 
@@ -103,7 +107,9 @@ object TransactionPeriodMapper {
 
         val periodStart = budgetSettings.startDate
         val periodEnd = budgetSettings.getPeriodEndDate()
-        val effectiveEnd = listOfNotNull(transaction.recurrentEndDate?.toLocalDate(), periodEnd, today).minOrNull() ?: periodEnd
+        val effectiveEnd =
+            listOfNotNull(transaction.recurrentEndDate?.toLocalDate(), periodEnd, today).minOrNull()
+                ?: periodEnd
 
         var current = txDate
         val occurrences = mutableListOf<LocalDate>()
@@ -112,7 +118,8 @@ object TransactionPeriodMapper {
             if (!current.isBefore(periodStart) && !current.isAfter(periodEnd)) {
                 occurrences.add(current)
             }
-            current = nextOccurrence(current, transaction.recurrentFrequency, transaction.subscriptionDay)
+            current =
+                nextOccurrence(current, transaction.recurrentFrequency, transaction.subscriptionDay)
         }
 
         return if (occurrences.isEmpty()) listOf(txDate) else occurrences
@@ -128,9 +135,11 @@ object TransactionPeriodMapper {
             RecurrentFrequency.BIWEEKLY -> date.plusWeeks(2)
             RecurrentFrequency.MONTHLY -> {
                 val next = date.plusMonths(1)
-                val targetDay = (subscriptionDay ?: date.dayOfMonth).coerceAtMost(next.lengthOfMonth())
+                val targetDay =
+                    (subscriptionDay ?: date.dayOfMonth).coerceAtMost(next.lengthOfMonth())
                 next.withDayOfMonth(targetDay)
             }
+
             null -> date
         }
     }

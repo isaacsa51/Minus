@@ -60,6 +60,9 @@ jobs:
         run: |
           echo "$MINUS_RELEASE_KEYSTORE_BASE64" | base64 --decode > release-keystore.jks
 
+      - name: Run Detekt
+        run: ./gradlew detekt
+
       - name: Run Fastlane release lane
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -89,7 +89,6 @@ fun AppNavGraph(
         popEnterTransition = { getScreenTransitions(initialState, targetState).first },
         popExitTransition = { getScreenTransitions(initialState, targetState).second },
     ) {
-
         composable(Screen.Onboarding.route) {
             OnboardingScreen(
                 onSetBudget = {
@@ -110,7 +109,6 @@ fun AppNavGraph(
             )
         }
 
-
         composable(
             route = Screen.Wallet.route,
             arguments = listOf(
@@ -120,9 +118,14 @@ fun AppNavGraph(
                 },
             ),
         ) { backStackEntry ->
-            val forceChange = backStackEntry.arguments?.getBoolean(Screen.Wallet.ARG_FORCE_CHANGE) ?: false
+            val forceChange =
+                backStackEntry.arguments?.getBoolean(Screen.Wallet.ARG_FORCE_CHANGE) ?: false
 
-            CompositionLocalProvider(LocalBottomSheetScrollState provides BottomSheetScrollState(topPadding = 0.dp)) {
+            CompositionLocalProvider(
+                LocalBottomSheetScrollState provides BottomSheetScrollState(
+                    topPadding = 0.dp
+                )
+            ) {
                 Wallet(
                     forceChange = forceChange,
                     activityResultRegistryOwner = activityResultRegistryOwner,
@@ -171,8 +174,10 @@ fun AppNavGraph(
         ) { backStackEntry ->
             logcat(tag) { "Navigating to Main" }
 
-            val openWallet = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_OPEN_WALLET) ?: false
-            val forceWalletSetup = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_FORCE_WALLET_SETUP) ?: false
+            val openWallet =
+                backStackEntry.arguments?.getBoolean(Screen.Main.ARG_OPEN_WALLET) ?: false
+            val forceWalletSetup =
+                backStackEntry.arguments?.getBoolean(Screen.Main.ARG_FORCE_WALLET_SETUP) ?: false
 
             // Consume navigation arguments so they don't persist on back navigation
             LaunchedEffect(backStackEntry.id) {

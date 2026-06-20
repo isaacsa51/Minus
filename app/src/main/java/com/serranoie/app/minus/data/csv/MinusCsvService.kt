@@ -18,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class MinusCsvService @Inject constructor(
     private val repository: BudgetRepository,
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
 
     private val parser = MinusCsvParser()
@@ -28,16 +28,16 @@ class MinusCsvService @Inject constructor(
     suspend fun getExportFileName(): String {
         val settings = repository.getBudgetSettingsSync() ?: return MinusCsvContract.FILE_NAME
         val periodCount = repository.getPeriodCount()
-        
-        // If current period has no transactions yet, count might be one lower than expected 
+
+        // If current period has no transactions yet, count might be one lower than expected
         // for the "current" label, but user asked for "sequence number of the period".
         // If they are in their 5th period, we use BP5.
         val bpLabel = "BP${periodCount + 1}"
-        
+
         val startDate = settings.startDate.format(fileDateFormatter).lowercase()
         val endDate = settings.getPeriodEndDate().format(fileDateFormatter).lowercase()
 
-        return "minus_backup-${bpLabel}_${startDate}-${endDate}.csv"
+        return "minus_backup-${bpLabel}_$startDate-$endDate.csv"
     }
 
     suspend fun exportAllTransactions(outputStream: OutputStream) {

@@ -1,9 +1,8 @@
 package com.serranoie.app.minus.presentation.notification
+
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import logcat.asLog
-import logcat.logcat
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -12,12 +11,16 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import logcat.asLog
+import logcat.logcat
+
 class NotificationRescheduleReceiver : BroadcastReceiver() {
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface NotificationRescheduleReceiverEntryPoint {
         fun budgetRepository(): BudgetRepository
     }
+
     override fun onReceive(context: Context, intent: Intent) {
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
@@ -38,7 +41,5 @@ class NotificationRescheduleReceiver : BroadcastReceiver() {
                 pendingResult.finish()
             }
         }
-    }
-    companion object {
     }
 }
