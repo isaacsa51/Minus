@@ -1,15 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
@@ -25,7 +19,6 @@ import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.home.MainScreenContent
 import com.serranoie.app.minus.presentation.ui.home.MainScreenUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import org.junit.Rule
 import org.junit.Test
@@ -34,139 +27,128 @@ import java.time.LocalDate
 import java.util.Locale
 
 class MainScreenScreenshotTest {
-	@get:Rule
-	val paparazzi = Paparazzi(
-		deviceConfig = DeviceConfig.PIXEL_5,
-		renderingMode = SessionParams.RenderingMode.NORMAL,
-	)
+    @get:Rule
+    val paparazzi = Paparazzi(
+        deviceConfig = DeviceConfig.PIXEL_5,
+        renderingMode = SessionParams.RenderingMode.NORMAL,
+    )
 
-	@Test
-	fun mainScreenPhoneIdle() {
-		Locale.setDefault(Locale.US)
+    @Test
+    fun mainScreenPhoneIdle() {
+        Locale.setDefault(Locale.US)
 
-		paparazzi.snapshot {
-			MainScreenPreviewContent(
-				budgetUiState = sampleMainBudgetUiState().copy(numpadInput = ""),
-				windowSizeClass = WindowWidthSizeClass.Compact,
-			)
-		}
-	}
+        paparazzi.snapshot {
+            MainScreenPreviewContent(
+                budgetUiState = sampleMainBudgetUiState().copy(numpadInput = ""),
+                windowSizeClass = WindowWidthSizeClass.Compact,
+            )
+        }
+    }
 
-	@Test
-	fun mainScreenPhoneEditingExpense() {
-		Locale.setDefault(Locale.US)
+    @Test
+    fun mainScreenPhoneEditingExpense() {
+        Locale.setDefault(Locale.US)
 
-		paparazzi.snapshot {
-			MainScreenPreviewContent(
-				budgetUiState = sampleMainBudgetUiState().copy(
-					numpadInput = "42.80",
-					isNumpadValid = true,
-					animState = AnimState.EDITING,
-					currentComment = "Dinner",
-					tags = listOf("food", "friends"),
-				),
-				windowSizeClass = WindowWidthSizeClass.Compact,
-			)
-		}
-	}
+        paparazzi.snapshot {
+            MainScreenPreviewContent(
+                budgetUiState = sampleMainBudgetUiState().copy(
+                    numpadInput = "42.80",
+                    isNumpadValid = true,
+                    animState = AnimState.EDITING,
+                    currentComment = "Dinner",
+                    tags = listOf("food", "friends"),
+                ),
+                windowSizeClass = WindowWidthSizeClass.Compact,
+            )
+        }
+    }
 }
 
 class MainScreenTabletScreenshotTest {
-	@get:Rule
-	val paparazzi = Paparazzi(
-		deviceConfig = DeviceConfig.PIXEL_C,
-		renderingMode = SessionParams.RenderingMode.NORMAL,
-	)
+    @get:Rule
+    val paparazzi = Paparazzi(
+        deviceConfig = DeviceConfig.PIXEL_C,
+        renderingMode = SessionParams.RenderingMode.NORMAL,
+    )
 
-	@Test
-	fun mainScreenTabletTwoPane() {
-		Locale.setDefault(Locale.US)
+    @Test
+    fun mainScreenTabletTwoPane() {
+        Locale.setDefault(Locale.US)
 
-		paparazzi.snapshot {
-			MainScreenPreviewContent(
-				budgetUiState = sampleMainBudgetUiState().copy(
-					numpadInput = "17.25+8.75",
-					isNumpadValid = true,
-					isCalculation = true,
-					animState = AnimState.EDITING,
-				),
-				windowSizeClass = WindowWidthSizeClass.Expanded,
-			)
-		}
-	}
+        paparazzi.snapshot {
+            MainScreenPreviewContent(
+                budgetUiState = sampleMainBudgetUiState().copy(
+                    numpadInput = "17.25+8.75",
+                    isNumpadValid = true,
+                    isCalculation = true,
+                    animState = AnimState.EDITING,
+                ),
+                windowSizeClass = WindowWidthSizeClass.Expanded,
+            )
+        }
+    }
 }
 
 @Composable
 private fun MainScreenPreviewContent(
-	budgetUiState: BudgetUiState,
-	windowSizeClass: WindowWidthSizeClass,
+    budgetUiState: BudgetUiState,
+    windowSizeClass: WindowWidthSizeClass,
 ) {
-	CompositionLocalProvider(
-		LocalWindowSize provides windowSizeClass,
-		LocalWindowInsets provides PaddingValues(0.dp),
-	) {
-		MinusTheme {
-			MainScreenContent(
-				mainScreenState = MainScreenUiState(),
-				budgetUiState = budgetUiState,
-				onboardingCompleted = true,
-				tutorialStage = FirstLaunchTutorialStage.COMPLETED,
-				showCreditQuickToggleFeature = true,
-				onProcessIntent = {},
-				onNavigateToAnalytics = {},
-				onNavigateToSettings = {},
-				onNavigateToWallet = {},
-				openWalletOnStart = false,
-				showBudgetPeriodSheet = false,
-				forceBudgetPeriodSheetSetup = false,
-				selectedViewPeriod = BudgetPeriod.DAILY,
-				settingsDataStore = null,
-				undoSnackbarActionLabel = "Undo",
-				history = { modifier, _, _, _ ->
-					Box(
-						modifier = modifier
-							.fillMaxSize()
-							.background(colorButton)
-							.padding(24.dp),
-						contentAlignment = Alignment.Center,
-					) {
-						Text("History preview with ${budgetUiState.transactions.size} expenses")
-					}
-				},
-			)
-		}
-	}
+    CompositionLocalProvider(
+        LocalWindowSize provides windowSizeClass,
+        LocalWindowInsets provides PaddingValues(0.dp),
+    ) {
+        MinusTheme {
+            MainScreenContent(
+                mainScreenState = MainScreenUiState(),
+                budgetUiState = budgetUiState,
+                onboardingCompleted = true,
+                tutorialStage = FirstLaunchTutorialStage.COMPLETED,
+                showCreditQuickToggleFeature = true,
+                onProcessIntent = {},
+                onNavigateToAnalytics = {},
+                onNavigateToSettings = {},
+                onNavigateToWallet = {},
+                openWalletOnStart = false,
+                showBudgetPeriodSheet = false,
+                forceBudgetPeriodSheetSetup = false,
+                selectedViewPeriod = BudgetPeriod.DAILY,
+                settingsDataStore = null,
+                undoSnackbarActionLabel = "Undo",
+            )
+        }
+    }
 }
 
 private fun sampleMainBudgetUiState(): BudgetUiState = BudgetUiState(
-	budgetSettings = BudgetSettings(
-		totalBudget = BigDecimal("900.00"),
-		period = BudgetPeriod.MONTHLY,
-		startDate = LocalDate.of(2026, 1, 1),
-		endDate = LocalDate.of(2026, 1, 30),
-		currencyCode = "USD",
-		daysInPeriod = 30,
-	),
-	budgetState = BudgetState(
-		remainingToday = BigDecimal("31.25"),
-		totalSpentToday = BigDecimal("18.75"),
-		dailyBudget = BigDecimal("50.00"),
-		daysRemaining = 12,
-		progress = 0.58f,
-		isOverBudget = false,
-		totalBudget = BigDecimal("900.00"),
-		totalSpentInPeriod = BigDecimal("522.45"),
-	),
-	transactions = listOf(
-		Transaction(
-			id = 1L,
-			amount = BigDecimal("18.75"),
-			comment = "Lunch",
-			date = LocalDate.of(2026, 1, 15).atTime(12, 30),
-			periodId = 7L,
-		),
-	),
-	selectedDate = LocalDate.of(2026, 1, 15),
-	currentPeriodStartedAtMillis = LocalDate.of(2026, 1, 1).toEpochDay(),
-	currentPeriodId = 7L,
+    budgetSettings = BudgetSettings(
+        totalBudget = BigDecimal("900.00"),
+        period = BudgetPeriod.MONTHLY,
+        startDate = LocalDate.of(2026, 1, 1),
+        endDate = LocalDate.of(2026, 1, 30),
+        currencyCode = "USD",
+        daysInPeriod = 30,
+    ),
+    budgetState = BudgetState(
+        remainingToday = BigDecimal("31.25"),
+        totalSpentToday = BigDecimal("18.75"),
+        dailyBudget = BigDecimal("50.00"),
+        daysRemaining = 12,
+        progress = 0.58f,
+        isOverBudget = false,
+        totalBudget = BigDecimal("900.00"),
+        totalSpentInPeriod = BigDecimal("522.45"),
+    ),
+    transactions = listOf(
+        Transaction(
+            id = 1L,
+            amount = BigDecimal("18.75"),
+            comment = "Lunch",
+            date = LocalDate.of(2026, 1, 15).atTime(12, 30),
+            periodId = 7L,
+        ),
+    ),
+    selectedDate = LocalDate.of(2026, 1, 15),
+    currentPeriodStartedAtMillis = LocalDate.of(2026, 1, 1).toEpochDay(),
+    currentPeriodId = 7L,
 )
