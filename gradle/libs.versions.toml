@@ -46,6 +46,9 @@ logcat = "0.4"
 uiTestManifest = "1.8.3"
 paparazzi = "2.0.0-alpha05"
 touchRobot = "0.1.0"
+truth = "1.4.4"
+kotlinxCoroutinesTest = "1.10.2"
+turbine = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -113,6 +116,9 @@ androidx-compose-ui-tooling-v106 = { group = "androidx.compose.ui", name = "ui-t
 androidx-compose-ui-testmanifest-v183 = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "uiTestManifest" }
 touchrobot-core = { group = "me.saket.touchrobot", name = "touchrobot-core", version.ref = "touchRobot" }
 touchrobot-paparazzi = { group = "me.saket.touchrobot", name = "touchrobot-paparazzi", version.ref = "touchRobot" }
+google-truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
