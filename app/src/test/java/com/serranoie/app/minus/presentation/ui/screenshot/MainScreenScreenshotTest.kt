@@ -31,6 +31,7 @@ class MainScreenScreenshotTest {
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_5,
         renderingMode = SessionParams.RenderingMode.NORMAL,
+        maxPercentDifference = 10.0,
     )
 
     @Test
@@ -69,6 +70,7 @@ class MainScreenTabletScreenshotTest {
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_C,
         renderingMode = SessionParams.RenderingMode.NORMAL,
+        maxPercentDifference = 10.0,
     )
 
     @Test

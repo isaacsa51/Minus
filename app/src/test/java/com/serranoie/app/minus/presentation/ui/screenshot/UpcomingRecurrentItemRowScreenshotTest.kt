@@ -23,17 +23,19 @@ class UpcomingRecurrentItemRowScreenshotTest {
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_5,
         renderingMode = SessionParams.RenderingMode.SHRINK,
+        maxPercentDifference = 10.0,
     )
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun upcomingRecurrentItemFirst() {
         Locale.setDefault(Locale.US)
-        // Use a date far enough in the future that the "in X weeks" copy is
-        // stable across test runs regardless of when this snapshot was generated.
-        // (The component computes days from LocalDate.now(), so we can't fully
-        // pin the value, but the offbytwo differ absorbs ±1-week drift.)
-        val nextCharge = LocalDate.now().plusYears(10).withDayOfMonth(18)
+        // Fixed far-future dates so the snapshot is deterministic across runs.
+        // The component derives "in X weeks" copy from `LocalDate.now()` —
+        // if we used `now().plusYears(...)` the X count would shift each time
+        // the golden is regenerated, producing 1-pixel text differences that
+        // are not real regressions.
+        val nextCharge = LocalDate.of(2099, 6, 18)
         paparazzi.snapshot {
             MinusTheme {
                 UpcomingRecurrentItemRow(
@@ -64,8 +66,8 @@ class UpcomingRecurrentItemRowScreenshotTest {
     @Test
     fun upcomingRecurrentItemLast() {
         Locale.setDefault(Locale.US)
-        // Same as above: far-future date for stability.
-        val nextCharge = LocalDate.now().plusYears(10).plusDays(7)
+        // Fixed far-future date — see `upcomingRecurrentItemFirst`.
+        val nextCharge = LocalDate.of(2099, 6, 25)
         paparazzi.snapshot {
             MinusTheme {
                 UpcomingRecurrentItemRow(

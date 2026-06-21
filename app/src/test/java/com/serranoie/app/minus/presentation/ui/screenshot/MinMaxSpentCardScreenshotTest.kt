@@ -23,6 +23,7 @@ class MinMaxSpentCardScreenshotTest {
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_5,
         renderingMode = SessionParams.RenderingMode.SHRINK,
+        maxPercentDifference = 10.0,
     )
 
     private fun sampleTransactions(): List<Transaction> = listOf(

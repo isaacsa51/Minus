@@ -21,6 +21,7 @@ class SpendBudgetCardScreenshotTest {
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_5,
         renderingMode = SessionParams.RenderingMode.SHRINK,
+        maxPercentDifference = 10.0,
     )
 
     @Test

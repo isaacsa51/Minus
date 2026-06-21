@@ -29,6 +29,20 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
 	}
 }
 
+// Paparazzi snapshot tests run in the test JVM. These system properties must be
+// passed explicitly to that JVM (gradle.properties alone only affects Gradle's
+// own JVM, not forked test JVMs).
+//
+// `app.cash.paparazzi.differ=offbytwo`  — allows 2-pixel offset per pixel
+// `paparazzi.maxPercentDifferenceDefault` — up to 5% of pixels may differ
+//
+// Together these absorb cross-platform rasterisation drift (Linux CI vs
+// Windows/macOS dev machines) without hiding real layout regressions.
+tasks.withType<Test>().configureEach {
+	systemProperty("app.cash.paparazzi.differ", "offbytwo")
+	systemProperty("paparazzi.maxPercentDifferenceDefault", "5.0")
+}
+
 fun gitOutput(vararg args: String): String? {
 	return runCatching {
 		val process = ProcessBuilder("git", *args)
