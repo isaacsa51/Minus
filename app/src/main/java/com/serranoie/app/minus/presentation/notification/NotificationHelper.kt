@@ -26,7 +26,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class NotificationHelper @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) {
     companion object {
         const val CHANNEL_PERIOD_END = "budget_period_end"
@@ -43,41 +43,40 @@ class NotificationHelper @Inject constructor(
     }
 
     private fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            val periodEndChannel = NotificationChannel(
-                CHANNEL_PERIOD_END,
-                "Budget Period End",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notifications when your budget period ends with remaining balance"
-                enableVibration(true)
-            }
-
-            val recurrentChannel = NotificationChannel(
-                CHANNEL_RECURRENT,
-                "Recurrent Expenses",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "Notifications when recurrent expenses are due"
-                enableVibration(true)
-            }
-
-            val creditChannel = NotificationChannel(
-                CHANNEL_CREDIT,
-                "Credit Card Reminders",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Reminders before credit card cutoff date"
-                enableVibration(true)
-            }
-
-            notificationManager.createNotificationChannel(periodEndChannel)
-            notificationManager.createNotificationChannel(recurrentChannel)
-            notificationManager.createNotificationChannel(creditChannel)
-            logcat { "Notification channels created" }
+        val periodEndChannel = NotificationChannel(
+            CHANNEL_PERIOD_END,
+            "Budget Period End",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Notifications when your budget period ends with remaining balance"
+            enableVibration(true)
         }
+
+        val recurrentChannel = NotificationChannel(
+            CHANNEL_RECURRENT,
+            "Recurrent Expenses",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Notifications when recurrent expenses are due"
+            enableVibration(true)
+        }
+
+        val creditChannel = NotificationChannel(
+            CHANNEL_CREDIT,
+            "Credit Card Reminders",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Reminders before credit card cutoff date"
+            enableVibration(true)
+        }
+
+        notificationManager.createNotificationChannel(periodEndChannel)
+        notificationManager.createNotificationChannel(recurrentChannel)
+        notificationManager.createNotificationChannel(creditChannel)
+        logcat { "Notification channels created" }
     }
 
     private fun checkNotificationPermission(): Boolean {
@@ -112,7 +111,7 @@ class NotificationHelper @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val message = buildPeriodEndMessage(remainingBudget, currency)
+        val message = buildPeriodEndMessage(remainingBudget)
 
         val notification = NotificationCompat.Builder(context, CHANNEL_PERIOD_END)
             .setSmallIcon(R.drawable.ic_notification)
@@ -130,7 +129,7 @@ class NotificationHelper @Inject constructor(
         logcat { "Period end notification shown successfully" }
     }
 
-    private fun buildPeriodEndMessage(remainingBudget: String, currency: String): String {
+    private fun buildPeriodEndMessage(remainingBudget: String): String {
         val amount = remainingBudget.toDoubleOrNull() ?: 0.0
         return if (amount > 0) {
             "El periodo terminó con $$remainingBudget sobrante. Tap para ver detalles."
@@ -141,7 +140,7 @@ class NotificationHelper @Inject constructor(
         }
     }
 
-    fun showRecurrentExpenseNotification(amount: String, comment: String, frequency: String, currency: String) {
+    fun showRecurrentExpenseNotification(amount: String, comment: String) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
             logcat { "Cannot show notification - permission not granted" }
@@ -181,7 +180,12 @@ class NotificationHelper @Inject constructor(
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_RECURRENT, notification)
     }
 
-    fun showUpcomingSubscriptionNotification(amount: String, comment: String, daysUntil: Long, currency: String) {
+    fun showUpcomingSubscriptionNotification(
+        amount: String,
+        comment: String,
+        daysUntil: Long,
+        currency: String
+    ) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
             logcat { "Cannot show notification - permission not granted" }
@@ -228,7 +232,11 @@ class NotificationHelper @Inject constructor(
         logcat { "Upcoming subscription notification shown: $message" }
     }
 
-    fun showCreditCutoffNotification(totalAmount: String, cutoffDateText: String, currency: String) {
+    fun showCreditCutoffNotification(
+        totalAmount: String,
+        cutoffDateText: String,
+        currency: String
+    ) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
             logcat { "Cannot show credit notification - permission not granted" }
@@ -246,7 +254,8 @@ class NotificationHelper @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val message = "Tu fecha de corte es el $cutoffDateText. Se recomienda saldar $totalAmount para evitar intereses."
+        val message =
+            "Tu fecha de corte es el $cutoffDateText. Se recomienda saldar $totalAmount para evitar intereses."
 
         val notification = NotificationCompat.Builder(context, CHANNEL_CREDIT)
             .setSmallIcon(R.drawable.ic_notification)

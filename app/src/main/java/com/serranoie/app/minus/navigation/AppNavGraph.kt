@@ -1,15 +1,6 @@
 package com.serranoie.app.minus.navigation
 
-import android.app.AlarmManager
-import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.Context
-import android.content.Intent
-import android.os.Build
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultRegistryOwner
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
@@ -20,16 +11,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -37,127 +19,57 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.serranoie.app.minus.R
-import com.serranoie.app.minus.domain.model.PeriodMappingMode
-import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
-import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
-import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
-import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_HOUR
-import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_MINUTE
-import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_HOUR
-import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_MINUTE
-import com.serranoie.app.minus.presentation.DYNAMIC_COLOR_KEY
-import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTIVE_KEY
-import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
-import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
-import com.serranoie.app.minus.presentation.NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.presentation.NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_PAYMENTS_VIEW_MODE_KEY
-import com.serranoie.app.minus.presentation.THEME_MODE_KEY
-import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
-import com.serranoie.app.minus.presentation.appTheme
-import com.serranoie.app.minus.presentation.appTypography
-import com.serranoie.app.minus.presentation.dynamicColorEnabled
-import com.serranoie.app.minus.presentation.settingsDataStore
-import com.serranoie.app.minus.presentation.ui.analytics.Analytics
-import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsActions
-import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsState
-import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
+import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsScreen
 import com.serranoie.app.minus.presentation.ui.home.MainScreen
 import com.serranoie.app.minus.presentation.ui.onboarding.OnboardingScreen
-import com.serranoie.app.minus.presentation.ui.settings.CsvTransferEntryPoint
-import com.serranoie.app.minus.presentation.ui.settings.Settings
-import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportForm
-import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportViewModel
-import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiEffect
-import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
-import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
+import com.serranoie.app.minus.presentation.ui.settings.SettingsScreen
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportScreen
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
-import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
-import com.serranoie.app.minus.presentation.ui.tutorial.PERIOD_MAPPING_MODE_KEY
-import com.serranoie.app.minus.presentation.ui.tutorial.periodMappingModeFlow
 import com.serranoie.app.minus.presentation.ui.wallet.Wallet
-import dagger.hilt.android.EntryPointAccessors
-import kotlinx.coroutines.launch
 import logcat.logcat
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.ZoneId
-import java.time.temporal.ChronoUnit
-import java.util.Date
-import android.provider.Settings as AndroidSettings
+
+private const val TAG = "AppNavGraph"
 
 /**
- * Returns direction-aware screen transition animations based on navigation direction.
+ * Direction-aware screen transition animations.
  *
- * Forward navigation (e.g., Onboard→Sorter):
- * - Enter: Slide in from right (+30) + fade in
- * - Exit: Slide out to left (-30) + fade out
- *
- * Backward navigation (e.g., Settings→Review):
- * - Enter: Slide in from left (-30) + fade in
- * - Exit: Slide out to right (+30) + fade out
+ * Forward navigation  (e.g. Onboarding -> Main):  slide + fade in from right, out to left
+ * Backward navigation (e.g. Settings -> Analytics): slide + fade in from left, out to right
  */
-fun getScreenTransitions(
+private fun getScreenTransitions(
     initialState: NavBackStackEntry,
-    targetState: NavBackStackEntry
+    targetState: NavBackStackEntry,
 ): Pair<EnterTransition, ExitTransition> {
-    // Determine navigation direction based on back stack index
-    val initialIndex = initialState.destination.id
-    val targetIndex = targetState.destination.id
-    val isForwardNavigation = targetIndex > initialIndex
+    val isForward = targetState.destination.id > initialState.destination.id
 
-    return if (isForwardNavigation) {
-        // Forward: New screen slides in from right, old slides out to left
-        val enter = slideInHorizontally(
-            initialOffsetX = { 30 },
-            animationSpec = tween(300)
-        ) + fadeIn(
-            animationSpec = tween(250, delayMillis = 50)
-        )
-        val exit = slideOutHorizontally(
-            targetOffsetX = { -30 },
-            animationSpec = tween(300)
-        ) + fadeOut(
-            animationSpec = tween(200)
-        )
-        Pair(enter, exit)
-    } else {
-        // Backward: New screen slides in from left, old slides out to right
-        val enter = slideInHorizontally(
-            initialOffsetX = { -30 },
-            animationSpec = tween(300)
-        ) + fadeIn(
-            animationSpec = tween(250, delayMillis = 50)
-        )
-        val exit = slideOutHorizontally(
-            targetOffsetX = { 30 },
-            animationSpec = tween(300)
-        ) + fadeOut(
-            animationSpec = tween(200)
-        )
-        Pair(enter, exit)
-    }
+    val enter = slideInHorizontally(
+        initialOffsetX = { if (isForward) 30 else -30 },
+        animationSpec = tween(300),
+    ) + fadeIn(animationSpec = tween(250, delayMillis = 50))
+
+    val exit = slideOutHorizontally(
+        targetOffsetX = { if (isForward) -30 else 30 },
+        animationSpec = tween(300),
+    ) + fadeOut(animationSpec = tween(200))
+
+    return enter to exit
 }
 
 /**
  * Root navigation graph for the app.
  *
- * Flow:
- *  - First launch:  Onboarding → Wallet (setup) → Main
- *  - Regular launch: Main (wallet editing is a bottom sheet within Main)
- *  - Period ended:  Analytics → Wallet (new setup) → Main
+ * App flow:
+ *  - First launch:       Onboarding → Main (with wallet setup)
+ *  - Regular launch:     Main (wallet editing is a bottom sheet within Main)
+ *  - Period ended:       Analytics → Main (with wallet setup)
  *
- * @param navController       Optional external controller; a new one is created by default.
- * @param startDestination    Route to start on – either [Screen.Onboarding], [Screen.Main], or [Screen.Analytics].
- * @param activityResultRegistryOwner Forwarded to screens that need it (Wallet, MainScreen).
- * @param onOnboardingComplete  Called when the user finishes onboarding so the caller can
- *                              persist the "completed" flag.
+ * All state management and business logic is delegated to screen-specific
+ * ViewModels and thin composable wrappers. This graph is purely responsible
+ * for navigation composition.
+ *
+ * @param startDestination Route to start on – [Screen.Onboarding], [Screen.Main], or [Screen.Analytics].
+ * @param onOnboardingComplete Called when onboarding finishes so the caller can persist the flag.
  */
 @Composable
 fun AppNavGraph(
@@ -166,40 +78,24 @@ fun AppNavGraph(
     onOnboardingComplete: () -> Unit,
     navController: NavHostController = rememberNavController(),
 ) {
-    val tag = "AppNavGraph - ISAAC"
-    val scope = rememberCoroutineScope()
-    logcat(tag) { "AppNavGraph created with startDestination: $startDestination" }
+    val tag = TAG
+    logcat(tag) { "Created with startDestination: $startDestination" }
 
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        enterTransition = {
-            val (enter, _) = getScreenTransitions(initialState, targetState)
-            enter
-        },
-        exitTransition = {
-            val (_, exit) = getScreenTransitions(initialState, targetState)
-            exit
-        },
-        popEnterTransition = {
-            val (enter, _) = getScreenTransitions(initialState, targetState)
-            enter
-        },
-        popExitTransition = {
-            val (_, exit) = getScreenTransitions(initialState, targetState)
-            exit
-        }
+        enterTransition = { getScreenTransitions(initialState, targetState).first },
+        exitTransition = { getScreenTransitions(initialState, targetState).second },
+        popEnterTransition = { getScreenTransitions(initialState, targetState).first },
+        popExitTransition = { getScreenTransitions(initialState, targetState).second },
     ) {
-
         composable(Screen.Onboarding.route) {
             OnboardingScreen(
                 onSetBudget = {
                     onOnboardingComplete()
                     navController.navigate(
-                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true)
-                    ) {
-                        popUpTo(Screen.Onboarding.route) { inclusive = true }
-                    }
+                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true),
+                    ) { popUpTo(Screen.Onboarding.route) { inclusive = true } }
                 },
                 onOnboardingComplete = {
                     onOnboardingComplete()
@@ -207,11 +103,9 @@ fun AppNavGraph(
                 onClose = {
                     onOnboardingComplete()
                     navController.navigate(
-                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true)
-                    ) {
-                        popUpTo(Screen.Onboarding.route) { inclusive = true }
-                    }
-                }
+                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true),
+                    ) { popUpTo(Screen.Onboarding.route) { inclusive = true } }
+                },
             )
         }
 
@@ -221,181 +115,47 @@ fun AppNavGraph(
                 navArgument(Screen.Wallet.ARG_FORCE_CHANGE) {
                     type = NavType.BoolType
                     defaultValue = false
-                }
-            )
+                },
+            ),
         ) { backStackEntry ->
-            val forceChange = backStackEntry.arguments?.getBoolean(Screen.Wallet.ARG_FORCE_CHANGE) ?: false
+            val forceChange =
+                backStackEntry.arguments?.getBoolean(Screen.Wallet.ARG_FORCE_CHANGE) ?: false
 
             CompositionLocalProvider(
-                LocalBottomSheetScrollState provides BottomSheetScrollState(topPadding = 0.dp)
+                LocalBottomSheetScrollState provides BottomSheetScrollState(
+                    topPadding = 0.dp
+                )
             ) {
                 Wallet(
                     forceChange = forceChange,
                     activityResultRegistryOwner = activityResultRegistryOwner,
                     onClose = {
-                        logcat(tag) { "Wallet onClose - navigating to Main" }
+                        logcat(tag) { "Wallet onClose → Main" }
                         navController.navigate(Screen.Main.route) {
                             popUpTo(0) { inclusive = true }
                         }
                     },
                     onOnboardingComplete = {
-                        logcat(tag) { "Wallet onOnboardingComplete - calling parent onOnboardingComplete" }
+                        logcat(tag) { "Wallet onOnboardingComplete" }
                         onOnboardingComplete()
-                    }
+                    },
                 )
             }
         }
 
         composable(Screen.Analytics.route) {
-            val viewModel: BudgetViewModel = hiltViewModel()
-            val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-            val context = androidx.compose.ui.platform.LocalContext.current
-            val preferences = context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences()).value
-
-            val budgetSettings = uiState.budgetSettings
-            val allTransactions = uiState.transactions
-            val budgetState = uiState.budgetState
-            val currentPeriodId = uiState.currentPeriodId
-
-            val lastPeriodEnd = preferences[LAST_PERIOD_END_KEY]?.let {
-                Date(it).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-            }
-            val remainingFromLastPeriod = preferences[REMAINING_FROM_LAST_PERIOD_KEY]
-                ?.toBigDecimalOrNull()
-
-            val shouldShowEndedPeriodSnapshot =
-                lastPeriodEnd != null && remainingFromLastPeriod != null && budgetSettings != null
-
-            val endedPeriodStartDate = if (shouldShowEndedPeriodSnapshot) {
-                val currentEnd = budgetSettings.getPeriodEndDate()
-                val currentDays = ChronoUnit.DAYS.between(budgetSettings.startDate, currentEnd).toInt() + 1
-                lastPeriodEnd.minusDays((currentDays - 1).toLong())
-            } else null
-
-            // Filter transactions for the relevant period (ended snapshot when available, otherwise current)
-            val transactions = remember(currentPeriodId, allTransactions, budgetSettings, endedPeriodStartDate, lastPeriodEnd, shouldShowEndedPeriodSnapshot) {
-                allTransactions.filter { transaction ->
-                    val txDate = transaction.date?.toLocalDate() ?: return@filter false
-                    if (shouldShowEndedPeriodSnapshot && endedPeriodStartDate != null && lastPeriodEnd != null) {
-                        !txDate.isBefore(endedPeriodStartDate) && !txDate.isAfter(lastPeriodEnd)
-                    } else {
-                        if (currentPeriodId > 0L && transaction.periodId > 0L) {
-                            return@filter transaction.periodId == currentPeriodId
-                        }
-                        val startDate = budgetSettings?.startDate ?: return@filter false
-                        val endDate = budgetSettings.getPeriodEndDate()
-                        !txDate.isBefore(startDate) && !txDate.isAfter(endDate)
-                    }
-                }
-            }
-
-            val startDate = if (shouldShowEndedPeriodSnapshot && endedPeriodStartDate != null) {
-                Date.from(endedPeriodStartDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
-            } else {
-                budgetSettings?.startDate?.atStartOfDay()?.let {
-                    Date.from(it.atZone(ZoneId.systemDefault()).toInstant())
-                } ?: Date()
-            }
-
-            val plannedFinishDate = if (shouldShowEndedPeriodSnapshot && lastPeriodEnd != null) {
-                Date.from(lastPeriodEnd.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
-            } else {
-                budgetSettings?.getPeriodEndDate()?.atStartOfDay()?.let {
-                    Date.from(it.atZone(ZoneId.systemDefault()).toInstant())
-                }
-            }
-
-            val earlyFinishActive = preferences[EARLY_FINISH_ACTIVE_KEY] ?: false
-            val earlyFinishActualDate = preferences[EARLY_FINISH_ACTUAL_DATE_KEY]?.let {
-                Date(it)
-            }
-            val earlyFinishOriginalEndDate = preferences[EARLY_FINISH_ORIGINAL_END_DATE_KEY]?.let {
-                Date(it)
-            }
-
-            // Check if period is finished naturally or marked as finished early
-            val today = java.time.LocalDate.now()
-            val periodFinishedNaturally = budgetSettings?.getPeriodEndDate()?.let { endDate ->
-                today.isAfter(endDate)
-            } ?: false
-            val periodFinished = periodFinishedNaturally || earlyFinishActive
-
-            val wholeBudget = if (shouldShowEndedPeriodSnapshot && budgetSettings != null && remainingFromLastPeriod != null) {
-                val spentInEndedPeriod = transactions.filter { !it.isDeleted }.sumOf { it.amount }
-                spentInEndedPeriod.add(remainingFromLastPeriod)
-            } else {
-                budgetSettings?.totalBudget ?: budgetState?.totalBudget ?: BigDecimal.ZERO
-            }
-            val totalSpentInPeriod = transactions.filter { !it.isDeleted }.sumOf { it.amount }
-            val remainingBudget = wholeBudget.subtract(totalSpentInPeriod)
-            val plannedPeriodDays = if (shouldShowEndedPeriodSnapshot && endedPeriodStartDate != null && lastPeriodEnd != null) {
-                ChronoUnit.DAYS.between(endedPeriodStartDate, lastPeriodEnd).toInt() + 1
-            } else {
-                budgetSettings?.getPeriodEndDate()?.let { periodEnd ->
-                    ChronoUnit.DAYS.between(budgetSettings.startDate, periodEnd).toInt() + 1
-                } ?: 0
-            }
-            val dailyBudget = if (wholeBudget > BigDecimal.ZERO && plannedPeriodDays > 0) {
-                wholeBudget.divide(BigDecimal(plannedPeriodDays), 2, RoundingMode.HALF_UP)
-            } else {
-                BigDecimal.ZERO
-            }
-            val extraAffordableDaysFromRemaining = if (
-                earlyFinishActive &&
-                remainingBudget > BigDecimal.ZERO &&
-                dailyBudget > BigDecimal.ZERO
-            ) {
-                remainingBudget.divide(dailyBudget, 0, RoundingMode.DOWN).toInt().coerceAtLeast(0)
-            } else {
-                0
-            }
-
-            val displaySettings = budgetSettings?.copy(
-                totalBudget = if (shouldShowEndedPeriodSnapshot && remainingFromLastPeriod != null) {
-                    wholeBudget.subtract(remainingFromLastPeriod)
-                } else {
-                    budgetSettings.totalBudget
+            AnalyticsScreen(
+                activityResultRegistryOwner = activityResultRegistryOwner,
+                onNavigateToMainWithWallet = {
+                    navController.navigate(
+                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true),
+                    ) { popUpTo(0) { inclusive = true } }
                 },
-                rollOverLimit = if (shouldShowEndedPeriodSnapshot) remainingFromLastPeriod else budgetSettings.rollOverLimit
-            )
-            val displayBudgetState = budgetState?.copy(
-                totalBudget = wholeBudget
-            )
-            val shouldShowRolloverStyleInAnalytics =
-                !shouldShowEndedPeriodSnapshot &&
-                    displaySettings?.rollOverLimit?.let { it > BigDecimal.ZERO } == true
-
-            val analyticsState = AnalyticsState(
-                periodFinished = periodFinished,
-                transactions = transactions,
-                spends = transactions,
-                wholeBudget = wholeBudget,
-                currencyCode = budgetSettings?.currencyCode ?: "USD",
-                finishPeriodActualDate = if (earlyFinishActive) earlyFinishActualDate else null,
-                startPeriodDate = startDate,
-                finishPeriodDate = if (earlyFinishActive) earlyFinishOriginalEndDate else plannedFinishDate,
-                extraAffordableDaysFromRemaining = extraAffordableDaysFromRemaining,
-                budgetSettingsForDisplay = displaySettings,
-                budgetStateForDisplay = displayBudgetState,
-                showRolloverStyleInBudgetDisplay = shouldShowRolloverStyleInAnalytics
-            )
-
-            Analytics(
-                state = analyticsState,
-                actions = AnalyticsActions(
-                    onCreateNewPeriod = {
-                        viewModel.clearEarlyFinishState()
-                        navController.navigate(
-                            Screen.Main.createRoute(openWallet = true, forceWalletSetup = true)
-                        )
-                    },
-                    onClose = {
-                        navController.navigate(Screen.Main.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
+                onNavigateToMain = {
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(0) { inclusive = true }
                     }
-                ),
-                activityResultRegistryOwner = activityResultRegistryOwner
+                },
             )
         }
 
@@ -409,13 +169,17 @@ fun AppNavGraph(
                 navArgument(Screen.Main.ARG_FORCE_WALLET_SETUP) {
                     type = NavType.BoolType
                     defaultValue = false
-                }
-            )
+                },
+            ),
         ) { backStackEntry ->
             logcat(tag) { "Navigating to Main" }
-            val openWallet = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_OPEN_WALLET) ?: false
-            val forceWalletSetup = backStackEntry.arguments?.getBoolean(Screen.Main.ARG_FORCE_WALLET_SETUP) ?: false
 
+            val openWallet =
+                backStackEntry.arguments?.getBoolean(Screen.Main.ARG_OPEN_WALLET) ?: false
+            val forceWalletSetup =
+                backStackEntry.arguments?.getBoolean(Screen.Main.ARG_FORCE_WALLET_SETUP) ?: false
+
+            // Consume navigation arguments so they don't persist on back navigation
             LaunchedEffect(backStackEntry.id) {
                 if (openWallet || forceWalletSetup) {
                     backStackEntry.arguments?.putBoolean(Screen.Main.ARG_OPEN_WALLET, false)
@@ -425,7 +189,6 @@ fun AppNavGraph(
 
             MainScreen(
                 openWalletOnStart = openWallet,
-                forceWalletSetup = forceWalletSetup,
                 onNavigateToAnalytics = {
                     navController.navigate(Screen.Analytics.route)
                 },
@@ -434,224 +197,28 @@ fun AppNavGraph(
                 },
                 onNavigateToWallet = {
                     navController.navigate(Screen.Wallet.createRoute(false))
-                }
+                },
             )
         }
 
         composable(Screen.Settings.route) {
             logcat(tag) { "Navigating to Settings" }
-            val context = androidx.compose.ui.platform.LocalContext.current
-            val viewModel: BudgetViewModel = hiltViewModel()
-            val csvTransferManager = EntryPointAccessors
-                .fromApplication(context.applicationContext, CsvTransferEntryPoint::class.java)
-                .csvTransferManager()
-            val importLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.OpenDocument(),
-                onResult = { uri ->
-                    uri?.let {
-                        runCatching {
-                            context.contentResolver.takePersistableUriPermission(
-                                it,
-                                Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            )
-                        }
-                        csvTransferManager.enqueueImport(it.toString())
-                    }
-                }
-            )
 
-            val preferences = context.settingsDataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences()).value
-            val currentThemeMode = context.appTheme
-            val isCreditQuickToggleFeatureEnabled = preferences[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false
-            val recurrentPaymentsViewMode = RecurrentPaymentsViewMode.fromName(preferences[RECURRENT_PAYMENTS_VIEW_MODE_KEY])
-            val notificationHour = preferences[NOTIFICATION_HOUR_KEY] ?: DEFAULT_NOTIFICATION_HOUR
-            val notificationMinute = preferences[NOTIFICATION_MINUTE_KEY] ?: DEFAULT_NOTIFICATION_MINUTE
-            val recurrentNotificationHour = preferences[RECURRENT_NOTIFICATION_HOUR_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_HOUR
-            val recurrentNotificationMinute = preferences[RECURRENT_NOTIFICATION_MINUTE_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_MINUTE
-            val exactAlarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                alarmManager.canScheduleExactAlarms()
-            } else {
-                true
-            }
-            val periodMappingMode = context.periodMappingModeFlow()
-	            .collectAsStateWithLifecycle(initialValue = PeriodMappingMode.ACTIVE_BUDGET).value
-
-            val currentThemeString = when (currentThemeMode) {
-                ThemeMode.LIGHT -> "Light"
-                ThemeMode.NIGHT -> "Dark"
-                else -> "System"
-            }
-            val currentTypographyString = when (context.appTypography) {
-                TypographyMode.DEFAULT -> "Default"
-                TypographyMode.CONDENSED -> "Condensed"
-                TypographyMode.EXPRESSIVE -> "Expressive"
-            }
-            Settings(
-                currentTheme = currentThemeString,
-                currentTypography = currentTypographyString,
-                isMaterialYouEnabled = context.dynamicColorEnabled,
-                isCreditQuickToggleFeatureEnabled = isCreditQuickToggleFeatureEnabled,
-                recurrentPaymentsViewMode = recurrentPaymentsViewMode,
-                notificationHour = notificationHour,
-                notificationMinute = notificationMinute,
-                recurrentNotificationHour = recurrentNotificationHour,
-                recurrentNotificationMinute = recurrentNotificationMinute,
-                exactAlarmEnabled = exactAlarmEnabled,
-                onThemeChange = { themeMode ->
-                    logcat(tag) { "Theme changed to: $themeMode" }
-                    val newThemeMode = when (themeMode) {
-                        "Light" -> ThemeMode.LIGHT
-                        "Dark" -> ThemeMode.NIGHT
-                        else -> ThemeMode.SYSTEM
-                    }
-                    context.appTheme = newThemeMode
-                    scope.launch {
-                        context.settingsDataStore.edit { prefs ->
-                            prefs[THEME_MODE_KEY] = newThemeMode.toString()
-                        }
-                    }
-                },
-                onTypographyChange = { typographyMode ->
-                    val newTypographyMode = when (typographyMode) {
-                        "Default" -> TypographyMode.DEFAULT
-                        "Condensed" -> TypographyMode.CONDENSED
-                        else -> TypographyMode.EXPRESSIVE
-                    }
-                    context.appTypography = newTypographyMode
-                    scope.launch {
-                        context.settingsDataStore.edit { prefs ->
-                            prefs[TYPOGRAPHY_MODE_KEY] = newTypographyMode.toString()
-                        }
-                    }
-                },
-                onMaterialYouToggle = {
-                    logcat(tag) { "Material You toggled" }
-                    val newValue = !context.dynamicColorEnabled
-                    context.dynamicColorEnabled = newValue
-                    scope.launch {
-                        context.settingsDataStore.edit { prefs ->
-                            prefs[DYNAMIC_COLOR_KEY] = newValue
-                        }
-                    }
-                },
-                onCreditQuickToggleFeatureToggle = {
-                    val newValue = !isCreditQuickToggleFeatureEnabled
-                    scope.launch {
-                        context.settingsDataStore.edit { prefs ->
-                            prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY] = newValue
-                        }
-                    }
-                },
-                onRecurrentPaymentsViewModeChange = { mode ->
-                    scope.launch {
-                        context.settingsDataStore.edit { prefs ->
-                            prefs[RECURRENT_PAYMENTS_VIEW_MODE_KEY] = mode.name
-                        }
-                    }
-                },
-                onNotificationTimeChange = { hour, minute ->
-                    viewModel.updatePeriodEndNotificationTime(hour, minute)
-                },
-                onRecurrentNotificationTimeChange = { hour, minute ->
-                    viewModel.updateRecurrentNotificationTime(hour, minute)
-                },
-                onOpenExactAlarmSettings = {
-                    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Intent(AndroidSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                            data = "package:${context.packageName}".toUri()
-                        }
-                    } else {
-                        Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = "package:${context.packageName}".toUri()
-                        }
-                    }
-                    context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                },
-                periodMappingMode = periodMappingMode,
-                onPeriodMappingModeChange = { mode ->
-                    scope.launch {
-                        context.settingsDataStore.edit { prefs ->
-                            prefs[PERIOD_MAPPING_MODE_KEY] = mode.name
-                        }
-                    }
-                },
-                onExportCsv = {
-                    scope.launch {
-                        csvTransferManager.exportAndShareCsv()
-                    }
-                },
-                onImportCsv = {
-                    importLauncher.launch(arrayOf("text/*", "text/csv", "application/csv"))
-                },
-                onResetTutorial = {
-                    scope.launch {
-                        context.settingsDataStore.edit { prefs ->
-                            prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] = FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
-                        }
-                    }
-                },
-                onBugReportClick = {
+            SettingsScreen(
+                onNavigateToBugReport = {
                     navController.navigate(Screen.BugReport.route)
                 },
-                onBack = {
+                onNavigateBack = {
                     navController.popBackStack()
-                }
+                },
             )
         }
 
         composable(Screen.BugReport.route) {
-            val context = LocalContext.current
-            val shareTitle = stringResource(com.serranoie.app.minus.R.string.bug_report_share_title)
-            val recipientEmail = stringResource(R.string.bug_report_recipient_email)
-            val emailSubjectTemplate = stringResource(R.string.bug_report_email_subject)
-            val emailBody = stringResource(R.string.bug_report_email_body)
-            val viewModel: BugReportViewModel = hiltViewModel()
-            val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-
-            LaunchedEffect(viewModel) {
-                viewModel.effects.collect { effect ->
-                    when (effect) {
-                        is BugReportUiEffect.OpenEmailComposer -> {
-                            val mailToIntent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = "mailto:".toUri()
-                            }
-                            val defaultEmailPackage = mailToIntent.resolveActivity(context.packageManager)?.packageName
-                            val emailIntent = Intent(Intent.ACTION_SEND).apply {
-                                type = "application/zip"
-                                defaultEmailPackage?.let(::setPackage)
-                                putExtra(Intent.EXTRA_EMAIL, arrayOf(recipientEmail))
-                                putExtra(Intent.EXTRA_SUBJECT, emailSubjectTemplate.format(effect.title))
-                                putExtra(Intent.EXTRA_TEXT, emailBody)
-                                putExtra(Intent.EXTRA_STREAM, effect.uri)
-                                putExtra(Intent.EXTRA_TITLE, effect.fileName)
-                                clipData = ClipData.newUri(
-                                    context.contentResolver,
-                                    effect.fileName,
-                                    effect.uri,
-                                )
-                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            }
-
-                            try {
-                                context.startActivity(emailIntent)
-                            } catch (_: ActivityNotFoundException) {
-                                context.startActivity(Intent.createChooser(emailIntent.setPackage(null), shareTitle))
-                            }
-                        }
-                        is BugReportUiEffect.ShowError -> {
-                            Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-            }
-
-            BugReportForm(
-                uiState = uiState,
-                onIntent = viewModel::onIntent,
-                onBackClick = {
+            BugReportScreen(
+                onBack = {
                     navController.popBackStack()
-                }
+                },
             )
         }
     }

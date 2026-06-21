@@ -55,430 +55,436 @@ import java.time.ZoneId
 import java.util.Date
 
 internal fun LazyListScope.budgetDisplaySection(
-	budgetState: BudgetState?,
-	budgetSettings: BudgetSettings?,
-	currencyCode: String,
+    budgetState: BudgetState?,
+    budgetSettings: BudgetSettings?,
+    currencyCode: String,
 ) {
-	item("budget-display") {
-		val startDate = budgetSettings?.startDate?.let {
-			Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
-		} ?: Date()
+    item("budget-display") {
+        val startDate = budgetSettings?.startDate?.let {
+            Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
+        } ?: Date()
 
-		val finishDate = budgetSettings?.getPeriodEndDate()?.let {
-			Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
-		}
+        val finishDate = budgetSettings?.getPeriodEndDate()?.let {
+            Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
+        }
 
-		val budget = budgetState?.totalBudget ?: BigDecimal.ZERO
-		logcat("History") {
-			"BudgetDisplay input budget=$budget budgetStateTotal=${budgetState?.totalBudget} budgetSettingsTotal=${budgetSettings?.totalBudget} rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward}"
-		}
+        val budget = budgetState?.totalBudget ?: BigDecimal.ZERO
+        logcat("History") {
+            "BudgetDisplay input budget=$budget budgetStateTotal=${budgetState?.totalBudget} budgetSettingsTotal=${budgetSettings?.totalBudget} rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward}"
+        }
 
-		BudgetDisplay(
-			budget = budget,
-			budgetState = budgetState,
-			budgetSettings = budgetSettings,
-			currencyCode = currencyCode,
-			bigVariant = true,
-			modifier = Modifier.fillMaxWidth(),
-			startDate = startDate,
-			finishDate = finishDate,
-		)
-	}
+        BudgetDisplay(
+            budget = budget,
+            budgetState = budgetState,
+            budgetSettings = budgetSettings,
+            currencyCode = currencyCode,
+            bigVariant = true,
+            modifier = Modifier.fillMaxWidth(),
+            startDate = startDate,
+            finishDate = finishDate,
+        )
+    }
 }
 
 internal fun LazyListScope.currentPeriodRecurrentSection(
-	upcomingRecurrentInPeriod: List<UpcomingRecurrentItem>,
-	showUpcomingRecurrentInPeriod: Boolean,
-	onToggleShowUpcomingRecurrentInPeriod: () -> Unit,
-	recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
-	currencyFormat: NumberFormat,
-	onDelete: (Transaction) -> Unit,
-	onEdit: (Transaction) -> Unit,
-	onClick: (Transaction) -> Unit,
+    upcomingRecurrentInPeriod: List<UpcomingRecurrentItem>,
+    showUpcomingRecurrentInPeriod: Boolean,
+    onToggleShowUpcomingRecurrentInPeriod: () -> Unit,
+    recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
+    currencyFormat: NumberFormat,
+    onDelete: (Transaction) -> Unit,
+    onEdit: (Transaction) -> Unit,
+    onClick: (Transaction) -> Unit,
 ) {
-	if (upcomingRecurrentInPeriod.isEmpty()) return
+    if (upcomingRecurrentInPeriod.isEmpty()) return
 
-	item("upcoming-recurrent-toggle") {
-		RecurrentPaymentsDivider(
-			title = stringResource(R.string.recurrent_payments_divider_title_current_period),
-			isExpanded = showUpcomingRecurrentInPeriod,
-			onToggleClick = onToggleShowUpcomingRecurrentInPeriod,
-			itemCount = upcomingRecurrentInPeriod.size,
-			modifier = Modifier.fillMaxWidth(),
-		)
-	}
+    item("upcoming-recurrent-toggle") {
+        RecurrentPaymentsDivider(
+            title = stringResource(R.string.recurrent_payments_divider_title_current_period),
+            isExpanded = showUpcomingRecurrentInPeriod,
+            onToggleClick = onToggleShowUpcomingRecurrentInPeriod,
+            itemCount = upcomingRecurrentInPeriod.size,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 
-	item("upcoming-recurrent-content") {
-		AnimatedVisibility(
-			visible = showUpcomingRecurrentInPeriod,
-			enter = expandVertically(
-				animationSpec = tween(300),
-				expandFrom = Alignment.Top,
-			) + fadeIn(animationSpec = tween(300)),
-			exit = shrinkVertically(
-				animationSpec = tween(300),
-				shrinkTowards = Alignment.Top,
-			) + fadeOut(animationSpec = tween(300)),
-		) {
-			RecurrentItemsContent(
-				items = upcomingRecurrentInPeriod,
-				recurrentPaymentsViewMode = recurrentPaymentsViewMode,
-				currencyFormat = currencyFormat,
-				verticalItem = { _, item, position ->
-					SwipeableUpcomingRecurrentItem(
-						item = item,
-						currencyFormat = currencyFormat,
-						position = position,
-						onDelete = { onDelete(item.transaction) },
-						onEdit = { onEdit(item.transaction) },
-						onClick = { onClick(item.transaction) },
-					)
-				},
-				horizontalKeyPrefix = "upcoming",
-				onClick = onClick,
-			)
-		}
-	}
+    item("upcoming-recurrent-content") {
+        AnimatedVisibility(
+            visible = showUpcomingRecurrentInPeriod,
+            enter = expandVertically(
+                animationSpec = tween(300),
+                expandFrom = Alignment.Top,
+            ) + fadeIn(animationSpec = tween(300)),
+            exit = shrinkVertically(
+                animationSpec = tween(300),
+                shrinkTowards = Alignment.Top,
+            ) + fadeOut(animationSpec = tween(300)),
+        ) {
+            RecurrentItemsContent(
+                items = upcomingRecurrentInPeriod,
+                recurrentPaymentsViewMode = recurrentPaymentsViewMode,
+                currencyFormat = currencyFormat,
+                verticalItem = { _, item, position ->
+                    SwipeableUpcomingRecurrentItem(
+                        item = item,
+                        currencyFormat = currencyFormat,
+                        position = position,
+                        onDelete = { onDelete(item.transaction) },
+                        onEdit = { onEdit(item.transaction) },
+                        onClick = { onClick(item.transaction) },
+                    )
+                },
+                horizontalKeyPrefix = "upcoming",
+                onClick = onClick,
+            )
+        }
+    }
 }
 
 internal fun LazyListScope.transactionDateSections(
-	groupedTransactions: Map<LocalDate?, List<Transaction>>,
-	expandedDates: Set<LocalDate>,
-	deletingTransactionIds: Set<Long>,
-	currencyCode: String,
-	currencyFormat: NumberFormat,
-	readOnly: Boolean,
-	keyPrefix: String,
-	onToggleDate: (LocalDate) -> Unit,
-	onDelete: (Transaction) -> Unit,
-	onEdit: (Transaction) -> Unit,
-	onClick: (Transaction) -> Unit,
+    groupedTransactions: Map<LocalDate?, List<Transaction>>,
+    expandedDates: Set<LocalDate>,
+    deletingTransactionIds: Set<Long>,
+    currencyCode: String,
+    currencyFormat: NumberFormat,
+    readOnly: Boolean,
+    keyPrefix: String,
+    onToggleDate: (LocalDate) -> Unit,
+    onDelete: (Transaction) -> Unit,
+    onEdit: (Transaction) -> Unit,
+    onClick: (Transaction) -> Unit,
 ) {
-	groupedTransactions.forEach { (date, transactions) ->
-		val isExpanded = date?.let { expandedDates.contains(it) } ?: false
-		val dayTotal = transactions.sumOf { it.amount }
+    groupedTransactions.forEach { (date, transactions) ->
+        val isExpanded = date?.let { expandedDates.contains(it) } ?: false
+        val dayTotal = transactions.sumOf { it.amount }
 
-		item("$keyPrefix-date-$date") {
-			HistoryDateDivider(
-				date = date,
-				isExpanded = isExpanded,
-				onToggleClick = {
-					date?.let(onToggleDate)
-				},
-				totalAmount = dayTotal,
-				currencyCode = currencyCode,
-			)
-		}
+        item("$keyPrefix-date-$date") {
+            HistoryDateDivider(
+                date = date,
+                isExpanded = isExpanded,
+                onToggleClick = {
+                    date?.let(onToggleDate)
+                },
+                totalAmount = dayTotal,
+                currencyCode = currencyCode,
+            )
+        }
 
-		item("$keyPrefix-date-content-$date") {
-			AnimatedVisibility(
-				visible = isExpanded,
-				enter = expandVertically(
-					animationSpec = tween(300),
-					expandFrom = Alignment.Top,
-				) + fadeIn(animationSpec = tween(300)),
-				exit = shrinkVertically(
-					animationSpec = tween(300),
-					shrinkTowards = Alignment.Top,
-				) + fadeOut(animationSpec = tween(300)),
-			) {
-				Column {
-					transactions.forEachIndexed { index, transaction ->
-						key(transaction.id) {
-							val position = paddedListItemPosition(index, transactions.lastIndex, transactions.size)
-							val isBeingDeleted = transaction.id in deletingTransactionIds
-							AnimatedVisibility(
-								visible = !isBeingDeleted,
-								enter = EnterTransition.None,
-								exit = slideOutHorizontally(
-									animationSpec = tween(durationMillis = 280),
-									targetOffsetX = { fullWidth -> fullWidth },
-								) + fadeOut(animationSpec = tween(durationMillis = 280)),
-							) {
-								SwipeableExpenseItem(
-									transaction = transaction,
-									currencyFormat = currencyFormat,
-									position = position,
-									isBeingDeleted = isBeingDeleted,
-									onDelete = { onDelete(transaction) },
-									onEdit = { onEdit(transaction) },
-									readOnly = readOnly,
-									onClick = { onClick(transaction) },
-								)
-							}
+        item("$keyPrefix-date-content-$date") {
+            AnimatedVisibility(
+                visible = isExpanded,
+                enter = expandVertically(
+                    animationSpec = tween(300),
+                    expandFrom = Alignment.Top,
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = shrinkVertically(
+                    animationSpec = tween(300),
+                    shrinkTowards = Alignment.Top,
+                ) + fadeOut(animationSpec = tween(300)),
+            ) {
+                Column {
+                    transactions.forEachIndexed { index, transaction ->
+                        key(transaction.id) {
+                            val position = paddedListItemPosition(
+                                index, transactions.lastIndex, transactions.size
+                            )
+                            val isBeingDeleted = transaction.id in deletingTransactionIds
+                            AnimatedVisibility(
+                                visible = !isBeingDeleted,
+                                enter = EnterTransition.None,
+                                exit = slideOutHorizontally(
+                                    animationSpec = tween(durationMillis = 280),
+                                    targetOffsetX = { fullWidth -> fullWidth },
+                                ) + fadeOut(animationSpec = tween(durationMillis = 280)),
+                            ) {
+                                SwipeableExpenseItem(
+                                    transaction = transaction,
+                                    currencyFormat = currencyFormat,
+                                    position = position,
+                                    isBeingDeleted = isBeingDeleted,
+                                    onDelete = { onDelete(transaction) },
+                                    onEdit = { onEdit(transaction) },
+                                    readOnly = readOnly,
+                                    onClick = { onClick(transaction) },
+                                )
+                            }
 
-							if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {
-								Spacer(modifier = Modifier.height(2.dp))
-							}
-						}
-					}
+                            if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {
+                                Spacer(modifier = Modifier.height(2.dp))
+                            }
+                        }
+                    }
 
-					DayTotalItem(
-						total = dayTotal,
-						currencyFormat = currencyFormat,
-						modifier = Modifier
-							.fillMaxWidth()
+                    DayTotalItem(
+                        total = dayTotal,
+                        currencyFormat = currencyFormat,
+                        modifier = Modifier
+	                        .fillMaxWidth()
 							.padding(horizontal = 16.dp, vertical = 8.dp),
-					)
-				}
-			}
-		}
-	}
+                    )
+                }
+            }
+        }
+    }
 }
 
 internal fun LazyListScope.futureRecurrentSection(
-	futureRecurrentOutOfPeriod: List<UpcomingRecurrentItem>,
-	showOutOfPeriodSubscriptions: Boolean,
-	onToggleShowOutOfPeriodSubscriptions: () -> Unit,
-	recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
-	currencyFormat: NumberFormat,
-	onDelete: (Transaction) -> Unit,
-	onEdit: (Transaction) -> Unit,
-	onClick: (Transaction) -> Unit,
+    futureRecurrentOutOfPeriod: List<UpcomingRecurrentItem>,
+    showOutOfPeriodSubscriptions: Boolean,
+    onToggleShowOutOfPeriodSubscriptions: () -> Unit,
+    recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
+    currencyFormat: NumberFormat,
+    onDelete: (Transaction) -> Unit,
+    onEdit: (Transaction) -> Unit,
+    onClick: (Transaction) -> Unit,
 ) {
-	if (futureRecurrentOutOfPeriod.isEmpty()) return
+    if (futureRecurrentOutOfPeriod.isEmpty()) return
 
-	item("future-recurrent-toggle") {
-		val interactionSource = remember { MutableInteractionSource() }
-		Box(
-			modifier = Modifier
-				.fillMaxWidth()
-				.clickable(
+    item("future-recurrent-toggle") {
+        val interactionSource = remember { MutableInteractionSource() }
+        Box(
+            modifier = Modifier
+	            .fillMaxWidth()
+	            .clickable(
 					interactionSource = interactionSource,
 					indication = null,
 				) {
 					onToggleShowOutOfPeriodSubscriptions()
 				},
-		) {
-			WavyDivider(
-				text = if (showOutOfPeriodSubscriptions) {
-					"Ocultar subscripciones fuera del periodo"
-				} else {
-					"Mostrar subscripciones fuera del periodo"
-				},
-				horizontalPadding = 0.dp,
-				amplitude = 4f,
-				wavelength = 45f,
-			)
-		}
-	}
+        ) {
+            WavyDivider(
+                text = if (showOutOfPeriodSubscriptions) {
+                    "Ocultar subscripciones fuera del periodo"
+                } else {
+                    "Mostrar subscripciones fuera del periodo"
+                },
+                horizontalPadding = 0.dp,
+                amplitude = 4f,
+                wavelength = 45f,
+            )
+        }
+    }
 
-	item("future-recurrent-content") {
-		AnimatedVisibility(
-			visible = showOutOfPeriodSubscriptions,
-			enter = expandVertically(
-				animationSpec = tween(300),
-				expandFrom = Alignment.Top,
-			) + fadeIn(animationSpec = tween(300)),
-			exit = shrinkVertically(
-				animationSpec = tween(300),
-				shrinkTowards = Alignment.Top,
-			) + fadeOut(animationSpec = tween(300)),
-		) {
-			RecurrentItemsContent(
-				items = futureRecurrentOutOfPeriod,
-				recurrentPaymentsViewMode = recurrentPaymentsViewMode,
-				currencyFormat = currencyFormat,
-				verticalItem = { _, item, position ->
-					SwipeableUpcomingRecurrentItem(
-						item = item,
-						currencyFormat = currencyFormat,
-						position = position,
-						onDelete = { onDelete(item.transaction) },
-						onEdit = { onEdit(item.transaction) },
-						onClick = { onClick(item.transaction) },
-					)
-				},
-				horizontalKeyPrefix = "future",
-				onClick = onClick,
-			)
-		}
-	}
+    item("future-recurrent-content") {
+        AnimatedVisibility(
+            visible = showOutOfPeriodSubscriptions,
+            enter = expandVertically(
+                animationSpec = tween(300),
+                expandFrom = Alignment.Top,
+            ) + fadeIn(animationSpec = tween(300)),
+            exit = shrinkVertically(
+                animationSpec = tween(300),
+                shrinkTowards = Alignment.Top,
+            ) + fadeOut(animationSpec = tween(300)),
+        ) {
+            RecurrentItemsContent(
+                items = futureRecurrentOutOfPeriod,
+                recurrentPaymentsViewMode = recurrentPaymentsViewMode,
+                currencyFormat = currencyFormat,
+                verticalItem = { _, item, position ->
+                    SwipeableUpcomingRecurrentItem(
+                        item = item,
+                        currencyFormat = currencyFormat,
+                        position = position,
+                        onDelete = { onDelete(item.transaction) },
+                        onEdit = { onEdit(item.transaction) },
+                        onClick = { onClick(item.transaction) },
+                    )
+                },
+                horizontalKeyPrefix = "future",
+                onClick = onClick,
+            )
+        }
+    }
 }
 
 internal fun LazyListScope.pastPeriodToggleSection(
-	groupedPastTransactions: Map<LocalDate?, List<Transaction>>,
-	showPastPeriod: Boolean,
-	onToggleShowPastPeriod: () -> Unit,
+    groupedPastTransactions: Map<LocalDate?, List<Transaction>>,
+    showPastPeriod: Boolean,
+    onToggleShowPastPeriod: () -> Unit,
 ) {
-	if (groupedPastTransactions.isEmpty()) return
+    if (groupedPastTransactions.isEmpty()) return
 
-	item("wavy-divider") {
-		val interactionSource = remember { MutableInteractionSource() }
-		Box(
-			modifier = Modifier
-				.fillMaxWidth()
-				.clickable(
+    item("wavy-divider") {
+        val interactionSource = remember { MutableInteractionSource() }
+        Box(
+            modifier = Modifier
+	            .fillMaxWidth()
+	            .clickable(
 					interactionSource = interactionSource,
 					indication = null,
 				) {
 					onToggleShowPastPeriod()
 				},
-		) {
-			WavyDivider(
-				text = if (showPastPeriod) "Ocultar gastos del periodo pasado" else "Mostrar gastos del periodo pasado",
-				horizontalPadding = 0.dp,
-				amplitude = 4f,
-				wavelength = 45f,
-			)
-		}
-	}
+        ) {
+            WavyDivider(
+                text = if (showPastPeriod) "Ocultar gastos del periodo pasado" else "Mostrar gastos del periodo pasado",
+                horizontalPadding = 0.dp,
+                amplitude = 4f,
+                wavelength = 45f,
+            )
+        }
+    }
 }
 
 internal fun LazyListScope.pastTransactionDateSections(
-	showPastPeriod: Boolean,
-	groupedPastTransactions: Map<LocalDate?, List<Transaction>>,
-	expandedDates: Set<LocalDate>,
-	deletingTransactionIds: Set<Long>,
-	currencyCode: String,
-	currencyFormat: NumberFormat,
-	readOnly: Boolean,
-	onToggleDate: (LocalDate) -> Unit,
-	onDelete: (Transaction) -> Unit,
-	onEdit: (Transaction) -> Unit,
-	onClick: (Transaction) -> Unit,
+    showPastPeriod: Boolean,
+    groupedPastTransactions: Map<LocalDate?, List<Transaction>>,
+    expandedDates: Set<LocalDate>,
+    deletingTransactionIds: Set<Long>,
+    currencyCode: String,
+    currencyFormat: NumberFormat,
+    readOnly: Boolean,
+    onToggleDate: (LocalDate) -> Unit,
+    onDelete: (Transaction) -> Unit,
+    onEdit: (Transaction) -> Unit,
+    onClick: (Transaction) -> Unit,
 ) {
-	if (!showPastPeriod) return
+    if (!showPastPeriod) return
 
-	groupedPastTransactions.forEach { (date, transactions) ->
-		val isExpanded = date?.let { expandedDates.contains(it) } ?: false
-		val dayTotal = transactions.sumOf { it.amount }
+    groupedPastTransactions.forEach { (date, transactions) ->
+        val isExpanded = date?.let { expandedDates.contains(it) } ?: false
+        val dayTotal = transactions.sumOf { it.amount }
 
-		item("past-date-$date") {
-			HistoryDateDivider(
-				date = date,
-				isExpanded = isExpanded,
-				onToggleClick = {
-					date?.let(onToggleDate)
-				},
-				totalAmount = dayTotal,
-				currencyCode = currencyCode,
-			)
-		}
+        item("past-date-$date") {
+            HistoryDateDivider(
+                date = date,
+                isExpanded = isExpanded,
+                onToggleClick = {
+                    date?.let(onToggleDate)
+                },
+                totalAmount = dayTotal,
+                currencyCode = currencyCode,
+            )
+        }
 
-		item("past-date-content-$date") {
-			AnimatedVisibility(
-				visible = isExpanded,
-				enter = expandVertically(
-					animationSpec = tween(300),
-					expandFrom = Alignment.Top,
-				) + fadeIn(animationSpec = tween(300)),
-				exit = shrinkVertically(
-					animationSpec = tween(300),
-					shrinkTowards = Alignment.Top,
-				) + fadeOut(animationSpec = tween(300)),
-			) {
-				Column {
-					transactions.forEachIndexed { index, transaction ->
-						key(transaction.id) {
-							val position = paddedListItemPosition(index, transactions.lastIndex, transactions.size)
-							val isBeingDeleted = transaction.id in deletingTransactionIds
-							AnimatedVisibility(
-								visible = !isBeingDeleted,
-								enter = EnterTransition.None,
-								exit = slideOutHorizontally(
-									animationSpec = tween(durationMillis = 280),
-									targetOffsetX = { fullWidth -> fullWidth },
-								) + fadeOut(animationSpec = tween(durationMillis = 280)),
-							) {
-								SwipeableExpenseItem(
-									transaction = transaction,
-									currencyFormat = currencyFormat,
-									position = position,
-									isBeingDeleted = isBeingDeleted,
-									onDelete = { onDelete(transaction) },
-									onEdit = { onEdit(transaction) },
-									readOnly = readOnly,
-									onClick = { onClick(transaction) },
-								)
-							}
+        item("past-date-content-$date") {
+            AnimatedVisibility(
+                visible = isExpanded,
+                enter = expandVertically(
+                    animationSpec = tween(300),
+                    expandFrom = Alignment.Top,
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = shrinkVertically(
+                    animationSpec = tween(300),
+                    shrinkTowards = Alignment.Top,
+                ) + fadeOut(animationSpec = tween(300)),
+            ) {
+                Column {
+                    transactions.forEachIndexed { index, transaction ->
+                        key(transaction.id) {
+                            val position = paddedListItemPosition(
+                                index, transactions.lastIndex, transactions.size
+                            )
+                            val isBeingDeleted = transaction.id in deletingTransactionIds
+                            AnimatedVisibility(
+                                visible = !isBeingDeleted,
+                                enter = EnterTransition.None,
+                                exit = slideOutHorizontally(
+                                    animationSpec = tween(durationMillis = 280),
+                                    targetOffsetX = { fullWidth -> fullWidth },
+                                ) + fadeOut(animationSpec = tween(durationMillis = 280)),
+                            ) {
+                                SwipeableExpenseItem(
+                                    transaction = transaction,
+                                    currencyFormat = currencyFormat,
+                                    position = position,
+                                    isBeingDeleted = isBeingDeleted,
+                                    onDelete = { onDelete(transaction) },
+                                    onEdit = { onEdit(transaction) },
+                                    readOnly = readOnly,
+                                    onClick = { onClick(transaction) },
+                                )
+                            }
 
-							if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {
-								Spacer(modifier = Modifier.height(2.dp))
-							}
-						}
-					}
+                            if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {
+                                Spacer(modifier = Modifier.height(2.dp))
+                            }
+                        }
+                    }
 
-					val totalText = currencyFormat.format(dayTotal)
-					Row(
-						modifier = Modifier
-							.fillMaxWidth()
+                    val totalText = currencyFormat.format(dayTotal)
+                    Row(
+                        modifier = Modifier
+	                        .fillMaxWidth()
 							.padding(horizontal = 16.dp, vertical = 8.dp),
-						horizontalArrangement = Arrangement.End,
-						verticalAlignment = Alignment.CenterVertically,
-					) {
-						Text(
-							text = "Total del día: ",
-							style = MaterialTheme.typography.labelMedium,
-							color = MaterialTheme.colorScheme.onSurfaceVariant,
-						)
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "Total del día: ",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
 
-						Text(
-							text = totalText,
-							style = MaterialTheme.typography.labelLarge,
-							color = MaterialTheme.colorScheme.primary,
-							fontWeight = FontWeight.Bold,
-						)
-					}
-				}
-			}
-		}
-	}
+                        Text(
+                            text = totalText,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun RecurrentItemsContent(
-	items: List<UpcomingRecurrentItem>,
-	recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
-	currencyFormat: NumberFormat,
-	verticalItem: @Composable (index: Int, item: UpcomingRecurrentItem, position: PaddedListItemPosition) -> Unit,
-	horizontalKeyPrefix: String,
-	onClick: (Transaction) -> Unit,
+    items: List<UpcomingRecurrentItem>,
+    recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
+    currencyFormat: NumberFormat,
+    verticalItem: @Composable (index: Int, item: UpcomingRecurrentItem, position: PaddedListItemPosition) -> Unit,
+    horizontalKeyPrefix: String,
+    onClick: (Transaction) -> Unit,
 ) {
-	if (recurrentPaymentsViewMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
-		Column(modifier = Modifier.fillMaxWidth()) {
-			items.forEachIndexed { index, item ->
-				verticalItem(index, item, paddedListItemPosition(index, items.lastIndex, items.size))
-				if (index < items.lastIndex) {
-					Spacer(modifier = Modifier.height(2.dp))
-				}
-			}
-		}
-	} else {
-		LazyRow(
-			modifier = Modifier.fillMaxWidth(),
-			horizontalArrangement = Arrangement.spacedBy(8.dp),
-			contentPadding = PaddingValues(horizontal = 16.dp),
-		) {
-			itemsIndexed(
-				items = items,
-				key = { _, item -> "$horizontalKeyPrefix-${item.transaction.id}" },
-			) { _, item ->
-				RecurrentTicketCard(
-					title = item.transaction.comment,
-					amountFormatted = currencyFormat.format(item.transaction.amount),
-					nextChargeDate = prettyDate(
-						item.nextChargeDate.atStartOfDay(),
-						showTime = false,
-						forceShowDate = false,
-					),
-					frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()
-						?.replaceFirstChar { it.uppercase() },
-					onClick = { onClick(item.transaction) },
-					modifier = Modifier.fillParentMaxWidth(0.45f),
-				)
-			}
-		}
-	}
+    if (recurrentPaymentsViewMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            items.forEachIndexed { index, item ->
+                verticalItem(
+                    index, item, paddedListItemPosition(index, items.lastIndex, items.size)
+                )
+                if (index < items.lastIndex) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                }
+            }
+        }
+    } else {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+        ) {
+            itemsIndexed(
+                items = items,
+                key = { _, item -> "$horizontalKeyPrefix-${item.transaction.id}" },
+            ) { _, item ->
+                RecurrentTicketCard(
+                    title = item.transaction.comment,
+                    amountFormatted = currencyFormat.format(item.transaction.amount),
+                    nextChargeDate = prettyDate(
+                        item.nextChargeDate.atStartOfDay(),
+                        showTime = false,
+                        forceShowDate = false,
+                    ),
+                    frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()
+                        ?.replaceFirstChar { it.uppercase() },
+                    onClick = { onClick(item.transaction) },
+                    modifier = Modifier.fillParentMaxWidth(0.45f),
+                )
+            }
+        }
+    }
 }
 
 private fun paddedListItemPosition(
-	index: Int,
-	lastIndex: Int,
-	size: Int,
+    index: Int,
+    lastIndex: Int,
+    size: Int,
 ): PaddedListItemPosition = when {
-	size == 1 -> PaddedListItemPosition.Single
-	index == 0 -> PaddedListItemPosition.First
-	index == lastIndex -> PaddedListItemPosition.Last
-	else -> PaddedListItemPosition.Middle
+    size == 1 -> PaddedListItemPosition.Single
+    index == 0 -> PaddedListItemPosition.First
+    index == lastIndex -> PaddedListItemPosition.Last
+    else -> PaddedListItemPosition.Middle
 }

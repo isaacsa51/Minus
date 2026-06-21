@@ -6,15 +6,15 @@ import com.serranoie.app.minus.presentation.ui.budget.PeriodBoundaryResult
 import javax.inject.Inject
 
 class PersistBudgetSettingsUseCase @Inject constructor(
-	private val periodManager: BudgetPeriodManager,
+    private val periodManager: BudgetPeriodManager,
 ) {
-	suspend operator fun invoke(
-		settings: BudgetSettings,
-		forceNewPeriodBoundary: Boolean,
-	): PeriodBoundaryResult {
-		return periodManager.persistBudgetSettings(
-			settings = settings,
-			forceNewPeriodBoundary = forceNewPeriodBoundary,
-		)
-	}
+    suspend operator fun invoke(
+        settings: BudgetSettings,
+        forceNewPeriodBoundary: Boolean,
+    ): PeriodBoundaryResult {
+        return periodManager.persistBudgetSettings(
+            settings = settings,
+            forceNewPeriodBoundary = forceNewPeriodBoundary,
+        )
+    }
 }

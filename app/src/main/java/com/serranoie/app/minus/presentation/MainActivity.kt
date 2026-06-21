@@ -108,260 +108,261 @@ const val DEFAULT_RECURRENT_NOTIFICATION_MINUTE = 0
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-	private val isDone: MutableState<Boolean> = mutableStateOf(false)
-	private val isReady: MutableState<Boolean> = mutableStateOf(false)
-	private val dataStoreLoaded: MutableState<Boolean> = mutableStateOf(false)
-	private val onboardingComplete: MutableState<Boolean> = mutableStateOf(false)
-	private val earlyFinishPending: MutableState<Boolean> = mutableStateOf(false)
+    private val isDone: MutableState<Boolean> = mutableStateOf(false)
+    private val isReady: MutableState<Boolean> = mutableStateOf(false)
+    private val dataStoreLoaded: MutableState<Boolean> = mutableStateOf(false)
+    private val onboardingComplete: MutableState<Boolean> = mutableStateOf(false)
+    private val earlyFinishPending: MutableState<Boolean> = mutableStateOf(false)
 
-	@Inject
-	lateinit var notificationScheduler: NotificationScheduler
+    @Inject
+    lateinit var notificationScheduler: NotificationScheduler
 
-	@Inject
-	lateinit var settingsRepository: SettingsRepository
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
-	@Inject
-	lateinit var permissionHandler: PermissionHandler
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
 
-	@Inject
-	lateinit var themeManager: ThemeManager
+    @Inject
+    lateinit var themeManager: ThemeManager
 
-	@Inject
-	lateinit var censorManager: CensorManager
+    @Inject
+    lateinit var censorManager: CensorManager
 
-	@Inject
-	lateinit var wearableService: WearableService
+    @Inject
+    lateinit var wearableService: WearableService
 
-	@Inject
-	lateinit var midnightTransitionManager: MidnightTransitionManager
+    @Inject
+    lateinit var midnightTransitionManager: MidnightTransitionManager
 
-	private val requestNotificationPermissionLauncher = registerForActivityResult(
-		ActivityResultContracts.RequestPermission()
-	) { isGranted ->
-		permissionHandler.onNotificationPermissionResult(isGranted, notificationScheduler)
-	}
+    private val requestNotificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        permissionHandler.onNotificationPermissionResult(isGranted, notificationScheduler)
+    }
 
-	private fun checkAndRequestNotificationPermission() {
-		permissionHandler.requestNotificationPermissionIfNeeded(
-			activity = this,
-			launcher = requestNotificationPermissionLauncher,
-		)
-	}
+    private fun checkAndRequestNotificationPermission() {
+        permissionHandler.requestNotificationPermissionIfNeeded(
+            activity = this,
+            launcher = requestNotificationPermissionLauncher,
+        )
+    }
 
-	override fun onResume() {
-		super.onResume()
-		censorManager.start()
-	}
+    override fun onResume() {
+        super.onResume()
+        censorManager.start()
+    }
 
-	override fun onPause() {
-		super.onPause()
-		censorManager.stop()
-	}
+    override fun onPause() {
+        super.onPause()
+        censorManager.stop()
+    }
 
-	@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-	override fun onCreate(savedInstanceState: Bundle?) {
-		val context = this.applicationContext
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val context = this.applicationContext
 
-		WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
-		installSplashScreen().setKeepOnScreenCondition {
-			val keepOn = !dataStoreLoaded.value || !isDone.value
-			keepOn
-		}
+        installSplashScreen().setKeepOnScreenCondition {
+            val keepOn = !dataStoreLoaded.value || !isDone.value
+            keepOn
+        }
 
-		super.onCreate(savedInstanceState)
-		enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
-		lifecycleScope.launch {
-			try {
-				runCatching {
-					val nodeIds = wearableService.getReachableSenderNodeIds()
-					logcat {
-						"wear capability minus_wear_sender reachableNodes=${nodeIds.size} ids=${nodeIds.joinToString()}"
-					}
-				}.onFailure {
-					logcat { it.asLog() }
-				}
+        lifecycleScope.launch {
+            try {
+                runCatching {
+                    val nodeIds = wearableService.getReachableSenderNodeIds()
+                    logcat {
+                        "wear capability minus_wear_sender reachableNodes=${nodeIds.size} ids=${nodeIds.joinToString()}"
+                    }
+                }.onFailure {
+                    logcat { it.asLog() }
+                }
 
-				val userSettings = settingsRepository.getSettings()
-				onboardingComplete.value = userSettings.onboardingCompleted
-				earlyFinishPending.value = userSettings.earlyFinishActive
-				themeManager.applyUserSettings(context, userSettings)
+                val userSettings = settingsRepository.getSettings()
+                onboardingComplete.value = userSettings.onboardingCompleted
+                earlyFinishPending.value = userSettings.earlyFinishActive
+                themeManager.applyUserSettings(context, userSettings)
 
-				dataStoreLoaded.value = true
-				isDone.value = true
-			} catch (_: Exception) {
-				dataStoreLoaded.value = true
-				isDone.value = true
-			}
+                dataStoreLoaded.value = true
+                isDone.value = true
+            } catch (_: Exception) {
+                dataStoreLoaded.value = true
+                isDone.value = true
+            }
 
-			notificationScheduler.initializeNotifications()
-		}
+            notificationScheduler.initializeNotifications()
+        }
 
-		settingsRepository.observeSettings().onEach { settings ->
-			logcat {
-				"Settings observer -> onboarding_completed=${settings.onboardingCompleted}"
-			}
-			onboardingComplete.value = settings.onboardingCompleted
-			earlyFinishPending.value = settings.earlyFinishActive
-			themeManager.applyUserSettings(applicationContext, settings)
-		}.launchIn(lifecycleScope)
+        settingsRepository.observeSettings().onEach { settings ->
+            logcat {
+                "Settings observer -> onboarding_completed=${settings.onboardingCompleted}"
+            }
+            onboardingComplete.value = settings.onboardingCompleted
+            earlyFinishPending.value = settings.earlyFinishActive
+            themeManager.applyUserSettings(applicationContext, settings)
+        }.launchIn(lifecycleScope)
 
-		ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
-			override fun onStart(owner: LifecycleOwner) {
-				lifecycleScope.launch {
-					midnightTransitionManager.handleAppStart()
-				}
-			}
-		})
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                lifecycleScope.launch {
+                    midnightTransitionManager.handleAppStart()
+                }
+            }
+        })
 
-		setContent {
-			val activityResultRegistryOwner = LocalActivityResultRegistryOwner.current
+        setContent {
+            val activityResultRegistryOwner = LocalActivityResultRegistryOwner.current
 
-			LaunchedEffect(Unit) {
-				isReady.value = true
-			}
+            LaunchedEffect(Unit) {
+                isReady.value = true
+            }
 
-			LaunchedEffect(isReady.value) {
-				if (isReady.value) {
-					checkAndRequestNotificationPermission()
-				}
-			}
+            LaunchedEffect(isReady.value) {
+                if (isReady.value) {
+                    checkAndRequestNotificationPermission()
+                }
+            }
 
+            val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
 
-			val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
+            // INFO: Seems like this is not needed anymore since we support tablet layouts.
+// 			if (widthSizeClass == WindowWidthSizeClass.Compact) {
+// 				lockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+// 			}
 
-			// INFO: Seems like this is not needed anymore since we support tablet layouts.
-//			if (widthSizeClass == WindowWidthSizeClass.Compact) {
-//				lockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-//			}
+            val windowInsets = WindowInsets.systemBars.asPaddingValues()
 
-			val windowInsets = WindowInsets.systemBars.asPaddingValues()
+            if (isReady.value && dataStoreLoaded.value) {
+                val dynamicColor = context.dynamicColorEnabled
+                val isCensored by censorManager.isCensored.collectAsStateWithLifecycle()
 
-			if (isReady.value && dataStoreLoaded.value) {
-				val dynamicColor = context.dynamicColorEnabled
-				val isCensored by censorManager.isCensored.collectAsStateWithLifecycle()
+                val startDestination = when {
+                    earlyFinishPending.value -> Screen.Analytics.route
+                    !onboardingComplete.value -> Screen.Onboarding.route
+                    else -> Screen.Main.route
+                }
 
-				val startDestination = when {
-					earlyFinishPending.value -> Screen.Analytics.route
-					!onboardingComplete.value -> Screen.Onboarding.route
-					else -> Screen.Main.route
-				}
+                MinusTheme(dynamicColor = dynamicColor) {
+                    CompositionLocalProvider(
+                        LocalWindowSize provides widthSizeClass,
+                        LocalWindowInsets provides windowInsets,
+                        LocalCensorMode provides isCensored,
+                    ) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            val navController = rememberNavController()
 
-				MinusTheme(dynamicColor = dynamicColor) {
-					CompositionLocalProvider(
-						LocalWindowSize provides widthSizeClass,
-						LocalWindowInsets provides windowInsets,
-						LocalCensorMode provides isCensored,
-					) {
-						Surface(
-							color = MaterialTheme.colorScheme.background
-						) {
-							val navController = rememberNavController()
+                            key(startDestination) {
+                                AppNavGraph(
+                                    activityResultRegistryOwner = activityResultRegistryOwner,
+                                    startDestination = startDestination,
+                                    navController = navController,
+                                    onOnboardingComplete = {
+                                        lifecycleScope.launch {
+                                            logcat {
+                                                "onOnboardingComplete -> writing onboarding_completed=true"
+                                            }
+                                            settingsRepository.setOnboardingCompleted(true)
+                                        }
+                                    }
+                                )
+                            }
 
-							key(startDestination) {
-								AppNavGraph(
-									activityResultRegistryOwner = activityResultRegistryOwner,
-									startDestination = startDestination,
-									navController = navController,
-									onOnboardingComplete = {
-										lifecycleScope.launch {
-											logcat {
-												"onOnboardingComplete -> writing onboarding_completed=true"
-											}
-											settingsRepository.setOnboardingCompleted(true)
-										}
-									})
-							}
+                            val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()
+                            val midnightTransitionData by midnightTransitionManager.midnightTransitionData.collectAsStateWithLifecycle()
 
-							val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()
-							val midnightTransitionData by midnightTransitionManager.midnightTransitionData.collectAsStateWithLifecycle()
+                            if (shouldShowMidnightDialog && midnightTransitionData != null) {
+                                val data = midnightTransitionData!!
+                                if (data.shouldNavigateToAnalyticsOnly) {
+                                    LaunchedEffect(
+                                        data.periodEndDate,
+                                        data.remainingAmount,
+                                        data.totalBudget,
+                                        data.totalSpent
+                                    ) {
+                                        midnightTransitionManager.onTransitionDialogConfirmed()
+                                        navController.navigate(Screen.Analytics.route) {
+                                            popUpTo(Screen.Main.route) { inclusive = false }
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                } else {
+                                    val periodLabel = "${data.periodStartDate.dayOfMonth} ${
+                                        data.periodStartDate.month.name.lowercase().take(3)
+                                    } - ${data.periodEndDate.dayOfMonth} ${
+                                        data.periodEndDate.month.name.lowercase().take(3)
+                                    }"
+                                    RolloverDialog(
+                                        remainingAmount = data.remainingAmount,
+                                        currencyCode = data.currencyCode,
+                                        periodLabel = periodLabel,
+                                        spentAmount = data.totalSpent,
+                                        onSplitEqually = {
+                                            lifecycleScope.launch {
+                                                midnightTransitionManager.rollRemainingSplitEqually()
+                                                navController.navigate(Screen.Analytics.route) {
+                                                    popUpTo(Screen.Main.route) { inclusive = false }
+                                                    launchSingleTop = true
+                                                }
+                                            }
+                                        },
+                                        onCarryToNextDay = {
+                                            lifecycleScope.launch {
+                                                midnightTransitionManager.rollRemainingToFirstDay()
+                                                navController.navigate(Screen.Analytics.route) {
+                                                    popUpTo(Screen.Main.route) { inclusive = false }
+                                                    launchSingleTop = true
+                                                }
+                                            }
+                                        },
+                                        onViewAnalytics = {
+                                            midnightTransitionManager.onTransitionDialogConfirmed()
+                                            navController.navigate(Screen.Analytics.route) {
+                                                popUpTo(Screen.Main.route) { inclusive = false }
+                                            }
+                                        },
+                                        onDismiss = {
+                                            midnightTransitionManager.onTransitionDialogDismissed()
+                                        }
+                                    )
+                                }
+                            }
 
-							if (shouldShowMidnightDialog && midnightTransitionData != null) {
-								val data = midnightTransitionData!!
-								if (data.shouldNavigateToAnalyticsOnly) {
-									LaunchedEffect(
-										data.periodEndDate,
-										data.remainingAmount,
-										data.totalBudget,
-										data.totalSpent
-									) {
-										midnightTransitionManager.onTransitionDialogConfirmed()
-										navController.navigate(Screen.Analytics.route) {
-											popUpTo(Screen.Main.route) { inclusive = false }
-											launchSingleTop = true
-										}
-									}
-								} else {
-									val periodLabel = "${data.periodStartDate.dayOfMonth} ${
-										data.periodStartDate.month.name.lowercase().take(3)
-									} - ${data.periodEndDate.dayOfMonth} ${
-										data.periodEndDate.month.name.lowercase().take(3)
-									}"
-									RolloverDialog(
-										remainingAmount = data.remainingAmount,
-										currencyCode = data.currencyCode,
-										periodLabel = periodLabel,
-										spentAmount = data.totalSpent,
-										onSplitEqually = {
-											lifecycleScope.launch {
-												midnightTransitionManager.rollRemainingSplitEqually()
-												navController.navigate(Screen.Analytics.route) {
-													popUpTo(Screen.Main.route) { inclusive = false }
-													launchSingleTop = true
-												}
-											}
-										},
-										onCarryToNextDay = {
-											lifecycleScope.launch {
-												midnightTransitionManager.rollRemainingToFirstDay()
-												navController.navigate(Screen.Analytics.route) {
-													popUpTo(Screen.Main.route) { inclusive = false }
-													launchSingleTop = true
-												}
-											}
-										},
-										onViewAnalytics = {
-											midnightTransitionManager.onTransitionDialogConfirmed()
-											navController.navigate(Screen.Analytics.route) {
-												popUpTo(Screen.Main.route) { inclusive = false }
-											}
-										},
-										onDismiss = {
-											midnightTransitionManager.onTransitionDialogDismissed()
-										})
-								}
-							}
+                            val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()
+                            LaunchedEffect(needsBudgetSetup) {
+                                if (needsBudgetSetup) {
+                                    logcat { "needsBudgetSetup detected, navigating to wallet setup" }
+                                    midnightTransitionManager.onBudgetSetupHandled()
+                                    // Only force edit mode if no budget has ever been created.
+                                    // Use BUDGET_END_DATE_KEY as a proxy: if it's null, no budget was ever saved.
+                                    // If a budget exists, open wallet in view mode so user sees period info.
+                                    val prefs = context.settingsDataStore.data.first()
+                                    val hasBudget = prefs[BUDGET_END_DATE_KEY] != null
+                                    navController.navigate(
+                                        Screen.Main.createRoute(
+                                            openWallet = true,
+                                            forceWalletSetup = !hasBudget
+                                        )
+                                    ) {
+                                        popUpTo(Screen.Main.route) { inclusive = true }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
-							val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()
-							LaunchedEffect(needsBudgetSetup) {
-								if (needsBudgetSetup) {
-									logcat { "needsBudgetSetup detected, navigating to wallet setup" }
-									midnightTransitionManager.onBudgetSetupHandled()
-									// Only force edit mode if no budget has ever been created.
-									// Use BUDGET_END_DATE_KEY as a proxy: if it's null, no budget was ever saved.
-									// If a budget exists, open wallet in view mode so user sees period info.
-									val prefs = context.settingsDataStore.data.first()
-									val hasBudget = prefs[BUDGET_END_DATE_KEY] != null
-									navController.navigate(
-										Screen.Main.createRoute(
-											openWallet = true,
-											forceWalletSetup = !hasBudget
-										)
-									) {
-										popUpTo(Screen.Main.route) { inclusive = true }
-										launchSingleTop = true
-									}
-								}
-							}
-						}
-					}
-				}
-
-				LaunchedEffect(Unit) {
-					isDone.value = true
-				}
-			}
-		}
-	}
+                LaunchedEffect(Unit) {
+                    isDone.value = true
+                }
+            }
+        }
+    }
 }

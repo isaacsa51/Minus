@@ -21,3 +21,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Detekt
+config/detekt/detekt-baseline.xml
+build/reports/detekt/

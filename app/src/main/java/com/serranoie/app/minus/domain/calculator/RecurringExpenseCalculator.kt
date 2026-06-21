@@ -34,10 +34,12 @@ class RecurringExpenseCalculator @Inject constructor() {
                 val daysBetween = ChronoUnit.DAYS.between(startDate, today).toInt()
                 daysBetween >= 0 && daysBetween % 7 == 0
             }
+
             RecurrentFrequency.BIWEEKLY -> {
                 val daysBetween = ChronoUnit.DAYS.between(startDate, today).toInt()
                 daysBetween >= 0 && daysBetween % 14 == 0
             }
+
             RecurrentFrequency.MONTHLY -> {
                 val billingDay = transaction.subscriptionDay ?: startDate.dayOfMonth
                 today.dayOfMonth == billingDay

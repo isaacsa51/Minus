@@ -48,7 +48,9 @@ class MinusCsvParser {
                     if (row.amount <= BigDecimal.ZERO) {
                         errors.add("Line $lineNo discarded: amount must be > 0")
                         null
-                    } else row
+                    } else {
+                        row
+                    }
                 }.onSuccess { parsed ->
                     if (parsed != null) rows.add(parsed)
                 }.onFailure { throwable ->

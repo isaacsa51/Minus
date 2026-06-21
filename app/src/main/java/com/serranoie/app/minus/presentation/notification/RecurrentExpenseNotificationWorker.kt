@@ -9,11 +9,11 @@ import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.settingsDataStore
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import com.serranoie.app.minus.presentation.settingsDataStore
 import kotlinx.coroutines.flow.first
 import logcat.asLog
 import logcat.logcat
@@ -160,9 +160,7 @@ class RecurrentExpenseNotificationWorker(
 
         notificationHelper.showRecurrentExpenseNotification(
             amount = transaction.amount.toPlainString(),
-            comment = transaction.comment,
-            frequency = frequency.name,
-            currency = settings.currencyCode
+            comment = transaction.comment
         )
         applicationContext.settingsDataStore.edit { prefs ->
             prefs[dedupeKey] = today.toString()

@@ -13,7 +13,6 @@ object MinusCsvContract {
     const val COL_ID = "id"
     const val COL_IS_CREDIT = "is_credit"
 
-    // Budget metadata (repeated in a metadata row, and compatible with older exports)
     const val COL_BUDGET_TOTAL = "budget_total"
     const val COL_BUDGET_PERIOD = "budget_period"
     const val COL_BUDGET_START_DATE = "budget_start_date"

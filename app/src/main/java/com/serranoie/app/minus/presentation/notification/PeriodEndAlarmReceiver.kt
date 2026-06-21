@@ -1,9 +1,8 @@
 package com.serranoie.app.minus.presentation.notification
+
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import logcat.asLog
-import logcat.logcat
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -13,7 +12,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import logcat.asLog
+import logcat.logcat
 import java.time.LocalDate
+
 class PeriodEndAlarmReceiver : BroadcastReceiver() {
     @EntryPoint
     @InstallIn(SingletonComponent::class)
@@ -21,6 +23,7 @@ class PeriodEndAlarmReceiver : BroadcastReceiver() {
         fun budgetRepository(): BudgetRepository
         fun notificationHelper(): NotificationHelper
     }
+
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != NotificationScheduler.ACTION_SHOW_PERIOD_END_NOTIFICATION) return
         val pendingResult = goAsync()
@@ -32,8 +35,8 @@ class PeriodEndAlarmReceiver : BroadcastReceiver() {
                 )
                 val budgetRepository = entryPoint.budgetRepository()
                 val notificationHelper = entryPoint.notificationHelper()
-	            val settings = budgetRepository.getBudgetSettingsSync() ?: return@launch
-	            val periodEnd = settings.getPeriodEndDate()
+                val settings = budgetRepository.getBudgetSettingsSync() ?: return@launch
+                val periodEnd = settings.getPeriodEndDate()
                 val today = LocalDate.now()
                 if (today.isBefore(periodEnd)) {
                     return@launch
@@ -41,7 +44,9 @@ class PeriodEndAlarmReceiver : BroadcastReceiver() {
                 val transactions = budgetRepository.getTransactions().first()
                 val periodTransactions = transactions.filter { transaction ->
                     val txDate = transaction.date?.toLocalDate()
-                    txDate != null && !txDate.isBefore(settings.startDate) && !txDate.isAfter(periodEnd)
+                    txDate != null && !txDate.isBefore(settings.startDate) && !txDate.isAfter(
+                        periodEnd
+                    )
                 }
                 val totalSpent = periodTransactions
                     .filter { !it.isDeleted }
@@ -57,7 +62,5 @@ class PeriodEndAlarmReceiver : BroadcastReceiver() {
                 pendingResult.finish()
             }
         }
-    }
-    companion object {
     }
 }

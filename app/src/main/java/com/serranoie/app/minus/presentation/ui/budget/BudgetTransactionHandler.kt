@@ -31,7 +31,7 @@ sealed interface ApplyTransactionResult {
 }
 
 class BudgetTransactionHandler @Inject constructor(
-	private val budgetRepository: BudgetRepository,
+	internal val budgetRepository: BudgetRepository,
 	private val addTransactionUseCase: AddTransactionUseCase,
 	private val deleteTransactionUseCase: DeleteTransactionUseCase,
 	private val budgetExpressionEvaluator: BudgetExpressionEvaluator,

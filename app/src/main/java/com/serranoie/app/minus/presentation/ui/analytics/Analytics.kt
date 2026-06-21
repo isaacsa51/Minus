@@ -44,7 +44,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
-import com.serranoie.app.minus.presentation.ui.history.History
+import com.serranoie.app.minus.presentation.ui.history.HistoryScreen
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHeader
 import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeader
@@ -65,25 +65,25 @@ import java.util.Calendar
 import java.util.Date
 
 data class AnalyticsState(
-	val periodFinished: Boolean = false,
-	val transactions: List<Transaction> = emptyList(),
-	val spends: List<Transaction> = emptyList(),
-	val wholeBudget: BigDecimal = BigDecimal.ZERO,
-	val currencyCode: String = "USD",
-	val finishPeriodActualDate: Date? = null,
-	val startPeriodDate: Date = Date(),
-	val finishPeriodDate: Date? = null,
-	val extraAffordableDaysFromRemaining: Int = 0,
-	val budgetSettingsForDisplay: BudgetSettings? = null,
-	val budgetStateForDisplay: BudgetState? = null,
-	val showRolloverStyleInBudgetDisplay: Boolean = false,
-	val isLoading: Boolean = false,
+    val periodFinished: Boolean = false,
+    val transactions: List<Transaction> = emptyList(),
+    val spends: List<Transaction> = emptyList(),
+    val wholeBudget: BigDecimal = BigDecimal.ZERO,
+    val currencyCode: String = "USD",
+    val finishPeriodActualDate: Date? = null,
+    val startPeriodDate: Date = Date(),
+    val finishPeriodDate: Date? = null,
+    val extraAffordableDaysFromRemaining: Int = 0,
+    val budgetSettingsForDisplay: BudgetSettings? = null,
+    val budgetStateForDisplay: BudgetState? = null,
+    val showRolloverStyleInBudgetDisplay: Boolean = false,
+    val isLoading: Boolean = false,
 )
 
 data class AnalyticsActions(
-	val onCreateNewPeriod: () -> Unit = {},
-	val onClose: () -> Unit = {},
-	val onExportCSV: () -> Unit = {},
+    val onCreateNewPeriod: () -> Unit = {},
+    val onClose: () -> Unit = {},
+    val onExportCSV: () -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -91,465 +91,465 @@ data class Size(val width: Dp, val height: Dp)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Analytics(
-	state: AnalyticsState = AnalyticsState(),
-	actions: AnalyticsActions = AnalyticsActions(),
-	activityResultRegistryOwner: ActivityResultRegistryOwner? = null,
+    state: AnalyticsState = AnalyticsState(),
+    actions: AnalyticsActions = AnalyticsActions(),
+    activityResultRegistryOwner: ActivityResultRegistryOwner? = null,
 ) {
-	val view = LocalView.current
-	val scrollState = rememberScrollState()
-	var showHistorySheet by remember { mutableStateOf(false) }
-	val sheetState = rememberModalBottomSheetState()
+    val view = LocalView.current
+    val scrollState = rememberScrollState()
+    var showHistorySheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
 
-	var selectedCategory by remember { mutableStateOf<CategoryAnalyticsState?>(null) }
+    var selectedCategory by remember { mutableStateOf<CategoryAnalyticsState?>(null) }
 
-	val navigationBarHeight =
-		LocalWindowInsets.current.calculateBottomPadding().coerceAtLeast(16.dp)
+    val navigationBarHeight =
+        LocalWindowInsets.current.calculateBottomPadding().coerceAtLeast(16.dp)
 
-	Scaffold(
-		modifier = Modifier.fillMaxSize(),
-		topBar = {
-			if (!state.periodFinished) {
-				MiddlePeriodHeader(
-					onClose = actions.onClose,
-				)
-			}
-		},
-	) { paddingValues ->
-		BoxWithConstraints(
-			modifier = Modifier
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            if (!state.periodFinished) {
+                MiddlePeriodHeader(
+                    onClose = actions.onClose,
+                )
+            }
+        },
+    ) { paddingValues ->
+        BoxWithConstraints(
+            modifier = Modifier
 				.fillMaxSize()
 				.padding(paddingValues)
-		) {
-			val useWideAnalyticsLayout = maxWidth >= 840.dp
+        ) {
+            val useWideAnalyticsLayout = maxWidth >= 840.dp
 
-			Column(
-				Modifier
+            Column(
+                Modifier
 					.fillMaxSize()
 					.verticalScroll(scrollState)
-			) {
-				if (state.periodFinished) {
-					FinishedPeriodHeader(
-						scrollState = scrollState,
-						hasSpends = state.spends.isNotEmpty(),
-						isOverBudget = state.spends.sumOf { it.amount } > state.wholeBudget,
-					)
-				}
+            ) {
+                if (state.periodFinished) {
+                    FinishedPeriodHeader(
+                        scrollState = scrollState,
+                        hasSpends = state.spends.isNotEmpty(),
+                        isOverBudget = state.spends.sumOf { it.amount } > state.wholeBudget,
+                    )
+                }
 
-				Spacer(modifier = Modifier.height(16.dp))
-				BudgetDisplay(
-					budget = state.wholeBudget,
-					currencyCode = state.currencyCode,
-					startDate = state.startPeriodDate,
-					finishDate = state.finishPeriodDate,
-					actualFinishDate = state.finishPeriodActualDate,
-					extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
-					modifier = Modifier.padding(horizontal = 16.dp),
-					budgetState = state.budgetStateForDisplay,
-					budgetSettings = state.budgetSettingsForDisplay,
-					showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
-				)
-				Spacer(modifier = Modifier.height(16.dp))
-				AnalyticsResponsiveLayout(
-					useTabletLayout = useWideAnalyticsLayout,
-					state = state,
-					onShowHistory = {
-						showHistorySheet = true
-						view.weakHapticFeedback()
-					},
-					onCategoryClick = { categoryName, categorySpends ->
-						selectedCategory = state.toCategoryAnalyticsState(categoryName, categorySpends)
-						view.weakHapticFeedback()
-					}
-				)
-				Spacer(modifier = Modifier.height(16.dp))
-				SavingsRecommendationCard(
-					budget = state.wholeBudget,
-					spends = state.spends,
-					currency = state.currencyCode,
-					modifier = Modifier.padding(horizontal = 16.dp),
-				)
-				// Spacer to push content up, making room for the fixed button at bottom
-				Spacer(modifier = Modifier.height(80.dp + navigationBarHeight))
-			}
+                Spacer(modifier = Modifier.height(16.dp))
+                BudgetDisplay(
+                    budget = state.wholeBudget,
+                    currencyCode = state.currencyCode,
+                    startDate = state.startPeriodDate,
+                    finishDate = state.finishPeriodDate,
+                    actualFinishDate = state.finishPeriodActualDate,
+                    extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    budgetState = state.budgetStateForDisplay,
+                    budgetSettings = state.budgetSettingsForDisplay,
+                    showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                AnalyticsResponsiveLayout(
+                    useTabletLayout = useWideAnalyticsLayout,
+                    state = state,
+                    onShowHistory = {
+                        showHistorySheet = true
+                        view.weakHapticFeedback()
+                    },
+                    onCategoryClick = { categoryName, categorySpends ->
+                        selectedCategory =
+                            state.toCategoryAnalyticsState(categoryName, categorySpends)
+                        view.weakHapticFeedback()
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                SavingsRecommendationCard(
+                    budget = state.wholeBudget,
+                    spends = state.spends,
+                    currency = state.currencyCode,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                // Spacer to push content up, making room for the fixed button at bottom
+                Spacer(modifier = Modifier.height(80.dp + navigationBarHeight))
+            }
 
-			Box(
-				modifier = Modifier
+            Box(
+                modifier = Modifier
 					.fillMaxWidth()
 					.align(androidx.compose.ui.Alignment.BottomCenter)
 					.zIndex(1f)
 					.padding(bottom = navigationBarHeight, start = 16.dp, end = 16.dp)
-			) {
-				Button(
-					modifier = Modifier
+            ) {
+                Button(
+                    modifier = Modifier
 						.fillMaxWidth()
 						.heightIn(60.dp),
-					onClick = {
-						view.strongHapticFeedback()
-						actions.onCreateNewPeriod()
-					},
-				) {
-					Text(
-						text = stringResource(R.string.new_budget),
-						style = MaterialTheme.typography.labelMediumEmphasized,
-					)
-				}
-			}
-		}
-	}
+                    onClick = {
+                        view.strongHapticFeedback()
+                        actions.onCreateNewPeriod()
+                    },
+                ) {
+                    Text(
+                        text = stringResource(R.string.new_budget),
+                        style = MaterialTheme.typography.labelMediumEmphasized,
+                    )
+                }
+            }
+        }
+    }
 
-	if (selectedCategory != null) {
-		ModalBottomSheet(
-			onDismissRequest = { selectedCategory = null },
-			sheetState = sheetState,
-		) {
-			CategoryAnalytics(
-				state = selectedCategory!!,
-				actions = CategoryAnalyticsActions(
-					onClose = { selectedCategory = null },
-					onCreateNewPeriod = actions.onCreateNewPeriod
-				)
-			)
-		}
-	}
+    if (selectedCategory != null) {
+        ModalBottomSheet(
+            onDismissRequest = { selectedCategory = null },
+            sheetState = sheetState,
+        ) {
+            CategoryAnalytics(
+                state = selectedCategory!!,
+                actions = CategoryAnalyticsActions(
+                    onClose = { selectedCategory = null },
+                    onCreateNewPeriod = actions.onCreateNewPeriod
+                )
+            )
+        }
+    }
 
-	if (showHistorySheet) {
-		ModalBottomSheet(
-			onDismissRequest = { showHistorySheet = false },
-			sheetState = sheetState,
-			dragHandle = {
-				BottomSheetDefaults.DragHandle()
-			}
-		) {
-			History(
-				readOnly = true,
-				onClose = { showHistorySheet = false }
-			)
-		}
-	}
+    if (showHistorySheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showHistorySheet = false },
+            sheetState = sheetState,
+            dragHandle = {
+                BottomSheetDefaults.DragHandle()
+            }
+        ) {
+            HistoryScreen(
+                readOnly = true,
+            )
+        }
+    }
 }
 
 @Composable
 private fun AnalyticsResponsiveLayout(
-	useTabletLayout: Boolean,
-	state: AnalyticsState,
-	onShowHistory: () -> Unit,
-	onCategoryClick: (String, List<Transaction>) -> Unit,
+    useTabletLayout: Boolean,
+    state: AnalyticsState,
+    onShowHistory: () -> Unit,
+    onCategoryClick: (String, List<Transaction>) -> Unit,
 ) {
-	if (useTabletLayout) {
-		AnalyticsTabletLayout(
-			state = state,
-			onShowHistory = onShowHistory,
-			onCategoryClick = onCategoryClick,
-		)
-	} else {
-		AnalyticsCompactLayout(
-			state = state,
-			onShowHistory = onShowHistory,
-			onCategoryClick = onCategoryClick,
-		)
-	}
+    if (useTabletLayout) {
+        AnalyticsTabletLayout(
+            state = state,
+            onShowHistory = onShowHistory,
+            onCategoryClick = onCategoryClick,
+        )
+    } else {
+        AnalyticsCompactLayout(
+            state = state,
+            onShowHistory = onShowHistory,
+            onCategoryClick = onCategoryClick,
+        )
+    }
 }
 
 @Composable
 private fun AnalyticsCompactLayout(
-	state: AnalyticsState,
-	onShowHistory: () -> Unit,
-	onCategoryClick: (String, List<Transaction>) -> Unit,
+    state: AnalyticsState,
+    onShowHistory: () -> Unit,
+    onCategoryClick: (String, List<Transaction>) -> Unit,
 ) {
-	Column {
-		Row(
-			Modifier
+    Column {
+        Row(
+            Modifier
 				.fillMaxWidth()
 				.padding(horizontal = 16.dp)
-		) {
-			if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
-				CalendarHeatmap(
-					transactions = state.transactions,
-					budget = state.wholeBudget,
-					startDate = state.startPeriodDate,
-					finishDate = state.finishPeriodDate,
-					modifier = Modifier
+        ) {
+            if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
+                CalendarHeatmap(
+                    transactions = state.transactions,
+                    budget = state.wholeBudget,
+                    startDate = state.startPeriodDate,
+                    finishDate = state.finishPeriodDate,
+                    modifier = Modifier
 						.weight(1f)
 						.wrapContentHeight(),
-				)
-			}
-		}
-		SpendsChart(
-			spends = state.spends,
-			modifier = Modifier
+                )
+            }
+        }
+        SpendsChart(
+            spends = state.spends,
+            modifier = Modifier
 				.fillMaxWidth()
 				.heightIn(0.dp, 400.dp)
 				.padding(horizontal = 16.dp),
-		)
-		Spacer(modifier = Modifier.height(16.dp))
-		Row(
-			modifier = Modifier
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier
 				.fillMaxWidth()
 				.padding(horizontal = 16.dp)
 				.height(IntrinsicSize.Min)
-		) {
-			MinMaxSpentCard(
-				isMin = true,
-				spends = state.spends,
-				currency = "MXN",
-				modifier = Modifier
+        ) {
+            MinMaxSpentCard(
+                isMin = true,
+                spends = state.spends,
+                currency = "MXN",
+                modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight(),
-			)
-			Spacer(modifier = Modifier.width(16.dp))
-			MinMaxSpentCard(
-				isMin = false,
-				spends = state.spends,
-				currency = "MXN",
-				modifier = Modifier
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            MinMaxSpentCard(
+                isMin = false,
+                spends = state.spends,
+                currency = "MXN",
+                modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight(),
-			)
-		}
-		Spacer(modifier = Modifier.height(16.dp))
-		Row(
-			modifier = Modifier
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier
 				.fillMaxWidth()
 				.padding(horizontal = 16.dp)
-		) {
-			SpendsCountCard(
-				count = state.spends.size,
-				onClick = onShowHistory,
-				modifier = Modifier
+        ) {
+            SpendsCountCard(
+                count = state.spends.size,
+                onClick = onShowHistory,
+                modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight(),
-			)
-			Spacer(modifier = Modifier.width(16.dp))
-			AverageSpendCard(
-				spends = state.spends,
-				startDate = state.startPeriodDate,
-				finishDate = state.finishPeriodDate,
-				currency = "MXN",
-				modifier = Modifier
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            AverageSpendCard(
+                spends = state.spends,
+                startDate = state.startPeriodDate,
+                finishDate = state.finishPeriodDate,
+                currency = "MXN",
+                modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight(),
-			)
-		}
-		Spacer(modifier = Modifier.height(16.dp))
-		SpendBudgetCard(
-			budget = state.wholeBudget,
-			spend = state.spends.sumOf { it.amount },
-			modifier = Modifier
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        SpendBudgetCard(
+            budget = state.wholeBudget,
+            spend = state.spends.sumOf { it.amount },
+            modifier = Modifier
 				.fillMaxWidth()
 				.padding(horizontal = 16.dp),
-		)
-		Spacer(modifier = Modifier.height(16.dp))
-		CategoriesChartCard(
-			spends = state.spends,
-			currency = "MXN",
-			modifier = Modifier
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        CategoriesChartCard(
+            spends = state.spends,
+            currency = "MXN",
+            modifier = Modifier
 				.padding(horizontal = 16.dp)
 				.fillMaxWidth(),
-			onCategoryClick = onCategoryClick
-		)
-	}
+            onCategoryClick = onCategoryClick
+        )
+    }
 }
 
 @Composable
 private fun AnalyticsTabletLayout(
-	state: AnalyticsState,
-	onShowHistory: () -> Unit,
-	onCategoryClick: (String, List<Transaction>) -> Unit,
+    state: AnalyticsState,
+    onShowHistory: () -> Unit,
+    onCategoryClick: (String, List<Transaction>) -> Unit,
 ) {
-	Column(
-		modifier = Modifier
+    Column(
+        modifier = Modifier
 			.fillMaxWidth()
 			.padding(horizontal = 16.dp)
-	) {
-		Row(
-			modifier = Modifier
+    ) {
+        Row(
+            modifier = Modifier
 				.fillMaxWidth()
 				.height(IntrinsicSize.Min)
 				.requiredHeightIn(min = 180.dp)
-		) {
-			Box(
-				modifier = Modifier
+        ) {
+            Box(
+                modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight()
-			) {
-				if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
-					CalendarHeatmap(
-						transactions = state.transactions,
-						budget = state.wholeBudget,
-						startDate = state.startPeriodDate,
-						finishDate = state.finishPeriodDate,
-						modifier = Modifier
+            ) {
+                if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
+                    CalendarHeatmap(
+                        transactions = state.transactions,
+                        budget = state.wholeBudget,
+                        startDate = state.startPeriodDate,
+                        finishDate = state.finishPeriodDate,
+                        modifier = Modifier
 							.fillMaxWidth()
 							.fillMaxHeight(),
-					)
-				}
-			}
-			Spacer(modifier = Modifier.width(16.dp))
-			Row(
-				modifier = Modifier
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Row(
+                modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight()
-			) {
-				MinMaxSpentCard(
-					isMin = true,
-					spends = state.spends,
-					currency = "MXN",
-					modifier = Modifier
+            ) {
+                MinMaxSpentCard(
+                    isMin = true,
+                    spends = state.spends,
+                    currency = "MXN",
+                    modifier = Modifier
 						.weight(1f)
 						.fillMaxHeight(),
-				)
-				Spacer(modifier = Modifier.width(16.dp))
-				MinMaxSpentCard(
-					isMin = false,
-					spends = state.spends,
-					currency = "MXN",
-					modifier = Modifier
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                MinMaxSpentCard(
+                    isMin = false,
+                    spends = state.spends,
+                    currency = "MXN",
+                    modifier = Modifier
 						.weight(1f)
 						.fillMaxHeight(),
-				)
-			}
-		}
-		Spacer(modifier = Modifier.height(16.dp))
-		Row(
-			modifier = Modifier
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier
 				.fillMaxWidth()
 				.height(IntrinsicSize.Min)
-		) {
-			SpendBudgetCard(
-				budget = state.wholeBudget,
-				spend = state.spends.sumOf { it.amount },
-				modifier = Modifier.weight(1f),
-			)
-			Spacer(modifier = Modifier.width(16.dp))
-			Row(
-				modifier = Modifier
+        ) {
+            SpendBudgetCard(
+                budget = state.wholeBudget,
+                spend = state.spends.sumOf { it.amount },
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Row(
+                modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight()
-			) {
-				SpendsCountCard(
-					count = state.spends.size,
-					onClick = onShowHistory,
-					modifier = Modifier
+            ) {
+                SpendsCountCard(
+                    count = state.spends.size,
+                    onClick = onShowHistory,
+                    modifier = Modifier
 						.weight(1f)
 						.fillMaxHeight(),
-				)
-				Spacer(modifier = Modifier.width(8.dp))
-				AverageSpendCard(
-					spends = state.spends,
-					startDate = state.startPeriodDate,
-					finishDate = state.finishPeriodDate,
-					currency = "MXN",
-					modifier = Modifier.weight(1f),
-				)
-			}
-		}
-		Spacer(modifier = Modifier.height(8.dp))
-		CategoriesChartCard(
-			spends = state.spends,
-			currency = "MXN",
-			modifier = Modifier.fillMaxWidth(),
-			onCategoryClick = onCategoryClick
-		)
-	}
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                AverageSpendCard(
+                    spends = state.spends,
+                    startDate = state.startPeriodDate,
+                    finishDate = state.finishPeriodDate,
+                    currency = "MXN",
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        CategoriesChartCard(
+            spends = state.spends,
+            currency = "MXN",
+            modifier = Modifier.fillMaxWidth(),
+            onCategoryClick = onCategoryClick
+        )
+    }
 }
 
 private fun AnalyticsState.toCategoryAnalyticsState(
-	categoryName: String,
-	categorySpends: List<Transaction>,
+    categoryName: String,
+    categorySpends: List<Transaction>,
 ): CategoryAnalyticsState = CategoryAnalyticsState(
-	periodFinished = periodFinished,
-	transactions = transactions,
-	spends = spends,
-	wholeBudget = wholeBudget,
-	finishPeriodActualDate = finishPeriodActualDate,
-	startPeriodDate = startPeriodDate,
-	finishPeriodDate = finishPeriodDate,
-	isLoading = isLoading,
-	categoryName = categoryName,
-	categorySpends = categorySpends
+    periodFinished = periodFinished,
+    transactions = transactions,
+    spends = spends,
+    wholeBudget = wholeBudget,
+    finishPeriodActualDate = finishPeriodActualDate,
+    startPeriodDate = startPeriodDate,
+    finishPeriodDate = finishPeriodDate,
+    isLoading = isLoading,
+    categoryName = categoryName,
+    categorySpends = categorySpends
 )
 
 private val previewStartDate: Date
-	get() = Calendar.getInstance().apply {
-		add(Calendar.DAY_OF_MONTH, -34)
-	}.time
+    get() = Calendar.getInstance().apply {
+        add(Calendar.DAY_OF_MONTH, -34)
+    }.time
 
 private val previewFinishDate: Date
-	get() = Calendar.getInstance().apply {
-		add(Calendar.DAY_OF_MONTH, 7)
-	}.time
+    get() = Calendar.getInstance().apply {
+        add(Calendar.DAY_OF_MONTH, 7)
+    }.time
 
 private fun previewAnalyticsTransactions(): List<Transaction> {
-	val categories = listOf(
-		"Comida",
-		"Transporte",
-		"Entretenimiento",
-		"Salud",
-		"Servicios",
-		"Compras",
-		"Café",
-		"Mascotas",
-		"Gimnasio",
-		"Regalos",
-	)
+    val categories = listOf(
+        "Comida",
+        "Transporte",
+        "Entretenimiento",
+        "Salud",
+        "Servicios",
+        "Compras",
+        "Café",
+        "Mascotas",
+        "Gimnasio",
+        "Regalos",
+    )
 
-	return categories.flatMapIndexed { index, category ->
-		listOf(
-			Transaction(
-				amount = BigDecimal(45 + index * 18),
-				date = LocalDateTime.now().minusDays((index * 3L) + 1),
-				comment = category,
-			),
-			Transaction(
-				amount = BigDecimal(30 + index * 11),
-				date = LocalDateTime.now().minusDays((index * 3L) + 2),
-				comment = category,
-			),
-		)
-	} + listOf(
-		Transaction(
-			amount = BigDecimal(180),
-			date = LocalDateTime.now().minusDays(31),
-			comment = "",
-		),
-		Transaction(
-			amount = BigDecimal(96),
-			date = LocalDateTime.now().minusDays(27),
-			comment = "Comida",
-		),
-	)
+    return categories.flatMapIndexed { index, category ->
+        listOf(
+            Transaction(
+                amount = BigDecimal(45 + index * 18),
+                date = LocalDateTime.now().minusDays((index * 3L) + 1),
+                comment = category,
+            ),
+            Transaction(
+                amount = BigDecimal(30 + index * 11),
+                date = LocalDateTime.now().minusDays((index * 3L) + 2),
+                comment = category,
+            ),
+        )
+    } + listOf(
+        Transaction(
+            amount = BigDecimal(180),
+            date = LocalDateTime.now().minusDays(31),
+            comment = "",
+        ),
+        Transaction(
+            amount = BigDecimal(96),
+            date = LocalDateTime.now().minusDays(27),
+            comment = "Comida",
+        ),
+    )
 }
 
 private fun previewAnalyticsState(periodFinished: Boolean): AnalyticsState = AnalyticsState(
-	periodFinished = periodFinished,
-	transactions = previewAnalyticsTransactions(),
-	spends = previewAnalyticsTransactions(),
-	wholeBudget = BigDecimal(2400),
-	startPeriodDate = previewStartDate,
-	finishPeriodDate = if (periodFinished) Date() else previewFinishDate,
-	finishPeriodActualDate = if (periodFinished) Date() else null,
+    periodFinished = periodFinished,
+    transactions = previewAnalyticsTransactions(),
+    spends = previewAnalyticsTransactions(),
+    wholeBudget = BigDecimal(2400),
+    startPeriodDate = previewStartDate,
+    finishPeriodDate = if (periodFinished) Date() else previewFinishDate,
+    finishPeriodActualDate = if (periodFinished) Date() else null,
 )
 
 @PreviewScreenSizes
 @Composable
 private fun PreviewAnalyticsNotFinished() {
-	MinusTheme {
-		Surface {
-			Analytics(
-				state = previewAnalyticsState(periodFinished = false),
-			)
-		}
-	}
+    MinusTheme {
+        Surface {
+            Analytics(
+                state = previewAnalyticsState(periodFinished = false),
+            )
+        }
+    }
 }
 
 @PreviewScreenSizes
 @Composable
 private fun PreviewAnalyticsFinished() {
-	MinusTheme {
-		Surface {
-			Analytics(
-				state = previewAnalyticsState(periodFinished = true),
-			)
-		}
-	}
+    MinusTheme {
+        Surface {
+            Analytics(
+                state = previewAnalyticsState(periodFinished = true),
+            )
+        }
+    }
 }

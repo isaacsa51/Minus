@@ -5,5 +5,5 @@ import javax.inject.Singleton
 
 @Singleton
 class PhoneWearMessageListener @Inject constructor() {
-	fun start() = Unit
+    fun start() = Unit
 }

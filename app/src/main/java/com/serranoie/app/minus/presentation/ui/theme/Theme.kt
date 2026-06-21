@@ -280,7 +280,7 @@ fun MinusTheme(
 
 	val typography = when (context.appTypography) {
 		TypographyMode.DEFAULT -> Typography
-		TypographyMode.CONDENSED -> Typography.withCondensedStyles()
+		TypographyMode.CONDENSED -> CondensedTypography
 		TypographyMode.EXPRESSIVE -> ExpressiveTypography
 	}
 

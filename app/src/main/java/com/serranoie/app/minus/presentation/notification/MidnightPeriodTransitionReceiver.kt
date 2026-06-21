@@ -59,7 +59,6 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
                 val periodEnd = settings.getPeriodEndDate()
                 val today = LocalDate.now()
 
-                // Check if the period ended only after the final day has fully passed
                 if (!today.isAfter(periodEnd)) {
                     logcat { "Period has not ended yet (end=$periodEnd, today=$today), skipping" }
                     return@launch
@@ -67,7 +66,6 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
 
                 logcat { "Period has ended! Period end: $periodEnd, Today: $today" }
 
-                // Calculate period summary
                 val transactions = budgetRepository.getTransactions().first()
                 val periodTransactions = transactions.filter { transaction ->
                     val txDate = transaction.date?.toLocalDate()
@@ -78,14 +76,11 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
                     .sumOf { it.amount }
                 val remaining = settings.totalBudget.subtract(totalSpent)
 
-                // Show notification
                 notificationHelper.showPeriodEndNotification(
                     remainingBudget = remaining.toPlainString(),
                     currency = settings.currencyCode
                 )
 
-                // Update DataStore to mark that midnight transition happened
-                // This allows MainActivity to detect it when coming to foreground
                 updateMidnightTransitionState(context, periodEnd, remaining)
 
                 logcat { "Midnight transition completed successfully" }

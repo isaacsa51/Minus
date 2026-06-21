@@ -7,41 +7,37 @@ import com.serranoie.app.minus.domain.model.UserSettings
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
-/**
- * Repository for managing user settings and preferences.
- * Provides a clean interface for loading and saving user preferences from DataStore.
- */
 interface SettingsRepository {
 
-	fun observeSettings(): Flow<UserSettings>
+    fun observeSettings(): Flow<UserSettings>
 
-	fun observeCurrentPeriodRollover(): Flow<Pair<BigDecimal, Boolean>>
+    fun observeCurrentPeriodRollover(): Flow<Pair<BigDecimal, Boolean>>
 
-	fun observeCurrentPeriodBoundary(): Flow<Pair<Long, Long>>
+    fun observeCurrentPeriodBoundary(): Flow<Pair<Long, Long>>
 
-	suspend fun getCurrentPeriodId(): Long
+    suspend fun getCurrentPeriodId(): Long
 
-	suspend fun getSettings(): UserSettings
+    suspend fun getSettings(): UserSettings
 
-	suspend fun setOnboardingCompleted(completed: Boolean)
+    suspend fun setOnboardingCompleted(completed: Boolean)
 
-	suspend fun setEarlyFinishActive(active: Boolean, actualDate: Long, originalEndDate: Long)
+    suspend fun setEarlyFinishActive(active: Boolean, actualDate: Long, originalEndDate: Long)
 
-	suspend fun setCurrentPeriod(periodId: Long, startedAt: Long)
+    suspend fun setCurrentPeriod(periodId: Long, startedAt: Long)
 
-	suspend fun setCurrentPeriodRollover(amount: BigDecimal, carryForward: Boolean)
+    suspend fun setCurrentPeriodRollover(amount: BigDecimal, carryForward: Boolean)
 
-	suspend fun setPendingRollover(amount: BigDecimal, strategy: RemainingBudgetStrategy)
+    suspend fun setPendingRollover(amount: BigDecimal, strategy: RemainingBudgetStrategy)
 
-	suspend fun clearPendingRollover()
+    suspend fun clearPendingRollover()
 
-	suspend fun setNotificationTime(hour: Int, minute: Int)
+    suspend fun setNotificationTime(hour: Int, minute: Int)
 
-	suspend fun setThemeMode(mode: ThemeMode)
+    suspend fun setThemeMode(mode: ThemeMode)
 
-	suspend fun setTypographyMode(mode: TypographyMode)
+    suspend fun setTypographyMode(mode: TypographyMode)
 
-	suspend fun setDynamicColorEnabled(enabled: Boolean)
+    suspend fun setDynamicColorEnabled(enabled: Boolean)
 
-	suspend fun clearEarlyFinish()
+    suspend fun clearEarlyFinish()
 }

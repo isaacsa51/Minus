@@ -1,4 +1,4 @@
-﻿package com.serranoie.app.minus.presentation.notification
+package com.serranoie.app.minus.presentation.notification
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -47,7 +47,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class NotificationScheduler @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val budgetRepository: BudgetRepository
 ) {
     companion object {
@@ -84,7 +84,8 @@ class NotificationScheduler @Inject constructor(
 
         val tomorrow = LocalDate.now().plusDays(1)
         val midnight = LocalDateTime.of(tomorrow, LocalTime.MIDNIGHT)
-        val triggerTime = midnight.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val triggerTime =
+            midnight.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
         logcat {
             "Scheduling midnight period check: triggerDateTime=$midnight triggerMillis=$triggerTime"
         }
@@ -98,6 +99,7 @@ class NotificationScheduler @Inject constructor(
                 )
                 logcat { "Midnight period check scheduled for $midnight" }
             }
+
             Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> {
                 alarmManager.setExactAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
@@ -106,6 +108,7 @@ class NotificationScheduler @Inject constructor(
                 )
                 logcat { "Midnight period check scheduled for $midnight" }
             }
+
             else -> {
                 logcat { "Exact alarms not allowed, falling back to inexact alarm for midnight" }
                 alarmManager.setAndAllowWhileIdle(
@@ -132,13 +135,16 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
-    fun schedulePeriodEndNotification(periodEndDate: LocalDate, currentDate: LocalDate = LocalDate.now()) {
+    fun schedulePeriodEndNotification(
+        periodEndDate: LocalDate,
+        currentDate: LocalDate = LocalDate.now()
+    ) {
         scope.launch {
             val (hour, minute) = getPeriodEndNotificationTime()
             schedulePeriodEndNotification(periodEndDate, hour, minute, currentDate)
         }
     }
-    
+
     private fun schedulePeriodEndNotification(
         periodEndDate: LocalDate,
         hour: Int,
@@ -147,7 +153,8 @@ class NotificationScheduler @Inject constructor(
     ) {
         val now = LocalDateTime.now()
         val triggerDateTime = LocalDateTime.of(periodEndDate, LocalTime.of(hour, minute))
-        val triggerMillis = triggerDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val triggerMillis =
+            triggerDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, PeriodEndAlarmReceiver::class.java).apply {
             action = ACTION_SHOW_PERIOD_END_NOTIFICATION
@@ -158,7 +165,7 @@ class NotificationScheduler @Inject constructor(
             alarmIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        
+
         alarmManager.cancel(pendingIntent)
 
         when {
@@ -168,6 +175,7 @@ class NotificationScheduler @Inject constructor(
                 }
                 context.sendBroadcast(alarmIntent)
             }
+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms() -> {
                 logcat {
                     "Scheduling period end notification: triggerDateTime=$triggerDateTime triggerMillis=$triggerMillis mode=exact_allow_while_idle periodEndDate=$periodEndDate currentDate=$currentDate"
@@ -178,6 +186,7 @@ class NotificationScheduler @Inject constructor(
                     pendingIntent
                 )
             }
+
             Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> {
                 logcat {
                     "Scheduling period end notification: triggerDateTime=$triggerDateTime triggerMillis=$triggerMillis mode=exact_allow_while_idle_pre_s periodEndDate=$periodEndDate currentDate=$currentDate"
@@ -188,6 +197,7 @@ class NotificationScheduler @Inject constructor(
                     pendingIntent
                 )
             }
+
             else -> {
                 logcat {
                     "Scheduling period end notification: triggerDateTime=$triggerDateTime triggerMillis=$triggerMillis mode=inexact_allow_while_idle periodEndDate=$periodEndDate currentDate=$currentDate exactAlarmsAllowed=false"
@@ -237,17 +247,23 @@ class NotificationScheduler @Inject constructor(
             return
         }
 
-        val nextRunDateTime = nextOccurrenceDateTime(transaction, LocalDateTime.now(), notificationTime) ?: run {
-            cancelRecurrentExpenseNotification(transaction)
-            logcat { "No future recurrent notification to schedule for transactionId=${transaction.id}" }
-            return
-        }
-        val initialDelay = Duration.between(LocalDateTime.now(), nextRunDateTime).toMillis().coerceAtLeast(0L)
-        val nextRunMillis = nextRunDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val nextRunDateTime =
+            nextOccurrenceDateTime(transaction, LocalDateTime.now(), notificationTime) ?: run {
+                cancelRecurrentExpenseNotification(transaction)
+                logcat { "No future recurrent notification to schedule for transactionId=${transaction.id}" }
+                return
+            }
+        val initialDelay =
+            Duration.between(LocalDateTime.now(), nextRunDateTime).toMillis().coerceAtLeast(0L)
+        val nextRunMillis =
+            nextRunDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
         val workName = recurrentWorkName(transaction)
 
         logcat {
-            "Scheduling recurrent expense notification: transactionId=${transaction.id} nextRunDateTime=$nextRunDateTime nextRunMillis=$nextRunMillis configuredTime=%02d:%02d initialDelayMs=$initialDelay workName=$workName policy=REPLACE".format(notificationTime.first, notificationTime.second)
+            "Scheduling recurrent expense notification: transactionId=${transaction.id} nextRunDateTime=$nextRunDateTime nextRunMillis=$nextRunMillis configuredTime=%02d:%02d initialDelayMs=$initialDelay workName=$workName policy=REPLACE".format(
+                notificationTime.first,
+                notificationTime.second
+            )
         }
 
         val workRequest = OneTimeWorkRequestBuilder<RecurrentExpenseNotificationWorker>()
@@ -315,7 +331,11 @@ class NotificationScheduler @Inject constructor(
         return triggerDateTime
     }
 
-    private fun nextSteppedOccurrence(startDate: LocalDate, today: LocalDate, stepDays: Long): LocalDate {
+    private fun nextSteppedOccurrence(
+        startDate: LocalDate,
+        today: LocalDate,
+        stepDays: Long
+    ): LocalDate {
         if (!today.isAfter(startDate)) return startDate
         val daysBetween = ChronoUnit.DAYS.between(startDate, today)
         val steps = (daysBetween + stepDays - 1) / stepDays
@@ -330,7 +350,8 @@ class NotificationScheduler @Inject constructor(
         var candidate = today.withDayOfMonth(subscriptionDay.coerceIn(1, today.lengthOfMonth()))
         if (candidate.isBefore(today)) {
             val nextMonth = today.plusMonths(1)
-            candidate = nextMonth.withDayOfMonth(subscriptionDay.coerceIn(1, nextMonth.lengthOfMonth()))
+            candidate =
+                nextMonth.withDayOfMonth(subscriptionDay.coerceIn(1, nextMonth.lengthOfMonth()))
         }
         return if (candidate.isBefore(startDate)) startDate else candidate
     }
@@ -370,7 +391,7 @@ class NotificationScheduler @Inject constructor(
             cancelPeriodEndNotification()
         }
     }
-    
+
     fun cancelPeriodEndNotification() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val pendingIntent = PendingIntent.getBroadcast(
@@ -383,7 +404,7 @@ class NotificationScheduler @Inject constructor(
         )
         alarmManager.cancel(pendingIntent)
     }
-    
+
     private suspend fun getPeriodEndNotificationTime(): Pair<Int, Int> {
         val preferences = context.settingsDataStore.data.first()
         val hour = preferences[NOTIFICATION_HOUR_KEY] ?: DEFAULT_NOTIFICATION_HOUR
@@ -393,8 +414,10 @@ class NotificationScheduler @Inject constructor(
 
     private suspend fun getRecurrentNotificationTime(): Pair<Int, Int> {
         val preferences = context.settingsDataStore.data.first()
-        val hour = preferences[RECURRENT_NOTIFICATION_HOUR_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_HOUR
-        val minute = preferences[RECURRENT_NOTIFICATION_MINUTE_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_MINUTE
+        val hour =
+            preferences[RECURRENT_NOTIFICATION_HOUR_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_HOUR
+        val minute =
+            preferences[RECURRENT_NOTIFICATION_MINUTE_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_MINUTE
         return hour to minute
     }
 }

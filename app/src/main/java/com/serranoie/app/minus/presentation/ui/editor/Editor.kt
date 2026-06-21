@@ -104,7 +104,12 @@ fun Editor(
 	onOpenAnalytics: () -> Unit = {},
 	onOpenWallet: () -> Unit = {},
 	openWalletOnStart: Boolean = false,
-	forceWalletSetup: Boolean = false,
+	showBudgetPeriodSheet: Boolean = false,
+	forceBudgetPeriodSheetSetup: Boolean = false,
+	selectedViewPeriod: BudgetPeriod = BudgetPeriod.DAILY,
+	onShowBudgetPeriodSheet: () -> Unit = {},
+	onHideBudgetPeriodSheet: () -> Unit = {},
+	onPeriodSelected: (BudgetPeriod) -> Unit = {},
 	onCommentClick: () -> Unit,
 	onBudgetPillClickForTutorial: () -> Unit = {},
 	onAnalyticsClickForTutorial: () -> Unit = {},
@@ -129,28 +134,8 @@ fun Editor(
 	val view = LocalView.current
 	val scope = rememberCoroutineScope()
 	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-	var showBottomSheet by remember { mutableStateOf(false) }
-	var hasAutoOpenedWalletSheet by remember { mutableStateOf(false) }
-
-	LaunchedEffect(openWalletOnStart) {
-		if (openWalletOnStart && !hasAutoOpenedWalletSheet) {
-			showBottomSheet = true
-			hasAutoOpenedWalletSheet = true
-		}
-	}
 
 	val editorFocusController = remember { FocusController() }
-
-	var selectedViewPeriod by remember {
-		mutableStateOf(uiState.budgetSettings?.period ?: BudgetPeriod.DAILY)
-	}
-
-	LaunchedEffect(uiState.budgetSettings?.period) {
-		uiState.budgetSettings?.period?.let {
-			logcat { "Sync selectedViewPeriod from uiState period=$it (previous=$selectedViewPeriod)" }
-			selectedViewPeriod = it
-		}
-	}
 
 	if (uiState.showRecurrentDialog) {
 		RecurrentExpenseDialog(
@@ -190,7 +175,7 @@ fun Editor(
 				onOpenBudgetSheet = {
 //					onBudgetPillClickForTutorial()
 					view.weakHapticFeedback()
-					showBottomSheet = true
+					onShowBudgetPeriodSheet()
 				},
 				modifier = Modifier
 					.weight(1f)
@@ -322,14 +307,14 @@ fun Editor(
 		}
 	}
 
-	if (showBottomSheet) {
+	if (showBudgetPeriodSheet) {
 		ModalBottomSheet(
-			onDismissRequest = { showBottomSheet = false },
+			onDismissRequest = onHideBudgetPeriodSheet,
 			sheetState = sheetState,
 		) {
-			val shouldForceSetupMode = forceWalletSetup
+			val shouldForceSetupMode = forceBudgetPeriodSheetSetup
 			logcat {
-				"Opening BudgetPeriodSheet: forceWalletSetup=$forceWalletSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$shouldForceSetupMode"
+				"Opening BudgetPeriodSheet: forceBudgetPeriodSheetSetup=$forceBudgetPeriodSheetSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$shouldForceSetupMode"
 			}
 			BudgetPeriodSheet(
 				budgetSettings = uiState.budgetSettings,
@@ -339,36 +324,31 @@ fun Editor(
 				currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
 				startInEditMode = shouldForceSetupMode,
 				onPeriodSelected = { newPeriod ->
-					logcat { "BudgetPeriodSheet onPeriodSelected -> newPeriod=$newPeriod, previousSelectedViewPeriod=$selectedViewPeriod" }
-					selectedViewPeriod = newPeriod
-					onChangePeriod(newPeriod)
+					logcat { "BudgetPeriodSheet onPeriodSelected -> newPeriod=$newPeriod" }
+					onPeriodSelected(newPeriod)
 				},
 				onSaveBudget = { newSettings ->
 					logcat { "BudgetPeriodSheet onSaveBudget -> $newSettings" }
 					onSaveBudget(newSettings)
 					scope.launch { sheetState.hide() }
-					showBottomSheet = false
+					onHideBudgetPeriodSheet()
 				},
 				onEditBudget = {
-					onOpenWallet()
+					// Re-enter the sheet in edit mode (force setup)
+					onShowBudgetPeriodSheet()
 					scope.launch { sheetState.hide() }
-					showBottomSheet = false
 				},
 				onFinishEarly = {
 					onFinishBudgetEarly()
 					onOpenAnalytics()
 					scope.launch { sheetState.hide() }
-					showBottomSheet = false
+					onHideBudgetPeriodSheet()
 				},
 			)
 		}
 	}
 }
 
-/**
- * Content shown when editing (typing numbers).
- * Number is positioned like the idle cursor, tagging toolbar at bottom.
- */
 @Composable
 private fun EditingContent(
 	input: String,
@@ -560,7 +540,7 @@ private fun evaluateCalculation(input: String): String? {
 				"-" -> result - nextNum
 				"*" -> result * nextNum
 				"/" -> {
-					if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null // Division by zero
+					if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null
 					result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
 				}
 

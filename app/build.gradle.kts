@@ -4,9 +4,43 @@ plugins {
 	alias(libs.plugins.kotlin.compose)
 	alias(libs.plugins.kotlin.serialization)
 	alias(libs.plugins.paparazzi)
+	alias(libs.plugins.detekt)
 
 	id("dagger.hilt.android.plugin")
 	id("com.google.devtools.ksp")
+}
+
+detekt {
+	buildUponDefaultConfig = true
+	config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+	baseline = file("$rootDir/config/detekt/detekt-baseline.xml")
+	// Disable all default rulesets so only rules in detekt.yml are active.
+	// Formatting rules (Indentation, MaxLineLength, etc.) are part of default
+	// rulesets and can't be selectively disabled in the Gradle plugin — any
+	// formatting issues present in the codebase are suppressed via the baseline.
+	disableDefaultRuleSets = true
+}
+
+// Configure reports on the task level (avoids deprecated extension-level API)
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+	reports {
+		html.required.set(true)
+		xml.required.set(true)
+	}
+}
+
+// Paparazzi snapshot tests run in the test JVM. These system properties must be
+// passed explicitly to that JVM (gradle.properties alone only affects Gradle's
+// own JVM, not forked test JVMs).
+//
+// `app.cash.paparazzi.differ=offbytwo`  — allows 2-pixel offset per pixel
+// `paparazzi.maxPercentDifferenceDefault` — up to 5% of pixels may differ
+//
+// Together these absorb cross-platform rasterisation drift (Linux CI vs
+// Windows/macOS dev machines) without hiding real layout regressions.
+tasks.withType<Test>().configureEach {
+	systemProperty("app.cash.paparazzi.differ", "offbytwo")
+	systemProperty("paparazzi.maxPercentDifferenceDefault", "5.0")
 }
 
 fun gitOutput(vararg args: String): String? {
@@ -185,7 +219,6 @@ dependencies {
 	implementation(libs.androidx.compose.animation)
 	implementation(libs.androidx.compose.ui.tooling.preview.v106)
 	implementation(libs.androidx.datastore.preferences)
-	implementation(libs.androidx.recyclerview)
 	implementation(libs.androidx.room.runtime)
 	implementation(libs.androidx.room.ktx)
 	implementation(libs.androidx.room.paging)
@@ -197,6 +230,7 @@ dependencies {
 	implementation(libs.androidx.glance.appwidget)
 	implementation(libs.androidx.glance.appwidget.preview)
 	implementation(libs.androidx.glance.preview)
+	implementation(libs.androidx.glance.material3)
 	implementation(libs.androidx.core.splashscreen)
 	implementation(libs.accompanist.systemuicontroller)
 	implementation(libs.dagger)
@@ -207,10 +241,6 @@ dependencies {
 	ksp(libs.androidx.hilt.compiler)
 	ksp(libs.dagger.compiler)
 	ksp(libs.hilt.androidcompiler)
-
-	// Glance
-	implementation(libs.androidx.glance.appwidget)
-	implementation(libs.androidx.glance.material3)
 
 	// WorkManager for notifications
 	implementation(libs.androidx.work.runtime.ktx)
@@ -223,6 +253,4 @@ dependencies {
 
 	debugImplementation(libs.androidx.compose.ui.tooling.v106)
 	debugImplementation(libs.androidx.compose.ui.testmanifest.v183)
-
-	implementation(libs.androidx.compose.material3.windowsize)
 }

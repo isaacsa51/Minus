@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.data.csv
 
 import android.content.Context
+import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -21,7 +22,7 @@ class CsvImportWorker @AssistedInject constructor(
         )
 
         return runCatching {
-            applicationContext.contentResolver.openInputStream(android.net.Uri.parse(uriString)).use { stream ->
+            applicationContext.contentResolver.openInputStream(uriString.toUri()).use { stream ->
                 if (stream == null) {
                     return Result.failure(
                         Data.Builder().putString(KEY_ERROR, "Unable to open CSV stream").build()

@@ -15,6 +15,8 @@ import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCas
 import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodRolloverUseCase
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
+import com.serranoie.app.minus.presentation.notification.NotificationHelper
+import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.ui.budget.mvi.BudgetUiEffect
 import com.serranoie.app.minus.presentation.ui.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
@@ -23,8 +25,6 @@ import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetSystemInt
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.EditMode
-import com.serranoie.app.minus.presentation.notification.NotificationHelper
-import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -303,9 +303,7 @@ class BudgetViewModel @Inject constructor(
 			try {
 				notificationHelper.showRecurrentExpenseNotification(
 					amount = "50.00",
-					comment = "Test expense",
-					frequency = "MONTHLY",
-					currency = currency
+					comment = "Test expense"
 				)
 			} catch (e: Exception) {
 				logcat(TAG) { e.asLog() }
