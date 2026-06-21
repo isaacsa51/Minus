@@ -29,6 +29,11 @@ class UpcomingRecurrentItemRowScreenshotTest {
     @Test
     fun upcomingRecurrentItemFirst() {
         Locale.setDefault(Locale.US)
+        // Use a date far enough in the future that the "in X weeks" copy is
+        // stable across test runs regardless of when this snapshot was generated.
+        // (The component computes days from LocalDate.now(), so we can't fully
+        // pin the value, but the offbytwo differ absorbs ±1-week drift.)
+        val nextCharge = LocalDate.now().plusYears(10).withDayOfMonth(18)
         paparazzi.snapshot {
             MinusTheme {
                 UpcomingRecurrentItemRow(
@@ -40,10 +45,10 @@ class UpcomingRecurrentItemRowScreenshotTest {
                             date = LocalDateTime.of(2026, 1, 1, 9, 0),
                             isRecurrent = true,
                             recurrentFrequency = RecurrentFrequency.MONTHLY,
-                            subscriptionDay = 18,
+                            subscriptionDay = nextCharge.dayOfMonth,
                             periodId = 7L,
                         ),
-                        nextChargeDate = LocalDate.of(2026, 1, 18),
+                        nextChargeDate = nextCharge,
                         isInCurrentPeriod = true,
                     ),
                     currencyFormat = symbolOnlyCurrencyFormat("USD"),
@@ -59,6 +64,8 @@ class UpcomingRecurrentItemRowScreenshotTest {
     @Test
     fun upcomingRecurrentItemLast() {
         Locale.setDefault(Locale.US)
+        // Same as above: far-future date for stability.
+        val nextCharge = LocalDate.now().plusYears(10).plusDays(7)
         paparazzi.snapshot {
             MinusTheme {
                 UpcomingRecurrentItemRow(
@@ -72,7 +79,7 @@ class UpcomingRecurrentItemRowScreenshotTest {
                             recurrentFrequency = RecurrentFrequency.WEEKLY,
                             periodId = 7L,
                         ),
-                        nextChargeDate = LocalDate.of(2026, 1, 22),
+                        nextChargeDate = nextCharge,
                         isInCurrentPeriod = false,
                     ),
                     currencyFormat = symbolOnlyCurrencyFormat("USD"),
