@@ -25,3 +25,4 @@ local.properties
 # Detekt
 config/detekt/detekt-baseline.xml
 build/reports/detekt/
+.hotswan/

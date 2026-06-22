@@ -173,15 +173,22 @@
 
     <string name="day_total_format">Total: %1$s</string>
 
-    <string name="onboarding_welcome_title">Welcome to Minus!</string>
+    <string name="onboarding_welcome_title">Welcome to Minus</string>
     <string name="onboarding_welcome_subtitle">Hi and welcome, lets start saving together.</string>
+    <string name="onboarding_welcome_intro">A simple budget tracker that helps you decide how much you can spend each day, week, fortnight, or month.</string>
     <string name="onboarding_step_1_title">Set a budget</string>
-    <string name="onboarding_step_1_subtitle">Estimate how much money you need for a period and stay informed about how much you can save.</string>
-    <string name="onboarding_step_2_title">Track every expense</string>
-    <string name="onboarding_step_2_subtitle">This app helps you calculate how much you can spend per day, week, biweekly period, or month so you stay on track and know what is left.</string>
-    <string name="onboarding_step_3_title">Spend wisely</string>
-    <string name="onboarding_step_3_subtitle">Over time, you will learn how much you can save and how much you can spend.</string>
-    <string name="onboarding_set_budget_button">Set a budget</string>
+    <string name="onboarding_step_1_subtitle">Define your spending limit for any period.</string>
+    <string name="onboarding_step_2_title">Track expenses</string>
+    <string name="onboarding_step_2_subtitle">Log what you spend and see what is left each day.</string>
+    <string name="onboarding_step_3_title">Recurring expenses</string>
+    <string name="onboarding_step_3_subtitle">Add subscriptions and Minus will track them for you automatically.</string>
+    <string name="onboarding_step_4_title">Calculate on the fly</string>
+    <string name="onboarding_step_4_subtitle">Your remaining budget updates in real time as you spend.</string>
+    <string name="onboarding_step_5_title">See your analytics</string>
+    <string name="onboarding_step_5_subtitle">Charts, heatmaps, and category breakdowns for any period.</string>
+    <string name="onboarding_step_6_title">Spend wisely</string>
+    <string name="onboarding_step_6_subtitle">Over time, learn how much you can save and how much you can spend.</string>
+    <string name="onboarding_set_budget_button">Continue</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Select the period</string>

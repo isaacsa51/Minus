@@ -31,12 +31,6 @@ import logcat.logcat
 
 private const val TAG = "AppNavGraph"
 
-/**
- * Direction-aware screen transition animations.
- *
- * Forward navigation  (e.g. Onboarding -> Main):  slide + fade in from right, out to left
- * Backward navigation (e.g. Settings -> Analytics): slide + fade in from left, out to right
- */
 private fun getScreenTransitions(
     initialState: NavBackStackEntry,
     targetState: NavBackStackEntry,
@@ -56,21 +50,6 @@ private fun getScreenTransitions(
     return enter to exit
 }
 
-/**
- * Root navigation graph for the app.
- *
- * App flow:
- *  - First launch:       Onboarding → Main (with wallet setup)
- *  - Regular launch:     Main (wallet editing is a bottom sheet within Main)
- *  - Period ended:       Analytics → Main (with wallet setup)
- *
- * All state management and business logic is delegated to screen-specific
- * ViewModels and thin composable wrappers. This graph is purely responsible
- * for navigation composition.
- *
- * @param startDestination Route to start on – [Screen.Onboarding], [Screen.Main], or [Screen.Analytics].
- * @param onOnboardingComplete Called when onboarding finishes so the caller can persist the flag.
- */
 @Composable
 fun AppNavGraph(
     activityResultRegistryOwner: ActivityResultRegistryOwner?,
@@ -91,16 +70,7 @@ fun AppNavGraph(
     ) {
         composable(Screen.Onboarding.route) {
             OnboardingScreen(
-                onSetBudget = {
-                    onOnboardingComplete()
-                    navController.navigate(
-                        Screen.Main.createRoute(openWallet = true, forceWalletSetup = true),
-                    ) { popUpTo(Screen.Onboarding.route) { inclusive = true } }
-                },
-                onOnboardingComplete = {
-                    onOnboardingComplete()
-                },
-                onClose = {
+                onOnboardingCompleted = {
                     onOnboardingComplete()
                     navController.navigate(
                         Screen.Main.createRoute(openWallet = true, forceWalletSetup = true),
@@ -179,7 +149,6 @@ fun AppNavGraph(
             val forceWalletSetup =
                 backStackEntry.arguments?.getBoolean(Screen.Main.ARG_FORCE_WALLET_SETUP) ?: false
 
-            // Consume navigation arguments so they don't persist on back navigation
             LaunchedEffect(backStackEntry.id) {
                 if (openWallet || forceWalletSetup) {
                     backStackEntry.arguments?.putBoolean(Screen.Main.ARG_OPEN_WALLET, false)
