@@ -168,6 +168,10 @@ android {
     packaging {
         resources.excludes += "/META-INF/AL2.0"
         resources.excludes += "/META-INF/LGPL2.1"
+        // JUnit Jupiter (transitive of mockk) ships these META-INF
+        // resources in multiple jars — only keep the first.
+        resources.excludes += "/META-INF/LICENSE.md"
+        resources.excludes += "/META-INF/LICENSE-notice.md"
     }
     namespace = "com.serranoie.app.minus"
 
@@ -212,6 +216,7 @@ dependencies {
 	androidTestImplementation(platform(libs.androidx.compose.bom))
 	androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 	androidTestImplementation(libs.google.truth)
+	androidTestImplementation(libs.mockk.android)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
