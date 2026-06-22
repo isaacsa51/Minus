@@ -11,7 +11,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.R
@@ -31,12 +30,6 @@ class OnboardingScreenE2ETest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    /**
-     * Tests construct a [OnboardingViewModel] directly (mocking the
-     * repositories) and pass it to the screen. This avoids the
-     * `@AndroidEntryPoint` requirement on the host Activity, which
-     * would otherwise break `hiltViewModel()` resolution.
-     */
     private fun setOnboardingContent(
         onOnboardingCompleted: () -> Unit = {},
         viewModel: OnboardingViewModel = OnboardingViewModel(
@@ -66,10 +59,6 @@ class OnboardingScreenE2ETest {
         .onAllNodes(hasText(str(R.string.onboarding_set_budget_button)) and hasClickAction())
         .onFirst()
 
-    // -------------------------------------------------------------------------
-    // Hero
-    // -------------------------------------------------------------------------
-
     @Test
     fun when_onboarding_screen_is_rendered_then_welcome_title_is_visible() {
         setOnboardingContent()
@@ -78,24 +67,12 @@ class OnboardingScreenE2ETest {
     }
 
     @Test
-    fun when_onboarding_screen_is_rendered_then_welcome_subtitle_is_visible() {
+    fun when_onboarding_screen_is_rendered_then_welcome_title_text_matches_resource() {
         setOnboardingContent()
 
-        composeTestRule.onNodeWithText(str(R.string.onboarding_welcome_subtitle))
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun when_onboarding_screen_is_rendered_then_welcome_subtitle_text_matches_resource() {
-        setOnboardingContent()
-
-        val expected = str(R.string.onboarding_welcome_subtitle)
+        val expected = str(R.string.onboarding_welcome_title)
         composeTestRule.onNodeWithText(expected).assertTextEquals(expected)
     }
-
-    // -------------------------------------------------------------------------
-    // Intro paragraph — explains what Minus is
-    // -------------------------------------------------------------------------
 
     @Test
     fun when_onboarding_screen_is_rendered_then_intro_paragraph_is_visible() {
@@ -113,16 +90,10 @@ class OnboardingScreenE2ETest {
         composeTestRule.onNodeWithText(expected).assertTextEquals(expected)
     }
 
-    // -------------------------------------------------------------------------
-    // Feature grid — 6 steps covering what the user can do in Minus
-    // -------------------------------------------------------------------------
-
     @Test
     fun when_onboarding_screen_is_rendered_then_all_six_step_titles_are_visible() {
         setOnboardingContent()
 
-        // 6 steps: Set a budget, Track expenses, Recurring expenses,
-        // Calculate on the fly, See your analytics, Spend wisely
         composeTestRule.onNodeWithText(str(R.string.onboarding_step_1_title)).assertIsDisplayed()
         composeTestRule.onNodeWithText(str(R.string.onboarding_step_2_title)).assertIsDisplayed()
         composeTestRule.onNodeWithText(str(R.string.onboarding_step_3_title)).assertIsDisplayed()
@@ -161,35 +132,19 @@ class OnboardingScreenE2ETest {
             .assertIsDisplayed()
     }
 
-    // -------------------------------------------------------------------------
-    // CTA button — "Continue"
-    // -------------------------------------------------------------------------
-
     @Test
     fun when_onboarding_screen_is_rendered_then_continue_button_is_visible() {
         setOnboardingContent()
 
-        continueButton().performScrollTo().assertIsDisplayed()
+        continueButton().assertIsDisplayed()
     }
-
-    // -------------------------------------------------------------------------
-    // Effect wiring — OnWelcomeDismissed → OnboardingCompleted
-    // -------------------------------------------------------------------------
-    //
-    // The welcome step's "Continue" button dispatches
-    // [OnboardingUiIntent.OnWelcomeDismissed]. The VM marks the
-    // onboarding flag as completed in settings and emits
-    // [OnboardingUiEffect.OnboardingCompleted]; the screen forwards
-    // that to the navigation callback. We exercise the same wiring
-    // by dispatching the intent directly (and also by tapping the
-    // button) so the test isn't sensitive to UI flakiness.
 
     @Test
     fun when_user_taps_continue_button_then_on_onboarding_completed_fires() {
         var invoked = 0
         setOnboardingContent(onOnboardingCompleted = { invoked++ })
 
-        continueButton().performScrollTo().performClick()
+        continueButton().performClick()
         composeTestRule.waitForIdle()
 
         assertThat(invoked).isEqualTo(1)
@@ -201,9 +156,9 @@ class OnboardingScreenE2ETest {
         setOnboardingContent(onOnboardingCompleted = { invoked++ })
 
         val button = continueButton()
-        button.performScrollTo().performClick()
+        button.performClick()
         composeTestRule.waitForIdle()
-        button.performScrollTo().performClick()
+        button.performClick()
         composeTestRule.waitForIdle()
 
         assertThat(invoked).isEqualTo(2)
