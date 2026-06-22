@@ -51,6 +51,17 @@ sealed interface OnboardingUiIntent {
     data object OnNextStep : OnboardingUiIntent
     data object OnPreviousStep : OnboardingUiIntent
     data object OnCompleteOnboarding : OnboardingUiIntent
+
+    /**
+     * Dispatched from the welcome step when the user taps the
+     * "Set a budget" CTA. The welcome step is informational only —
+     * it doesn't collect a budget, period, or date range. The actual
+     * budget setup happens in the wallet screen that the nav graph
+     * opens next. This intent just marks onboarding as complete and
+     * emits [OnboardingUiEffect.OnboardingCompleted] so the screen
+     * can navigate away.
+     */
+    data object OnWelcomeDismissed : OnboardingUiIntent
 }
 
 /**

@@ -65,38 +65,6 @@ class MainScreenScreenshotTest {
     }
 }
 
-class MainScreenTabletScreenshotTest {
-    @get:Rule
-    val paparazzi = Paparazzi(
-        deviceConfig = DeviceConfig.PIXEL_C,
-        renderingMode = SessionParams.RenderingMode.NORMAL,
-        maxPercentDifference = 10.0,
-    )
-
-    @Test
-    @org.junit.Ignore(
-        "Tablet two-pane layout instantiates HistoryViewModel via hiltViewModel(), " +
-            "which requires an activity context. Paparazzi does not provide one, so " +
-            "the layout cannot be rendered. See MainScreenScreenshotTest#mainScreenPhone* " +
-            "for the phone layout which renders without ViewModels."
-    )
-    fun mainScreenTabletTwoPane() {
-        Locale.setDefault(Locale.US)
-
-        paparazzi.snapshot {
-            MainScreenPreviewContent(
-                budgetUiState = sampleMainBudgetUiState().copy(
-                    numpadInput = "17.25+8.75",
-                    isNumpadValid = true,
-                    isCalculation = true,
-                    animState = AnimState.EDITING,
-                ),
-                windowSizeClass = WindowWidthSizeClass.Expanded,
-            )
-        }
-    }
-}
-
 @Composable
 private fun MainScreenPreviewContent(
     budgetUiState: BudgetUiState,

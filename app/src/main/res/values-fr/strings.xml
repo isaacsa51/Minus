@@ -153,15 +153,22 @@
 
     <string name="day_total_format">Total : %1$s</string>
 
-    <string name="onboarding_welcome_title">Bienvenue sur Minus !</string>
+    <string name="onboarding_welcome_title">Bienvenue sur Minus</string>
     <string name="onboarding_welcome_subtitle">Bonjour et bienvenue, commençons à épargner ensemble.</string>
+    <string name="onboarding_welcome_intro">Un suivi de budget simple qui vous aide à décider combien vous pouvez dépenser chaque jour, semaine, quinzaine ou mois.</string>
     <string name="onboarding_step_1_title">Définir un budget</string>
-    <string name="onboarding_step_1_subtitle">Estimez l\'argent dont vous avez besoin pour une période et restez informé de ce que vous pouvez économiser.</string>
-    <string name="onboarding_step_2_title">Suivre chaque dépense</string>
-    <string name="onboarding_step_2_subtitle">Cette application vous aide à calculer ce que vous pouvez dépenser par jour, semaine, quinzaine ou mois pour garder le cap.</string>
-    <string name="onboarding_step_3_title">Dépenser intelligemment</string>
-    <string name="onboarding_step_3_subtitle">Au fil du temps, vous apprendrez combien vous pouvez économiser et combien vous pouvez dépenser.</string>
-    <string name="onboarding_set_budget_button">Définir un budget</string>
+    <string name="onboarding_step_1_subtitle">Définissez votre limite de dépenses pour n\'importe quelle période.</string>
+    <string name="onboarding_step_2_title">Suivre les dépenses</string>
+    <string name="onboarding_step_2_subtitle">Notez ce que vous dépensez et voyez ce qu\'il reste chaque jour.</string>
+    <string name="onboarding_step_3_title">Dépenses récurrentes</string>
+    <string name="onboarding_step_3_subtitle">Ajoutez vos abonnements et Minus les suivra automatiquement pour vous.</string>
+    <string name="onboarding_step_4_title">Calcul en temps réel</string>
+    <string name="onboarding_step_4_subtitle">Votre budget restant se met à jour en direct à chaque dépense.</string>
+    <string name="onboarding_step_5_title">Consultez vos analyses</string>
+    <string name="onboarding_step_5_subtitle">Graphiques, cartes de chaleur et répartition par catégories pour chaque période.</string>
+    <string name="onboarding_step_6_title">Dépensez malin</string>
+    <string name="onboarding_step_6_subtitle">Avec le temps, apprenez combien vous pouvez économiser et dépenser.</string>
+    <string name="onboarding_set_budget_button">Continuer</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Sélectionnez la période</string>

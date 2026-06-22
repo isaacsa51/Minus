@@ -152,13 +152,20 @@
 
     <string name="onboarding_welcome_title">¡Bienvenidos a Menos!</string>
     <string name="onboarding_welcome_subtitle">Hola y bienvenido, comencemos a ahorrar juntos.</string>
+    <string name="onboarding_welcome_intro">Un sencillo rastreador de presupuestos que te ayuda a decidir cuánto puedes gastar cada día, semana, quincena o mes.</string>
     <string name="onboarding_step_1_title">Establecer un presupuesto</string>
-    <string name="onboarding_step_1_subtitle">Calcula cuánto dinero necesitas para un período y mantente informado sobre cuánto puedes ahorrar.</string>
-    <string name="onboarding_step_2_title">Seguimiento de cada gasto</string>
-    <string name="onboarding_step_2_subtitle">Esta aplicación te ayuda a calcular cuánto puedes gastar por día, semana, período quincenal o mes para mantener el rumbo y saber lo que queda.</string>
-    <string name="onboarding_step_3_title">Gasta sabiamente</string>
-    <string name="onboarding_step_3_subtitle">Con el tiempo, aprenderá cuánto puede ahorrar y cuánto puede gastar.</string>
-    <string name="onboarding_set_budget_button">Establecer un presupuesto</string>
+    <string name="onboarding_step_1_subtitle">Define tu límite de gasto para cualquier periodo.</string>
+    <string name="onboarding_step_2_title">Seguimiento de gastos</string>
+    <string name="onboarding_step_2_subtitle">Registra lo que gastas y mira lo que queda cada día.</string>
+    <string name="onboarding_step_3_title">Gastos recurrentes</string>
+    <string name="onboarding_step_3_subtitle">Añade suscripciones y Minus las seguirá por ti automáticamente.</string>
+    <string name="onboarding_step_4_title">Calcula al instante</string>
+    <string name="onboarding_step_4_subtitle">Tu presupuesto restante se actualiza en tiempo real mientras gastas.</string>
+    <string name="onboarding_step_5_title">Consulta tus analíticas</string>
+    <string name="onboarding_step_5_subtitle">Gráficas, mapas de calor y desglose por categorías de cualquier periodo.</string>
+    <string name="onboarding_step_6_title">Gasta con cabeza</string>
+    <string name="onboarding_step_6_subtitle">Con el tiempo, aprende cuánto puedes ahorrar y cuánto puedes gastar.</string>
+    <string name="onboarding_set_budget_button">Continuar</string>
 
     <string name="onboarding_finish_date_selector_title">Selecciona el periodo</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d días · %2$s - %3$s</string>

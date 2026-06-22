@@ -536,4 +536,62 @@ class OnboardingViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    // -------------------------------------------------------------------------
+    // OnWelcomeDismissed — fired by the welcome-step CTA
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun `when_welcome_dismissed_is_called_then_settings_marked_completed_and_effect_emitted`() = runTest {
+        coEvery { settingsRepository.setOnboardingCompleted(any()) } returns Unit
+        val viewModel = newViewModel()
+
+        viewModel.effects.test {
+            viewModel.processIntent(OnboardingUiIntent.OnWelcomeDismissed)
+            advanceUntilIdle()
+            runCurrent()
+
+            // Settings flag flipped, state updated, effect emitted.
+            coVerify { settingsRepository.setOnboardingCompleted(true) }
+            assertThat(viewModel.uiState.value.isCompleted).isTrue()
+
+            val effect = awaitItem()
+            assertThat(effect).isEqualTo(OnboardingUiEffect.OnboardingCompleted)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when_welcome_dismissed_is_called_then_no_budget_is_saved_and_no_notification_scheduled`() = runTest {
+        // No stubs needed — the welcome step never touches the budget
+        // repository or the notification scheduler. The relaxed mocks
+        // would still pass; coVerify(exactly = 0) is the actual
+        // assertion of "never called".
+        val viewModel = newViewModel()
+
+        viewModel.processIntent(OnboardingUiIntent.OnWelcomeDismissed)
+        advanceUntilIdle()
+
+        coVerify(exactly = 0) { budgetRepository.saveBudgetSettings(any()) }
+        coVerify(exactly = 0) { notificationScheduler.schedulePeriodEndNotification(any()) }
+        coVerify(exactly = 0) { notificationScheduler.initializeNotifications() }
+    }
+
+    @Test
+    fun `when_welcome_dismissed_fails_with_repo_exception_then_onboarding_failed_effect_is_emitted`() = runTest {
+        coEvery { settingsRepository.setOnboardingCompleted(any()) } throws RuntimeException("datastore locked")
+        val viewModel = newViewModel()
+
+        viewModel.effects.test {
+            viewModel.processIntent(OnboardingUiIntent.OnWelcomeDismissed)
+            advanceUntilIdle()
+            runCurrent()
+
+            val effect = awaitItem()
+            assertThat(effect).isInstanceOf(OnboardingUiEffect.OnboardingFailed::class.java)
+            effect as OnboardingUiEffect.OnboardingFailed
+            assertThat(effect.message).isEqualTo("datastore locked")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }

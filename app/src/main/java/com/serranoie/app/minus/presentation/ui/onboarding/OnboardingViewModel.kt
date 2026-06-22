@@ -41,6 +41,7 @@ class OnboardingViewModel @Inject constructor(
             is OnboardingUiIntent.OnNextStep -> handleNextStep()
             is OnboardingUiIntent.OnPreviousStep -> handlePreviousStep()
             is OnboardingUiIntent.OnCompleteOnboarding -> handleCompleteOnboarding()
+            is OnboardingUiIntent.OnWelcomeDismissed -> handleWelcomeDismissed()
             is OnboardingUiIntent.OnDateRangeSelected -> handleDateRangeSelected(
                 intent.startDate,
                 intent.endDate,
@@ -130,6 +131,25 @@ class OnboardingViewModel @Inject constructor(
 
                 settingsRepository.setOnboardingCompleted(true)
 
+                _uiState.update { it.copy(isCompleted = true) }
+                _effects.emit(OnboardingUiEffect.OnboardingCompleted)
+            } catch (e: Exception) {
+                _effects.emit(OnboardingUiEffect.OnboardingFailed(e.message ?: "Unknown error"))
+            }
+        }
+    }
+
+    /**
+     * Mark onboarding as completed from the welcome step. The welcome
+     * step is informational only — the user has not entered a budget
+     * yet, so we skip the budget save and notification scheduling.
+     * The actual budget setup happens in the wallet screen that the
+     * nav graph opens next.
+     */
+    private fun handleWelcomeDismissed() {
+        viewModelScope.launch {
+            try {
+                settingsRepository.setOnboardingCompleted(true)
                 _uiState.update { it.copy(isCompleted = true) }
                 _effects.emit(OnboardingUiEffect.OnboardingCompleted)
             } catch (e: Exception) {
