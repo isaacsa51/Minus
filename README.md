@@ -112,8 +112,10 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 ### Translations
 Any contributions to translate Minus into other languages are greatly appreciated. Please submit a pull request with your translations.
 
+> [!IMPORTANT]
+> This app is still on the heavy side of development, while the core features works as expected. Any issues or feedback can be generated inside the app or here: [GitHub Issues](https://github.com/isaacsa51/Minus/issues).
 
-#### Disclaimer
-This app is still on the heavy side of development, while the core features works as expected. Any issues or feedback can be generated inside the app or here: [GitHub Issues](https://github.com/isaacsa51/Minus/issues).
+> [!NOTE]
+> While Minus incorporates visual artifacts from [Buckwheat](https://github.com/danilkinkin/buckwheat), it's totally different from the original with a vastly more advanced architectural paradigm. Any superficial similarities are merely legacy design cues within a fundamentally different and more robust ecosystem.
 
 Made with ❤️ by [Isaac Serrano](https://linkedin.com/in/serranoie)
