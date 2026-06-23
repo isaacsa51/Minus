@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.e2e
+package com.serranoie.app.minus.presentation.ui.e2e.onboarding
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,7 +12,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.onboarding.OnboardingScreen
@@ -147,7 +147,7 @@ class OnboardingScreenE2ETest {
         continueButton().performClick()
         composeTestRule.waitForIdle()
 
-        assertThat(invoked).isEqualTo(1)
+        Truth.assertThat(invoked).isEqualTo(1)
     }
 
     @Test
@@ -161,7 +161,7 @@ class OnboardingScreenE2ETest {
         button.performClick()
         composeTestRule.waitForIdle()
 
-        assertThat(invoked).isEqualTo(2)
+        Truth.assertThat(invoked).isEqualTo(2)
     }
 
     @Test
@@ -177,6 +177,6 @@ class OnboardingScreenE2ETest {
         vm.processIntent(OnboardingUiIntent.OnWelcomeDismissed)
         composeTestRule.waitForIdle()
 
-        assertThat(invoked).isEqualTo(1)
+        Truth.assertThat(invoked).isEqualTo(1)
     }
 }

@@ -1,0 +1,134 @@
+
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN: printToLog:
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN: Printing with useUnmergedTree = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN: Node #1 at (l=0.0, t=0.0, r=1080.0, b=2160.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:  |-Node #3 at (l=0.0, t=0.0, r=1080.0, b=2160.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |-Node #6 at (l=0.0, t=1080.0, r=1080.0, b=2160.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 0.0.dp), bottomStart = CornerSize(size = 0.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #13 at (l=50.0, t=1091.0, r=279.0, b=1339.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #14 at (l=50.0, t=1091.0, r=279.0, b=1339.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[7]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #16 at (l=301.0, t=1091.0, r=529.0, b=1339.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #17 at (l=301.0, t=1091.0, r=529.0, b=1339.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[8]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #19 at (l=551.0, t=1091.0, r=779.0, b=1339.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #20 at (l=551.0, t=1091.0, r=779.0, b=1339.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[9]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #23 at (l=50.0, t=1361.0, r=279.0, b=1609.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #24 at (l=50.0, t=1361.0, r=279.0, b=1609.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[4]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #26 at (l=301.0, t=1361.0, r=529.0, b=1609.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #27 at (l=301.0, t=1361.0, r=529.0, b=1609.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[5]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #29 at (l=551.0, t=1361.0, r=779.0, b=1609.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #30 at (l=551.0, t=1361.0, r=779.0, b=1609.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[6]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #33 at (l=50.0, t=1631.0, r=279.0, b=1879.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #34 at (l=50.0, t=1631.0, r=279.0, b=1879.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[1]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #36 at (l=301.0, t=1631.0, r=529.0, b=1879.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #37 at (l=301.0, t=1631.0, r=529.0, b=1879.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[2]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #39 at (l=551.0, t=1631.0, r=779.0, b=1879.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #40 at (l=551.0, t=1631.0, r=779.0, b=1879.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[3]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #43 at (l=50.0, t=1901.0, r=529.0, b=2149.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #44 at (l=50.0, t=1901.0, r=529.0, b=2149.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[0]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #46 at (l=551.0, t=1901.0, r=779.0, b=2149.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #47 at (l=551.0, t=1901.0, r=779.0, b=2149.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Text = '[.]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #50 at (l=801.0, t=1091.0, r=1030.0, b=1339.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |  |-Node #51 at (l=801.0, t=1091.0, r=1030.0, b=1339.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    ContentDescription = '[Editor action]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    Actions = [OnClick, OnLongClick, RequestFocus]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |    MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |  |-Node #54 at (l=790.0, t=1350.0, r=1041.0, b=2160.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |     |-Node #55 at (l=801.0, t=1361.0, r=1030.0, b=2149.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |       IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 80.0.dp), topEnd = CornerSize(size = 80.0.dp), bottomEnd = CornerSize(size = 80.0.dp), bottomStart = CornerSize(size = 80.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |        |-Node #56 at (l=801.0, t=1361.0, r=1030.0, b=2149.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |          ContentDescription = '[Editor action]'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |          Focused = 'false'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |          Shape = 'RectangleShape'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |          Actions = [OnClick, OnLongClick, RequestFocus]
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |          MergeDescendants = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:     |-Node #64 at (l=0.0, t=-992.0, r=1080.0, b=1080.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:       IsContainer = 'true'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 0.0.dp), topEnd = CornerSize(size = 0.0.dp), bottomEnd = CornerSize(size = 36.0.dp), bottomStart = CornerSize(size = 36.0.dp))'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:       VerticalScrollAxisRange = 'ScrollAxisRange(value=1.0, maxValue=1.0, reverseScrolling=false)'
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:        |-Node #69 at (l=499.0, t=1041.0, r=582.0, b=1052.0)px
+06-22 16:12:14.072   677   699 D DEBUG_SCREEN:          Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+

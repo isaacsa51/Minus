@@ -12,6 +12,7 @@
 /capture
 /.idea
 /.kotlin
+/.minimax
 /sync-contract/build
 
 # Release signing artifacts

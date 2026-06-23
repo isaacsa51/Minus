@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.e2e
+package com.serranoie.app.minus.presentation.ui.e2e.budget
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
@@ -6,7 +6,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
@@ -56,14 +56,14 @@ class BudgetPeriodSheetEditModeE2ETest {
 
     @Test
     fun when_no_active_budget_then_sheet_opens_in_edit_mode_and_budget_input_is_visible() {
-        // Given — no budget period saved, sheet is forced into edit mode
+        // Given
         renderSheet(
             budgetSettings = null,
             startInEditMode = true,
             onSaveBudget = {},
         )
 
-        // Then — the budget input is the primary control
+        // Then
         composeTestRule
             .onNodeWithTag(BUDGET_PERIOD_BUDGET_INPUT_TAG)
             .assertIsDisplayed()
@@ -204,7 +204,7 @@ class BudgetPeriodSheetEditModeE2ETest {
         val settings = sampleBudgetSettings()
 
         // Then
-        assertThat(settings.totalBudget).isEqualTo(BigDecimal("1000.00"))
-        assertThat(settings.period).isEqualTo(BudgetPeriod.MONTHLY)
+        Truth.assertThat(settings.totalBudget).isEqualTo(BigDecimal("1000.00"))
+        Truth.assertThat(settings.period).isEqualTo(BudgetPeriod.MONTHLY)
     }
 }
