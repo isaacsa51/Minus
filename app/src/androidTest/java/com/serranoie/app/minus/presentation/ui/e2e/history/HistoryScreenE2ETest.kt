@@ -151,8 +151,10 @@ class HistoryScreenE2ETest {
 
         val expectedStart = prettyDate(periodStart)
         val expectedEnd = prettyDate(periodEnd)
-        composeTestRule.onAllNodesWithText(expectedStart, substring = true).onLast().assertIsDisplayed()
-        composeTestRule.onAllNodesWithText(expectedEnd, substring = true).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(expectedStart, substring = true).onLast()
+            .assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(expectedEnd, substring = true).onLast()
+            .assertIsDisplayed()
 
         Truth.assertThat(transactions).hasSize(4)
     }
@@ -192,7 +194,7 @@ class HistoryScreenE2ETest {
         )
 
         composeTestRule.waitForIdle()
-composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
         val totalBudgetLabel = composeTestRule.activity.getString(R.string.total_budget)

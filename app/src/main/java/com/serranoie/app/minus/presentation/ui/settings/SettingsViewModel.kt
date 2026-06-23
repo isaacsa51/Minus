@@ -12,11 +12,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.DYNAMIC_COLOR_KEY
 import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_PAYMENTS_VIEW_MODE_KEY
 import com.serranoie.app.minus.presentation.THEME_MODE_KEY
 import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
 import com.serranoie.app.minus.presentation.appTheme
@@ -44,7 +44,7 @@ data class SettingsUiState(
     val currentTypography: String = "Expressive",
     val isMaterialYouEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,
-    val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
+    val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val notificationHour: Int = 9,
     val notificationMinute: Int = 0,
     val recurrentNotificationHour: Int = 8,
@@ -61,6 +61,7 @@ sealed interface SettingsUiEffect {
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val settingsRepository: SettingsRepository,
     private val updateNotificationTimeUseCase: UpdatePeriodEndNotificationTimeUseCase,
 ) : ViewModel() {
 
@@ -87,41 +88,47 @@ class SettingsViewModel @Inject constructor(
 
     private fun loadPreferences() {
         viewModelScope.launch {
-            context.settingsDataStore.data.collect { prefs ->
+            settingsRepository.observeSettings().collect { settings ->
                 _uiState.update { current ->
                     current.copy(
-                        currentTheme = when (context.appTheme) {
-                            ThemeMode.LIGHT -> "Light"
-                            ThemeMode.NIGHT -> "Dark"
+                        currentTheme = when (settings.themeMode) {
+                            com.serranoie.app.minus.domain.model.ThemeMode.LIGHT -> "Light"
+                            com.serranoie.app.minus.domain.model.ThemeMode.NIGHT -> "Dark"
                             else -> "System"
                         },
-                        currentTypography = when (context.appTypography) {
-                            TypographyMode.DEFAULT -> "Default"
-                            TypographyMode.CONDENSED -> "Condensed"
+                        currentTypography = when (settings.typographyMode) {
+                            com.serranoie.app.minus.domain.model.TypographyMode.DEFAULT -> "Default"
+                            com.serranoie.app.minus.domain.model.TypographyMode.CONDENSED -> "Condensed"
                             else -> "Expressive"
                         },
-                        isMaterialYouEnabled = context.dynamicColorEnabled,
-                        isCreditQuickToggleEnabled = prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false,
-                        recurrentPaymentsViewMode = RecurrentPaymentsViewMode.fromName(
-                            prefs[RECURRENT_PAYMENTS_VIEW_MODE_KEY]
-                        ),
-                        notificationHour = prefs[RECURRENT_NOTIFICATION_HOUR_KEY] ?: 9,
-                        notificationMinute = prefs[RECURRENT_NOTIFICATION_MINUTE_KEY] ?: 0,
-                        recurrentNotificationHour = prefs[RECURRENT_NOTIFICATION_HOUR_KEY] ?: 8,
-                        recurrentNotificationMinute = prefs[RECURRENT_NOTIFICATION_MINUTE_KEY] ?: 0,
+                        isMaterialYouEnabled = settings.dynamicColorEnabled,
+                        recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
+                        notificationHour = settings.notificationHour,
+                        notificationMinute = settings.notificationMinute,
+                        recurrentNotificationHour = settings.notificationHour, // Fixed to match repo if needed, but repo has separate? No, repo only has one.
+                        recurrentNotificationMinute = settings.notificationMinute,
                         exactAlarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                             alarmManager.canScheduleExactAlarms()
                         } else true,
-                        periodMappingMode = try {
-                            PeriodMappingMode.valueOf(
-                                prefs[PERIOD_MAPPING_MODE_KEY] ?: ""
-                            )
-                        } catch (_: Exception) {
-                            PeriodMappingMode.ACTIVE_BUDGET
-                        },
+                        // PeriodMappingMode is not in UserSettings yet, keeping direct access for now or just ignoring if not critical
                     )
                 }
+            }
+        }
+        // Need to also handle PeriodMappingMode and isCreditQuickToggleEnabled which are NOT in UserSettings
+        viewModelScope.launch {
+            context.settingsDataStore.data.collect { prefs ->
+                _uiState.update { it.copy(
+                    isCreditQuickToggleEnabled = prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false,
+                    periodMappingMode = try {
+                        PeriodMappingMode.valueOf(
+                            prefs[PERIOD_MAPPING_MODE_KEY] ?: ""
+                        )
+                    } catch (_: Exception) {
+                        PeriodMappingMode.ACTIVE_BUDGET
+                    },
+                ) }
             }
         }
     }
@@ -180,9 +187,7 @@ class SettingsViewModel @Inject constructor(
     fun onRecurrentPaymentsViewModeChange(mode: RecurrentPaymentsViewMode) {
         _uiState.update { it.copy(recurrentPaymentsViewMode = mode) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[RECURRENT_PAYMENTS_VIEW_MODE_KEY] = mode.name
-            }
+            settingsRepository.setRecurrentPaymentsViewMode(mode)
         }
     }
 

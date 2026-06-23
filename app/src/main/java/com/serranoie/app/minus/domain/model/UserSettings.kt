@@ -1,9 +1,7 @@
 package com.serranoie.app.minus.domain.model
 
-/**
- * User preferences and settings loaded from DataStore.
- * These represent the user's configuration choices and app state.
- */
+import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
+
 data class UserSettings(
     val onboardingCompleted: Boolean = false,
     val earlyFinishActive: Boolean = false,
@@ -15,7 +13,8 @@ data class UserSettings(
     val notificationMinute: Int = DEFAULT_NOTIFICATION_MINUTE,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val typographyMode: TypographyMode = TypographyMode.EXPRESSIVE,
-    val dynamicColorEnabled: Boolean = false
+    val dynamicColorEnabled: Boolean = false,
+    val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
 ) {
     companion object {
         const val DEFAULT_NOTIFICATION_HOUR = 9

@@ -15,6 +15,7 @@ import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_AMOUNT_KEY_NAME
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_STRATEGY_KEY_NAME
 import com.serranoie.app.minus.presentation.settingsDataStore
+import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -52,6 +53,8 @@ private val NOTIFICATION_MINUTE = intPreferencesKey(NOTIFICATION_MINUTE_KEY_NAME
 private val THEME_MODE = stringPreferencesKey(THEME_MODE_KEY_NAME)
 private val TYPOGRAPHY_MODE = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
 private val DYNAMIC_COLOR = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
+private val RECURRENT_PAYMENTS_VIEW_MODE =
+    stringPreferencesKey(RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME)
 private val CURRENT_PERIOD_ROLLOVER_AMOUNT =
     stringPreferencesKey(CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY_NAME)
 private val CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD =
@@ -80,7 +83,10 @@ class SettingsRepositoryImpl @Inject constructor(
                 themeMode = preferences[THEME_MODE]?.toThemeMode() ?: ThemeMode.SYSTEM,
                 typographyMode = preferences[TYPOGRAPHY_MODE]?.toTypographyMode()
                     ?: TypographyMode.EXPRESSIVE,
-                dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false
+                dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false,
+                recurrentPaymentsViewMode = RecurrentPaymentsViewMode.fromName(
+                    preferences[RECURRENT_PAYMENTS_VIEW_MODE]
+                )
             )
         }
     }
@@ -179,6 +185,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setDynamicColorEnabled(enabled: Boolean) {
         context.settingsDataStore.edit { preferences ->
             preferences[DYNAMIC_COLOR] = enabled
+        }
+    }
+
+    override suspend fun setRecurrentPaymentsViewMode(mode: RecurrentPaymentsViewMode) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[RECURRENT_PAYMENTS_VIEW_MODE] = mode.name
         }
     }
 

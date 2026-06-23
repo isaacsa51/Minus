@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
@@ -17,13 +18,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val budgetTransactionHandler: BudgetTransactionHandler,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryUiState())
@@ -43,13 +44,15 @@ class HistoryViewModel @Inject constructor(
             combine(
                 budgetTransactionHandler.budgetRepository.getTransactions(),
                 budgetTransactionHandler.budgetRepository.getBudgetSettings(),
-            ) { transactions, settings ->
-                transactions to settings
-            }.collect { (transactions, settings) ->
+                settingsRepository.observeSettings(),
+            ) { transactions, settings, userSettings ->
+                Triple(transactions, settings, userSettings)
+            }.collect { (transactions, settings, userSettings) ->
                 recomputeDerivedState(
                     transactions = transactions,
                     budgetSettings = settings,
                     budgetState = null,
+                    userSettings = userSettings,
                 )
             }
         }
@@ -144,6 +147,7 @@ class HistoryViewModel @Inject constructor(
         transactions: List<Transaction>,
         budgetSettings: BudgetSettings?,
         budgetState: BudgetState?,
+        userSettings: com.serranoie.app.minus.domain.model.UserSettings?,
     ) {
         val current = _uiState.value
         val pendingRemoved = current.pendingRemovedTransactions
@@ -199,6 +203,8 @@ class HistoryViewModel @Inject constructor(
             upcomingRecurrentInPeriod = upcomingInPeriod,
             futureRecurrentOutOfPeriod = futureOutOfPeriod,
             expandedDates = autoExpanded,
+            recurrentPaymentsViewMode = userSettings?.recurrentPaymentsViewMode
+                ?: RecurrentPaymentsViewMode.VERTICAL_LIST,
         )
     }
 
