@@ -2,21 +2,34 @@ package com.serranoie.app.minus.presentation.ui.e2e.history
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onLast
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeRight
 import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.History
+import com.serranoie.app.minus.presentation.ui.history.HistoryUiIntent
 import com.serranoie.app.minus.presentation.ui.history.HistoryUiState
+import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
@@ -87,16 +100,296 @@ class HistoryScreenE2ETest {
         ),
     )
 
-    private fun setHistoryContent(uiState: HistoryUiState) {
+    private fun setHistoryContent(
+        uiState: HistoryUiState,
+        onProcessIntent: (HistoryUiIntent) -> Unit = {},
+    ) {
         composeTestRule.setContent {
             MinusTheme {
                 History(
                     uiState = uiState,
                     modifier = Modifier.fillMaxSize(),
-                    onProcessIntent = {},
+                    onProcessIntent = onProcessIntent,
                 )
             }
         }
+    }
+
+    private fun sampleUpcomingRecurrentItems(): List<UpcomingRecurrentItem> = listOf(
+        UpcomingRecurrentItem(
+            transaction = Transaction.create(
+                amount = BigDecimal("15.00"),
+                comment = "Netflix",
+                date = LocalDateTime.now().minusDays(10),
+                isRecurrent = true,
+                recurrentFrequency = RecurrentFrequency.MONTHLY,
+            ),
+            nextChargeDate = today.plusDays(5),
+            isInCurrentPeriod = true,
+        )
+    )
+
+    @Test
+    fun when_recurrent_view_mode_is_horizontal_then_recurrent_items_are_shown_as_cards() {
+        val recurrentItems = sampleUpcomingRecurrentItems()
+        setHistoryContent(
+            uiState = HistoryUiState(
+                budgetSettings = sampleBudgetSettings(),
+                budgetState = sampleBudgetState(),
+                upcomingRecurrentInPeriod = recurrentItems,
+                showUpcomingRecurrentInPeriod = true,
+                recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
+            ),
+        )
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Netflix").assertIsDisplayed()
+        val monthlyLabel =
+            composeTestRule.activity.getString(R.string.recurrent_ticket_frequency_monthly)
+        composeTestRule.onNodeWithText(monthlyLabel, substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun when_recurrent_view_mode_is_vertical_then_recurrent_items_are_shown_as_list_items() {
+        val recurrentItems = sampleUpcomingRecurrentItems()
+        setHistoryContent(
+            uiState = HistoryUiState(
+                budgetSettings = sampleBudgetSettings(),
+                budgetState = sampleBudgetState(),
+                upcomingRecurrentInPeriod = recurrentItems,
+                showUpcomingRecurrentInPeriod = true,
+                recurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
+            ),
+        )
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Netflix").assertIsDisplayed()
+
+        val amount = formatCurrency(BigDecimal("15"))
+        composeTestRule.onNodeWithText(amount).assertIsDisplayed()
+    }
+
+    @Test
+    fun when_tapping_transaction_then_detail_dialog_is_shown() {
+        val transactions = sampleTransactions()
+        var capturedIntent: HistoryUiIntent? = null
+
+        setHistoryContent(
+            uiState = HistoryUiState(
+                budgetSettings = sampleBudgetSettings(),
+                budgetState = sampleBudgetState(),
+                transactions = transactions,
+                displayTransactions = transactions,
+                groupedCurrentTransactions = mapOf(today to transactions),
+                expandedDates = setOf(today),
+            ),
+            onProcessIntent = { capturedIntent = it }
+        )
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Coffee").performClick()
+
+        Truth.assertThat(capturedIntent)
+            .isInstanceOf(HistoryUiIntent.SetSelectedTransaction::class.java)
+        val selectedTx = (capturedIntent as HistoryUiIntent.SetSelectedTransaction).transaction
+        Truth.assertThat(selectedTx?.comment).isEqualTo("Coffee")
+    }
+
+    @Test
+    fun when_swiping_right_on_transaction_then_it_is_removed_from_list() {
+        val transactions = sampleTransactions()
+        var uiState by mutableStateOf(
+            HistoryUiState(
+                budgetSettings = sampleBudgetSettings(),
+                budgetState = sampleBudgetState(),
+                transactions = transactions,
+                displayTransactions = transactions,
+                groupedCurrentTransactions = mapOf(today to transactions),
+                expandedDates = setOf(today),
+            )
+        )
+
+        composeTestRule.setContent {
+            MinusTheme {
+                History(
+                    uiState = uiState,
+                    modifier = Modifier.fillMaxSize(),
+                    onProcessIntent = { intent ->
+                        if (intent is HistoryUiIntent.DeleteTransaction) {
+                            val newTransactions =
+                                uiState.transactions.filterNot { it.id == intent.transaction.id }
+                            uiState = uiState.copy(
+                                transactions = newTransactions,
+                                displayTransactions = newTransactions,
+                                groupedCurrentTransactions = mapOf(today to newTransactions)
+                            )
+                        }
+                    },
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Coffee").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Coffee").performTouchInput {
+            swipeRight()
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onAllNodesWithText("Coffee").assertCountEquals(0)
+    }
+
+    @Test
+    fun when_swiping_left_on_transaction_then_transaction_edit_screen_is_displayed() {
+        val transactions = sampleTransactions()
+        var uiState by mutableStateOf(
+            HistoryUiState(
+                budgetSettings = sampleBudgetSettings(),
+                budgetState = sampleBudgetState(),
+                transactions = transactions,
+                displayTransactions = transactions,
+                groupedCurrentTransactions = mapOf(today to transactions),
+                expandedDates = setOf(today),
+            )
+        )
+
+        composeTestRule.setContent {
+            MinusTheme {
+                History(
+                    uiState = uiState,
+                    modifier = Modifier.fillMaxSize(),
+                    onProcessIntent = { intent ->
+                        if (intent is HistoryUiIntent.SetEditingTransaction) {
+                            uiState = uiState.copy(editingTransaction = intent.transaction)
+                        }
+                    },
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Coffee").performTouchInput {
+            swipeLeft()
+        }
+
+        composeTestRule.waitForIdle()
+
+        val editTitle = composeTestRule.activity.getString(R.string.edit_expense_title)
+        composeTestRule.onNodeWithText(editTitle).assertIsDisplayed()
+
+        composeTestRule.onAllNodesWithText("Coffee").onLast().assertIsDisplayed()
+    }
+
+    @Test
+    fun when_tapping_transaction_then_deleting_from_dialog_removes_it_from_list() {
+        val transactions = sampleTransactions()
+        var uiState by mutableStateOf(
+            HistoryUiState(
+                budgetSettings = sampleBudgetSettings(),
+                budgetState = sampleBudgetState(),
+                transactions = transactions,
+                displayTransactions = transactions,
+                groupedCurrentTransactions = mapOf(today to transactions),
+                expandedDates = setOf(today),
+            )
+        )
+
+        composeTestRule.setContent {
+            MinusTheme {
+                History(
+                    uiState = uiState,
+                    modifier = Modifier.fillMaxSize(),
+                    onProcessIntent = { intent ->
+                        when (intent) {
+                            is HistoryUiIntent.SetSelectedTransaction -> {
+                                uiState = uiState.copy(selectedTransaction = intent.transaction)
+                            }
+
+                            is HistoryUiIntent.DeleteTransaction -> {
+                                val newTransactions =
+                                    uiState.transactions.filterNot { it.id == intent.transaction.id }
+                                uiState = uiState.copy(
+                                    transactions = newTransactions,
+                                    displayTransactions = newTransactions,
+                                    groupedCurrentTransactions = mapOf(today to newTransactions),
+                                    selectedTransaction = null
+                                )
+                            }
+
+                            else -> {}
+                        }
+                    },
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Coffee").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Eliminar").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodesWithText("Coffee").assertCountEquals(0)
+    }
+
+    @Test
+    fun when_tapping_transaction_then_editing_from_dialog_shows_edit_screen() {
+        val transactions = sampleTransactions()
+        var uiState by mutableStateOf(
+            HistoryUiState(
+                budgetSettings = sampleBudgetSettings(),
+                budgetState = sampleBudgetState(),
+                transactions = transactions,
+                displayTransactions = transactions,
+                groupedCurrentTransactions = mapOf(today to transactions),
+                expandedDates = setOf(today),
+            )
+        )
+
+        composeTestRule.setContent {
+            MinusTheme {
+                History(
+                    uiState = uiState,
+                    modifier = Modifier.fillMaxSize(),
+                    onProcessIntent = { intent ->
+                        when (intent) {
+                            is HistoryUiIntent.SetSelectedTransaction -> {
+                                uiState = uiState.copy(selectedTransaction = intent.transaction)
+                            }
+
+                            is HistoryUiIntent.SetEditingTransaction -> {
+                                uiState = uiState.copy(
+                                    editingTransaction = intent.transaction,
+                                    selectedTransaction = null
+                                )
+                            }
+
+                            else -> {}
+                        }
+                    },
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Coffee").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Editar").performClick()
+        composeTestRule.waitForIdle()
+
+        val editTitle = composeTestRule.activity.getString(R.string.edit_expense_title)
+        composeTestRule.onNodeWithText(editTitle).assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("Coffee").onLast().assertIsDisplayed()
     }
 
     private fun formatCurrency(value: BigDecimal, currencyCode: String = "USD"): String {
@@ -151,8 +444,10 @@ class HistoryScreenE2ETest {
 
         val expectedStart = prettyDate(periodStart)
         val expectedEnd = prettyDate(periodEnd)
-        composeTestRule.onAllNodesWithText(expectedStart, substring = true).onLast().assertIsDisplayed()
-        composeTestRule.onAllNodesWithText(expectedEnd, substring = true).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(expectedStart, substring = true).onLast()
+            .assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(expectedEnd, substring = true).onLast()
+            .assertIsDisplayed()
 
         Truth.assertThat(transactions).hasSize(4)
     }
@@ -192,7 +487,7 @@ class HistoryScreenE2ETest {
         )
 
         composeTestRule.waitForIdle()
-composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
         val totalBudgetLabel = composeTestRule.activity.getString(R.string.total_budget)

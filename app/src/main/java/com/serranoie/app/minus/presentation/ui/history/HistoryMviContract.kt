@@ -1,6 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.history
 
+import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import java.time.LocalDate
 
 sealed interface HistoryUiIntent {
@@ -27,8 +30,8 @@ sealed interface HistoryUiEffect {
 }
 
 data class HistoryUiState(
-    val budgetSettings: com.serranoie.app.minus.domain.model.BudgetSettings? = null,
-    val budgetState: com.serranoie.app.minus.domain.model.BudgetState? = null,
+    val budgetSettings: BudgetSettings? = null,
+    val budgetState: BudgetState? = null,
     val currentPeriodId: Long = 0L,
     val currentPeriodStartedAtMillis: Long = 0L,
 
@@ -47,10 +50,11 @@ data class HistoryUiState(
     val showOutOfPeriodSubscriptions: Boolean = false,
     val showUpcomingRecurrentInPeriod: Boolean = true,
     val lockSwipeable: Boolean = true,
+    val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
 
     val displayTransactions: List<Transaction> = emptyList(),
     val groupedCurrentTransactions: Map<LocalDate?, List<Transaction>> = emptyMap(),
     val groupedPastTransactions: Map<LocalDate?, List<Transaction>> = emptyMap(),
-    val upcomingRecurrentInPeriod: List<com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem> = emptyList(),
-    val futureRecurrentOutOfPeriod: List<com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem> = emptyList(),
+    val upcomingRecurrentInPeriod: List<UpcomingRecurrentItem> = emptyList(),
+    val futureRecurrentOutOfPeriod: List<UpcomingRecurrentItem> = emptyList(),
 )

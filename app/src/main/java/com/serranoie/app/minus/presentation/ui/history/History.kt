@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,14 +45,11 @@ fun History(
     onProcessIntent: (HistoryUiIntent) -> Unit = {},
 ) {
     val resources = LocalResources.current
-    val recurrentPaymentsViewMode = remember {
-        RecurrentPaymentsViewMode.HORIZONTAL_LIST
-    }
     val scrollState = rememberLazyListState()
     val currencyCode = uiState.budgetSettings?.currencyCode ?: "USD"
     val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
 
-    LaunchedEffect(uiState.groupedCurrentTransactions.keys, readOnly) {
+    LaunchedEffect(uiState.groupedCurrentTransactions.keys, readOnly, onProcessIntent) {
         val sortedDates = uiState.groupedCurrentTransactions.keys.filterNotNull().sortedDescending()
         val current = uiState.expandedDates
         if (current.isEmpty()) {
@@ -84,9 +80,11 @@ fun History(
                 upcomingRecurrentInPeriod = uiState.upcomingRecurrentInPeriod,
                 showUpcomingRecurrentInPeriod = uiState.showUpcomingRecurrentInPeriod,
                 onToggleShowUpcomingRecurrentInPeriod = {
-                    onProcessIntent(HistoryUiIntent.ToggleUpcomingRecurrentInPeriod(!uiState.showUpcomingRecurrentInPeriod))
+                    onProcessIntent(
+                        HistoryUiIntent.ToggleUpcomingRecurrentInPeriod(!uiState.showUpcomingRecurrentInPeriod)
+                    )
                 },
-                recurrentPaymentsViewMode = recurrentPaymentsViewMode,
+                recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
                 currencyFormat = currencyFormat,
                 onDelete = { tx -> onProcessIntent(HistoryUiIntent.SetRecurrentToDelete(tx)) },
                 onEdit = { tx -> onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(tx)) },
@@ -107,7 +105,8 @@ fun History(
                         tx,
                         resources.getString(
                             R.string.expense_deleted_format,
-                            tx.comment.ifEmpty { resources.getString(R.string.generic_expense) }),
+                            tx.comment.ifEmpty { resources.getString(R.string.generic_expense) }
+                        ),
                     ) {
                         onCancelPendingDelete()
                     }
@@ -121,9 +120,11 @@ fun History(
                 futureRecurrentOutOfPeriod = uiState.futureRecurrentOutOfPeriod,
                 showOutOfPeriodSubscriptions = uiState.showOutOfPeriodSubscriptions,
                 onToggleShowOutOfPeriodSubscriptions = {
-                    onProcessIntent(HistoryUiIntent.ToggleOutOfPeriodSubscriptions(!uiState.showOutOfPeriodSubscriptions))
+                    onProcessIntent(
+                        HistoryUiIntent.ToggleOutOfPeriodSubscriptions(!uiState.showOutOfPeriodSubscriptions)
+                    )
                 },
-                recurrentPaymentsViewMode = recurrentPaymentsViewMode,
+                recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
                 currencyFormat = currencyFormat,
                 onDelete = { tx -> onProcessIntent(HistoryUiIntent.SetRecurrentToDelete(tx)) },
                 onEdit = { tx -> onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(tx)) },
@@ -152,7 +153,8 @@ fun History(
                         tx,
                         resources.getString(
                             R.string.expense_deleted_format,
-                            tx.comment.ifEmpty { resources.getString(R.string.generic_expense) }),
+                            tx.comment.ifEmpty { resources.getString(R.string.generic_expense) }
+                        ),
                     ) {
                         onCancelPendingDelete()
                     }
@@ -196,7 +198,8 @@ fun History(
                         tx,
                         resources.getString(
                             R.string.expense_deleted_format,
-                            tx.comment.ifEmpty { resources.getString(R.string.generic_expense) }),
+                            tx.comment.ifEmpty { resources.getString(R.string.generic_expense) }
+                        ),
                     ) { onCancelPendingDelete() }
                     onProcessIntent(HistoryUiIntent.DeleteTransaction(tx))
                 }
@@ -215,7 +218,8 @@ fun History(
             onShowInfoSnackbar(
                 resources.getString(
                     R.string.expense_modified_format,
-                    tx.comment.ifEmpty { resources.getString(R.string.generic_expense) })
+                    tx.comment.ifEmpty { resources.getString(R.string.generic_expense) }
+                )
             )
             onProcessIntent(HistoryUiIntent.SetEditingTransaction(null))
         },
