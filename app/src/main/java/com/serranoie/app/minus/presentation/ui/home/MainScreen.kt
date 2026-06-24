@@ -61,17 +61,17 @@ fun MainScreen(
         mainScreenViewModel.effects.collect { effect ->
             when (effect) {
                 is MainScreenUiEffect.RequestUndo -> {
-                    mainScreenState.pendingDeleteTransaction?.let { tx ->
-                        budgetViewModel.processIntent(
-                            BudgetTransactionIntent.RestoreTransactionTapped(tx)
-                        )
-                    }
+                    budgetViewModel.processIntent(
+                        BudgetTransactionIntent.RestoreTransactionTapped(effect.transaction)
+                    )
                 }
+
                 is MainScreenUiEffect.UpdateDragProgress -> {
                     budgetViewModel.processIntent(
                         BudgetNumpadIntent.SetDragProgress(effect.progress)
                     )
                 }
+
                 is MainScreenUiEffect.OpenWallet -> onNavigateToWallet()
                 is MainScreenUiEffect.OpenAnalytics -> onNavigateToAnalytics()
                 is MainScreenUiEffect.ShowUndoSnackbar -> {}
@@ -89,17 +89,14 @@ fun MainScreen(
             when (intent) {
                 is MainScreenUiIntent.ProcessBudgetTransactionIntent ->
                     budgetViewModel.processIntent(intent.intent)
+
                 is MainScreenUiIntent.ProcessBudgetEditorIntent ->
                     budgetViewModel.processIntent(intent.intent)
+
                 is MainScreenUiIntent.ProcessBudgetNumpadIntent ->
                     budgetViewModel.processIntent(intent.intent)
+
                 else -> mainScreenViewModel.processIntent(intent, tutorialStage)
-            }
-            if (intent is MainScreenUiIntent.QueueDeleteWithUndo) {
-                mainScreenViewModel.onTransactionDeleteQueued(intent.transaction, intent.message)
-            }
-            if (intent is MainScreenUiIntent.CancelPendingDelete) {
-                mainScreenViewModel.onPendingDeleteCanceled()
             }
         },
         onNavigateToAnalytics = onNavigateToAnalytics,

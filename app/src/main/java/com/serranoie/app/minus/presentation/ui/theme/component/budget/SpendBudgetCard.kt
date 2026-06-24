@@ -194,7 +194,8 @@ fun SpendBudgetCard(
 			) {
 				Text(
 					text = numberFormat(context, spend, "MXN"),
-					style = MaterialTheme.typography.titleLargeCondensed.copy(fontWeight = FontWeight.Light),
+					style = MaterialTheme.typography.displaySmallEmphasized.copy(fontWeight = FontWeight.Light),
+					fontSize = MaterialTheme.typography.titleLargeEmphasized.fontSize,
 					overflow = TextOverflow.Ellipsis,
 					softWrap = false,
 					lineHeight = TextUnit(0.2f, TextUnitType.Em),

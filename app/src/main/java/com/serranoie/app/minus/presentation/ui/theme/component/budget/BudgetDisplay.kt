@@ -70,7 +70,7 @@ fun BudgetDisplay(
     actualFinishDate: Date? = null,
     extraDaysFromRemaining: Int = 0,
     showRolloverStyle: Boolean = true,
-    contentPadding: PaddingValues = PaddingValues(vertical = 8.dp, horizontal = 18.dp),
+    contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 18.dp),
 ) {
     val currencyFormat =
         symbolOnlyCurrencyFormat(currencyCode)

@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.history
+﻿package com.serranoie.app.minus.presentation.ui.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -107,11 +107,9 @@ class HistoryViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             pendingRemovedTransactions = _uiState.value.pendingRemovedTransactions + (transaction.id to transaction),
         )
-        viewModelScope.launch {
-            budgetTransactionHandler.deleteTransaction(transaction)
-        }
         autoDismissJob = viewModelScope.launch {
-            delay(330)
+            delay(EXIT_ANIMATION_DURATION_MS)
+            budgetTransactionHandler.deleteTransaction(transaction)
             _uiState.value = _uiState.value.copy(pendingRemovedTransactions = emptyMap())
         }
     }
@@ -210,6 +208,11 @@ class HistoryViewModel @Inject constructor(
 
     private fun computeCurrentPeriodId(transactions: List<Transaction>): Long {
         return transactions.filter { it.periodId > 0L }.maxByOrNull { it.periodId }?.periodId ?: 0L
+    }
+
+
+    companion object {
+        private const val EXIT_ANIMATION_DURATION_MS = 600L
     }
 
     override fun onCleared() {

@@ -92,10 +92,8 @@ fun SwipeActions(
         }
     )
     
-    // Reset swipe state when disabled (e.g., when item is being deleted)
     LaunchedEffect(enabled) {
         if (!enabled) {
-            state.snapTo(SwipeToDismissBoxValue.Settled)
             hasTriggeredHaptic = false
             willDismiss = false
         }
