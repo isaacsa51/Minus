@@ -172,6 +172,8 @@
     <string name="censor_mode_alert_dismiss">Entendido</string>
     <string name="censor_mode_card_label">Modo privado activado</string>
     <string name="censor_mode_card_body">Cubre la parte superior del teléfono (donde está la cámara) con la mano durante un segundo para desactivarlo.</string>
+    <string name="censor_mode_toast_enabled">Modo de privacidad activado</string>
+    <string name="censor_mode_toast_disabled">Modo de privacidad desactivado</string>
 
     <string name="onboarding_finish_date_selector_title">Selecciona el periodo</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d días · %2$s - %3$s</string>

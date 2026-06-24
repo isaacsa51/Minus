@@ -175,6 +175,8 @@
     <string name="censor_mode_alert_dismiss">Compris</string>
     <string name="censor_mode_card_label">Mode privé activé</string>
     <string name="censor_mode_card_body">Couvrez le haut du téléphone (là où se trouve l\'appareil photo) avec votre main pendant environ une seconde pour l\'éteindre.</string>
+    <string name="censor_mode_toast_enabled">Mode confidentialité activé</string>
+    <string name="censor_mode_toast_disabled">Mode confidentialité désactivé</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Sélectionnez la période</string>

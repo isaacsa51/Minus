@@ -195,6 +195,8 @@
     <string name="censor_mode_alert_dismiss">Got it</string>
     <string name="censor_mode_card_label">Privacy mode activated</string>
     <string name="censor_mode_card_body">Cover the top of the phone (where the camera sits) with your hand for about a second to turn it off.</string>
+    <string name="censor_mode_toast_enabled">Privacy mode enabled</string>
+    <string name="censor_mode_toast_disabled">Privacy mode disabled</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Select the period</string>

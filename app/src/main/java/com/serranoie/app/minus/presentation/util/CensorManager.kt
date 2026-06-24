@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
+import com.serranoie.app.minus.R
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -77,10 +78,11 @@ class CensorManager @Inject constructor(
 	private fun toggleCensor() {
 		val newState = !_isCensored.value
 		_isCensored.value = newState
-		
-		val message = if (newState) "Censor Mode Enabled" else "Censor Mode Disabled"
-		Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-		
+
+		val messageRes = if (newState) R.string.censor_mode_toast_enabled
+		else R.string.censor_mode_toast_disabled
+		Toast.makeText(context, context.getString(messageRes), Toast.LENGTH_SHORT).show()
+
 		logcat { "Censor mode toggled: $newState (after 0.8s hold)" }
 	}
 
