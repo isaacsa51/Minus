@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.home
+﻿package com.serranoie.app.minus.presentation.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor() : ViewModel() {
@@ -57,7 +58,7 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
                 pendingDeleteTransaction = transaction,
                 isSnackbarVisible = true,
                 snackbarMessage = message,
-                snackbarActionLabel = "Undo",
+                snackbarActionLabel = "UNDO",
                 snackbarHasUndo = true,
             )
         }
@@ -66,14 +67,14 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
             _effects.emit(
                 MainScreenUiEffect.ShowUndoSnackbar(
                     message = message,
-                    actionLabel = "Undo",
+                    actionLabel = "UNDO",
                 )
             )
         }
 
         autoDismissJob = viewModelScope.launch {
-            delay(3_500L)
-            cancelPendingDelete()
+            delay(3_500L.milliseconds)
+            dismissSnackbar()
         }
     }
 
@@ -97,9 +98,12 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun cancelPendingDelete() {
+        val transaction = _uiState.value.pendingDeleteTransaction
         onPendingDeleteCanceled()
-        viewModelScope.launch {
-            _effects.emit(MainScreenUiEffect.RequestUndo)
+        if (transaction != null) {
+            viewModelScope.launch {
+                _effects.emit(MainScreenUiEffect.RequestUndo(transaction))
+            }
         }
     }
 

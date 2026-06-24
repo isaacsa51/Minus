@@ -54,7 +54,7 @@
     <string name="edit_recurrent_expense_title">Editar gasto recurrente</string>
     <string name="edit_expense_title">Editar gasto</string>
     <string name="cancel_edit_content_desc">Cancelar edición</string>
-    <string name="configure_recurrence">Configurar la recurrencia</string>
+    <string name="configure_recurrence">Configurar recurrencia</string>
     <string name="make_recurrent">Hacer Recurrente</string>
     <string name="select_time">Seleccionar hora</string>
     <string name="billing_day">Día de pago</string>

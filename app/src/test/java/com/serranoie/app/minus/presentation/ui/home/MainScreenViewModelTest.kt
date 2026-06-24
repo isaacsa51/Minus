@@ -87,14 +87,14 @@ class MainScreenViewModelTest {
                 assertThat(state.pendingDeleteTransaction).isEqualTo(transaction)
                 assertThat(state.isSnackbarVisible).isTrue()
                 assertThat(state.snackbarMessage).isEqualTo("Deleted")
-                assertThat(state.snackbarActionLabel).isEqualTo("Undo")
+                assertThat(state.snackbarActionLabel).isEqualTo("UNDO")
                 assertThat(state.snackbarHasUndo).isTrue()
 
                 val effect = awaitItem()
                 assertThat(effect).isInstanceOf(MainScreenUiEffect.ShowUndoSnackbar::class.java)
                 effect as MainScreenUiEffect.ShowUndoSnackbar
                 assertThat(effect.message).isEqualTo("Deleted")
-                assertThat(effect.actionLabel).isEqualTo("Undo")
+                assertThat(effect.actionLabel).isEqualTo("UNDO")
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -128,7 +128,8 @@ class MainScreenViewModelTest {
                 assertThat(state.snackbarHasUndo).isFalse()
 
                 val effect = awaitItem()
-                assertThat(effect).isEqualTo(MainScreenUiEffect.RequestUndo)
+                assertThat(effect).isInstanceOf(MainScreenUiEffect.RequestUndo::class.java)
+                assertThat((effect as MainScreenUiEffect.RequestUndo).transaction.id).isEqualTo(1L)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -436,7 +437,7 @@ class MainScreenViewModelTest {
         }
 
     @Test
-    fun when_3500ms_pass_without_user_action_then_snackbar_is_auto_dismissed_and_request_undo_is_emitted() =
+    fun when_3500ms_pass_without_user_action_then_snackbar_is_auto_dismissed_and_no_effect_is_emitted() =
         runTest {
             // Given
             val viewModel = newViewModel()
@@ -460,8 +461,7 @@ class MainScreenViewModelTest {
                 assertThat(state.snackbarActionLabel).isEqualTo("")
                 assertThat(state.snackbarHasUndo).isFalse()
 
-                val effect = awaitItem()
-                assertThat(effect).isEqualTo(MainScreenUiEffect.RequestUndo)
+                expectNoEvents()
                 cancelAndIgnoreRemainingEvents()
             }
         }

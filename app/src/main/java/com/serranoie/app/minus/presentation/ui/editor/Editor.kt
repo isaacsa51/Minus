@@ -95,651 +95,685 @@ import java.time.LocalDate
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Editor(
-	uiState: BudgetUiState,
-	animState: AnimState,
-	onInputChange: (String) -> Unit = {},
-	onFocus: () -> Unit,
-	onOpenHistory: () -> Unit,
-	onOpenSettings: () -> Unit,
-	onOpenAnalytics: () -> Unit = {},
-	onOpenWallet: () -> Unit = {},
-	openWalletOnStart: Boolean = false,
-	showBudgetPeriodSheet: Boolean = false,
-	forceBudgetPeriodSheetSetup: Boolean = false,
-	selectedViewPeriod: BudgetPeriod = BudgetPeriod.DAILY,
-	onShowBudgetPeriodSheet: () -> Unit = {},
-	onHideBudgetPeriodSheet: () -> Unit = {},
-	onPeriodSelected: (BudgetPeriod) -> Unit = {},
-	onCommentClick: () -> Unit,
-	onBudgetPillClickForTutorial: () -> Unit = {},
-	onAnalyticsClickForTutorial: () -> Unit = {},
-	onChangePeriod: (BudgetPeriod) -> Unit = {},
-	onFinishBudgetEarly: () -> Unit = {},
-	onSaveBudget: (BudgetSettings) -> Unit = {},
-	onCommentUpdate: (String) -> Unit = {},
-	onDeleteTag: (String) -> Unit = {},
-	onRecurrentToggle: (Boolean) -> Unit = {},
-	onCreditToggle: (Boolean) -> Unit = {},
-	showCreditQuickToggleFeature: Boolean = false,
-	onDismissRecurrentDialog: () -> Unit = {},
-	onDismissCreditCutoffDialog: () -> Unit = {},
-	onRecurrentExpenseConfirm: (RecurrentFrequency, LocalDate, Int?) -> Unit = { _, _, _ -> },
-	onCreditCutoffConfirm: (Int) -> Unit = {},
-	showAnalyticsButton: Boolean = true,
-	showSettingsButton: Boolean = true,
-	budgetPillHintAnchorModifier: Modifier = Modifier,
-	analyticsHintAnchorModifier: Modifier = Modifier,
-	modifier: Modifier = Modifier,
+    uiState: BudgetUiState,
+    animState: AnimState,
+    onInputChange: (String) -> Unit = {},
+    onFocus: () -> Unit,
+    onOpenHistory: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenAnalytics: () -> Unit = {},
+    onOpenWallet: () -> Unit = {},
+    openWalletOnStart: Boolean = false,
+    showBudgetPeriodSheet: Boolean = false,
+    forceBudgetPeriodSheetSetup: Boolean = false,
+    selectedViewPeriod: BudgetPeriod = BudgetPeriod.DAILY,
+    onShowBudgetPeriodSheet: () -> Unit = {},
+    onHideBudgetPeriodSheet: () -> Unit = {},
+    onPeriodSelected: (BudgetPeriod) -> Unit = {},
+    onCommentClick: () -> Unit,
+    onBudgetPillClickForTutorial: () -> Unit = {},
+    onAnalyticsClickForTutorial: () -> Unit = {},
+    onChangePeriod: (BudgetPeriod) -> Unit = {},
+    onFinishBudgetEarly: () -> Unit = {},
+    onSaveBudget: (BudgetSettings) -> Unit = {},
+    onCommentUpdate: (String) -> Unit = {},
+    onDeleteTag: (String) -> Unit = {},
+    onRecurrentToggle: (Boolean) -> Unit = {},
+    onCreditToggle: (Boolean) -> Unit = {},
+    showCreditQuickToggleFeature: Boolean = false,
+    onDismissRecurrentDialog: () -> Unit = {},
+    onDismissCreditCutoffDialog: () -> Unit = {},
+    onRecurrentExpenseConfirm: (RecurrentFrequency, LocalDate, Int?) -> Unit = { _, _, _ -> },
+    onCreditCutoffConfirm: (Int) -> Unit = {},
+    showAnalyticsButton: Boolean = true,
+    showSettingsButton: Boolean = true,
+    budgetPillHintAnchorModifier: Modifier = Modifier,
+    analyticsHintAnchorModifier: Modifier = Modifier,
+    modifier: Modifier = Modifier,
 ) {
-	val view = LocalView.current
-	val scope = rememberCoroutineScope()
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val view = LocalView.current
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-	val editorFocusController = remember { FocusController() }
+    val editorFocusController = remember { FocusController() }
 
-	if (uiState.showRecurrentDialog) {
-		RecurrentExpenseDialog(
-			budgetSettings = uiState.budgetSettings,
-			onDismiss = onDismissRecurrentDialog,
-			onConfirm = onRecurrentExpenseConfirm
-		)
-	}
+    if (uiState.showRecurrentDialog) {
+        RecurrentExpenseDialog(
+            budgetSettings = uiState.budgetSettings,
+            onDismiss = onDismissRecurrentDialog,
+            onConfirm = onRecurrentExpenseConfirm
+        )
+    }
 
-	if (uiState.showCreditCutoffDialog) {
-		CreditCutoffDayDialog(
-			onDismiss = onDismissCreditCutoffDialog, onConfirm = onCreditCutoffConfirm
-		)
-	}
+    if (uiState.showCreditCutoffDialog) {
+        CreditCutoffDayDialog(
+            onDismiss = onDismissCreditCutoffDialog,
+            onConfirm = onCreditCutoffConfirm
+        )
+    }
 
-	Column(
-		modifier = modifier
-			.fillMaxSize()
-			.background(colorButton)
-			.statusBarsPadding()
-			.clickable(
-				interactionSource = remember { MutableInteractionSource() }, indication = null
-			) { onFocus() }) {
-		Row(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			BudgetPill(
-				budgetState = uiState.budgetState,
-				budgetSettings = uiState.budgetSettings,
-				viewPeriod = selectedViewPeriod,
-				currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-				centerRemainingAmount = animState == AnimState.EDITING,
-				onOpenSettings = onOpenSettings,
-				onOpenBudgetSheet = {
-//					onBudgetPillClickForTutorial()
-					view.weakHapticFeedback()
-					onShowBudgetPeriodSheet()
-				},
-				modifier = Modifier
-					.weight(1f)
-					.animateContentSize(animationSpec = tween(200))
-					.padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
-					.then(budgetPillHintAnchorModifier)
-			)
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(colorButton)
+            .statusBarsPadding()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { onFocus() }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BudgetPill(
+                budgetState = uiState.budgetState,
+                budgetSettings = uiState.budgetSettings,
+                viewPeriod = selectedViewPeriod,
+                currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+                centerRemainingAmount = animState == AnimState.EDITING,
+                onOpenSettings = onOpenSettings,
+                onOpenBudgetSheet = {
+// 					onBudgetPillClickForTutorial()
+                    view.weakHapticFeedback()
+                    onShowBudgetPeriodSheet()
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .animateContentSize(animationSpec = tween(200))
+                    .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                    .then(budgetPillHintAnchorModifier)
+            )
 
-			AnimatedContent(
-				targetState = animState == AnimState.EDITING, transitionSpec = {
-					slideInHorizontally(animationSpec = tween(200)) { it } + fadeIn(tween(200)) togetherWith slideOutHorizontally(
-						animationSpec = tween(200)
-					) { -it } + fadeOut(
-						tween(
-							200
-						)
-					)
-				}, label = "topBarTrailingSwitch"
-			) { isEditing ->
-				if (isEditing) {
-					Row(verticalAlignment = Alignment.CenterVertically) {
-						RecurrenceModeToggle(
-							isEnabled = uiState.isRecurrentEnabled,
-							onToggle = onRecurrentToggle,
-							icon = Icons.Rounded.EventRepeat,
-							contentDescription = "Recurrent payment",
-						)
-						Spacer(modifier = Modifier.size(8.dp))
-						if (showCreditQuickToggleFeature) {
-							RecurrenceModeToggle(
-								isEnabled = uiState.isCreditEnabled,
-								onToggle = onCreditToggle,
-								icon = Icons.Rounded.CreditCard,
-								contentDescription = "Credit card payment",
-							)
-						}
-					}
-				} else {
-					Row(verticalAlignment = Alignment.CenterVertically) {
-						if (showAnalyticsButton) {
-							IconButton(
-								onClick = {
-									onAnalyticsClickForTutorial()
-									view.weakHapticFeedback()
-									onOpenAnalytics()
-								}, modifier = Modifier
-									.size(48.dp)
-									.then(analyticsHintAnchorModifier)
-							) {
-								Icon(
-									imageVector = Icons.Rounded.BarChart,
-									contentDescription = "Analytics",
-									tint = MaterialTheme.colorScheme.onSurface,
-									modifier = Modifier.size(28.dp),
-								)
-							}
-						}
+            AnimatedContent(
+                targetState = animState == AnimState.EDITING,
+                transitionSpec = {
+                    slideInHorizontally(animationSpec = tween(200)) { it } + fadeIn(tween(200)) togetherWith slideOutHorizontally(
+                        animationSpec = tween(200)
+                    ) { -it } + fadeOut(
+                        tween(
+                            200
+                        )
+                    )
+                },
+                label = "topBarTrailingSwitch"
+            ) { isEditing ->
+                if (isEditing) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RecurrenceModeToggle(
+                            isEnabled = uiState.isRecurrentEnabled,
+                            onToggle = onRecurrentToggle,
+                            icon = Icons.Rounded.EventRepeat,
+                            contentDescription = "Recurrent payment",
+                        )
+                        Spacer(modifier = Modifier.size(8.dp))
+                        if (showCreditQuickToggleFeature) {
+                            RecurrenceModeToggle(
+                                isEnabled = uiState.isCreditEnabled,
+                                onToggle = onCreditToggle,
+                                icon = Icons.Rounded.CreditCard,
+                                contentDescription = "Credit card payment",
+                            )
+                        }
+                    }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (showAnalyticsButton) {
+                            IconButton(
+                                onClick = {
+                                    onAnalyticsClickForTutorial()
+                                    view.weakHapticFeedback()
+                                    onOpenAnalytics()
+                                },
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .then(analyticsHintAnchorModifier)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.BarChart,
+                                    contentDescription = "Analytics",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(28.dp),
+                                )
+                            }
+                        }
 
-						if (showSettingsButton) {
-							IconButton(
-								onClick = {
-									onOpenSettings()
-									view.weakHapticFeedback()
-								}, modifier = Modifier.size(48.dp)
-							) {
-								Icon(
-									imageVector = Icons.Rounded.Settings,
-									contentDescription = "Settings",
-									tint = MaterialTheme.colorScheme.onSurface,
-									modifier = Modifier.size(28.dp),
-								)
-							}
-						}
-					}
-				}
-			}
-		}
+                        if (showSettingsButton) {
+                            IconButton(
+                                onClick = {
+                                    onOpenSettings()
+                                    view.weakHapticFeedback()
+                                },
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Settings,
+                                    contentDescription = "Settings",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(28.dp),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-		AnimatedContent(
-			targetState = animState, transitionSpec = {
-				when (targetState) {
-					AnimState.EDITING -> fadeIn(tween(200)) togetherWith fadeOut(tween(200))
-					AnimState.IDLE -> fadeIn(tween(300)) togetherWith fadeOut(tween(200))
-					else -> fadeIn(tween(200)) togetherWith fadeOut(tween(200))
-				}
-			}, label = "editorContent"
-		) { state ->
-			when (state) {
-				AnimState.EDITING -> {
-					EditingContent(
-						input = uiState.numpadInput,
-						onInputChange = onInputChange,
-						currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-						isCalculation = uiState.isCalculation,
-						tags = uiState.tags,
-						currentComment = uiState.currentComment,
-						onCommentUpdate = onCommentUpdate,
-						onDeleteTag = onDeleteTag,
-						editorFocusController = editorFocusController,
-						modifier = Modifier
-							.fillMaxWidth()
-							.weight(1f)
-					)
-				}
+        AnimatedContent(
+            targetState = animState,
+            transitionSpec = {
+                when (targetState) {
+                    AnimState.EDITING -> fadeIn(tween(200)) togetherWith fadeOut(tween(200))
+                    AnimState.IDLE -> fadeIn(tween(300)) togetherWith fadeOut(tween(200))
+                    else -> fadeIn(tween(200)) togetherWith fadeOut(tween(200))
+                }
+            },
+            label = "editorContent"
+        ) { state ->
+            when (state) {
+                AnimState.EDITING -> {
+                    EditingContent(
+                        input = uiState.numpadInput,
+                        onInputChange = onInputChange,
+                        currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+                        isCalculation = uiState.isCalculation,
+                        tags = uiState.tags,
+                        currentComment = uiState.currentComment,
+                        onCommentUpdate = onCommentUpdate,
+                        onDeleteTag = onDeleteTag,
+                        editorFocusController = editorFocusController,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    )
+                }
 
-				AnimState.IDLE, AnimState.RESET -> {
-					IdleContent(
-						budgetState = uiState.budgetState,
-						currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
+                AnimState.IDLE, AnimState.RESET -> {
+                    IdleContent(
+                        budgetState = uiState.budgetState,
+                        currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
-				else -> {
-					Box(
-						modifier = Modifier
-							.fillMaxWidth()
-							.weight(1f),
-						contentAlignment = Alignment.Center
-					) {
-						Text(
-							text = "Saving...",
-							style = MaterialTheme.typography.bodyLarge,
-							color = MaterialTheme.colorScheme.onSurfaceVariant
-						)
-					}
-				}
-			}
-		}
-	}
+                else -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Saving...",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
 
-	if (showBudgetPeriodSheet) {
-		ModalBottomSheet(
-			onDismissRequest = onHideBudgetPeriodSheet,
-			sheetState = sheetState,
-		) {
-			val shouldForceSetupMode = forceBudgetPeriodSheetSetup
-			logcat {
-				"Opening BudgetPeriodSheet: forceBudgetPeriodSheetSetup=$forceBudgetPeriodSheetSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$shouldForceSetupMode"
-			}
-			BudgetPeriodSheet(
-				budgetSettings = uiState.budgetSettings,
-				budgetState = uiState.budgetState,
-				selectedPeriod = selectedViewPeriod,
-				pendingExpensesCount = uiState.pendingExpensesForNextPeriod.size,
-				currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-				startInEditMode = shouldForceSetupMode,
-				onPeriodSelected = { newPeriod ->
-					logcat { "BudgetPeriodSheet onPeriodSelected -> newPeriod=$newPeriod" }
-					onPeriodSelected(newPeriod)
-				},
-				onSaveBudget = { newSettings ->
-					logcat { "BudgetPeriodSheet onSaveBudget -> $newSettings" }
-					onSaveBudget(newSettings)
-					scope.launch { sheetState.hide() }
-					onHideBudgetPeriodSheet()
-				},
-				onEditBudget = {
-					// Re-enter the sheet in edit mode (force setup)
-					onShowBudgetPeriodSheet()
-					scope.launch { sheetState.hide() }
-				},
-				onFinishEarly = {
-					onFinishBudgetEarly()
-					onOpenAnalytics()
-					scope.launch { sheetState.hide() }
-					onHideBudgetPeriodSheet()
-				},
-			)
-		}
-	}
+    if (showBudgetPeriodSheet) {
+        ModalBottomSheet(
+            onDismissRequest = onHideBudgetPeriodSheet,
+            sheetState = sheetState,
+        ) {
+            val shouldForceSetupMode = forceBudgetPeriodSheetSetup
+            logcat {
+                "Opening BudgetPeriodSheet: forceBudgetPeriodSheetSetup=$forceBudgetPeriodSheetSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$shouldForceSetupMode"
+            }
+            BudgetPeriodSheet(
+                budgetSettings = uiState.budgetSettings,
+                budgetState = uiState.budgetState,
+                selectedPeriod = selectedViewPeriod,
+                pendingExpensesCount = uiState.pendingExpensesForNextPeriod.size,
+                currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+                startInEditMode = shouldForceSetupMode,
+                onPeriodSelected = { newPeriod ->
+                    logcat { "BudgetPeriodSheet onPeriodSelected -> newPeriod=$newPeriod" }
+                    onPeriodSelected(newPeriod)
+                },
+                onSaveBudget = { newSettings ->
+                    logcat { "BudgetPeriodSheet onSaveBudget -> $newSettings" }
+                    onSaveBudget(newSettings)
+                    scope.launch { sheetState.hide() }
+                    onHideBudgetPeriodSheet()
+                },
+                onEditBudget = {
+                    // Re-enter the sheet in edit mode (force setup)
+                    onShowBudgetPeriodSheet()
+                    scope.launch { sheetState.hide() }
+                },
+                onFinishEarly = {
+                    onFinishBudgetEarly()
+                    onOpenAnalytics()
+                    scope.launch { sheetState.hide() }
+                    onHideBudgetPeriodSheet()
+                },
+            )
+        }
+    }
 }
 
 @Composable
 private fun EditingContent(
-	input: String,
-	onInputChange: (String) -> Unit,
-	currencyCode: String,
-	isCalculation: Boolean,
-	tags: List<String>,
-	currentComment: String,
-	onCommentUpdate: (String) -> Unit,
-	onDeleteTag: (String) -> Unit,
-	editorFocusController: FocusController,
-	modifier: Modifier = Modifier
+    input: String,
+    onInputChange: (String) -> Unit,
+    currencyCode: String,
+    isCalculation: Boolean,
+    tags: List<String>,
+    currentComment: String,
+    onCommentUpdate: (String) -> Unit,
+    onDeleteTag: (String) -> Unit,
+    editorFocusController: FocusController,
+    modifier: Modifier = Modifier
 ) {
-	val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
-	val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
+    val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
+    val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
 
-	val hasExpressionOperators = remember(input) { input.any { it in "+-×÷" } }
-	val showCalculationUi = hasExpressionOperators
+    val hasExpressionOperators = remember(input) { input.any { it in "+-×÷" } }
+    val showCalculationUi = hasExpressionOperators
 
-	val calculationResult = remember(input, showCalculationUi) {
-		if (!showCalculationUi || input.isEmpty()) return@remember null
+    val calculationResult = remember(input, showCalculationUi) {
+        if (!showCalculationUi || input.isEmpty()) return@remember null
 
-		val last = input.lastOrNull()
-		if (last != null && (last in "+-×÷" || last == '.')) {
-			null
-		} else {
-			evaluateCalculation(input)
-		}
-	}
+        val last = input.lastOrNull()
+        if (last != null && (last in "+-×÷" || last == '.')) {
+            null
+        } else {
+            evaluateCalculation(input)
+        }
+    }
 
-	val displayContent = if (showCalculationUi) {
-		"$currencySymbol $input"
-	} else {
-		try {
-			val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
-			currencyFormat.format(value)
-		} catch (e: Exception) {
-			input.ifEmpty { currencyFormat.format(BigDecimal.ZERO) }
-		}
-	}
+    val displayContent = if (showCalculationUi) {
+        "$currencySymbol $input"
+    } else {
+        try {
+            val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
+            currencyFormat.format(value)
+        } catch (e: Exception) {
+            input.ifEmpty { currencyFormat.format(BigDecimal.ZERO) }
+        }
+    }
 
-	val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
-		fontWeight = FontWeight.W500,
-		fontSize = 86.sp,
-	)
+    val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
+        fontWeight = FontWeight.W500,
+        fontSize = 86.sp,
+    )
 
-	BoxWithConstraints(
-		modifier = modifier.fillMaxSize()
-	) {
-		val density = LocalDensity.current
-		val availableWidth = maxWidth - 32.dp
-		val amountSlotHeight = 124.dp
-		val containerSizePx = remember(availableWidth, amountSlotHeight, density) {
-			with(density) {
-				IntSize(
-					width = availableWidth.toPx().toInt(), height = amountSlotHeight.toPx().toInt()
-				)
-			}
-		}
+    BoxWithConstraints(
+        modifier = modifier.fillMaxSize()
+    ) {
+        val density = LocalDensity.current
+        val availableWidth = maxWidth - 32.dp
+        val amountSlotHeight = 124.dp
+        val containerSizePx = remember(availableWidth, amountSlotHeight, density) {
+            with(density) {
+                IntSize(
+                    width = availableWidth.toPx().toInt(),
+                    height = amountSlotHeight.toPx().toInt()
+                )
+            }
+        }
 
-		Column(
-			modifier = Modifier.fillMaxSize()
-		) {
-			Box(
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(amountSlotHeight)
-					.padding(start = 16.dp, end = 16.dp), contentAlignment = Alignment.TopEnd
-			) {
-				AnimatedContent(
-					targetState = if (showCalculationUi && calculationResult != null) "result" else "input",
-					transitionSpec = {
-						(fadeIn(animationSpec = tween(200)) + slideInHorizontally(
-							animationSpec = tween(200)
-						) { it / 4 }) togetherWith (fadeOut(animationSpec = tween(200)) + slideOutHorizontally(
-							animationSpec = tween(200)
-						) { -it / 4 })
-					},
-					label = "EditorNumberTransition",
-					modifier = Modifier.fillMaxWidth()
-				) { state ->
-					if (state == "result" && showCalculationUi && calculationResult != null) {
-						Column(
-							horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()
-						) {
-							AutoResizeBasicTextField(
-								value = displayContent,
-								onValueChange = {},
-								readOnly = true,
-								modifier = Modifier.wrapContentWidth(Alignment.End),
-								textStyle = baseTextStyle.copy(
-									color = MaterialTheme.colorScheme.onSurface,
-									textAlign = TextAlign.End
-								),
-								singleLine = true,
-								minFontSize = 20.sp,
-								maxFontSize = 57.sp,
-								containerSize = containerSizePx
-							)
-							AutoResizeBasicTextField(
-								value = "= ${currencySymbol}$calculationResult",
-								onValueChange = {},
-								readOnly = true,
-								modifier = Modifier
-									.wrapContentWidth(Alignment.End)
-									.padding(top = 4.dp),
-								textStyle = baseTextStyle.copy(
-									color = MaterialTheme.colorScheme.onSurfaceVariant,
-									textAlign = TextAlign.End
-								),
-								singleLine = true,
-								minFontSize = 16.sp,
-								maxFontSize = 36.sp,
-								containerSize = containerSizePx
-							)
-						}
-					} else {
-						AutoResizeBasicTextField(
-							value = displayContent,
-							onValueChange = {},
-							readOnly = true,
-							modifier = Modifier.wrapContentWidth(Alignment.End),
-							textStyle = baseTextStyle.copy(
-								color = MaterialTheme.colorScheme.onSurface,
-								textAlign = TextAlign.End
-							),
-							singleLine = true,
-							containerSize = containerSizePx,
-							decorationBox = { innerTextField ->
-								Box { innerTextField() }
-							})
-					}
-				}
-			}
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(amountSlotHeight)
+                    .padding(start = 16.dp, end = 16.dp),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                AnimatedContent(
+                    targetState = if (showCalculationUi && calculationResult != null) "result" else "input",
+                    transitionSpec = {
+                        (
+                            fadeIn(animationSpec = tween(200)) + slideInHorizontally(
+                                animationSpec = tween(200)
+                            ) { it / 4 }
+                            ) togetherWith (
+                            fadeOut(animationSpec = tween(200)) + slideOutHorizontally(
+                                animationSpec = tween(200)
+                            ) { -it / 4 }
+                            )
+                    },
+                    label = "EditorNumberTransition",
+                    modifier = Modifier.fillMaxWidth()
+                ) { state ->
+                    if (state == "result" && showCalculationUi && calculationResult != null) {
+                        Column(
+                            horizontalAlignment = Alignment.End,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            AutoResizeBasicTextField(
+                                value = displayContent,
+                                onValueChange = {},
+                                readOnly = true,
+                                modifier = Modifier.wrapContentWidth(Alignment.End),
+                                textStyle = baseTextStyle.copy(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.End
+                                ),
+                                singleLine = true,
+                                minFontSize = 20.sp,
+                                maxFontSize = 57.sp,
+                                containerSize = containerSizePx
+                            )
+                            AutoResizeBasicTextField(
+                                value = "= ${currencySymbol}$calculationResult",
+                                onValueChange = {},
+                                readOnly = true,
+                                modifier = Modifier
+                                    .wrapContentWidth(Alignment.End)
+                                    .padding(top = 4.dp),
+                                textStyle = baseTextStyle.copy(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.End
+                                ),
+                                singleLine = true,
+                                minFontSize = 16.sp,
+                                maxFontSize = 36.sp,
+                                containerSize = containerSizePx
+                            )
+                        }
+                    } else {
+                        AutoResizeBasicTextField(
+                            value = displayContent,
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier.wrapContentWidth(Alignment.End),
+                            textStyle = baseTextStyle.copy(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.End
+                            ),
+                            singleLine = true,
+                            containerSize = containerSizePx,
+                            decorationBox = { innerTextField ->
+                                Box { innerTextField() }
+                            }
+                        )
+                    }
+                }
+            }
 
-			Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-			CategoryToolbar(
-				tags = tags,
-				currentComment = currentComment,
-				stage = EditStage.EDIT_SPENT,
-				onCommentUpdate = onCommentUpdate,
-				onDeleteTag = onDeleteTag,
-				editorFocusController = editorFocusController,
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(bottom = 26.dp)
-			)
-		}
-	}
+            CategoryToolbar(
+                tags = tags,
+                currentComment = currentComment,
+                stage = EditStage.EDIT_SPENT,
+                onCommentUpdate = onCommentUpdate,
+                onDeleteTag = onDeleteTag,
+                editorFocusController = editorFocusController,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 26.dp)
+            )
+        }
+    }
 }
 
 private fun evaluateCalculation(input: String): String? {
-	if (input.isBlank()) return null
+    if (input.isBlank()) return null
 
-	return try {
-		val normalized = input.trim().replace("×", "*").replace("÷", "/")
+    return try {
+        val normalized = input.trim().replace("×", "*").replace("÷", "/")
 
-		normalized.lastOrNull()?.let { if (it in "+-*/") return null }
+        normalized.lastOrNull()?.let { if (it in "+-*/") return null }
 
-		val hasOperator = normalized.any { it in "+-*/" }
+        val hasOperator = normalized.any { it in "+-*/" }
 
-		if (!hasOperator) {
-			val num = normalized.toBigDecimalOrNull() ?: return null
-			return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
-				num.toBigInteger().toString()
-			} else {
-				num.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
-			}
-		}
+        if (!hasOperator) {
+            val num = normalized.toBigDecimalOrNull() ?: return null
+            return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
+                num.toBigInteger().toString()
+            } else {
+                num.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+            }
+        }
 
-		val tokenPattern = Regex("([+\\-*/])")
-		val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
-		val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
+        val tokenPattern = Regex("([+\\-*/])")
+        val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
+        val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
 
-		if (parts.isEmpty() || parts[0].isEmpty()) return null
+        if (parts.isEmpty() || parts[0].isEmpty()) return null
 
-		if (operators.size > parts.size - 1) return null
+        if (operators.size > parts.size - 1) return null
 
-		var result = parts[0].toBigDecimalOrNull() ?: return null
+        var result = parts[0].toBigDecimalOrNull() ?: return null
 
-		for (i in operators.indices) {
-			if (i + 1 >= parts.size) break
-			val operator = operators[i]
-			val nextNum = parts[i + 1].toBigDecimalOrNull() ?: return null
+        for (i in operators.indices) {
+            if (i + 1 >= parts.size) break
+            val operator = operators[i]
+            val nextNum = parts[i + 1].toBigDecimalOrNull() ?: return null
 
-			result = when (operator) {
-				"+" -> result + nextNum
-				"-" -> result - nextNum
-				"*" -> result * nextNum
-				"/" -> {
-					if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null
-					result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
-				}
+            result = when (operator) {
+                "+" -> result + nextNum
+                "-" -> result - nextNum
+                "*" -> result * nextNum
+                "/" -> {
+                    if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null
+                    result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
+                }
 
-				else -> return null
-			}
-		}
+                else -> return null
+            }
+        }
 
-		if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
-			result.toBigInteger().toString()
-		} else {
-			result.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
-		}
-	} catch (e: Exception) {
-		null
-	}
+        if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
+            result.toBigInteger().toString()
+        } else {
+            result.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
+        }
+    } catch (e: Exception) {
+        null
+    }
 }
 
 @Composable
 private fun RecurrenceModeToggle(
-	isEnabled: Boolean,
-	onToggle: (Boolean) -> Unit,
-	icon: ImageVector,
-	contentDescription: String,
-	modifier: Modifier = Modifier,
+    isEnabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+    icon: ImageVector,
+    contentDescription: String,
+    modifier: Modifier = Modifier,
 ) {
-	val containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
-	val contentColor = MaterialTheme.colorScheme.tertiary
-	val selectedColor = contentColor.copy(alpha = 0.22f)
+    val containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
+    val contentColor = MaterialTheme.colorScheme.tertiary
+    val selectedColor = contentColor.copy(alpha = 0.22f)
 
-	Card(
-		modifier = modifier.height(50.dp), shape = CircleShape, colors = CardDefaults.cardColors(
-			containerColor = containerColor,
-			contentColor = contentColor,
-		), onClick = { onToggle(!isEnabled) }) {
-		Box(
-			modifier = Modifier
-				.fillMaxHeight()
-				.padding(horizontal = 6.dp, vertical = 6.dp)
-				.clip(CircleShape)
-				.background(if (isEnabled) selectedColor else Color.Transparent)
-				.padding(horizontal = 14.dp, vertical = 8.dp),
-			contentAlignment = Alignment.Center,
-		) {
-			Icon(
-				imageVector = icon,
-				contentDescription = contentDescription,
-				modifier = Modifier.size(24.dp)
-			)
-		}
-	}
+    Card(
+        modifier = modifier.height(50.dp),
+        shape = CircleShape,
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+        ),
+        onClick = { onToggle(!isEnabled) }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 6.dp, vertical = 6.dp)
+                .clip(CircleShape)
+                .background(if (isEnabled) selectedColor else Color.Transparent)
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
 }
 
 @Composable
 private fun CreditCutoffDayDialog(
-	onDismiss: () -> Unit,
-	onConfirm: (Int) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit,
 ) {
-	var cutoffDayInput by remember { mutableStateOf("15") }
-	val cutoffDay = cutoffDayInput.toIntOrNull()
-	val isValid = cutoffDay != null && cutoffDay in 1..31
+    var cutoffDayInput by remember { mutableStateOf("15") }
+    val cutoffDay = cutoffDayInput.toIntOrNull()
+    val isValid = cutoffDay != null && cutoffDay in 1..31
 
-	AlertDialog(
-		onDismissRequest = onDismiss,
-		title = {
-			Text(
-				text = stringResource(R.string.credit_cutoff_dialog_title),
-				style = MaterialTheme.typography.titleMediumEmphasized
-			)
-		},
-		text = {
-			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-				Text(text = stringResource(R.string.credit_cutoff_dialog_message))
-				OutlinedTextField(
-					value = cutoffDayInput,
-					onValueChange = { value ->
-						cutoffDayInput = value.filter { it.isDigit() }.take(2)
-					},
-					label = { Text(stringResource(R.string.credit_cutoff_dialog_label)) },
-					singleLine = true,
-					isError = cutoffDayInput.isNotBlank() && !isValid,
-				)
-			}
-		},
-		confirmButton = {
-			Button(onClick = { cutoffDay?.let(onConfirm) }, enabled = isValid) {
-				Text(
-					stringResource(R.string.save),
-					style = MaterialTheme.typography.labelSmallEmphasized
-				)
-			}
-		},
-		dismissButton = {
-			TextButton(onClick = onDismiss) {
-				Text(
-					stringResource(R.string.cancel),
-					style = MaterialTheme.typography.labelSmallEmphasized
-				)
-			}
-		})
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.credit_cutoff_dialog_title),
+                style = MaterialTheme.typography.titleMediumEmphasized
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(text = stringResource(R.string.credit_cutoff_dialog_message))
+                OutlinedTextField(
+                    value = cutoffDayInput,
+                    onValueChange = { value ->
+                        cutoffDayInput = value.filter { it.isDigit() }.take(2)
+                    },
+                    label = { Text(stringResource(R.string.credit_cutoff_dialog_label)) },
+                    singleLine = true,
+                    isError = cutoffDayInput.isNotBlank() && !isValid,
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = { cutoffDay?.let(onConfirm) }, enabled = isValid) {
+                Text(
+                    stringResource(R.string.save),
+                    style = MaterialTheme.typography.labelSmallEmphasized
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    stringResource(R.string.cancel),
+                    style = MaterialTheme.typography.labelSmallEmphasized
+                )
+            }
+        }
+    )
 }
 
 @Composable
 private fun IdleContent(
-	budgetState: BudgetState?, currencyCode: String, modifier: Modifier = Modifier
+    budgetState: BudgetState?,
+    currencyCode: String,
+    modifier: Modifier = Modifier
 ) {
-	val cursorVisible = remember { mutableStateOf(true) }
-	LaunchedEffect(Unit) {
-		while (true) {
-			delay(530)
-			cursorVisible.value = !cursorVisible.value
-		}
-	}
+    val cursorVisible = remember { mutableStateOf(true) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(530)
+            cursorVisible.value = !cursorVisible.value
+        }
+    }
 
-	Box(
-		modifier = modifier
-			.fillMaxWidth()
-			.padding(horizontal = 16.dp),
-		contentAlignment = Alignment.CenterEnd
-	) {
-		Text(
-			text = if (cursorVisible.value) "|" else "",
-			style = MaterialTheme.typography.displayLarge,
-			color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-		)
-	}
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Text(
+            text = if (cursorVisible.value) "|" else "",
+            style = MaterialTheme.typography.displayLarge,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+        )
+    }
 }
 
 @Preview(showBackground = true, device = "id:pixel_5", backgroundColor = 0xFF121212)
 @Composable
 fun EditorPreview_Idle() {
-	MinusTheme {
-		Editor(
-			uiState = BudgetUiState(
-				budgetSettings = BudgetSettings(
-					totalBudget = BigDecimal("500.00"),
-					period = BudgetPeriod.DAILY,
-					startDate = LocalDate.now(),
-					currencyCode = "USD"
-				), budgetState = BudgetState(
-					remainingToday = BigDecimal("110.00"),
-					totalSpentToday = BigDecimal("12.50"),
-					dailyBudget = BigDecimal("122.50"),
-					daysRemaining = 15,
-					progress = 0.1f,
-					isOverBudget = false,
-					totalBudget = BigDecimal("500.00"),
-					totalSpentInPeriod = BigDecimal("12.50")
-				), transactions = emptyList(), numpadInput = "", isNumpadValid = false
-			),
-			animState = AnimState.IDLE,
-			onFocus = {},
-			onOpenHistory = {},
-			onOpenSettings = {},
-			onCommentClick = {},
-			onCommentUpdate = {},
-			onDeleteTag = {},
-			onRecurrentToggle = {},
-			onCreditToggle = {},
-			onDismissRecurrentDialog = {},
-			onDismissCreditCutoffDialog = {},
-			onRecurrentExpenseConfirm = { _, _, _ -> },
-			onCreditCutoffConfirm = {})
-	}
+    MinusTheme {
+        Editor(
+            uiState = BudgetUiState(
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("500.00"),
+                    period = BudgetPeriod.DAILY,
+                    startDate = LocalDate.now(),
+                    currencyCode = "USD"
+                ),
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal("110.00"),
+                    totalSpentToday = BigDecimal("12.50"),
+                    dailyBudget = BigDecimal("122.50"),
+                    daysRemaining = 15,
+                    progress = 0.1f,
+                    isOverBudget = false,
+                    totalBudget = BigDecimal("500.00"),
+                    totalSpentInPeriod = BigDecimal("12.50")
+                ),
+                transactions = emptyList(),
+                numpadInput = "",
+                isNumpadValid = false
+            ),
+            animState = AnimState.IDLE,
+            onFocus = {},
+            onOpenHistory = {},
+            onOpenSettings = {},
+            onCommentClick = {},
+            onCommentUpdate = {},
+            onDeleteTag = {},
+            onRecurrentToggle = {},
+            onCreditToggle = {},
+            onDismissRecurrentDialog = {},
+            onDismissCreditCutoffDialog = {},
+            onRecurrentExpenseConfirm = { _, _, _ -> },
+            onCreditCutoffConfirm = {}
+        )
+    }
 }
 
 @Preview(showBackground = true, device = "id:Nexus One", backgroundColor = 0xFF121212)
 @Composable
 fun EditorPreview_Editing() {
-	MinusTheme {
-		Editor(
-			uiState = BudgetUiState(
-				budgetSettings = BudgetSettings(
-					totalBudget = BigDecimal("500.00"),
-					period = BudgetPeriod.DAILY,
-					startDate = LocalDate.now(),
-					currencyCode = "USD"
-				), budgetState = BudgetState(
-					remainingToday = BigDecimal("110.00"),
-					totalSpentToday = BigDecimal("12.50"),
-					dailyBudget = BigDecimal("122.50"),
-					daysRemaining = 15,
-					progress = 0.1f,
-					isOverBudget = false,
-					totalBudget = BigDecimal("500.00"),
-					totalSpentInPeriod = BigDecimal("12.50")
-				), transactions = emptyList(), numpadInput = "250", isNumpadValid = true
-			),
-			animState = AnimState.EDITING,
-			onFocus = {},
-			onOpenHistory = {},
-			onOpenSettings = {},
-			onCommentClick = {},
-			onCommentUpdate = {},
-			onDeleteTag = {},
-			onRecurrentToggle = {},
-			onCreditToggle = {},
-			onDismissRecurrentDialog = {},
-			onDismissCreditCutoffDialog = {},
-			onRecurrentExpenseConfirm = { _, _, _ -> },
-			onCreditCutoffConfirm = {})
-	}
+    MinusTheme {
+        Editor(
+            uiState = BudgetUiState(
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("500.00"),
+                    period = BudgetPeriod.DAILY,
+                    startDate = LocalDate.now(),
+                    currencyCode = "USD"
+                ),
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal("110.00"),
+                    totalSpentToday = BigDecimal("12.50"),
+                    dailyBudget = BigDecimal("122.50"),
+                    daysRemaining = 15,
+                    progress = 0.1f,
+                    isOverBudget = false,
+                    totalBudget = BigDecimal("500.00"),
+                    totalSpentInPeriod = BigDecimal("12.50")
+                ),
+                transactions = emptyList(),
+                numpadInput = "250",
+                isNumpadValid = true
+            ),
+            animState = AnimState.EDITING,
+            onFocus = {},
+            onOpenHistory = {},
+            onOpenSettings = {},
+            onCommentClick = {},
+            onCommentUpdate = {},
+            onDeleteTag = {},
+            onRecurrentToggle = {},
+            onCreditToggle = {},
+            onDismissRecurrentDialog = {},
+            onDismissCreditCutoffDialog = {},
+            onRecurrentExpenseConfirm = { _, _, _ -> },
+            onCreditCutoffConfirm = {}
+        )
+    }
 }

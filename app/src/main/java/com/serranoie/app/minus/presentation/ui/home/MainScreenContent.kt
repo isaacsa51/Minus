@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.home
+﻿package com.serranoie.app.minus.presentation.ui.home
 
 import android.util.Log
 import androidx.compose.animation.core.AnimationSpec
@@ -52,7 +52,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
+
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -142,18 +142,20 @@ fun MainScreenContent(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        snapshotFlow { mainScreenState.isSnackbarVisible }.collect { visible ->
-            if (visible) {
-                val result = snackbarHostState.showSnackbar(
-                    message = mainScreenState.snackbarMessage,
-                    actionLabel = mainScreenState.snackbarActionLabel,
-                    duration = SnackbarDuration.Short,
-                )
-                when (result) {
-                    SnackbarResult.ActionPerformed -> onProcessIntent(MainScreenUiIntent.CancelPendingDelete)
-                    SnackbarResult.Dismissed -> onProcessIntent(MainScreenUiIntent.DismissSnackbar)
-                }
+    LaunchedEffect(
+        mainScreenState.isSnackbarVisible,
+        mainScreenState.snackbarMessage,
+        mainScreenState.snackbarActionLabel,
+    ) {
+        if (mainScreenState.isSnackbarVisible) {
+            val result = snackbarHostState.showSnackbar(
+                message = mainScreenState.snackbarMessage,
+                actionLabel = mainScreenState.snackbarActionLabel,
+                duration = SnackbarDuration.Short,
+            )
+            when (result) {
+                SnackbarResult.ActionPerformed -> onProcessIntent(MainScreenUiIntent.CancelPendingDelete)
+                SnackbarResult.Dismissed -> onProcessIntent(MainScreenUiIntent.DismissSnackbar)
             }
         }
     }

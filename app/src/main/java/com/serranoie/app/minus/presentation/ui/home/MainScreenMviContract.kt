@@ -40,7 +40,7 @@ sealed interface MainScreenUiEffect {
         val actionLabel: String,
     ) : MainScreenUiEffect
 
-    data object RequestUndo : MainScreenUiEffect
+    data class RequestUndo(val transaction: Transaction) : MainScreenUiEffect
 
     data class UpdateDragProgress(val progress: Float) : MainScreenUiEffect
 
