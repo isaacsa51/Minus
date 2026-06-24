@@ -28,6 +28,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -97,6 +99,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
+import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.StatusBarPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -339,7 +342,14 @@ private fun MainNavigationRail(
             modifier = itemModifier,
             selected = false,
             onClick = onNavigateToSettings,
-            icon = { Icon(Icons.Rounded.Settings, contentDescription = "Settings") },
+            icon = {
+                val isCensored = LocalCensorMode.current
+                BadgedBox(
+                    badge = { if (isCensored) Badge() },
+                ) {
+                    Icon(Icons.Rounded.Settings, contentDescription = "Settings")
+                }
+            },
             label = { Text("Settings") })
         Spacer(Modifier.weight(1f))
     }

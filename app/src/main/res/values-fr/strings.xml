@@ -170,6 +170,11 @@
     <string name="onboarding_step_6_subtitle">Avec le temps, apprenez combien vous pouvez économiser et dépenser.</string>
     <string name="onboarding_set_budget_button">Continuer</string>
     <string name="recurrent_toggle_label">Récurrent</string>
+    <string name="censor_mode_alert_title">Mode censure activé</string>
+    <string name="censor_mode_alert_message">Toutes vos valeurs financières sont floutées.</string>
+    <string name="censor_mode_alert_dismiss">Compris</string>
+    <string name="censor_mode_card_label">Mode privé activé</string>
+    <string name="censor_mode_card_body">Couvrez le haut du téléphone (là où se trouve l\'appareil photo) avec votre main pendant environ une seconde pour l\'éteindre.</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Sélectionnez la période</string>

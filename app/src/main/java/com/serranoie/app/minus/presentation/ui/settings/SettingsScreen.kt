@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import dagger.hilt.android.EntryPointAccessors
 
 @Composable
@@ -18,6 +19,7 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val isCensored = LocalCensorMode.current
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
@@ -50,6 +52,7 @@ fun SettingsScreen(
     }
 
     Settings(
+        isCensored = isCensored,
         currentTheme = uiState.currentTheme,
         currentTypography = uiState.currentTypography,
         isMaterialYouEnabled = uiState.isMaterialYouEnabled,
