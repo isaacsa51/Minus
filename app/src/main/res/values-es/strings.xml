@@ -166,6 +166,7 @@
     <string name="onboarding_step_6_title">Gasta con cabeza</string>
     <string name="onboarding_step_6_subtitle">Con el tiempo, aprende cuánto puedes ahorrar y cuánto puedes gastar.</string>
     <string name="onboarding_set_budget_button">Continuar</string>
+    <string name="recurrent_toggle_label">Recurrente</string>
 
     <string name="onboarding_finish_date_selector_title">Selecciona el periodo</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d días · %2$s - %3$s</string>

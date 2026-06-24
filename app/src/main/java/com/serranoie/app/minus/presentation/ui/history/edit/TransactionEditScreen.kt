@@ -39,6 +39,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorStat
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -46,6 +47,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Transaction as NumpadTransaction
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,9 +147,13 @@ fun TransactionEditScreen(
         ) {
             RecurrenceToggleButton(
                 isRecurrent = isRecurrent,
-                selectedFrequency = selectedFrequency,
-                subscriptionDay = subscriptionDay,
-                onClick = { showRecurrentBottomSheet = true },
+                onToggle = {
+                    scope.launch {
+                        delay(180.milliseconds)
+                        showRecurrentBottomSheet = true
+                    }
+                },
+                modifier = Modifier.weight(1f),
             )
 
             TransactionDateTimeRow(
@@ -259,7 +265,8 @@ fun TransactionEditScreen(
             },
             onDelete = {
                 onCancel()
-            }
+            },
+            enableCalculationMode = false,
         )
     }
 
@@ -302,7 +309,7 @@ fun TransactionEditScreen(
             sheetState = sheetState
         ) {
             RecurrenceConfigSheet(
-                isRecurrent = isRecurrent,
+                isRecurrent = true,
                 selectedFrequency = selectedFrequency,
                 subscriptionDay = subscriptionDay,
                 recurrentEndDate = recurrentEndDate,

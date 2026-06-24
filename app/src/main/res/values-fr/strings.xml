@@ -169,6 +169,7 @@
     <string name="onboarding_step_6_title">Dépensez malin</string>
     <string name="onboarding_step_6_subtitle">Avec le temps, apprenez combien vous pouvez économiser et dépenser.</string>
     <string name="onboarding_set_budget_button">Continuer</string>
+    <string name="recurrent_toggle_label">Récurrent</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Sélectionnez la période</string>

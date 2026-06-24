@@ -12,6 +12,7 @@ import com.serranoie.app.minus.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import androidx.compose.ui.tooling.preview.Preview
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 
@@ -25,7 +26,7 @@ internal fun EditDatePickerDialog(
     onDateSelected: (LocalDate) -> Unit,
 ) {
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialDate.atStartOfDay(ZoneId.systemDefault())
+        initialSelectedDateMillis = initialDate.atStartOfDay(ZoneOffset.UTC)
             .toInstant()
             .toEpochMilli()
     )
@@ -37,7 +38,7 @@ internal fun EditDatePickerDialog(
                 onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
                         val selectedDate =
-                            Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
+                            Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC)
                                 .toLocalDate()
                         onDateSelected(selectedDate)
                     }

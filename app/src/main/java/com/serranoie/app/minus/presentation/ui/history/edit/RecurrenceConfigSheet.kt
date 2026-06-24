@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.history.edit
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -48,9 +49,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import java.time.Instant
@@ -58,8 +61,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import androidx.compose.ui.tooling.preview.Preview
-import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -69,10 +70,7 @@ internal fun RecurrenceConfigSheet(
     subscriptionDay: Int,
     recurrentEndDate: LocalDate,
     onSaveConfiguration: (
-        isRecurrent: Boolean,
-        frequency: RecurrentFrequency,
-        subscriptionDay: Int,
-        endDate: LocalDate
+        isRecurrent: Boolean, frequency: RecurrentFrequency, subscriptionDay: Int, endDate: LocalDate
     ) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -100,38 +98,8 @@ internal fun RecurrenceConfigSheet(
                 style = MaterialTheme.typography.titleMediumEmphasized,
             )
 
-            IconButton(onClick = {
-                onSaveConfiguration(
-                    localIsRecurrent,
-                    localSelectedFrequency,
-                    localSubscriptionDay,
-                    localRecurrentEndDate,
-                )
-                onDismiss()
-            }) {
-                Icon(
-                    imageVector = Icons.Default.SaveAlt,
-                    contentDescription = stringResource(R.string.save),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.recurrent_expense),
-                style = MaterialTheme.typography.bodyLarge
-            )
             Switch(
-                checked = localIsRecurrent,
-                onCheckedChange = { localIsRecurrent = it }
-            )
+                checked = localIsRecurrent, onCheckedChange = { localIsRecurrent = it })
         }
 
         if (localIsRecurrent) {
@@ -172,7 +140,7 @@ internal fun RecurrenceConfigSheet(
                             else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                         },
                     ) {
-                        Text(label)
+                        Text(label, style = MaterialTheme.typography.labelMediumCondensed)
                     }
                 }
             }
@@ -202,8 +170,10 @@ internal fun RecurrenceConfigSheet(
                     Icon(
                         imageVector = Icons.Default.CalendarToday,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outlineVariant,
-                    )
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable {
+                            showEndDatePicker = true
+                        })
                 },
                 shape = RoundedCornerShape(14.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -216,19 +186,13 @@ internal fun RecurrenceConfigSheet(
                 singleLine = true,
             )
 
-            TextButton(
-                onClick = { showEndDatePicker = true },
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text(stringResource(R.string.change_date))
-            }
-
             OutlinedCard(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
                 shape = MaterialTheme.shapes.large,
                 border = BorderStroke(
-                    1.dp,
-                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                 ),
                 colors = CardDefaults.outlinedCardColors(
                     containerColor = Color.Transparent
@@ -260,44 +224,55 @@ internal fun RecurrenceConfigSheet(
             }
         }
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(12.dp))
+
+        Button(
+            modifier = Modifier.fillMaxWidth(), onClick = {
+                onSaveConfiguration(
+                    localIsRecurrent,
+                    localSelectedFrequency,
+                    localSubscriptionDay,
+                    localRecurrentEndDate,
+                )
+                onDismiss()
+            }) {
+            Text(
+                text = stringResource(R.string.save),
+                style = MaterialTheme.typography.labelSmallEmphasized
+            )
+        }
+
+        Spacer(Modifier.height(12.dp))
     }
 
     if (showEndDatePicker) {
         val datePickerState = rememberDatePickerState(
             initialSelectedDateMillis = localRecurrentEndDate.atStartOfDay(ZoneId.systemDefault())
-                .toInstant().toEpochMilli(),
-            selectableDates = object : SelectableDates {
+                .toInstant().toEpochMilli(), selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                     val date = Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneId.systemDefault())
                         .toLocalDate()
                     return date.isAfter(today) && !date.isAfter(maxSelectableDate)
                 }
-            }
-        )
+            })
 
-        DatePickerDialog(
-            onDismissRequest = { showEndDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            localRecurrentEndDate =
-                                Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
-                        }
-                        showEndDatePicker = false
+        DatePickerDialog(onDismissRequest = { showEndDatePicker = false }, confirmButton = {
+            TextButton(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        localRecurrentEndDate =
+                            Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
+                                .toLocalDate()
                     }
-                ) {
-                    Text(stringResource(R.string.accept))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showEndDatePicker = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
+                    showEndDatePicker = false
+                }) {
+                Text(stringResource(R.string.accept))
             }
-        ) {
+        }, dismissButton = {
+            TextButton(onClick = { showEndDatePicker = false }) {
+                Text(stringResource(R.string.cancel))
+            }
+        }) {
             DatePicker(state = datePickerState)
         }
     }
@@ -309,8 +284,7 @@ private fun MonthlySubscriptionDayRow(
     onDayChange: (Int) -> Unit,
 ) {
     Surface(
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceContainer
+        shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Row(
             modifier = Modifier
@@ -329,7 +303,7 @@ private fun MonthlySubscriptionDayRow(
 
             Text(
                 text = stringResource(R.string.monthly_on_day_format, day),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleSmallEmphasized
             )
 
             IconButton(onClick = { onDayChange((day + 1).coerceAtMost(31)) }) {
@@ -354,14 +328,11 @@ private fun buildRecurrentSummary(
     return when (frequency) {
         RecurrentFrequency.WEEKLY -> stringResource(R.string.summary_weekly_format, formattedDate)
         RecurrentFrequency.BIWEEKLY -> stringResource(
-            R.string.summary_biweekly_format,
-            formattedDate
+            R.string.summary_biweekly_format, formattedDate
         )
 
         RecurrentFrequency.MONTHLY -> stringResource(
-            R.string.summary_monthly_format,
-            selectedDay,
-            formattedDate
+            R.string.summary_monthly_format, selectedDay, formattedDate
         )
     }
 }

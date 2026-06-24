@@ -95,6 +95,7 @@ fun Numpad(
 	onDragProgressChanged: (Float) -> Unit = {},
 	dragProgress: Float = 0f,
 	rowHeight: Dp = 55.dp, // Still kept for backward compatibility but internal logic now uses weights
+	enableCalculationMode: Boolean = true,
 ) {
 	val view = LocalView.current
 	val haptic = LocalHapticFeedback.current
@@ -125,11 +126,12 @@ fun Numpad(
 			.fillMaxWidth()
 			.windowInsetsPadding(WindowInsets.navigationBars)
 			.padding(horizontal = 14.dp)
-			.pointerInput(isCalculation, hasOperators) {
-				var accumulatedDrag = 0f
-				var lastReportedProgress = 0f
-				var lastTickProgress = 0f
-				var hasTriggered = false
+.pointerInput(isCalculation, hasOperators, enableCalculationMode) {
+			if (!enableCalculationMode) return@pointerInput
+			var accumulatedDrag = 0f
+			var lastReportedProgress = 0f
+			var lastTickProgress = 0f
+			var hasTriggered = false
 
 				detectVerticalDragGestures(
 					onDragStart = {

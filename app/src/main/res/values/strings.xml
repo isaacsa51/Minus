@@ -189,6 +189,7 @@
     <string name="onboarding_step_6_title">Spend wisely</string>
     <string name="onboarding_step_6_subtitle">Over time, learn how much you can save and how much you can spend.</string>
     <string name="onboarding_set_budget_button">Continue</string>
+    <string name="recurrent_toggle_label">Recurrent</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Select the period</string>
