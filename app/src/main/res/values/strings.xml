@@ -190,6 +190,11 @@
     <string name="onboarding_step_6_subtitle">Over time, learn how much you can save and how much you can spend.</string>
     <string name="onboarding_set_budget_button">Continue</string>
     <string name="recurrent_toggle_label">Recurrent</string>
+    <string name="censor_mode_alert_title">Censor mode is active</string>
+    <string name="censor_mode_alert_message">All your financial values are currently blurred.</string>
+    <string name="censor_mode_alert_dismiss">Got it</string>
+    <string name="censor_mode_card_label">Privacy mode activated</string>
+    <string name="censor_mode_card_body">Cover the top of the phone (where the camera sits) with your hand for about a second to turn it off.</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Select the period</string>

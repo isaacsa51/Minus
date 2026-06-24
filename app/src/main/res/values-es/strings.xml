@@ -167,6 +167,11 @@
     <string name="onboarding_step_6_subtitle">Con el tiempo, aprende cuánto puedes ahorrar y cuánto puedes gastar.</string>
     <string name="onboarding_set_budget_button">Continuar</string>
     <string name="recurrent_toggle_label">Recurrente</string>
+    <string name="censor_mode_alert_title">Modo de censura activo</string>
+    <string name="censor_mode_alert_message">Todos tus valores financieros están difuminados.</string>
+    <string name="censor_mode_alert_dismiss">Entendido</string>
+    <string name="censor_mode_card_label">Modo privado activado</string>
+    <string name="censor_mode_card_body">Cubre la parte superior del teléfono (donde está la cámara) con la mano durante un segundo para desactivarlo.</string>
 
     <string name="onboarding_finish_date_selector_title">Selecciona el periodo</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d días · %2$s - %3$s</string>
