@@ -24,6 +24,7 @@ import com.serranoie.app.minus.presentation.appTypography
 import com.serranoie.app.minus.presentation.dynamicColorEnabled
 import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
+import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferManager
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
 import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY

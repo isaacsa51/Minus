@@ -58,9 +58,6 @@ import androidx.compose.ui.window.PopupPositionProvider
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 
-/**
- * Controller for managing focus between the custom tag editor and system components.
- */
 class FocusController {
     var onFocus: MutableState<(() -> Unit)?> = mutableStateOf(null)
     var onBlur: MutableState<(() -> Unit)?> = mutableStateOf(null)
@@ -73,7 +70,6 @@ class FocusController {
         onBlur.value?.let { it() }
     }
 }
-
 
 
 @Composable
@@ -142,11 +138,11 @@ fun CategoryToolbar(
                         )
                     ) { with(localDensity) { 24.dp.toPx().toInt() } },
                 ) {
-	                CategoryTag(value = tag, onClick = {
-	                onCommentUpdate(tag)
-                }, onDelete = {
-	                onDeleteTag(tag)
-                })
+                    CategoryTag(value = tag, onClick = {
+                        onCommentUpdate(tag)
+                    }, onDelete = {
+                        onDeleteTag(tag)
+                    })
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -154,7 +150,7 @@ fun CategoryToolbar(
             if (tags.isNotEmpty()) {
                 Spacer(modifier = Modifier.width(8.dp))
             }
-            
+
             AnimatedVisibility(
                 visible = showAddComment,
                 enter = fadeIn(
@@ -208,7 +204,6 @@ internal data class DropdownMenuPositionProvider(
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
     ): IntOffset {
-        val verticalMargin = with(density) { 48.dp.roundToPx() }
         val topBarHeightPx = with(density) { topBarHeight.roundToPx() }
         // The content offset specified using the dropdown offset parameter.
         val contentOffsetX = with(density) { contentOffset.x.roundToPx() }
@@ -313,29 +308,29 @@ fun CommentEditor(
 @Composable
 private fun CategoryToolbarPreview() {
     MinusTheme {
-			CategoryToolbar(
-				tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
-				currentComment = "Groceries",
-				stage = EditStage.EDIT_SPENT,
-				onCommentUpdate = {},
-				editorFocusController = remember { FocusController() },
-				modifier = Modifier.padding(vertical = 16.dp)
-			)
-		}
+        CategoryToolbar(
+            tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
+            currentComment = "Groceries",
+            stage = EditStage.EDIT_SPENT,
+            onCommentUpdate = {},
+            editorFocusController = remember { FocusController() },
+            modifier = Modifier.padding(vertical = 16.dp)
+        )
+    }
 }
 
 
 @Preview(name = "Empty with suggestion")
 @Composable
 private fun CategoryToolbarPreviewEmpty() {
-	MinusTheme {
-			CategoryToolbar(
-				tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
-				currentComment = "",
-				stage = EditStage.EDIT_SPENT,
-				onCommentUpdate = {},
-				editorFocusController = remember { FocusController() },
-				modifier = Modifier.padding(vertical = 16.dp)
-			)
-		}
+    MinusTheme {
+        CategoryToolbar(
+            tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
+            currentComment = "",
+            stage = EditStage.EDIT_SPENT,
+            onCommentUpdate = {},
+            editorFocusController = remember { FocusController() },
+            modifier = Modifier.padding(vertical = 16.dp)
+        )
+    }
 }

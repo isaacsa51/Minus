@@ -61,6 +61,7 @@ import com.serranoie.app.minus.navigation.AppNavGraph
 import com.serranoie.app.minus.navigation.Screen
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.permission.PermissionHandler
+import com.serranoie.app.minus.presentation.ui.changelog.ChangelogGate
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.ThemeManager
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
@@ -259,19 +260,30 @@ class MainActivity : ComponentActivity() {
                             val navController = rememberNavController()
 
                             key(startDestination) {
-                                AppNavGraph(
-                                    activityResultRegistryOwner = activityResultRegistryOwner,
-                                    startDestination = startDestination,
-                                    navController = navController,
-                                    onOnboardingComplete = {
-                                        lifecycleScope.launch {
-                                            logcat {
-                                                "onOnboardingComplete -> writing onboarding_completed=true"
+                                ChangelogGate(
+                                    currentVersionCode = run {
+                                        val info = context.packageManager.getPackageInfo(
+                                            context.packageName,
+                                            0,
+                                        )
+                                        @Suppress("DEPRECATION")
+                                        info.longVersionCode.toInt()
+                                    },
+                                ) {
+                                    AppNavGraph(
+                                        activityResultRegistryOwner = activityResultRegistryOwner,
+                                        startDestination = startDestination,
+                                        navController = navController,
+                                        onOnboardingComplete = {
+                                            lifecycleScope.launch {
+                                                logcat {
+                                                    "onOnboardingComplete -> writing onboarding_completed=true"
+                                                }
+                                                settingsRepository.setOnboardingCompleted(true)
                                             }
-                                            settingsRepository.setOnboardingCompleted(true)
                                         }
-                                    }
-                                )
+                                    )
+                                }
                             }
 
                             val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()

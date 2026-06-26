@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.settings
+package com.serranoie.app.minus.presentation.ui.settings.csv
 
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn

@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Alarm
@@ -39,6 +40,7 @@ import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -77,7 +79,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.serranoie.app.minus.BuildConfig
@@ -129,6 +131,7 @@ fun Settings(
 	onImportCsv: () -> Unit = {},
 	onResetTutorial: () -> Unit = {},
 	onBugReportClick: () -> Unit = {},
+	onNavigateToChangelog: () -> Unit = {},
 	onBack: () -> Unit = {},
 ) {
 	var showThemeDialog by remember { mutableStateOf(false) }
@@ -602,9 +605,44 @@ fun Settings(
 				) {
 					CustomPaddedListItem(
 						onClick = {
+							onNavigateToChangelog()
+							view.weakHapticFeedback()
+						},
+						position = PaddedListItemPosition.First,
+					) {
+						Icon(
+							imageVector = Icons.Default.AutoAwesome,
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.primary
+						)
+						Spacer(modifier = Modifier.width(16.dp))
+						Column(modifier = Modifier.weight(1f)) {
+							Text(
+								text = stringResource(R.string.changelog_settings_item_title),
+								style = MaterialTheme.typography.bodyMediumEmphasized,
+								color = MaterialTheme.colorScheme.onSurface
+							)
+							Text(
+								text = stringResource(
+									R.string.changelog_settings_item_subtitle,
+									BuildConfig.VERSION_NAME,
+								),
+								style = MaterialTheme.typography.bodySmall,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+						Icon(
+							imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.onSurfaceVariant,
+						)
+					}
+
+					CustomPaddedListItem(
+						onClick = {
 							Utils.openWebLink(context, "https://www.github.com/isaacsa51/Minus")
 							view.weakHapticFeedback()
-						}, position = PaddedListItemPosition.First
+						}, position = PaddedListItemPosition.Middle
 					) {
 						Icon(
 							imageVector = Icons.Default.QuestionMark,
@@ -1067,7 +1105,7 @@ private fun formatNotificationTime(
 		.format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
 }
 
-@PreviewScreenSizes
+@PreviewLightDark
 @Composable
 private fun PreviewSettings() {
 	MinusTheme {
