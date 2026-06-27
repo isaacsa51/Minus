@@ -335,9 +335,9 @@
     <!-- Budget Pill -->
     <string name="budget_pill_over_budget">Budget exhausted</string>
     <string name="budget_pill_no_budget">No budget</string>
-    <string name="budget_pill_exhausted_daily_label">daily</string>
-    <string name="budget_pill_exhausted_weekly_label">weekly</string>
-    <string name="budget_pill_exhausted_biweekly_label">biweekly</string>
+    <string name="budget_pill_exhausted_daily_label">Daily</string>
+    <string name="budget_pill_exhausted_weekly_label">Weekly</string>
+    <string name="budget_pill_exhausted_biweekly_label">Biweekly</string>
     <string name="budget_pill_exhausted_single">%1$s budget exhausted</string>
     <string name="budget_pill_exhausted_double">%1$s and %2$s budget exhausted</string>
     <string name="budget_pill_exhausted_triple">%1$s, %2$s and %3$s budget exhausted</string>

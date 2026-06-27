@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
-import com.serranoie.app.minus.presentation.ui.editor.EditBudgetContent
+import com.serranoie.app.minus.presentation.ui.editor.sheets.EditBudgetContent
 import com.serranoie.app.minus.presentation.ui.theme.component.wallet.WalletStatusBarStub
 
 @Composable

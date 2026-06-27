@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package com.serranoie.app.minus.presentation.ui.editor
+package com.serranoie.app.minus.presentation.ui.editor.sheets
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
@@ -181,17 +181,21 @@ fun BudgetPeriodSheet(
         targetState = isEditMode,
         transitionSpec = {
             if (targetState) {
-                (slideInHorizontally(
-                    initialOffsetX = { it / 3 }, animationSpec = tween(300)
-                ) + fadeIn(tween(250, delayMillis = 50))).togetherWith(
+                (
+                    slideInHorizontally(
+                        initialOffsetX = { it / 3 }, animationSpec = tween(300)
+                    ) + fadeIn(tween(250, delayMillis = 50))
+                    ).togetherWith(
                     slideOutHorizontally(
                         targetOffsetX = { -it / 3 }, animationSpec = tween(300)
                     ) + fadeOut(tween(200))
                 )
             } else {
-                (slideInHorizontally(
-                    initialOffsetX = { -it / 3 }, animationSpec = tween(300)
-                ) + fadeIn(tween(250, delayMillis = 50))).togetherWith(
+                (
+                    slideInHorizontally(
+                        initialOffsetX = { -it / 3 }, animationSpec = tween(300)
+                    ) + fadeIn(tween(250, delayMillis = 50))
+                    ).togetherWith(
                     slideOutHorizontally(
                         targetOffsetX = { it / 3 }, animationSpec = tween(300)
                     ) + fadeOut(tween(200))
@@ -386,12 +390,15 @@ private fun ViewBudgetContent(
                 Card(
                     modifier = Modifier
                         .weight(1f)
-                        .height(120.dp), colors = CardDefaults.cardColors(
+                        .height(120.dp),
+                    colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ), shape = RoundedCornerShape(12.dp)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Box(
-                        modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = stringResource(R.string.no_ending_date),
@@ -493,7 +500,9 @@ fun EditBudgetContent(
     }
 
     val pendingNotificationText = resources.getQuantityString(
-        R.plurals.pending_expense, pendingExpensesCount, pendingExpensesCount
+        R.plurals.pending_expense,
+        pendingExpensesCount,
+        pendingExpensesCount
     )
 
     val currentBudget = budgetSettings?.totalBudget ?: BigDecimal.ZERO
@@ -610,7 +619,8 @@ fun EditBudgetContent(
 
         if (showPreviousValuesChip && currentBudget > BigDecimal.ZERO) {
             Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
             ) {
                 AssistChip(
                     onClick = { showPreviousValues = !showPreviousValues },
@@ -681,13 +691,16 @@ fun EditBudgetContent(
                         }
 
                         Box(
-                            modifier = Modifier.weight(0.5f), contentAlignment = Alignment.CenterEnd
+                            modifier = Modifier.weight(0.5f),
+                            contentAlignment = Alignment.CenterEnd
                         ) {
                             IconButton(
                                 onClick = {
                                     budgetText = if (currentBudget > BigDecimal.ZERO) {
-                                        (currentBudget.multiply(BigDecimal(100))
-                                            .toBigInteger()).toString()
+                                        (
+                                            currentBudget.multiply(BigDecimal(100))
+                                                .toBigInteger()
+                                            ).toString()
                                     } else {
                                         ""
                                     }
@@ -699,7 +712,8 @@ fun EditBudgetContent(
                                     currencyCache = currentCurrency
                                     strategyCache = currentStrategy
                                     showPreviousValues = false
-                                }, modifier = Modifier.size(40.dp)
+                                },
+                                modifier = Modifier.size(40.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Check,
@@ -736,7 +750,8 @@ fun EditBudgetContent(
                     label = {
                         Text(
                             stringResource(
-                                R.string.use_previous_period_days, previousPeriodDays
+                                R.string.use_previous_period_days,
+                                previousPeriodDays
                             )
                         )
                     },
@@ -894,7 +909,8 @@ fun EditBudgetContent(
             onSelect = { code ->
                 currencyCache = code
                 showCurrencyPicker = false
-            })
+            }
+        )
     }
 
     if (showStrategyPicker) {
@@ -904,7 +920,8 @@ fun EditBudgetContent(
             onSelect = { strategy ->
                 strategyCache = strategy
                 showStrategyPicker = false
-            })
+            }
+        )
     }
 }
 
@@ -1154,7 +1171,8 @@ private fun CompactPeriodCard(
         modifier = modifier.clickable(onClick = onClick),
         onClick = onClick,
         border = BorderStroke(
-            width = if (isSelected) 2.dp else 1.dp, color = borderColor
+            width = if (isSelected) 2.dp else 1.dp,
+            color = borderColor
         ),
         colors = CardDefaults.outlinedCardColors(containerColor = backgroundColor),
     ) {
@@ -1170,11 +1188,14 @@ private fun CompactPeriodCard(
                     BudgetPeriod.WEEKLY -> stringResource(R.string.budget_period_weekly)
                     BudgetPeriod.BIWEEKLY -> stringResource(R.string.budget_period_biweekly)
                     BudgetPeriod.MONTHLY -> stringResource(R.string.budget_period_monthly)
-                }, style = if (isSelected) {
+                },
+                style = if (isSelected) {
                     MaterialTheme.typography.bodySmallEmphasized
                 } else {
                     MaterialTheme.typography.bodySmallCondensed
-                }, fontWeight = FontWeight.Medium, color = textColor
+                },
+                fontWeight = FontWeight.Medium,
+                color = textColor
             )
 
             Text(
@@ -1222,13 +1243,15 @@ private fun BudgetPeriodSheetPreview() {
                 currencyCode = "MXN",
                 onPeriodSelected = { },
                 onSaveBudget = { },
-                onFinishEarly = { })
+                onFinishEarly = { }
+            )
         }
     }
 }
 
 @Preview(
-    showBackground = true, device = "spec:width=1080px,height=2340px,dpi=440"
+    showBackground = true,
+    device = "spec:width=1080px,height=2340px,dpi=440"
 )
 @Composable
 private fun EditModePreview() {
