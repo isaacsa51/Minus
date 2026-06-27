@@ -11,10 +11,10 @@ import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
-import com.serranoie.app.minus.presentation.ui.editor.BUDGET_PERIOD_EDIT_BUTTON_TAG
-import com.serranoie.app.minus.presentation.ui.editor.BUDGET_PERIOD_SHEET_TAG
-import com.serranoie.app.minus.presentation.ui.editor.BudgetPeriodSheet
-import com.serranoie.app.minus.presentation.ui.editor.budgetPeriodCardTag
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_EDIT_BUTTON_TAG
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SHEET_TAG
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
+import com.serranoie.app.minus.presentation.ui.editor.sheets.budgetPeriodCardTag
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import me.saket.touchrobot.onNode
 import me.saket.touchrobot.rememberTouchRobot

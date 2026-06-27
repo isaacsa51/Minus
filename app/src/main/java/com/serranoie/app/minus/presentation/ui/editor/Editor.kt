@@ -2,6 +2,7 @@
 
 package com.serranoie.app.minus.presentation.ui.editor
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -18,9 +19,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,58 +29,63 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
+import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalculation
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
+import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
+import com.serranoie.app.minus.presentation.ui.editor.dialogs.RecurrentExpenseDialog
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTextField
@@ -94,6 +100,7 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -179,7 +186,6 @@ fun Editor(
                 centerRemainingAmount = animState == AnimState.EDITING,
                 onOpenSettings = onOpenSettings,
                 onOpenBudgetSheet = {
-// 					onBudgetPillClickForTutorial()
                     view.weakHapticFeedback()
                     onShowBudgetPeriodSheet()
                 },
@@ -205,20 +211,121 @@ fun Editor(
             ) { isEditing ->
                 if (isEditing) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        RecurrenceModeToggle(
-                            isEnabled = uiState.isRecurrentEnabled,
-                            onToggle = onRecurrentToggle,
-                            icon = Icons.Rounded.EventRepeat,
-                            contentDescription = "Recurrent payment",
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
                         if (showCreditQuickToggleFeature) {
-                            RecurrenceModeToggle(
-                                isEnabled = uiState.isCreditEnabled,
-                                onToggle = onCreditToggle,
-                                icon = Icons.Rounded.CreditCard,
-                                contentDescription = "Credit card payment",
-                            )
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    ButtonGroupDefaults.ConnectedSpaceBetween
+                                ),
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                val creditDescription = "Credit card payment"
+                                TooltipBox(
+                                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                                        TooltipAnchorPosition.Above
+                                    ),
+                                    tooltip = {
+                                        PlainTooltip(
+                                            modifier = Modifier.semantics {
+                                                liveRegion = LiveRegionMode.Assertive
+                                                paneTitle = creditDescription
+                                            }
+                                        ) { Text(creditDescription) }
+                                    },
+                                    state = rememberTooltipState(),
+                                ) {
+                                    ToggleButton(
+                                        checked = uiState.isCreditEnabled,
+                                        onCheckedChange = onCreditToggle,
+                                        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                                        modifier = Modifier.semantics { role = Role.RadioButton },
+                                        colors = ToggleButtonDefaults.toggleButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
+                                                alpha = 0.5f
+                                            ),
+                                            checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.CreditCard,
+                                            contentDescription = creditDescription
+                                        )
+                                    }
+                                }
+
+                                val recurrentDescription = "Recurrent payment"
+                                TooltipBox(
+                                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                                        TooltipAnchorPosition.Above
+                                    ),
+                                    tooltip = {
+                                        PlainTooltip(
+                                            modifier = Modifier.semantics {
+                                                liveRegion = LiveRegionMode.Assertive
+                                                paneTitle = recurrentDescription
+                                            }
+                                        ) { Text(recurrentDescription) }
+                                    },
+                                    state = rememberTooltipState(),
+                                ) {
+                                    ToggleButton(
+                                        checked = uiState.isRecurrentEnabled,
+                                        onCheckedChange = onRecurrentToggle,
+                                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                                        modifier = Modifier.semantics { role = Role.RadioButton },
+                                        colors = ToggleButtonDefaults.toggleButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
+                                                alpha = 0.5f
+                                            ),
+                                            checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.EventRepeat,
+                                            contentDescription = recurrentDescription
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            val recurrentDescription = "Recurrent payment"
+                            TooltipBox(
+                                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                                    TooltipAnchorPosition.Below
+                                ),
+                                tooltip = {
+                                    PlainTooltip(
+                                        modifier = Modifier.semantics {
+                                            liveRegion = LiveRegionMode.Assertive
+                                            paneTitle = recurrentDescription
+                                        }
+                                    ) { Text(recurrentDescription) }
+                                },
+                                state = rememberTooltipState(),
+                            ) {
+                                ToggleButton(
+                                    checked = uiState.isRecurrentEnabled,
+                                    onCheckedChange = onRecurrentToggle,
+                                    shapes = ToggleButtonDefaults.shapes(),
+                                    modifier = Modifier.semantics { role = Role.RadioButton },
+                                    colors = ToggleButtonDefaults.toggleButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
+                                            alpha = 0.5f
+                                        ),
+                                        checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                        checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.EventRepeat,
+                                        contentDescription = recurrentDescription
+                                    )
+                                }
+                            }
                         }
                     }
                 } else {
@@ -284,9 +391,7 @@ fun Editor(
                 AnimState.EDITING -> {
                     EditingContent(
                         input = uiState.numpadInput,
-                        onInputChange = onInputChange,
                         currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-                        isCalculation = uiState.isCalculation,
                         tags = uiState.tags,
                         currentComment = uiState.currentComment,
                         onCommentUpdate = onCommentUpdate,
@@ -300,8 +405,6 @@ fun Editor(
 
                 AnimState.IDLE, AnimState.RESET -> {
                     IdleContent(
-                        budgetState = uiState.budgetState,
-                        currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -329,9 +432,8 @@ fun Editor(
             onDismissRequest = onHideBudgetPeriodSheet,
             sheetState = sheetState,
         ) {
-            val shouldForceSetupMode = forceBudgetPeriodSheetSetup
             logcat {
-                "Opening BudgetPeriodSheet: forceBudgetPeriodSheetSetup=$forceBudgetPeriodSheetSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$shouldForceSetupMode"
+                "Opening BudgetPeriodSheet: forceBudgetPeriodSheetSetup=$forceBudgetPeriodSheetSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$forceBudgetPeriodSheetSetup"
             }
             BudgetPeriodSheet(
                 budgetSettings = uiState.budgetSettings,
@@ -339,7 +441,7 @@ fun Editor(
                 selectedPeriod = selectedViewPeriod,
                 pendingExpensesCount = uiState.pendingExpensesForNextPeriod.size,
                 currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-                startInEditMode = shouldForceSetupMode,
+                startInEditMode = forceBudgetPeriodSheetSetup,
                 onPeriodSelected = { newPeriod ->
                     logcat { "BudgetPeriodSheet onPeriodSelected -> newPeriod=$newPeriod" }
                     onPeriodSelected(newPeriod)
@@ -351,7 +453,6 @@ fun Editor(
                     onHideBudgetPeriodSheet()
                 },
                 onEditBudget = {
-                    // Re-enter the sheet in edit mode (force setup)
                     onShowBudgetPeriodSheet()
                     scope.launch { sheetState.hide() }
                 },
@@ -369,9 +470,7 @@ fun Editor(
 @Composable
 private fun EditingContent(
     input: String,
-    onInputChange: (String) -> Unit,
     currencyCode: String,
-    isCalculation: Boolean,
     tags: List<String>,
     currentComment: String,
     onCommentUpdate: (String) -> Unit,
@@ -383,10 +482,9 @@ private fun EditingContent(
     val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
 
     val hasExpressionOperators = remember(input) { input.any { it in "+-×÷" } }
-    val showCalculationUi = hasExpressionOperators
 
-    val calculationResult = remember(input, showCalculationUi) {
-        if (!showCalculationUi || input.isEmpty()) return@remember null
+    val calculationResult = remember(input, hasExpressionOperators) {
+        if (!hasExpressionOperators || input.isEmpty()) return@remember null
 
         val last = input.lastOrNull()
         if (last != null && (last in "+-×÷" || last == '.')) {
@@ -396,13 +494,13 @@ private fun EditingContent(
         }
     }
 
-    val displayContent = if (showCalculationUi) {
+    val displayContent = if (hasExpressionOperators) {
         "$currencySymbol $input"
     } else {
         try {
             val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
             currencyFormat.format(value)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             input.ifEmpty { currencyFormat.format(BigDecimal.ZERO) }
         }
     }
@@ -438,22 +536,22 @@ private fun EditingContent(
                 contentAlignment = Alignment.TopEnd
             ) {
                 AnimatedContent(
-                    targetState = if (showCalculationUi && calculationResult != null) "result" else "input",
+                    targetState = if (hasExpressionOperators && calculationResult != null) "result" else "input",
                     transitionSpec = {
                         (
-                            fadeIn(animationSpec = tween(200)) + slideInHorizontally(
-                                animationSpec = tween(200)
-                            ) { it / 4 }
-                            ) togetherWith (
-                            fadeOut(animationSpec = tween(200)) + slideOutHorizontally(
-                                animationSpec = tween(200)
-                            ) { -it / 4 }
-                            )
+                                fadeIn(animationSpec = tween(200)) + slideInHorizontally(
+                                    animationSpec = tween(200)
+                                ) { it / 4 }
+                                ) togetherWith (
+                                fadeOut(animationSpec = tween(200)) + slideOutHorizontally(
+                                    animationSpec = tween(200)
+                                ) { -it / 4 }
+                                )
                     },
                     label = "EditorNumberTransition",
                     modifier = Modifier.fillMaxWidth()
                 ) { state ->
-                    if (state == "result" && showCalculationUi && calculationResult != null) {
+                    if (state == "result" && hasExpressionOperators && calculationResult != null) {
                         Column(
                             horizontalAlignment = Alignment.End,
                             modifier = Modifier.fillMaxWidth()
@@ -526,162 +624,14 @@ private fun EditingContent(
     }
 }
 
-private fun evaluateCalculation(input: String): String? {
-    if (input.isBlank()) return null
-
-    return try {
-        val normalized = input.trim().replace("×", "*").replace("÷", "/")
-
-        normalized.lastOrNull()?.let { if (it in "+-*/") return null }
-
-        val hasOperator = normalized.any { it in "+-*/" }
-
-        if (!hasOperator) {
-            val num = normalized.toBigDecimalOrNull() ?: return null
-            return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
-                num.toBigInteger().toString()
-            } else {
-                num.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
-            }
-        }
-
-        val tokenPattern = Regex("([+\\-*/])")
-        val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
-        val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
-
-        if (parts.isEmpty() || parts[0].isEmpty()) return null
-
-        if (operators.size > parts.size - 1) return null
-
-        var result = parts[0].toBigDecimalOrNull() ?: return null
-
-        for (i in operators.indices) {
-            if (i + 1 >= parts.size) break
-            val operator = operators[i]
-            val nextNum = parts[i + 1].toBigDecimalOrNull() ?: return null
-
-            result = when (operator) {
-                "+" -> result + nextNum
-                "-" -> result - nextNum
-                "*" -> result * nextNum
-                "/" -> {
-                    if (nextNum.compareTo(BigDecimal.ZERO) == 0) return null
-                    result.divide(nextNum, 2, java.math.RoundingMode.HALF_UP)
-                }
-
-                else -> return null
-            }
-        }
-
-        if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
-            result.toBigInteger().toString()
-        } else {
-            result.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString()
-        }
-    } catch (e: Exception) {
-        null
-    }
-}
-
-@Composable
-private fun RecurrenceModeToggle(
-    isEnabled: Boolean,
-    onToggle: (Boolean) -> Unit,
-    icon: ImageVector,
-    contentDescription: String,
-    modifier: Modifier = Modifier,
-) {
-    val containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
-    val contentColor = MaterialTheme.colorScheme.tertiary
-    val selectedColor = contentColor.copy(alpha = 0.22f)
-
-    Card(
-        modifier = modifier.height(50.dp),
-        shape = CircleShape,
-        colors = CardDefaults.cardColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
-        ),
-        onClick = { onToggle(!isEnabled) }
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(horizontal = 6.dp, vertical = 6.dp)
-                .clip(CircleShape)
-                .background(if (isEnabled) selectedColor else Color.Transparent)
-                .padding(horizontal = 14.dp, vertical = 8.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun CreditCutoffDayDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (Int) -> Unit,
-) {
-    var cutoffDayInput by remember { mutableStateOf("15") }
-    val cutoffDay = cutoffDayInput.toIntOrNull()
-    val isValid = cutoffDay != null && cutoffDay in 1..31
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(R.string.credit_cutoff_dialog_title),
-                style = MaterialTheme.typography.titleMediumEmphasized
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(text = stringResource(R.string.credit_cutoff_dialog_message))
-                OutlinedTextField(
-                    value = cutoffDayInput,
-                    onValueChange = { value ->
-                        cutoffDayInput = value.filter { it.isDigit() }.take(2)
-                    },
-                    label = { Text(stringResource(R.string.credit_cutoff_dialog_label)) },
-                    singleLine = true,
-                    isError = cutoffDayInput.isNotBlank() && !isValid,
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = { cutoffDay?.let(onConfirm) }, enabled = isValid) {
-                Text(
-                    stringResource(R.string.save),
-                    style = MaterialTheme.typography.labelSmallEmphasized
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    stringResource(R.string.cancel),
-                    style = MaterialTheme.typography.labelSmallEmphasized
-                )
-            }
-        }
-    )
-}
-
 @Composable
 private fun IdleContent(
-    budgetState: BudgetState?,
-    currencyCode: String,
     modifier: Modifier = Modifier
 ) {
     val cursorVisible = remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
         while (true) {
-            delay(530)
+            delay(530.milliseconds)
             cursorVisible.value = !cursorVisible.value
         }
     }
@@ -700,7 +650,7 @@ private fun IdleContent(
     }
 }
 
-@Preview(showBackground = true, device = "id:pixel_5", backgroundColor = 0xFF121212)
+@Preview
 @Composable
 fun EditorPreview_Idle() {
     MinusTheme {
@@ -743,7 +693,7 @@ fun EditorPreview_Idle() {
     }
 }
 
-@Preview(showBackground = true, device = "id:Nexus One", backgroundColor = 0xFF121212)
+@PreviewLightDark
 @Composable
 fun EditorPreview_Editing() {
     MinusTheme {
@@ -770,6 +720,52 @@ fun EditorPreview_Editing() {
                 isNumpadValid = true
             ),
             animState = AnimState.EDITING,
+            onFocus = {},
+            onOpenHistory = {},
+            onOpenSettings = {},
+            onCommentClick = {},
+            onCommentUpdate = {},
+            onDeleteTag = {},
+            onRecurrentToggle = {},
+            onCreditToggle = {},
+            onDismissRecurrentDialog = {},
+            onDismissCreditCutoffDialog = {},
+            onRecurrentExpenseConfirm = { _, _, _ -> },
+            onCreditCutoffConfirm = {}
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Composable
+private fun EditorPreview_Editing_WithCredit() {
+    MinusTheme {
+        Editor(
+            uiState = BudgetUiState(
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("500.00"),
+                    period = BudgetPeriod.DAILY,
+                    startDate = LocalDate.now(),
+                    currencyCode = "USD"
+                ),
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal("110.00"),
+                    totalSpentToday = BigDecimal("12.50"),
+                    dailyBudget = BigDecimal("122.50"),
+                    daysRemaining = 15,
+                    progress = 0.1f,
+                    isOverBudget = false,
+                    totalBudget = BigDecimal("500.00"),
+                    totalSpentInPeriod = BigDecimal("12.50")
+                ),
+                transactions = emptyList(),
+                numpadInput = "250",
+                isNumpadValid = true,
+                isCreditEnabled = true,
+                isRecurrentEnabled = true
+            ),
+            animState = AnimState.EDITING,
+            showCreditQuickToggleFeature = true,
             onFocus = {},
             onOpenHistory = {},
             onOpenSettings = {},
