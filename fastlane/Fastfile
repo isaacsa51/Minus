@@ -45,12 +45,28 @@ platform :android do
     changelog_content
   end
 
+  desc "Convierte los changelogs de fastlane/metadata en app/src/main/assets/changelog.json"
+  desc "Lee fastlane/metadata/android/en-US/changelogs/*.txt (y overrides en fastlane/changelogs/*.json)"
+  desc "para regenerar el JSON consumido por ChangelogRepository.kt en la app."
+  lane :changelog_to_json do
+    gradle(
+      task: ":app:generateAppChangelogJson",
+      flags: "--quiet"
+    )
+    UI.success("changelog.json regenerado desde fastlane/metadata")
+  end
+
   desc "Genera el APK Release firmado y crea un Release en GitHub"
   lane :publish_github do
     version_tag = ENV.fetch("VERSION_TAG")
 
-    # Generar changelog automáticamente
+    # Generar changelog automáticamente (txt desde git log entre el tag
+    # anterior y el nuevo) y convertirlo a JSON para que el APK lleve las
+    # notas estructuradas en assets/changelog.json. El comando Gradle también
+    # corre implícitamente en preBuild, pero lo invocamos explícito para que
+    # el JSON se regenere ANTES de ensamblar los APKs Release.
     generate_changelog(version_tag: version_tag)
+    changelog_to_json
 
     gradle(
       task: ":app:assembleWearRelease"

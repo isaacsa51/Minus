@@ -106,7 +106,7 @@ dependencies {
 	implementation(libs.androidx.core.splashscreen)
 	implementation("androidx.datastore:datastore-preferences:1.1.7")
 	implementation("androidx.work:work-runtime-ktx:2.10.0")
-	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+	implementation(libs.kotlinx.serialization.json)
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 	androidTestImplementation(platform(libs.androidx.compose.bom))
 	androidTestImplementation(libs.androidx.compose.ui.test.junit4)

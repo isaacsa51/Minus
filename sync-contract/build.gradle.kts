@@ -9,7 +9,7 @@ version = "1.0"
 
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation(libs.kotlinx.serialization.json)
     testImplementation(kotlin("test"))
 }
 

@@ -197,6 +197,14 @@
     <string name="censor_mode_card_body">Cover the top of the phone (where the camera sits) with your hand for about a second to turn it off.</string>
     <string name="censor_mode_toast_enabled">Privacy mode enabled</string>
     <string name="censor_mode_toast_disabled">Privacy mode disabled</string>
+    <string name="changelog_settings_item_title">What\'s New</string>
+    <string name="changelog_settings_item_subtitle">See the latest features and fixes in v%1$s</string>
+    <string name="changelog_badge_feature">Feature</string>
+    <string name="changelog_badge_improvement">Improvement</string>
+    <string name="changelog_badge_bug_fix">Bug fix</string>
+    <string name="changelog_release_header">Version %1$s — %2$s</string>
+    <string name="changelog_close">Close</string>
+    <string name="changelog_previous_versions">Previous versions</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Select the period</string>

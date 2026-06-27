@@ -8,12 +8,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferEntryPoint
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import dagger.hilt.android.EntryPointAccessors
 
 @Composable
 fun SettingsScreen(
     onNavigateToBugReport: () -> Unit,
+    onNavigateToChangelog: () -> Unit = {},
     onNavigateBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -77,6 +79,7 @@ fun SettingsScreen(
         onImportCsv = viewModel::onImportCsv,
         onResetTutorial = viewModel::onResetTutorial,
         onBugReportClick = viewModel::onBugReportClick,
+        onNavigateToChangelog = onNavigateToChangelog,
         onBack = viewModel::onBack,
     )
 }

@@ -16,10 +16,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
+
+private const val TAG = "ISAAC:Onboarding"
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
@@ -35,6 +38,7 @@ class OnboardingViewModel @Inject constructor(
     val effects: SharedFlow<OnboardingUiEffect> = _effects.asSharedFlow()
 
     fun processIntent(intent: OnboardingUiIntent) {
+        logcat(TAG) { "processIntent: $intent (state before: currentStep=${_uiState.value.currentStep}, isCompleted=${_uiState.value.isCompleted})" }
         when (intent) {
             is OnboardingUiIntent.OnBudgetAmountChanged -> handleBudgetAmountChanged(intent.amount)
             is OnboardingUiIntent.OnDaysSelected -> handleDaysSelected(intent.days)
@@ -147,12 +151,15 @@ class OnboardingViewModel @Inject constructor(
      * nav graph opens next.
      */
     private fun handleWelcomeDismissed() {
+        logcat(TAG) { "handleWelcomeDismissed: setting onboarding_completed=true" }
         viewModelScope.launch {
             try {
                 settingsRepository.setOnboardingCompleted(true)
                 _uiState.update { it.copy(isCompleted = true) }
+                logcat(TAG) { "handleWelcomeDismissed: emitted OnboardingCompleted" }
                 _effects.emit(OnboardingUiEffect.OnboardingCompleted)
             } catch (e: Exception) {
+                logcat(TAG) { "handleWelcomeDismissed failed: ${e.message}" }
                 _effects.emit(OnboardingUiEffect.OnboardingFailed(e.message ?: "Unknown error"))
             }
         }

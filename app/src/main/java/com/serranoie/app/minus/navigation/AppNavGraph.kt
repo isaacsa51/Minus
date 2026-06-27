@@ -20,6 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsScreen
+import com.serranoie.app.minus.presentation.ui.changelog.ChangelogHistoryScreen
+import com.serranoie.app.minus.presentation.ui.changelog.ChangelogHistoryViewModel
 import com.serranoie.app.minus.presentation.ui.home.MainScreen
 import com.serranoie.app.minus.presentation.ui.onboarding.OnboardingScreen
 import com.serranoie.app.minus.presentation.ui.settings.SettingsScreen
@@ -27,9 +29,12 @@ import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportScree
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.wallet.Wallet
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
 import logcat.logcat
 
-private const val TAG = "AppNavGraph"
+private const val TAG = "ISAAC:AppNavGraph"
 
 private fun getScreenTransitions(
     initialState: NavBackStackEntry,
@@ -55,6 +60,7 @@ fun AppNavGraph(
     activityResultRegistryOwner: ActivityResultRegistryOwner?,
     startDestination: String,
     onOnboardingComplete: () -> Unit,
+    onRequestNotificationPermission: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val tag = TAG
@@ -167,6 +173,7 @@ fun AppNavGraph(
                 onNavigateToWallet = {
                     navController.navigate(Screen.Wallet.createRoute(false))
                 },
+                onRequestNotificationPermission = onRequestNotificationPermission,
             )
         }
 
@@ -177,9 +184,24 @@ fun AppNavGraph(
                 onNavigateToBugReport = {
                     navController.navigate(Screen.BugReport.route)
                 },
+                onNavigateToChangelog = {
+                    navController.navigate(Screen.Changelog.route)
+                },
                 onNavigateBack = {
                     navController.popBackStack()
                 },
+            )
+        }
+
+        composable(Screen.Changelog.route) {
+            logcat(tag) { "Navigating to Changelog" }
+
+            val viewModel = hiltViewModel<ChangelogHistoryViewModel>()
+            val releases by viewModel.releases.collectAsStateWithLifecycle()
+
+            ChangelogHistoryScreen(
+                releases = releases,
+                onBack = { navController.popBackStack() },
             )
         }
 

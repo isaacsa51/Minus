@@ -33,7 +33,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.rounded.Sell
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
@@ -165,7 +165,7 @@ fun EditableCategoryTag(
 
                 Icon(
                     modifier = Modifier.size(20.dp),
-                    imageVector = Icons.Default.Label,
+                    imageVector = Icons.Rounded.Sell,
                     contentDescription = null,
                 )
 

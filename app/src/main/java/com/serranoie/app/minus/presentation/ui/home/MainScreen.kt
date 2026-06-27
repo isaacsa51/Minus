@@ -14,9 +14,13 @@ import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
+import com.serranoie.app.minus.presentation.ui.changelog.ChangelogGate
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.ui.tutorial.firstLaunchTutorialStageFlow
 import kotlinx.coroutines.flow.map
+import logcat.logcat
+
+private const val TAG = "ISAAC:MainScreen"
 
 @Composable
 fun MainScreen(
@@ -24,6 +28,7 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToWallet: () -> Unit = {},
     openWalletOnStart: Boolean = false,
+    onRequestNotificationPermission: () -> Unit = {},
     budgetViewModel: BudgetViewModel = hiltViewModel(),
     mainScreenViewModel: MainScreenViewModel = hiltViewModel(),
 ) {
@@ -43,6 +48,13 @@ fun MainScreen(
         .collectAsStateWithLifecycle(initialValue = false)
 
     val undoSnackbarActionLabel = stringResource(R.string.undo)
+
+    logcat(TAG) { "MainScreen composed (openWalletOnStart=$openWalletOnStart)" }
+
+    LaunchedEffect(Unit) {
+        logcat(TAG) { "Triggering onRequestNotificationPermission from MainScreen LaunchedEffect" }
+        onRequestNotificationPermission()
+    }
 
     LaunchedEffect(openWalletOnStart, mainScreenState.walletSheetOpened) {
         if (openWalletOnStart && !mainScreenState.walletSheetOpened) {
@@ -79,34 +91,45 @@ fun MainScreen(
         }
     }
 
-    MainScreenContent(
-        mainScreenState = mainScreenState,
-        budgetUiState = budgetUiState,
-        onboardingCompleted = onboardingCompleted,
-        tutorialStage = tutorialStage,
-        showCreditQuickToggleFeature = showCreditQuickToggleFeature,
-        onProcessIntent = { intent ->
-            when (intent) {
-                is MainScreenUiIntent.ProcessBudgetTransactionIntent ->
-                    budgetViewModel.processIntent(intent.intent)
-
-                is MainScreenUiIntent.ProcessBudgetEditorIntent ->
-                    budgetViewModel.processIntent(intent.intent)
-
-                is MainScreenUiIntent.ProcessBudgetNumpadIntent ->
-                    budgetViewModel.processIntent(intent.intent)
-
-                else -> mainScreenViewModel.processIntent(intent, tutorialStage)
-            }
+    ChangelogGate(
+        currentVersionCode = run {
+            val info = context.packageManager.getPackageInfo(
+                context.packageName,
+                0,
+            )
+            @Suppress("DEPRECATION")
+            info.longVersionCode.toInt()
         },
-        onNavigateToAnalytics = onNavigateToAnalytics,
-        onNavigateToSettings = onNavigateToSettings,
-        onNavigateToWallet = onNavigateToWallet,
-        openWalletOnStart = openWalletOnStart,
-        showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet,
-        forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup,
-        selectedViewPeriod = mainScreenState.selectedViewPeriod,
-        settingsDataStore = context.settingsDataStore,
-        undoSnackbarActionLabel = undoSnackbarActionLabel,
-    )
+    ) {
+        MainScreenContent(
+            mainScreenState = mainScreenState,
+            budgetUiState = budgetUiState,
+            onboardingCompleted = onboardingCompleted,
+            tutorialStage = tutorialStage,
+            showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+            onProcessIntent = { intent ->
+                when (intent) {
+                    is MainScreenUiIntent.ProcessBudgetTransactionIntent ->
+                        budgetViewModel.processIntent(intent.intent)
+
+                    is MainScreenUiIntent.ProcessBudgetEditorIntent ->
+                        budgetViewModel.processIntent(intent.intent)
+
+                    is MainScreenUiIntent.ProcessBudgetNumpadIntent ->
+                        budgetViewModel.processIntent(intent.intent)
+
+                    else -> mainScreenViewModel.processIntent(intent, tutorialStage)
+                }
+            },
+            onNavigateToAnalytics = onNavigateToAnalytics,
+            onNavigateToSettings = onNavigateToSettings,
+            onNavigateToWallet = onNavigateToWallet,
+            openWalletOnStart = openWalletOnStart,
+            showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet,
+            forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup,
+            selectedViewPeriod = mainScreenState.selectedViewPeriod,
+            settingsDataStore = context.settingsDataStore,
+            undoSnackbarActionLabel = undoSnackbarActionLabel,
+        )
+    }
 }

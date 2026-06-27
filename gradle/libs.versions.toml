@@ -112,6 +112,7 @@ dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", versi
 hilt-androidcompiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "dagger" }
 commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref = "commonsCsv" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
 logcat = { group = "com.squareup.logcat", name = "logcat", version.ref = "logcat" }
 androidx-compose-ui-tooling-v106 = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "composeUiToolingPreview" }
 androidx-compose-ui-testmanifest-v183 = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "uiTestManifest" }

@@ -177,6 +177,14 @@
     <string name="censor_mode_card_body">Couvrez le haut du téléphone (là où se trouve l\'appareil photo) avec votre main pendant environ une seconde pour l\'éteindre.</string>
     <string name="censor_mode_toast_enabled">Mode confidentialité activé</string>
     <string name="censor_mode_toast_disabled">Mode confidentialité désactivé</string>
+    <string name="changelog_settings_item_title">Nouveautés</string>
+    <string name="changelog_settings_item_subtitle">Découvrez les dernières fonctionnalités et corrections dans v%1$s</string>
+    <string name="changelog_badge_feature">Fonctionnalité</string>
+    <string name="changelog_badge_improvement">Amélioration</string>
+    <string name="changelog_badge_bug_fix">Correctif</string>
+    <string name="changelog_release_header">Version %1$s — %2$s</string>
+    <string name="changelog_close">Fermer</string>
+    <string name="changelog_previous_versions">Versions précédentes</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Sélectionnez la période</string>

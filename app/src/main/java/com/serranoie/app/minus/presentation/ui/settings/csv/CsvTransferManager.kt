@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.settings
+package com.serranoie.app.minus.presentation.ui.settings.csv
 
 import android.content.ContentValues
 import android.content.Context

@@ -32,8 +32,8 @@ import kotlin.math.sin
  * A wavy line divider with customizable amplitude and text in the center.
  *
  * @param text The text to display in the center of the divider
- * @param amplitude The height of the wave peaks (default 8f)
- * @param wavelength The length of each wave cycle (default 20f)
+ * @param amplitude The height of the wave peaks (default 3f)
+ * @param wavelength The length of each wave cycle (default 60f)
  * @param strokeWidth The thickness of the line (default 2.dp)
  * @param color The color of the wave line
  */
@@ -42,8 +42,8 @@ fun WavyDivider(
 	text: String,
 	modifier: Modifier = Modifier,
 	horizontalPadding: Dp = 16.dp,
-	amplitude: Float = 8f,
-	wavelength: Float = 20f,
+	amplitude: Float = 3f,
+	wavelength: Float = 60f,
 	strokeWidth: Float = 4f,
 	color: Color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
 ) {

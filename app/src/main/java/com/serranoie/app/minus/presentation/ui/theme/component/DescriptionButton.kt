@@ -40,7 +40,7 @@ fun DescriptionButton(
 ){
 	Card(
 		onClick = {
-			logcat("DescriptionButton") { "Card clicked - invoking onClick" }
+			logcat("ISAAC:DescriptionButton") { "Card onClick fired at ${System.currentTimeMillis()}ms -> invoking onClick" }
 			onClick()
 		},
 		modifier = modifier.fillMaxWidth(),

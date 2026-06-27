@@ -150,10 +150,10 @@
 
     <string name="day_total_format">Total: %1$s</string>
 
-    <string name="onboarding_welcome_title">¡Bienvenidos a Menos!</string>
+    <string name="onboarding_welcome_title">¡Bienvenido a Menos!</string>
     <string name="onboarding_welcome_subtitle">Hola y bienvenido, comencemos a ahorrar juntos.</string>
     <string name="onboarding_welcome_intro">Un sencillo rastreador de presupuestos que te ayuda a decidir cuánto puedes gastar cada día, semana, quincena o mes.</string>
-    <string name="onboarding_step_1_title">Establecer un presupuesto</string>
+    <string name="onboarding_step_1_title">Establece un presupuesto</string>
     <string name="onboarding_step_1_subtitle">Define tu límite de gasto para cualquier periodo.</string>
     <string name="onboarding_step_2_title">Seguimiento de gastos</string>
     <string name="onboarding_step_2_subtitle">Registra lo que gastas y mira lo que queda cada día.</string>
@@ -174,6 +174,14 @@
     <string name="censor_mode_card_body">Cubre la parte superior del teléfono (donde está la cámara) con la mano durante un segundo para desactivarlo.</string>
     <string name="censor_mode_toast_enabled">Modo de privacidad activado</string>
     <string name="censor_mode_toast_disabled">Modo de privacidad desactivado</string>
+    <string name="changelog_settings_item_title">Novedades</string>
+    <string name="changelog_settings_item_subtitle">Conoce las últimas funciones y arreglos en v%1$s</string>
+    <string name="changelog_badge_feature">Función</string>
+    <string name="changelog_badge_improvement">Mejora</string>
+    <string name="changelog_badge_bug_fix">Corrección</string>
+    <string name="changelog_release_header">Versión %1$s · %2$s</string>
+    <string name="changelog_close">Cerrar</string>
+    <string name="changelog_previous_versions">Versiones anteriores</string>
 
     <string name="onboarding_finish_date_selector_title">Selecciona el periodo</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d días · %2$s - %3$s</string>
