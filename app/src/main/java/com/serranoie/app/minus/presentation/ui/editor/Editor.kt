@@ -240,7 +240,7 @@ fun Editor(
                                         modifier = Modifier.semantics { role = Role.RadioButton },
                                         colors = ToggleButtonDefaults.toggleButtonColors(
                                             containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
-                                                alpha = 0.3f
+                                                alpha = 0.5f
                                             ),
                                             checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
                                             contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -276,7 +276,7 @@ fun Editor(
                                         modifier = Modifier.semantics { role = Role.RadioButton },
                                         colors = ToggleButtonDefaults.toggleButtonColors(
                                             containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
-                                                alpha = 0.3f
+                                                alpha = 0.5f
                                             ),
                                             checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
                                             contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -313,7 +313,7 @@ fun Editor(
                                     modifier = Modifier.semantics { role = Role.RadioButton },
                                     colors = ToggleButtonDefaults.toggleButtonColors(
                                         containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
-                                            alpha = 0.3f
+                                            alpha = 0.5f
                                         ),
                                         checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
                                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
