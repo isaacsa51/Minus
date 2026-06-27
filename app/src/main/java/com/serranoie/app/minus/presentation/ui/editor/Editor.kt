@@ -179,7 +179,6 @@ fun Editor(
                 centerRemainingAmount = animState == AnimState.EDITING,
                 onOpenSettings = onOpenSettings,
                 onOpenBudgetSheet = {
-// 					onBudgetPillClickForTutorial()
                     view.weakHapticFeedback()
                     onShowBudgetPeriodSheet()
                 },

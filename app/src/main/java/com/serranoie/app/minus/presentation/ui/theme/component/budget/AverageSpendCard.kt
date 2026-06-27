@@ -22,74 +22,75 @@ import java.util.Date
 
 @Composable
 fun AverageSpendCard(
-	modifier: Modifier = Modifier,
-	spends: List<Transaction>,
-	startDate: Date? = null,
-	finishDate: Date? = null,
-	currency: String = "MXN",
+    modifier: Modifier = Modifier,
+    spends: List<Transaction>,
+    startDate: Date? = null,
+    finishDate: Date? = null,
+    currency: String = "MXN",
 ) {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	val totalAmount = remember(spends) {
-		spends.sumOf { it.amount }
-	}
+    val totalAmount = remember(spends) {
+        spends.sumOf { it.amount }
+    }
 
-	val days = remember(spends, startDate, finishDate) {
-		if (startDate != null && finishDate != null) {
-			val diff = finishDate.time - startDate.time
-			(diff / (1000 * 60 * 60 * 24)).coerceAtLeast(1)
-		} else {
-			val dates = spends.mapNotNull { it.date?.toLocalDate() }
-			val minDate = dates.minOrNull()
-			val maxDate = dates.maxOrNull()
-			if (minDate != null && maxDate != null) {
-				java.time.temporal.ChronoUnit.DAYS.between(minDate, maxDate).coerceAtLeast(1)
-			} else 1
-		}
-	}
+    val days = remember(spends, startDate, finishDate) {
+        if (startDate != null && finishDate != null) {
+            val diff = finishDate.time - startDate.time
+            (diff / (1000 * 60 * 60 * 24)).coerceAtLeast(1)
+        } else {
+            val dates = spends.mapNotNull { it.date?.toLocalDate() }
+            val minDate = dates.minOrNull()
+            val maxDate = dates.maxOrNull()
+            if (minDate != null && maxDate != null) {
+                java.time.temporal.ChronoUnit.DAYS.between(minDate, maxDate).coerceAtLeast(1)
+            } else 1
+        }
+    }
 
-	val averagePerDay = remember(totalAmount, days, spends.isEmpty()) {
-		if (spends.isEmpty()) return@remember null
-		totalAmount.divide(days.toBigDecimal(), 2, RoundingMode.HALF_EVEN)
-	}
+    val averagePerDay = remember(totalAmount, days, spends.isEmpty()) {
+        if (spends.isEmpty()) return@remember null
+        totalAmount.divide(days.toBigDecimal(), 2, RoundingMode.HALF_EVEN)
+    }
 
-	StatCard(
-		modifier = modifier,
-		value = if (averagePerDay != null) {
-			numberFormat(
-				context,
-				averagePerDay,
-				currency = currency,
-			)
-		} else {
-			stringResource(R.string.empty)
-		},
-		colors = CardDefaults.cardColors(
-			containerColor = combineColors(
-				MaterialTheme.colorScheme.surface,
-				MaterialTheme.colorScheme.surfaceVariant,
-				angle = 0.3f,
-			),
-		),
-		label = stringResource(R.string.daily_average),
-		contentPadding = PaddingValues(vertical = 8.dp, horizontal = 32.dp),
-		horizontalAlignment = Alignment.CenterHorizontally
-	)
+    StatCard(
+        modifier = modifier,
+        value = if (averagePerDay != null) {
+            numberFormat(
+                context,
+                averagePerDay,
+                currency = currency,
+            )
+        } else {
+            stringResource(R.string.empty)
+        },
+        colors = CardDefaults.cardColors(
+            containerColor = combineColors(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.surfaceVariant,
+                angle = 0.3f,
+            ),
+        ),
+        label = stringResource(R.string.daily_average),
+        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    )
 }
 
 
-@Preview(name = "AverageSpendCard",
-	device = "spec:width=500px,height=200px,dpi=440"
+@Preview(
+    name = "AverageSpendCard",
+    device = "spec:width=500px,height=200px,dpi=440"
 )
 @Composable
 private fun PreviewAverageSpendCard() {
-	AverageSpendCard(
-		spends = listOf(
-			Transaction(
-				amount = 100.toBigDecimal(),
-				date = LocalDateTime.now(),
-				comment = "Category",
-			),
-		)
-	)
+    AverageSpendCard(
+        spends = listOf(
+            Transaction(
+                amount = 100.toBigDecimal(),
+                date = LocalDateTime.now(),
+                comment = "Category",
+            ),
+        )
+    )
 }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.serranoie.app.minus.presentation.ui.theme.harmonize.blend.Blend
+import com.serranoie.app.minus.presentation.ui.theme.harmonize.hct.Hct
 import com.serranoie.app.minus.presentation.ui.theme.harmonize.palette.CorePalette
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import kotlin.math.ceil
@@ -30,12 +31,20 @@ fun combineColors(colors: List<Color>, angle: Float = 0.5F): Color {
 }
 
 @Composable
-fun harmonize(designColor: Color, sourceColor: Color = MaterialTheme.colorScheme.primary): Color {
-	return harmonizeWithColor(designColor, sourceColor)
+fun harmonize(
+	designColor: Color,
+	sourceColor: Color = MaterialTheme.colorScheme.primary,
+	chromaFactor: Float = 1.0f
+): Color {
+	return harmonizeWithColor(designColor, sourceColor, chromaFactor)
 }
 
-fun harmonizeWithColor(designColor: Color, sourceColor: Color): Color {
-	return Color(Blend.harmonize(designColor.toArgb(), sourceColor.toArgb()))
+fun harmonizeWithColor(designColor: Color, sourceColor: Color, chromaFactor: Float = 1.0f): Color {
+	val harmonized = Blend.harmonize(designColor.toArgb(), sourceColor.toArgb())
+	if (chromaFactor == 1.0f) return Color(harmonized)
+
+	val hct = Hct.fromInt(harmonized)
+	return Color(Hct.from(hct.hue, hct.chroma * chromaFactor, hct.tone).toInt())
 }
 
 @Composable

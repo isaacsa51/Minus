@@ -13,25 +13,25 @@ import com.serranoie.app.minus.domain.model.TypographyMode as DomainTypographyMo
 @Singleton
 class ThemeManager @Inject constructor() {
 
-	fun applyUserSettings(context: Context, settings: UserSettings) {
-		context.appTheme = settings.themeMode.toPresentationThemeMode()
-		context.appTypography = settings.typographyMode.toPresentationTypographyMode()
-		context.dynamicColorEnabled = settings.dynamicColorEnabled
-	}
+    fun applyUserSettings(context: Context, settings: UserSettings) {
+        context.appTheme = settings.themeMode.toPresentationThemeMode()
+        context.appTypography = settings.typographyMode.toPresentationTypographyMode()
+        context.dynamicColorEnabled = settings.dynamicColorEnabled
+    }
 
-	private fun DomainThemeMode.toPresentationThemeMode(): ThemeMode {
-		return when (this) {
-			DomainThemeMode.LIGHT -> ThemeMode.LIGHT
-			DomainThemeMode.NIGHT -> ThemeMode.NIGHT
-			DomainThemeMode.SYSTEM -> ThemeMode.SYSTEM
-		}
-	}
+    private fun DomainThemeMode.toPresentationThemeMode(): ThemeMode {
+        return when (this) {
+            DomainThemeMode.LIGHT -> ThemeMode.LIGHT
+            DomainThemeMode.NIGHT -> ThemeMode.NIGHT
+            DomainThemeMode.SYSTEM -> ThemeMode.SYSTEM
+        }
+    }
 
-	private fun DomainTypographyMode.toPresentationTypographyMode(): TypographyMode {
-		return when (this) {
-			DomainTypographyMode.DEFAULT -> TypographyMode.DEFAULT
-			DomainTypographyMode.CONDENSED -> TypographyMode.CONDENSED
-			DomainTypographyMode.EXPRESSIVE -> TypographyMode.EXPRESSIVE
-		}
-	}
+    private fun DomainTypographyMode.toPresentationTypographyMode(): TypographyMode {
+        return when (this) {
+            DomainTypographyMode.DEFAULT -> TypographyMode.DEFAULT
+            DomainTypographyMode.CONDENSED -> TypographyMode.CONDENSED
+            DomainTypographyMode.EXPRESSIVE -> TypographyMode.EXPRESSIVE
+        }
+    }
 }
