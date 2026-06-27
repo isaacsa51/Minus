@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,16 +32,18 @@ fun CategoryAmount(
 	isSpecial: Boolean = false,
 	palette: HarmonizedColorPalette? = null,
 	currency: String = "MXN",
+	selected: Boolean = false,
 	onClick: (() -> Unit)? = null
 ) {
 	val context = LocalContext.current
 
 	Surface(
 		shape = CircleShape,
-		color = palette?.main ?: MaterialTheme.colorScheme.surface,
-		contentColor = palette?.onSurface ?: MaterialTheme.colorScheme.onSurface,
+		color = if (selected) palette?.main ?: MaterialTheme.colorScheme.primary else palette?.main?.copy(alpha = 0.2f) ?: MaterialTheme.colorScheme.surface,
+		contentColor = if (selected) palette?.onSurface ?: MaterialTheme.colorScheme.onPrimary else palette?.main ?: MaterialTheme.colorScheme.onSurface,
 		modifier = modifier,
-	onClick = onClick ?: {},
+		border = if (selected) null else BorderStroke(1.dp, palette?.main ?: Color.Transparent),
+		onClick = onClick ?: {},
 	) {
 		Row(
 			modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),

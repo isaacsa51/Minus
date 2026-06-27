@@ -231,7 +231,11 @@ fun CategoriesChartCard(
                         .size(180.dp),
                     items = tags,
                     selectedIndex = tags.indexOfFirst { it.name == selectedCategoryName },
-                    holeColor = cardBgColor
+                    holeColor = cardBgColor,
+                    onItemClick = { index ->
+                        val tag = tags[index]
+                        selectedCategoryName = if (selectedCategoryName == tag.name) null else tag.name
+                    }
                 )
                 FlowRow(
                     modifier = Modifier
@@ -253,6 +257,7 @@ fun CategoriesChartCard(
                             palette = tag.color,
                             isSpecial = tag.isSpecial,
                             currency = currency,
+                            selected = selectedCategoryName == tag.name,
                             onClick = {
                                 selectedCategoryName = if (selectedCategoryName == tag.name) null else tag.name
                                 onCategoryClick?.invoke(tag.name, categoryTransactions)
