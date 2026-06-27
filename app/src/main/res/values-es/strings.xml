@@ -211,9 +211,15 @@
     <string name="settings_period_end_time_subtitle">La notificación se mostrará el día que termina el período a esta hora.</string>
     <string name="settings_recurrent_notification_time_title">Hora de pagos recurrentes</string>
     <string name="settings_recurrent_notification_time_subtitle">La revisión diaria de pagos recurrentes se ejecuta a esta hora.</string>
+    <string name="settings_notification_permission_title">Permiso de notificaciones</string>
+    <string name="settings_notification_permission_granted_subtitle">Concedido — recibirás notificaciones</string>
+    <string name="settings_notification_permission_denied_subtitle">Denegado — toca para abrir los ajustes del sistema y permitir las notificaciones</string>
+    <string name="settings_notification_permission_action">Abrir</string>
     <string name="settings_exact_alarm_title">Alarmas exactas</string>
     <string name="settings_exact_alarm_enabled_subtitle">Habilitado para intentar mostrar notificaciones a la hora seleccionada.</string>
     <string name="settings_exact_alarm_disabled_subtitle">Desactivado; Android puede retrasar la notificación</string>
+    <string name="settings_time_picker_cancel">Cancelar</string>
+    <string name="settings_time_picker_confirm">Aceptar</string>
 
     <string name="settings_about_title">Acerca de</string>
     <string name="settings_about_subtitle">Obtenga más información sobre la aplicación y su desarrollo.</string>

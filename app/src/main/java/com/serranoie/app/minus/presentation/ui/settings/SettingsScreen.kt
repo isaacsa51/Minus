@@ -3,10 +3,14 @@ package com.serranoie.app.minus.presentation.ui.settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferEntryPoint
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
@@ -21,6 +25,7 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val isCensored = LocalCensorMode.current
 
     val importLauncher = rememberLauncherForActivityResult(
@@ -35,6 +40,18 @@ fun SettingsScreen(
             .csvTransferManager()
         viewModel.setCsvTransferManager(manager)
         viewModel.setImportLauncher(importLauncher)
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshNotificationPermission()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -65,6 +82,7 @@ fun SettingsScreen(
         recurrentNotificationHour = uiState.recurrentNotificationHour,
         recurrentNotificationMinute = uiState.recurrentNotificationMinute,
         exactAlarmEnabled = uiState.exactAlarmEnabled,
+        notificationPermissionGranted = uiState.notificationPermissionGranted,
         onThemeChange = viewModel::onThemeChange,
         onTypographyChange = viewModel::onTypographyChange,
         onMaterialYouToggle = viewModel::onMaterialYouToggle,
@@ -73,6 +91,10 @@ fun SettingsScreen(
         onNotificationTimeChange = viewModel::onNotificationTimeChange,
         onRecurrentNotificationTimeChange = viewModel::onRecurrentNotificationTimeChange,
         onOpenExactAlarmSettings = viewModel::onOpenExactAlarmSettings,
+        onOpenNotificationSettings = {
+            viewModel.onOpenAppSettings()
+            viewModel.refreshNotificationPermission()
+        },
         periodMappingMode = uiState.periodMappingMode,
         onPeriodMappingModeChange = viewModel::onPeriodMappingModeChange,
         onExportCsv = viewModel::onExportCsv,

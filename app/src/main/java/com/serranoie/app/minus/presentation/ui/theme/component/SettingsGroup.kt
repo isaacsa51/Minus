@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -61,8 +62,8 @@ fun FlexibleListGroup(
 ) {
     Column(
         modifier = modifier
-			.padding(16.dp)
-			.padding(vertical = 8.dp)
+            .padding(16.dp)
+            .padding(vertical = 8.dp)
     ) {
         title?.let {
             Text(
@@ -108,9 +109,9 @@ fun ListItem(
     Column {
         Row(
             modifier = Modifier
-				.fillMaxWidth()
-				.clickable(onClick = onClick)
-				.padding(16.dp),
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             leadingIcon?.invoke()
@@ -160,9 +161,9 @@ fun CustomSettingsItem(
 ) {
     Row(
         modifier = Modifier
-			.fillMaxWidth()
-			.clickable(onClick = onClick)
-			.padding(16.dp),
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         content = content
     )
@@ -234,13 +235,13 @@ fun PaddedListItem(
         tonalElevation = 2.dp,
         color = MaterialTheme.colorScheme.surfaceVariant,
         modifier = Modifier
-			.fillMaxWidth()
-			.clip(shape)
+            .fillMaxWidth()
+            .clip(shape)
     ) {
         Row(
             modifier = Modifier
-				.clickable { onClick() }
-				.padding(16.dp),
+                .clickable { onClick() }
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically) {
             Icon(imageVector = icon, contentDescription = null)
             Spacer(modifier = Modifier.width(16.dp))
@@ -276,6 +277,7 @@ fun CustomPaddedListItem(
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     onLongClick: (() -> Unit)? = null,
+    borderStroke: BorderStroke? = null,
     content: @Composable RowScope.() -> Unit
 ) {
     val shape = when (position) {
@@ -295,17 +297,18 @@ fun CustomPaddedListItem(
         shape = shape,
         color = background,
         contentColor = contentColor,
+        border = borderStroke,
         modifier = modifier
-			.fillMaxWidth()
-			.clip(shape)
+            .fillMaxWidth()
+            .clip(shape)
     ) {
         Row(
             modifier = Modifier
-				.combinedClickable(
-					onClick = onClick,
-					onLongClick = onLongClick,
-				)
-				.padding(horizontal = 16.dp, vertical = 12.dp),
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                )
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             content = content
         )
@@ -348,19 +351,17 @@ fun CustomPaddedExpandableItem(
         tonalElevation = 4.dp,
         color = MaterialTheme.colorScheme.surfaceContainer,
         modifier = modifier
-			.fillMaxWidth()
-			.clip(shape)
+            .fillMaxWidth()
+            .clip(shape)
     ) {
         Column {
-            // Default content - always clickable
             Row(
                 modifier = Modifier
-					.clickable { onToggleExpanded() }
-					.padding(16.dp),
+                    .clickable { onToggleExpanded() }
+                    .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 content = defaultContent)
 
-            // Expanded content - only shown when expanded
             AnimatedVisibility(
                 visible = isExpanded,
                 enter = expandVertically() + fadeIn(),
@@ -374,16 +375,9 @@ fun CustomPaddedExpandableItem(
     }
 }
 
-/**
- * Enum to define the position of an item in a padded list for proper corner rounding.
- */
 enum class PaddedListItemPosition {
     First, Middle, Last, Single
 }
-
-data class SettingItem(
-    val title: String, val subtitle: String? = null, val icon: ImageVector, val onClick: () -> Unit
-)
 
 @Preview(showBackground = true)
 @Composable
@@ -439,8 +433,8 @@ fun FlexibleSettingsGroupPreview() {
                     // Any other composable can go here
                     Box(
                         modifier = Modifier
-							.fillMaxWidth()
-							.padding(16.dp)
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     ) {
                         Text(
                             text = "You can put any composable content here!",
