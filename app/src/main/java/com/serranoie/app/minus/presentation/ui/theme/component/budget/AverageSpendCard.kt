@@ -68,7 +68,7 @@ fun AverageSpendCard(
             containerColor = combineColors(
                 MaterialTheme.colorScheme.surface,
                 MaterialTheme.colorScheme.surfaceVariant,
-                angle = 0.3f,
+                t = 0.3f,
             ),
         ),
         label = stringResource(R.string.daily_average),

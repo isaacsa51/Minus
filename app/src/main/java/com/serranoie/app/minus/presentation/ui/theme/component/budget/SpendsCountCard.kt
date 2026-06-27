@@ -45,7 +45,7 @@ fun SpendsCountCard(
             containerColor = combineColors(
                 MaterialTheme.colorScheme.surface,
                 MaterialTheme.colorScheme.surfaceVariant,
-                angle = 0.3f,
+                t = 0.3f,
             ),
         ),
         onClick = onClick

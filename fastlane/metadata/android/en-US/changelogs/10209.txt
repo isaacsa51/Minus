@@ -1,8 +1,0 @@
-What changed in this drop.
-- feat: Added badge and info on settings about mode (#41)
-- fix: implement correct usage of History actions (#40)
-- fix: use proper value set on settings instead of the remember value (#38)
-- fix: use wrapWidth instead of hardcoded width on BudgetDisplay (#34)
-- refactor: modularize navigation and extract business logic to ViewModels (#30)
-- test: coverage for Onboard and Home screens (#31)
-- test: insert HistoryScreen E2E tests coverage

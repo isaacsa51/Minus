@@ -87,36 +87,6 @@ public final class Hct {
     return argb;
   }
 
-  /**
-   * Set the hue of this color. Chroma may decrease because chroma has a different maximum for any
-   * given hue and tone.
-   *
-   * @param newHue 0 <= newHue < 360; invalid values are corrected.
-   */
-  public void setHue(double newHue) {
-    setInternalState(CamSolver.solveToInt(newHue, chroma, tone));
-  }
-
-  /**
-   * Set the chroma of this color. Chroma may decrease because chroma has a different maximum for
-   * any given hue and tone.
-   *
-   * @param newChroma 0 <= newChroma < ?
-   */
-  public void setChroma(double newChroma) {
-    setInternalState(CamSolver.solveToInt(hue, newChroma, tone));
-  }
-
-  /**
-   * Set the tone of this color. Chroma may decrease because chroma has a different maximum for any
-   * given hue and tone.
-   *
-   * @param newTone 0 <= newTone <= 100; invalid valids are corrected.
-   */
-  public void setTone(double newTone) {
-    setInternalState(CamSolver.solveToInt(hue, chroma, newTone));
-  }
-
   private void setInternalState(int argb) {
     this.argb = argb;
     Cam16 cam = Cam16.fromInt(argb);

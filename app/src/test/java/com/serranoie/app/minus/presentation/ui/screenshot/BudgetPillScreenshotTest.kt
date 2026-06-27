@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -52,7 +51,6 @@ class BudgetPillScreenshotTest {
                         ),
                         viewPeriod = BudgetPeriod.DAILY,
                         currencyCode = "USD",
-                        onOpenSettings = { },
                         onOpenBudgetSheet = { },
                     )
                 }
@@ -85,7 +83,6 @@ class BudgetPillScreenshotTest {
                         ),
                         viewPeriod = BudgetPeriod.DAILY,
                         currencyCode = "USD",
-                        onOpenSettings = { },
                         onOpenBudgetSheet = { },
                     )
                 }

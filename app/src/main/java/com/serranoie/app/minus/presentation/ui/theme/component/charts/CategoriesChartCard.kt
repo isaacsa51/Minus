@@ -99,7 +99,7 @@ fun CategoriesChartCard(
             color = harmonizeWithColor(
                 designColor = baseColor,
                 sourceColor = MaterialTheme.colorScheme.primary,
-                chromaFactor = if (isNightMode) 2f else 1f
+                chromaMultiplier = if (isNightMode) 2f else 1f
             ),
         )
     }
@@ -168,7 +168,7 @@ fun CategoriesChartCard(
     val cardBgColor = combineColors(
         MaterialTheme.colorScheme.surface,
         MaterialTheme.colorScheme.surfaceVariant,
-        angle = 0.3f,
+        t = 0.3f,
     )
 
     Card(
