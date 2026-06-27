@@ -56,16 +56,24 @@ import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.DescriptionButton
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
 import com.serranoie.app.minus.presentation.util.combineColors
+import logcat.logcat
+
+private const val TAG = "ISAAC:OnboardingScreen"
 
 @Composable
 fun OnboardingScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
     onOnboardingCompleted: () -> Unit = {},
 ) {
+    logcat(TAG) { "OnboardingScreen composed" }
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
+            logcat(TAG) { "OnboardingScreen received effect: $effect" }
             when (effect) {
-                OnboardingUiEffect.OnboardingCompleted -> onOnboardingCompleted()
+                OnboardingUiEffect.OnboardingCompleted -> {
+                    logcat(TAG) { "OnboardingScreen -> invoking onOnboardingCompleted()" }
+                    onOnboardingCompleted()
+                }
                 is OnboardingUiEffect.OnboardingFailed -> {
                     // Failures are also reflected in [OnboardingUiState.error];
                     // the parent screen (or activity) may surface them.
@@ -75,7 +83,10 @@ fun OnboardingScreen(
     }
 
     OnboardingScreenContent(
-        onContinue = { viewModel.processIntent(OnboardingUiIntent.OnWelcomeDismissed) },
+        onContinue = {
+            logcat(TAG) { "Set Budget tapped -> dispatching OnWelcomeDismissed" }
+            viewModel.processIntent(OnboardingUiIntent.OnWelcomeDismissed)
+        },
     )
 }
 

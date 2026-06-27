@@ -150,10 +150,10 @@
 
     <string name="day_total_format">Total: %1$s</string>
 
-    <string name="onboarding_welcome_title">¡Bienvenidos a Menos!</string>
+    <string name="onboarding_welcome_title">¡Bienvenido a Menos!</string>
     <string name="onboarding_welcome_subtitle">Hola y bienvenido, comencemos a ahorrar juntos.</string>
     <string name="onboarding_welcome_intro">Un sencillo rastreador de presupuestos que te ayuda a decidir cuánto puedes gastar cada día, semana, quincena o mes.</string>
-    <string name="onboarding_step_1_title">Establecer un presupuesto</string>
+    <string name="onboarding_step_1_title">Establece un presupuesto</string>
     <string name="onboarding_step_1_subtitle">Define tu límite de gasto para cualquier periodo.</string>
     <string name="onboarding_step_2_title">Seguimiento de gastos</string>
     <string name="onboarding_step_2_subtitle">Registra lo que gastas y mira lo que queda cada día.</string>

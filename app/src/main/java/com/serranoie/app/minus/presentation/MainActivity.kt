@@ -21,7 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
@@ -61,7 +60,6 @@ import com.serranoie.app.minus.navigation.AppNavGraph
 import com.serranoie.app.minus.navigation.Screen
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.permission.PermissionHandler
-import com.serranoie.app.minus.presentation.ui.changelog.ChangelogGate
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.ThemeManager
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
@@ -189,9 +187,14 @@ class MainActivity : ComponentActivity() {
                 earlyFinishPending.value = userSettings.earlyFinishActive
                 themeManager.applyUserSettings(context, userSettings)
 
+                logcat("ISAAC:Main") {
+                    "Initial settings load -> onboarding_completed=${userSettings.onboardingCompleted}, earlyFinishActive=${userSettings.earlyFinishActive}"
+                }
+
                 dataStoreLoaded.value = true
                 isDone.value = true
             } catch (_: Exception) {
+                logcat("ISAAC:Main") { "Initial settings load failed" }
                 dataStoreLoaded.value = true
                 isDone.value = true
             }
@@ -200,8 +203,9 @@ class MainActivity : ComponentActivity() {
         }
 
         settingsRepository.observeSettings().onEach { settings ->
-            logcat {
-                "Settings observer -> onboarding_completed=${settings.onboardingCompleted}"
+            val previous = onboardingComplete.value
+            logcat("ISAAC:Main") {
+                "Settings observer -> onboarding_completed=${settings.onboardingCompleted} (was $previous), earlyFinishActive=${settings.earlyFinishActive}"
             }
             onboardingComplete.value = settings.onboardingCompleted
             earlyFinishPending.value = settings.earlyFinishActive
@@ -223,12 +227,6 @@ class MainActivity : ComponentActivity() {
                 isReady.value = true
             }
 
-            LaunchedEffect(isReady.value) {
-                if (isReady.value) {
-                    checkAndRequestNotificationPermission()
-                }
-            }
-
             val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
 
             // INFO: Seems like this is not needed anymore since we support tablet layouts.
@@ -247,6 +245,9 @@ class MainActivity : ComponentActivity() {
                     !onboardingComplete.value -> Screen.Onboarding.route
                     else -> Screen.Main.route
                 }
+                logcat("ISAAC:Main") {
+                    "Resolved startDestination=$startDestination (earlyFinishPending=${earlyFinishPending.value}, onboardingComplete=${onboardingComplete.value})"
+                }
 
                 MinusTheme(dynamicColor = dynamicColor) {
                     CompositionLocalProvider(
@@ -259,32 +260,31 @@ class MainActivity : ComponentActivity() {
                         ) {
                             val navController = rememberNavController()
 
-                            key(startDestination) {
-                                ChangelogGate(
-                                    currentVersionCode = run {
-                                        val info = context.packageManager.getPackageInfo(
-                                            context.packageName,
-                                            0,
-                                        )
-                                        @Suppress("DEPRECATION")
-                                        info.longVersionCode.toInt()
-                                    },
-                                ) {
-                                    AppNavGraph(
-                                        activityResultRegistryOwner = activityResultRegistryOwner,
-                                        startDestination = startDestination,
-                                        navController = navController,
-                                        onOnboardingComplete = {
-                                            lifecycleScope.launch {
-                                                logcat {
-                                                    "onOnboardingComplete -> writing onboarding_completed=true"
-                                                }
-                                                settingsRepository.setOnboardingCompleted(true)
-                                            }
+                            AppNavGraph(
+                                activityResultRegistryOwner = activityResultRegistryOwner,
+                                startDestination = startDestination,
+                                navController = navController,
+                                onOnboardingComplete = {
+                                    logcat("ISAAC:Main") { "AppNavGraph.onOnboardingComplete fired -> writing onboarding_completed=true + dismissing midnight transition manager (user has no budget yet)" }
+                                    lifecycleScope.launch {
+                                        logcat {
+                                            "onOnboardingComplete -> writing onboarding_completed=true"
                                         }
-                                    )
-                                }
-                            }
+                                        settingsRepository.setOnboardingCompleted(true)
+                                        // Clear the budget-setup prompt: a brand-new user coming from
+                                        // onboarding has no budget period active, so the
+                                        // MidnightTransitionManager signal is redundant — the
+                                        // AppNavGraph onOnboardingComplete path already navigates
+                                        // to Main with openWallet=true so the wallet sheet surfaces
+                                        // the budget-setup CTA on its own.
+                                        midnightTransitionManager.onBudgetSetupHandled()
+                                    }
+                                },
+                                onRequestNotificationPermission = {
+                                    logcat("ISAAC:Main") { "AppNavGraph.onRequestNotificationPermission fired" }
+                                    checkAndRequestNotificationPermission()
+                                },
+                            )
 
                             val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()
                             val midnightTransitionData by midnightTransitionManager.midnightTransitionData.collectAsStateWithLifecycle()
@@ -347,9 +347,13 @@ class MainActivity : ComponentActivity() {
                             }
 
                             val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()
-                            LaunchedEffect(needsBudgetSetup) {
-                                if (needsBudgetSetup) {
-                                    logcat { "needsBudgetSetup detected, navigating to wallet setup" }
+                            // Only react to the wallet setup prompt AFTER onboarding completes.
+                            // Without this guard, MidnightPeriodChecker.handleEndingPeriod flips
+                            // _needsBudgetSetup=true on first launch (no budget yet) and the
+                            // LaunchedEffect below would auto-navigate us out of OnboardingScreen.
+                            LaunchedEffect(needsBudgetSetup, onboardingComplete.value) {
+                                if (needsBudgetSetup && onboardingComplete.value) {
+                                    logcat("ISAAC:Main") { "needsBudgetSetup detected AND onboardingComplete=true -> navigating to wallet setup" }
                                     midnightTransitionManager.onBudgetSetupHandled()
                                     // Only force edit mode if no budget has ever been created.
                                     // Use BUDGET_END_DATE_KEY as a proxy: if it's null, no budget was ever saved.
@@ -365,6 +369,8 @@ class MainActivity : ComponentActivity() {
                                         popUpTo(Screen.Main.route) { inclusive = true }
                                         launchSingleTop = true
                                     }
+                                } else if (needsBudgetSetup && !onboardingComplete.value) {
+                                    logcat("ISAAC:Main") { "needsBudgetSetup detected but onboarding NOT complete -> suppressing wallet setup navigation until onboarding finishes" }
                                 }
                             }
                         }

@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.domain.usecase
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.domain.model.changelog.ChangelogDecision
 import com.serranoie.app.minus.domain.model.changelog.ChangelogItem
@@ -128,8 +127,6 @@ class ChangelogTriggerEvaluatorTest {
 
     @Test
     fun `when current versionCode is at Int MAX and lastSeen is one less then Show`() {
-        // Boundary case: handles Int.MAX_VALUE without Long-overflow surprises
-        // since currentVersionCode is widened to Long for the comparison.
         val decision = decideChangelog(
             currentVersionCode = Int.MAX_VALUE,
             lastSeenVersionCode = (Int.MAX_VALUE - 1).toLong(),
@@ -152,9 +149,6 @@ class ChangelogTriggerEvaluatorTest {
 
     @Test
     fun `when current versionCode is one and lastSeen is null then Skip (first install)`() {
-        // First-install path: the caller is expected to seed lastSeen with
-        // the current versionCode after seeing Skip so the sheet doesn't
-        // re-fire on every fresh install.
         val decision = decideChangelog(
             currentVersionCode = 1,
             lastSeenVersionCode = null,
@@ -166,8 +160,6 @@ class ChangelogTriggerEvaluatorTest {
 
     @Test
     fun `when Show is returned it carries the same release instance passed in`() {
-        // The gate's ViewModel stores this exact reference in its pending
-        // StateFlow, so it must be the same object — not a copy.
         val decision = decideChangelog(
             currentVersionCode = 200,
             lastSeenVersionCode = 100L,
@@ -175,6 +167,6 @@ class ChangelogTriggerEvaluatorTest {
         )
 
         val show = decision as ChangelogDecision.Show
-        Truth.assertThat(show.release).isSameInstanceAs(latestRelease)
+        assertThat(show.release).isSameInstanceAs(latestRelease)
     }
 }

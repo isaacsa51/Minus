@@ -9,9 +9,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToIndex
 import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
@@ -26,7 +27,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ChangelogE2ETest {
-
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
@@ -144,10 +144,11 @@ class ChangelogE2ETest {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithText(whatsNewTitle()).onFirst()
-            .performScrollTo().assertIsDisplayed()
-        composeTestRule.onAllNodesWithText(whatsNewSubtitle()).onFirst()
-            .performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithTag("SettingsScreen").performScrollToIndex(Int.MAX_VALUE)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodesWithText(whatsNewTitle()).onFirst().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(whatsNewSubtitle()).onFirst().assertIsDisplayed()
     }
 
     @Test
@@ -158,7 +159,7 @@ class ChangelogE2ETest {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithText(whatsNewTitle()).onFirst().performScrollTo()
+        composeTestRule.onNodeWithTag("SettingsScreen").performScrollToIndex(Int.MAX_VALUE)
         composeTestRule.waitForIdle()
 
         composeTestRule.onAllNodesWithText(whatsNewTitle()).onFirst().performClick()
@@ -305,10 +306,7 @@ class ChangelogE2ETest {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithText(whatsNewTitle()).onFirst().performScrollTo()
-        composeTestRule.onAllNodesWithText(
-            composeTestRule.activity.getString(R.string.settings_about_title)
-        ).onFirst().performScrollTo()
+        composeTestRule.onNodeWithTag("SettingsScreen").performScrollToIndex(Int.MAX_VALUE)
         composeTestRule.waitForIdle()
 
         composeTestRule.onAllNodesWithText(whatsNewTitle()).assertCountEquals(1)

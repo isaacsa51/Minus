@@ -52,7 +52,7 @@ internal fun ChangelogItemCard(
     item: ChangelogItem,
     modifier: Modifier = Modifier,
 ) {
-    var isExpanded by rememberSaveable { mutableStateOf(true) }
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
     val hasDescription = !item.description.isNullOrBlank()
 
     Card(

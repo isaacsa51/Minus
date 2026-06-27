@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -75,9 +74,6 @@ private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) 
             )
         }
 
-        // Order: New Features → Bug Fixes → Improvements (bugs get
-        // prominent placement right under features since they're what
-        // users actively look for after an upgrade).
         listOf(
             ReleaseType.FEATURE to "New Features",
             ReleaseType.BUG_FIX to "Bug Fixes",

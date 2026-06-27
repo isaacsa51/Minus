@@ -15,7 +15,11 @@ import javax.inject.Inject
 /**
  * - `currentVersionCode <= 0` -> [ChangelogDecision.Skip] (defensive)
  * - `latest == null` -> [ChangelogDecision.Skip]
- * - `lastSeen == null` -> [ChangelogDecision.Skip] + caller must seed `currentVersionCode`
+ * - `lastSeen == null` -> [ChangelogDecision.Show] of `latest`
+ *   (debut reveal: fires once on the first launch of a version with the
+ *   changelog system — covers both fresh installs AND upgrades from a
+ *   version that pre-dated the changelog code, where DataStore was never
+ *   written by the previous build)
  * - `currentVersionCode > lastSeen` -> [ChangelogDecision.Show] of `latest`
  * - else -> [ChangelogDecision.Skip]
  */
@@ -28,7 +32,7 @@ fun decideChangelog(
     val latest = latestRelease ?: return ChangelogDecision.Skip
 
     return when {
-        lastSeenVersionCode == null -> ChangelogDecision.Skip
+        lastSeenVersionCode == null -> ChangelogDecision.Show(latest)
         currentVersionCode.toLong() > lastSeenVersionCode -> ChangelogDecision.Show(latest)
         else -> ChangelogDecision.Skip
     }
@@ -53,17 +57,20 @@ class ChangelogTriggerEvaluator @Inject constructor(
         val decision = decideChangelog(currentVersionCode, lastSeen, latest)
 
         when (decision) {
-            is ChangelogDecision.Show -> logcat("Changelog") { "ChangelogTriggerEvaluator: upgrade detected (current=$currentVersionCode, lastSeen=$lastSeen), showing release ${latest.versionName}" }
-            ChangelogDecision.Skip -> {
-                if (lastSeen == null) {
-                    logcat("Changelog") { "ChangelogTriggerEvaluator: first install, seeding $currentVersionCode and skipping sheet" }
+            is ChangelogDecision.Show -> {
+                val reason = if (lastSeen == null) {
+                    "first install of changelog-equipped version"
                 } else {
-                    logcat("Changelog") { "ChangelogTriggerEvaluator: currentVersionCode=$currentVersionCode == lastSeen=$lastSeen, skipping" }
+                    "upgrade detected (current=$currentVersionCode > lastSeen=$lastSeen)"
                 }
+                logcat("Changelog") { "ChangelogTriggerEvaluator: $reason, showing release ${latest.versionName}" }
+            }
+            ChangelogDecision.Skip -> {
+                logcat("Changelog") { "ChangelogTriggerEvaluator: currentVersionCode=$currentVersionCode == lastSeen=$lastSeen, skipping" }
             }
         }
 
-        if (decision is ChangelogDecision.Show || lastSeen == null) {
+        if (decision is ChangelogDecision.Show) {
             writeLastSeen(currentVersionCode)
         }
 

@@ -35,9 +35,6 @@ internal fun ChangelogMedia(
     AsyncImage(
         model = ImageRequest.Builder(context)
             .data(resolvedResId)
-            // coil-gif auto-registers GifDecoder for animated GIFs; static
-            // images use Coil's default decoder. No explicit decoderFactory
-            // needed — let Coil pick by content type.
             .crossfade(true)
             .build(),
         contentDescription = null,

@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import logcat.logcat
 
-private const val TAG = "AppNavGraph"
+private const val TAG = "ISAAC:AppNavGraph"
 
 private fun getScreenTransitions(
     initialState: NavBackStackEntry,
@@ -60,6 +60,7 @@ fun AppNavGraph(
     activityResultRegistryOwner: ActivityResultRegistryOwner?,
     startDestination: String,
     onOnboardingComplete: () -> Unit,
+    onRequestNotificationPermission: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val tag = TAG
@@ -172,6 +173,7 @@ fun AppNavGraph(
                 onNavigateToWallet = {
                     navController.navigate(Screen.Wallet.createRoute(false))
                 },
+                onRequestNotificationPermission = onRequestNotificationPermission,
             )
         }
 
