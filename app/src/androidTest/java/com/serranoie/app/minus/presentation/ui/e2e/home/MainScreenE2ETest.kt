@@ -235,7 +235,9 @@ class MainScreenE2ETest {
                     onDelete = { capturedIntents += "Delete" },
                     onApply = { capturedIntents += "Apply" },
                     onOperatorInput = { capturedIntents += "Operator:$it" },
-                    modifier = Modifier.fillMaxSize().height(400.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .height(400.dp),
                 )
             }
         }
@@ -333,7 +335,8 @@ class MainScreenE2ETest {
             animState = AnimState.EDITING,
         )
 
-        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("123"))).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("123"))).onLast()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -401,7 +404,8 @@ class MainScreenE2ETest {
             budgetSettings = sampleBudgetSettings(totalBudget = BigDecimal("500.00")),
         )
 
-        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("500.00"))).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("500.00"))).onLast()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -417,7 +421,8 @@ class MainScreenE2ETest {
             budgetSettings = sampleBudgetSettings(totalBudget = BigDecimal("500.00")),
         )
 
-        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("450.00"))).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("450.00"))).onLast()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -437,7 +442,8 @@ class MainScreenE2ETest {
             viewPeriod = BudgetPeriod.WEEKLY,
         )
 
-        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("700.00"))).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("700.00"))).onLast()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -556,7 +562,8 @@ class MainScreenE2ETest {
             animState = AnimState.EDITING,
         )
 
-        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("123"))).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("123"))).onLast()
+            .assertIsDisplayed()
         composeTestRule.onAllNodesWithText("1", substring = true).onLast().assertIsDisplayed()
         composeTestRule.onAllNodesWithText("2", substring = true).onLast().assertIsDisplayed()
         composeTestRule.onAllNodesWithText("3", substring = true).onLast().assertIsDisplayed()
@@ -700,6 +707,7 @@ class MainScreenE2ETest {
         composeTestRule.mainClock.advanceTimeBy(300)
 
         val totalBudgetLabel = composeTestRule.activity.getString(R.string.total_budget)
-        composeTestRule.onAllNodesWithText(totalBudgetLabel, substring = true).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(totalBudgetLabel, substring = true).onLast()
+            .assertIsDisplayed()
     }
 }

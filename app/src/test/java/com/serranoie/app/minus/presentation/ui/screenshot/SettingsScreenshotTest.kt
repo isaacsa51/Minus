@@ -3,7 +3,6 @@ package com.serranoie.app.minus.presentation.ui.screenshot
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
@@ -111,6 +110,10 @@ class SettingsScreenshotTest {
                 onResetTutorial = {},
                 onBugReportClick = {},
                 onBack = {},
+                isCensored = false,
+                notificationPermissionGranted = true,
+                onOpenNotificationSettings = {},
+                onNavigateToChangelog = {},
             )
         }
     }

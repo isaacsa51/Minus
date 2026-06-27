@@ -242,9 +242,15 @@
     <string name="settings_period_end_time_subtitle">The notification will be shown on the period end date at this time</string>
     <string name="settings_recurrent_notification_time_title">Recurring payments time</string>
     <string name="settings_recurrent_notification_time_subtitle">Daily recurring payment checks run at this time</string>
+    <string name="settings_notification_permission_title">Notifications permission</string>
+    <string name="settings_notification_permission_granted_subtitle">Granted — you will receive notifications</string>
+    <string name="settings_notification_permission_denied_subtitle">Denied — tap to open system settings and allow notifications</string>
+    <string name="settings_notification_permission_action">Open</string>
     <string name="settings_exact_alarm_title">Exact alarms</string>
     <string name="settings_exact_alarm_enabled_subtitle">Enabled to try showing notifications at the selected time</string>
     <string name="settings_exact_alarm_disabled_subtitle">Disabled; Android may delay the notification</string>
+    <string name="settings_time_picker_cancel">Cancel</string>
+    <string name="settings_time_picker_confirm">OK</string>
 
     <string name="settings_about_title">About</string>
     <string name="settings_about_subtitle">Learn more about the app and its development</string>

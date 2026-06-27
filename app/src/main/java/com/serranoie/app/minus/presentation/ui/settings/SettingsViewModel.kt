@@ -1,11 +1,14 @@
 package com.serranoie.app.minus.presentation.ui.settings
 
+import android.Manifest
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
@@ -37,6 +40,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 import android.provider.Settings as AndroidSettings
 
@@ -51,6 +55,7 @@ data class SettingsUiState(
     val recurrentNotificationHour: Int = 8,
     val recurrentNotificationMinute: Int = 0,
     val exactAlarmEnabled: Boolean = true,
+    val notificationPermissionGranted: Boolean = false,
     val periodMappingMode: PeriodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
 )
 
@@ -77,6 +82,38 @@ class SettingsViewModel @Inject constructor(
 
     init {
         loadPreferences()
+        refreshNotificationPermission()
+    }
+
+    /**
+     * Re-checks POST_NOTIFICATIONS (Android 13+) so the Settings row reflects
+     * the latest state when the user returns from the system app-info screen.
+     */
+    fun refreshNotificationPermission() {
+        val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            // Pre-Tiramisu devices grant by default.
+            true
+        }
+        logcat("ISAAC:Settings") { "refreshNotificationPermission -> granted=$granted" }
+        _uiState.update { it.copy(notificationPermissionGranted = granted) }
+    }
+
+    /**
+     * Opens the system app-info page for this package so the user can
+     * enable/deny POST_NOTIFICATIONS, exact alarms, etc.
+     */
+    fun onOpenAppSettings() {
+        logcat("ISAAC:Settings") { "onOpenAppSettings" }
+        val intent = Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = "package:${context.packageName}".toUri()
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
     }
 
     fun setCsvTransferManager(manager: CsvTransferManager) {

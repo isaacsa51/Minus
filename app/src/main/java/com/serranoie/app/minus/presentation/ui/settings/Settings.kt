@@ -2,13 +2,13 @@
 
 package com.serranoie.app.minus.presentation.ui.settings
 
-import android.app.TimePickerDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.BugReport
@@ -40,7 +41,6 @@ import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,10 +59,12 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -87,6 +89,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.buildAppEnvironmentMetadata
+import com.serranoie.app.minus.presentation.ui.settings.components.NotificationPermissionItem
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
@@ -105,1030 +108,1114 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun Settings(
-	modifier: Modifier = Modifier,
-	isCensored: Boolean = false,
-	currentTheme: String,
-	currentTypography: String,
-	isMaterialYouEnabled: Boolean,
-	isCreditQuickToggleFeatureEnabled: Boolean,
-	recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
-	notificationHour: Int,
-	notificationMinute: Int,
-	recurrentNotificationHour: Int,
-	recurrentNotificationMinute: Int,
-	exactAlarmEnabled: Boolean,
-	onThemeChange: (String) -> Unit,
-	onTypographyChange: (String) -> Unit,
-	onMaterialYouToggle: () -> Unit,
-	onCreditQuickToggleFeatureToggle: () -> Unit,
-	onRecurrentPaymentsViewModeChange: (RecurrentPaymentsViewMode) -> Unit,
-	onNotificationTimeChange: (Int, Int) -> Unit,
-	onRecurrentNotificationTimeChange: (Int, Int) -> Unit,
-	onOpenExactAlarmSettings: () -> Unit,
-	periodMappingMode: PeriodMappingMode,
-	onPeriodMappingModeChange: (PeriodMappingMode) -> Unit,
-	onExportCsv: () -> Unit = {},
-	onImportCsv: () -> Unit = {},
-	onResetTutorial: () -> Unit = {},
-	onBugReportClick: () -> Unit = {},
-	onNavigateToChangelog: () -> Unit = {},
-	onBack: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    isCensored: Boolean = false,
+    currentTheme: String,
+    currentTypography: String,
+    isMaterialYouEnabled: Boolean,
+    isCreditQuickToggleFeatureEnabled: Boolean,
+    recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
+    notificationHour: Int,
+    notificationMinute: Int,
+    recurrentNotificationHour: Int,
+    recurrentNotificationMinute: Int,
+    exactAlarmEnabled: Boolean,
+    notificationPermissionGranted: Boolean,
+    onThemeChange: (String) -> Unit,
+    onTypographyChange: (String) -> Unit,
+    onMaterialYouToggle: () -> Unit,
+    onCreditQuickToggleFeatureToggle: () -> Unit,
+    onRecurrentPaymentsViewModeChange: (RecurrentPaymentsViewMode) -> Unit,
+    onNotificationTimeChange: (Int, Int) -> Unit,
+    onRecurrentNotificationTimeChange: (Int, Int) -> Unit,
+    onOpenExactAlarmSettings: () -> Unit,
+    onOpenNotificationSettings: () -> Unit,
+    periodMappingMode: PeriodMappingMode,
+    onPeriodMappingModeChange: (PeriodMappingMode) -> Unit,
+    onExportCsv: () -> Unit = {},
+    onImportCsv: () -> Unit = {},
+    onResetTutorial: () -> Unit = {},
+    onBugReportClick: () -> Unit = {},
+    onNavigateToChangelog: () -> Unit = {},
+    onBack: () -> Unit = {},
 ) {
-	var showThemeDialog by remember { mutableStateOf(false) }
-	var showTypographyDialog by remember { mutableStateOf(false) }
-	var showRecurrentPaymentsViewModeDialog by remember { mutableStateOf(false) }
-	var showNotificationTimePicker by remember { mutableStateOf(false) }
-	var showRecurrentNotificationTimePicker by remember { mutableStateOf(false) }
-	var isCreditFeatureExpanded by remember { mutableStateOf(false) }
-	val dismissThemeDialog = { showThemeDialog = false }
-	val dismissTypographyDialog = { showTypographyDialog = false }
-	val dismissRecurrentPaymentsViewModeDialog = { showRecurrentPaymentsViewModeDialog = false }
-	val dismissNotificationTimePicker = { showNotificationTimePicker = false }
-	val dismissRecurrentNotificationTimePicker = { showRecurrentNotificationTimePicker = false }
-	val scrollBehavior =
-		TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-	val context = LocalContext.current
-	val view = LocalView.current
-	val snackbarHostState = remember { SnackbarHostState() }
-	val coroutineScope = rememberCoroutineScope()
-	val appVersionName = "v${BuildConfig.VERSION_NAME}"
-	val metadataCopiedMessage = stringResource(R.string.settings_version_metadata_copied)
+    var showThemeDialog by remember { mutableStateOf(false) }
+    var showTypographyDialog by remember { mutableStateOf(false) }
+    var showRecurrentPaymentsViewModeDialog by remember { mutableStateOf(false) }
+    var showNotificationTimePicker by remember { mutableStateOf(false) }
+    var showRecurrentNotificationTimePicker by remember { mutableStateOf(false) }
+    var isCreditFeatureExpanded by remember { mutableStateOf(false) }
+    val dismissThemeDialog = { showThemeDialog = false }
+    val dismissTypographyDialog = { showTypographyDialog = false }
+    val dismissRecurrentPaymentsViewModeDialog = { showRecurrentPaymentsViewModeDialog = false }
+    val dismissNotificationTimePicker = { showNotificationTimePicker = false }
+    val dismissRecurrentNotificationTimePicker = { showRecurrentNotificationTimePicker = false }
+    val scrollBehavior =
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val context = LocalContext.current
+    val view = LocalView.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val appVersionName = "v${BuildConfig.VERSION_NAME}"
+    val metadataCopiedMessage = stringResource(R.string.settings_version_metadata_copied)
 
-	Scaffold(
-		modifier = modifier
-			.nestedScroll(scrollBehavior.nestedScrollConnection),
-		snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-		topBar = {
-			MediumTopAppBar(
-				title = {
-					Text(
-						text = stringResource(R.string.settings_title),
-						style = MaterialTheme.typography.titleLargeEmphasized,
-					)
-				}, navigationIcon = {
-					IconButton(
-						onClick = onBack, modifier = Modifier.testTag("SettingsBackButton")
-					) {
-						Icon(
-							imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-							contentDescription = null
-						)
-					}
-				}, colors = TopAppBarDefaults.topAppBarColors(
-					containerColor = MaterialTheme.colorScheme.surface,
-					titleContentColor = MaterialTheme.colorScheme.onSurface
-				), scrollBehavior = scrollBehavior
-			)
-		}) { paddingValues ->
-		LazyColumn(
-			modifier = Modifier
-				.fillMaxSize()
-				.padding(paddingValues)
-				.testTag("SettingsScreen"),
-		) {
-			if (isCensored) {
-				item {
-					OutlinedCard(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(horizontal = 16.dp, vertical = 8.dp),
-						shape = MaterialTheme.shapes.large,
-						border = BorderStroke(
-							1.dp,
-							MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-						),
-						colors = CardDefaults.outlinedCardColors(
-							containerColor = Color.Transparent
-						),
-					) {
-						Column(
-							modifier = Modifier
-								.fillMaxWidth()
-								.padding(horizontal = 12.dp, vertical = 14.dp),
-						) {
-							Row(verticalAlignment = Alignment.CenterVertically) {
-								Icon(
-									imageVector = Icons.Outlined.RemoveRedEye,
-									contentDescription = null,
-									tint = MaterialTheme.colorScheme.outline,
-									modifier = Modifier.size(20.dp)
-								)
-								Spacer(modifier = Modifier.width(8.dp))
-								Text(
-									text = stringResource(R.string.censor_mode_card_label),
-									style = MaterialTheme.typography.bodySmallCondensed,
-									color = MaterialTheme.colorScheme.outline,
-								)
-							}
-							Text(
-								text = stringResource(R.string.censor_mode_card_body),
-								modifier = Modifier.padding(top = 4.dp),
-								style = MaterialTheme.typography.bodySmallCondensed,
-								color = MaterialTheme.colorScheme.onSurface,
-							)
-						}
-					}
-				}
-			}
-			item {
-				PaddedListGroup(
-					title = stringResource(R.string.settings_section_appearance)
-				) {
-					CustomPaddedListItem(
-						onClick = {
-							showThemeDialog = true
-							view.weakHapticFeedback()
-						},
-						position = PaddedListItemPosition.First,
-						modifier = Modifier.testTag("SettingsThemeItem")
-					) {
-						Icon(
-							imageVector = Icons.Default.Brightness4,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Spacer(modifier = Modifier.width(16.dp))
+    Scaffold(
+        modifier = modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        topBar = {
+            MediumTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.settings_title),
+                        style = MaterialTheme.typography.titleLargeEmphasized,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier.testTag("SettingsBackButton")
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                ),
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .testTag("SettingsScreen"),
+        ) {
+            if (isCensored) {
+                item {
+                    OutlinedCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        shape = MaterialTheme.shapes.large,
+                        border = BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                        ),
+                        colors = CardDefaults.outlinedCardColors(
+                            containerColor = Color.Transparent
+                        ),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 14.dp),
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Outlined.RemoveRedEye,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.outline,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(R.string.censor_mode_card_label),
+                                    style = MaterialTheme.typography.bodySmallCondensed,
+                                    color = MaterialTheme.colorScheme.outline,
+                                )
+                            }
+                            Text(
+                                text = stringResource(R.string.censor_mode_card_body),
+                                modifier = Modifier.padding(top = 4.dp),
+                                style = MaterialTheme.typography.bodySmallCondensed,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
+                    }
+                }
+            }
+            item {
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_section_appearance)
+                ) {
+                    CustomPaddedListItem(
+                        onClick = {
+                            showThemeDialog = true
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.First,
+                        modifier = Modifier.testTag("SettingsThemeItem")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Brightness4,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Spacer(modifier = Modifier.width(16.dp))
 
-							Text(
-								text = stringResource(R.string.settings_theme_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_theme_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-						Text(
-							text = currentTheme,
-							style = MaterialTheme.typography.labelLargeCondensed,
-							color = MaterialTheme.colorScheme.primary
-						)
-					}
+                            Text(
+                                text = stringResource(R.string.settings_theme_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_theme_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = currentTheme,
+                            style = MaterialTheme.typography.labelLargeCondensed,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
 
-					CustomPaddedListItem(
-						onClick = {
-							showTypographyDialog = true
-							view.weakHapticFeedback()
-						},
-						position = PaddedListItemPosition.Middle,
-						modifier = Modifier.testTag("SettingsTypoItem")
-					) {
-						Icon(
-							imageVector = Icons.Default.TextFields,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
+                    CustomPaddedListItem(
+                        onClick = {
+                            showTypographyDialog = true
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.Middle,
+                        modifier = Modifier.testTag("SettingsTypoItem")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.TextFields,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
 
-						Column(modifier = Modifier.weight(1f)) {
-							Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Spacer(modifier = Modifier.width(16.dp))
 
-							Text(
-								text = stringResource(R.string.settings_typography_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_typography_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-						Text(
-							text = currentTypography,
-							style = MaterialTheme.typography.labelLargeCondensed,
-							color = MaterialTheme.colorScheme.primary
-						)
-					}
+                            Text(
+                                text = stringResource(R.string.settings_typography_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_typography_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = currentTypography,
+                            style = MaterialTheme.typography.labelLargeCondensed,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
 
-					CustomPaddedListItem(
-						onClick = onMaterialYouToggle,
-						position = PaddedListItemPosition.Last,
-						modifier = Modifier.testTag("SettingsMaterialYouItem")
-					) {
-						Icon(
-							imageVector = Icons.Default.Palette,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_material_you_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_material_you_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant,
-								modifier = Modifier.padding(end = 4.dp)
-							)
-						}
-						Switch(
-							checked = isMaterialYouEnabled, onCheckedChange = {
-								onMaterialYouToggle()
-//								view.toggleFeedback()
-							}, modifier = Modifier.testTag("SettingsMaterialYouSwitch")
-						)
-					}
-				}
-			}
+                    CustomPaddedListItem(
+                        onClick = onMaterialYouToggle,
+                        position = PaddedListItemPosition.Last,
+                        modifier = Modifier.testTag("SettingsMaterialYouItem")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_material_you_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_material_you_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(end = 4.dp)
+                            )
+                        }
+                        Switch(
+                            checked = isMaterialYouEnabled,
+                            onCheckedChange = {
+                                onMaterialYouToggle()
+// 								view.toggleFeedback()
+                            },
+                            modifier = Modifier.testTag("SettingsMaterialYouSwitch")
+                        )
+                    }
+                }
+            }
 
-			item {
-				PaddedListGroup(
-					title = stringResource(R.string.settings_section_features)
-				) {
-					CustomPaddedExpandableItem(
-						isExpanded = isCreditFeatureExpanded,
-						onToggleExpanded = { isCreditFeatureExpanded = !isCreditFeatureExpanded },
-						position = PaddedListItemPosition.First,
-						modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureItem"),
-						defaultContent = {
-							Icon(
-								imageVector = Icons.Default.CreditCard,
-								contentDescription = null,
-								tint = MaterialTheme.colorScheme.primary
-							)
-							Spacer(modifier = Modifier.width(16.dp))
-							Column(modifier = Modifier.weight(1f)) {
-								Text(
-									text = stringResource(R.string.settings_feature_credit_toggle_title),
-									style = MaterialTheme.typography.bodyMediumEmphasized,
-									color = MaterialTheme.colorScheme.onSurface
-								)
-								Text(
-									text = stringResource(R.string.settings_feature_credit_toggle_subtitle),
-									style = MaterialTheme.typography.bodySmall,
-									color = MaterialTheme.colorScheme.onSurfaceVariant
-								)
-							}
-							Icon(
-								imageVector = if (isCreditFeatureExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-								contentDescription = null,
-								tint = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						},
-						expandedContent = {
-							Text(
-								text = stringResource(R.string.settings_feature_credit_toggle_details),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant,
-								modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-							)
-							Row(
-								modifier = Modifier
-									.fillMaxWidth()
-									.padding(top = 8.dp, start = 6.dp, end = 6.dp),
-								verticalAlignment = Alignment.CenterVertically
-							) {
-								Text(
-									text = stringResource(R.string.settings_feature_credit_toggle_switch_label),
-									style = MaterialTheme.typography.bodyMedium,
-									color = MaterialTheme.colorScheme.onSurface,
-									modifier = Modifier.weight(1f)
-								)
-								Switch(
-									checked = isCreditQuickToggleFeatureEnabled,
-									onCheckedChange = { onCreditQuickToggleFeatureToggle() },
-									modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureSwitch")
-								)
-							}
-						}
-					)
+            item {
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_section_features)
+                ) {
+                    CustomPaddedExpandableItem(
+                        isExpanded = isCreditFeatureExpanded,
+                        onToggleExpanded = { isCreditFeatureExpanded = !isCreditFeatureExpanded },
+                        position = PaddedListItemPosition.First,
+                        modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureItem"),
+                        defaultContent = {
+                            Icon(
+                                imageVector = Icons.Default.CreditCard,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.settings_feature_credit_toggle_title),
+                                    style = MaterialTheme.typography.bodyMediumEmphasized,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = stringResource(R.string.settings_feature_credit_toggle_subtitle),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Icon(
+                                imageVector = if (isCreditFeatureExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        expandedContent = {
+                            Text(
+                                text = stringResource(R.string.settings_feature_credit_toggle_details),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp, start = 6.dp, end = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.settings_feature_credit_toggle_switch_label),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Switch(
+                                    checked = isCreditQuickToggleFeatureEnabled,
+                                    onCheckedChange = { onCreditQuickToggleFeatureToggle() },
+                                    modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureSwitch")
+                                )
+                            }
+                        }
+                    )
 
-					CustomPaddedListItem(
-						onClick = {
-							showRecurrentPaymentsViewModeDialog = true
-							view.weakHapticFeedback()
-						},
-						position = PaddedListItemPosition.Last,
-						modifier = Modifier.testTag("SettingsRecurrentPaymentsViewModeItem")
-					) {
-						Icon(
-							imageVector = Icons.AutoMirrored.Filled.ViewList,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_recurrent_payments_view_mode_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_recurrent_payments_view_mode_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-						Text(
-							text = recurrentPaymentsViewMode.label(),
-							style = MaterialTheme.typography.labelLargeCondensed,
-							color = MaterialTheme.colorScheme.primary
-						)
-					}
-				}
-			}
+                    CustomPaddedListItem(
+                        onClick = {
+                            showRecurrentPaymentsViewModeDialog = true
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.Last,
+                        modifier = Modifier.testTag("SettingsRecurrentPaymentsViewModeItem")
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ViewList,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_recurrent_payments_view_mode_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_recurrent_payments_view_mode_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = recurrentPaymentsViewMode.label(),
+                            style = MaterialTheme.typography.labelLargeCondensed,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
 
-			item {
-				PaddedListGroup(
-					title = stringResource(R.string.settings_section_notifications)
-				) {
-					CustomPaddedListItem(
-						onClick = {
-							showNotificationTimePicker = true
-							view.weakHapticFeedback()
-						},
-						position = PaddedListItemPosition.First,
-					) {
-						Icon(
-							imageVector = Icons.Default.AccessTime,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_period_end_time_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_period_end_time_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-						Text(
-							text = formatNotificationTime(
-								context, notificationHour, notificationMinute
-							),
-							style = MaterialTheme.typography.labelLargeCondensed,
-							color = MaterialTheme.colorScheme.primary
-						)
-					}
+            item {
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_section_notifications)
+                ) {
+                    NotificationPermissionItem(
+                        granted = notificationPermissionGranted,
+                        onClick = onOpenNotificationSettings,
+                        position = PaddedListItemPosition.First,
+                    )
 
-					CustomPaddedListItem(
-						onClick = {
-							showRecurrentNotificationTimePicker = true
-							view.weakHapticFeedback()
-						},
-						position = PaddedListItemPosition.Middle,
-					) {
-						Icon(
-							imageVector = Icons.Default.Repeat,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_recurrent_notification_time_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_recurrent_notification_time_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-						Text(
-							text = formatNotificationTime(
-								context, recurrentNotificationHour, recurrentNotificationMinute
-							),
-							style = MaterialTheme.typography.labelLargeCondensed,
-							color = MaterialTheme.colorScheme.primary
-						)
-					}
+                    CustomPaddedListItem(
+                        onClick = {
+                            showNotificationTimePicker = true
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.Middle,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccessTime,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_period_end_time_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_period_end_time_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = formatNotificationTime(
+                                context,
+                                notificationHour,
+                                notificationMinute
+                            ),
+                            style = MaterialTheme.typography.labelLargeCondensed,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
 
-					CustomPaddedListItem(
-						onClick = {
-							onOpenExactAlarmSettings()
-							view.weakHapticFeedback()
-						},
-						position = PaddedListItemPosition.Last,
-					) {
-						Icon(
-							imageVector = Icons.Default.Alarm,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_exact_alarm_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = if (exactAlarmEnabled) {
-									stringResource(R.string.settings_exact_alarm_enabled_subtitle)
-								} else {
-									stringResource(R.string.settings_exact_alarm_disabled_subtitle)
-								},
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
-				}
-			}
+                    CustomPaddedListItem(
+                        onClick = {
+                            showRecurrentNotificationTimePicker = true
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.Middle,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Repeat,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_recurrent_notification_time_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_recurrent_notification_time_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = formatNotificationTime(
+                                context,
+                                recurrentNotificationHour,
+                                recurrentNotificationMinute
+                            ),
+                            style = MaterialTheme.typography.labelLargeCondensed,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
 
-			item {
-				PaddedListGroup(
-					title = stringResource(R.string.settings_section_data_backup)
-				) {
-					CustomPaddedListItem(
-						onClick = {
-							onExportCsv()
-							view.toggleFeedback()
-						}, position = PaddedListItemPosition.First
-					) {
-						Icon(
-							imageVector = Icons.Default.Backup,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_backup_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_backup_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
+                    CustomPaddedListItem(
+                        onClick = {
+                            onOpenExactAlarmSettings()
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.Last,
+                        borderStroke = if (!exactAlarmEnabled) {
+                            BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                        } else {
+                            null
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Alarm,
+                            contentDescription = null,
+                            tint = if (exactAlarmEnabled) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.error
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_exact_alarm_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = if (exactAlarmEnabled) {
+                                    MaterialTheme.colorScheme.onSurface
+                                } else {
+                                    MaterialTheme.colorScheme.error
+                                }
+                            )
+                            Text(
+                                text = if (exactAlarmEnabled) {
+                                    stringResource(R.string.settings_exact_alarm_enabled_subtitle)
+                                } else {
+                                    stringResource(R.string.settings_exact_alarm_disabled_subtitle)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (exactAlarmEnabled) {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                } else {
+                                    MaterialTheme.colorScheme.error
+                                }
+                            )
+                        }
+                    }
+                }
+            }
 
-					CustomPaddedListItem(
-						onClick = {
-							onImportCsv()
-							view.toggleFeedback()
-						}, position = PaddedListItemPosition.Last
-					) {
-						Icon(
-							imageVector = Icons.Default.Publish,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_import_csv_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_import_csv_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
-				}
-			}
+            item {
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_section_data_backup)
+                ) {
+                    CustomPaddedListItem(
+                        onClick = {
+                            onExportCsv()
+                            view.toggleFeedback()
+                        },
+                        position = PaddedListItemPosition.First
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Backup,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_backup_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_backup_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
 
-			item {
-				PaddedListGroup(
-					title = stringResource(R.string.settings_section_app_info)
-				) {
-					CustomPaddedListItem(
-						onClick = {
-							onNavigateToChangelog()
-							view.weakHapticFeedback()
-						},
-						position = PaddedListItemPosition.First,
-					) {
-						Icon(
-							imageVector = Icons.Default.AutoAwesome,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.changelog_settings_item_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(
-									R.string.changelog_settings_item_subtitle,
-									BuildConfig.VERSION_NAME,
-								),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-						Icon(
-							imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.onSurfaceVariant,
-						)
-					}
+                    CustomPaddedListItem(
+                        onClick = {
+                            onImportCsv()
+                            view.toggleFeedback()
+                        },
+                        position = PaddedListItemPosition.Last
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Publish,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_import_csv_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_import_csv_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
 
-					CustomPaddedListItem(
-						onClick = {
-							Utils.openWebLink(context, "https://www.github.com/isaacsa51/Minus")
-							view.weakHapticFeedback()
-						}, position = PaddedListItemPosition.Middle
-					) {
-						Icon(
-							imageVector = Icons.Default.QuestionMark,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_about_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_about_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
+            item(key = "settings_app_info_section") {
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_section_app_info)
+                ) {
+                    CustomPaddedListItem(
+                        onClick = {
+                            onNavigateToChangelog()
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.First,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.changelog_settings_item_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(
+                                    R.string.changelog_settings_item_subtitle,
+                                    BuildConfig.VERSION_NAME,
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
 
-					CustomPaddedListItem(
-						onClick = {
-							onBugReportClick()
-							view.weakHapticFeedback()
-						}, position = PaddedListItemPosition.Middle
-					) {
-						Icon(
-							imageVector = Icons.Default.BugReport,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_bug_report_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = stringResource(R.string.settings_bug_report_subtitle),
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
+                    CustomPaddedListItem(
+                        onClick = {
+                            Utils.openWebLink(context, "https://www.github.com/isaacsa51/Minus")
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.Middle
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.QuestionMark,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_about_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_about_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
 
+                    CustomPaddedListItem(
+                        onClick = {
+                            onBugReportClick()
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.Middle
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.BugReport,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_bug_report_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_bug_report_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
 
-					CustomPaddedListItem(
-						onClick = {
-							view.weakHapticFeedback()
-						},
-						position = PaddedListItemPosition.Last,
-						onLongClick = {
-							context.copyAppEnvironmentMetadataToClipboard()
-							view.toggleFeedback()
-							coroutineScope.launch {
-								snackbarHostState.showSnackbar(
-									message = metadataCopiedMessage,
-									duration = SnackbarDuration.Short,
-								)
-							}
-						},
-					) {
-						Icon(
-							imageVector = Icons.Default.Info,
-							contentDescription = null,
-							tint = MaterialTheme.colorScheme.primary
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Column(modifier = Modifier.weight(1f)) {
-							Text(
-								text = stringResource(R.string.settings_version_title),
-								style = MaterialTheme.typography.bodyMediumEmphasized,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = appVersionName,
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-						}
-					}
-				}
-			}
+                    CustomPaddedListItem(
+                        onClick = {
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.Last,
+                        onLongClick = {
+                            context.copyAppEnvironmentMetadataToClipboard()
+                            view.toggleFeedback()
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = metadataCopiedMessage,
+                                    duration = SnackbarDuration.Short,
+                                )
+                            }
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_version_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = appVersionName,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
 
 //
-//			item {
-//				PaddedListGroup(
-//					title = stringResource(R.string.settings_section_tutorial)
-//				) {
-//					CustomPaddedListItem(
-//						onClick = {
-//							onResetTutorial()
-//							view.toggleFeedback()
-//						},
-//						position = PaddedListItemPosition.Single,
-//						modifier = Modifier.testTag("SettingsResetTutorialItem")
-//					) {
-//						Icon(
-//							imageVector = Icons.Default.Refresh,
-//							contentDescription = null,
-//							tint = MaterialTheme.colorScheme.primary
-//						)
-//						Spacer(modifier = Modifier.width(16.dp))
-//						Column(modifier = Modifier.weight(1f)) {
-//							Text(
-//								text = stringResource(R.string.settings_reset_tutorial_title),
-//								style = MaterialTheme.typography.bodyMediumEmphasized,
-//								color = MaterialTheme.colorScheme.onSurface
-//							)
-//							Text(
-//								text = stringResource(R.string.settings_reset_tutorial_subtitle),
-//								style = MaterialTheme.typography.bodySmall,
-//								color = MaterialTheme.colorScheme.onSurfaceVariant
-//							)
-//						}
-//					}
-//				}
-//			}
-		}
+// 			item {
+// 				PaddedListGroup(
+// 					title = stringResource(R.string.settings_section_tutorial)
+// 				) {
+// 					CustomPaddedListItem(
+// 						onClick = {
+// 							onResetTutorial()
+// 							view.toggleFeedback()
+// 						},
+// 						position = PaddedListItemPosition.Single,
+// 						modifier = Modifier.testTag("SettingsResetTutorialItem")
+// 					) {
+// 						Icon(
+// 							imageVector = Icons.Default.Refresh,
+// 							contentDescription = null,
+// 							tint = MaterialTheme.colorScheme.primary
+// 						)
+// 						Spacer(modifier = Modifier.width(16.dp))
+// 						Column(modifier = Modifier.weight(1f)) {
+// 							Text(
+// 								text = stringResource(R.string.settings_reset_tutorial_title),
+// 								style = MaterialTheme.typography.bodyMediumEmphasized,
+// 								color = MaterialTheme.colorScheme.onSurface
+// 							)
+// 							Text(
+// 								text = stringResource(R.string.settings_reset_tutorial_subtitle),
+// 								style = MaterialTheme.typography.bodySmall,
+// 								color = MaterialTheme.colorScheme.onSurfaceVariant
+// 							)
+// 						}
+// 					}
+// 				}
+// 			}
+        }
 
-		if (showThemeDialog) {
-			ThemePickerDialog(
-				currentTheme = currentTheme,
-				onThemeSelected = onThemeChange,
-				onDismiss = dismissThemeDialog
-			)
-		}
+        if (showThemeDialog) {
+            ThemePickerDialog(
+                currentTheme = currentTheme,
+                onThemeSelected = onThemeChange,
+                onDismiss = dismissThemeDialog
+            )
+        }
 
-		if (showTypographyDialog) {
-			TypographyPickerDialog(
-				currentTypography = currentTypography,
-				onTypographySelected = onTypographyChange,
-				onDismiss = dismissTypographyDialog,
-			)
-		}
+        if (showTypographyDialog) {
+            TypographyPickerDialog(
+                currentTypography = currentTypography,
+                onTypographySelected = onTypographyChange,
+                onDismiss = dismissTypographyDialog,
+            )
+        }
 
-		if (showRecurrentPaymentsViewModeDialog) {
-			RecurrentPaymentsViewModePickerDialog(
-				currentMode = recurrentPaymentsViewMode,
-				onModeSelected = onRecurrentPaymentsViewModeChange,
-				onDismiss = dismissRecurrentPaymentsViewModeDialog,
-			)
-		}
+        if (showRecurrentPaymentsViewModeDialog) {
+            RecurrentPaymentsViewModePickerDialog(
+                currentMode = recurrentPaymentsViewMode,
+                onModeSelected = onRecurrentPaymentsViewModeChange,
+                onDismiss = dismissRecurrentPaymentsViewModeDialog,
+            )
+        }
 
-		if (showNotificationTimePicker) {
-			NotificationTimePickerDialog(
-				initialHour = notificationHour,
-				initialMinute = notificationMinute,
-				onDismiss = dismissNotificationTimePicker,
-				onTimeSelected = { hour, minute ->
-					onNotificationTimeChange(hour, minute)
-					dismissNotificationTimePicker()
-				})
-		}
+        if (showNotificationTimePicker) {
+            NotificationTimePickerDialog(
+                initialHour = notificationHour,
+                initialMinute = notificationMinute,
+                onDismiss = dismissNotificationTimePicker,
+                onTimeSelected = { hour, minute ->
+                    onNotificationTimeChange(hour, minute)
+                    dismissNotificationTimePicker()
+                }
+            )
+        }
 
-		if (showRecurrentNotificationTimePicker) {
-			NotificationTimePickerDialog(
-				initialHour = recurrentNotificationHour,
-				initialMinute = recurrentNotificationMinute,
-				onDismiss = dismissRecurrentNotificationTimePicker,
-				onTimeSelected = { hour, minute ->
-					onRecurrentNotificationTimeChange(hour, minute)
-					dismissRecurrentNotificationTimePicker()
-				})
-		}
-	}
+        if (showRecurrentNotificationTimePicker) {
+            NotificationTimePickerDialog(
+                initialHour = recurrentNotificationHour,
+                initialMinute = recurrentNotificationMinute,
+                onDismiss = dismissRecurrentNotificationTimePicker,
+                onTimeSelected = { hour, minute ->
+                    onRecurrentNotificationTimeChange(hour, minute)
+                    dismissRecurrentNotificationTimePicker()
+                }
+            )
+        }
+    }
 }
 
 @Composable
 fun ThemePickerDialog(
-	currentTheme: String, onThemeSelected: (String) -> Unit, onDismiss: () -> Unit
+    currentTheme: String,
+    onThemeSelected: (String) -> Unit,
+    onDismiss: () -> Unit
 ) {
-	Dialog(onDismissRequest = onDismiss) {
-		Surface(
-			shape = RoundedCornerShape(28.dp),
-			color = MaterialTheme.colorScheme.surfaceContainerHigh,
-			tonalElevation = 6.dp,
-			modifier = Modifier.testTag("ThemePickerDialog")
-		) {
-			Column(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(24.dp)
-			) {
-				Text(
-					text = stringResource(R.string.settings_theme_dialog_title),
-					style = MaterialTheme.typography.headlineSmall,
-					fontWeight = FontWeight.Bold,
-					color = MaterialTheme.colorScheme.onSurface,
-					modifier = Modifier.padding(bottom = 16.dp)
-				)
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            tonalElevation = 6.dp,
+            modifier = Modifier.testTag("ThemePickerDialog")
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_theme_dialog_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
-				ThemeOption(
-					title = stringResource(R.string.settings_theme_light_title),
-					subtitle = stringResource(R.string.settings_theme_light_subtitle),
-					icon = Icons.Default.LightMode,
-					isSelected = currentTheme == "Light",
-					onClick = {
-						onThemeSelected("Light")
-						onDismiss()
-					})
+                ThemeOption(
+                    title = stringResource(R.string.settings_theme_light_title),
+                    subtitle = stringResource(R.string.settings_theme_light_subtitle),
+                    icon = Icons.Default.LightMode,
+                    isSelected = currentTheme == "Light",
+                    onClick = {
+                        onThemeSelected("Light")
+                        onDismiss()
+                    }
+                )
 
-				Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-				ThemeOption(
-					title = stringResource(R.string.settings_theme_dark_title),
-					subtitle = stringResource(R.string.settings_theme_dark_subtitle),
-					icon = Icons.Default.DarkMode,
-					isSelected = currentTheme == "Dark",
-					onClick = {
-						onThemeSelected("Dark")
-						onDismiss()
-					})
+                ThemeOption(
+                    title = stringResource(R.string.settings_theme_dark_title),
+                    subtitle = stringResource(R.string.settings_theme_dark_subtitle),
+                    icon = Icons.Default.DarkMode,
+                    isSelected = currentTheme == "Dark",
+                    onClick = {
+                        onThemeSelected("Dark")
+                        onDismiss()
+                    }
+                )
 
-				Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-				ThemeOption(
-					title = stringResource(R.string.settings_theme_system_title),
-					subtitle = stringResource(R.string.settings_theme_system_subtitle),
-					icon = Icons.Default.Brightness4,
-					isSelected = currentTheme == "System",
-					onClick = {
-						onThemeSelected("System")
-						onDismiss()
-					})
-			}
-		}
-	}
+                ThemeOption(
+                    title = stringResource(R.string.settings_theme_system_title),
+                    subtitle = stringResource(R.string.settings_theme_system_subtitle),
+                    icon = Icons.Default.Brightness4,
+                    isSelected = currentTheme == "System",
+                    onClick = {
+                        onThemeSelected("System")
+                        onDismiss()
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable
 private fun ThemeOption(
-	title: String, subtitle: String, icon: ImageVector, isSelected: Boolean, onClick: () -> Unit
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    isSelected: Boolean,
+    onClick: () -> Unit
 ) {
-	Row(
-		modifier = Modifier
-			.fillMaxWidth()
-			.clip(RoundedCornerShape(16.dp))
-			.background(
-				if (isSelected) {
-					MaterialTheme.colorScheme.primaryContainer
-				} else {
-					MaterialTheme.colorScheme.surface
-				}
-			)
-			.clickable(onClick = onClick)
-			.padding(16.dp),
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		Icon(
-			imageVector = icon, contentDescription = null, tint = if (isSelected) {
-				MaterialTheme.colorScheme.onPrimaryContainer
-			} else {
-				MaterialTheme.colorScheme.onSurfaceVariant
-			}, modifier = Modifier.size(24.dp)
-		)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                if (isSelected) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surface
+                }
+            )
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = if (isSelected) {
+                MaterialTheme.colorScheme.onPrimaryContainer
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            modifier = Modifier.size(24.dp)
+        )
 
-		Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(16.dp))
 
-		Column(modifier = Modifier.weight(1f)) {
-			Text(
-				text = title,
-				style = MaterialTheme.typography.bodyMediumEmphasized,
-				fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-				color = if (isSelected) {
-					MaterialTheme.colorScheme.onPrimaryContainer
-				} else {
-					MaterialTheme.colorScheme.onSurface
-				}
-			)
-			Text(
-				text = subtitle,
-				style = MaterialTheme.typography.bodySmall,
-				color = if (isSelected) {
-					MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-				} else {
-					MaterialTheme.colorScheme.onSurfaceVariant
-				}
-			)
-		}
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMediumEmphasized,
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                color = if (isSelected) {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                }
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = if (isSelected) {
+                    MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            )
+        }
 
-		if (isSelected) {
-			RadioButton(
-				selected = true, onClick = null, colors = RadioButtonDefaults.colors(
-					selectedColor = MaterialTheme.colorScheme.primary
-				)
-			)
-		}
-	}
+        if (isSelected) {
+            RadioButton(
+                selected = true,
+                onClick = null,
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+    }
 }
 
 @Composable
 fun TypographyPickerDialog(
-	currentTypography: String,
-	onTypographySelected: (String) -> Unit,
-	onDismiss: () -> Unit,
+    currentTypography: String,
+    onTypographySelected: (String) -> Unit,
+    onDismiss: () -> Unit,
 ) {
-	Dialog(onDismissRequest = onDismiss) {
-		Surface(
-			shape = RoundedCornerShape(28.dp),
-			color = MaterialTheme.colorScheme.surfaceContainerHigh,
-			tonalElevation = 6.dp,
-			modifier = Modifier.testTag("TypographyPickerDialog")
-		) {
-			Column(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(24.dp)
-			) {
-				Text(
-					text = stringResource(R.string.settings_typography_dialog_title),
-					style = MaterialTheme.typography.headlineSmall,
-					fontWeight = FontWeight.Bold,
-					color = MaterialTheme.colorScheme.onSurface,
-					modifier = Modifier.padding(bottom = 16.dp)
-				)
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            tonalElevation = 6.dp,
+            modifier = Modifier.testTag("TypographyPickerDialog")
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_typography_dialog_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
-				ThemeOption(
-					title = stringResource(R.string.settings_typography_default_title),
-					subtitle = stringResource(R.string.settings_typography_default_subtitle),
-					icon = Icons.Default.TextFields,
-					isSelected = currentTypography == "Default",
-					onClick = {
-						onTypographySelected("Default")
-						onDismiss()
-					}
-				)
+                ThemeOption(
+                    title = stringResource(R.string.settings_typography_default_title),
+                    subtitle = stringResource(R.string.settings_typography_default_subtitle),
+                    icon = Icons.Default.TextFields,
+                    isSelected = currentTypography == "Default",
+                    onClick = {
+                        onTypographySelected("Default")
+                        onDismiss()
+                    }
+                )
 
-				Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-				ThemeOption(
-					title = stringResource(R.string.settings_typography_condensed_title),
-					subtitle = stringResource(R.string.settings_typography_condensed_subtitle),
-					icon = Icons.Default.TextFields,
-					isSelected = currentTypography == "Condensed",
-					onClick = {
-						onTypographySelected("Condensed")
-						onDismiss()
-					}
-				)
+                ThemeOption(
+                    title = stringResource(R.string.settings_typography_condensed_title),
+                    subtitle = stringResource(R.string.settings_typography_condensed_subtitle),
+                    icon = Icons.Default.TextFields,
+                    isSelected = currentTypography == "Condensed",
+                    onClick = {
+                        onTypographySelected("Condensed")
+                        onDismiss()
+                    }
+                )
 
-				Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-				ThemeOption(
-					title = stringResource(R.string.settings_typography_expressive_title),
-					subtitle = stringResource(R.string.settings_typography_expressive_subtitle),
-					icon = Icons.Default.TextFields,
-					isSelected = currentTypography == "Expressive",
-					onClick = {
-						onTypographySelected("Expressive")
-						onDismiss()
-					}
-				)
-			}
-		}
-	}
+                ThemeOption(
+                    title = stringResource(R.string.settings_typography_expressive_title),
+                    subtitle = stringResource(R.string.settings_typography_expressive_subtitle),
+                    icon = Icons.Default.TextFields,
+                    isSelected = currentTypography == "Expressive",
+                    onClick = {
+                        onTypographySelected("Expressive")
+                        onDismiss()
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable
 fun RecurrentPaymentsViewModePickerDialog(
-	currentMode: RecurrentPaymentsViewMode,
-	onModeSelected: (RecurrentPaymentsViewMode) -> Unit,
-	onDismiss: () -> Unit,
+    currentMode: RecurrentPaymentsViewMode,
+    onModeSelected: (RecurrentPaymentsViewMode) -> Unit,
+    onDismiss: () -> Unit,
 ) {
-	Dialog(onDismissRequest = onDismiss) {
-		Surface(
-			shape = RoundedCornerShape(28.dp),
-			color = MaterialTheme.colorScheme.surfaceContainerHigh,
-			tonalElevation = 6.dp,
-			modifier = Modifier.testTag("RecurrentPaymentsViewModePickerDialog")
-		) {
-			Column(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(24.dp)
-			) {
-				Text(
-					text = stringResource(R.string.settings_recurrent_payments_view_mode_dialog_title),
-					style = MaterialTheme.typography.headlineSmall,
-					fontWeight = FontWeight.Bold,
-					color = MaterialTheme.colorScheme.onSurface,
-					modifier = Modifier.padding(bottom = 16.dp)
-				)
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            tonalElevation = 6.dp,
+            modifier = Modifier.testTag("RecurrentPaymentsViewModePickerDialog")
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_recurrent_payments_view_mode_dialog_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
-				ThemeOption(
-					title = stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_title),
-					subtitle = stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_subtitle),
-					icon = Icons.Default.Repeat,
-					isSelected = currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST,
-					onClick = {
-						onModeSelected(RecurrentPaymentsViewMode.HORIZONTAL_LIST)
-						onDismiss()
-					}
-				)
+                ThemeOption(
+                    title = stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_title),
+                    subtitle = stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_subtitle),
+                    icon = Icons.Default.Repeat,
+                    isSelected = currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST,
+                    onClick = {
+                        onModeSelected(RecurrentPaymentsViewMode.HORIZONTAL_LIST)
+                        onDismiss()
+                    }
+                )
 
-				Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-				ThemeOption(
-					title = stringResource(R.string.settings_recurrent_payments_view_mode_vertical_title),
-					subtitle = stringResource(R.string.settings_recurrent_payments_view_mode_vertical_subtitle),
-					icon = Icons.Default.Repeat,
-					isSelected = currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST,
-					onClick = {
-						onModeSelected(RecurrentPaymentsViewMode.VERTICAL_LIST)
-						onDismiss()
-					}
-				)
-			}
-		}
-	}
+                ThemeOption(
+                    title = stringResource(R.string.settings_recurrent_payments_view_mode_vertical_title),
+                    subtitle = stringResource(R.string.settings_recurrent_payments_view_mode_vertical_subtitle),
+                    icon = Icons.Default.Repeat,
+                    isSelected = currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST,
+                    onClick = {
+                        onModeSelected(RecurrentPaymentsViewMode.VERTICAL_LIST)
+                        onDismiss()
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable
 private fun NotificationTimePickerDialog(
-	initialHour: Int, initialMinute: Int, onDismiss: () -> Unit, onTimeSelected: (Int, Int) -> Unit
+    initialHour: Int,
+    initialMinute: Int,
+    onDismiss: () -> Unit,
+    onTimeSelected: (Int, Int) -> Unit
 ) {
-	val context = LocalContext.current
-	DisposableEffect(context, initialHour, initialMinute) {
-		val dialog = TimePickerDialog(
-			context,
-			{ _, hour, minute -> onTimeSelected(hour, minute) },
-			initialHour,
-			initialMinute,
-			android.text.format.DateFormat.is24HourFormat(context)
-		)
-		dialog.setOnDismissListener { onDismiss() }
-		dialog.show()
-		onDispose {
-			dialog.setOnDismissListener(null)
-			dialog.dismiss()
-		}
-	}
+    val context = LocalContext.current
+    val state = rememberTimePickerState(
+        initialHour = initialHour,
+        initialMinute = initialMinute,
+        is24Hour = android.text.format.DateFormat.is24HourFormat(context),
+    )
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                TimePicker(state = state)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text(stringResource(R.string.settings_time_picker_cancel))
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    TextButton(onClick = {
+                        onTimeSelected(state.hour, state.minute)
+                        onDismiss()
+                    }) {
+                        Text(stringResource(R.string.settings_time_picker_confirm))
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun RecurrentPaymentsViewMode.label(): String {
-	return when (this) {
-		RecurrentPaymentsViewMode.HORIZONTAL_LIST -> stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_title)
-		RecurrentPaymentsViewMode.VERTICAL_LIST -> stringResource(R.string.settings_recurrent_payments_view_mode_vertical_title)
-	}
+    return when (this) {
+        RecurrentPaymentsViewMode.HORIZONTAL_LIST -> stringResource(
+            R.string.settings_recurrent_payments_view_mode_horizontal_title
+        )
+        RecurrentPaymentsViewMode.VERTICAL_LIST -> stringResource(
+            R.string.settings_recurrent_payments_view_mode_vertical_title
+        )
+    }
 }
 
 private fun Context.copyAppEnvironmentMetadataToClipboard() {
-	val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-	clipboard.setPrimaryClip(
-		ClipData.newPlainText(
-			"Minus app environment metadata",
-			buildAppEnvironmentMetadata(),
-		)
-	)
+    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.setPrimaryClip(
+        ClipData.newPlainText(
+            "Minus app environment metadata",
+            buildAppEnvironmentMetadata(),
+        )
+    )
 }
 
 private fun formatNotificationTime(
-	context: Context, hour: Int, minute: Int
+    context: Context,
+    hour: Int,
+    minute: Int
 ): String {
-	val pattern = if (android.text.format.DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a"
-	return LocalTime.of(hour, minute)
-		.format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
+    val pattern = if (android.text.format.DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a"
+    return LocalTime.of(hour, minute)
+        .format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
 }
 
 @PreviewLightDark
 @Composable
 private fun PreviewSettings() {
-	MinusTheme {
-		Settings(
-			currentTheme = "System",
-			currentTypography = "Expressive",
-			isMaterialYouEnabled = true,
-			isCreditQuickToggleFeatureEnabled = false,
-			recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
-			notificationHour = 9,
-			notificationMinute = 0,
-			recurrentNotificationHour = 8,
-			recurrentNotificationMinute = 0,
-			exactAlarmEnabled = true,
-			onThemeChange = {},
-			onTypographyChange = {},
-			onMaterialYouToggle = {},
-			onCreditQuickToggleFeatureToggle = {},
-			onRecurrentPaymentsViewModeChange = {},
-			onNotificationTimeChange = { _, _ -> },
-			onRecurrentNotificationTimeChange = { _, _ -> },
-			onOpenExactAlarmSettings = {},
-			periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
-			onPeriodMappingModeChange = {})
-	}
+    MinusTheme {
+        Settings(
+            currentTheme = "System",
+            currentTypography = "Expressive",
+            isMaterialYouEnabled = true,
+            isCreditQuickToggleFeatureEnabled = false,
+            recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
+            notificationHour = 9,
+            notificationMinute = 0,
+            recurrentNotificationHour = 8,
+            recurrentNotificationMinute = 0,
+            exactAlarmEnabled = true,
+            notificationPermissionGranted = true,
+            onThemeChange = {},
+            onTypographyChange = {},
+            onMaterialYouToggle = {},
+            onCreditQuickToggleFeatureToggle = {},
+            onRecurrentPaymentsViewModeChange = {},
+            onNotificationTimeChange = { _, _ -> },
+            onRecurrentNotificationTimeChange = { _, _ -> },
+            onOpenExactAlarmSettings = {},
+            onOpenNotificationSettings = {},
+            periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
+            onPeriodMappingModeChange = {}
+        )
+    }
 }

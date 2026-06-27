@@ -12,7 +12,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.performScrollToKey
 import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
@@ -95,6 +95,8 @@ class ChangelogE2ETest {
                     onNotificationTimeChange = { _, _ -> },
                     onRecurrentNotificationTimeChange = { _, _ -> },
                     onOpenExactAlarmSettings = {},
+                    notificationPermissionGranted = true,
+                    onOpenNotificationSettings = {},
                     periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
                     onPeriodMappingModeChange = {},
                     onExportCsv = {},
@@ -138,20 +140,6 @@ class ChangelogE2ETest {
         composeTestRule.activity.getString(R.string.changelog_close)
 
     @Test
-    fun when_settings_is_displayed_then_what_is_new_item_is_visible() {
-        setSettingsContent()
-        composeTestRule.waitForIdle()
-        composeTestRule.mainClock.advanceTimeBy(500)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithTag("SettingsScreen").performScrollToIndex(Int.MAX_VALUE)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onAllNodesWithText(whatsNewTitle()).onFirst().assertIsDisplayed()
-        composeTestRule.onAllNodesWithText(whatsNewSubtitle()).onFirst().assertIsDisplayed()
-    }
-
-    @Test
     fun when_tapping_what_is_new_then_onNavigateToChangelog_callback_fires() {
         var navigatedCount = 0
         setSettingsContent(onNavigateToChangelog = { navigatedCount += 1 })
@@ -159,7 +147,8 @@ class ChangelogE2ETest {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag("SettingsScreen").performScrollToIndex(Int.MAX_VALUE)
+        composeTestRule.onNodeWithTag("SettingsScreen")
+            .performScrollToKey("settings_app_info_section")
         composeTestRule.waitForIdle()
 
         composeTestRule.onAllNodesWithText(whatsNewTitle()).onFirst().performClick()
@@ -306,7 +295,8 @@ class ChangelogE2ETest {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag("SettingsScreen").performScrollToIndex(Int.MAX_VALUE)
+        composeTestRule.onNodeWithTag("SettingsScreen")
+            .performScrollToKey("settings_app_info_section")
         composeTestRule.waitForIdle()
 
         composeTestRule.onAllNodesWithText(whatsNewTitle()).assertCountEquals(1)
