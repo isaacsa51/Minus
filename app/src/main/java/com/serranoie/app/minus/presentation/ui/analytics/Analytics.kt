@@ -100,7 +100,7 @@ fun Analytics(
     val view = LocalView.current
     val scrollState = rememberScrollState()
     var showHistorySheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var selectedCategory by remember { mutableStateOf<CategoryAnalyticsState?>(null) }
 

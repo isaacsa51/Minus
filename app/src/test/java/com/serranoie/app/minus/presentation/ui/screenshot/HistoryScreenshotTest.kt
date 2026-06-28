@@ -163,11 +163,11 @@ class HistoryScreenshotTest {
 				)
 			}
 			itemsIndexed(todaysTransactions, key = { _, tx -> tx.id }) { index, tx ->
-				ExpenseItem(
+                ExpenseItem(
                     transaction = tx,
                     currencyFormat = currencyFormat,
-                    position = paddedPosition(index, todaysTransactions.lastIndex, todaysTransactions.size),,
-				)
+                    position = paddedPosition(index, todaysTransactions.lastIndex, todaysTransactions.size),
+                )
 			}
 			item {
 				DayTotalItem(
@@ -191,11 +191,11 @@ class HistoryScreenshotTest {
 						)
 					}
 					itemsIndexed(transactions, key = { _, tx -> tx.id }) { index, tx ->
-						ExpenseItem(
+                        ExpenseItem(
                             transaction = tx,
                             currencyFormat = currencyFormat,
-                            position = paddedPosition(index, transactions.lastIndex, transactions.size),,
-						)
+                            position = paddedPosition(index, transactions.lastIndex, transactions.size),
+                        )
 					}
 				}
 		}

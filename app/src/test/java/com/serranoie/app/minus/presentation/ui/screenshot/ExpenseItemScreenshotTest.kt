@@ -32,7 +32,7 @@ class ExpenseItemScreenshotTest {
                 ExpenseItem(
                     transaction = sampleTransaction(),
                     currencyFormat = symbolOnlyCurrencyFormat("USD"),
-                    position = PaddedListItemPosition.First,,
+                    position = PaddedListItemPosition.First,
                 )
             }
         }
@@ -47,7 +47,7 @@ class ExpenseItemScreenshotTest {
                 ExpenseItem(
                     transaction = sampleTransaction(),
                     currencyFormat = symbolOnlyCurrencyFormat("USD"),
-                    position = PaddedListItemPosition.Last,,
+                    position = PaddedListItemPosition.Last,
                 )
             }
         }

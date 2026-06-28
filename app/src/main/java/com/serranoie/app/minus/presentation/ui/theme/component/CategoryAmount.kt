@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +42,7 @@ fun CategoryAmount(
 		shape = CircleShape,
 		color = if (selected) palette?.main ?: MaterialTheme.colorScheme.primary else palette?.main?.copy(alpha = 0.2f) ?: MaterialTheme.colorScheme.surface,
 		contentColor = if (selected) palette?.onSurface ?: MaterialTheme.colorScheme.onPrimary else palette?.main ?: MaterialTheme.colorScheme.onSurface,
-		modifier = modifier,
+		modifier = modifier.then(Modifier.testTag("CategoryAmount_$value")),
 		border = if (selected) null else BorderStroke(1.dp, palette?.main ?: Color.Transparent),
 		onClick = onClick ?: {},
 	) {

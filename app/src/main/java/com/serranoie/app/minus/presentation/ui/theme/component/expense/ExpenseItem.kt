@@ -28,7 +28,7 @@ fun ExpenseItem(
     currencyFormat: NumberFormat,
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
     onClick: () -> Unit = {},
-    modifier: Modifier
+    modifier: Modifier = Modifier,
 ) {
 	CustomPaddedListItem(
 		onClick = onClick,
