@@ -199,7 +199,7 @@ class MainScreenE2ETest {
     ) {
         composeTestRule.setContent {
             MinusTheme {
-                androidx.compose.foundation.layout.Box(
+                Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = androidx.compose.ui.Alignment.TopStart,
                 ) {
@@ -208,7 +208,6 @@ class MainScreenE2ETest {
                         budgetSettings = budgetSettings,
                         viewPeriod = viewPeriod,
                         currencyCode = currencyCode,
-                        onOpenSettings = {},
                         onOpenBudgetSheet = { capturedIntents += "ShowBudgetPeriodSheet" },
                         modifier = Modifier.fillMaxSize(),
                     )

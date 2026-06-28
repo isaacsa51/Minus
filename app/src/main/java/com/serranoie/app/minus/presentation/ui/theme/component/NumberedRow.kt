@@ -35,7 +35,7 @@ fun NumberedRow(
 		combineColors(
 			MaterialTheme.colorScheme.primaryContainer,
 			MaterialTheme.colorScheme.surfaceVariant,
-			angle = 0.9F,
+			t = 0.9f,
 		)
 	)
 

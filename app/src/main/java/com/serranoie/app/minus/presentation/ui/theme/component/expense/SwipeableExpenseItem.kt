@@ -60,10 +60,11 @@ fun SwipeableExpenseItem(
             modifier = Modifier.fillMaxWidth()
         ) {
             ExpenseItem(
+                modifier = Modifier,
                 transaction = transaction,
                 currencyFormat = currencyFormat,
                 position = position,
-                onClick = onClick
+                onClick = onClick,
             )
         }
     } else {
@@ -96,10 +97,11 @@ fun SwipeableExpenseItem(
                 )
             ) {
                 ExpenseItem(
+                    modifier = Modifier,
                     transaction = transaction,
                     currencyFormat = currencyFormat,
                     position = position,
-                    onClick = onClick
+                    onClick = onClick,
                 )
             }
         }

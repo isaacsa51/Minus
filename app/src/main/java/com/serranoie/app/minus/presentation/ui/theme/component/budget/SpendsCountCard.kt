@@ -34,79 +34,79 @@ import com.serranoie.app.minus.presentation.util.combineColors
 
 @Composable
 fun SpendsCountCard(
-	modifier: Modifier = Modifier,
-	count: Int,
-	onClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    count: Int,
+    onClick: () -> Unit = {},
 ) {
-	Card(
-		modifier = modifier.heightIn(min = 56.dp),
-		shape = CircleShape,
-		colors = CardDefaults.cardColors(
-			containerColor = combineColors(
-				MaterialTheme.colorScheme.surface,
-				MaterialTheme.colorScheme.surfaceVariant,
-				angle = 0.3f,
-			),
-		),
-		onClick = onClick
-	) {
-		val textColor = LocalContentColor.current
+    Card(
+        modifier = modifier.heightIn(min = 56.dp),
+        shape = CircleShape,
+        colors = CardDefaults.cardColors(
+            containerColor = combineColors(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.surfaceVariant,
+                t = 0.3f,
+            ),
+        ),
+        onClick = onClick
+    ) {
+        val textColor = LocalContentColor.current
 
-		Box(
-			modifier = Modifier
-				.padding(horizontal = 24.dp)
-				.fillMaxWidth()
-				.fillMaxHeight(),
-			contentAlignment = Alignment.Center,
-		) {
-			Column(
-				Modifier
-					.fillMaxWidth()
-					.padding(14.dp, 8.dp),
-				verticalArrangement = Arrangement.Center,
-				horizontalAlignment = Alignment.CenterHorizontally
-			) {
-				Text(
-					text = count.toString(),
-					modifier = Modifier.fillMaxWidth(),
-					style = MaterialTheme.typography.titleLargeEmphasized,
-					overflow = TextOverflow.Ellipsis,
-					softWrap = true,
-					textAlign = TextAlign.Center,
-				)
-				Text(
-					text = stringResource(R.string.total_expenses),
-					modifier = Modifier
-						.fillMaxWidth()
-						.basicMarquee(),
-					style = MaterialTheme.typography.labelMediumCondensed,
-					color = textColor.copy(alpha = 0.6f),
-					softWrap = true,
-					textAlign = TextAlign.Center,
-				)
-				Spacer(modifier = Modifier.height(4.dp))
-			}
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp, 8.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = count.toString(),
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.titleLargeEmphasized,
+                    overflow = TextOverflow.Ellipsis,
+                    softWrap = true,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = stringResource(R.string.total_expenses),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .basicMarquee(),
+                    style = MaterialTheme.typography.labelMediumCondensed,
+                    color = textColor.copy(alpha = 0.6f),
+                    softWrap = true,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
 
-			Icon(
-				modifier = Modifier.align(Alignment.CenterEnd),
-				imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-				contentDescription = null,
-			)
-		}
-	}
+            Icon(
+                modifier = Modifier.align(Alignment.CenterEnd),
+                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                contentDescription = null,
+            )
+        }
+    }
 }
 
-
 @Preview(
-	name = "SpendsCountCard", device = "spec:width=500px,height=300px"
+    name = "SpendsCountCard",
+    device = "spec:width=500px,height=300px"
 )
 @Composable
 private fun PreviewSpendsCountCard() {
-	MinusTheme {
-		Column {
-			SpendsCountCard(
-				count = 10,
-			)
-		}
-	}
+    MinusTheme {
+        Column {
+            SpendsCountCard(
+                count = 10,
+            )
+        }
+    }
 }

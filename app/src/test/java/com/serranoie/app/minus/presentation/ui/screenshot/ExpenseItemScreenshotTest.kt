@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
@@ -34,7 +33,6 @@ class ExpenseItemScreenshotTest {
                     transaction = sampleTransaction(),
                     currencyFormat = symbolOnlyCurrencyFormat("USD"),
                     position = PaddedListItemPosition.First,
-                    onClick = {},
                 )
             }
         }
@@ -50,7 +48,6 @@ class ExpenseItemScreenshotTest {
                     transaction = sampleTransaction(),
                     currencyFormat = symbolOnlyCurrencyFormat("USD"),
                     position = PaddedListItemPosition.Last,
-                    onClick = {},
                 )
             }
         }

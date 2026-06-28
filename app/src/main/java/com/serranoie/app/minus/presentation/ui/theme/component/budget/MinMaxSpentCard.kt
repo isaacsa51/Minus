@@ -48,223 +48,224 @@ import java.util.Date
 
 @Composable
 fun MinMaxSpentCard(
-	modifier: Modifier = Modifier,
-	isMin: Boolean,
-	spends: List<Transaction>,
-	currency: String = "MXN",
+    modifier: Modifier = Modifier,
+    isMin: Boolean,
+    spends: List<Transaction>,
+    currency: String = "MXN",
 ) {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	val minSpent = spends.minByOrNull { it.amount }
-	val maxSpent = spends.maxByOrNull { it.amount }
+    val minSpent = spends.minByOrNull { it.amount }
+    val maxSpent = spends.maxByOrNull { it.amount }
 
-	val spent = if (isMin) minSpent else maxSpent
+    val spent = if (isMin) minSpent else maxSpent
 
-	val minValue = minSpent?.amount ?: BigDecimal.ZERO
-	val maxValue = maxSpent?.amount ?: BigDecimal.ZERO
-	val currValue = spent?.amount ?: BigDecimal.ZERO
+    val minValue = minSpent?.amount ?: BigDecimal.ZERO
+    val maxValue = maxSpent?.amount ?: BigDecimal.ZERO
+    val currValue = spent?.amount ?: BigDecimal.ZERO
 
-	val harmonizedColor = toPalette(
-		harmonize(
-			combineColors(
-				colorMin,
-				colorMax,
-				if ((maxValue - minValue).isZero()) {
-					if (isMin) 0f else 1f
-				} else if (maxValue != BigDecimal.ZERO) {
-					((currValue - minValue) / (maxValue - minValue)).toFloat()
-				} else {
-					0f
-				},
-			)
-		)
-	)
+    val harmonizedColor = toPalette(
+        harmonize(
+            combineColors(
+                colorMin,
+                colorMax,
+                if ((maxValue - minValue).isZero()) {
+                    if (isMin) 0f else 1f
+                } else if (maxValue != BigDecimal.ZERO) {
+                    ((currValue - minValue) / (maxValue - minValue)).toFloat()
+                } else {
+                    0f
+                },
+            )
+        )
+    )
 
-	StatCard(
-		modifier = modifier.heightIn(min = 140.dp),
-		value = if (spent != null) {
-			numberFormat(
-				context,
-				spent.amount,
-				currency = currency,
-			)
-		} else {
-			"-"
-		},
-		label = if (isMin) stringResource(R.string.minimum_spent) else stringResource(R.string.maximum_spent),
-		colors = CardDefaults.cardColors(
-			containerColor = harmonizedColor.container,
-			contentColor = harmonizedColor.onContainer,
-		),
-		content = {
-			Spacer(modifier = Modifier.height(6.dp))
+    StatCard(
+        modifier = modifier.heightIn(min = 140.dp),
+        value = if (spent != null) {
+            numberFormat(
+                context,
+                spent.amount,
+                currency = currency,
+            )
+        } else {
+            "-"
+        },
+        label = if (isMin) stringResource(R.string.minimum_spent) else stringResource(R.string.maximum_spent),
+        colors = CardDefaults.cardColors(
+            containerColor = harmonizedColor.container,
+            contentColor = harmonizedColor.onContainer,
+        ),
+        content = {
+            Spacer(modifier = Modifier.height(6.dp))
 
-			if (spent != null) {
-				Text(
-					text = prettyDate(
-						spent.date,
-						showTime = true,
-						forceShowDate = true,
-						shortMonth = true,
-					),
-					style = MaterialTheme.typography.bodyMedium,
-				)
+            if (spent != null) {
+                Text(
+                    text = prettyDate(
+                        spent.date,
+                        showTime = true,
+                        forceShowDate = true,
+                        shortMonth = true,
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
 
-				if (spent.comment.isNotEmpty()) {
-					Row(
-						modifier = Modifier.padding(top = 4.dp),
-						verticalAlignment = Alignment.CenterVertically,
-					) {
-						Icon(
-							modifier = Modifier.padding(top = 2.dp).size(16.dp),
-							imageVector = Icons.Rounded.Label,
-							contentDescription = null,
-						)
-						Spacer(modifier = Modifier.width(8.dp))
-						Text(
-							text = spent.comment,
-							style = MaterialTheme.typography.bodyMediumCondensed,
-						)
-					}
-				}
-			}
-		},
-		backdropContent = {
-			if (spends.isNotEmpty()) {
-				SpendsChart(
-					modifier = Modifier
-						.fillMaxHeight()
-						.fillMaxWidth(),
-					spends = spends,
-					markedTransaction = spent,
-					chartPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
-					showBeforeMarked = 4,
-					showAfterMarked = 1,
-				)
-			}
-		}
-	)
+                if (spent.comment.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier.padding(top = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .padding(top = 2.dp)
+                                .size(16.dp),
+                            imageVector = Icons.Rounded.Label,
+                            contentDescription = null,
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = spent.comment,
+                            style = MaterialTheme.typography.bodyMediumCondensed,
+                        )
+                    }
+                }
+            }
+        },
+        backdropContent = {
+            if (spends.isNotEmpty()) {
+                SpendsChart(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(),
+                    spends = spends,
+                    markedTransaction = spent,
+                    chartPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
+                    showBeforeMarked = 4,
+                    showAfterMarked = 1,
+                )
+            }
+        }
+    )
 }
-
 
 @Preview(name = "MinMaxSpentCard")
 @Composable
 private fun PreviewMinMaxSpentCard() {
-	MinusTheme {
-		Surface {
-			Column {
-				MinMaxSpentCard(
-					modifier = Modifier.height(IntrinsicSize.Min),
-					isMin = true,
-					currency = "MXN",
-					spends = listOf(
-						Transaction(
-							amount = BigDecimal(52),
-							date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(72),
-							date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(42),
-							date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(52),
-							date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(72),
-							date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(42),
-							date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(56),
-							date = Date().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(15),
-							date = Date().toLocalDateTime(),
-							comment = "Comment of spent"
-						),
-						Transaction(
-							amount = BigDecimal(42),
-							date = Date().toLocalDateTime()
-						),
-					),
-				)
+    MinusTheme {
+        Surface {
+            Column {
+                MinMaxSpentCard(
+                    modifier = Modifier.height(IntrinsicSize.Min),
+                    isMin = true,
+                    currency = "MXN",
+                    spends = listOf(
+                        Transaction(
+                            amount = BigDecimal(52),
+                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(72),
+                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(42),
+                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(52),
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(72),
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(42),
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(56),
+                            date = Date().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(15),
+                            date = Date().toLocalDateTime(),
+                            comment = "Comment of spent"
+                        ),
+                        Transaction(
+                            amount = BigDecimal(42),
+                            date = Date().toLocalDateTime()
+                        ),
+                    ),
+                )
 
-				MinMaxSpentCard(
-					modifier = Modifier.height(IntrinsicSize.Min),
-					isMin = false,
-					currency = "USD",
-					spends = listOf(
-						Transaction(
-							amount = BigDecimal(52),
-							date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(72),
-							date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(42),
-							date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(52),
-							date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(72),
-							date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(42),
-							date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(56),
-							date = Date().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(15),
-							date = Date().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(42),
-							date = Date().toLocalDateTime()
-						),
-					),
-				)
+                MinMaxSpentCard(
+                    modifier = Modifier.height(IntrinsicSize.Min),
+                    isMin = false,
+                    currency = "USD",
+                    spends = listOf(
+                        Transaction(
+                            amount = BigDecimal(52),
+                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(72),
+                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(42),
+                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(52),
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(72),
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(42),
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(56),
+                            date = Date().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(15),
+                            date = Date().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(42),
+                            date = Date().toLocalDateTime()
+                        ),
+                    ),
+                )
 
-				MinMaxSpentCard(
-					modifier = Modifier.height(IntrinsicSize.Min),
-					isMin = false,
-					currency = "USD",
-					spends = listOf(
-						Transaction(
-							amount = BigDecimal(42),
-							date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-						),
-						Transaction(
-							amount = BigDecimal(42),
-							date = Date().toLocalDateTime()
-						),
-					),
-				)
+                MinMaxSpentCard(
+                    modifier = Modifier.height(IntrinsicSize.Min),
+                    isMin = false,
+                    currency = "USD",
+                    spends = listOf(
+                        Transaction(
+                            amount = BigDecimal(42),
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(42),
+                            date = Date().toLocalDateTime()
+                        ),
+                    ),
+                )
 
-				MinMaxSpentCard(
-					modifier = Modifier.height(IntrinsicSize.Min),
-					isMin = false,
-					currency = "EUR",
-					spends = listOf(),
-				)
-			}
-		}
-	}
+                MinMaxSpentCard(
+                    modifier = Modifier.height(IntrinsicSize.Min),
+                    isMin = false,
+                    currency = "EUR",
+                    spends = listOf(),
+                )
+            }
+        }
+    }
 }

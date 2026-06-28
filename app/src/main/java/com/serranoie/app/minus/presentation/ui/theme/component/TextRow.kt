@@ -28,7 +28,7 @@ fun TextRow(
 		combineColors(
 			MaterialTheme.colorScheme.secondaryContainer,
 			MaterialTheme.colorScheme.surfaceVariant,
-			angle = 0.3F,
+			t = 0.3f,
 		)
 	),
 	endIcon: ImageVector? = null,
