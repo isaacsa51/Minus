@@ -1,0 +1,5 @@
+- chore: add missing launcher icon
+- Merge branch 'master' of https://github.com/isaacsa51/Minus
+- hotfix: changed git output gradle step
+- chore: include Apache License 2.0
+- Generate GitHub release notes automatically

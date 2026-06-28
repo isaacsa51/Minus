@@ -1,0 +1,2 @@
+- feat: rediseñar interacción del Numpad y refinar animaciones de teclado
+- feat: implementar modo de censura basado en proximidad

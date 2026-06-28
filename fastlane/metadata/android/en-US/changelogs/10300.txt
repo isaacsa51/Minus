@@ -1,3 +1,4 @@
+- hotfix: changed changlog deployment to be local
 - feat: changed donut chart view with bigger graph (#46)
 - refactor: new toggle buttons on editor (#45)
 - feat: new section under setting to handle gracefully the notification permission (#44)

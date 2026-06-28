@@ -1,0 +1,6 @@
+- feat: Refactor currency visual transformation and refine UI typography
+- FIX: use correct ID for a recurrent expense when edit state (#9)
+- Update GitHub badge image height in README
+- chore: fix github badge at readme
+- FEAT: Implement bug reporting screen (#8)
+- feat: Add download badges for IzzyOnDroid and GitHub

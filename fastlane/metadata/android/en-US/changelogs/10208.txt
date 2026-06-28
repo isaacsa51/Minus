@@ -1,0 +1,2 @@
+- feat: new launcher icon and fixes on banner images
+- feat: new launcher icon and fixes on banner images

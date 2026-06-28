@@ -1,0 +1,5 @@
+- chore: typo on strings.xml
+- feat: changed StepToReproduceField to use outlined instead of a basic
+- feat: enhance UI interactions, bug reporting, and transaction details
+- feat: implement MVI-based bug reporting system
+- fix: generate BugReportForm UI screen

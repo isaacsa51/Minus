@@ -1,0 +1,9 @@
+- hotfix: corregir enums para los cambios de settings
+- feat: crear widget min max con arreglos en previews (#26)
+- feat: añadir testing con Paparazzi y mejorar programación de notificaciones recurrentes
+- feat: añadir testing con Paparazzi y mejorar programación de notificaciones recurrentes
+- feat: añadir testing con Paparazzi y mejorar programación de notificaciones recurrentes
+- feat: actualizar estado de modal bottom sheet para omitir parcialmente expandido (#25)
+- fix: añadir acciones de swipe faltantes para gastos recurrentes (#24)
+- feat: mejorar pantalla de reporte de bugs para crear archivo markdown (#23)
+- Actualizar plantillas de issues

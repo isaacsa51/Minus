@@ -1,0 +1,5 @@
+- feat: refactorizar transformación visual de moneda y refinar tipografía
+- fix: usar ID correcto para gasto recurrente al editar estado (#9)
+- Actualizar insignia de GitHub en README
+- feat: implementar pantalla de reporte de bugs (#8)
+- feat: añadir insignias de descarga para IzzyOnDroid y GitHub

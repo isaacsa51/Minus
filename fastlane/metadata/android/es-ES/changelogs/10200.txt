@@ -1,0 +1,4 @@
+- feat: cambiar StepToReproduceField para usar outlined en lugar de basic
+- feat: mejorar interacciones de UI, reporte de bugs y detalles de transacción
+- feat: implementar sistema de reporte de bugs basado en MVI
+- fix: generar pantalla BugReportForm

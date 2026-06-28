@@ -1,0 +1,9 @@
+- hotfix: corrected enums for the settings changes
+- feat: creation of min max widget with some fixes on previews (#26)
+- feat: add screenshot testing with Paparazzi and improve recurrent notification scheduling
+- feat: add screenshot testing with Paparazzi and improve recurrent notification scheduling
+- feat: add screenshot testing with Paparazzi and improve recurrent notification scheduling
+- feat: update modal bottom sheet state to skip partially expanded (#25)
+- fix: add missing swipe actions for recurrent items (#24)
+- feat: enhance bug report screen to create proper markdown file (#23)
+- Update issue templates

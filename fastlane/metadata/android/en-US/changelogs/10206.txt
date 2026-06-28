@@ -1,0 +1,5 @@
+- hotfix: integrate action button into snackbar
+- hotfix: integrate action button into snackbar
+- hotfix: numpad layout to use weights and dynamic screen height (#15)
+- fix: automate changelog generation and reintroduce credit toggle (#14)
+- feat: Overhaul Numpad interaction and refine keyboard animations

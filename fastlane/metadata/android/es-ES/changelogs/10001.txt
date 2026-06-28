@@ -1,0 +1,3 @@
+- Merge branch 'master' of https://github.com/isaacsa51/Minus
+- Hotfix: cambiar el paso de gradle para generar el output de git
+- Generar notas de release de GitHub automáticamente

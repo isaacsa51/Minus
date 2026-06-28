@@ -204,7 +204,7 @@
     <string name="changelog_badge_bug_fix">Bug fix</string>
     <string name="changelog_release_header">Version %1$s — %2$s</string>
     <string name="changelog_close">Close</string>
-    <string name="changelog_previous_versions">Previous versions</string>
+    <string name="changelog_previous_versions">Previous version</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Select the period</string>

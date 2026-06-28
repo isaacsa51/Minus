@@ -1,0 +1,13 @@
+- Hotfix: cambiar generación de changelog a ser local
+- Cambiar vista de gráfico de dona con un gráfico más grande (#46)
+- Nuevos botones de toggle en editor (#45)
+- Nueva sección en ajustes para manejar el permiso de notificaciones (#44)
+- Implementar pantalla de changelog con información dinámica desde el repo (#42)
+- Añadir insignia e información sobre modo en ajustes (#41)
+- Implementar uso correcto de acciones de Historial (#40)
+- Usar valor correcto en ajustes en lugar del valor en memoria (#38)
+- Test: añadir cobertura de pruebas E2E en HistoryScreen
+- Usar wrapWidth en lugar de ancho hardcodeado en BudgetDisplay (#34)
+- Test: cobertura para pantallas Onboard y Home (#31)
+- Modularizar navegación y extraer lógica de negocio a ViewModels (#30)
+- Actualizar rutas de imágenes en README

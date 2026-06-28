@@ -1,0 +1,5 @@
+- hotfix: arreglar error de gemfile
+- feat: refinar SpendBudgetCard e integrar en PeriodSwitcherSheet
+- ref: actualizar composable de analytics para incluir lógica de layout ancho
+- refactor: migrar dependencias a catálogos de versiones
+- refactor: desacoplar pantalla de historial y formatear main screen/main activity
