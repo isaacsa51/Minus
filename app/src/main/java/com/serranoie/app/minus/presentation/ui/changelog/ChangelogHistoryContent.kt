@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -68,10 +67,7 @@ internal fun ChangelogHistoryContent(
 private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) {
     releases.forEachIndexed { index, release ->
         item(key = "meta-${release.versionCode}") {
-            ChangelogReleaseMeta(
-                release = release,
-                showPreviousDivider = index < releases.lastIndex,
-            )
+            ChangelogReleaseMeta(release = release)
         }
 
         listOf(
@@ -105,31 +101,29 @@ private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) 
                 }
             }
         }
+
+        if (index < releases.lastIndex) {
+            item(key = "older-divider-${release.versionCode}") {
+                WavyDivider(text = stringResource(R.string.changelog_previous_versions))
+            }
+        }
     }
 }
 
 @Composable
-private fun ChangelogReleaseMeta(
-    release: VersionRelease,
-    showPreviousDivider: Boolean,
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        if (showPreviousDivider) {
-            WavyDivider(text = stringResource(R.string.changelog_previous_versions))
-        }
-        Text(
-            text = stringResource(
-                R.string.changelog_release_header,
-                release.versionName,
-                release.releaseDate,
-            ),
-            style = MaterialTheme.typography.titleSmallEmphasized.copy(
-                fontWeight = FontWeight.SemiBold,
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp, end = 16.dp),
-        )
-    }
+private fun ChangelogReleaseMeta(release: VersionRelease) {
+    Text(
+        text = stringResource(
+            R.string.changelog_release_header,
+            release.versionName,
+            release.releaseDate,
+        ),
+        style = MaterialTheme.typography.titleMediumEmphasized.copy(
+            fontWeight = FontWeight.SemiBold,
+        ),
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp, end = 16.dp),
+    )
 }
 
 @Preview(showBackground = true)

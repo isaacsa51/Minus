@@ -7,8 +7,10 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY
 import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY
+import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_AMOUNT_KEY
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_STRATEGY_KEY
+import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
 import com.serranoie.app.minus.domain.time.TimeProvider
 import com.serranoie.app.minus.presentation.BUDGET_END_DATE_KEY
 import com.serranoie.app.minus.presentation.CURRENT_PERIOD_ID_KEY
@@ -152,6 +154,10 @@ class BudgetPeriodManager @Inject constructor(
 			if (shouldApplyPendingRollover) {
 				prefs.remove(PENDING_ROLLOVER_AMOUNT_KEY)
 				prefs.remove(PENDING_ROLLOVER_STRATEGY_KEY)
+			}
+			if (shouldCreateNewPeriodBoundary) {
+				prefs.remove(LAST_PERIOD_END_KEY)
+				prefs.remove(REMAINING_FROM_LAST_PERIOD_KEY)
 			}
 			if (!prefs.contains(NOTIFICATION_HOUR_KEY)) {
 				prefs[NOTIFICATION_HOUR_KEY] = DEFAULT_NOTIFICATION_HOUR

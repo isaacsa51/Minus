@@ -42,10 +42,8 @@ tasks.withType<Test>().configureEach {
 
 fun gitOutput(vararg args: String): String? {
     return runCatching {
-        val process = ProcessBuilder("git", *args)
-            .directory(rootDir)
-            .redirectErrorStream(true)
-            .start()
+        val process =
+            ProcessBuilder("git", *args).directory(rootDir).redirectErrorStream(true).start()
         val output = process.inputStream.bufferedReader().readText().trim()
         if (process.waitFor() == 0) output.takeIf { it.isNotBlank() } else null
     }.getOrNull()
@@ -58,18 +56,17 @@ fun normalizedVersionTag(tag: String?): String? {
 
 fun releaseVersionName(): String {
     val tag = normalizedVersionTag(System.getenv("VERSION_TAG"))
-        ?: normalizedVersionTag(System.getenv("GITHUB_REF_NAME"))
-        ?: normalizedVersionTag(gitOutput("describe", "--tags", "--exact-match"))
-        ?: normalizedVersionTag(gitOutput("describe", "--tags", "--abbrev=0"))
-        ?: "v0.0.0-dev"
+        ?: normalizedVersionTag(System.getenv("GITHUB_REF_NAME")) ?: normalizedVersionTag(
+            gitOutput(
+                "describe", "--tags", "--exact-match"
+            )
+        ) ?: normalizedVersionTag(gitOutput("describe", "--tags", "--abbrev=0")) ?: "v0.0.0-dev"
 
     return tag.removePrefix("v")
 }
 
 fun versionCodeFrom(versionName: String): Int {
-    val parts = versionName.split("-", limit = 2).first()
-        .split(".")
-        .map { it.toIntOrNull() ?: 0 }
+    val parts = versionName.split("-", limit = 2).first().split(".").map { it.toIntOrNull() ?: 0 }
     val major = parts.getOrElse(0) { 0 }
     val minor = parts.getOrElse(1) { 0 }
     val patch = parts.getOrElse(2) { 0 }
@@ -143,8 +140,7 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             }
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -260,11 +256,95 @@ dependencies {
 
 /*
  * Single source of truth for release notes is fastlane/metadata/android/en-US/
- * changelogs/<versionCode>.txt (produced by fastlane's :generate_changelog
- * lane from `git log`). This task reads those files and writes
- * app/src/main/assets/changelog.json so ChangelogRepository.kt has structured
- * release notes without anyone hand-editing JSON.
+ * changelogs/<versionCode>.txt. Two Gradle tasks produce the runtime asset:
+ *
+ *   :app:prepareReleaseNotes      — writes the <versionCode>.txt from
+ *                                   `git log` between tags (mirrors fastlane's
+ *                                   :generate_changelog lane). Run this BEFORE
+ *                                   tagging so the committed JSON is
+ *                                   reproducible across IzzyOnDroid / F-Droid.
+ *   :app:generateAppChangelogJson — reads those .txt files (+ optional
+ *                                   fastlane/changelogs/<versionName>.json
+ *                                   overrides) and writes
+ *                                   app/src/main/assets/changelog.json so
+ *                                   ChangelogRepository.kt has structured
+ *                                   release notes without anyone hand-editing
+ *                                   JSON.
+ *
+ * prepareReleaseNotes.finalizedBy(generateAppChangelogJson) so the canonical
+ * workflow is a single command.
  */
+val prepareReleaseNotes by tasks.registering {
+    group = "minus"
+    description =
+        "Generate fastlane/metadata/android/en-US/changelogs/<versionCode>.txt from git log between tags, then regenerate app/src/main/assets/changelog.json."
+
+    doLast {
+        val versionTag = normalizedVersionTag(System.getenv("VERSION_TAG")) ?: normalizedVersionTag(
+            System.getenv("GITHUB_REF_NAME")
+        ) ?: normalizedVersionTag(gitOutput("describe", "--tags", "--exact-match"))
+        ?: normalizedVersionTag(gitOutput("describe", "--tags", "--abbrev=0"))
+        ?: throw GradleException(
+            "No version tag found. Set VERSION_TAG env var (e.g. VERSION_TAG=v1.3.0) " + "or create a git tag before running this task."
+        )
+
+        val versionCode = versionCodeFrom(versionTag.removePrefix("v"))
+
+        val endRef =
+            if (gitOutput("rev-parse", "--verify", "--quiet", "$versionTag^{commit}") != null) {
+                versionTag
+            } else {
+                "HEAD"
+            }
+
+        val previousTag =
+            gitOutput("describe", "--tags", "--abbrev=0", "$versionTag^") ?: gitOutput(
+                "describe", "--tags", "--abbrev=0"
+            ) ?: ""
+
+        val commits = if (previousTag.isNotBlank()) {
+            gitOutput("log", "$previousTag..$endRef", "--pretty=format:- %s")
+                ?: "- Initial release."
+        } else {
+            gitOutput("log", endRef, "--pretty=format:- %s") ?: "- Initial release."
+        }
+
+        val changelogContent =
+            if (commits.isBlank()) "- Minor improvements and bug fixes." else commits
+
+        val changelogDir = file("$rootDir/fastlane/metadata/android/en-US/changelogs")
+        changelogDir.mkdirs()
+        val txtFile = File(changelogDir, "$versionCode.txt")
+        txtFile.writeText(changelogContent + "\n")
+        logger.lifecycle(
+            "Wrote ${txtFile.path} (${
+                commits.lines().count()
+            } bullet(s), " + "versionTag=$versionTag, range=$previousTag..$endRef)"
+        )
+
+        val ghAvailable = runCatching {
+            val proc =
+                ProcessBuilder("gh", "auth", "status").directory(rootDir).redirectErrorStream(true)
+                    .start()
+            proc.inputStream.bufferedReader().readText()
+            proc.waitFor() == 0
+        }.getOrDefault(false)
+
+        if (ghAvailable) {
+            project.extra["minus.changelog.enrichPrBodies"] = true
+            logger.lifecycle(
+                "gh authenticated — will auto-fetch PR bodies for items with (#NN) references"
+            )
+        } else {
+            logger.warn("gh not authenticated or not installed — PR bodies will NOT be auto-fetched.")
+            logger.warn("  To enable: run 'gh auth login', then re-run this task.")
+            logger.warn("  Or set MINUS_CHANGELOG_ENRICH_PR_BODIES=true to force.")
+        }
+    }
+
+    finalizedBy("generateAppChangelogJson")
+}
+
 val generateAppChangelogJson by tasks.registering {
     group = "minus"
     description =
@@ -283,37 +363,36 @@ val generateAppChangelogJson by tasks.registering {
             return@doLast
         }
 
-        val txtFiles = changelogDir.listFiles { f -> f.isFile && f.name.endsWith(".txt") }
-            ?.toList()
-            ?.sortedByDescending { changelogVersionCodeFromFileName(it.name) }
-            ?: emptyList()
+        val txtFiles = changelogDir.listFiles { f -> f.isFile && f.name.endsWith(".txt") }?.toList()
+            ?.sortedByDescending { changelogVersionCodeFromFileName(it.name) } ?: emptyList()
+
+        val shouldEnrich = shouldEnrichChangelogPrBodies()
 
         val releases = mutableListOf<Map<String, Any?>>()
+        var totalItemsWithImages = 0
         for (txt in txtFiles) {
             val versionCode = changelogVersionCodeFromFileName(txt.name)
             if (versionCode <= 0) continue
             val versionName = changelogVersionCodeToName(versionCode)
 
-            val release = buildChangelogRelease(txt, versionCode, versionName, overrideDir)
-            if (release != null) releases.add(release)
+            val release =
+                buildChangelogRelease(txt, versionCode, versionName, overrideDir, shouldEnrich)
+            if (release != null) {
+                @Suppress("UNCHECKED_CAST") totalItemsWithImages += (release["items"] as List<Map<String, Any?>>).count { (it["imageName"] as? String)?.isNotBlank() == true }
+                releases.add(release)
+            }
         }
 
         outputFile.writeText(buildChangelogReleasesJson(releases))
-        logger.lifecycle("Generated ${outputFile.path} with ${releases.size} releases")
+        val enrichNote = if (shouldEnrich) " (PR bodies enriched)" else ""
+        logger.lifecycle(
+            "Generated ${outputFile.path} with ${releases.size} releases, " + "$totalItemsWithImages item(s) with images$enrichNote"
+        )
     }
 }
 
-/*
- * Hook into every AGP variant lifecycle so the assets JSON is always fresh
- * before any build/compile/test task runs. `preBuild` is the AGP-wide hook
- * that every variant preXxxBuild depends on; we also explicitly match all
- * preXxxBuild tasks (FossDebugBuild, WearReleaseBuild, etc.) so direct
- * invocation like `:app:assembleFossDebug` is also covered.
- */
-tasks.matching { it.name == "preBuild" || it.name.matches(Regex("^pre\\w*Build$")) }
-    .configureEach {
-        dependsOn(generateAppChangelogJson)
-    }
+fun shouldEnrichChangelogPrBodies(): Boolean =
+    System.getenv("MINUS_CHANGELOG_ENRICH_PR_BODIES") == "true" || project.extra.properties["minus.changelog.enrichPrBodies"] == true
 
 fun changelogVersionCodeFromFileName(fileName: String): Int =
     fileName.substringBeforeLast('.').toIntOrNull() ?: 0
@@ -329,51 +408,122 @@ fun buildChangelogRelease(
     txt: File,
     versionCode: Int,
     versionName: String,
-    overrideDir: File
+    overrideDir: File,
+    enrichPrBodies: Boolean = false,
 ): Map<String, Any?>? {
     val overrideFile = File(overrideDir, "$versionName.json")
+    val versionShort = versionName.replace(".", "_")
+    val imagesByPr = changelogScanChangelogImages(versionShort)
+
     if (overrideFile.exists()) {
         val overridden = readChangelogOverride(overrideFile, versionCode, versionName)
-        if (overridden != null) return overridden
+        if (overridden != null) {
+            @Suppress("UNCHECKED_CAST") val items =
+                (overridden["items"] as? List<Map<String, Any?>>)?.map {
+                    changelogAutoFillImageName(
+                        it, imagesByPr
+                    )
+                } ?: emptyList()
+            return overridden.toMutableMap().apply { this["items"] = items }
+        }
         logger.warn("Override ${overrideFile.path} could not be parsed; falling back to ${txt.name}.")
     }
 
     val items = parseChangelogTxtItems(txt.readText())
     if (items.isEmpty()) return null
 
-    val enrichedItems = changelogEnrichItemsWithPrBodies(items)
+    val enrichedItems = if (enrichPrBodies) {
+        changelogEnrichItemsWithPrBodies(items)
+    } else {
+        items
+    }
+
+    val finalItems = enrichedItems.map { changelogAutoFillImageName(it, imagesByPr) }
 
     return mapOf(
         "versionCode" to versionCode,
         "versionName" to versionName,
         "releaseDate" to changelogResolveReleaseDate(versionName, overrideDir),
-        "items" to enrichedItems,
+        "items" to finalItems,
     )
 }
 
+/**
+ * Scans the standard Android drawable folders for changelog images matching
+ * the convention `changelog_<versionShort>_<PR_NUMBER>.<ext>`. Returns a map
+ * of `PR number -> resource name` (without extension) for use in auto-filling
+ * the `imageName` field on items whose title contains the same `(#NN)`
+ * reference.
+ *
+ * Convention examples (for version "1.3.0", versionShort = "1_3_0"):
+ *   changelog_1_3_0_46.webp   →  PR #46  →  "changelog_1_3_0_46"
+ *   changelog_1_3_0_44.gif    →  PR #44  →  "changelog_1_3_0_44"
+ *
+ * Scans `drawable/` AND `drawable-nodpi/` (the two folders Android developers
+ * typically use for changelog screenshots, since they're display-once and
+ * don't need density scaling). Other density-qualified folders are skipped.
+ *
+ * Returns an empty map if no folders exist or no matching files are found.
+ * Silently ignores files that don't match the strict PR-number pattern —
+ * descriptive names like `changelog_1_3_0_chart.webp` are not auto-mapped
+ * (wire those via the override JSON's `imageName` field instead).
+ */
+fun changelogScanChangelogImages(versionShort: String): Map<Int, String> {
+    val resDir = file("$rootDir/app/src/main/res")
+    val drawableFolders = listOf("drawable", "drawable-nodpi").mapNotNull { name ->
+        val dir = File(resDir, name)
+        if (dir.isDirectory) dir else null
+    }
+    if (drawableFolders.isEmpty()) return emptyMap()
+
+    val pattern = Regex("^changelog_${versionShort}_(\\d+)\\.(webp|png|jpg|jpeg|gif)$")
+    val result = mutableMapOf<Int, String>()
+    for (folder in drawableFolders) {
+        folder.listFiles()?.forEach { f ->
+            val match = pattern.matchEntire(f.name) ?: return@forEach
+            val prNumber = match.groupValues[1].toIntOrNull() ?: return@forEach
+            if (prNumber !in result || folder.name == "drawable-nodpi") {
+                result[prNumber] = f.nameWithoutExtension
+            }
+        }
+    }
+    return result
+}
+
+fun changelogAutoFillImageName(
+    item: Map<String, Any?>,
+    imagesByPr: Map<Int, String>,
+): Map<String, Any?> {
+    val currentImageName = item["imageName"] as? String
+    if (!currentImageName.isNullOrBlank()) return item
+
+    val title = item["title"] as? String ?: return item
+    val prNumber = changelogExtractPrNumber(title) ?: return item
+    val autoImage = imagesByPr[prNumber] ?: return item
+
+    logger.lifecycle("Changelog: auto-mapped image '$autoImage' to PR #$prNumber")
+    return item.toMutableMap().apply { this["imageName"] = autoImage }
+}
+
 fun readChangelogOverride(
-    overrideFile: File,
-    defaultVersionCode: Int,
-    defaultVersionName: String
+    overrideFile: File, defaultVersionCode: Int, defaultVersionName: String
 ): Map<String, Any?>? {
     return try {
-        @Suppress("UNCHECKED_CAST")
-        val parsed = JsonSlurper().parse(overrideFile) as? Map<String, Any?> ?: return null
+        @Suppress("UNCHECKED_CAST") val parsed =
+            JsonSlurper().parse(overrideFile) as? Map<String, Any?> ?: return null
 
-        @Suppress("UNCHECKED_CAST")
-        val items = (parsed["items"] as? List<Map<String, Any?>>)
-            ?.map { normalizeChangelogItem(it) }
-            ?: emptyList()
+        @Suppress("UNCHECKED_CAST") val items =
+            (parsed["items"] as? List<Map<String, Any?>>)?.map { normalizeChangelogItem(it) }
+                ?: emptyList()
 
         if (parsed.containsKey("items") && items.isEmpty()) return null
 
         mapOf(
             "versionCode" to (parsed["versionCode"] as? Int ?: defaultVersionCode),
             "versionName" to (parsed["versionName"] as? String ?: defaultVersionName),
-            "releaseDate" to (
-                parsed["releaseDate"] as? String
-                    ?: changelogResolveReleaseDate(defaultVersionName, overrideFile.parentFile)
-                ),
+            "releaseDate" to (parsed["releaseDate"] as? String ?: changelogResolveReleaseDate(
+                defaultVersionName, overrideFile.parentFile
+            )),
             "items" to items,
         )
     } catch (e: Exception) {
@@ -429,21 +579,22 @@ fun classifyChangelogType(text: String): String {
     val lower = text.lowercase()
     val prefixType = when {
         lower.startsWith("feat:") || lower.startsWith("feat(") -> "FEATURE"
-        lower.startsWith("fix:") || lower.startsWith("fix(") ||
-            lower.startsWith("bug:") || lower.startsWith("bug(") -> "BUG_FIX"
+        lower.startsWith("fix:") || lower.startsWith("fix(") || lower.startsWith("bug:") || lower.startsWith(
+            "bug("
+        ) -> "BUG_FIX"
 
-        lower.startsWith("refactor:") || lower.startsWith("refactor(") ||
-            lower.startsWith("perf:") || lower.startsWith("perf(") ||
-            lower.startsWith("improve:") || lower.startsWith("improve(") -> "IMPROVEMENT"
+        lower.startsWith("refactor:") || lower.startsWith("refactor(") || lower.startsWith("perf:") || lower.startsWith(
+            "perf("
+        ) || lower.startsWith("improve:") || lower.startsWith("improve(") -> "IMPROVEMENT"
 
         else -> null
     }
     if (prefixType != null) return prefixType
 
     return when {
-        lower.contains("fix") || lower.contains("bug") ||
-            lower.contains("crash") || lower.contains("resolve") ||
-            lower.contains("issue") || lower.contains("patch") -> "BUG_FIX"
+        lower.contains("fix") || lower.contains("bug") || lower.contains("crash") || lower.contains(
+            "resolve"
+        ) || lower.contains("issue") || lower.contains("patch") -> "BUG_FIX"
 
         else -> "IMPROVEMENT"
     }
@@ -481,8 +632,8 @@ fun changelogResolveReleaseDate(versionName: String, overrideDir: File): String 
     val overrideFile = File(overrideDir, "$versionName.json")
     if (overrideFile.exists()) {
         try {
-            @Suppress("UNCHECKED_CAST")
-            val parsed = JsonSlurper().parse(overrideFile) as? Map<String, Any?>
+            @Suppress("UNCHECKED_CAST") val parsed =
+                JsonSlurper().parse(overrideFile) as? Map<String, Any?>
             val date = parsed?.get("releaseDate") as? String
             if (!date.isNullOrBlank()) return date
         } catch (_: Exception) {
@@ -513,23 +664,8 @@ private fun changelogTodayIsoDate(): String {
 private val CHANGELOG_PR_NUMBER_REGEX = Regex("""\(#(\d+)\)""")
 
 private fun changelogExtractPrNumber(title: String): Int? =
-    CHANGELOG_PR_NUMBER_REGEX.find(title)
-        ?.groupValues
-        ?.getOrNull(1)
-        ?.toIntOrNull()
+    CHANGELOG_PR_NUMBER_REGEX.find(title)?.groupValues?.getOrNull(1)?.toIntOrNull()
 
-/**
- * Fetches the body of a GitHub PR via the `gh` CLI. Returns `null` on any
- * failure (`gh` not installed, not authenticated, PR not found, timeout) —
- * callers should treat that as "no description available" and leave the
- * existing field untouched.
- *
- * Uses a polling-loop 15s timeout instead of `Process.waitFor(timeout, unit)`
- * because `java.util.concurrent.TimeUnit` isn't on the Gradle Kotlin DSL
- * sandbox classpath. Polling against `System.currentTimeMillis()` + a
- * `Thread.sleep` works because both `java.lang.System` and `java.lang.Thread`
- * are always available.
- */
 private fun changelogFetchPrBody(prNumber: Int): String? {
     val proc = try {
         ProcessBuilder(
@@ -541,10 +677,7 @@ private fun changelogFetchPrBody(prNumber: Int): String? {
             "body",
             "--jq",
             ".body",
-        )
-            .directory(rootDir)
-            .redirectErrorStream(true)
-            .start()
+        ).directory(rootDir).redirectErrorStream(true).start()
     } catch (e: Exception) {
         return null
     }
@@ -616,13 +749,6 @@ private fun changelogFilterPrBody(body: String): String? {
     return lines.joinToString("\n").trim().takeIf { it.isNotBlank() }
 }
 
-/**
- * Returns the item unchanged unless its `description` is null/blank AND its
- * title contains a `(#NN)` reference — in which case it tries to fetch the
- * PR body and replace the null description with it. Description stays null
- * when the fetch fails (gh not installed, not authenticated, PR not found,
- * timeout) so the card renders as title-only.
- */
 private fun changelogEnrichItemWithPrBody(item: Map<String, Any?>): Map<String, Any?> {
     val title = item["title"] as? String ?: return item
     val description = item["description"] as? String
@@ -651,8 +777,7 @@ fun buildChangelogReleasesJson(releases: List<Map<String, Any?>>): String {
         sb.append("    \"versionName\": ${changelogJsonString(release["versionName"] as String)},\n")
         sb.append("    \"releaseDate\": ${changelogJsonString(release["releaseDate"] as String)},\n")
         sb.append("    \"items\": ")
-        @Suppress("UNCHECKED_CAST")
-        val items = release["items"] as List<Map<String, Any?>>
+        @Suppress("UNCHECKED_CAST") val items = release["items"] as List<Map<String, Any?>>
         sb.append(buildChangelogItemsJson(items))
         sb.append("\n  }")
     }
@@ -678,12 +803,9 @@ fun buildChangelogItemsJson(items: List<Map<String, Any?>>): String {
 }
 
 fun changelogJsonString(s: String): String {
-    val escaped = s
-        .replace("\\", "\\\\")
-        .replace("\"", "\\\"")
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
-        .replace("\t", "\\t")
+    val escaped =
+        s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r")
+            .replace("\t", "\\t")
     return "\"$escaped\""
 }
 

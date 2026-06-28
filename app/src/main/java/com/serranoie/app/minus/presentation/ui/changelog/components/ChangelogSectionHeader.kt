@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.BugReport
+import androidx.compose.material.icons.rounded.RocketLaunch
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.domain.model.changelog.ReleaseType
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 
 @Composable
 internal fun ChangelogSectionHeader(
@@ -46,10 +47,10 @@ internal fun ChangelogSectionHeader(
                 tint = accent,
                 modifier = Modifier.size(20.dp),
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMediumEmphasized.copy(
+                style = MaterialTheme.typography.titleMediumCondensed.copy(
                     letterSpacing = 1.5.sp,
                 ),
                 color = accent,
@@ -66,7 +67,7 @@ private fun changelogSectionAccent(type: ReleaseType): Color = when (type) {
 }
 
 private fun changelogSectionIcon(type: ReleaseType): ImageVector = when (type) {
-    ReleaseType.FEATURE -> Icons.Rounded.Add
+    ReleaseType.FEATURE -> Icons.Rounded.RocketLaunch
     ReleaseType.IMPROVEMENT -> Icons.Rounded.AutoAwesome
     ReleaseType.BUG_FIX -> Icons.Rounded.BugReport
 }

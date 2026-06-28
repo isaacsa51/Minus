@@ -1,0 +1,15 @@
+- feat: changed donut chart view with bigger graph (#46)
+- refactor: new toggle buttons on editor (#45)
+- feat: new section under setting to handle gracefully the notification permission (#44)
+- feat: implement changelog screen with dynamic information from repo (#42)
+- chore: add proper strings values to toast on privacy mode
+- feat: added badge and inf on settings about mode (#41)
+- fix: implement correct usage of History actions (#40)
+- fix: use proper value set on settings instead of the remember value (#38)
+- chore: updated README
+- test: insert HistoryScreen E2E tests coverage
+- fix: use wrapWidth instead of hardcoded width on BudgetDisplay (#34)
+- test: coverage for Onboard and Home screens. (#31)
+- refactor: modularize navigation and extract business logic to ViewModels (#30)
+- update image paths in README
+- chore: change app icon on readme

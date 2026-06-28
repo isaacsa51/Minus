@@ -4,12 +4,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.BudgetRepository
-import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
+import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
+import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTIVE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
@@ -44,6 +45,7 @@ sealed interface AnalyticsUiEffect {
 @HiltViewModel
 class AnalyticsViewModel @Inject constructor(
     private val budgetRepository: BudgetRepository,
+    private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase,
     private val clearEarlyFinishStateUseCase: ClearEarlyFinishStateUseCase,
 ) : ViewModel() {
 
@@ -62,10 +64,11 @@ class AnalyticsViewModel @Inject constructor(
             combine(
                 budgetRepository.getBudgetSettings(),
                 budgetRepository.getTransactions(),
-            ) { settings, transactions ->
-                settings to transactions
-            }.collect { (settings, transactions) ->
-                val currentPeriodId = computeCurrentPeriodId(settings, transactions)
+                observeCurrentPeriodBoundaryUseCase(),
+            ) { settings, transactions, periodBoundary ->
+                Triple(settings, transactions, periodBoundary)
+            }.collect { (settings, transactions, periodBoundary) ->
+                val currentPeriodId = periodBoundary.second
                 _uiState.value = _uiState.value.copy(
                     budgetSettings = settings,
                     allTransactions = transactions,
@@ -74,14 +77,6 @@ class AnalyticsViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private fun computeCurrentPeriodId(settings: BudgetSettings?, transactions: List<Transaction>): Long {
-        if (settings == null) return 0L
-        return transactions
-            .filter { it.periodId > 0L }
-            .maxByOrNull { it.periodId }
-            ?.periodId ?: 0L
     }
 
     private fun buildDisplayState(
@@ -100,7 +95,9 @@ class AnalyticsViewModel @Inject constructor(
         }
         val remainingFromLastPeriod = prefs?.get(REMAINING_FROM_LAST_PERIOD_KEY)?.toBigDecimalOrNull()
 
-        val shouldShowEndedSnapshot = lastPeriodEnd != null && remainingFromLastPeriod != null
+        val shouldShowEndedSnapshot = lastPeriodEnd != null &&
+            remainingFromLastPeriod != null &&
+            !lastPeriodEnd.isBefore(settings.startDate)
 
         val endedPeriodStartDate = if (shouldShowEndedSnapshot) {
             val currentEnd = settings.getPeriodEndDate()

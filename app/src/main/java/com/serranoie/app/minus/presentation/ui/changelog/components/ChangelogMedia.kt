@@ -1,13 +1,16 @@
 package com.serranoie.app.minus.presentation.ui.changelog.components
 
 import android.content.Context
+import android.util.TypedValue
+import android.widget.ImageView
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.viewinterop.AndroidView
 import logcat.logcat
 
 /**
@@ -29,31 +32,65 @@ internal fun ChangelogMedia(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val resolvedResId = remember(imageName) { resolveChangelogDrawableId(context, imageName) }
-    if (resolvedResId == 0) return
+    val info = remember(imageName) { resolveChangelogDrawableInfo(context, imageName) }
+    if (info.resId == 0) return
 
-    AsyncImage(
-        model = ImageRequest.Builder(context)
-            .data(resolvedResId)
-            .crossfade(true)
-            .build(),
+    if (info.isAnimated) {
+        AnimatedChangelogMedia(resId = info.resId, modifier = modifier)
+    } else {
+        StaticChangelogMedia(resId = info.resId, modifier = modifier)
+    }
+}
+
+@Composable
+private fun AnimatedChangelogMedia(resId: Int, modifier: Modifier = Modifier) {
+    AndroidView(
+        factory = { context ->
+            ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                setImageResource(resId)
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun StaticChangelogMedia(resId: Int, modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(resId),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = modifier,
     )
 }
 
-private fun resolveChangelogDrawableId(context: Context, name: String): Int {
-    return try {
-        val id = context.resources.getIdentifier(name, "drawable", context.packageName)
-        if (id == 0) {
-            logcat("Changelog") { "ChangelogMedia: drawable '$name' not found in res/drawable/" }
+private data class ChangelogDrawableInfo(
+    val resId: Int,
+    val isAnimated: Boolean,
+)
+
+private fun resolveChangelogDrawableInfo(context: Context, name: String): ChangelogDrawableInfo {
+    val resId = try {
+        context.resources.getIdentifier(name, "drawable", context.packageName).also {
+            if (it == 0) logcat("Changelog") { "ChangelogMedia: drawable '$name' not found in res/drawable/" }
         }
-        id
     } catch (cancellation: kotlinx.coroutines.CancellationException) {
         throw cancellation
     } catch (t: Throwable) {
         logcat("Changelog") { "ChangelogMedia: failed to resolve '$name': ${t.message}" }
         0
     }
+
+    if (resId == 0) return ChangelogDrawableInfo(0, false)
+
+    val isAnimated = runCatching {
+        val typedValue = TypedValue()
+        context.resources.getValue(resId, typedValue, true)
+        val path = typedValue.string?.toString() ?: ""
+        val extension = path.substringAfterLast('.', "").lowercase()
+        extension == "gif" || extension == "webp"
+    }.getOrDefault(false)
+
+    return ChangelogDrawableInfo(resId, isAnimated)
 }
