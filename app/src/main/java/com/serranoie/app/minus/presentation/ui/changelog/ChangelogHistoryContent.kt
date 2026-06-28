@@ -85,19 +85,18 @@ private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) 
                     modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
                 )
             }
-            items(
-                items = items,
-                key = { "${release.versionCode}-$type-${it.title}" },
-            ) { item ->
-                when (item.type) {
-                    ReleaseType.BUG_FIX -> ChangelogBugFixItemCard(
-                        item = item,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
-                    else -> ChangelogItemCard(
-                        item = item,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
+            items.forEachIndexed { idx, item ->
+                item(key = "${release.versionCode}-$type-$idx") {
+                    when (item.type) {
+                        ReleaseType.BUG_FIX -> ChangelogBugFixItemCard(
+                            item = item,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                        )
+                        else -> ChangelogItemCard(
+                            item = item,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                        )
+                    }
                 }
             }
         }
