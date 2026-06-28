@@ -44,6 +44,8 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
+import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalytics
+import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalyticsState
 import com.serranoie.app.minus.presentation.ui.history.HistoryScreen
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHeader
@@ -205,10 +207,10 @@ fun Analytics(
         ) {
             CategoryAnalytics(
                 state = selectedCategory!!,
-                actions = CategoryAnalyticsActions(
-                    onClose = { selectedCategory = null },
-                    onCreateNewPeriod = actions.onCreateNewPeriod
-                )
+//                actions = CategoryAnalyticsActions(
+//                    onClose = { selectedCategory = null },
+//                    onCreateNewPeriod = actions.onCreateNewPeriod
+//                )
             )
         }
     }

@@ -24,10 +24,11 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ExpenseItem(
-	transaction: Transaction,
-	currencyFormat: NumberFormat,
-	position: PaddedListItemPosition = PaddedListItemPosition.Middle,
-	onClick: () -> Unit = {}
+    transaction: Transaction,
+    currencyFormat: NumberFormat,
+    position: PaddedListItemPosition = PaddedListItemPosition.Middle,
+    onClick: () -> Unit = {},
+    modifier: Modifier
 ) {
 	CustomPaddedListItem(
 		onClick = onClick,
@@ -72,17 +73,17 @@ fun ExpenseItem(
 private fun ExpenseItemPreview() {
 	MinusTheme {
 		ExpenseItem(
-			transaction = Transaction(
-				id = 1L,
-				amount = java.math.BigDecimal("150.50"),
-				comment = "Compra en supermercado",
-				date = LocalDateTime.now(),
-				isDeleted = false,
-				isRecurrent = false
-			),
-			currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
-			position = PaddedListItemPosition.Single,
-			onClick = {}
-		)
+            modifier = Modifier,
+            transaction = Transaction(
+                id = 1L,
+                amount = java.math.BigDecimal("150.50"),
+                comment = "Compra en supermercado",
+                date = LocalDateTime.now(),
+                isDeleted = false,
+                isRecurrent = false
+            ),
+            currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
+            position = PaddedListItemPosition.Single,
+        )
 	}
 }

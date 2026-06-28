@@ -37,9 +37,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.CategoryAmount
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.presentation.util.HarmonizedColorPalette
 import com.serranoie.app.minus.presentation.util.combineColors
-import com.serranoie.app.minus.presentation.util.harmonize
 import com.serranoie.app.minus.presentation.util.harmonizeWithColor
-import com.serranoie.app.minus.presentation.util.toPalette
+import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -69,61 +68,72 @@ var baseColors = listOf(
 
 @Composable
 fun CategoriesChartCard(
-    modifier: Modifier = Modifier,
     spends: List<Transaction>,
+    modifier: Modifier = Modifier,
     currency: String = "MXN",
     onCategoryClick: ((categoryName: String, categorySpends: List<Transaction>) -> Unit)? = null,
 ) {
     val isNightMode = isNightMode()
     val labelWithoutTag = stringResource(R.string.categories_chart_uncategorized)
     val labelRest = stringResource(R.string.categories_chart_rest)
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
     val maxDisplay = 20
 
     var selectedCategoryName by remember { mutableStateOf<String?>(null) }
 
-    val colors = (0 until maxDisplay).map { i ->
-        val baseSize = baseColors.size
-        val colorIndex = i % baseSize
-        val iteration = i / baseSize
+    val colors = remember(isNightMode, primaryColor) {
+        (0 until maxDisplay).map { i ->
+            val baseSize = baseColors.size
+            val colorIndex = i % baseSize
+            val iteration = i / baseSize
 
-        var baseColor = baseColors[colorIndex]
+            var baseColor = baseColors[colorIndex]
 
-        if (iteration > 0) {
-            val hsl = FloatArray(3)
-            ColorUtils.colorToHSL(baseColor.toArgb(), hsl)
-            hsl[0] = (hsl[0] + (iteration * 137.5f)) % 360f
-            baseColor = Color(ColorUtils.HSLToColor(hsl))
+            if (iteration > 0) {
+                val hsl = FloatArray(3)
+                ColorUtils.colorToHSL(baseColor.toArgb(), hsl)
+                hsl[0] = (hsl[0] + (iteration * 137.5f)) % 360f
+                baseColor = Color(ColorUtils.HSLToColor(hsl))
+            }
+
+            toPaletteWithTheme(
+                color = harmonizeWithColor(
+                    designColor = baseColor,
+                    sourceColor = primaryColor,
+                    chromaMultiplier = if (isNightMode) 2f else 1f
+                ),
+                darkTheme = isNightMode
+            )
         }
-
-        toPalette(
+    }
+    val restColor = remember(isNightMode, primaryColor) {
+        toPaletteWithTheme(
             color = harmonizeWithColor(
-                designColor = baseColor,
-                sourceColor = MaterialTheme.colorScheme.primary,
-                chromaMultiplier = if (isNightMode) 2f else 1f
+                designColor = Color(0xFF222222),
+                sourceColor = primaryColor
             ),
+            darkTheme = isNightMode
+        ).copy(
+            main = if (isNightMode) Color(0xFFF0F0F0) else Color(0xFF222222),
+            onSurface = if (isNightMode) Color(0xFF1A1A1A) else Color(0xFFF4F4F4)
         )
     }
-    val restColor = toPalette(
-        color = harmonize(
-            designColor = Color(0xFF222222),
-            sourceColor = MaterialTheme.colorScheme.primary
-        ),
-    ).copy(
-        main = if (isNightMode) Color(0xFFF0F0F0) else Color(0xFF222222),
-        onSurface = if (isNightMode) Color(0xFF1A1A1A) else Color(0xFFF4F4F4)
-    )
-    val stubColor = toPalette(
-        color = harmonize(
-            designColor = Color(0xFFCCCCCC),
-            sourceColor = MaterialTheme.colorScheme.primary
-        ),
-    ).copy(
-        main = if (isNightMode) MaterialTheme.colorScheme.surfaceVariant else Color(0xFFCCCCCC),
-    )
+    val stubColor = remember(isNightMode, primaryColor, surfaceVariantColor) {
+        toPaletteWithTheme(
+            color = harmonizeWithColor(
+                designColor = Color(0xFFCCCCCC),
+                sourceColor = primaryColor
+            ),
+            darkTheme = isNightMode
+        ).copy(
+            main = if (isNightMode) surfaceVariantColor else Color(0xFFCCCCCC),
+        )
+    }
 
     var offsetColor = 0
 
-    val tags = remember(spends) {
+    val tags = remember(spends, labelWithoutTag, labelRest, colors, restColor) {
         var result = spends.map { it.copy(comment = it.comment.ifEmpty { labelWithoutTag }) }
             .groupBy { it.comment.trim() }.map { tag ->
                 CategoryUsage(
@@ -179,92 +189,116 @@ fun CategoriesChartCard(
         )
     ) {
         if (isEmpty) {
-            Box {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        DonutChart(
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .size(64.dp),
-                            items = listOf(CategoryUsage("", BigDecimal(360), stubColor)),
-                            holeColor = cardBgColor
-                        )
-                        Column {
-                            Text(
-                                text = stringResource(R.string.categories_chart_empty_title),
-                                style = MaterialTheme.typography.bodyLargeEmphasized.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                ),
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.categories_chart_empty_subtitle),
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.8f),
-                                    ),
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+            EmptyChartContent(stubColor)
         } else {
-            Column(
+            ChartContent(
+                tags = tags,
+                selectedCategoryName = selectedCategoryName,
+                spends = spends,
+                labelWithoutTag = labelWithoutTag,
+                currency = currency,
+                onCategoryClick = onCategoryClick,
+                onSelectionChange = { selectedCategoryName = it }
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyChartContent(stubColor: HarmonizedColorPalette) {
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 DonutChart(
                     modifier = Modifier
-                        .padding(top = 24.dp, bottom = 16.dp)
-                        .size(180.dp),
-                    items = tags,
-                    selectedIndex = tags.indexOfFirst { it.name == selectedCategoryName },
-                    holeColor = cardBgColor,
-                    onItemClick = { index ->
-                        val tag = tags[index]
-                        selectedCategoryName = if (selectedCategoryName == tag.name) null else tag.name
-                    }
+                        .padding(end = 16.dp)
+                        .size(64.dp),
+                    items = listOf(CategoryUsage("", BigDecimal(360), stubColor)),
                 )
-                FlowRow(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp)
-                ) {
-                    tags.forEach { tag ->
-                        val categoryTransactions = remember(spends, tag.name) {
-                            spends.filter {
-                                val category = it.comment.trim().ifEmpty { labelWithoutTag }
-                                category == tag.name
-                            }
-                        }
-                        CategoryAmount(
-                            value = tag.name,
-                            amount = tag.amount,
-                            palette = tag.color,
-                            isSpecial = tag.isSpecial,
-                            currency = currency,
-                            selected = selectedCategoryName == tag.name,
-                            onClick = {
-                                selectedCategoryName = if (selectedCategoryName == tag.name) null else tag.name
-                                onCategoryClick?.invoke(tag.name, categoryTransactions)
-                            },
+                Column {
+                    Text(
+                        text = stringResource(R.string.categories_chart_empty_title),
+                        style = MaterialTheme.typography.bodyLargeEmphasized.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.categories_chart_empty_subtitle),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.8f),
+                            ),
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChartContent(
+    tags: List<CategoryUsage>,
+    selectedCategoryName: String?,
+    spends: List<Transaction>,
+    labelWithoutTag: String,
+    currency: String,
+    onCategoryClick: ((String, List<Transaction>) -> Unit)?,
+    onSelectionChange: (String?) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        DonutChart(
+            modifier = Modifier
+                .padding(top = 24.dp, bottom = 16.dp)
+                .size(180.dp),
+            items = tags,
+            selectedIndex = tags.indexOfFirst { it.name == selectedCategoryName },
+            onItemClick = { index ->
+                val tag = tags[index]
+                onSelectionChange(if (selectedCategoryName == tag.name) null else tag.name)
+            }
+        )
+        FlowRow(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
+        ) {
+            tags.forEach { tag ->
+                val categoryTransactions = remember(spends, tag.name) {
+                    spends.filter {
+                        val category = it.comment.trim().ifEmpty { labelWithoutTag }
+                        category == tag.name
+                    }
+                }
+                CategoryAmount(
+                    value = tag.name,
+                    amount = tag.amount,
+                    palette = tag.color,
+                    isSpecial = tag.isSpecial,
+                    currency = currency,
+                    selected = selectedCategoryName == tag.name,
+                    onClick = {
+                        onSelectionChange(if (selectedCategoryName == tag.name) null else tag.name)
+                        onCategoryClick?.invoke(tag.name, categoryTransactions)
+                    },
+                )
             }
         }
     }
@@ -326,12 +360,12 @@ private fun PreviewCategoriesChartExtremeManyCategories() {
         CategoriesChartCard(
             spends = categories.mapIndexed { index, name ->
                 Transaction(
-                    amount = BigDecimal(100 - index * 2), // Varying amounts
+                    amount = BigDecimal(100 - index * 2),
                     comment = name,
                     date = LocalDateTime.now()
                 )
             },
-            onCategoryClick = { _, _ -> } // Mock listener to enable click logic
+            onCategoryClick = { _, _ -> }
         )
     }
 }

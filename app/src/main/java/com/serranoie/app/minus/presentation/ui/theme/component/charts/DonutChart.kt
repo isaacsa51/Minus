@@ -1,27 +1,23 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.charts
 
+import android.graphics.Paint
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -37,8 +33,6 @@ fun DonutChart(
     modifier: Modifier = Modifier,
     items: List<CategoryUsage>,
     selectedIndex: Int = -1,
-    holeColor: Color = Color.White,
-    chartPadding: PaddingValues = PaddingValues(0.dp),
     onItemClick: (Int) -> Unit = {},
 ) {
     if (items.isEmpty()) return
@@ -76,10 +70,12 @@ fun DonutChart(
         )
     }
 
-    val textPaint = remember(localDensity) {
-        android.graphics.Paint().apply {
-            color = android.graphics.Color.WHITE
-            textAlign = android.graphics.Paint.Align.CENTER
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val textPaint = remember(localDensity, onSurfaceColor, surfaceColor) {
+        Paint().apply {
+            color = onSurfaceColor.toArgb()
+            textAlign = Paint.Align.CENTER
             textSize = with(localDensity) { 16.sp.toPx() }
             isAntiAlias = true
             typeface = android.graphics.Typeface.DEFAULT_BOLD
@@ -137,16 +133,13 @@ fun DonutChart(
                 arcCenterY += sin(Math.toRadians(midAngle.toDouble())).toFloat() * offsetDist
             }
 
-            // Draw a proper donut slice using Path
             val path = Path().apply {
-                // Outer arc
                 arcTo(
                     rect = androidx.compose.ui.geometry.Rect(arcCenterX - outerRadius, arcCenterY - outerRadius, arcCenterX + outerRadius, arcCenterY + outerRadius),
                     startAngleDegrees = currentStartAngle,
                     sweepAngleDegrees = sweepAngle,
                     forceMoveTo = true
                 )
-                // Inner arc (backwards)
                 arcTo(
                     rect = androidx.compose.ui.geometry.Rect(arcCenterX - innerRadius, arcCenterY - innerRadius, arcCenterX + innerRadius, arcCenterY + innerRadius),
                     startAngleDegrees = currentStartAngle + sweepAngle,
@@ -162,7 +155,6 @@ fun DonutChart(
                 style = Fill
             )
 
-            // Draw percentage if selected or animating
             if (offsetProgress > 0.5f) {
                 val percentage = items[index].amount
                     .divide(total, 4, RoundingMode.HALF_UP)
@@ -174,6 +166,7 @@ fun DonutChart(
                 val labelX = arcCenterX + cos(Math.toRadians(midAngle.toDouble())).toFloat() * labelRadius
                 val labelY = arcCenterY + sin(Math.toRadians(midAngle.toDouble())).toFloat() * labelRadius
                 
+                textPaint.color = (if (items[index].isSpecial) surfaceColor else onSurfaceColor).toArgb()
                 textPaint.alpha = (255 * ((offsetProgress - 0.5f) * 2f)).toInt().coerceIn(0, 255)
                 
                 drawContext.canvas.nativeCanvas.drawText(
