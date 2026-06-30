@@ -1,16 +1,16 @@
 package com.serranoie.app.minus.presentation.ui.changelog
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,6 +27,7 @@ import com.serranoie.app.minus.presentation.ui.changelog.components.ChangelogIte
 import com.serranoie.app.minus.presentation.ui.changelog.components.ChangelogSectionHeader
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 
 // !INFO: Population of real data and how it's being rendered, check: [CHANGELOG_GENERATION.md]
 
@@ -57,7 +58,6 @@ internal fun ChangelogHistoryContent(
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         changelogReleaseItems(releases)
     }
@@ -66,7 +66,7 @@ internal fun ChangelogHistoryContent(
 @OptIn(ExperimentalFoundationApi::class)
 private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) {
     releases.forEachIndexed { index, release ->
-        item(key = "meta-${release.versionCode}") {
+        stickyHeader(key = "meta-${release.versionCode}") {
             ChangelogReleaseMeta(release = release)
         }
 
@@ -78,23 +78,26 @@ private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) 
             val items = release.items.filter { it.type == type }
             if (items.isEmpty()) return@forEach
 
-            stickyHeader(key = "header-${release.versionCode}-$type") {
+            item(key = "header-${release.versionCode}-$type") {
                 ChangelogSectionHeader(
                     title = title,
                     type = type,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
                 )
             }
+
             items.forEachIndexed { idx, item ->
                 item(key = "${release.versionCode}-$type-$idx") {
+                    val showDivider = idx < items.lastIndex
                     when (item.type) {
                         ReleaseType.BUG_FIX -> ChangelogBugFixItemCard(
                             item = item,
-                            modifier = Modifier.padding(horizontal = 16.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            showDivider = showDivider,
                         )
                         else -> ChangelogItemCard(
                             item = item,
-                            modifier = Modifier.padding(horizontal = 16.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            showDivider = showDivider,
                         )
                     }
                 }
@@ -111,18 +114,21 @@ private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) 
 
 @Composable
 private fun ChangelogReleaseMeta(release: VersionRelease) {
-    Text(
-        text = stringResource(
-            R.string.changelog_release_header,
-            release.versionName,
-            release.releaseDate,
-        ),
-        style = MaterialTheme.typography.titleMediumEmphasized.copy(
-            fontWeight = FontWeight.SemiBold,
-        ),
-        color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp, end = 16.dp),
-    )
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text = stringResource(
+                R.string.changelog_release_header,
+                release.versionName,
+                release.releaseDate,
+            ),
+            style = MaterialTheme.typography.titleLargeEmphasized,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -136,7 +142,6 @@ private fun ChangelogHistoryContentPreview() {
             items = listOf(
                 ChangelogItem(
                     title = "Launcher icon fix",
-                    description = "Added the missing launcher icon into the app so it shows up correctly in the system app drawer.",
                     type = ReleaseType.BUG_FIX,
                 ),
             ),
@@ -148,12 +153,10 @@ private fun ChangelogHistoryContentPreview() {
             items = listOf(
                 ChangelogItem(
                     title = "Calculator-style expense entry",
-                    description = "Type amounts with the calculator-style numpad, including operators and live result preview.",
                     type = ReleaseType.FEATURE,
                 ),
                 ChangelogItem(
                     title = "Budget tracking",
-                    description = "Set daily, weekly or monthly budgets and watch the progress meter react as you spend.",
                     type = ReleaseType.FEATURE,
                 ),
             ),

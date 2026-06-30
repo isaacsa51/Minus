@@ -203,6 +203,8 @@
     <string name="changelog_badge_improvement">Improvement</string>
     <string name="changelog_badge_bug_fix">Bug fix</string>
     <string name="changelog_release_header">Version %1$s — %2$s</string>
+    <string name="changelog_release_version">Version %1$s</string>
+    <string name="changelog_release_date">Released %1$s</string>
     <string name="changelog_close">Close</string>
     <string name="changelog_previous_versions">Previous version</string>
 

@@ -30,13 +30,13 @@ import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
-import com.serranoie.app.minus.presentation.ui.editor.BUDGET_PERIOD_APPLY_BUTTON_TAG
-import com.serranoie.app.minus.presentation.ui.editor.BUDGET_PERIOD_BUDGET_INPUT_TAG
-import com.serranoie.app.minus.presentation.ui.editor.BUDGET_PERIOD_SHEET_TAG
-import com.serranoie.app.minus.presentation.ui.editor.BudgetPeriodSheet
 import com.serranoie.app.minus.presentation.ui.editor.Editor
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_APPLY_BUTTON_TAG
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_BUDGET_INPUT_TAG
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SHEET_TAG
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
 import com.serranoie.app.minus.presentation.ui.history.History
 import com.serranoie.app.minus.presentation.ui.history.HistoryUiState
 import com.serranoie.app.minus.presentation.ui.home.MainScreenContent

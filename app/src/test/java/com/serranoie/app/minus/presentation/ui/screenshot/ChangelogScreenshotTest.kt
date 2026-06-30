@@ -64,7 +64,6 @@ class ChangelogScreenshotTest {
                     modifier = Modifier.fillMaxSize(),
                     item = ChangelogItem(
                         title = "Deep Insights v2",
-                        description = "Predictive AI analysis for recurring subscriptions with enhanced 99% accuracy model.",
                         type = ReleaseType.FEATURE,
                     ),
                 )
@@ -81,7 +80,6 @@ class ChangelogScreenshotTest {
                     modifier = Modifier.fillMaxSize(),
                     item = ChangelogItem(
                         title = "Launch Optimization",
-                        description = "Overall application bootstrap speed improved by 25% through binary optimization.",
                         type = ReleaseType.IMPROVEMENT,
                     ),
                 )
@@ -98,7 +96,6 @@ class ChangelogScreenshotTest {
                     modifier = Modifier.fillMaxSize(),
                     item = ChangelogItem(
                         title = "Launcher icon fix",
-                        description = "Added the missing launcher icon into the app so it shows up correctly in the system app drawer.",
                         type = ReleaseType.BUG_FIX,
                     ),
                 )
@@ -192,7 +189,6 @@ class ChangelogScreenshotTest {
             items = listOf(
                 ChangelogItem(
                     title = "Launcher icon fix",
-                    description = "Added the missing launcher icon into the app so it shows up correctly in the system app drawer.",
                     type = ReleaseType.BUG_FIX,
                 ),
             ),
@@ -204,17 +200,14 @@ class ChangelogScreenshotTest {
             items = listOf(
                 ChangelogItem(
                     title = "Calculator-style expense entry",
-                    description = "Type amounts with the calculator-style numpad, including operators and live result preview.",
                     type = ReleaseType.FEATURE,
                 ),
                 ChangelogItem(
                     title = "Budget tracking",
-                    description = "Set daily, weekly or monthly budgets and watch the progress meter react as you spend.",
                     type = ReleaseType.FEATURE,
                 ),
                 ChangelogItem(
                     title = "GitHub release automation",
-                    description = "Tagged builds now publish a GitHub release automatically through Fastlane.",
                     type = ReleaseType.IMPROVEMENT,
                 ),
             ),

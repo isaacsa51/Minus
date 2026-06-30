@@ -180,6 +180,8 @@
     <string name="changelog_badge_improvement">Mejora</string>
     <string name="changelog_badge_bug_fix">Corrección</string>
     <string name="changelog_release_header">Versión %1$s · %2$s</string>
+    <string name="changelog_release_version">Versión %1$s</string>
+    <string name="changelog_release_date">Publicada el %1$s</string>
     <string name="changelog_close">Cerrar</string>
     <string name="changelog_previous_versions">Versión anterior</string>
 

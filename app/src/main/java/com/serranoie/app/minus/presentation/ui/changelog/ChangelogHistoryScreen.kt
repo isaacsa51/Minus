@@ -84,7 +84,6 @@ private val sampleReleases = listOf(
         items = listOf(
             ChangelogItem(
                 title = "Launcher icon fix",
-                description = "Added the missing launcher icon into the app so it shows up correctly in the system app drawer.",
                 type = ReleaseType.BUG_FIX,
             ),
         ),
@@ -96,12 +95,10 @@ private val sampleReleases = listOf(
         items = listOf(
             ChangelogItem(
                 title = "Calculator-style expense entry",
-                description = "Type amounts with the calculator-style numpad, including operators and live result preview.",
                 type = ReleaseType.FEATURE,
             ),
             ChangelogItem(
                 title = "Budget tracking",
-                description = "Set daily, weekly or monthly budgets and watch the progress meter react as you spend.",
                 type = ReleaseType.FEATURE,
             ),
         ),

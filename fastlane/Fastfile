@@ -45,29 +45,27 @@ platform :android do
     changelog_content
   end
 
-  desc "Convierte los changelogs de fastlane/metadata en app/src/main/assets/changelog.json"
-  desc "Lee fastlane/metadata/android/en-US/changelogs/*.txt (y overrides en fastlane/changelogs/*.json)"
-  desc "para regenerar el JSON consumido por ChangelogRepository.kt en la app."
-  lane :changelog_to_json do
-    gradle(
-      task: ":app:generateAppChangelogJson",
-      flags: "--quiet"
-    )
-    UI.success("changelog.json regenerado desde fastlane/metadata")
-  end
-
   desc "Genera el APK Release firmado y crea un Release en GitHub"
   lane :publish_github do
     version_tag = ENV.fetch("VERSION_TAG")
 
-    # Generar changelog automáticamente (txt desde git log entre el tag
-    # anterior y el nuevo) y convertirlo a JSON para que el APK lleve las
-    # notas estructuradas en assets/changelog.json. El comando Gradle también
-    # corre implícitamente en preBuild, pero lo invocamos explícito para que
-    # el JSON se regenere ANTES de ensamblar los APKs Release.
+    # 1. Escribe fastlane/metadata/android/en-US/changelogs/<versionCode>.txt
+    #    desde git log entre el tag anterior y el nuevo.
     generate_changelog(version_tag: version_tag)
-    changelog_to_json
 
+    # 2. assembleWearRelease / assembleFossRelease disparan preBuild, que a
+    #    su vez corre :app:generateChangelogKotlin y emite
+    #    app/build/generated/source/changelog/GeneratedChangelog.kt de forma
+    #    deterministica a partir del .txt recien escrito. El source set
+    #    esta registrado en app/build.gradle.kts:
+    #
+    #      android.sourceSets["main"].kotlin.srcDir(
+    #        layout.buildDirectory.dir("generated/source/changelog")
+    #      )
+    #      tasks.named("preBuild").configure { dependsOn(generateChangelogKotlin) }
+    #
+    #    No hay paso intermedio de JSON / assets/changelog.json - el objeto
+    #    Kotlin es la capa de datos del runtime (ChangelogRepository.kt).
     gradle(
       task: ":app:assembleWearRelease"
     )

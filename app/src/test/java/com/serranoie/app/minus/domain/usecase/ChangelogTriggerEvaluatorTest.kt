@@ -16,7 +16,6 @@ class ChangelogTriggerEvaluatorTest {
         items = listOf(
             ChangelogItem(
                 title = "Sample",
-                description = "Sample item",
                 type = ReleaseType.FEATURE,
             ),
         ),
