@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
@@ -63,6 +64,7 @@ private const val MONTH_WIDGET_MAX_DAYS = 31
 private val monthWidgetYearKey = intPreferencesKey("month_heatmap_year")
 private val monthWidgetMonthKey = intPreferencesKey("month_heatmap_month")
 private val monthWidgetTotalSpentKey = intPreferencesKey("month_heatmap_total_spent")
+private val monthWidgetCurrencyKey = stringPreferencesKey("month_heatmap_currency")
 private fun monthWidgetRatioKey(day: Int) = floatPreferencesKey("month_heatmap_ratio_$day")
 private fun monthWidgetHasSpendingKey(day: Int) =
 	intPreferencesKey("month_heatmap_has_spending_$day")
@@ -154,6 +156,8 @@ internal fun MonthHeatmapContent(
 	yearMonth: YearMonth,
 	monthCells: List<MonthWidgetCellState>,
 	totalSpent: Int,
+	currency: String = "USD",
+	totalSpentLabel: String = "Total Spent",
 	modifier: GlanceModifier = GlanceModifier,
 ) {
 	val calendarCells = buildMonthWidgetCalendarCells(yearMonth, monthCells)
@@ -196,7 +200,7 @@ internal fun MonthHeatmapContent(
 		}
 
 		Text(
-			text = "Total gastado: ${formatWidgetAmount(totalSpent)}",
+			text = "$totalSpentLabel: ${formatWidgetCurrency(currency, totalSpent)}",
 			style = TextStyle(
 				fontSize = 10.sp,
 				fontWeight = FontWeight.Bold,
@@ -211,36 +215,43 @@ class MonthHeatmapWidget : GlanceAppWidget() {
 	override suspend fun provideGlance(context: Context, id: GlanceId) {
 		provideContent {
 			GlanceTheme {
-				val prefs = currentState<Preferences>()
-				val now = YearMonth.now()
-				val yearMonth = YearMonth.of(
-					prefs[monthWidgetYearKey] ?: now.year,
-					prefs[monthWidgetMonthKey] ?: now.monthValue,
-				)
-
-				val monthCells = (1..MONTH_WIDGET_MAX_DAYS).map { day ->
-					MonthWidgetCellState(
-						dayNumber = day,
-						ratio = prefs[monthWidgetRatioKey(day)] ?: 0f,
-						hasSpending = (prefs[monthWidgetHasSpendingKey(day)] ?: 0) == 1,
-					)
-				}
-				val totalSpent = prefs[monthWidgetTotalSpentKey] ?: 0
-
-				Box(
-					modifier = GlanceModifier
-						.fillMaxSize()
-						.background(GlanceTheme.colors.surface)
-						.clickable(actionRunCallback<OpenAppAction>())
-						.padding(8.dp),
-				) {
-					MonthHeatmapContent(
-						yearMonth = yearMonth,
-						monthCells = monthCells,
-						totalSpent = totalSpent,
-					)
-				}
+				WidgetContent(context)
 			}
+		}
+	}
+
+	@Composable
+	private fun WidgetContent(context: Context) {
+		val prefs = currentState<Preferences>()
+		val now = YearMonth.now()
+		val yearMonth = YearMonth.of(
+			prefs[monthWidgetYearKey] ?: now.year,
+			prefs[monthWidgetMonthKey] ?: now.monthValue,
+		)
+		val monthCells = (1..MONTH_WIDGET_MAX_DAYS).map { day ->
+			MonthWidgetCellState(
+				dayNumber = day,
+				ratio = prefs[monthWidgetRatioKey(day)] ?: 0f,
+				hasSpending = (prefs[monthWidgetHasSpendingKey(day)] ?: 0) == 1,
+			)
+		}
+		val totalSpent = prefs[monthWidgetTotalSpentKey] ?: 0
+		val currency = prefs[monthWidgetCurrencyKey] ?: "USD"
+
+		Box(
+			modifier = GlanceModifier
+				.fillMaxSize()
+				.background(GlanceTheme.colors.surface)
+				.clickable(actionRunCallback<OpenAppAction>())
+				.padding(8.dp),
+		) {
+			MonthHeatmapContent(
+				yearMonth = yearMonth,
+				monthCells = monthCells,
+				totalSpent = totalSpent,
+				currency = currency,
+				totalSpentLabel = context.getString(R.string.total_spent),
+			)
 		}
 	}
 }
@@ -253,6 +264,7 @@ suspend fun updateMonthHeatmapWidget(
 	context: Context,
 	monthData: MonthHeatmapData,
 	totalSpent: Int,
+	currency: String = "USD",
 ) {
 	val maxTransactions = monthData.days.maxOfOrNull { it.transactionCount }?.coerceAtLeast(1) ?: 1
 
@@ -264,6 +276,7 @@ suspend fun updateMonthHeatmapWidget(
 			prefs[monthWidgetYearKey] = monthData.year
 			prefs[monthWidgetMonthKey] = monthData.month
 			prefs[monthWidgetTotalSpentKey] = totalSpent
+			prefs[monthWidgetCurrencyKey] = currency
 
 			for (day in 1..MONTH_WIDGET_MAX_DAYS) {
 				val spending = monthData.days.firstOrNull { it.dayOfMonth == day }
@@ -326,6 +339,8 @@ private fun MonthHeatmapContentPreview() {
 				yearMonth = ym,
 				monthCells = cells,
 				totalSpent = 1250,
+				currency = "USD",
+				totalSpentLabel = "Total Spent",
 			)
 		}
 	}

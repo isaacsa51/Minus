@@ -37,7 +37,7 @@ class BudgetWidgetUpdater @Inject constructor(
         updateBudgetOverviewWidget(context, budgetAmount, currency, startDate, endDate, daysLeft)
         updateDaysCountdownWidget(context, daysLeft, budget.totalBudget.toInt(), "days left")
         updateHeatmapWidget(context, heatmapData.monthHeatmapData)
-        updateMonthHeatmapWidget(context, heatmapData.currentMonthHeatmap, heatmapData.currentMonthTotalSpent)
+        updateMonthHeatmapWidget(context, heatmapData.currentMonthHeatmap, heatmapData.currentMonthTotalSpent, currency)
         updateMinMaxSpentWidget(context, currentPeriodTransactions, currency)
         updateAverageSpendWidget(context, currentPeriodTransactions, currency, startDate, endDate)
     }
