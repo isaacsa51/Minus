@@ -134,6 +134,13 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
 
+            postprocessing {
+                isRemoveUnusedCode = true
+                isRemoveUnusedResources = true
+                isObfuscate = false
+                isOptimizeCode = true
+            }
+
             if (hasReleaseSigningConfig) {
                 signingConfig = signingConfigs.getByName("release")
             }
@@ -323,7 +330,7 @@ val prepareReleaseNotes by tasks.registering {
         val changelogDir = file("$rootDir/fastlane/metadata/android/en-US/changelogs")
         changelogDir.mkdirs()
         val txtFile = File(changelogDir, "$versionCode.txt")
-        txtFile.writeText(changelogContent + "\n")
+        txtFile.writeText(changelogContent + "\n", Charsets.UTF_8)
         logger.lifecycle(
             "Wrote ${txtFile.path} (${
                 commits.lines().count()
@@ -526,8 +533,11 @@ fun humanizeChangelogTitle(text: String): String {
 fun changelogResolveReleaseDate(versionName: String): String {
     val tag = "v$versionName"
     val gitDate = gitOutput("log", "-1", "--format=%cs", tag)
-    if (!gitDate.isNullOrBlank()) return gitDate
-    return changelogTodayIsoDate()
+        ?: throw GradleException(
+            "Cannot resolve release date for $tag - tag does not exist locally. " +
+                "Fetch the tag or pass VERSION_TAG explicitly."
+        )
+    return gitDate
 }
 
 private fun changelogTodayIsoDate(): String {

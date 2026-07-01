@@ -1,0 +1,2 @@
+# Force LF line endings for changelog source-of-truth files.
+fastlane/metadata/**/*.txt text eol=lf
