@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
@@ -16,23 +17,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.NumberFormat
-import java.util.Currency
 import java.util.Locale
 import kotlin.math.min
 
-/**
- * Simplified currency format that only supports USD/MXN with $ symbol.
- */
-fun formatCurrency(amount: BigDecimal): String {
-    val format = NumberFormat.getCurrencyInstance(Locale.US)
-    format.currency = Currency.getInstance("USD")
-    return format.format(amount)
-}
+fun formatCurrency(amount: BigDecimal, currencyCode: String = "USD"): String =
+    formatCurrencySymbolOnly(amount, currencyCode)
 
-/**
- * Gets the currency symbol ($ for USD/MXN).
- */
-fun getCurrencySymbol(): String = "$"
+fun getCurrencySymbol(currencyCode: String = "USD"): String =
+    SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
 
 
 fun getAnnotatedString(
@@ -75,23 +67,19 @@ private fun calcShift(before: String, after: String, position: Int): Int {
     return shift
 }
 
-/**
- * Visual transformation that formats input as USD/MXN currency with $ symbol.
- */
 private fun visualTransformationAsCurrency(
     context: Context,
     input: AnnotatedString,
     hintColor: Color,
+    currencyCode: String = "USD",
 ): TransformedText {
     val floatDivider = getFloatDivider()
     val fixed = tryConvertStringToNumber(input.text)
 
-    // Format as currency
     val amount = input.text.ifEmpty { "0" }.toBigDecimalOrNull() ?: BigDecimal.ZERO
-    val formatted = formatCurrency(amount)
+    val formatted = formatCurrency(amount, currencyCode)
 
-    // Remove $ symbol for the raw number display
-    val currSymbol = getCurrencySymbol()
+    val currSymbol = getCurrencySymbol(currencyCode)
     var output = formatted.replace(currSymbol, "").trim()
 
     val forceShowAfterDot = input.text.contains(".0")
@@ -150,16 +138,13 @@ private fun visualTransformationAsCurrency(
     }
 }
 
-/**
- * Creates a visual transformation function for currency input.
- * Only supports USD/MXN with $ symbol.
- */
 fun visualTransformationAsCurrency(
     context: Context,
     hintColor: Color,
+    currencyCode: String = "USD",
 ): ((input: AnnotatedString) -> TransformedText) {
     return {
-        visualTransformationAsCurrency(context, it, hintColor)
+        visualTransformationAsCurrency(context, it, hintColor, currencyCode)
     }
 }
 
