@@ -53,7 +53,8 @@ data class CategoryAnalyticsState(
     val finishPeriodDate: Date? = null,
     val isLoading: Boolean = false,
     val categoryName: String = "",
-    val categorySpends: List<Transaction> = emptyList()
+    val categorySpends: List<Transaction> = emptyList(),
+    val currencyCode: String = "USD"
 )
 
 @Composable
@@ -98,6 +99,7 @@ fun CategoryAnalytics(
             ) {
                 DetailedChart(
                     spends = state.categorySpends,
+                    currencyCode = state.currencyCode,
                     modifier = Modifier.fillMaxSize(),
                     chartPadding = PaddingValues(
                         horizontal = 16.dp,
@@ -111,7 +113,7 @@ fun CategoryAnalytics(
         } else if (state.categorySpends.size == 1) {
             val transaction = state.categorySpends.first()
             val currencyFormat =
-                symbolOnlyCurrencyFormat("USD")
+                symbolOnlyCurrencyFormat(state.currencyCode)
 
             Card(
                 modifier = Modifier
@@ -151,7 +153,7 @@ fun CategoryAnalytics(
                 spends = state.categorySpends,
                 startDate = state.startPeriodDate,
                 finishDate = state.finishPeriodDate,
-                currency = "USD",
+                currency = state.currencyCode,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             )
 
@@ -160,7 +162,7 @@ fun CategoryAnalytics(
 
         if (state.categorySpends.isNotEmpty()) {
             val currencyFormat =
-                symbolOnlyCurrencyFormat("USD")
+                symbolOnlyCurrencyFormat(state.currencyCode)
 
             Column(
                 modifier = Modifier

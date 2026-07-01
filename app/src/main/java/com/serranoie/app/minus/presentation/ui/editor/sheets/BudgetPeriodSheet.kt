@@ -346,6 +346,7 @@ private fun ViewBudgetContent(
                 .padding(bottom = 8.dp),
             budget = totalBudget,
             spend = totalSpent,
+            currency = currencyCode,
         )
 
         Row(

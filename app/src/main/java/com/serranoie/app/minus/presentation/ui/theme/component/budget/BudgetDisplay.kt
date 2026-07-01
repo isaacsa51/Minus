@@ -341,15 +341,11 @@ fun Arrow(
     }
 }
 
-@Preview
+@Preview(device = "id:pixel_tablet", showBackground = true)
 @Composable
-private fun PreviewChart() {
+private fun PreviewArrow() {
     MinusTheme {
         Box {
-            Icon(
-                imageVector = Icons.Default.ArrowForward,
-                contentDescription = null,
-            )
             Arrow(
                 modifier = Modifier
                     .height(24.dp)
@@ -359,12 +355,12 @@ private fun PreviewChart() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun PreviewCross() {
     MinusTheme {
         Cross {
-            Text(text = "Days count")
+            Text(text = "Just a normal date here")
         }
     }
 }
@@ -441,7 +437,7 @@ private fun BudgetDisplayPreview_OverBudget() {
     }
 }
 
-@Preview(device = "spec:width=800px,height=500px")
+@Preview(device = "spec:width=1800px,height=900px,dpi=320")
 @Composable
 private fun BudgetDisplayPreview_RolloverSplit() {
     MinusTheme {

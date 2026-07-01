@@ -293,7 +293,7 @@ private fun AnalyticsCompactLayout(
             MinMaxSpentCard(
                 isMin = true,
                 spends = state.spends,
-                currency = "MXN",
+                currency = state.currencyCode,
                 modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight(),
@@ -302,7 +302,7 @@ private fun AnalyticsCompactLayout(
             MinMaxSpentCard(
                 isMin = false,
                 spends = state.spends,
-                currency = "MXN",
+                currency = state.currencyCode,
                 modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight(),
@@ -326,7 +326,7 @@ private fun AnalyticsCompactLayout(
                 spends = state.spends,
                 startDate = state.startPeriodDate,
                 finishDate = state.finishPeriodDate,
-                currency = "MXN",
+                currency = state.currencyCode,
                 modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight(),
@@ -336,6 +336,7 @@ private fun AnalyticsCompactLayout(
         SpendBudgetCard(
             budget = state.wholeBudget,
             spend = state.spends.sumOf { it.amount },
+            currency = state.currencyCode,
             modifier = Modifier
 				.fillMaxWidth()
 				.padding(horizontal = 16.dp),
@@ -343,7 +344,7 @@ private fun AnalyticsCompactLayout(
         Spacer(modifier = Modifier.height(16.dp))
         CategoriesChartCard(
             spends = state.spends,
-            currency = "MXN",
+            currency = state.currencyCode,
             modifier = Modifier
 				.padding(horizontal = 16.dp)
 				.fillMaxWidth(),
@@ -395,7 +396,7 @@ private fun AnalyticsTabletLayout(
                 MinMaxSpentCard(
                     isMin = true,
                     spends = state.spends,
-                    currency = "MXN",
+                    currency = state.currencyCode,
                     modifier = Modifier
 						.weight(1f)
 						.fillMaxHeight(),
@@ -404,7 +405,7 @@ private fun AnalyticsTabletLayout(
                 MinMaxSpentCard(
                     isMin = false,
                     spends = state.spends,
-                    currency = "MXN",
+                    currency = state.currencyCode,
                     modifier = Modifier
 						.weight(1f)
 						.fillMaxHeight(),
@@ -420,6 +421,7 @@ private fun AnalyticsTabletLayout(
             SpendBudgetCard(
                 budget = state.wholeBudget,
                 spend = state.spends.sumOf { it.amount },
+                currency = state.currencyCode,
                 modifier = Modifier.weight(1f),
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -440,7 +442,7 @@ private fun AnalyticsTabletLayout(
                     spends = state.spends,
                     startDate = state.startPeriodDate,
                     finishDate = state.finishPeriodDate,
-                    currency = "MXN",
+                    currency = state.currencyCode,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -448,7 +450,7 @@ private fun AnalyticsTabletLayout(
         Spacer(modifier = Modifier.height(8.dp))
         CategoriesChartCard(
             spends = state.spends,
-            currency = "MXN",
+            currency = state.currencyCode,
             modifier = Modifier.fillMaxWidth(),
             onCategoryClick = onCategoryClick
         )
@@ -468,7 +470,8 @@ private fun AnalyticsState.toCategoryAnalyticsState(
     finishPeriodDate = finishPeriodDate,
     isLoading = isLoading,
     categoryName = categoryName,
-    categorySpends = categorySpends
+    categorySpends = categorySpends,
+    currencyCode = currencyCode,
 )
 
 private val previewStartDate: Date
