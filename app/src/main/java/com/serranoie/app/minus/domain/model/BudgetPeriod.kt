@@ -1,7 +1,12 @@
 package com.serranoie.app.minus.domain.model
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.platform.LocalConfiguration
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.Currency
+import java.util.Locale
 
 enum class BudgetPeriod {
     DAILY, WEEKLY, BIWEEKLY, MONTHLY
@@ -14,39 +19,58 @@ enum class RemainingBudgetStrategy {
 data class SupportedCurrency(
     val code: String,
     val symbol: String,
-    val name: String,
 ) {
+    fun displayName(locale: Locale = Locale.getDefault()): String =
+        runCatching { Currency.getInstance(code).getDisplayName(locale) }
+            .getOrDefault(code)
+
+    @Composable
+    @ReadOnlyComposable
+    fun displayName(): String {
+        val locale = LocalConfiguration.current.locales[0]
+        return displayName(locale)
+    }
+
     companion object {
         val ALL = listOf(
-            SupportedCurrency("USD", "$", "Dólar estadounidense"),
-            SupportedCurrency("MXN", "$", "Peso mexicano"),
-            SupportedCurrency("EUR", "€", "Euro"),
-            SupportedCurrency("GBP", "£", "Libra esterlina"),
-            SupportedCurrency("JPY", "¥", "Yen japonés"),
-            SupportedCurrency("CNY", "¥", "Yuan chino"),
-            SupportedCurrency("KRW", "₩", "Won surcoreano"),
-            SupportedCurrency("INR", "₹", "Rupia india"),
-            SupportedCurrency("BRL", "R$", "Real brasileño"),
-            SupportedCurrency("ARS", "$", "Peso argentino"),
-            SupportedCurrency("COP", "$", "Peso colombiano"),
-            SupportedCurrency("CLP", "$", "Peso chileno"),
-            SupportedCurrency("PEN", "S/", "Sol peruano"),
-            SupportedCurrency("CAD", "CA$", "Dólar canadiense"),
-            SupportedCurrency("AUD", "A$", "Dólar australiano"),
-            SupportedCurrency("CHF", "CHF", "Franco suizo"),
-            SupportedCurrency("SEK", "kr", "Corona sueca"),
-            SupportedCurrency("NOK", "kr", "Corona noruega"),
-            SupportedCurrency("DKK", "kr", "Corona danesa"),
-            SupportedCurrency("PLN", "zł", "Zloty polaco"),
-            SupportedCurrency("TRY", "₺", "Lira turca"),
-            SupportedCurrency("RUB", "₽", "Rublo ruso"),
-            SupportedCurrency("THB", "฿", "Baht tailandés"),
-            SupportedCurrency("PHP", "₱", "Peso filipino"),
-            SupportedCurrency("TWD", "NT$", "Dólar taiwanés"),
-            SupportedCurrency("ILS", "₪", "Shekel israelí"),
-            SupportedCurrency("ZAR", "R", "Rand sudafricano"),
-            SupportedCurrency("NGN", "₦", "Naira nigeriana"),
-            SupportedCurrency("EGP", "E£", "Libra egipcia"),
+            SupportedCurrency("USD", "$"),
+            SupportedCurrency("MXN", "$"),
+            SupportedCurrency("EUR", "€"),
+            SupportedCurrency("GBP", "£"),
+            SupportedCurrency("HKD", "HK$"),
+            SupportedCurrency("SGD", "S$"),
+            SupportedCurrency("JPY", "¥"),
+            SupportedCurrency("CNY", "¥"),
+            SupportedCurrency("KRW", "₩"),
+            SupportedCurrency("INR", "₹"),
+            SupportedCurrency("PKR", "₨"),
+            SupportedCurrency("BDT", "৳"),
+            SupportedCurrency("MYR", "RM"),
+            SupportedCurrency("IDR", "Rp"),
+            SupportedCurrency("VND", "₫"),
+            SupportedCurrency("BRL", "R$"),
+            SupportedCurrency("ARS", "$"),
+            SupportedCurrency("COP", "$"),
+            SupportedCurrency("CLP", "$"),
+            SupportedCurrency("PEN", "S/"),
+            SupportedCurrency("CAD", "CA$"),
+            SupportedCurrency("AUD", "A$"),
+            SupportedCurrency("NZD", "NZ$"),
+            SupportedCurrency("CHF", "CHF"),
+            SupportedCurrency("SEK", "kr"),
+            SupportedCurrency("NOK", "kr"),
+            SupportedCurrency("DKK", "kr"),
+            SupportedCurrency("PLN", "zł"),
+            SupportedCurrency("TRY", "₺"),
+            SupportedCurrency("RUB", "₽"),
+            SupportedCurrency("THB", "฿"),
+            SupportedCurrency("PHP", "₱"),
+            SupportedCurrency("TWD", "NT$"),
+            SupportedCurrency("ILS", "₪"),
+            SupportedCurrency("AED", "د.إ"),
+            SupportedCurrency("ZAR", "R"),
+            SupportedCurrency("NGN", "₦"),
+            SupportedCurrency("EGP", "E£"),
         )
 
         fun findByCode(code: String): SupportedCurrency? =
