@@ -120,6 +120,7 @@ fun SpendBudgetCard(
     modifier: Modifier = Modifier,
     budget: BigDecimal,
     spend: BigDecimal,
+    currency: String = "USD",
 ) {
     val context: Context = LocalContext.current
 
@@ -193,7 +194,7 @@ fun SpendBudgetCard(
                     .padding(vertical = 16.dp, horizontal = 24.dp),
             ) {
                 Text(
-                    text = numberFormat(context, spend, "MXN"),
+                    text = numberFormat(context, spend, currency),
                     style = MaterialTheme.typography.displaySmallEmphasized.copy(fontWeight = FontWeight.Light),
                     fontSize = MaterialTheme.typography.titleLargeEmphasized.fontSize,
                     overflow = TextOverflow.Ellipsis,
@@ -246,6 +247,7 @@ private fun PreviewSpendBudgetCard() {
                 modifier = Modifier.height(IntrinsicSize.Min),
                 spend = BigDecimal(3740),
                 budget = BigDecimal(60000),
+                currency = "INR"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -254,6 +256,7 @@ private fun PreviewSpendBudgetCard() {
                 modifier = Modifier.height(IntrinsicSize.Min),
                 spend = BigDecimal(30740),
                 budget = BigDecimal(60000),
+                currency = "EUR"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -262,6 +265,16 @@ private fun PreviewSpendBudgetCard() {
                 modifier = Modifier.height(IntrinsicSize.Min),
                 spend = BigDecimal(45740),
                 budget = BigDecimal(60000),
+                currency = "BKT"
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            SpendBudgetCard(
+                modifier = Modifier.height(IntrinsicSize.Min),
+                spend = BigDecimal(58000),
+                budget = BigDecimal(60000),
+                currency = "MXN"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -270,6 +283,7 @@ private fun PreviewSpendBudgetCard() {
                 modifier = Modifier.height(IntrinsicSize.Min),
                 spend = BigDecimal.ZERO,
                 budget = BigDecimal(60000),
+                currency = "VND"
             )
         }
     }

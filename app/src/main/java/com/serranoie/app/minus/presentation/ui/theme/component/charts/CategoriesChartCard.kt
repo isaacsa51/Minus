@@ -315,33 +315,7 @@ private fun PreviewCategoriesChart() {
                     comment = "Food",
                     date = LocalDateTime.now(),
                     isDeleted = false
-                ),
-                Transaction(
-                    amount = BigDecimal(50),
-                    comment = "Streaming",
-                    date = LocalDateTime.now(),
-                    isDeleted = false
-                ),
-                Transaction(
-                    amount = BigDecimal(20),
-                    comment = "Gas",
-                    date = LocalDateTime.now(),
-                    isDeleted = false
-                ),
-
-                Transaction(
-                    amount = BigDecimal(200),
-                    comment = "Gym",
-                    date = LocalDateTime.now(),
-                    isDeleted = false
-                ),
-
-                Transaction(
-                    amount = BigDecimal(15),
-                    comment = "Internet",
-                    date = LocalDateTime.now(),
-                    isDeleted = false
-                ),
+                )
             )
         )
     }

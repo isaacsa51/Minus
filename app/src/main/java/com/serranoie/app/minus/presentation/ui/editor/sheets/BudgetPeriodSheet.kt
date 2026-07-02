@@ -346,6 +346,7 @@ private fun ViewBudgetContent(
                 .padding(bottom = 8.dp),
             budget = totalBudget,
             spend = totalSpent,
+            currency = currencyCode,
         )
 
         Row(
@@ -903,7 +904,7 @@ fun EditBudgetContent(
     }
 
     if (showCurrencyPicker) {
-        CurrencyPickerDialog(
+        CurrencySelectorDialog(
             currentCode = currencyCache,
             onDismiss = { showCurrencyPicker = false },
             onSelect = { code ->
@@ -962,83 +963,6 @@ private fun SettingsRow(
             )
         }
     }
-}
-
-@Composable
-private fun CurrencyPickerDialog(
-    currentCode: String,
-    onDismiss: () -> Unit,
-    onSelect: (String) -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                stringResource(R.string.select_currency),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
-        },
-        text = {
-            Column(
-                modifier = Modifier
-                    .heightIn(max = 400.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                SupportedCurrency.ALL.forEach { currency ->
-                    val isSelected = currency.code == currentCode
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable { onSelect(currency.code) }
-                            .padding(vertical = 12.dp, horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = currency.symbol,
-                            style = MaterialTheme.typography.titleMediumEmphasized,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.width(40.dp),
-                        )
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = currency.code,
-                                style = MaterialTheme.typography.bodyMediumEmphasized,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface
-                                },
-                            )
-                            Text(
-                                text = currency.name,
-                                style = MaterialTheme.typography.bodySmallCondensed,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        if (isSelected) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = stringResource(R.string.currency_selected),
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp),
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    stringResource(R.string.close),
-                    style = MaterialTheme.typography.labelMediumEmphasized
-                )
-            }
-        },
-    )
 }
 
 @Composable
