@@ -47,7 +47,6 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.colorOnButton
-import com.serranoie.app.minus.presentation.ui.theme.displayMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.displaySmallCondensed
 
 enum class NumpadButtonType { DEFAULT, PRIMARY, SECONDARY, TERTIARY, DELETE, OPERATOR }
@@ -67,7 +66,7 @@ fun NumpadButton(
 	val emphasizedTextStyle = MaterialTheme.typography.displayMediumEmphasized
 
 	val radius by animateDpAsState(
-		targetValue = if (isPressed) 24.dp else 80.dp, animationSpec = if (isPressed) {
+		targetValue = if (isPressed) 18.dp else 100.dp, animationSpec = if (isPressed) {
 			tween(durationMillis = 60, easing = LinearOutSlowInEasing)
 		} else {
 			tween(durationMillis = 620, easing = LinearEasing)
@@ -77,7 +76,7 @@ fun NumpadButton(
 		targetValue = if (isPressed) 1f else 0f, animationSpec = if (isPressed) {
 			tween(durationMillis = 60, easing = LinearOutSlowInEasing)
 		} else {
-			tween(durationMillis = 560, easing = LinearEasing)
+			tween(durationMillis = 400, easing = LinearOutSlowInEasing)
 		}, label = "ButtonPressProgress"
 	)
 
@@ -174,7 +173,7 @@ private fun lerp(start: Float, stop: Float, fraction: Float): Float {
 	return start + (stop - start) * fraction
 }
 
-@Preview
+@Preview(device = "spec:width=500px,height=550px,dpi=440")
 @Composable
 private fun NumpadButtonPreviews() {
 	MinusTheme {
