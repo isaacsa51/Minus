@@ -89,6 +89,7 @@ private fun MainScreenPreviewContent(
                 showBudgetPeriodSheet = false,
                 forceBudgetPeriodSheetSetup = false,
                 selectedViewPeriod = BudgetPeriod.DAILY,
+                onPeriodSelected = {},
                 settingsDataStore = null,
                 undoSnackbarActionLabel = "Undo",
             )

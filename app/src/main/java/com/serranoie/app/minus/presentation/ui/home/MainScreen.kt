@@ -40,7 +40,8 @@ fun MainScreen(
         .map { it[ONBOARDING_COMPLETED_KEY] ?: false }
         .collectAsStateWithLifecycle(initialValue = false)
 
-    val tutorialStage by context.firstLaunchTutorialStageFlow()
+    val tutorialStage by context
+        .firstLaunchTutorialStageFlow()
         .collectAsStateWithLifecycle(initialValue = FirstLaunchTutorialStage.COMPLETED)
 
     val showCreditQuickToggleFeature by context.settingsDataStore.data
@@ -74,32 +75,40 @@ fun MainScreen(
             when (effect) {
                 is MainScreenUiEffect.RequestUndo -> {
                     budgetViewModel.processIntent(
-                        BudgetTransactionIntent.RestoreTransactionTapped(effect.transaction)
+                        BudgetTransactionIntent.RestoreTransactionTapped(effect.transaction),
                     )
                 }
 
                 is MainScreenUiEffect.UpdateDragProgress -> {
                     budgetViewModel.processIntent(
-                        BudgetNumpadIntent.SetDragProgress(effect.progress)
+                        BudgetNumpadIntent.SetDragProgress(effect.progress),
                     )
                 }
 
-                is MainScreenUiEffect.OpenWallet -> onNavigateToWallet()
-                is MainScreenUiEffect.OpenAnalytics -> onNavigateToAnalytics()
+                is MainScreenUiEffect.OpenWallet -> {
+                    onNavigateToWallet()
+                }
+
+                is MainScreenUiEffect.OpenAnalytics -> {
+                    onNavigateToAnalytics()
+                }
+
                 is MainScreenUiEffect.ShowUndoSnackbar -> {}
             }
         }
     }
 
     ChangelogGate(
-        currentVersionCode = run {
-            val info = context.packageManager.getPackageInfo(
-                context.packageName,
-                0,
-            )
-            @Suppress("DEPRECATION")
-            info.longVersionCode.toInt()
-        },
+        currentVersionCode =
+            run {
+                val info =
+                    context.packageManager.getPackageInfo(
+                        context.packageName,
+                        0,
+                    )
+                @Suppress("DEPRECATION")
+                info.longVersionCode.toInt()
+            },
     ) {
         MainScreenContent(
             mainScreenState = mainScreenState,
@@ -109,16 +118,21 @@ fun MainScreen(
             showCreditQuickToggleFeature = showCreditQuickToggleFeature,
             onProcessIntent = { intent ->
                 when (intent) {
-                    is MainScreenUiIntent.ProcessBudgetTransactionIntent ->
+                    is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
                         budgetViewModel.processIntent(intent.intent)
+                    }
 
-                    is MainScreenUiIntent.ProcessBudgetEditorIntent ->
+                    is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
                         budgetViewModel.processIntent(intent.intent)
+                    }
 
-                    is MainScreenUiIntent.ProcessBudgetNumpadIntent ->
+                    is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
                         budgetViewModel.processIntent(intent.intent)
+                    }
 
-                    else -> mainScreenViewModel.processIntent(intent, tutorialStage)
+                    else -> {
+                        mainScreenViewModel.processIntent(intent, tutorialStage)
+                    }
                 }
             },
             onNavigateToAnalytics = onNavigateToAnalytics,
@@ -128,6 +142,9 @@ fun MainScreen(
             showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet,
             forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup,
             selectedViewPeriod = mainScreenState.selectedViewPeriod,
+            onPeriodSelected = { period ->
+                mainScreenViewModel.processIntent(MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage)
+            },
             settingsDataStore = context.settingsDataStore,
             undoSnackbarActionLabel = undoSnackbarActionLabel,
         )
