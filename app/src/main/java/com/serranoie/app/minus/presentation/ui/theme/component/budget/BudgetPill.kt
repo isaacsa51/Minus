@@ -21,12 +21,15 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -105,21 +108,15 @@ fun BudgetPill(
     val (periodBudget, periodSpent, periodRemaining) = when (period) {
         BudgetPeriod.DAILY -> Triple(dailyBudgetAmount, dailySpent, dailyRemainingAmount)
         BudgetPeriod.WEEKLY -> Triple(
-            weeklyBudgetAmount,
-            periodSpentAggregate,
-            weeklyRemainingAmount
+            weeklyBudgetAmount, periodSpentAggregate, weeklyRemainingAmount
         )
 
         BudgetPeriod.BIWEEKLY -> Triple(
-            biweeklyBudgetAmount,
-            periodSpentAggregate,
-            biweeklyRemainingAmount
+            biweeklyBudgetAmount, periodSpentAggregate, biweeklyRemainingAmount
         )
 
         BudgetPeriod.MONTHLY -> Triple(
-            monthlyBudgetAmount,
-            periodSpentAggregate,
-            monthlyRemainingAmount
+            monthlyBudgetAmount, periodSpentAggregate, monthlyRemainingAmount
         )
     }
 
@@ -149,9 +146,7 @@ fun BudgetPill(
                     0 -> null
                     1 -> stringResource(R.string.budget_pill_exhausted_single, exhausted.first())
                     2 -> stringResource(
-                        R.string.budget_pill_exhausted_double,
-                        exhausted[0],
-                        exhausted[1]
+                        R.string.budget_pill_exhausted_double, exhausted[0], exhausted[1]
                     )
 
                     else -> null
@@ -172,9 +167,7 @@ fun BudgetPill(
                     0 -> null
                     1 -> stringResource(R.string.budget_pill_exhausted_single, exhausted.first())
                     2 -> stringResource(
-                        R.string.budget_pill_exhausted_double,
-                        exhausted[0],
-                        exhausted[1]
+                        R.string.budget_pill_exhausted_double, exhausted[0], exhausted[1]
                     )
 
                     else -> stringResource(
@@ -208,8 +201,7 @@ fun BudgetPill(
     val bad = colorBad
     val harmonizedColor = remember(spendProgress, primaryColor, isDarkTheme, good, notGood, bad) {
         val combined = combineColors(
-            listOf(good, notGood, bad),
-            spendProgress.coerceIn(0f, 1f)
+            listOf(good, notGood, bad), spendProgress.coerceIn(0f, 1f)
         )
         val harmonized = harmonizeWithColor(combined, primaryColor)
         toPaletteWithTheme(harmonized, isDarkTheme)
@@ -227,8 +219,7 @@ fun BudgetPill(
     )
 
     Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
             modifier = Modifier.height(if (showExhaustedMessage) 50.dp else 50.dp),
@@ -240,8 +231,7 @@ fun BudgetPill(
             onClick = onOpenBudgetSheet
         ) {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
                 // Background progress indicator
                 if (!bigVariant) {
@@ -252,8 +242,7 @@ fun BudgetPill(
                             .clip(CircleShape),
                         color = harmonizedColor.main,
                         trackColor = Color.Transparent,
-                        drawStopIndicator = {}
-                    )
+                        drawStopIndicator = {})
 
 // 					val density  = LocalDensity.current
 // 					val strokeWidthPx = with(density) { 28.dp.toPx() }
@@ -277,25 +266,17 @@ fun BudgetPill(
                     modifier = Modifier.fillMaxSize(),
                     transitionSpec = {
                         if (targetState) {
-                            (
-                                slideInHorizontally(animationSpec = tween(220)) { it / 5 } + fadeIn(
-                                    tween(180)
-                                )
-                                ) togetherWith (
-                                slideOutHorizontally(animationSpec = tween(180)) { -it / 5 } + fadeOut(
-                                    tween(120)
-                                )
-                                )
+                            (slideInHorizontally(animationSpec = tween(220)) { it / 5 } + fadeIn(
+                                tween(180)
+                            )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { -it / 5 } + fadeOut(
+                                tween(120)
+                            ))
                         } else {
-                            (
-                                slideInHorizontally(animationSpec = tween(220)) { -it / 5 } + fadeIn(
-                                    tween(180)
-                                )
-                                ) togetherWith (
-                                slideOutHorizontally(animationSpec = tween(180)) { it / 5 } + fadeOut(
-                                    tween(120)
-                                )
-                                )
+                            (slideInHorizontally(animationSpec = tween(220)) { -it / 5 } + fadeIn(
+                                tween(180)
+                            )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { it / 5 } + fadeOut(
+                                tween(120)
+                            ))
                         }
                     },
                     label = "budgetPillContent",
@@ -343,12 +324,13 @@ fun BudgetPill(
                                 isOverBudget = isCurrentPeriodOverBudget,
                                 exhaustedMessage = exhaustedMessage,
                                 bigVariant = bigVariant,
-                                modifier = if (isCurrentPeriodOverBudget || bigVariant) {
-                                    Modifier.padding(
+                                wrapContent = true,
+                                modifier = when {
+                                    isCurrentPeriodOverBudget || bigVariant -> Modifier.padding(
                                         horizontal = 32.dp
                                     )
-                                } else {
-                                    Modifier.weight(1f)
+
+                                    else -> Modifier.wrapContentWidth()
                                 },
                             )
 
@@ -359,9 +341,9 @@ fun BudgetPill(
                                     color = textColor,
                                     minFontSize = 16.sp,
                                     modifier = Modifier
-                                        .weight(0.45f)
+                                        .weight(1f)
                                         .censor(),
-                                    textAlign = TextAlign.End,
+                                    textAlign = TextAlign.End
                                 )
                             }
                         }
@@ -379,6 +361,7 @@ private fun StatusLabel(
     isOverBudget: Boolean,
     exhaustedMessage: String? = null,
     bigVariant: Boolean = false,
+    wrapContent: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val textColor = LocalContentColor.current
@@ -409,9 +392,8 @@ private fun StatusLabel(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .offset(y = labelVerticalOffset),
-            verticalAlignment = Alignment.CenterVertically
+                .then(if (wrapContent) Modifier.wrapContentWidth() else Modifier.fillMaxWidth())
+                .offset(y = labelVerticalOffset), verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(textStartOffset))
             AdaptiveSingleLineText(
@@ -425,14 +407,14 @@ private fun StatusLabel(
                 },
                 color = textColor,
                 minFontSize = if (bigVariant) 14.sp else 12.sp,
-                modifier = Modifier.weight(1f),
+                modifier = if (wrapContent) Modifier.wrapContentWidth() else Modifier.weight(1f),
                 textAlign = if (bigVariant) TextAlign.Center else TextAlign.Start,
+                fillWidth = !wrapContent,
             )
         }
 
         AnimatedVisibility(
-            visible = exhaustedMessage != null && !bigVariant,
-            enter = slideInVertically(
+            visible = exhaustedMessage != null && !bigVariant, enter = slideInVertically(
                 initialOffsetY = { -it }, animationSpec = tween(300)
             ) + fadeIn(animationSpec = tween(300))
         ) {
@@ -456,6 +438,7 @@ private fun AdaptiveSingleLineText(
     minFontSize: TextUnit,
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start,
+    fillWidth: Boolean = true,
 ) {
     BoxWithConstraints(modifier = modifier) {
         val density = LocalDensity.current
@@ -478,7 +461,9 @@ private fun AdaptiveSingleLineText(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             textAlign = textAlign,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = (if (fillWidth) Modifier
+                .fillMaxWidth()
+                .wrapContentHeight() else Modifier).align(Alignment.Center),
         )
     }
 }
@@ -488,8 +473,7 @@ private fun AdaptiveSingleLineText(
 private fun PreviewBudgetPill() {
     MinusTheme {
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.background(
+            verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.background(
                 MaterialTheme.colorScheme.surface
             )
         ) {
