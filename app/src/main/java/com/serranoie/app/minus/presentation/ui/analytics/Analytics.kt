@@ -46,6 +46,7 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalytics
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalyticsState
+import com.serranoie.app.minus.presentation.ui.analytics.util.previewAnalyticsState
 import com.serranoie.app.minus.presentation.ui.history.HistoryScreen
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHeader
@@ -472,67 +473,6 @@ private fun AnalyticsState.toCategoryAnalyticsState(
     categoryName = categoryName,
     categorySpends = categorySpends,
     currencyCode = currencyCode,
-)
-
-private val previewStartDate: Date
-    get() = Calendar.getInstance().apply {
-        add(Calendar.DAY_OF_MONTH, -34)
-    }.time
-
-private val previewFinishDate: Date
-    get() = Calendar.getInstance().apply {
-        add(Calendar.DAY_OF_MONTH, 7)
-    }.time
-
-private fun previewAnalyticsTransactions(): List<Transaction> {
-    val categories = listOf(
-        "Comida",
-        "Transporte",
-        "Entretenimiento",
-        "Salud",
-        "Servicios",
-        "Compras",
-        "Café",
-        "Mascotas",
-        "Gimnasio",
-        "Regalos",
-    )
-
-    return categories.flatMapIndexed { index, category ->
-        listOf(
-            Transaction(
-                amount = BigDecimal(45 + index * 18),
-                date = LocalDateTime.now().minusDays((index * 3L) + 1),
-                comment = category,
-            ),
-            Transaction(
-                amount = BigDecimal(30 + index * 11),
-                date = LocalDateTime.now().minusDays((index * 3L) + 2),
-                comment = category,
-            ),
-        )
-    } + listOf(
-        Transaction(
-            amount = BigDecimal(180),
-            date = LocalDateTime.now().minusDays(31),
-            comment = "",
-        ),
-        Transaction(
-            amount = BigDecimal(96),
-            date = LocalDateTime.now().minusDays(27),
-            comment = "Comida",
-        ),
-    )
-}
-
-private fun previewAnalyticsState(periodFinished: Boolean): AnalyticsState = AnalyticsState(
-    periodFinished = periodFinished,
-    transactions = previewAnalyticsTransactions(),
-    spends = previewAnalyticsTransactions(),
-    wholeBudget = BigDecimal(2400),
-    startPeriodDate = previewStartDate,
-    finishPeriodDate = if (periodFinished) Date() else previewFinishDate,
-    finishPeriodActualDate = if (periodFinished) Date() else null,
 )
 
 @PreviewScreenSizes
