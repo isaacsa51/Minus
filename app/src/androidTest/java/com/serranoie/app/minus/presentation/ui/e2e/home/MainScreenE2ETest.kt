@@ -143,6 +143,7 @@ class MainScreenE2ETest {
                         showBudgetPeriodSheet = showBudgetPeriodSheet,
                         forceBudgetPeriodSheetSetup = false,
                         selectedViewPeriod = selectedViewPeriod,
+                        onPeriodSelected = {},
                         settingsDataStore = null,
                         undoSnackbarActionLabel = "Undo",
                     )
