@@ -20,13 +20,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
@@ -80,17 +90,32 @@ fun MinMaxSpentCard(
         )
     )
 
+    val formattedSpent = if (spent != null) {
+        numberFormat(context, spent.amount, currency = currency)
+    } else {
+        null
+    }
+    val annotatedSpent = remember(formattedSpent, currency) {
+        if (formattedSpent != null) {
+            val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: ""
+            if (currencySymbol.length > 2 && formattedSpent.startsWith(currencySymbol)) {
+                AnnotatedString.Builder().apply {
+                    pushStyle(SpanStyle(fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f, baselineShift = BaselineShift(0.25f)))
+                    append(currencySymbol)
+                    pop()
+                    append(formattedSpent.removePrefix(currencySymbol))
+                }.toAnnotatedString()
+            } else {
+                AnnotatedString(formattedSpent)
+            }
+        } else {
+            AnnotatedString("-")
+        }
+    }
     StatCard(
         modifier = modifier.heightIn(min = 140.dp),
-        value = if (spent != null) {
-            numberFormat(
-                context,
-                spent.amount,
-                currency = currency,
-            )
-        } else {
-            "-"
-        },
+        value = formattedSpent ?: "-",
+        annotatedValue = annotatedSpent,
         label = if (isMin) stringResource(R.string.minimum_spent) else stringResource(R.string.maximum_spent),
         colors = CardDefaults.cardColors(
             containerColor = harmonizedColor.container,

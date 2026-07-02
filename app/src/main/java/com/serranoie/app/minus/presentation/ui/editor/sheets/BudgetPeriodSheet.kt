@@ -27,17 +27,16 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Repartition
-import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material.icons.rounded.FiberSmartRecord
+import androidx.compose.material.icons.rounded.Repartition
 import androidx.compose.material.icons.rounded.Sync
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -640,8 +639,8 @@ fun EditBudgetContent(
                         )
                     },
                     colors = AssistChipDefaults.assistChipColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        labelColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     ),
                 )
             }
@@ -731,7 +730,7 @@ fun EditBudgetContent(
 
         SettingsRow(
             modifier = Modifier.testTag(BUDGET_PERIOD_DATE_ROW_TAG),
-            icon = Icons.Outlined.DateRange,
+            icon = Icons.Rounded.DateRange,
             label = if (endCache != null) {
                 "${startCache.format(dateFormatter)} — ${endCache?.format(dateFormatter)}"
             } else {
@@ -775,7 +774,7 @@ fun EditBudgetContent(
 
         SettingsRow(
             modifier = Modifier.testTag(BUDGET_PERIOD_STRATEGY_ROW_TAG),
-            icon = Icons.Default.Repartition,
+            icon = Icons.Rounded.Repartition,
             label = stringResource(R.string.remaining_budget_label),
             trailingText = when (strategyCache) {
                 RemainingBudgetStrategy.ASK_ALWAYS -> stringResource(R.string.strategy_ask_always)
@@ -790,7 +789,7 @@ fun EditBudgetContent(
         val currencyDisplay = SupportedCurrency.findByCode(currencyCache)
         SettingsRow(
             modifier = Modifier.testTag(BUDGET_PERIOD_CURRENCY_ROW_TAG),
-            icon = Icons.Default.Edit,
+            icon = Icons.Rounded.FiberSmartRecord,
             label = stringResource(R.string.currency_label),
             trailingText = if (currencyDisplay != null) {
                 "${currencyDisplay.symbol} ${currencyDisplay.code}"
