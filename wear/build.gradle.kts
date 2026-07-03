@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+
 plugins {
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.kotlin.android)
@@ -82,6 +84,15 @@ android {
 	useLibrary("wear-sdk")
 	buildFeatures {
 		compose = true
+	}
+
+	applicationVariants.all {
+		outputs.all {
+			val output = this as? BaseVariantOutputImpl
+			if (output != null) {
+				output.outputFileName = "Minus-WearOS-v$appVersionName.apk"
+			}
+		}
 	}
 }
 

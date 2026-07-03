@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -161,6 +163,20 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    applicationVariants.all {
+        outputs.all {
+            val output = this as? BaseVariantOutputImpl
+            if (output != null) {
+                val flavorName = name.replaceFirstChar { it.titlecase() }
+                output.outputFileName = if (flavorName.contains("wear", ignoreCase = true)) {
+                    "Minus-WearOS-v$appVersionName.apk"
+                } else {
+                    "Minus-v$appVersionName.apk"
+                }
+            }
+        }
     }
 
     sourceSets {
