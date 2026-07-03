@@ -104,7 +104,7 @@
     <string name="budget_no_date_defined">Aucune date de fin définie</string>
     <string name="budget_no_days_defined">Aucun jour défini</string>
     <string name="budget_less_than_one_day_validation">Le budget doit être d\'au moins un jour</string>
-    <!--  Analytics  -->
+
     <string name="analytics_title">Analyses</string>
 
     <plurals name="days">
@@ -113,8 +113,8 @@
     </plurals>
 
     <plurals name="analytics_days_left">
-        <item quantity="one">%d jour restant</item>
-        <item quantity="other">%d jours restants</item>
+        <item quantity="one">%d jour</item>
+        <item quantity="other">%d jours</item>
     </plurals>
 
     <string name="total_budget">Budget total</string>
