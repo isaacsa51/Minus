@@ -54,9 +54,14 @@ fun normalizedVersionTag(tag: String?): String? {
     return normalizedTag.takeIf { it.matches(Regex("^v?\\d+\\.\\d+\\.\\d+(-[A-Za-z0-9.-]+)?$")) }
 }
 
+fun versionTagFromEnvOrProperty(): String? =
+    System.getProperty("VERSION_TAG")
+        ?: System.getenv("VERSION_TAG")
+        ?: System.getenv("GITHUB_REF_NAME")
+
 fun releaseVersionName(): String {
-    val tag = normalizedVersionTag(System.getenv("VERSION_TAG"))
-        ?: normalizedVersionTag(System.getenv("GITHUB_REF_NAME")) ?: normalizedVersionTag(
+    val tag = normalizedVersionTag(versionTagFromEnvOrProperty())
+        ?: normalizedVersionTag(
             gitOutput(
                 "describe", "--tags", "--exact-match"
             )
@@ -311,13 +316,13 @@ val prepareReleaseNotes by tasks.registering {
         "Generate fastlane/metadata/android/en-US/changelogs/<versionCode>.txt from git log between tags, then regenerate the compiled-in GeneratedChangelog.kt."
 
     doLast {
-        val versionTag = normalizedVersionTag(System.getenv("VERSION_TAG")) ?: normalizedVersionTag(
-            System.getenv("GITHUB_REF_NAME")
-        ) ?: normalizedVersionTag(gitOutput("describe", "--tags", "--exact-match"))
-        ?: normalizedVersionTag(gitOutput("describe", "--tags", "--abbrev=0"))
-        ?: throw GradleException(
-            "No version tag found. Set VERSION_TAG env var (e.g. VERSION_TAG=v1.3.0) " + "or create a git tag before running this task."
-        )
+        val versionTag = normalizedVersionTag(versionTagFromEnvOrProperty())
+            ?: normalizedVersionTag(gitOutput("describe", "--tags", "--exact-match"))
+            ?: normalizedVersionTag(gitOutput("describe", "--tags", "--abbrev=0"))
+            ?: throw GradleException(
+                "No version tag found. Set VERSION_TAG env var (e.g. VERSION_TAG=v1.3.0) " +
+                    "or create a git tag before running this task."
+            )
 
         val versionCode = versionCodeFrom(versionTag.removePrefix("v"))
 

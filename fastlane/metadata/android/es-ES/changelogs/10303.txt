@@ -1,0 +1,6 @@
+- Añadir más monedas y diálogo de selección de moneda mejorado (#68)
+- Corregir envío de estado para el分割 de presupuesto en pantalla principal (#67)
+- Mostrar gráfico de dona cuando solo hay 1 categoría y mejorar tarjeta (#58)
+- Añadir más monedas y corregir código de moneda en componentes (#57)
+- Corrección: fortalecer RB, ajuste de interfaz, sin ofuscación para builds reproducibles
+- Corrección urgente: cambiar lógica y generación de JSON para metadatos del changelog

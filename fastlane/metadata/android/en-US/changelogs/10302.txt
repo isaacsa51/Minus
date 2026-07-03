@@ -1,0 +1,3 @@
+- fix: show donut chart when only 1 category and enhance card (#58)
+- feat: add more currencies and fix currency code on components (#57)
+- fix: RB hardening, UI tweak, obfuscation off for reproduceable builds
