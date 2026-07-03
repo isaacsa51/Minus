@@ -114,8 +114,8 @@
     </plurals>
 
     <plurals name="analytics_days_left">
-        <item quantity="one">%d day left</item>
-        <item quantity="other">%d days left</item>
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
     </plurals>
 
     <string name="total_budget">Total budget</string>
