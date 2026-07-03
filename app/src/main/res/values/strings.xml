@@ -418,6 +418,9 @@
     <string name="remaining_budget_label">Remaining</string>
     <string name="currency_label">Currency</string>
     <string name="select_currency">Select currency</string>
+    <string name="search_currency">Search currency…</string>
+    <string name="clear">Clear</string>
+    <string name="currency_no_results">No currencies found</string>
     <string name="currency_selected">Selected</string>
 
     <!-- Remaining Budget Strategy -->

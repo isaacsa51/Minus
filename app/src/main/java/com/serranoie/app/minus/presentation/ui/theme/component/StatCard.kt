@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +44,7 @@ fun StatCard(
 	modifier: Modifier = Modifier,
 	value: String,
 	label: String,
+	annotatedValue: AnnotatedString? = null,
 	contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
 	colors: CardColors = CardDefaults.cardColors(
 		containerColor = MaterialTheme.colorScheme.surfaceDim,
@@ -111,7 +113,7 @@ fun StatCard(
 						}
 					}
 					Text(
-						text = value,
+						text = annotatedValue ?: AnnotatedString(value),
 						modifier = Modifier
 							.fillMaxWidth()
 							.then(

@@ -17,10 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -37,6 +34,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
@@ -101,6 +103,37 @@ fun BudgetDisplay(
     val rolloverAmount =
         displayBudget.subtract(baseBudget).takeIf { it > BigDecimal.ZERO } ?: BigDecimal.ZERO
     val shouldShowCrossedBaseBudget = showRolloverStyle && rolloverAmount > BigDecimal.ZERO
+
+    val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
+    val formattedValue = currencyFormat.format(displayBudget)
+    val formattedAmount = formattedValue.removePrefix(currencySymbol)
+
+    val valueFontSize = if (bigVariant) {
+        MaterialTheme.typography.headlineLarge.fontSize
+    } else {
+        MaterialTheme.typography.titleLarge.fontSize
+    }
+    val useAnnotatedValue = currencySymbol.length > 2
+    val symbolFontSize = valueFontSize * 0.5f
+    val annotatedDisplayValue: AnnotatedString? = if (useAnnotatedValue) {
+        AnnotatedString.Builder().run {
+            pushStyle(
+                SpanStyle(
+                    fontSize = symbolFontSize,
+                    fontWeight = FontWeight.Light,
+                    baselineShift = BaselineShift(
+                        0.25f
+                    )
+                )
+            )
+            append(currencySymbol)
+            pop()
+            pushStyle(SpanStyle(fontSize = valueFontSize, fontWeight = FontWeight.Light))
+            append(formattedAmount)
+            pop()
+            toAnnotatedString()
+        }
+    } else null
     logcat("BudgetDisplay") {
         "state budget=$budget settingsTotal=$settingsTotalBudget stateTotal=$stateTotalBudget rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward} showRolloverStyle=$showRolloverStyle baseBudget=$baseBudget displayBudget=$displayBudget rolloverAmount=$rolloverAmount showCross=$shouldShowCrossedBaseBudget"
     }
@@ -113,15 +146,12 @@ fun BudgetDisplay(
             contentColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         label = stringResource(R.string.total_budget),
-        value = currencyFormat.format(displayBudget),
+        value = if (useAnnotatedValue) formattedAmount else formattedValue,
+        annotatedValue = annotatedDisplayValue,
         crossedValue = if (shouldShowCrossedBaseBudget) currencyFormat.format(baseBudget) else null,
         crossedValueColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
         valueFontStyle = MaterialTheme.typography.displaySmallEmphasized,
-        valueFontSize = if (bigVariant) {
-            MaterialTheme.typography.headlineLarge.fontSize
-        } else {
-            MaterialTheme.typography.titleLarge.fontSize
-        },
+        valueFontSize = valueFontSize,
         content = {
             Row(
                 modifier = Modifier
@@ -480,7 +510,7 @@ private fun BudgetDisplayPreview_NullState() {
             budget = BigDecimal.ZERO,
             budgetState = null,
             budgetSettings = null,
-            currencyCode = "USD",
+            currencyCode = "MAD",
             startDate = startDate,
             finishDate = finishDate
         )

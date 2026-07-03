@@ -29,7 +29,12 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +42,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
@@ -193,10 +199,25 @@ fun SpendBudgetCard(
                     .fillMaxWidth()
                     .padding(vertical = 16.dp, horizontal = 24.dp),
             ) {
+                val valueFontSize = MaterialTheme.typography.titleLargeEmphasized.fontSize
+                val formattedAmount = numberFormat(context, spend, currency)
+                val annotatedSpend = remember(formattedAmount, currency) {
+                    val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: ""
+                    if (currencySymbol.length > 2 && formattedAmount.startsWith(currencySymbol)) {
+                        AnnotatedString.Builder().apply {
+                            pushStyle(SpanStyle(fontSize = valueFontSize * 0.5f, baselineShift = BaselineShift(0.25f)))
+                            append(currencySymbol)
+                            pop()
+                            append(formattedAmount.removePrefix(currencySymbol))
+                        }.toAnnotatedString()
+                    } else {
+                        AnnotatedString(formattedAmount)
+                    }
+                }
                 Text(
-                    text = numberFormat(context, spend, currency),
+                    text = annotatedSpend,
                     style = MaterialTheme.typography.displaySmallEmphasized.copy(fontWeight = FontWeight.Light),
-                    fontSize = MaterialTheme.typography.titleLargeEmphasized.fontSize,
+                    fontSize = valueFontSize,
                     overflow = TextOverflow.Ellipsis,
                     softWrap = false,
                     lineHeight = TextUnit(0.2f, TextUnitType.Em),

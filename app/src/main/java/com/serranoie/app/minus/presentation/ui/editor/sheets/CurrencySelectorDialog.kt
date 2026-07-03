@@ -9,22 +9,33 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import java.util.Locale
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
@@ -38,61 +49,129 @@ fun CurrencySelectorDialog(
     onDismiss: () -> Unit,
     onSelect: (String) -> Unit,
 ) {
+    var query by remember { mutableStateOf("") }
+    val filteredCurrencies = remember(query) {
+        if (query.isBlank()) {
+            SupportedCurrency.ALL
+        } else {
+            val q = query.trim()
+            SupportedCurrency.ALL.filter {
+                it.code.contains(q, ignoreCase = true) ||
+                    it.displayName(Locale.getDefault()).contains(q, ignoreCase = true)
+            }
+        }
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
                 stringResource(R.string.select_currency),
-                style = MaterialTheme.typography.titleLargeEmphasized
+                style = MaterialTheme.typography.titleLargeEmphasized,
             )
         },
         text = {
             Column(
-                modifier = Modifier
-                    .heightIn(max = 400.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.heightIn(max = 500.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                SupportedCurrency.ALL.forEach { currency ->
-                    val isSelected = currency.code == currentCode
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable { onSelect(currency.code) }
-                            .padding(vertical = 12.dp, horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
                         Text(
-                            text = currency.symbol,
-                            style = MaterialTheme.typography.titleMediumEmphasized,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.width(50.dp),
+                            stringResource(R.string.search_currency),
+                            style = MaterialTheme.typography.bodyMedium,
                         )
-                        Column(modifier = Modifier.weight(1f).padding(start = 4.dp)) {
-                            Text(
-                                text = currency.code,
-                                style = MaterialTheme.typography.bodyMediumEmphasized,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface
-                                },
-                            )
-                            Text(
-                                text = currency.displayName(),
-                                style = MaterialTheme.typography.bodySmallCondensed,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    trailingIcon = {
+                        if (query.isNotEmpty()) {
+                            IconButton(onClick = { query = "" }) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = stringResource(R.string.clear),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         }
-                        if (isSelected) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = stringResource(R.string.currency_selected),
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp),
-                            )
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                    ),
+                )
+
+                if (filteredCurrencies.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.currency_no_results),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 24.dp),
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f, fill = false),
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        items(
+                            items = filteredCurrencies,
+                            key = { it.code },
+                        ) { currency ->
+                            val isSelected = currency.code == currentCode
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable { onSelect(currency.code) }
+                                    .padding(vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = currency.symbol,
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.titleMediumEmphasized,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.width(60.dp),
+                                )
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(start = 8.dp),
+                                ) {
+                                    Text(
+                                        text = currency.code,
+                                        style = MaterialTheme.typography.bodyMediumEmphasized,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isSelected) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurface
+                                        },
+                                    )
+                                    Text(
+                                        text = currency.displayName(),
+                                        style = MaterialTheme.typography.bodySmallCondensed,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                if (isSelected) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = stringResource(R.string.currency_selected),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp),
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -102,7 +181,7 @@ fun CurrencySelectorDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     stringResource(R.string.close),
-                    style = MaterialTheme.typography.labelMediumEmphasized
+                    style = MaterialTheme.typography.labelMediumEmphasized,
                 )
             }
         },
@@ -116,7 +195,7 @@ private fun CurrencySelectorDialogPreview() {
         CurrencySelectorDialog(
             currentCode = "USD",
             onDismiss = {},
-            onSelect = {}
+            onSelect = {},
         )
     }
 }

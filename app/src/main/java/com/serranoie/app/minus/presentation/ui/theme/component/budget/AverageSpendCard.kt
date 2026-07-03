@@ -9,9 +9,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.combineColors
@@ -53,17 +60,34 @@ fun AverageSpendCard(
         totalAmount.divide(days.toBigDecimal(), 2, RoundingMode.HALF_EVEN)
     }
 
+    val formattedAverage = if (averagePerDay != null) {
+        numberFormat(context, averagePerDay, currency = currency)
+    } else {
+        null
+    }
+    val emptyLabel = stringResource(R.string.empty)
+    val annotatedAverage = remember(formattedAverage, currency, emptyLabel) {
+        if (formattedAverage != null) {
+            val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: ""
+            if (currencySymbol.length > 2 && formattedAverage.startsWith(currencySymbol)) {
+                AnnotatedString.Builder().apply {
+                    pushStyle(SpanStyle(fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f, baselineShift = BaselineShift(0.25f)))
+                    append(currencySymbol)
+                    pop()
+                    append(formattedAverage.removePrefix(currencySymbol))
+                }.toAnnotatedString()
+            } else {
+                AnnotatedString(formattedAverage)
+            }
+        } else {
+            AnnotatedString(emptyLabel)
+        }
+    }
+
     StatCard(
         modifier = modifier,
-        value = if (averagePerDay != null) {
-            numberFormat(
-                context,
-                averagePerDay,
-                currency = currency,
-            )
-        } else {
-            stringResource(R.string.empty)
-        },
+        value = formattedAverage ?: emptyLabel,
+        annotatedValue = annotatedAverage,
         colors = CardDefaults.cardColors(
             containerColor = combineColors(
                 MaterialTheme.colorScheme.surface,
