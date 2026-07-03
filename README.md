@@ -1,34 +1,39 @@
 <p align="center">
-  <img src="assets/app_icon.png" alt="App Icon" width="128"/>
+  <img src="assets/banner.png" alt="App Banner" width="100%">
 </p>
 
 # Minus - An easy to use, budget tracking app
 
 <p align="center">
-  <img src="assets/banner.png" alt="App Banner" width="100%">
-</p>
-
-<p align="center">
   <strong>Minus</strong> is an easy to use & powerful budget tracking app. <br/>Register, calculate and make reminders for your recurring expenses alongside credit card due dates.
 </p>
 
-<p align="center">
-  <a href="https://github.com/isaacsa51/Minus/releases">
-    <img src="https://img.shields.io/github/v/release/1372Slash/Zenith?label=Download%20Minus&style=for-the-badge&color=89db4a&logo=android&logoColor=white">
-  </a>
+<div align="center">
+<h4>
+    <a href="#features">Features</a>
+  <span> - </span>
+    <a href="PROJECT_OVERVIEW.md">Project Overview</a>
+  <span> - </span>
+    <a href="https://github.com/isaacsa51/Minus/issues/new?template=bug_report.md">Report Bug</a>
+  <span> - </span>
+    <a href="https://github.com/isaacsa51/Minus/issues/new?template=feature_request.md">Request a Feature</a>
+  </h4>
+</div>
 
-  <br>
-  
-  <a href="https://apt.izzysoft.de/packages/com.serranoie.app.minus">
-    <img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder_nofont.png" height="50" alt="Get it at IzzyOnDroid">
-  </a>
-
-  <br>
-
-  <a href="https://github.com/isaacsa51/Minus/releases">
-    <img src="assets/badge_github.png" height="80" alt="Get it at GitHub">
-  </a>
-</p>
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://apt.izzysoft.de/packages/com.serranoie.app.minus">
+        <img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder_nofont.png" height="50" alt="Get it at IzzyOnDroid">
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/isaacsa51/Minus/releases">
+        <img src="assets/badge_github.png" height="80" alt="Get it at GitHub">
+      </a>
+    </td>
+  </tr>
+</table>
 
 <p align="center">
   <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Android/android2.svg">
@@ -38,84 +43,46 @@
   <img src="https://m3-markdown-badges.vercel.app/issues/1/2/isaacsa51/Minus">
 </p>
 
-<p align="center">
-  <img src="assets/screenshot_1.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/>
-  <img src="assets/screenshot_2.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/>
-  <img src="assets/screenshot_3.png" alt="Screenshot 2" width="200" style="border-radius:26px;"/>
-  <img src="assets/screenshot_4.png" alt="Screenshot 3" width="200" style="border-radius:26px;"/>
-  <img src="assets/screenshot_5.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/>
-  <img src="assets/screenshot_6.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/>
-  <img src="assets/screenshot_7.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/>
-  <img src="assets/screenshot_8.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/>
-</p>
+<table align="center">
+  <tr>
+    <td><img src="assets/screenshot_1.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/></td>
+    <td><img src="assets/screenshot_2.png" alt="Screenshot 2" width="200" style="border-radius:26px;"/></td>
+    <td><img src="assets/screenshot_3.png" alt="Screenshot 3" width="200" style="border-radius:26px;"/></td>
+    <td><img src="assets/screenshot_4.png" alt="Screenshot 4" width="200" style="border-radius:26px;"/></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshot_5.png" alt="Screenshot 5" width="200" style="border-radius:26px;"/></td>
+    <td><img src="assets/screenshot_6.png" alt="Screenshot 6" width="200" style="border-radius:26px;"/></td>
+    <td><img src="assets/screenshot_7.png" alt="Screenshot 7" width="200" style="border-radius:26px;"/></td>
+    <td><img src="assets/screenshot_8.png" alt="Screenshot 8" width="200" style="border-radius:26px;"/></td>
+  </tr>
+</table>
 
 ---
 
-## Project Overview
+## Features
 
-The primary goal of Minus is to provide an easy and familiar interface for recording daily spending. By mimicking the layout of a standard calculator interface that reduces it's complexity, that way any user can easy and quickly enter their expenses.
+| |                                                                                                                                                                                                                                                                                                                                                                                                                   |
+|:---|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <img src="assets/screenshot_1.png" alt="Numpad expense entry" width="240" style="border-radius:26px;"/> | **Save, Edit, Delete & Calculate on the Fly** <br/> Register expenses in seconds using a familiar calculator-style numpad. No complex forms — just tap the amount and save. Swipe up to reveal math operators and make calculations directly before saving.                                                                                                                                                       |
+| <img src="assets/screenshot_2.png" alt="Budget periods" width="240" style="border-radius:26px;"/> | **Smart Budget Periods** <br/> Configure your budget to match how you actually think about money. Choose between Daily, Weekly, Biweekly, or Monthly periods. Minus automatically breaks down your total budget.                                                                                                                                                                                                  |
+| <img src="assets/screenshot_3.png" alt="Recurring expenses" width="240" style="border-radius:26px;"/> | **Recurring Expenses & Subscriptions** <br/> Track subscriptions and recurring bills with automatic notifications. Notifications fire at a configurable time before each occurrence.                                                                                                                                                                                                                              |
+| <img src="assets/screenshot_6.png" alt="Expense history" width="240" style="border-radius:26px;"/> | **See your expenses and analyze them** <br/> Every expense is stored and grouped by date. Browse history organized into: current period transactions, upcoming recurrent expenses, and past period data. Analyze them viewing graphs and see how can you save using the in app recommendation.                                                                                                                    |
+| <img src="assets/screenshot_8.png" alt="Undo and export" width="240" style="border-radius:26px;"/> | **CSV Export** <br/> **CSV Export** writes your full expense history to the Downloads folder including amount, date, comment, category, and recurrence settings.                                                                                                                                                                                                                                                  |
+| <img src="assets/screenshot_3.png" alt="Theme customization" width="240" style="border-radius:26px;"/> | **Customizable Themes & Material You** <br/> Minus adapts to your device with full Material You. Pick **Light / Dark / System** appearance, enable wallpaper-based colors, configure **typography density** and enable the **Privacy Mode** to hide amounts for privacy when sharing your screen.                                                                                                                 |
+| <img src="assets/wear_1.png" alt="Wear OS" width="240" style="border-radius:26px;"/> | **Wear OS Companion App** — Track expenses directly from your wrist. A full numpad interface optimized for round and square watch faces, a glanceable recent history, and notification sync with the phone app. Budget state is shared via DataStore — the watch works independently without the phone app running. See the [Project Overview](PROJECT_OVERVIEW.md#wear-os-integration) for architecture details. |
 
-### Core Features
+## Contributing
 
-- Easy Expense Entry: Log expenses directly through a Numpad interface.
-- CSV Export: Securely export expense data to the device Downloads folder for backup or further analysis in spreadsheet software.
-- Undo & Batch Actions: Restore individual expenses or delete all at once.
-- Wear OS Integration: Provides a companion app for quick expense entry on wearable devices.
-- Subscription Management: Easily manage and track subscriptions.
-- Customizable Settings: Light/Dark/System themes, Material You colors and typography styles.
-- Make calculations on the fly: Need to split a expense amount among multiple people? Swipe up to reveal the operator button, make an operation and press equals to see the result and directly save that expense amount.
-
-
-## Technology Stack
-
-| Category               | Technology                    | Purpose                                              |
-|:-----------------------|:------------------------------|:-----------------------------------------------------|
-| UI Framework           | Jetpack Compose               | Declarative UI for Mobile and Wear OS                |
-| Architecture           | MVI (Model-View-Intent)       | Uni-directional data flow and state management       |
-| Asynchronous / Streams | Kotlin Coroutines & Flow      | Non-blocking database I/O and reactive state updates |
-| Dependency Injection   | Hilt / Dagger                 | Modular dependency management and scoping            |
-| Database               | Room                          | Local persistence with SQLite                        |
-| Logging                | Logcat (Square)               | Pattern-based structured logging                     |
-| Navigation             | Compose Navigation            | Type-safe in-app navigation                          |
-| Design System          | Material 3 Expressive (Alpha) | Modern UI components and dynamic theming             |
-
-## Architecture
-
-Minus follows Modern Android Development (MAD) practices and a Clean Architecture approach:
-
-*   Presentation Layer: Built entirely with Jetpack Compose. Uses ViewModel and StateFlow for reactive UI updates.
-*   Data Layer: Utilizes Room Database for local persistence and MediaStore for file exports.
-*   Navigation: Managed via Jetpack Compose Navigation with a centralized AppNavGraph.
-*   Concurrency: Powered by Kotlin Coroutines and Flow for non-blocking operations.
-*   Wear OS Integration: Provides a companion app for quick expense entry on wearable devices.
-*   MVI (Model-View-Intent) Architecture: Used for state management and event handling.
-
----
-
-## Wear OS Integration _(still very early on development, may not work properly)_
-
-
-<p align="center">
-  <img src="assets/wear_1.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/>
-  <img src="assets/wear_2.png" alt="Screenshot 1" width="200" style="border-radius:26px;"/>
-</p>
-
-Minus includes a companion Wear OS application. The wearable version provides:
-*   Similar numpad interface for quick expense entry.
-*   Glanceable history of recent entries.
-*   Notification sync through system.
-*   Optimization for round and square watch faces using the latest Wear OS Compose libraries.
-
-### Contributing
 Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more information.
 
-### Translations
-Any contributions to translate Minus into other languages are greatly appreciated. Please submit a pull request with your translations.
+## Translations
 
-> [!IMPORTANT]
-> This app is still on the heavy side of development, while the core features works as expected. Any issues or feedback can be generated inside the app or here: [GitHub Issues](https://github.com/isaacsa51/Minus/issues).
+Any contributions to translate Minus into other languages are greatly appreciated. Please submit a pull request with your translations.
 
 > [!NOTE]
 > While Minus incorporates visual artifacts from [Buckwheat](https://github.com/danilkinkin/buckwheat), it's totally different from the original with a vastly more advanced architectural paradigm. Any superficial similarities are merely legacy design cues within a fundamentally different and more robust ecosystem.
 
-Made with ❤️ by [Isaac Serrano](https://linkedin.com/in/serranoie)
+<div align="center">
+    <p>Made with <3 by <a href="https://linkedin.com/in/serranoie">Isaac Serrano</a></p>
+</div>
