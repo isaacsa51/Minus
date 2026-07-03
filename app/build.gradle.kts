@@ -419,6 +419,10 @@ val generateChangelogKotlin by tasks.registering {
             if (versionCode <= 0) continue
             val versionName = changelogVersionCodeToName(versionCode)
             val releaseDate = changelogResolveReleaseDate(versionName)
+            if (releaseDate == null) {
+                logger.warn("Skipping ${txt.name} — tag v$versionName not found locally (skip pre-release tags like 1.3.2-pre)")
+                continue
+            }
 
             val items = parseChangelogTxtItems(txt.readText())
             if (items.isEmpty()) continue
@@ -551,13 +555,9 @@ fun humanizeChangelogTitle(text: String): String {
     return t[0].uppercaseChar() + t.substring(1)
 }
 
-fun changelogResolveReleaseDate(versionName: String): String {
+fun changelogResolveReleaseDate(versionName: String): String? {
     val tag = "v$versionName"
     val gitDate = gitOutput("log", "-1", "--format=%cs", tag)
-        ?: throw GradleException(
-            "Cannot resolve release date for $tag - tag does not exist locally. " +
-                "Fetch the tag or pass VERSION_TAG explicitly."
-        )
     return gitDate
 }
 
