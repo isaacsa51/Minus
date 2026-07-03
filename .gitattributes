@@ -1,2 +1,4 @@
-# Force LF line endings for changelog source-of-truth files.
+# Force LF line endings for ALL text files (RB-friendly)
+* text=auto eol=lf
+# But explicitly mark the changelog source-of-truth (overrides above)
 fastlane/metadata/**/*.txt text eol=lf

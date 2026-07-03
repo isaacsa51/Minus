@@ -203,6 +203,11 @@ android {
         // Disables dependency metadata when building Android App Bundles (for Google Play)
         includeInBundle = false
     }
+
+    androidResources{
+        // disable PNG crunching for RB (the aaptOptions.cruncherEnabled = false is deprecated)
+        noCompress += listOf("png", "webp")
+    }
 }
 
 tasks.named("preBuild").configure {
