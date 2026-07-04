@@ -389,4 +389,21 @@
     <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
     <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Mostrar los pagos recurrentes como tarjetas horizontales</string>
     <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
+
+    <!-- Transaction Detail -->
+    <string name="without_date">Sin fecha</string>
+    <string name="no_name">Sin nombre</string>
+    <string name="description">Descripción</string>
+    <string name="date">Fecha</string>
+    <string name="frequency">Frecuencia</string>
+    <string name="charge_day">Día de cobro</string>
+    <string name="day_number">Día %1$d</string>
+    <string name="recurrence_end">Fin recurrencia</string>
+
+    <!-- Transaction Detail Ticket Card -->
+    <string name="ticket_operation_number">Op. #%1$d</string>
+    <string name="ticket_expense">GASTO</string>
+    <string name="ticket_recurrent_expense">GASTO RECURRENTE</string>
+    <string name="ticket_total_amount">MONTO TOTAL</string>
+    <string name="mark_as_paid">Marcar como pagado</string>
 </resources>

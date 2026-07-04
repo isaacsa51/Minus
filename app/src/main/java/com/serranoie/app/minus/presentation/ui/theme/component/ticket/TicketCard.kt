@@ -26,18 +26,6 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 
-/**
- * A card component that uses TicketView as its container.
- *
- * @param header Optional header content to display at the top of the ticket
- * @param clickable Optional lambda to handle click events, can be null for non-clickable card
- * @param actions Optional actions to display at the bottom of the ticket (e.g., buttons)
- * @param modifier Modifier for the card
- * @param backgroundColor Background color for the ticket shape
- * @param teethWidthDp Width of the ticket "teeth" in dp
- * @param teethHeightDp Height of the ticket "teeth" in dp
- * @param content Main content of the ticket
- */
 @Composable
 fun TicketCard(
 	modifier: Modifier = Modifier,
@@ -74,18 +62,6 @@ fun TicketCard(
 	}
 }
 
-/**
- * A simplified version of TicketCard that works with transaction data.
- * Shows transaction details in a ticket format.
- *
- * @param amountFormatted The formatted amount to display
- * @param comment The transaction comment/description
- * @param dateText Formatted date string
- * @param isRecurrent Whether this is a recurrent transaction
- * @param frequencyLabel Optional label for the recurrence frequency
- * @param onClick Optional click handler
- * @param modifier Modifier for the card
- */
 @Composable
 fun TransactionTicketCard(
 	amountFormatted: String,
