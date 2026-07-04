@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.util
 
 import android.content.Context
 import com.serranoie.app.minus.domain.model.SupportedCurrency
+import com.serranoie.app.minus.domain.model.SymbolPosition
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -28,13 +29,19 @@ fun formatCurrencySymbolOnly(
 	maximumFractionDigits: Int = 2,
 	minimumFractionDigits: Int = 0,
 ): String {
-	val symbol = SupportedCurrency.findByCode(currencyCode)?.symbol
+	val supported = SupportedCurrency.findByCode(currencyCode)
+	val symbol = supported?.symbol
 	if (symbol != null) {
 		val numberFormatter = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
 			this.maximumFractionDigits = maximumFractionDigits
 			this.minimumFractionDigits = minimumFractionDigits
 		}
-		return "$symbol${numberFormatter.format(value)}"
+		val formatted = numberFormatter.format(value)
+		return if (supported.symbolPosition == SymbolPosition.END) {
+			"$formatted$symbol"
+		} else {
+			"$symbol$formatted"
+		}
 	}
 	// Fallback to standard currency formatter
 	return try {
@@ -62,16 +69,23 @@ fun symbolOnlyCurrencyFormat(
 	maximumFractionDigits: Int = 2,
 	minimumFractionDigits: Int = 0,
 ): NumberFormat {
-	val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
+	val supported = SupportedCurrency.findByCode(currencyCode)
+	val currencySymbol = supported?.symbol ?: "$"
+	val symbolAtEnd = supported?.symbolPosition == SymbolPosition.END
 	return (NumberFormat.getNumberInstance(Locale.getDefault()) as DecimalFormat).apply {
 		this.maximumFractionDigits = maximumFractionDigits
 		this.minimumFractionDigits = minimumFractionDigits
-		positivePrefix = currencySymbol
-		negativePrefix = "-" + currencySymbol
+		if (symbolAtEnd) {
+			positiveSuffix = currencySymbol
+			negativeSuffix = "-" + currencySymbol
+		} else {
+			positivePrefix = currencySymbol
+			negativePrefix = "-" + currencySymbol
+		}
 		try {
 			currency = java.util.Currency.getInstance(currencyCode)
 		} catch (e: Exception) {
-			// Keep the positivePrefix set above
+			// Keep the prefix/suffix set above
 		}
 	}
 }

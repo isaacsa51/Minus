@@ -16,9 +16,15 @@ enum class RemainingBudgetStrategy {
     ASK_ALWAYS, SPLIT_EQUALLY, ADD_TO_FIRST_DAY,
 }
 
+enum class SymbolPosition {
+    START,
+    END,
+}
+
 data class SupportedCurrency(
     val code: String,
     val symbol: String,
+    val symbolPosition: SymbolPosition = SymbolPosition.START,
 ) {
     fun displayName(locale: Locale = Locale.getDefault()): String =
         runCatching { Currency.getInstance(code).getDisplayName(locale) }
@@ -47,7 +53,7 @@ data class SupportedCurrency(
             SupportedCurrency("BDT", "৳"),
             SupportedCurrency("MYR", "RM"),
             SupportedCurrency("IDR", "Rp"),
-            SupportedCurrency("VND", "₫"),
+            SupportedCurrency("VND", "₫", SymbolPosition.END),
             SupportedCurrency("BRL", "R$"),
             SupportedCurrency("ARS", "$"),
             SupportedCurrency("COP", "$"),
@@ -109,6 +115,7 @@ data class SupportedCurrency(
             SupportedCurrency("ZWL", "ZWL"),
             SupportedCurrency("SAR", "SAR"),
             SupportedCurrency("SYP", "SYP"),
+            SupportedCurrency("HUF", "Ft", SymbolPosition.END),
         )
 
         fun findByCode(code: String): SupportedCurrency? =
