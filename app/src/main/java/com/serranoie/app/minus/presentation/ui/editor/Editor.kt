@@ -61,6 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.liveRegion
@@ -74,6 +75,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -133,7 +135,7 @@ fun Editor(
     showCreditQuickToggleFeature: Boolean = false,
     onDismissRecurrentDialog: () -> Unit = {},
     onDismissCreditCutoffDialog: () -> Unit = {},
-    onRecurrentExpenseConfirm: (RecurrentFrequency, LocalDate, Int?) -> Unit = { _, _, _ -> },
+    onRecurrentExpenseConfirm: (RecurrentFrequency, LocalDate, Int?, String) -> Unit = { _, _, _, _ -> },
     onCreditCutoffConfirm: (Int) -> Unit = {},
     showAnalyticsButton: Boolean = true,
     showSettingsButton: Boolean = true,
@@ -151,7 +153,12 @@ fun Editor(
         RecurrentExpenseDialog(
             budgetSettings = uiState.budgetSettings,
             onDismiss = onDismissRecurrentDialog,
-            onConfirm = onRecurrentExpenseConfirm
+            onConfirm = onRecurrentExpenseConfirm,
+            fallbackComments = mapOf(
+                RecurrentFrequency.WEEKLY to stringResource(R.string.recurrent_ticket_weekly_unnamed),
+                RecurrentFrequency.BIWEEKLY to stringResource(R.string.recurrent_ticket_biweekly_unnamed),
+                RecurrentFrequency.MONTHLY to stringResource(R.string.recurrent_ticket_monthly_unnamed),
+            ),
         )
     }
 
@@ -686,7 +693,7 @@ fun EditorPreview_Idle() {
             onCreditToggle = {},
             onDismissRecurrentDialog = {},
             onDismissCreditCutoffDialog = {},
-            onRecurrentExpenseConfirm = { _, _, _ -> },
+            onRecurrentExpenseConfirm = { _, _, _, _ -> },
             onCreditCutoffConfirm = {}
         )
     }
@@ -729,7 +736,7 @@ fun EditorPreview_Editing() {
             onCreditToggle = {},
             onDismissRecurrentDialog = {},
             onDismissCreditCutoffDialog = {},
-            onRecurrentExpenseConfirm = { _, _, _ -> },
+            onRecurrentExpenseConfirm = { _, _, _, _ -> },
             onCreditCutoffConfirm = {}
         )
     }
@@ -775,7 +782,7 @@ private fun EditorPreview_Editing_WithCredit() {
             onCreditToggle = {},
             onDismissRecurrentDialog = {},
             onDismissCreditCutoffDialog = {},
-            onRecurrentExpenseConfirm = { _, _, _ -> },
+            onRecurrentExpenseConfirm = { _, _, _, _ -> },
             onCreditCutoffConfirm = {}
         )
     }

@@ -60,6 +60,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Density
@@ -74,7 +75,9 @@ import androidx.wear.compose.material.rememberSwipeableState
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
@@ -703,10 +706,10 @@ private fun PhoneLayout(
                             ),
                         )
                     },
-                    onRecurrentExpenseConfirm = { freq, date, day ->
+                    onRecurrentExpenseConfirm = { freq, date, day, fallbackComment ->
                         onProcessIntent(
                             MainScreenUiIntent.ProcessBudgetEditorIntent(
-                                BudgetEditorIntent.RecurrentExpenseApplied(freq, date, day),
+                                BudgetEditorIntent.RecurrentExpenseApplied(freq, date, day, fallbackComment),
                             ),
                         )
                     },
@@ -930,10 +933,10 @@ private fun TabletLayout(
                             ),
                         )
                     },
-                    onRecurrentExpenseConfirm = { freq, date, day ->
+                    onRecurrentExpenseConfirm = { freq, date, day, fallbackComment ->
                         onProcessIntent(
                             MainScreenUiIntent.ProcessBudgetEditorIntent(
-                                BudgetEditorIntent.RecurrentExpenseApplied(freq, date, day),
+                                BudgetEditorIntent.RecurrentExpenseApplied(freq, date, day, fallbackComment),
                             ),
                         )
                     },

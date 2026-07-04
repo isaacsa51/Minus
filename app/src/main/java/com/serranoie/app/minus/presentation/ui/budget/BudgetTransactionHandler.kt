@@ -123,16 +123,11 @@ class BudgetTransactionHandler @Inject constructor(
 		subscriptionDay: Int?,
 		resolveActivePeriodId: suspend () -> Long,
 		isCredit: Boolean = false,
+		fallbackComment: String,
 	): Boolean {
 		val amount = pendingAmount ?: return false
 		val rawComment = pendingComment.trim()
 		val now = LocalDateTime.now()
-
-		val fallbackComment = when (frequency) {
-			RecurrentFrequency.WEEKLY -> "Subscripción semanal sin nombre"
-			RecurrentFrequency.BIWEEKLY -> "Subscripción quincenal sin nombre"
-			RecurrentFrequency.MONTHLY -> "Subscripción mensual sin nombre"
-		}
 
 		val finalComment = rawComment.ifEmpty { fallbackComment }
 		val activePeriodId = resolveActivePeriodId()

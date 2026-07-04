@@ -213,6 +213,7 @@
     <string name="settings_feature_credit_toggle_details">Une fois activé, vous pouvez marquer les paiements effectués avec une carte de crédit. \nEn déclarant une date de facturation, vous saurez combien payer à votre banque avant de devoir payer des intérêts.</string>
     <string name="settings_feature_credit_toggle_switch_label">Activer l\'usage CC</string>
 
+    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Afficher les paiements récurrents sous forme de liste de dépenses régulières</string>
     <string name="settings_period_end_time_title">Heure de fin de période</string>
     <string name="settings_period_end_time_subtitle">La notification sera affichée le jour de fin de période à cette heure</string>
     <string name="settings_recurrent_notification_time_title">Heure des paiements récurrents</string>
@@ -323,6 +324,7 @@
     <string name="categories_chart_rest">Restant</string>
     <string name="categories_chart_empty_title">Nous ne pouvons pas répartir vos dpenses par catégories</string>
     <string name="categories_chart_empty_subtitle">Utilisez des étiquettes pour voir le graphique par catégories</string>
+    <string name="category_no_expenses">Aucune dépense dans cette catégorie</string>
 
     <!-- Calendar Heatmap -->
     <string name="calendar_heatmap_info_text">Ce graphique montre l\'argent dépensé pour chaque jour de la période</string>
@@ -348,6 +350,7 @@
 
     <!-- Recurrent Ticket -->
     <string name="recurrent_ticket_unnamed_subscription">Abonnement sans nom</string>
+    <string name="recurrent_ticket_monthly_unnamed">Abonnement mensuel sans nom</string>
     <string name="recurrent_ticket_frequency_weekly">Hebdomadaire</string>
     <string name="recurrent_ticket_frequency_biweekly">Toutes les deux semaines</string>
     <string name="recurrent_ticket_frequency_monthly">Mensuel</string>
@@ -387,6 +390,7 @@
     <string name="remaining_budget_label">Restant</string>
     <string name="currency_label">Devise</string>
     <string name="select_currency">Sélectionner la devise</string>
+    <string name="currency_no_results">Aucune devise trouvée</string>
     <string name="currency_selected">Sélectionné</string>
 
     <!-- Remaining Budget Strategy -->
@@ -398,4 +402,14 @@
     <string name="strategy_split_equally_desc">Le surplus est divisé équitablement entre tous les jours de la nouvelle période</string>
     <string name="strategy_add_to_first_day">Ajouter au premier jour</string>
     <string name="strategy_add_to_first_day_desc">Tout le surplus est ajouté au premier jour de la nouvelle période</string>
+    <string name="recurrent_ticket_weekly_unnamed">Abonnement hebdomadaire sans nom</string>
+    <string name="recurrent_ticket_biweekly_unnamed">Abonnement bihebdomadaire sans nom</string>
+    <string name="search_currency">Rechercher une devise</string>
+    <string name="clear">Clair</string>
+    <string name="settings_recurrent_payments_view_mode_title">Mode d\'affichage des paiements récurrents</string>
+    <string name="settings_recurrent_payments_view_mode_subtitle">Modifiez le type d\'affichage pour afficher vos paiements récurrents.</string>
+    <string name="settings_recurrent_payments_view_mode_dialog_title">Mode d\'affichage des paiements récurrents</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontale</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Afficher les paiements récurrents sous forme de cartes horizontales</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_title">Verticale</string>
 </resources>
