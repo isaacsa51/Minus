@@ -76,10 +76,12 @@ jobs:
 
       - name: Verify HEAD matches tag
         run: |
+          # Use ^{commit} to dereference annotated tags — otherwise
+          # rev-parse returns the tag object hash, not the commit hash.
           HEAD_SHA=$(git rev-parse HEAD)
-          TAG_SHA=$(git rev-parse "${{ github.ref_name }}")
+          TAG_SHA=$(git rev-parse "${{ github.ref_name }}^{commit}")
           if [ "$HEAD_SHA" != "$TAG_SHA" ]; then
-            echo "::error::HEAD ($HEAD_SHA) ≠ tag ($TAG_SHA)"
+            echo "::error::HEAD ($HEAD_SHA) ≠ tag commit ($TAG_SHA)"
             exit 1
           fi
 
