@@ -28,17 +28,10 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.util.prettyDate
 import java.math.BigDecimal
+import java.text.NumberFormat
 import java.time.LocalDate
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 
-/**
- * A clickable date divider for history items that can expand/collapse.
- *
- * @param date The date to display
- * @param isExpanded Whether the section is currently expanded
- * @param onToggleClick Callback when the divider is clicked
- * @param totalAmount Optional total amount to display for the day
- * @param currencyCode Optional currency code for formatting
- */
 @Composable
 fun HistoryDateDivider(
 	date: LocalDate?,
@@ -89,13 +82,7 @@ fun HistoryDateDivider(
 			enter = fadeIn(animationSpec = tween(durationMillis = 150)),
 			exit = fadeOut(animationSpec = tween(durationMillis = 150))
 		) {
-			val currencyFormat = java.text.NumberFormat.getCurrencyInstance().apply {
-				if (currencyCode.isNotBlank()) {
-					runCatching {
-						currency = java.util.Currency.getInstance(currencyCode)
-					}
-				}
-			}
+			val currencyFormat = symbolOnlyCurrencyFormat(currencyCode, maximumFractionDigits = 0)
 			DayTotalItem(
 				total = totalAmount!!,
 				currencyFormat = currencyFormat,
