@@ -255,6 +255,7 @@ fun History(
         budgetStartDate = uiState.budgetSettings?.startDate ?: LocalDate.now().minusDays(30),
         budgetEndDate = uiState.budgetSettings?.getPeriodEndDate() ?: LocalDate.now(),
         currencyCode = currencyCode,
+        tags = uiState.tags,
         onCancel = { onProcessIntent(HistoryUiIntent.SetEditingTransaction(null)) },
         onSave = { tx ->
             onProcessIntent(HistoryUiIntent.SaveEditedTransaction(tx))
@@ -281,6 +282,7 @@ fun History(
         budgetStartDate = uiState.budgetSettings?.startDate ?: LocalDate.now().minusDays(30),
         budgetEndDate = uiState.budgetSettings?.getPeriodEndDate() ?: LocalDate.now(),
         currencyCode = currencyCode,
+        tags = uiState.tags,
         onCancel = { onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null)) },
         onSave = { tx ->
             onProcessIntent(HistoryUiIntent.SaveEditedTransaction(tx))

@@ -21,6 +21,7 @@ internal fun TransactionEditDialog(
     budgetStartDate: LocalDate,
     budgetEndDate: LocalDate,
     currencyCode: String,
+    tags: List<String> = emptyList(),
     onCancel: () -> Unit,
     onSave: (Transaction) -> Unit,
 ) {
@@ -43,6 +44,7 @@ internal fun TransactionEditDialog(
                 budgetStartDate = budgetStartDate,
                 budgetEndDate = budgetEndDate,
                 currencyCode = currencyCode,
+                tags = tags,
                 onCancel = onCancel,
                 onSave = { newAmount, newComment, newDateTime, newIsRecurrent, newFrequency, newEndDate, newSubscriptionDay ->
                     val updatedTransaction = transaction.copy(

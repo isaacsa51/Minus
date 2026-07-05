@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -37,6 +38,15 @@ class HistoryViewModel @Inject constructor(
 
     init {
         observeData()
+        observeCategories()
+    }
+
+    private fun observeCategories() {
+        viewModelScope.launch {
+            budgetTransactionHandler.budgetRepository.getActiveCategories().collect { categories ->
+                _uiState.update { it.copy(tags = categories.map { c -> c.name }) }
+            }
+        }
     }
 
     private fun observeData() {

@@ -35,6 +35,8 @@ data class HistoryUiState(
     val currentPeriodId: Long = 0L,
     val currentPeriodStartedAtMillis: Long = 0L,
 
+    val tags: List<String> = emptyList(),
+
     val transactions: List<Transaction> = emptyList(),
 
     val editingTransaction: Transaction? = null,
