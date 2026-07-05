@@ -248,7 +248,7 @@ fun MainScreenContent(
     }
 
     Row(modifier = Modifier.fillMaxSize()) {
-        if (windowSizeClass != WindowWidthSizeClass.Compact) {
+        if (windowSizeClass == WindowWidthSizeClass.Expanded) {
             MainNavigationRail(
                 expanded = shouldExpandRail,
                 onNavigateToAnalytics = onNavigateToAnalytics,
@@ -266,7 +266,7 @@ fun MainScreenContent(
             val contentHeight = constraints.maxHeight.toFloat()
             val contentWidth = constraints.maxWidth.toFloat()
 
-            if (windowSizeClass == WindowWidthSizeClass.Compact) {
+            if (windowSizeClass != WindowWidthSizeClass.Expanded) {
                 PhoneLayout(
                     budgetUiState = budgetUiState,
                     topSheetState = topSheetState,
@@ -292,6 +292,7 @@ fun MainScreenContent(
                     onPeriodSelected = onPeriodSelected,
                 )
             } else {
+                // Expanded (>= 840dp): two-pane tablet layout
                 TabletLayout(
                     budgetUiState = budgetUiState,
                     contentHeight = contentHeight,
@@ -1093,6 +1094,9 @@ private fun MainScreenPreview() {
             configuration.screenWidthDp < 840 -> WindowWidthSizeClass.Medium
             else -> WindowWidthSizeClass.Expanded
         }
+    // Both Compact and Medium use PhoneLayout; only Expanded uses TabletLayout.
+    // The @PreviewScreenSizes annotation covers a range of dp values so both
+    // layouts get previewed regardless of how the classification maps them.
 
     CompositionLocalProvider(LocalWindowSize provides windowSizeClass) {
         MinusTheme {

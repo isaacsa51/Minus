@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,61 +40,61 @@ import kotlin.math.sin
  */
 @Composable
 fun WavyDivider(
-	text: String,
-	modifier: Modifier = Modifier,
-	horizontalPadding: Dp = 16.dp,
-	amplitude: Float = 3f,
-	wavelength: Float = 60f,
-	strokeWidth: Float = 4f,
-	color: Color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+    text: String,
+    modifier: Modifier = Modifier,
+    horizontalPadding: Dp = 16.dp,
+    amplitude: Float = 3f,
+    wavelength: Float = 60f,
+    strokeWidth: Float = 2f,
+    color: Color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
 ) {
-	BoxWithConstraints(
-		modifier = modifier.fillMaxWidth()
-	) {
-		val maxTextWidth = maxWidth * 0.7f
-		Row(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = horizontalPadding, vertical = 8.dp),
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(12.dp)
-		) {
-			WavyLine(
-				modifier = Modifier
-					.weight(1f)
-					.widthIn(min = 24.dp),
-				amplitude = amplitude,
-				wavelength = wavelength,
-				strokeWidth = strokeWidth,
-				color = color
-			)
+    BoxWithConstraints(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        val maxTextWidth = maxWidth * 0.7f
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = horizontalPadding, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            WavyLine(
+                modifier = Modifier
+                    .weight(1f)
+                    .widthIn(min = 24.dp),
+                amplitude = amplitude,
+                wavelength = wavelength,
+                strokeWidth = strokeWidth,
+                color = color
+            )
 
-			Text(
-				text = text,
-				modifier = Modifier
-					.widthIn(max = maxTextWidth)
-					.basicMarquee(),
-				textAlign = TextAlign.Center,
-				style = MaterialTheme.typography.labelMediumCondensed,
-				color = MaterialTheme.colorScheme.outline,
-				maxLines = 1
-			)
+            Text(
+                text = text,
+                modifier = Modifier
+                    .widthIn(max = maxTextWidth)
+                    .basicMarquee(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.labelMediumCondensed,
+                color = MaterialTheme.colorScheme.outline,
+                maxLines = 1
+            )
 
-			WavyLine(
-				modifier = Modifier
-					.weight(1f)
-					.widthIn(min = 24.dp),
-				amplitude = amplitude,
-				wavelength = wavelength,
-				strokeWidth = strokeWidth,
-				color = color
-			)
-		}
-	}
+            WavyLine(
+                modifier = Modifier
+                    .weight(1f)
+                    .widthIn(min = 24.dp),
+                amplitude = amplitude,
+                wavelength = wavelength,
+                strokeWidth = strokeWidth,
+                color = color
+            )
+        }
+    }
 }
 
 /**
- * A composable that draws a single wavy line using Canvas.
+ * A composable that draws a single wavy line
  *
  * @param amplitude The height of the wave peaks
  * @param wavelength The length of each wave cycle
@@ -102,61 +103,61 @@ fun WavyDivider(
  */
 @Composable
 private fun WavyLine(
-	modifier: Modifier = Modifier,
-	amplitude: Float = 8f,
-	wavelength: Float = 20f,
-	strokeWidth: Float = 3f,
-	color: Color,
+    modifier: Modifier = Modifier,
+    amplitude: Float = 8f,
+    wavelength: Float = 20f,
+    strokeWidth: Float = 3f,
+    color: Color,
 ) {
-	Canvas(
-		modifier = modifier.height((amplitude * 2 + strokeWidth).dp)
-	) {
-		val width = size.width
-		val height = size.height
-		val centerY = height / 2
+    val d = LocalDensity.current.density
+    Canvas(
+        modifier = modifier.height(((amplitude + strokeWidth) * 2 * d).dp)
+    ) {
+        val width = size.width
+        val height = size.height
+        val centerY = height / 2
 
-		val path = Path().apply {
-			moveTo(0f, centerY)
+        val amp = amplitude * d
+        val wl = wavelength * d
+        val sw = strokeWidth * d
 
-			var x = 0f
-			while (x < width) {
-				val y = centerY + sin((x / wavelength) * 2 * Math.PI.toFloat()) * amplitude
-				lineTo(x, y)
-				x += 2f
-			}
-		}
+        val path = Path().apply {
+            moveTo(0f, centerY)
 
-		drawPath(
-			path = path,
-			color = color,
-			style = Stroke(
-				width = strokeWidth,
-				cap = StrokeCap.Round
-			)
-		)
-	}
+            var x = 0f
+            while (x < width) {
+                val y = centerY + sin((x / wl) * 2 * Math.PI.toFloat()) * amp
+                lineTo(x, y)
+                x += 2f
+            }
+        }
+
+        drawPath(
+            path = path, color = color, style = Stroke(
+                width = sw, cap = StrokeCap.Round
+            )
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun WavyDividerPreview() {
-	MinusTheme {
-		WavyDivider(
-			text = stringResource(R.string.wavy_divider_show_all_past_period_expenses),
-			amplitude = 3f,
-			wavelength = 60f
-		)
-	}
+    MinusTheme {
+        WavyDivider(
+            text = stringResource(R.string.wavy_divider_show_all_past_period_expenses),
+            amplitude = 3f,
+            wavelength = 60f
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun WavyDividerHighAmplitudePreview() {
-	MinusTheme {
-		WavyDivider(
-			text = "Testiiiing...",
-			amplitude = 4f,
-			wavelength = 50f
-		)
-	}
+    MinusTheme {
+        WavyDivider(
+            text = "Testiiiing...", amplitude = 4f, wavelength = 50f
+        )
+    }
 }
