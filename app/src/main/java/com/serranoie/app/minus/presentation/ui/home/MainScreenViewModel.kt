@@ -2,6 +2,7 @@
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
@@ -20,7 +21,9 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
-class MainScreenViewModel @Inject constructor() : ViewModel() {
+class MainScreenViewModel @Inject constructor(
+    private val settingsRepository: SettingsRepository,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainScreenUiState())
     val uiState: StateFlow<MainScreenUiState> = _uiState.asStateFlow()
@@ -29,6 +32,14 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
     val effects: SharedFlow<MainScreenUiEffect> = _effects.asSharedFlow()
 
     private var autoDismissJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            settingsRepository.observeSettings().collect { settings ->
+                _uiState.update { it.copy(selectedViewPeriod = settings.budgetSplitViewPeriod) }
+            }
+        }
+    }
 
     fun processIntent(intent: MainScreenUiIntent, currentTutorialStage: FirstLaunchTutorialStage) {
         when (intent) {
@@ -157,6 +168,9 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
 
     private fun setSelectedPeriod(period: BudgetPeriod) {
         _uiState.update { it.copy(selectedViewPeriod = period) }
+        viewModelScope.launch {
+            settingsRepository.setBudgetSplitViewPeriod(period)
+        }
     }
 
     private fun markWalletSheetOpened() {

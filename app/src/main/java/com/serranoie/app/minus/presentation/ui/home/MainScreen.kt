@@ -8,6 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.settingsDataStore
@@ -36,21 +37,24 @@ fun MainScreen(
     val mainScreenState by mainScreenViewModel.uiState.collectAsStateWithLifecycle()
     val budgetUiState by budgetViewModel.uiState.collectAsStateWithLifecycle()
 
-    val onboardingCompleted by context.settingsDataStore.data
-        .map { it[ONBOARDING_COMPLETED_KEY] ?: false }
-        .collectAsStateWithLifecycle(initialValue = false)
+    val onboardingCompleted by context.settingsDataStore.data.map {
+        it[ONBOARDING_COMPLETED_KEY] ?: false
+    }.collectAsStateWithLifecycle(initialValue = false)
 
-    val tutorialStage by context
-        .firstLaunchTutorialStageFlow()
+    val tutorialStage by context.firstLaunchTutorialStageFlow()
         .collectAsStateWithLifecycle(initialValue = FirstLaunchTutorialStage.COMPLETED)
 
-    val showCreditQuickToggleFeature by context.settingsDataStore.data
-        .map { it[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false }
-        .collectAsStateWithLifecycle(initialValue = false)
+    val showCreditQuickToggleFeature by context.settingsDataStore.data.map {
+        it[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false
+    }.collectAsStateWithLifecycle(initialValue = false)
+
+    val effectiveSelectedPeriod =
+        mainScreenState.selectedViewPeriod ?: budgetUiState.budgetSettings?.period
+        ?: BudgetPeriod.DAILY
 
     val undoSnackbarActionLabel = stringResource(R.string.undo)
 
-    logcat(TAG) { "MainScreen composed (openWalletOnStart=$openWalletOnStart)" }
+    logcat(TAG) { "MainScreen composed (openWalletOnStart=$openWalletOnStart, effectivePeriod=$effectiveSelectedPeriod)" }
 
     LaunchedEffect(Unit) {
         logcat(TAG) { "Triggering onRequestNotificationPermission from MainScreen LaunchedEffect" }
@@ -99,16 +103,13 @@ fun MainScreen(
     }
 
     ChangelogGate(
-        currentVersionCode =
-            run {
-                val info =
-                    context.packageManager.getPackageInfo(
-                        context.packageName,
-                        0,
-                    )
-                @Suppress("DEPRECATION")
-                info.longVersionCode.toInt()
-            },
+        currentVersionCode = run {
+            val info = context.packageManager.getPackageInfo(
+                context.packageName,
+                0,
+            )
+            @Suppress("DEPRECATION") info.longVersionCode.toInt()
+        },
     ) {
         MainScreenContent(
             mainScreenState = mainScreenState,
@@ -141,9 +142,11 @@ fun MainScreen(
             openWalletOnStart = openWalletOnStart,
             showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet,
             forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup,
-            selectedViewPeriod = mainScreenState.selectedViewPeriod,
+            selectedViewPeriod = effectiveSelectedPeriod,
             onPeriodSelected = { period ->
-                mainScreenViewModel.processIntent(MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage)
+                mainScreenViewModel.processIntent(
+                    MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
+                )
             },
             settingsDataStore = context.settingsDataStore,
             undoSnackbarActionLabel = undoSnackbarActionLabel,

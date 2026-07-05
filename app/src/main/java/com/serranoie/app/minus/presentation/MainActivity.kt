@@ -37,6 +37,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import com.serranoie.app.minus.data.repository.BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME
 import com.serranoie.app.minus.data.repository.CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME
 import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_ID_KEY_NAME
 import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_STARTED_AT_KEY_NAME
@@ -100,6 +101,7 @@ val EARLY_FINISH_ACTUAL_DATE_KEY = longPreferencesKey(EARLY_FINISH_ACTUAL_DATE_K
 val EARLY_FINISH_ORIGINAL_END_DATE_KEY = longPreferencesKey(EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME)
 val CURRENT_PERIOD_STARTED_AT_KEY = longPreferencesKey(CURRENT_PERIOD_STARTED_AT_KEY_NAME)
 val CURRENT_PERIOD_ID_KEY = longPreferencesKey(CURRENT_PERIOD_ID_KEY_NAME)
+val BUDGET_SPLIT_VIEW_PERIOD_KEY = stringPreferencesKey(BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME)
 const val DEFAULT_NOTIFICATION_HOUR = 9
 const val DEFAULT_NOTIFICATION_MINUTE = 0
 const val DEFAULT_RECURRENT_NOTIFICATION_HOUR = 8

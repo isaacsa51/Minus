@@ -125,7 +125,7 @@ fun MainScreenContent(
     openWalletOnStart: Boolean,
     showBudgetPeriodSheet: Boolean,
     forceBudgetPeriodSheetSetup: Boolean,
-    selectedViewPeriod: BudgetPeriod,
+    selectedViewPeriod: BudgetPeriod?,
     onPeriodSelected: (BudgetPeriod) -> Unit,
     settingsDataStore: DataStore<Preferences>?,
     undoSnackbarActionLabel: String,
@@ -395,7 +395,7 @@ private fun PhoneLayout(
     snackbarHostState: SnackbarHostState,
     showBudgetPeriodSheet: Boolean,
     forceBudgetPeriodSheetSetup: Boolean,
-    selectedViewPeriod: BudgetPeriod,
+    selectedViewPeriod: BudgetPeriod?,
     onPeriodSelected: (BudgetPeriod) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -776,7 +776,7 @@ private fun TabletLayout(
     snackbarHostState: SnackbarHostState,
     showBudgetPeriodSheet: Boolean,
     forceBudgetPeriodSheetSetup: Boolean,
-    selectedViewPeriod: BudgetPeriod,
+    selectedViewPeriod: BudgetPeriod?,
     onPeriodSelected: (BudgetPeriod) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()

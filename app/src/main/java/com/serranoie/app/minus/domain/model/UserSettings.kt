@@ -15,6 +15,7 @@ data class UserSettings(
     val typographyMode: TypographyMode = TypographyMode.EXPRESSIVE,
     val dynamicColorEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
+    val budgetSplitViewPeriod: BudgetPeriod? = null,
 ) {
     companion object {
         const val DEFAULT_NOTIFICATION_HOUR = 9
@@ -27,11 +28,11 @@ data class UserSettings(
 enum class ThemeMode {
     LIGHT,
     NIGHT,
-    SYSTEM
+    SYSTEM,
 }
 
 enum class TypographyMode {
     DEFAULT,
     CONDENSED,
-    EXPRESSIVE
+    EXPRESSIVE,
 }

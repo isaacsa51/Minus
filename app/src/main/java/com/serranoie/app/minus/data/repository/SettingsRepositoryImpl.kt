@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
@@ -40,6 +41,7 @@ const val EARLY_FINISH_ACTUAL_DATE_KEY_NAME = "early_finish_actual_date_millis"
 const val EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME = "early_finish_original_end_date_millis"
 const val CURRENT_PERIOD_STARTED_AT_KEY_NAME = "current_period_started_at_millis"
 const val CURRENT_PERIOD_ID_KEY_NAME = "current_period_id"
+const val BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME = "budget_split_view_period"
 
 private val ONBOARDING_COMPLETED = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NAME)
 private val EARLY_FINISH_ACTIVE = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
@@ -61,6 +63,7 @@ private val CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD =
     booleanPreferencesKey(CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY_NAME)
 private val PENDING_ROLLOVER_AMOUNT = stringPreferencesKey(PENDING_ROLLOVER_AMOUNT_KEY_NAME)
 private val PENDING_ROLLOVER_STRATEGY = stringPreferencesKey(PENDING_ROLLOVER_STRATEGY_KEY_NAME)
+private val BUDGET_SPLIT_VIEW_PERIOD = stringPreferencesKey(BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME)
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
@@ -86,7 +89,10 @@ class SettingsRepositoryImpl @Inject constructor(
                 dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false,
                 recurrentPaymentsViewMode = RecurrentPaymentsViewMode.fromName(
                     preferences[RECURRENT_PAYMENTS_VIEW_MODE]
-                )
+                ),
+                budgetSplitViewPeriod = preferences[BUDGET_SPLIT_VIEW_PERIOD]?.let { name ->
+                    try { BudgetPeriod.valueOf(name) } catch (_: Exception) { null }
+                }
             )
         }
     }
@@ -191,6 +197,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setRecurrentPaymentsViewMode(mode: RecurrentPaymentsViewMode) {
         context.settingsDataStore.edit { preferences ->
             preferences[RECURRENT_PAYMENTS_VIEW_MODE] = mode.name
+        }
+    }
+
+    override suspend fun setBudgetSplitViewPeriod(period: BudgetPeriod) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[BUDGET_SPLIT_VIEW_PERIOD] = period.name
         }
     }
 

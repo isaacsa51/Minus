@@ -118,7 +118,7 @@ fun Editor(
     openWalletOnStart: Boolean = false,
     showBudgetPeriodSheet: Boolean = false,
     forceBudgetPeriodSheetSetup: Boolean = false,
-    selectedViewPeriod: BudgetPeriod = BudgetPeriod.DAILY,
+    selectedViewPeriod: BudgetPeriod? = null,
     onShowBudgetPeriodSheet: () -> Unit = {},
     onHideBudgetPeriodSheet: () -> Unit = {},
     onPeriodSelected: (BudgetPeriod) -> Unit = {},
@@ -188,7 +188,7 @@ fun Editor(
             BudgetPill(
                 budgetState = uiState.budgetState,
                 budgetSettings = uiState.budgetSettings,
-                viewPeriod = selectedViewPeriod,
+                viewPeriod = selectedViewPeriod ?: BudgetPeriod.DAILY,
                 currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
                 centerRemainingAmount = animState == AnimState.EDITING,
                 onOpenBudgetSheet = {

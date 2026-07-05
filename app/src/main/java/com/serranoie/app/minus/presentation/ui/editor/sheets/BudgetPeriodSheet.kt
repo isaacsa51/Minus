@@ -126,7 +126,7 @@ fun budgetPeriodCardTag(period: BudgetPeriod) = "BudgetPeriodSheet.Period.${peri
 fun BudgetPeriodSheet(
     budgetSettings: BudgetSettings?,
     budgetState: BudgetState?,
-    selectedPeriod: BudgetPeriod = budgetSettings?.period ?: BudgetPeriod.DAILY,
+    selectedPeriod: BudgetPeriod? = budgetSettings?.period,
     currencyCode: String,
     onPeriodSelected: (BudgetPeriod) -> Unit,
     onSaveBudget: ((BudgetSettings) -> Unit)? = null,
@@ -171,7 +171,7 @@ fun BudgetPeriodSheet(
             logcat {
                 "periodCache auto-adjusted from $previous to $periodCache because previous is not available for totalDays=$totalDays"
             }
-            onPeriodSelected(periodCache)
+            onPeriodSelected(periodCache!!)
         }
     }
 
@@ -217,7 +217,7 @@ fun BudgetPeriodSheet(
             ViewBudgetContent(
                 budgetSettings = budgetSettings,
                 budgetState = budgetState,
-                periodCache = periodCache,
+                periodCache = periodCache ?: available.first(),
                 currencyFormat = currencyFormat,
                 currencyCode = currencyCode,
                 totalBudget = totalBudget,
