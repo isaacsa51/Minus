@@ -16,7 +16,6 @@ fun formatWidgetCurrency(currency: String, amount: Int): String {
     return formatCurrencySymbolOnly(
         value = BigDecimal(amount),
         currencyCode = currency,
-        maximumFractionDigits = 0,
         minimumFractionDigits = 0,
     )
 }

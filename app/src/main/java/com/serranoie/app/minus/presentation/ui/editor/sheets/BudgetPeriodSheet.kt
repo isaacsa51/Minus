@@ -147,7 +147,7 @@ fun BudgetPeriodSheet(
 ) {
     val haptic = LocalHapticFeedback.current
     val currencyFormat = remember(currencyCode) {
-        symbolOnlyCurrencyFormat(currencyCode, maximumFractionDigits = 0)
+        symbolOnlyCurrencyFormat(currencyCode)
     }
 
     val startDate = budgetSettings?.startDate ?: LocalDate.now()
