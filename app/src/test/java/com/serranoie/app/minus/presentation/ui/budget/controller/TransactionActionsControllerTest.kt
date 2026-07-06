@@ -13,19 +13,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-/**
- * Unit tests for [TransactionActionsController]. The controller delegates
- * the heavy lifting to a [TransactionHandler] strategy; tests provide a
- * fake that returns pre-canned [ApplyTransactionResult]s and Result-wrapped
- * operations. Backticked English test names (when_X_then_Y) following
- * the BDD Given/When/Then convention.
- */
 class TransactionActionsControllerTest {
-
-    /**
-     * A configurable fake handler so each test can pin the exact result it
-     * wants to assert against.
-     */
     private class FakeHandler : TransactionHandler {
         var applyResult: ApplyTransactionResult = ApplyTransactionResult.InvalidInput
         var applyRecurrentResult: Boolean = false
@@ -51,6 +39,7 @@ class TransactionActionsControllerTest {
             subscriptionDay: Int?,
             resolveActivePeriodId: suspend () -> Long,
             isCredit: Boolean,
+            fallbackComment: String,
         ): Boolean = applyRecurrentResult
 
         override suspend fun delete(transaction: Transaction): kotlin.Result<Unit> = deleteResult
@@ -78,10 +67,6 @@ class TransactionActionsControllerTest {
         currencyCode = "USD",
         daysInPeriod = 30,
     )
-
-    // -------------------------------------------------------------------------
-    // apply
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_handler_returns_invalid_input_then_no_actions_are_emitted`() = runTest {
@@ -181,10 +166,6 @@ class TransactionActionsControllerTest {
         )
     }
 
-    // -------------------------------------------------------------------------
-    // applyRecurrent
-    // -------------------------------------------------------------------------
-
     @Test
     fun `when_handler_reports_applied_recurrent_successfully_then_clear_input_action_is_emitted`() = runTest {
         val controller = newController(
@@ -199,6 +180,7 @@ class TransactionActionsControllerTest {
             pendingComment = "Subscription",
             resolveActivePeriodId = { 1L },
             isCredit = false,
+            fallbackComment = "Monthly subscription without name",
         )
 
         assertThat(actions).containsExactly(TransactionAction.ClearInput)
@@ -218,14 +200,11 @@ class TransactionActionsControllerTest {
             pendingComment = "Subscription",
             resolveActivePeriodId = { 1L },
             isCredit = false,
+            fallbackComment = "Monthly subscription without name",
         )
 
         assertThat(actions).isEmpty()
     }
-
-    // -------------------------------------------------------------------------
-    // delete
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_handler_reports_delete_success_then_no_actions_are_emitted`() = runTest {
@@ -249,10 +228,6 @@ class TransactionActionsControllerTest {
         assertThat(actions).containsExactly(TransactionAction.DeleteFailed)
     }
 
-    // -------------------------------------------------------------------------
-    // restore
-    // -------------------------------------------------------------------------
-
     @Test
     fun `when_handler_reports_restore_success_then_no_actions_are_emitted`() = runTest {
         val controller = newController(
@@ -274,10 +249,6 @@ class TransactionActionsControllerTest {
 
         assertThat(actions).containsExactly(TransactionAction.RestoreFailed)
     }
-
-    // -------------------------------------------------------------------------
-    // edit
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_edit_is_called_then_handler_receives_the_transaction`() = runTest {

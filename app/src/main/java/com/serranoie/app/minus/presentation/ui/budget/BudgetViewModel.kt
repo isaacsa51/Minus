@@ -533,6 +533,7 @@ class BudgetViewModel @Inject constructor(
                 intent.frequency,
                 intent.endDate,
                 intent.subscriptionDay,
+                intent.fallbackComment,
             )
 
             is BudgetEditorIntent.CreditCutoffDayConfirmed -> handleCreditCutoffDayConfirmed(intent.cutoffDay)
@@ -581,6 +582,7 @@ class BudgetViewModel @Inject constructor(
         frequency: RecurrentFrequency,
         endDate: LocalDate,
         subscriptionDay: Int?,
+        fallbackComment: String,
     ) {
         viewModelScope.launch {
             val actions = transactionActionsController.applyRecurrent(
@@ -591,6 +593,7 @@ class BudgetViewModel @Inject constructor(
                 pendingComment = editorStateController.state.value.pendingRecurrentComment,
                 resolveActivePeriodId = ::resolveActivePeriodId,
                 isCredit = editorStateController.state.value.isCreditEnabled,
+                fallbackComment = fallbackComment,
             )
             if (actions.isNotEmpty()) {
                 editorStateController.applyRecurrentDialog()
@@ -773,6 +776,7 @@ private class TransactionHandlerImpl(
         subscriptionDay: Int?,
         resolveActivePeriodId: suspend () -> Long,
         isCredit: Boolean,
+        fallbackComment: String,
     ): Boolean = delegate.applyRecurrentExpense(
         pendingAmount = pendingAmount,
         pendingComment = pendingComment,
@@ -781,6 +785,7 @@ private class TransactionHandlerImpl(
         subscriptionDay = subscriptionDay,
         resolveActivePeriodId = this.resolveActivePeriodId,
         isCredit = isCredit,
+        fallbackComment = fallbackComment,
     )
 
     override suspend fun delete(transaction: Transaction): kotlin.Result<Unit> =

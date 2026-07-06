@@ -22,6 +22,7 @@ sealed interface BudgetEditorIntent : BudgetUiIntent {
         val frequency: RecurrentFrequency,
         val endDate: LocalDate,
         val subscriptionDay: Int? = null,
+        val fallbackComment: String,
     ) : BudgetEditorIntent
     data class CreditCutoffDayConfirmed(val cutoffDay: Int) : BudgetEditorIntent
     data object FinishBudgetEarly : BudgetEditorIntent

@@ -317,6 +317,7 @@
     <string name="categories_chart_rest">Restante</string>
     <string name="categories_chart_empty_title">No podemos dividir los gastos sin categoría</string>
     <string name="categories_chart_empty_subtitle">Agregue categorías para ver el gráfico</string>
+    <string name="category_no_expenses">No hay gastos en esta categoría</string>
 
     <string name="calendar_heatmap_info_text">Este gráfico muestra el dinero gastado por cada día del período.</string>
 
@@ -337,6 +338,7 @@
     <string name="delete_recurrent_expense_warning">Esta acción eliminará toda la configuración de este gasto recurrente y no recibirás más notificaciones.</string>
 
     <string name="recurrent_ticket_unnamed_subscription">Suscripción sin nombre</string>
+    <string name="recurrent_ticket_monthly_unnamed">Suscripción sin nombre</string>
     <string name="recurrent_ticket_frequency_weekly">Semanalmente</string>
     <string name="recurrent_ticket_frequency_biweekly">Quincenal</string>
     <string name="recurrent_ticket_frequency_monthly">Mensual</string>
@@ -372,6 +374,7 @@
     <string name="remaining_budget_label">Sobrante</string>
     <string name="currency_label">Divisa</string>
     <string name="select_currency">Seleccionar divisa</string>
+    <string name="currency_no_results">No se encontró la divisa</string>
     <string name="currency_selected">Seleccionado</string>
 
     <!-- Remaining Budget Strategy -->
@@ -389,4 +392,8 @@
     <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
     <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Mostrar los pagos recurrentes como tarjetas horizontales</string>
     <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
+    <string name="recurrent_ticket_weekly_unnamed">Suscripción semanal sin nombre</string>
+    <string name="recurrent_ticket_biweekly_unnamed">Suscripción quincenal sin nombre</string>
+    <string name="search_currency">Buscar divisa</string>
+    <string name="clear">Borrar</string>
 </resources>

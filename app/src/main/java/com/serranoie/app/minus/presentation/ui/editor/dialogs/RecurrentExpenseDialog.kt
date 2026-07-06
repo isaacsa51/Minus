@@ -67,7 +67,8 @@ import java.util.Locale
 fun RecurrentExpenseDialog(
     budgetSettings: BudgetSettings?,
     onDismiss: () -> Unit,
-    onConfirm: (frequency: RecurrentFrequency, endDate: LocalDate, subscriptionDay: Int?) -> Unit,
+    onConfirm: (frequency: RecurrentFrequency, endDate: LocalDate, subscriptionDay: Int?, fallbackComment: String) -> Unit,
+    fallbackComments: Map<RecurrentFrequency, String>,
     modifier: Modifier = Modifier,
 ) {
     val today = LocalDate.now()
@@ -292,7 +293,8 @@ fun RecurrentExpenseDialog(
                 onConfirm(
                     selectedFrequency,
                     selectedEndDate,
-                    if (selectedFrequency == RecurrentFrequency.MONTHLY) selectedDay else null
+                    if (selectedFrequency == RecurrentFrequency.MONTHLY) selectedDay else null,
+                    fallbackComments[selectedFrequency] ?: "",
                 )
             }
         ) {
@@ -346,7 +348,12 @@ private fun RecurrentExpenseDialogPreview() {
                 currencyCode = "USD"
             ),
             onDismiss = {},
-            onConfirm = { _, _, _ -> }
+            onConfirm = { _, _, _, _ -> },
+            fallbackComments = mapOf(
+                RecurrentFrequency.WEEKLY to "Weekly subscription without name",
+                RecurrentFrequency.BIWEEKLY to "Biweekly subscription without name",
+                RecurrentFrequency.MONTHLY to "Monthly subscription without name",
+            ),
         )
     }
 }
