@@ -1,0 +1,7 @@
+- hotfix: update jdk to use paparazzi
+- hotfix: remove foojay plugin for deployment fixes
+- feat: render categories list on edit mode (#91)
+- feat: hungarian forint at end implementation (#90)
+- feat: added syrian pound currency (#89)
+- fix: modularize history dialogs and localize transaction strings (#88)
+- fix: added correct locale for recurring payment without name (#87)
