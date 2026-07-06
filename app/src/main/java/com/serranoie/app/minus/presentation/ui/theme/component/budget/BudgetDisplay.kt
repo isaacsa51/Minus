@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -339,34 +339,33 @@ fun Arrow(
     tint: Color = LocalContentColor.current,
 ) {
     Canvas(modifier = modifier) {
-        val width = this.size.width
-        val height = this.size.height
-        val heightHalf = height / 2
+        val d = density
+        val triSide = 16f * d
+        val triHeight = triSide
+        val halfSide = triSide / 2
 
-        val thickness = 6
-        val thicknessHalf = thickness / 2
+        val right = size.width
+        val centerY = size.height / 2
 
-        val trianglePath = Path().let {
-            it.moveTo(11f, heightHalf - thicknessHalf)
-            it.lineTo(width - 22.4f, heightHalf - thicknessHalf)
-            it.lineTo(width - 37.4f, heightHalf - 18)
-            it.lineTo(width - 33, heightHalf - 22.4f)
-            it.lineTo(width - 10.5f, heightHalf)
-            it.lineTo(width - 33, heightHalf + 22.4f)
-            it.lineTo(width - 37.4f, heightHalf + 18)
-            it.lineTo(width - 22.4f, heightHalf + thicknessHalf)
-            it.lineTo(width - 22.4f, heightHalf + thicknessHalf)
-            it.lineTo(11f, heightHalf + thicknessHalf)
+        val thickness = size.height * 0.15f
+        val halfThick = thickness / 2
+        val lineEnd = right - triHeight + halfThick
 
-            it.close()
-
-            it
+        val arrowPath = Path().apply {
+            moveTo(right, centerY)
+            lineTo(lineEnd, centerY - halfSide)
+            moveTo(right, centerY)
+            lineTo(lineEnd, centerY + halfSide)
         }
 
-        drawPath(
-            path = trianglePath,
-            SolidColor(tint),
-            style = Fill
+        drawPath(arrowPath, SolidColor(tint), style = Stroke(width = thickness, cap = StrokeCap.Round))
+
+        drawLine(
+            color = tint,
+            start = Offset(0f, centerY),
+            end = Offset(lineEnd + triHeight - 6f, centerY), // 6f is to make the line have an offset to be on top of the triangle.
+            strokeWidth = thickness,
+            cap = StrokeCap.Round,
         )
     }
 }

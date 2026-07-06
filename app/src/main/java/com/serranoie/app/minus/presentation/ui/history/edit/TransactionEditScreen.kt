@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import com.serranoie.app.minus.presentation.LocalWindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -59,6 +60,7 @@ fun TransactionEditScreen(
     budgetStartDate: LocalDate,
     budgetEndDate: LocalDate,
     currencyCode: String = "USD",
+    tags: List<String> = emptyList(),
     onCancel: () -> Unit = {},
     onSave: (
         newAmount: BigDecimal,
@@ -184,11 +186,11 @@ fun TransactionEditScreen(
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(vertical = 8.dp),
             shape = MaterialTheme.shapes.medium
         ) {
             CategoryToolbar(
-                tags = emptyList(),
+                tags = tags,
                 currentComment = editedComment,
                 stage = EditStage.EDIT_SPENT,
                 onCommentUpdate = { editedComment = it },
@@ -204,6 +206,7 @@ fun TransactionEditScreen(
         Numpad(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom = LocalWindowInsets.current.calculateBottomPadding())
                 .height(targetNumpadHeight),
             editorState = editorState,
             onNumberInput = { digit ->
