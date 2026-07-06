@@ -16,11 +16,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TicketCard
@@ -53,7 +56,11 @@ internal fun TransactionDetailTicketCard(
 					.padding(vertical = 8.dp, horizontal = 18.dp)
             ) {
                 Text(
-                    text = if (transaction.isRecurrent) "GASTO RECURRENTE" else "GASTO",
+                    text = if (transaction.isRecurrent) {
+                        stringResource(R.string.ticket_recurrent_expense)
+                    } else {
+                        stringResource(R.string.ticket_expense)
+                    },
                     color = Color.White,
                     style = MaterialTheme.typography.labelLargeEmphasized,
                     textAlign = TextAlign.Center,
@@ -63,16 +70,18 @@ internal fun TransactionDetailTicketCard(
             }
 
             Text(
-                text = "Num. de Operación: #${transaction.id}",
+                text = stringResource(R.string.ticket_operation_number, transaction.id),
                 style = MaterialTheme.typography.bodyMediumCondensed,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
 
             HorizontalDivider()
 
             Text(
-                text = "MONTO TOTAL",
+                text = stringResource(R.string.ticket_total_amount),
                 style = MaterialTheme.typography.labelLargeEmphasized,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -89,18 +98,24 @@ internal fun TransactionDetailTicketCard(
             HorizontalDivider()
 
             details.forEach { (label, value) ->
-                Box(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Text(
                         text = label,
-                        style = MaterialTheme.typography.bodyMediumCondensed,
+                        style = MaterialTheme.typography.bodyMediumCondensed.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.align(Alignment.CenterStart),
+                        modifier = Modifier.weight(1f),
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = value,
                         style = MaterialTheme.typography.bodyMediumCondensed,
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.align(Alignment.CenterEnd),
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -115,7 +130,7 @@ internal fun TransactionDetailTicketCard(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = "Marcar como pagado",
+                        text = stringResource(R.string.mark_as_paid),
                         style = MaterialTheme.typography.labelSmallEmphasized,
                     )
                 }
@@ -133,7 +148,7 @@ internal fun TransactionDetailTicketCard(
                     onClick = onEdit,
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text("Editar", style = MaterialTheme.typography.labelSmallEmphasized)
+                    Text(stringResource(R.string.edit), style = MaterialTheme.typography.labelSmallEmphasized)
                 }
 
                 if (!readOnly) {
@@ -145,7 +160,7 @@ internal fun TransactionDetailTicketCard(
                             contentColor = MaterialTheme.colorScheme.onError,
                         ),
                     ) {
-                        Text("Eliminar", style = MaterialTheme.typography.labelSmallEmphasized)
+                        Text(stringResource(R.string.delete), style = MaterialTheme.typography.labelSmallEmphasized)
                     }
                 }
             }

@@ -436,4 +436,21 @@
     <string name="strategy_split_equally_desc">The surplus is divided equally among all days of the new period</string>
     <string name="strategy_add_to_first_day">Add to first day</string>
     <string name="strategy_add_to_first_day_desc">All surplus is added to the first day of the new period</string>
+
+    <!-- Transaction Detail -->
+    <string name="without_date">Without date</string>
+    <string name="no_name">No name</string>
+    <string name="description">Description</string>
+    <string name="date">Date</string>
+    <string name="frequency">Frequency</string>
+    <string name="charge_day">Charge day</string>
+    <string name="day_number">Day %1$d</string>
+    <string name="recurrence_end">Recurrence end</string>
+
+    <!-- Transaction Detail Ticket Card -->
+    <string name="ticket_operation_number" translatable="false">Op. #%1$d</string>
+    <string name="ticket_expense">EXPENSE</string>
+    <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
+    <string name="ticket_total_amount">TOTAL AMOUNT</string>
+    <string name="mark_as_paid">Mark as paid</string>
 </resources>

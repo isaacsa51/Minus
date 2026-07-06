@@ -402,6 +402,23 @@
     <string name="strategy_split_equally_desc">Le surplus est divisé équitablement entre tous les jours de la nouvelle période</string>
     <string name="strategy_add_to_first_day">Ajouter au premier jour</string>
     <string name="strategy_add_to_first_day_desc">Tout le surplus est ajouté au premier jour de la nouvelle période</string>
+
+    <!-- Transaction Detail -->
+    <string name="without_date">Sans date</string>
+    <string name="no_name">Sans nom</string>
+    <string name="description">Description</string>
+    <string name="date">Date</string>
+    <string name="frequency">Fréquence</string>
+    <string name="charge_day">Jour de facturation</string>
+    <string name="day_number">Jour %1$d</string>
+    <string name="recurrence_end">Fin de récurrence</string>
+
+    <!-- Transaction Detail Ticket Card -->
+    <string name="ticket_operation_number">Op. #%1$d</string>
+    <string name="ticket_expense">DÉPENSE</string>
+    <string name="ticket_recurrent_expense">DÉPENSE RÉCURRENTE</string>
+    <string name="ticket_total_amount">MONTANT TOTAL</string>
+    <string name="mark_as_paid">Marquer comme payé</string>
     <string name="recurrent_ticket_weekly_unnamed">Abonnement hebdomadaire sans nom</string>
     <string name="recurrent_ticket_biweekly_unnamed">Abonnement bihebdomadaire sans nom</string>
     <string name="search_currency">Rechercher une devise</string>

@@ -35,11 +35,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransac
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import java.time.LocalDate
 
-/**
- * View-mode for the recurrent payments section. Lives at the top of
- * the history feature so it can be referenced by the section
- * composables and by the settings dialog without an import cycle.
- */
 enum class RecurrentPaymentsViewMode {
     HORIZONTAL_LIST, VERTICAL_LIST;
 
@@ -50,14 +45,6 @@ enum class RecurrentPaymentsViewMode {
     }
 }
 
-/**
- * Public entry point for the History screen. Wires up [HistoryViewModel]
- * (collects UI state, observes one-shot effects) and delegates the
- * actual rendering to the stateless [History] composable below.
- *
- * E2E tests and Previews bypass this and call [History] directly with
- * a hand-built [HistoryUiState].
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
@@ -89,15 +76,6 @@ fun HistoryScreen(
     )
 }
 
-/**
- * Stateless body of the History screen — the LazyColumn with all
- * sections, plus the transaction-detail / edit / delete-recurrent
- * dialogs.
- *
- * Takes a pre-built [uiState] and an [onProcessIntent] callback so
- * it can be driven by a real [HistoryViewModel] (in production) or
- * by hand-crafted state in tests / previews.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun History(

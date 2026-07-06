@@ -32,6 +32,8 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
+import com.serranoie.app.minus.presentation.ui.history.edit.dialogs.EditDatePickerDialog
+import com.serranoie.app.minus.presentation.ui.history.edit.dialogs.EditTimePickerDialog
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
