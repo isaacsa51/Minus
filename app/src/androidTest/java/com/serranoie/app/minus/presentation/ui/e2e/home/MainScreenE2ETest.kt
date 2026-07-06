@@ -183,7 +183,7 @@ class MainScreenE2ETest {
                     onCreditToggle = {},
                     onDismissRecurrentDialog = {},
                     onDismissCreditCutoffDialog = {},
-                    onRecurrentExpenseConfirm = { _, _, _ -> },
+                    onRecurrentExpenseConfirm = { _, _, _, _ -> },
                     onCreditCutoffConfirm = {},
                     onSaveBudget = { capturedIntents += "SaveBudget" },
                 )
