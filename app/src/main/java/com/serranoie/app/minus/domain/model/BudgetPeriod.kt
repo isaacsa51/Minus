@@ -107,6 +107,7 @@ data class SupportedCurrency(
             SupportedCurrency("SCR", "SCR"),
             SupportedCurrency("MGA", "MGA"),
             SupportedCurrency("ZWL", "ZWL"),
+            SupportedCurrency("SAR", "SAR"),
         )
 
         fun findByCode(code: String): SupportedCurrency? =
