@@ -1,5 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,10 +29,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -150,6 +150,9 @@ fun MinMaxSpentCard(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = spent.comment,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.basicMarquee(),
                             style = MaterialTheme.typography.bodyMediumCondensed,
                         )
                     }
@@ -181,95 +184,6 @@ private fun PreviewMinMaxSpentCard() {
             Column {
                 MinMaxSpentCard(
                     modifier = Modifier.height(IntrinsicSize.Min),
-                    isMin = true,
-                    currency = "MXN",
-                    spends = listOf(
-                        Transaction(
-                            amount = BigDecimal(52),
-                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(72),
-                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(42),
-                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(52),
-                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(72),
-                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(42),
-                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(56),
-                            date = Date().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(15),
-                            date = Date().toLocalDateTime(),
-                            comment = "Comment of spent"
-                        ),
-                        Transaction(
-                            amount = BigDecimal(42),
-                            date = Date().toLocalDateTime()
-                        ),
-                    ),
-                )
-
-                MinMaxSpentCard(
-                    modifier = Modifier.height(IntrinsicSize.Min),
-                    isMin = false,
-                    currency = "USD",
-                    spends = listOf(
-                        Transaction(
-                            amount = BigDecimal(52),
-                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(72),
-                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(42),
-                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(52),
-                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(72),
-                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(42),
-                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(56),
-                            date = Date().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(15),
-                            date = Date().toLocalDateTime()
-                        ),
-                        Transaction(
-                            amount = BigDecimal(42),
-                            date = Date().toLocalDateTime()
-                        ),
-                    ),
-                )
-
-                MinMaxSpentCard(
-                    modifier = Modifier.height(IntrinsicSize.Min),
                     isMin = false,
                     currency = "USD",
                     spends = listOf(
@@ -289,6 +203,63 @@ private fun PreviewMinMaxSpentCard() {
                     isMin = false,
                     currency = "EUR",
                     spends = listOf(),
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "MinMaxSpentCard Mobile", widthDp = 380, heightDp = 300)
+@Composable
+private fun PreviewMinMaxSpentCardMobile() {
+    MinusTheme {
+        Surface {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                MinMaxSpentCard(
+                    modifier = Modifier.weight(1f),
+                    isMin = true,
+                    currency = "MXN",
+                    spends = listOf(
+                        Transaction(
+                            amount = BigDecimal(52),
+                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(42),
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(15),
+                            date = Date().toLocalDateTime(),
+                            comment = "Some weird payment to test if this edge case passes"
+                        ),
+                    ),
+                )
+
+                MinMaxSpentCard(
+                    modifier = Modifier.weight(1f),
+                    isMin = false,
+                    currency = "MXN",
+                    spends = listOf(
+                        Transaction(
+                            amount = BigDecimal(52),
+                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(72),
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                        ),
+                        Transaction(
+                            amount = BigDecimal(15),
+                            date = Date().toLocalDateTime(),
+                            comment = "Spotify"
+                        ),
+                    ),
                 )
             }
         }

@@ -84,6 +84,7 @@ class TransactionActionsController(
         pendingComment: String,
         resolveActivePeriodId: suspend () -> Long,
         isCredit: Boolean,
+        fallbackComment: String,
     ): List<TransactionAction> {
         val applied = handler.applyRecurrent(
             pendingAmount = pendingAmount,
@@ -93,6 +94,7 @@ class TransactionActionsController(
             subscriptionDay = subscriptionDay,
             resolveActivePeriodId = resolveActivePeriodId,
             isCredit = isCredit,
+            fallbackComment = fallbackComment,
         )
         return if (applied) {
             listOf(TransactionAction.ClearInput)
@@ -143,6 +145,7 @@ interface TransactionHandler {
         subscriptionDay: Int?,
         resolveActivePeriodId: suspend () -> Long,
         isCredit: Boolean,
+        fallbackComment: String,
     ): Boolean
 
     suspend fun delete(transaction: Transaction): kotlin.Result<Unit>

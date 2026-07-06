@@ -353,6 +353,7 @@
     <string name="categories_chart_rest">Remaining</string>
     <string name="categories_chart_empty_title">We can\'t split your spending by categories</string>
     <string name="categories_chart_empty_subtitle">Use tags to see the chart by categories</string>
+    <string name="category_no_expenses">No expenses in this category</string>
 
     <!-- Calendar Heatmap -->
     <string name="calendar_heatmap_info_text">This chart shows money spent for each day in the period</string>
@@ -378,6 +379,9 @@
 
     <!-- Recurrent Ticket -->
     <string name="recurrent_ticket_unnamed_subscription">Unnamed subscription</string>
+    <string name="recurrent_ticket_weekly_unnamed">Weekly subscription without name</string>
+    <string name="recurrent_ticket_biweekly_unnamed">Biweekly subscription without name</string>
+    <string name="recurrent_ticket_monthly_unnamed">Monthly subscription without name</string>
     <string name="recurrent_ticket_frequency_weekly">Weekly</string>
     <string name="recurrent_ticket_frequency_biweekly">Biweekly</string>
     <string name="recurrent_ticket_frequency_monthly">Monthly</string>

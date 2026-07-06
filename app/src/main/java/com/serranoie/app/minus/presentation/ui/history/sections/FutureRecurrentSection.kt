@@ -11,10 +11,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
@@ -26,7 +29,6 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import java.time.LocalDate
 import java.text.NumberFormat
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import java.math.BigDecimal
@@ -57,9 +59,9 @@ internal fun LazyListScope.futureRecurrentSection(
         ) {
             WavyDivider(
                 text = if (showOutOfPeriodSubscriptions) {
-                    "Ocultar subscripciones fuera del periodo"
+                    stringResource(R.string.hide_subscriptions_outside_period)
                 } else {
-                    "Mostrar subscripciones fuera del periodo"
+                    stringResource(R.string.show_subscriptions_outside_period)
                 },
                 horizontalPadding = 0.dp,
                 amplitude = 4f,

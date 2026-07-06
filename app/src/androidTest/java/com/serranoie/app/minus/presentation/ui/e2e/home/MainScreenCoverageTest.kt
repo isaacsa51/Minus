@@ -215,7 +215,7 @@ class MainScreenCoverageTest {
                     onCreditToggle = { capturedIntents += "CreditToggle:$it" },
                     onDismissRecurrentDialog = { capturedIntents += "DismissRecurrentDialog" },
                     onDismissCreditCutoffDialog = { capturedIntents += "DismissCreditCutoffDialog" },
-                    onRecurrentExpenseConfirm = { _, _, _ -> capturedIntents += "RecurrentConfirm" },
+                    onRecurrentExpenseConfirm = { _, _, _, _ -> capturedIntents += "RecurrentConfirm" },
                     onCreditCutoffConfirm = { capturedIntents += "CreditCutoffConfirm" },
                     onSaveBudget = { capturedIntents += "SaveBudget" },
                     showCreditQuickToggleFeature = showCreditQuickToggle,
