@@ -92,6 +92,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.SupportedCurrency
+import com.serranoie.app.minus.domain.model.SupportedCurrencyData
 import com.serranoie.app.minus.presentation.ui.onboarding.FinishDateSelector
 import com.serranoie.app.minus.presentation.ui.onboarding.availablePeriodsFor
 import com.serranoie.app.minus.presentation.ui.onboarding.budgetForPeriod
@@ -552,10 +553,17 @@ fun EditBudgetContent(
         SupportedCurrency.findByCode(currentCurrency)?.symbol ?: "$"
     }
 
-    var budgetText by remember(currentBudget) {
+    val currencyFractionDigits = remember(currentCurrency) {
+        SupportedCurrencyData.findByCode(currentCurrency)?.defaultFractionDigits ?: 2
+    }
+
+    var budgetText by remember(currentBudget, currencyFractionDigits) {
         mutableStateOf(
             if (currentBudget > BigDecimal.ZERO) {
-                (currentBudget.multiply(BigDecimal(100)).toBigInteger()).toString()
+                currentBudget.movePointRight(currencyFractionDigits)
+                    .setScale(0, java.math.RoundingMode.HALF_UP)
+                    .toBigInteger()
+                    .toString()
             } else {
                 ""
             }
@@ -571,7 +579,8 @@ fun EditBudgetContent(
     var showStrategyPicker by remember { mutableStateOf(false) }
     var showPreviousValues by remember { mutableStateOf(false) }
 
-    val parsedBudget = budgetText.toBigDecimalOrNull()?.divide(BigDecimal(100)) ?: BigDecimal.ZERO
+    val parsedBudget = budgetText.toBigDecimalOrNull()?.movePointLeft(currencyFractionDigits)
+        ?: BigDecimal.ZERO
     val totalDays = endCache?.let { ChronoUnit.DAYS.between(startCache, it).toInt() + 1 } ?: 0
     val canApply = parsedBudget > BigDecimal.ZERO && totalDays > 0
 
@@ -613,7 +622,9 @@ fun EditBudgetContent(
                     val filtered = newValue.filter { it.isDigit() }
                     budgetText = filtered
                 },
-                visualTransformation = CurrencyAmountInputVisualTransformation(),
+                visualTransformation = CurrencyAmountInputVisualTransformation(
+                    fractionDigits = currencyFractionDigits,
+                ),
                 textStyle = MaterialTheme.typography.titleMediumCondensed.copy(
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
@@ -700,7 +711,10 @@ fun EditBudgetContent(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "$currencySymbol${currentBudget.toPlainString()}",
+                                text = remember(currentBudget, currentCurrency) {
+                                    symbolOnlyCurrencyFormat(currentCurrency)
+                                        .format(currentBudget)
+                                },
                                 style = MaterialTheme.typography.titleMediumCondensed,
                                 fontWeight = FontWeight.Bold
                             )
