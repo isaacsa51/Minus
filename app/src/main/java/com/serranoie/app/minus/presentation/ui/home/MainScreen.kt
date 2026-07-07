@@ -8,6 +8,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
+import com.serranoie.app.minus.presentation.CATEGORY_LAYOUT_MODE_KEY
+import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
@@ -51,6 +54,18 @@ fun MainScreen(
     val effectiveSelectedPeriod =
         mainScreenState.selectedViewPeriod ?: budgetUiState.budgetSettings?.period
         ?: BudgetPeriod.DAILY
+
+    val directCategoryPopupEnabled by context.settingsDataStore.data
+        .map { it[CATEGORY_PICKER_DIRECT_POPUP_KEY] ?: false }
+        .collectAsStateWithLifecycle(initialValue = false)
+
+    val categoryLayoutModeEnabled by context.settingsDataStore.data
+        .map { it[CATEGORY_LAYOUT_MODE_KEY] ?: false }
+        .collectAsStateWithLifecycle(initialValue = false)
+
+    val categoryGridModeEnabled by context.settingsDataStore.data
+        .map { it[CATEGORY_GRID_MODE_KEY] ?: false }
+        .collectAsStateWithLifecycle(initialValue = false)
 
     val undoSnackbarActionLabel = stringResource(R.string.undo)
 
@@ -117,6 +132,9 @@ fun MainScreen(
             onboardingCompleted = onboardingCompleted,
             tutorialStage = tutorialStage,
             showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+            directCategoryPopupEnabled = directCategoryPopupEnabled,
+            categoryLayoutModeEnabled = categoryLayoutModeEnabled,
+            categoryGridModeEnabled = categoryGridModeEnabled,
             onProcessIntent = { intent ->
                 when (intent) {
                     is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {

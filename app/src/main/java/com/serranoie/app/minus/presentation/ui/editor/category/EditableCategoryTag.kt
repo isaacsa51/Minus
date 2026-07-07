@@ -80,11 +80,16 @@ fun EditableCategoryTag(
     tags: List<String>,
     onCommentUpdate: (String) -> Unit,
     editorFocusController: FocusController,
+    modifier: Modifier = Modifier,
     extendWidth: Dp = 0.dp,
     onlyIcon: Boolean = false,
     onEdit: (Boolean) -> Unit = {},
     onSaveExpense: () -> Unit = {},
     onDeleteTag: (String) -> Unit = {},
+    directCategoryPopupEnabled: Boolean = false,
+    categoryLayoutModeEnabled: Boolean = false,
+    categoryGridModeEnabled: Boolean = false,
+    onShowCategoryGrid: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
     val localDensity = LocalDensity.current
@@ -131,7 +136,7 @@ fun EditableCategoryTag(
             shape = CircleShape,
             color = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
+            modifier = modifier
                 .menuAnchor()
                 .clip(CircleShape)
                 .then(
@@ -139,12 +144,16 @@ fun EditableCategoryTag(
                         Modifier
                     } else {
                         Modifier.clickable {
-                            editorFocusController.blur()
-                            focusManager.clearFocus()
-                            scope.launch {
-                                delay(120)
-                                isEdit = true
-                                onEdit(true)
+                            if (categoryGridModeEnabled) {
+                                onShowCategoryGrid()
+                            } else {
+                                editorFocusController.blur()
+                                focusManager.clearFocus()
+                                scope.launch {
+                                    delay(120)
+                                    isEdit = true
+                                    onEdit(true)
+                                }
                             }
                         }
                     })) {
@@ -220,18 +229,24 @@ fun EditableCategoryTag(
 
         val trimmedValue = value.text.trim()
         val filteredItems = if (trimmedValue.isBlank()) {
-            emptyList()
+            if (directCategoryPopupEnabled) tags else emptyList()
         } else {
             tags.filter { tag ->
                 tag.contains(trimmedValue, ignoreCase = true) && tag != trimmedValue
             }
         }
 
-        LaunchedEffect(renderPopup, filteredItems.isNotEmpty()) {
-            isShowSuggestions = renderPopup && filteredItems.isNotEmpty()
+        LaunchedEffect(isEdit, directCategoryPopupEnabled) {
+            if (isEdit && directCategoryPopupEnabled && filteredItems.isNotEmpty()) {
+                isShowSuggestions = true
+            }
         }
 
-        if (renderPopup && filteredItems.isNotEmpty()) {
+        LaunchedEffect(renderPopup, filteredItems.isNotEmpty()) {
+            isShowSuggestions = filteredItems.isNotEmpty()
+        }
+
+        if ((renderPopup || (directCategoryPopupEnabled && isEdit)) && filteredItems.isNotEmpty()) {
             val topBarHeight = LocalWindowInsets.current.calculateTopPadding()
 
             val height = remember { mutableStateOf(1000.dp) }

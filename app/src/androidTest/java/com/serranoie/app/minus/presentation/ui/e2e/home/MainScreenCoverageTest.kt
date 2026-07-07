@@ -168,6 +168,9 @@ class MainScreenCoverageTest {
                         onboardingCompleted = onboardingCompleted,
                         tutorialStage = FirstLaunchTutorialStage.COMPLETED,
                         showCreditQuickToggleFeature = true,
+                        directCategoryPopupEnabled = false,
+                        categoryLayoutModeEnabled = false,
+                        categoryGridModeEnabled = false,
                         onProcessIntent = { intent -> capturedIntents += intent },
                         onNavigateToAnalytics = {},
                         onNavigateToSettings = {},
@@ -219,6 +222,9 @@ class MainScreenCoverageTest {
                     onCreditCutoffConfirm = { capturedIntents += "CreditCutoffConfirm" },
                     onSaveBudget = { capturedIntents += "SaveBudget" },
                     showCreditQuickToggleFeature = showCreditQuickToggle,
+                    directCategoryPopupEnabled = false,
+                    categoryLayoutModeEnabled = false,
+                    categoryGridModeEnabled = false,
                 )
             }
         }

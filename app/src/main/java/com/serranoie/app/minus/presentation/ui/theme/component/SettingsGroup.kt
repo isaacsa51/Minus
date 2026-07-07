@@ -170,6 +170,130 @@ fun CustomSettingsItem(
 }
 
 /**
+ * An expandable accordion list. The header is the first list item (position `First`),
+ * followed by selectable items starting from position `Middle`.
+ * The chevron animates 180° on expand/collapse. No outer surface — each item
+ * carries its own background color.
+ *
+ * @param isExpanded Whether the list is currently expanded
+ * @param onToggleExpanded Callback to toggle the expanded state
+ * @param modifier Modifier applied to the container
+ * @param headerLabel Text for the header row
+ * @param leadingIcon Composable for the leading icon on the header row
+ * @param expandedContent Composable content for the selectable items below the header
+ */
+@Composable
+fun PaddedExpandableList(
+    isExpanded: Boolean,
+    onToggleExpanded: () -> Unit,
+    modifier: Modifier = Modifier,
+    headerLabel: String,
+    containerPosition: PaddedListItemPosition = PaddedListItemPosition.First,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    expandedContent: @Composable ColumnScope.() -> Unit,
+) {
+    Column(modifier = modifier) {
+        SelectablePaddedItem(
+            label = headerLabel,
+            isActive = false,
+            onClick = onToggleExpanded,
+            position = containerPosition,
+            leadingIcon = leadingIcon,
+            trailingContent = {
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (isExpanded) "Collapse" else "Expand",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        )
+
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            Column(
+                modifier = Modifier.padding(top = 2.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                content = expandedContent
+            )
+        }
+    }
+}
+
+/**
+ * A selectable row item for use inside [PaddedExpandableList]'s expanded content.
+ * Supports two visual states:
+ * - **Inactive:** blends into the surface background
+ * - **Active:** pill-shaped with secondaryContainer background and larger corner radius
+ *
+ * @param label The text label for the item
+ * @param isActive Whether the item is in active/selected state
+ * @param onClick Click handler
+ * @param modifier Modifier applied to the item
+ * @param position The position in the list (affects inactive corner rounding)
+ * @param leadingIcon Optional leading icon composable
+ * @param trailingContent Optional trailing content composable (e.g. chevron)
+ */
+@Composable
+fun SelectablePaddedItem(
+    label: String,
+    isActive: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    position: PaddedListItemPosition = PaddedListItemPosition.Middle,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
+) {
+    val shape = when {
+        isActive -> RoundedCornerShape(16.dp)
+        position == PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
+        position == PaddedListItemPosition.First -> RoundedCornerShape(
+            topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
+        )
+        position == PaddedListItemPosition.Last -> RoundedCornerShape(
+            bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
+        )
+        else -> RoundedCornerShape(4.dp)
+    }
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .clickable { onClick() },
+        shape = shape,
+        color = if (isActive) {
+            MaterialTheme.colorScheme.secondaryContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceContainer
+        },
+        contentColor = if (isActive) {
+            MaterialTheme.colorScheme.onSecondaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            leadingIcon?.invoke()
+            if (leadingIcon != null) {
+                Spacer(modifier = Modifier.width(12.dp))
+            }
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMediumEmphasized,
+                modifier = Modifier.weight(1f),
+            )
+            trailingContent?.invoke()
+        }
+    }
+}
+
+/**
  * A padded list group container with rounded corners that handles item positioning automatically.
  *
  * @param modifier Modifier to be applied to the container
@@ -607,6 +731,61 @@ fun PaddedListGroupPreview() {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         })
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PaddedExpandableListPreview() {
+    MinusTheme {
+        var isExpanded by remember { mutableStateOf(true) }
+
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            item {
+                PaddedListGroup(title = null) {
+                    PaddedExpandableList(
+                        isExpanded = isExpanded,
+                        onToggleExpanded = { isExpanded = !isExpanded },
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        headerLabel = "Categories",
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        expandedContent = {
+                            val items = listOf("Food", "Transport", "Shopping", "Entertainment", "Bills")
+
+                            items.forEachIndexed { index, item ->
+                                val position = when {
+                                    items.size == 1 -> PaddedListItemPosition.Single
+                                    index == 0 -> PaddedListItemPosition.Middle
+                                    index == items.lastIndex -> PaddedListItemPosition.Last
+                                    else -> PaddedListItemPosition.Middle
+                                }
+
+                                SelectablePaddedItem(
+                                    label = item,
+                                    isActive = item == "Shopping",
+                                    onClick = { },
+                                    position = position,
+                                    modifier = Modifier.padding(bottom = 2.dp),
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Settings,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    )
                 }
             }
         }

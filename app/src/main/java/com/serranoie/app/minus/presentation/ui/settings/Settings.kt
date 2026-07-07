@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material3.CardDefaults
@@ -94,7 +95,9 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
+import com.serranoie.app.minus.presentation.ui.theme.component.PaddedExpandableList
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
+import com.serranoie.app.minus.presentation.ui.theme.component.SelectablePaddedItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.Utils
@@ -125,6 +128,12 @@ fun Settings(
     onTypographyChange: (String) -> Unit,
     onMaterialYouToggle: () -> Unit,
     onCreditQuickToggleFeatureToggle: () -> Unit,
+    isCategoryPickerDirectPopupEnabled: Boolean = false,
+    isCategoryLayoutModeEnabled: Boolean = false,
+    isCategoryGridModeEnabled: Boolean = false,
+    onCategoryPickerDirectPopupFeatureToggle: () -> Unit = {},
+    onCategoryLayoutModeToggle: () -> Unit = {},
+    onCategoryGridModeToggle: () -> Unit = {},
     onRecurrentPaymentsViewModeChange: (RecurrentPaymentsViewMode) -> Unit,
     onNotificationTimeChange: (Int, Int) -> Unit,
     onRecurrentNotificationTimeChange: (Int, Int) -> Unit,
@@ -145,6 +154,7 @@ fun Settings(
     var showNotificationTimePicker by remember { mutableStateOf(false) }
     var showRecurrentNotificationTimePicker by remember { mutableStateOf(false) }
     var isCreditFeatureExpanded by remember { mutableStateOf(false) }
+    var isCategoryFeatureExpanded by remember { mutableStateOf(false) }
     val dismissThemeDialog = { showThemeDialog = false }
     val dismissTypographyDialog = { showTypographyDialog = false }
     val dismissRecurrentPaymentsViewModeDialog = { showRecurrentPaymentsViewModeDialog = false }
@@ -410,6 +420,58 @@ fun Settings(
                                     modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureSwitch")
                                 )
                             }
+                        }
+                    )
+
+                    PaddedExpandableList(
+                        isExpanded = isCategoryFeatureExpanded,
+                        onToggleExpanded = { isCategoryFeatureExpanded = !isCategoryFeatureExpanded },
+                        headerLabel = stringResource(R.string.settings_category_behavior_title),
+                        containerPosition = PaddedListItemPosition.Middle,
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Sell,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        expandedContent = {
+                            SelectablePaddedItem(
+                                label = stringResource(R.string.settings_category_picker_direct_popup_switch_label),
+                                isActive = isCategoryPickerDirectPopupEnabled,
+                                onClick = onCategoryPickerDirectPopupFeatureToggle,
+                                position = PaddedListItemPosition.Middle,
+                                trailingContent = {
+                                    Switch(
+                                        checked = isCategoryPickerDirectPopupEnabled,
+                                        onCheckedChange = { onCategoryPickerDirectPopupFeatureToggle() },
+                                    )
+                                }
+                            )
+                            SelectablePaddedItem(
+                                label = stringResource(R.string.settings_category_layout_mode_switch_label),
+                                isActive = isCategoryLayoutModeEnabled,
+                                onClick = onCategoryLayoutModeToggle,
+                                position = PaddedListItemPosition.Middle,
+                                trailingContent = {
+                                    Switch(
+                                        checked = isCategoryLayoutModeEnabled,
+                                        onCheckedChange = { onCategoryLayoutModeToggle() },
+                                    )
+                                }
+                            )
+                            SelectablePaddedItem(
+                                label = stringResource(R.string.settings_category_grid_mode_switch_label),
+                                isActive = isCategoryGridModeEnabled,
+                                onClick = onCategoryGridModeToggle,
+                                position = PaddedListItemPosition.Middle,
+                                trailingContent = {
+                                    Switch(
+                                        checked = isCategoryGridModeEnabled,
+                                        onCheckedChange = { onCategoryGridModeToggle() },
+                                    )
+                                }
+                            )
                         }
                     )
 

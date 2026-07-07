@@ -84,6 +84,7 @@ import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalculation
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
+import com.serranoie.app.minus.presentation.ui.editor.category.EditableCategoryTag
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.RecurrentExpenseDialog
@@ -133,6 +134,10 @@ fun Editor(
     onRecurrentToggle: (Boolean) -> Unit = {},
     onCreditToggle: (Boolean) -> Unit = {},
     showCreditQuickToggleFeature: Boolean = false,
+    directCategoryPopupEnabled: Boolean = false,
+    categoryLayoutModeEnabled: Boolean = false,
+    categoryGridModeEnabled: Boolean = false,
+    onShowCategoryGrid: () -> Unit = {},
     onDismissRecurrentDialog: () -> Unit = {},
     onDismissCreditCutoffDialog: () -> Unit = {},
     onRecurrentExpenseConfirm: (RecurrentFrequency, LocalDate, Int?, String) -> Unit = { _, _, _, _ -> },
@@ -403,6 +408,10 @@ fun Editor(
                         onCommentUpdate = onCommentUpdate,
                         onDeleteTag = onDeleteTag,
                         editorFocusController = editorFocusController,
+                        directCategoryPopupEnabled = directCategoryPopupEnabled,
+                        categoryLayoutModeEnabled = categoryLayoutModeEnabled,
+                        categoryGridModeEnabled = categoryGridModeEnabled,
+                        onShowCategoryGrid = onShowCategoryGrid,
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
@@ -482,6 +491,10 @@ private fun EditingContent(
     onCommentUpdate: (String) -> Unit,
     onDeleteTag: (String) -> Unit,
     editorFocusController: FocusController,
+    directCategoryPopupEnabled: Boolean = false,
+    categoryLayoutModeEnabled: Boolean = false,
+    categoryGridModeEnabled: Boolean = false,
+    onShowCategoryGrid: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
@@ -521,6 +534,7 @@ private fun EditingContent(
     ) {
         val density = LocalDensity.current
         val availableWidth = maxWidth - 32.dp
+        val toolbarWidth = maxWidth - 48.dp
         val amountSlotHeight = 124.dp
         val containerSizePx = remember(availableWidth, amountSlotHeight, density) {
             with(density) {
@@ -615,17 +629,46 @@ private fun EditingContent(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            CategoryToolbar(
-                tags = tags,
-                currentComment = currentComment,
-                stage = EditStage.EDIT_SPENT,
-                onCommentUpdate = onCommentUpdate,
-                onDeleteTag = onDeleteTag,
-                editorFocusController = editorFocusController,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 26.dp)
-            )
+            if (categoryGridModeEnabled) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, end = 24.dp, bottom = 26.dp),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    EditableCategoryTag(
+                        currentComment = currentComment,
+                        tags = tags,
+                        onCommentUpdate = onCommentUpdate,
+                        editorFocusController = editorFocusController,
+                        extendWidth = toolbarWidth,
+                        onlyIcon = false,
+                        onEdit = {},
+                        onSaveExpense = {},
+                        onDeleteTag = onDeleteTag,
+                        directCategoryPopupEnabled = directCategoryPopupEnabled,
+                        categoryLayoutModeEnabled = categoryLayoutModeEnabled,
+                        categoryGridModeEnabled = categoryGridModeEnabled,
+                        onShowCategoryGrid = onShowCategoryGrid,
+                    )
+                }
+            } else {
+                CategoryToolbar(
+                    tags = tags,
+                    currentComment = currentComment,
+                    stage = EditStage.EDIT_SPENT,
+                    onCommentUpdate = onCommentUpdate,
+                    onDeleteTag = onDeleteTag,
+                    editorFocusController = editorFocusController,
+                    directCategoryPopupEnabled = directCategoryPopupEnabled,
+                    categoryLayoutModeEnabled = categoryLayoutModeEnabled,
+                    categoryGridModeEnabled = categoryGridModeEnabled,
+                    onShowCategoryGrid = onShowCategoryGrid,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 26.dp),
+                )
+            }
         }
     }
 }
