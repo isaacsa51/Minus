@@ -49,7 +49,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Date
 
-
 fun BudgetPeriod.toDays(): Int = when (this) {
 	BudgetPeriod.DAILY -> 1
 	BudgetPeriod.WEEKLY -> 7
@@ -75,16 +74,6 @@ fun BudgetPeriod.periodLabel(): String = when (this) {
 	BudgetPeriod.MONTHLY -> stringResource(R.string.budget_period_label_this_month)
 }
 
-/**
- * Returns the list of budget periods that can fit within the given [totalDays].
- * Only periods where at least one full period fits are included.
- *
- * Example: totalDays = 7
- *  - DAILY → included (1 day fits in 7)
- *  - WEEKLY → included (7 days fits in 7 exactly)
- *  - BIWEEKLY → excluded (14 days > 7)
- *  - MONTHLY → excluded (30 days > 7)
- */
 fun availablePeriodsFor(totalDays: Int): List<BudgetPeriod> = buildList {
 	add(BudgetPeriod.DAILY)
 	if (totalDays >= 7) add(BudgetPeriod.WEEKLY)
@@ -92,28 +81,6 @@ fun availablePeriodsFor(totalDays: Int): List<BudgetPeriod> = buildList {
 	if (totalDays >= 30) add(BudgetPeriod.MONTHLY)
 }
 
-/**
- * Calculates the budget amount for a specific period type given the total budget
- * distributed over [totalDays] days.
- *
- * The calculation determines how much budget is available per period by:
- * 1. Calculating how many full periods fit in the date range: floor(totalDays / periodDays)
- * 2. Dividing total budget by that number of periods
- *
- * Examples with totalBudget = $1000, totalDays = 7:
- *  - DAILY   → $1000 / 7 days = $142.86 per day
- *  - WEEKLY  → $1000 / 1 week = $1000 per week (7 days = 1 full week)
- *
- * With totalBudget = $1000, totalDays = 15:
- *  - DAILY   → $1000 / 15 = $66.67 per day
- *  - WEEKLY  → $1000 / 2 weeks (floor(15/7)) = $500 per week
- *  - BIWEEKLY → $1000 / 1 = $1000 per 2-week period
- *
- * @param totalBudget The total budget amount for the entire date range
- * @param totalDays Number of days in the budget period
- * @param period The period type to calculate budget for
- * @return The budget amount per that period type
- */
 fun budgetForPeriod(
 	totalBudget: BigDecimal,
 	totalDays: Int,
@@ -127,18 +94,6 @@ fun budgetForPeriod(
 	return totalBudget.divide(BigDecimal(numPeriods), 2, RoundingMode.HALF_UP)
 }
 
-/**
- * Two-step date-range + period selector sheet.
- *
- * Step 1 — [DateRangePicker]: user picks start → end date.
- * Step 2 — Period chips (inline, below the picker): user chooses how the budget
- *           should be split (Daily / Weekly / …).  Options that require more days
- *           than the selected range are hidden.
- *
- * @param totalBudget  Pass the current budget to show a "preview" amount on each chip.
- * @param currencyCode ISO 4217 code used when formatting the preview amounts.
- * @param onApply      Callback with the chosen start date, end date and period.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinishDateSelector(
