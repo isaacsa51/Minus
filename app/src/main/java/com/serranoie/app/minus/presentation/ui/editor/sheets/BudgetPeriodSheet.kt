@@ -16,6 +16,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,6 +44,7 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -55,6 +57,8 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -71,6 +75,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -120,7 +127,10 @@ const val BUDGET_PERIOD_PREVIOUS_VALUES_TAG = "BudgetPeriodSheet.PreviousValues"
 const val BUDGET_PERIOD_DATE_ROW_TAG = "BudgetPeriodSheet.DateRow"
 const val BUDGET_PERIOD_STRATEGY_ROW_TAG = "BudgetPeriodSheet.StrategyRow"
 const val BUDGET_PERIOD_CURRENCY_ROW_TAG = "BudgetPeriodSheet.CurrencyRow"
+const val BUDGET_PERIOD_SPLIT_TOGGLE_ROW_TAG = "BudgetPeriodSheet.SplitToggleRow"
+const val BUDGET_PERIOD_CALCULATED_CARD_TAG = "BudgetPeriodSheet.CalculatedCard"
 fun budgetPeriodCardTag(period: BudgetPeriod) = "BudgetPeriodSheet.Period.${period.name}"
+fun budgetPeriodToggleTag(period: BudgetPeriod) = "BudgetPeriodSheet.SplitToggle.${period.name}"
 
 @Composable
 fun BudgetPeriodSheet(
@@ -421,41 +431,63 @@ private fun ViewBudgetContent(
             modifier = Modifier.padding(bottom = 12.dp),
         )
 
-        if (totalDays > 0) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                available.chunked(2).forEach { rowPeriods ->
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
+        if (totalDays > 0 && available.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(BUDGET_PERIOD_SPLIT_TOGGLE_ROW_TAG),
+                horizontalArrangement = Arrangement.spacedBy(
+                    ButtonGroupDefaults.ConnectedSpaceBetween
+                ),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                available.forEachIndexed { index, p ->
+                    val isSelected = p == periodCache
+                    ToggleButton(
+                        checked = isSelected,
+                        onCheckedChange = { onPeriodSelected(p) },
+                        shapes = when (index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            available.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .semantics { role = Role.RadioButton }
+                            .testTag(budgetPeriodToggleTag(p)),
+                        colors = ToggleButtonDefaults.toggleButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                alpha = 0.5f
+                            ),
+                            checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
                     ) {
-                        rowPeriods.forEach { p ->
-                            val isSelected = p == periodCache
-                            val preview = if (totalBudget > BigDecimal.ZERO && totalDays > 0) {
-                                budgetForPeriod(totalBudget, totalDays, p)
-                            } else {
-                                BigDecimal.ZERO
-                            }
-
-                            CompactPeriodCard(
-                                period = p,
-                                budgetAmount = preview,
-                                currencyFormat = currencyFormat,
-                                isSelected = isSelected,
-                                onClick = { onPeriodSelected(p) },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .testTag(budgetPeriodCardTag(p))
-                            )
-                        }
-                        if (rowPeriods.size == 1) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
+                        Text(
+                            text = periodLabel(p),
+                            style = MaterialTheme.typography.labelMediumCondensed,
+                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                            maxLines = 1,
+                        )
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            CalculatedSplitCard(
+                periodCache = periodCache,
+                totalBudget = totalBudget,
+                totalDays = totalDays,
+                currencyFormat = currencyFormat,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(BUDGET_PERIOD_CALCULATED_CARD_TAG)
+            )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         HorizontalDivider()
 
@@ -1066,67 +1098,64 @@ private fun StrategyPickerDialog(
 }
 
 @Composable
-private fun CompactPeriodCard(
-    period: BudgetPeriod,
-    budgetAmount: BigDecimal,
+private fun periodLabel(period: BudgetPeriod): String = stringResource(
+    when (period) {
+        BudgetPeriod.DAILY -> R.string.budget_period_daily
+        BudgetPeriod.WEEKLY -> R.string.budget_period_weekly
+        BudgetPeriod.BIWEEKLY -> R.string.budget_period_biweekly
+        BudgetPeriod.MONTHLY -> R.string.budget_period_monthly
+    }
+)
+
+@Composable
+private fun periodWordLabel(period: BudgetPeriod): String = stringResource(
+    when (period) {
+        BudgetPeriod.DAILY -> R.string.budget_split_period_daily
+        BudgetPeriod.WEEKLY -> R.string.budget_split_period_weekly
+        BudgetPeriod.BIWEEKLY -> R.string.budget_split_period_biweekly
+        BudgetPeriod.MONTHLY -> R.string.budget_split_period_monthly
+    }
+)
+
+@Composable
+private fun CalculatedSplitCard(
+    periodCache: BudgetPeriod,
+    totalBudget: BigDecimal,
+    totalDays: Int,
     currencyFormat: NumberFormat,
-    isSelected: Boolean,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = if (isSelected) {
-        MaterialTheme.colorScheme.primaryContainer
+    val calculatedAmount = if (totalBudget > BigDecimal.ZERO && totalDays > 0) {
+        budgetForPeriod(totalBudget, totalDays, periodCache)
     } else {
-        MaterialTheme.colorScheme.surface
+        BigDecimal.ZERO
     }
-    val borderColor = if (isSelected) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-    }
-    val textColor = if (isSelected) {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurface
-    }
+    val formattedAmount = currencyFormat.format(calculatedAmount)
 
-    OutlinedCard(
-        modifier = modifier.clickable(onClick = onClick),
-        onClick = onClick,
-        border = BorderStroke(
-            width = if (isSelected) 2.dp else 1.dp,
-            color = borderColor
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
         ),
-        colors = CardDefaults.outlinedCardColors(containerColor = backgroundColor),
+        shape = MaterialTheme.shapes.large,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.Center
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = when (period) {
-                    BudgetPeriod.DAILY -> stringResource(R.string.budget_period_daily)
-                    BudgetPeriod.WEEKLY -> stringResource(R.string.budget_period_weekly)
-                    BudgetPeriod.BIWEEKLY -> stringResource(R.string.budget_period_biweekly)
-                    BudgetPeriod.MONTHLY -> stringResource(R.string.budget_period_monthly)
-                },
-                style = if (isSelected) {
-                    MaterialTheme.typography.bodySmallEmphasized
-                } else {
-                    MaterialTheme.typography.bodySmallCondensed
-                },
-                fontWeight = FontWeight.Medium,
-                color = textColor
+                text = stringResource(R.string.budget_split_calculated_amount),
+                style = MaterialTheme.typography.labelMediumCondensed,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-
             Text(
-                text = currencyFormat.format(budgetAmount),
-                style = MaterialTheme.typography.bodySmallCondensed,
+                text = formattedAmount,
+                style = MaterialTheme.typography.headlineMediumEmphasized,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else textColor.copy(alpha = 0.7f),
-                modifier = Modifier.censor()
+                modifier = Modifier.censor(),
             )
         }
     }

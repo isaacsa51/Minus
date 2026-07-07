@@ -34,9 +34,14 @@ class MainScreenViewModel @Inject constructor(
     private var autoDismissJob: Job? = null
 
     init {
+        _uiState.update { it.copy(selectedViewPeriod = BudgetPeriod.DAILY) }
         viewModelScope.launch {
             settingsRepository.observeSettings().collect { settings ->
-                _uiState.update { it.copy(selectedViewPeriod = settings.budgetSplitViewPeriod) }
+                _uiState.update {
+                    it.copy(
+                        selectedViewPeriod = settings.budgetSplitViewPeriod ?: BudgetPeriod.DAILY,
+                    )
+                }
             }
         }
     }
