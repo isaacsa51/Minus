@@ -82,7 +82,7 @@ fun HistoryDateDivider(
 			enter = fadeIn(animationSpec = tween(durationMillis = 150)),
 			exit = fadeOut(animationSpec = tween(durationMillis = 150))
 		) {
-			val currencyFormat = symbolOnlyCurrencyFormat(currencyCode, maximumFractionDigits = 0)
+			val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
 			DayTotalItem(
 				total = totalAmount!!,
 				currencyFormat = currencyFormat,

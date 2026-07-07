@@ -21,6 +21,7 @@ enum class SymbolPosition {
     END,
 }
 
+
 data class SupportedCurrency(
     val code: String,
     val symbol: String,
@@ -36,6 +37,11 @@ data class SupportedCurrency(
         val locale = LocalConfiguration.current.locales[0]
         return displayName(locale)
     }
+
+    val defaultFractionDigits: Int
+        get() = SupportedCurrencyData.BY_CODE[code]?.defaultFractionDigits ?: 2
+
+    val hasDecimals: Boolean get() = SupportedCurrencyData.BY_CODE[code]?.hasDecimals ?: true
 
     companion object {
         val ALL = listOf(
@@ -173,5 +179,62 @@ data class BudgetSettings(
             remainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
             creditCardCutoffDay = null,
         )
+    }
+}
+
+data class SupportedCurrencyData(
+    val code: String,
+    val symbol: String,
+    val symbolPosition: SymbolPosition = SymbolPosition.START,
+    val defaultFractionDigits: Int,
+) {
+    val hasDecimals: Boolean get() = defaultFractionDigits > 0
+
+    companion object {
+        private val SUPPORTED_CODES: List<Pair<String, SymbolPosition>> = listOf(
+            "USD" to SymbolPosition.START, "MXN" to SymbolPosition.START, "EUR" to SymbolPosition.START,
+            "GBP" to SymbolPosition.START, "HKD" to SymbolPosition.START, "SGD" to SymbolPosition.START,
+            "JPY" to SymbolPosition.START, "CNY" to SymbolPosition.START, "KRW" to SymbolPosition.START,
+            "INR" to SymbolPosition.START, "PKR" to SymbolPosition.START, "BDT" to SymbolPosition.START,
+            "MYR" to SymbolPosition.START, "IDR" to SymbolPosition.START, "VND" to SymbolPosition.END,
+            "BRL" to SymbolPosition.START, "ARS" to SymbolPosition.START, "COP" to SymbolPosition.START,
+            "CLP" to SymbolPosition.START, "PEN" to SymbolPosition.START, "CAD" to SymbolPosition.START,
+            "AUD" to SymbolPosition.START, "NZD" to SymbolPosition.START, "CHF" to SymbolPosition.START,
+            "SEK" to SymbolPosition.START, "NOK" to SymbolPosition.START, "DKK" to SymbolPosition.START,
+            "PLN" to SymbolPosition.END, "TRY" to SymbolPosition.START, "RUB" to SymbolPosition.START,
+            "THB" to SymbolPosition.START, "PHP" to SymbolPosition.START, "TWD" to SymbolPosition.START,
+            "ILS" to SymbolPosition.START, "ZAR" to SymbolPosition.START, "NGN" to SymbolPosition.START,
+            "EGP" to SymbolPosition.START, "MAD" to SymbolPosition.START, "TND" to SymbolPosition.START,
+            "LYD" to SymbolPosition.START, "DZD" to SymbolPosition.START, "SDG" to SymbolPosition.START,
+            "KES" to SymbolPosition.START, "GHS" to SymbolPosition.START, "XOF" to SymbolPosition.START,
+            "GMD" to SymbolPosition.START, "SLE" to SymbolPosition.START, "LRD" to SymbolPosition.START,
+            "GNF" to SymbolPosition.START, "MRU" to SymbolPosition.START, "CVE" to SymbolPosition.START,
+            "STN" to SymbolPosition.START, "TZS" to SymbolPosition.START, "UGX" to SymbolPosition.START,
+            "ETB" to SymbolPosition.START, "RWF" to SymbolPosition.START, "BIF" to SymbolPosition.START,
+            "DJF" to SymbolPosition.START, "SOS" to SymbolPosition.START, "ERN" to SymbolPosition.START,
+            "XAF" to SymbolPosition.START, "CDF" to SymbolPosition.START, "ZMW" to SymbolPosition.START,
+            "MWK" to SymbolPosition.START, "MZN" to SymbolPosition.START, "AOA" to SymbolPosition.START,
+            "BWP" to SymbolPosition.START, "LSL" to SymbolPosition.START, "SZL" to SymbolPosition.START,
+            "NAD" to SymbolPosition.START, "MUR" to SymbolPosition.START, "SCR" to SymbolPosition.START,
+            "MGA" to SymbolPosition.START, "ZWL" to SymbolPosition.START, "HUF" to SymbolPosition.END,
+            "UAH" to SymbolPosition.END,
+        )
+
+        private fun fractionDigits(code: String): Int =
+            runCatching { Currency.getInstance(code).defaultFractionDigits }
+                .getOrElse { 2 }
+
+        val BY_CODE: Map<String, SupportedCurrencyData> =
+            SUPPORTED_CODES.associate { (code, position) ->
+                val supported = SupportedCurrency.ALL.find { it.code == code }
+                code to SupportedCurrencyData(
+                    code = code,
+                    symbol = supported?.symbol ?: code,
+                    symbolPosition = position,
+                    defaultFractionDigits = fractionDigits(code),
+                )
+            }
+
+        fun findByCode(code: String): SupportedCurrencyData? = BY_CODE[code.uppercase()]
     }
 }
