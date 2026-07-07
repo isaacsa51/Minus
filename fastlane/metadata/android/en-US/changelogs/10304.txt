@@ -1,3 +1,4 @@
+- refactor: enhance changelog generation and ensure build reproducibility
 - hotfix: update jdk to use paparazzi
 - hotfix: remove foojay plugin for deployment fixes
 - feat: render categories list on edit mode (#91)

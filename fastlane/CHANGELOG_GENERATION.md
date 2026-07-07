@@ -15,36 +15,47 @@ release notes the user sees.
 flowchart LR
     subgraph dev["Developer"]
         commit["Commit<br/>feat: title (#42)"]
+        prep["bundle exec fastlane<br/>android prep_release"]
+        edit["(optional) edit .txt"]
+        commit2["git commit .txt"]
     end
 
     tag(["git tag vX.Y.Z"])
 
     subgraph ci["GitHub Actions: release.yml"]
-        publish["publish_github<br/>(Fastlane)"]
+        publish["publish_github<br/>(Fastlane, NO generation)"]
     end
 
-    txt[("fastlane/metadata/<br/>android/en-US/changelogs/<br/>&lt;versionCode&gt;.txt")]
+    txt[("fastlane/metadata/<br/>android/en-US/changelogs/<br/>&lt;versionCode&gt;.txt<br/>(committed)")]
     kt[("GeneratedChangelog.kt<br/>(build-time artifact)")]
     apk[("Release APK<br/>(Foss + Wear)")]
 
-    commit --> tag
+    commit --> prep
+    prep --> txt
+    txt --> edit
+    edit --> commit2
+    commit2 --> tag
     tag --> publish
-    publish --> genTxt[":generate_changelog"]
-    genTxt --> txt
-    txt --> gradle[":app:generateChangelogKotlin"]
+    publish --> guard{"txt committed?"}
+    guard -- no --> fail(["fail with<br/>Missing &lt;versionCode&gt;.txt"])
+    guard -- yes --> gradle[":app:generateChangelogKotlin"]
     gradle --> kt
     kt --> assemble["assembleWearRelease<br/>+ assembleFossRelease"]
     publish --> assemble
     assemble --> apk
     publish --> release["gh release create"]
 ```
----
 
+The critical change vs. earlier versions: **CI never regenerates the
+`.txt`**. IzzyOnDroid's reproducible-builds checker just checks out the
+tag and builds — that must produce the same APK as CI, byte-for-byte.
+
+---
 ## The 2 places data lives
 
 | Layer                    | Path                                                                   | Tracked in git? | Authored by                                                       |
 |--------------------------|------------------------------------------------------------------------|-----------------|-------------------------------------------------------------------|
-| **Source of truth**      | `fastlane/metadata/android/{en-US,es-ES}/changelogs/<versionCode>.txt` | YES             | Fastlane `:generate_changelog` (per release, from `git log`)      |
+| **Source of truth**      | `fastlane/metadata/android/{en-US,es-ES}/changelogs/<versionCode>.txt` | YES             | Developer — `:prep_release` lane (per release, from `git log`)    |
 | **Generated artifact**   | `app/build/generated/source/changelog/GeneratedChangelog.kt`           | NO (build dir)  | Gradle `:app:generateChangelogKotlin` task (runs on every build)  |
 
 The generated Kotlin is in `app/build/...` — never committed. It is
@@ -57,56 +68,93 @@ tasks.named("preBuild").configure { dependsOn(generateChangelogKotlin) }
 so the committed source of truth is always the `.txt` files.
 
 ---
-
 ## Per-release workflow
 
-### Default (auto-generated)
+> **Reproducibility rule**: the `.txt` files are **committed BEFORE
+> tagging**. The release CI (`fastlane publish_github`) **never regenerates
+> the changelog** — it only builds from the already-committed state. This
+> guarantees that anyone checking out the tag (IzzyOnDroid's RB checker,
+> F-Droid, a fresh clone) gets the *exact same* APK as the CI build.
+>
+> If you forget this step, `publish_github` fails loudly with a
+> `Missing fastlane/metadata/.../<versionCode>.txt` error instead of
+> silently regenerating and breaking reproducibility.
 
-1. **Commits from PRs or branchs following the commit convention system** so the parser
-   can classify each one as FEATURE / IMPROVEMENT / BUG_FIX:
+### Step 1 — Land commits via PRs as usual
 
-   ```bash
-   git commit -m "feat: add Wear OS quick-add tile (#42)"
-   git commit -m "fix: crash when entering negative amounts (#43)"
-   git commit -m "refactor: split BudgetViewModel by responsibility (#44)"
-   ```
+Commits from PRs/branches follow the commit convention system so the
+parser can classify each one as FEATURE / IMPROVEMENT / BUG_FIX:
 
-2. **Squash-merge to master** as usual. The commit subject becomes the
-   in-app changelog card title verbatim (Conventional-Commits prefix is
-   stripped, first letter capitalized). Trailing `(#NN)` references are
-   preserved and rendered as clickable links to the GitHub PR.
+```bash
+git commit -m "feat: add Wear OS quick-add tile (#42)"
+git commit -m "fix: crash when entering negative amounts (#43)"
+git commit -m "refactor: split BudgetViewModel by responsibility (#44)"
+```
 
-3. **Tag the release** when ready to ship:
+Squash-merge to master as usual. The commit subject becomes the
+in-app changelog card title verbatim (Conventional-Commits prefix is
+stripped, first letter capitalized). Trailing `(#NN)` references are
+preserved and rendered as clickable links to the GitHub PR.
 
-   ```bash
-   git tag v1.2.9
-   git push origin v1.2.9
-   ```
+### Step 2 — Prep the release locally (before tagging)
 
-4. **GitHub Actions does the rest.** The `release.yml` workflow runs
-   `bundle exec fastlane android publish_github`, which:
-    - Calls `:generate_changelog` -> writes `<versionCode>.txt`.
-    - Calls `assembleWearRelease` + `assembleFossRelease` -> the Kotlin
-      source set picks up `GeneratedChangelog.kt` automatically (regenerated
-      via `preBuild` -> `generateChangelogKotlin`), packages into the APKs.
-    - Runs `gh release create v1.2.9 *.apk` -> publishes.
+Run the dedicated lane — it generates the `.txt` from `git log` and
+prints the exact follow-up commands. Tag is **not** created yet.
 
-### Curated titles (edit the `.txt`)
+```bash
+bundle exec fastlane android prep_release version_tag:v1.2.9
+```
 
-If a commit subject reads poorly as a user-facing changelog title, edit
-the generated `.txt` file directly **before** tagging:
+This:
+1. Resolves the range `git log <previous_tag>..HEAD` (defaults to HEAD
+   when `v1.2.9` isn't tagged yet — so this works pre-tagging).
+2. Writes `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt`.
+3. Prints the next manual steps (edit / commit / tag / push).
+
+### Step 3 — Curate titles if needed (still before tagging)
+
+If any bullet reads poorly as a user-facing changelog entry, edit the
+`.txt` file directly. The Gradle parser treats it as the authoritative
+source on the next build.
 
 ```text
 - feat: add Wear OS quick-add tile (#42)
-- feat: significantly improve launch performance  # <- rewritten for the user
+- feat: significantly improve launch performance  # <- curated for the user
 - fix: crash when entering negative amounts (#43)
 ```
 
-Curated `.txt` files are committed; the Gradle task reads them as the
-authoritative source on the next build.
+### Step 4 — Commit the changelog BEFORE tagging
+
+```bash
+git add fastlane/metadata
+git commit -m "docs(changelog): preparar v1.2.9"
+```
+
+**Do not skip this step.** Without it, CI fails with a clear error.
+
+### Step 5 — Tag and push
+
+```bash
+git tag -a v1.2.9 -m "Release 1.2.9"
+git push origin v1.2.9
+```
+
+### Step 6 — CI builds and publishes
+
+The `release.yml` workflow runs `bundle exec fastlane android publish_github`,
+which:
+- **Validates** that `<versionCode>.txt` exists at the tagged commit
+  (fails fast if you forgot Step 4).
+- Calls `assembleWearRelease` + `assembleFossRelease` -> the Kotlin
+  source set picks up `GeneratedChangelog.kt` automatically (regenerated
+  deterministically via `preBuild` -> `generateChangelogKotlin`) and
+  packages the APKs.
+- Runs `gh release create v1.2.9 *.apk` -> publishes.
+
+Crucially, **no `.txt` is rewritten at build time** — Izzy's clean
+checkout produces the same APK byte-for-byte.
 
 ---
-
 ## How bullets get classified
 
 The Gradle parser in `app/build.gradle.kts` walks each `- bullet` line and

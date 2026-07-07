@@ -1,77 +1,154 @@
 default_platform(:android)
 
 platform :android do
-  desc "Genera los changelogs basados en los commits de git entre el tag actual y el anterior"
-  lane :generate_changelog do |options|
-    version_tag = options[:version_tag] || ENV["VERSION_TAG"] || (`git describe --tags --abbrev=0`.strip rescue "v0.0.0")
-
-    # Extraer versión limpia (ej: v1.2.6 -> 1.2.6)
-    clean_version = version_tag.gsub(/^v/, "")
-
-    # Calcular Version Code (siguiendo tu lógica de build.gradle.kts: major * 10000 + minor * 100 + patch)
-    parts = clean_version.split("-")[0].split(".").map(&:to_i)
-    major = parts[0] || 0
-    minor = parts[1] || 0
-    patch = parts[2] || 0
-
-    version_code = (major * 10_000) + (minor * 100) + patch
-    version_code = 1 if version_code <= 0 # Coincidir con la lógica de build.gradle.kts
-
-    # Obtener el tag anterior
-    previous_tag = `git describe --tags --abbrev=0 #{version_tag}^`.strip rescue nil
-
-    if previous_tag.nil? || previous_tag.empty?
-      UI.message("No se encontró un tag anterior, usando todos los commits.")
-      changelog_content = `git log #{version_tag} --pretty=format:"- %s"`.strip rescue "- Initial release."
-    else
-      UI.message("Generando changelog para #{version_tag} (Code: #{version_code}) desde #{previous_tag}")
-      changelog_content = `git log #{previous_tag}..#{version_tag} --pretty=format:"- %s"`.strip
-    end
-
-    if changelog_content.empty?
-      changelog_content = "- Minor improvements and bug fixes."
-    end
-
-    # Ruta del archivo
-    changelog_path = "metadata/android/en-US/changelogs/#{version_code}.txt"
-
-    # Asegurar que el directorio existe
-    FileUtils.mkdir_p(File.dirname(changelog_path))
-
-    # Escribir el archivo
-    File.write(changelog_path, changelog_content)
-
-    UI.success("Changelog generado en: #{changelog_path}")
-    changelog_content
+  # Computes the Android `versionCode` for a given version tag string,
+  # matching build.gradle.kts: major * 10_000 + minor * 100 + patch.
+  # Stripped of any pre-release suffix (e.g. `v1.3.4-pre` -> 10304).
+  def version_code_from(version_tag)
+    clean = version_tag.gsub(/^v/, "").split("-")[0]
+    parts = clean.split(".").map(&:to_i)
+    code = (parts[0] || 0) * 10_000 + (parts[1] || 0) * 100 + (parts[2] || 0)
+    code <= 0 ? 1 : code
   end
 
-  desc "Genera el APK Release firmado y crea un Release en GitHub"
+  # Walks `git tag --sort=-version:refname` and returns the highest tag
+  # that:
+  #   - is NOT a pre-release (no `-` in the name) — we treat `v1.3.4-pre`
+  #     as invisible when computing a real release's commit range,
+  #   - IS an ancestor of `end_ref` (i.e. reachable from HEAD or the tag).
+  # Returns "" if none found.
+  def latest_non_prerelease_tag_ancestor(end_ref)
+    tags = `git tag --sort=-version:refname`.lines.map(&:strip).reject(&:empty?)
+    tags.each do |tag|
+      next if tag.include?("-") # skip pre-release tags like v1.3.4-pre
+      is_ancestor = system(
+        "git", "merge-base", "--is-ancestor", tag, end_ref,
+        out: File::NULL, err: File::NULL
+      )
+      return tag if is_ancestor
+    end
+    ""
+  end
+
+  # Returns the bulleted changelog body (`- foo\n- bar\n...`) for a given
+  # version_tag, by running `git log` between the previous REAL release
+  # tag and the current ref (the tag itself if it exists, HEAD otherwise).
+  # Pre-release tags like `v1.3.4-pre` are ignored when picking the
+  # previous anchor — `v1.3.4` should always include all commits since
+  # `v1.3.3`, never just those since `v1.3.4-pre`. Robust to the case
+  # where `version_tag` has not been tagged yet (the normal pre-tagging
+  # case during release preparation).
+  def changelog_commits_for(version_tag)
+    end_ref =
+      if `git rev-parse --verify --quiet #{version_tag}^{commit}`.to_s.strip != ""
+        version_tag
+      else
+        "HEAD"
+      end
+
+    previous_tag = latest_non_prerelease_tag_ancestor(end_ref)
+
+    if previous_tag.empty?
+      `git log #{end_ref} --pretty=format:"- %s"`.to_s.strip
+    else
+      `git log #{previous_tag}..#{end_ref} --pretty=format:"- %s"`.to_s.strip
+    end
+  end
+
+  def changelog_path_for(version_tag)
+    "metadata/android/en-US/changelogs/#{version_code_from(version_tag)}.txt"
+  end
+
+  desc "Genera fastlane/metadata/.../changelogs/<versionCode>.txt desde git log entre el tag anterior y el HEAD/tag."
+  desc "Usar ANTES de taggear (ver :prep_release)."
+  lane :generate_changelog do |options|
+    version_tag = options[:version_tag] || ENV["VERSION_TAG"] || `git describe --tags --abbrev=0`.to_s.strip
+    version_tag = "v0.0.0" if version_tag.empty?
+
+    UI.message("Generando changelog para #{version_tag} (Code: #{version_code_from(version_tag)})…")
+    commits = changelog_commits_for(version_tag)
+    commits = "- Minor improvements and bug fixes." if commits.empty?
+
+    path = changelog_path_for(version_tag)
+    FileUtils.mkdir_p(File.dirname(path))
+
+    # Si el .txt ya existe (curado manualmente), hacemos backup con timestamp
+    # para que el dev pueda recuperar el contenido curado si lo prefiere
+    # sobre la regeneración. El .bak es deliberadamente UNTRACKED — vive
+    # solo en la working tree hasta que el dev decida qué hacer.
+    if File.exist?(path)
+      bak = "#{path}.bak.#{Time.now.to_i}"
+      FileUtils.mv(path, bak)
+      UI.important(
+        "Backup de #{path} → #{bak} (por si querés recuperar curation manual)."
+      )
+    end
+
+    File.write(path, commits)
+
+    UI.success("Changelog escrito en #{path}")
+    UI.important(
+      "Editá el archivo si querés curar entradas para el usuario.\n" \
+      "Recordá COMMIT ANTES de taggear (ver :prep_release)."
+    )
+    commits
+  end
+
+  desc "Prepara el release: genera el .txt y muestra los pasos para commitear ANTES de taggear."
+  desc "Mantiene la build determinística - el CI no regenera nada."
+  lane :prep_release do |options|
+    version_tag = options[:version_tag] || ENV["VERSION_TAG"]
+    UI.user_error!("Pasá version_tag como argumento (ej: version_tag:v1.3.4) o seteá VERSION_TAG") if version_tag.nil?
+
+    generate_changelog(version_tag: version_tag)
+    txt_path = changelog_path_for(version_tag)
+
+    UI.important(
+      "Próximos pasos manuales (CRUCIAL: commit ANTES del tag):\n" \
+      "  1. Editá #{txt_path} si querés curar entradas para el usuario.\n" \
+      "  2. git add fastlane/metadata\n" \
+      "  3. git commit -m \"docs(changelog): preparar #{version_tag}\"\n" \
+      "  4. git tag -a #{version_tag} -m \"Release #{version_tag.gsub(/^v/, '')}\"\n" \
+      "  5. git push origin #{version_tag}   # dispara el workflow Release Minus\n" \
+      "\n" \
+      "El CI sólo construye APKs desde el .txt ya comiteado, sin regenerarlo.\n" \
+      "Así IzzyOnDroid (RB checker), F-Droid y un checkout limpio obtienen el mismo APK."
+    )
+  end
+
+  desc "Construye los APKs firmados y crea el Release en GitHub. Asume que el .txt ya está comiteado."
   lane :publish_github do
     version_tag = ENV.fetch("VERSION_TAG")
 
-    # 1. Escribe fastlane/metadata/android/en-US/changelogs/<versionCode>.txt
-    #    desde git log entre el tag anterior y el nuevo.
-    generate_changelog(version_tag: version_tag)
+    # Guard: el .txt debe estar comiteado ANTES del tag. Si falta, fallamos
+    # con un mensaje accionable — nunca regeneramos en CI, eso rompe RB.
+    expected_txt = changelog_path_for(version_tag)
+    unless File.exist?(expected_txt)
+      UI.user_error!(
+        "Missing #{expected_txt}. El CI no regenera changelogs a propósito " \
+        "(rompe reproducibilidad frente a un checkout limpio).\n" \
+        "Generálo y commiteálo ANTES de taggear:\n" \
+        "  bundle exec fastlane android generate_changelog version_tag:#{version_tag}\n" \
+        "  git add #{expected_txt} && git commit -m 'docs(changelog): preparar #{version_tag}'\n" \
+        "Y re-taggeá (o mové el tag) para que apunte al commit con el .txt."
+      )
+    end
 
-    # 2. assembleWearRelease / assembleFossRelease disparan preBuild, que a
-    #    su vez corre :app:generateChangelogKotlin y emite
-    #    app/build/generated/source/changelog/GeneratedChangelog.kt de forma
-    #    deterministica a partir del .txt recien escrito. El source set
-    #    esta registrado en app/build.gradle.kts:
+    # NOTE: assembleWearRelease / assembleFossRelease disparan preBuild,
+    # que a su vez corre :app:generateChangelogKotlin y emite
+    # app/build/generated/source/changelog/GeneratedChangelog.kt en forma
+    # determinística a partir del .txt ya comiteado. El source set está
+    # registrado en app/build.gradle.kts:
     #
-    #      android.sourceSets["main"].kotlin.srcDir(
-    #        layout.buildDirectory.dir("generated/source/changelog")
-    #      )
-    #      tasks.named("preBuild").configure { dependsOn(generateChangelogKotlin) }
+    #   android.sourceSets["main"].kotlin.srcDir(
+    #     layout.buildDirectory.dir("generated/source/changelog")
+    #   )
+    #   tasks.named("preBuild").configure { dependsOn(generateChangelogKotlin) }
     #
-    #    No hay paso intermedio de JSON / assets/changelog.json - el objeto
-    #    Kotlin es la capa de datos del runtime (ChangelogRepository.kt).
-    gradle(
-      task: ":app:assembleWearRelease"
-    )
-    gradle(
-      task: ":app:assembleFossRelease"
-    )
+    # No hay paso intermedio de JSON / assets/changelog.json - el objeto
+    # Kotlin es la capa de datos del runtime (ChangelogRepository.kt).
+    gradle(task: ":app:assembleWearRelease")
+    gradle(task: ":app:assembleFossRelease")
 
     apk_paths = Dir[
       File.expand_path("../app/build/outputs/apk/{wear,foss}/release/*.apk", __dir__)
@@ -79,15 +156,9 @@ platform :android do
     UI.user_error!("No se encontraron APKs generados por Gradle") if apk_paths.empty?
 
     sh(
-      "gh",
-      "release",
-      "create",
-      version_tag,
-      *apk_paths,
-      "--repo",
-      ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
-      "--title",
-      "Minus #{version_tag}",
+      "gh", "release", "create", version_tag, *apk_paths,
+      "--repo", ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
+      "--title", "Minus #{version_tag}",
       "--generate-notes"
     )
   end
