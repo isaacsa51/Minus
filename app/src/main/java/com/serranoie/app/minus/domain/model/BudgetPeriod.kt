@@ -21,7 +21,6 @@ enum class SymbolPosition {
     END,
 }
 
-
 data class SupportedCurrency(
     val code: String,
     val symbol: String,
