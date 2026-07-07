@@ -84,6 +84,12 @@
     <string name="no_ending_date">Sin fecha de finalización</string>
     <string name="budget_split_logic">¿Cómo quieres dividir el presupuesto?</string>
     <string name="new_budget_period">Nuevo período de ahorro</string>
+    <string name="budget_split_calculated_amount">Monto calculado</string>
+    <string name="budget_split_helper_format">Tendrás %1$s para gastar cada %2$s</string>
+    <string name="budget_split_period_daily">día</string>
+    <string name="budget_split_period_weekly">semana</string>
+    <string name="budget_split_period_biweekly">quincena</string>
+    <string name="budget_split_period_monthly">mes</string>
 
     <string name="expense_deleted_format">%1$s eliminado</string>
     <string name="expense_modified_format">%1$s ha sido modificado</string>

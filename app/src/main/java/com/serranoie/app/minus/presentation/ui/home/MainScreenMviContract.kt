@@ -60,6 +60,6 @@ data class MainScreenUiState(
 
     val showBudgetPeriodSheet: Boolean = false,
     val forceBudgetPeriodSheetSetup: Boolean = false,
-    val selectedViewPeriod: BudgetPeriod = BudgetPeriod.DAILY,
+    val selectedViewPeriod: BudgetPeriod? = null,
     val walletSheetOpened: Boolean = false,
 )

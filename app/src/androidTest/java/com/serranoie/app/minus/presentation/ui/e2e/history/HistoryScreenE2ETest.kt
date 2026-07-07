@@ -334,7 +334,8 @@ class HistoryScreenE2ETest {
         composeTestRule.onNodeWithText("Coffee").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Delete").performClick()
+        val deleteLabel = composeTestRule.activity.getString(R.string.delete)
+        composeTestRule.onNodeWithText(deleteLabel).performClick()
         composeTestRule.waitForIdle()
 
         composeTestRule.onAllNodesWithText("Coffee").assertCountEquals(0)
@@ -384,7 +385,8 @@ class HistoryScreenE2ETest {
         composeTestRule.onNodeWithText("Coffee").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Edit").performClick()
+        val editLabel = composeTestRule.activity.getString(R.string.edit)
+        composeTestRule.onNodeWithText(editLabel).performClick()
         composeTestRule.waitForIdle()
 
         val editTitle = composeTestRule.activity.getString(R.string.edit_expense_title)

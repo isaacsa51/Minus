@@ -87,6 +87,12 @@
     <string name="no_ending_date">No ending date</string>
     <string name="budget_split_logic">How do you want to split the budget?</string>
     <string name="new_budget_period">New Budget Period</string>
+    <string name="budget_split_calculated_amount">Calculated amount</string>
+    <string name="budget_split_helper_format">You will have %1$s to spend every %2$s</string>
+    <string name="budget_split_period_daily">day</string>
+    <string name="budget_split_period_weekly">week</string>
+    <string name="budget_split_period_biweekly">fortnight</string>
+    <string name="budget_split_period_monthly">month</string>
 
     <!-- History -->
     <string name="expense_deleted_format">%1$s deleted</string>

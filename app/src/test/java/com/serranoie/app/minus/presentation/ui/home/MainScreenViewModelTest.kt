@@ -2,15 +2,20 @@ package com.serranoie.app.minus.presentation.ui.home
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -27,9 +32,12 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainScreenViewModelTest {
+    private val settingsRepository: SettingsRepository = mockk(relaxed = true)
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+        every { settingsRepository.observeSettings() } returns flowOf(UserSettings())
     }
 
     @After
@@ -37,7 +45,7 @@ class MainScreenViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun newViewModel() = MainScreenViewModel()
+    private fun newViewModel() = MainScreenViewModel(settingsRepository)
 
     private fun sampleTransaction(
         id: Long = 1L,
