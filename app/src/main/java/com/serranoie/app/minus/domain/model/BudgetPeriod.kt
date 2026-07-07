@@ -116,6 +116,7 @@ data class SupportedCurrency(
             SupportedCurrency("SAR", "SAR"),
             SupportedCurrency("SYP", "SYP"),
             SupportedCurrency("HUF", "Ft", SymbolPosition.END),
+            SupportedCurrency("UAH", "₴", SymbolPosition.END),
         )
 
         fun findByCode(code: String): SupportedCurrency? =
