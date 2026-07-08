@@ -82,7 +82,6 @@ fun CategoryToolbar(
     onDeleteTag: (String) -> Unit = {},
     onSaveExpense: () -> Unit = {},
     directCategoryPopupEnabled: Boolean = false,
-    categoryLayoutModeEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
     onShowCategoryGrid: () -> Unit = {},
     modifier: Modifier = Modifier
@@ -191,7 +190,6 @@ fun CategoryToolbar(
                     onSaveExpense = onSaveExpense,
                     onDeleteTag = onDeleteTag,
                     directCategoryPopupEnabled = directCategoryPopupEnabled,
-                    categoryLayoutModeEnabled = categoryLayoutModeEnabled,
                     categoryGridModeEnabled = categoryGridModeEnabled,
                     onShowCategoryGrid = onShowCategoryGrid,
                 )

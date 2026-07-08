@@ -239,9 +239,11 @@
     <string name="settings_feature_credit_toggle_details">When activated, you can now mark payments made with a credit card. \nBy declaring a billing date, you\'ll know how much to pay your bank before you have to pay interest, through a notification separate from the billing period.</string>
     <string name="settings_feature_credit_toggle_switch_label">Enable CC usage</string>
     <string name="settings_category_behavior_title">Category behavior</string>
-    <string name="settings_category_picker_direct_popup_switch_label">Direct category popup</string>
-    <string name="settings_category_layout_mode_switch_label">Layout mode</string>
+    <string name="settings_category_behavior_subtitle">Configure how the category picker behaves when tagging a transaction.</string>
+    <string name="settings_category_picker_direct_popup_switch_label">Show categories on tap</string>
+    <string name="settings_category_picker_direct_popup_description">Open the suggestions popup with all your saved categories as soon as you tap the category field. When off, suggestions only appear after you start typing.</string>
     <string name="settings_category_grid_mode_switch_label">Show as a list</string>
+    <string name="settings_category_grid_mode_description">Tap the category tag to open a grid of your saved categories, instead of entering inline edit mode. Also turns off the numpad\'s calculation mode while this is on.</string>
     <string name="settings_recurrent_payments_view_mode_title">Recurrent payments view mode</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Change the type of display to show your recurrent payments</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Recurrent payments view mode</string>

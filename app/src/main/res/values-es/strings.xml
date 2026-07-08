@@ -392,6 +392,7 @@
     <string name="strategy_split_equally_desc">El sobrante se divide equitativamente entre todos los días del nuevo período</string>
     <string name="strategy_add_to_first_day">Agregar al primer día</string>
     <string name="strategy_add_to_first_day_desc">Todo el sobrante se suma al primer día del nuevo período</string>
+    <string name="settings_category_grid_mode_description">Al dar tap en la cateogría se abrirá una lista con todas las categorías guardadas, en vez de escribirlos directamente. Este ajuste apaga el Numpad al escribir la categoria.</string>
     <string name="settings_recurrent_payments_view_mode_title">Modo de visualización de pagos recurrentes</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Cambia el tipo de visualización para mostrar tus pagos recurrentes.</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Modo de visualización de pagos recurrentes</string>
@@ -419,4 +420,8 @@
     <string name="recurrent_ticket_biweekly_unnamed">Suscripción quincenal sin nombre</string>
     <string name="search_currency">Buscar divisa</string>
     <string name="clear">Borrar</string>
+    <string name="settings_category_behavior_title">Comportamientos de categorias</string>
+    <string name="settings_category_picker_direct_popup_switch_label">Mostrar categorias al dar tap</string>
+    <string name="settings_category_picker_direct_popup_description">Abrir sugerencias de categorias al momento de dar tap en el field de categorias. Si esta apagado, las sugerencias solo aparecerán al momento que empieces a escribir.</string>
+    <string name="settings_category_grid_mode_switch_label">Mostrar como una lista</string>
 </resources>

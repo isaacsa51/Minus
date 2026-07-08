@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 
@@ -179,6 +180,13 @@ fun CustomSettingsItem(
  * @param onToggleExpanded Callback to toggle the expanded state
  * @param modifier Modifier applied to the container
  * @param headerLabel Text for the header row
+ * @param headerSubtitle Optional small description rendered below the header label in
+ *                       `bodySmall` / `onSurfaceVariant`. When `null` (default), no
+ *                       subtitle line is shown.
+ * @param headerVerticalPadding Optional vertical padding for the header row. When `null`
+ *                              (the default), the header keeps its standard 12.dp padding.
+ *                              Pass a larger `Dp` value (e.g. `20.dp`) to make the header
+ *                              card visually taller.
  * @param leadingIcon Composable for the leading icon on the header row
  * @param expandedContent Composable content for the selectable items below the header
  */
@@ -189,7 +197,9 @@ fun PaddedExpandableList(
     modifier: Modifier = Modifier,
     headerLabel: String,
     containerPosition: PaddedListItemPosition = PaddedListItemPosition.First,
+    headerSubtitle: String? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
+    headerVerticalPadding: Dp? = null,
     expandedContent: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = modifier) {
@@ -198,6 +208,8 @@ fun PaddedExpandableList(
             isActive = false,
             onClick = onToggleExpanded,
             position = containerPosition,
+            verticalPadding = headerVerticalPadding ?: 12.dp,
+            subtitle = headerSubtitle,
             leadingIcon = leadingIcon,
             trailingContent = {
                 Icon(
@@ -233,6 +245,11 @@ fun PaddedExpandableList(
  * @param onClick Click handler
  * @param modifier Modifier applied to the item
  * @param position The position in the list (affects inactive corner rounding)
+ * @param verticalPadding Vertical padding inside the row. Defaults to 12.dp; pass a larger
+ *                        value (e.g. from [PaddedExpandableList]'s `headerVerticalPadding`)
+ *                        to make the row visually taller.
+ * @param subtitle Optional small description rendered below the label in
+ *                 `bodySmall` / `onSurfaceVariant`. When `null` (default), no subtitle is shown.
  * @param leadingIcon Optional leading icon composable
  * @param trailingContent Optional trailing content composable (e.g. chevron)
  */
@@ -243,6 +260,8 @@ fun SelectablePaddedItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
+    verticalPadding: Dp = 12.dp,
+    subtitle: String? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
 ) {
@@ -276,20 +295,89 @@ fun SelectablePaddedItem(
         },
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = verticalPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             leadingIcon?.invoke()
             if (leadingIcon != null) {
                 Spacer(modifier = Modifier.width(12.dp))
             }
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMediumEmphasized,
-                modifier = Modifier.weight(1f),
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyMediumEmphasized,
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
             trailingContent?.invoke()
         }
+    }
+}
+
+/**
+ * A selectable card item that hosts arbitrary content, similar to how [PaddedListGroup] exposes
+ * a [content] slot. Use this when a single selectable card needs to compose multiple
+ * sub-elements (Text, Switch, Row, etc.) while preserving the segmented padded list shape and
+ * the active/inactive styling of [SelectablePaddedItem].
+ *
+ * Supports two visual states:
+ * - **Inactive:** blends into the surface background
+ * - **Active:** pill-shaped with secondaryContainer background and larger corner radius
+ *
+ * @param isActive Whether the item is in active/selected state
+ * @param onClick Click handler for the whole card
+ * @param modifier Modifier applied to the item
+ * @param position The position in the list (affects inactive corner rounding)
+ * @param content Composable content rendered inside the card (ColumnScope)
+ */
+@Composable
+fun SelectableInfoPaddedItem(
+    isActive: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    position: PaddedListItemPosition = PaddedListItemPosition.Middle,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val shape = when {
+        isActive -> RoundedCornerShape(16.dp)
+        position == PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
+        position == PaddedListItemPosition.First -> RoundedCornerShape(
+            topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
+        )
+        position == PaddedListItemPosition.Last -> RoundedCornerShape(
+            bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
+        )
+        else -> RoundedCornerShape(4.dp)
+    }
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .clickable { onClick() },
+        shape = shape,
+        color = if (isActive) {
+            MaterialTheme.colorScheme.secondaryContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceContainer
+        },
+        contentColor = if (isActive) {
+            MaterialTheme.colorScheme.onSecondaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            content = content
+        )
     }
 }
 

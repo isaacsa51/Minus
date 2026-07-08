@@ -169,7 +169,6 @@ class MainScreenCoverageTest {
                         tutorialStage = FirstLaunchTutorialStage.COMPLETED,
                         showCreditQuickToggleFeature = true,
                         directCategoryPopupEnabled = false,
-                        categoryLayoutModeEnabled = false,
                         categoryGridModeEnabled = false,
                         onProcessIntent = { intent -> capturedIntents += intent },
                         onNavigateToAnalytics = {},
@@ -223,7 +222,6 @@ class MainScreenCoverageTest {
                     onSaveBudget = { capturedIntents += "SaveBudget" },
                     showCreditQuickToggleFeature = showCreditQuickToggle,
                     directCategoryPopupEnabled = false,
-                    categoryLayoutModeEnabled = false,
                     categoryGridModeEnabled = false,
                 )
             }

@@ -32,8 +32,7 @@ import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
@@ -93,12 +92,11 @@ import com.serranoie.app.minus.presentation.ui.settings.bugreport.buildAppEnviro
 import com.serranoie.app.minus.presentation.ui.settings.components.NotificationPermissionItem
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
-import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedExpandableList
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
-import com.serranoie.app.minus.presentation.ui.theme.component.SelectablePaddedItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
+import com.serranoie.app.minus.presentation.ui.theme.component.SelectableInfoPaddedItem
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.Utils
 import com.serranoie.app.minus.presentation.util.Utils.toggleFeedback
@@ -129,10 +127,8 @@ fun Settings(
     onMaterialYouToggle: () -> Unit,
     onCreditQuickToggleFeatureToggle: () -> Unit,
     isCategoryPickerDirectPopupEnabled: Boolean = false,
-    isCategoryLayoutModeEnabled: Boolean = false,
     isCategoryGridModeEnabled: Boolean = false,
     onCategoryPickerDirectPopupFeatureToggle: () -> Unit = {},
-    onCategoryLayoutModeToggle: () -> Unit = {},
     onCategoryGridModeToggle: () -> Unit = {},
     onRecurrentPaymentsViewModeChange: (RecurrentPaymentsViewMode) -> Unit,
     onNotificationTimeChange: (Int, Int) -> Unit,
@@ -170,8 +166,7 @@ fun Settings(
     val metadataCopiedMessage = stringResource(R.string.settings_version_metadata_copied)
 
     Scaffold(
-        modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             MediumTopAppBar(
@@ -180,26 +175,21 @@ fun Settings(
                         text = stringResource(R.string.settings_title),
                         style = MaterialTheme.typography.titleLargeEmphasized,
                     )
-                },
-                navigationIcon = {
+                }, navigationIcon = {
                     IconButton(
-                        onClick = onBack,
-                        modifier = Modifier.testTag("SettingsBackButton")
+                        onClick = onBack, modifier = Modifier.testTag("SettingsBackButton")
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
+                }, colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface
-                ),
-                scrollBehavior = scrollBehavior
+                ), scrollBehavior = scrollBehavior
             )
-        }
-    ) { paddingValues ->
+        }) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -214,8 +204,7 @@ fun Settings(
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         shape = MaterialTheme.shapes.large,
                         border = BorderStroke(
-                            1.dp,
-                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                         ),
                         colors = CardDefaults.outlinedCardColors(
                             containerColor = Color.Transparent
@@ -350,12 +339,9 @@ fun Settings(
                             )
                         }
                         Switch(
-                            checked = isMaterialYouEnabled,
-                            onCheckedChange = {
+                            checked = isMaterialYouEnabled, onCheckedChange = {
                                 onMaterialYouToggle()
-// 								view.toggleFeedback()
-                            },
-                            modifier = Modifier.testTag("SettingsMaterialYouSwitch")
+                            }, modifier = Modifier.testTag("SettingsMaterialYouSwitch")
                         )
                     }
                 }
@@ -365,69 +351,71 @@ fun Settings(
                 PaddedListGroup(
                     title = stringResource(R.string.settings_section_features)
                 ) {
-                    CustomPaddedExpandableItem(
+                    PaddedExpandableList(
                         isExpanded = isCreditFeatureExpanded,
                         onToggleExpanded = { isCreditFeatureExpanded = !isCreditFeatureExpanded },
-                        position = PaddedListItemPosition.First,
-                        modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureItem"),
-                        defaultContent = {
+                        modifier = Modifier
+                            .testTag("SettingsCreditQuickToggleFeatureItem"),
+                        headerLabel = stringResource(R.string.settings_feature_credit_toggle_title),
+                        containerPosition = PaddedListItemPosition.First,
+                        headerVerticalPadding = 20.dp,
+                        leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.CreditCard,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary
                             )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = stringResource(R.string.settings_feature_credit_toggle_title),
-                                    style = MaterialTheme.typography.bodyMediumEmphasized,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = stringResource(R.string.settings_feature_credit_toggle_subtitle),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            Icon(
-                                imageVector = if (isCreditFeatureExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
                         },
                         expandedContent = {
-                            Text(
-                                text = stringResource(R.string.settings_feature_credit_toggle_details),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp, start = 6.dp, end = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                            SelectableInfoPaddedItem(
+                                isActive = isCreditQuickToggleFeatureEnabled,
+                                onClick = onCreditQuickToggleFeatureToggle,
+                                position = PaddedListItemPosition.Middle,
                             ) {
-                                Text(
-                                    text = stringResource(R.string.settings_feature_credit_toggle_switch_label),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                Switch(
-                                    checked = isCreditQuickToggleFeatureEnabled,
-                                    onCheckedChange = { onCreditQuickToggleFeatureToggle() },
-                                    modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureSwitch")
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.HelpOutline,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.settings_feature_credit_toggle_details),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.settings_feature_credit_toggle_switch_label),
+                                        style = MaterialTheme.typography.bodyMediumEmphasized,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Switch(
+                                        checked = isCreditQuickToggleFeatureEnabled,
+                                        onCheckedChange = { onCreditQuickToggleFeatureToggle() },
+                                        modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureSwitch")
+                                    )
+                                }
                             }
-                        }
-                    )
+                        })
 
                     PaddedExpandableList(
                         isExpanded = isCategoryFeatureExpanded,
-                        onToggleExpanded = { isCategoryFeatureExpanded = !isCategoryFeatureExpanded },
+                        onToggleExpanded = {
+                            isCategoryFeatureExpanded = !isCategoryFeatureExpanded
+                        },
                         headerLabel = stringResource(R.string.settings_category_behavior_title),
                         containerPosition = PaddedListItemPosition.Middle,
+                        headerSubtitle = stringResource(R.string.settings_category_behavior_subtitle),
+                        headerVerticalPadding = 20.dp,
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Sell,
@@ -436,44 +424,81 @@ fun Settings(
                             )
                         },
                         expandedContent = {
-                            SelectablePaddedItem(
-                                label = stringResource(R.string.settings_category_picker_direct_popup_switch_label),
+                            SelectableInfoPaddedItem(
                                 isActive = isCategoryPickerDirectPopupEnabled,
                                 onClick = onCategoryPickerDirectPopupFeatureToggle,
                                 position = PaddedListItemPosition.Middle,
-                                trailingContent = {
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.HelpOutline,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.settings_category_picker_direct_popup_description),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.settings_category_picker_direct_popup_switch_label),
+                                        style = MaterialTheme.typography.bodyMediumEmphasized,
+                                        modifier = Modifier.weight(1f)
+                                    )
                                     Switch(
                                         checked = isCategoryPickerDirectPopupEnabled,
                                         onCheckedChange = { onCategoryPickerDirectPopupFeatureToggle() },
                                     )
                                 }
-                            )
-                            SelectablePaddedItem(
-                                label = stringResource(R.string.settings_category_layout_mode_switch_label),
-                                isActive = isCategoryLayoutModeEnabled,
-                                onClick = onCategoryLayoutModeToggle,
-                                position = PaddedListItemPosition.Middle,
-                                trailingContent = {
-                                    Switch(
-                                        checked = isCategoryLayoutModeEnabled,
-                                        onCheckedChange = { onCategoryLayoutModeToggle() },
-                                    )
-                                }
-                            )
-                            SelectablePaddedItem(
-                                label = stringResource(R.string.settings_category_grid_mode_switch_label),
+                            }
+                            SelectableInfoPaddedItem(
                                 isActive = isCategoryGridModeEnabled,
                                 onClick = onCategoryGridModeToggle,
                                 position = PaddedListItemPosition.Middle,
-                                trailingContent = {
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.HelpOutline,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.settings_category_grid_mode_description),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.settings_category_grid_mode_switch_label),
+                                        style = MaterialTheme.typography.bodyMediumEmphasized,
+                                        modifier = Modifier.weight(1f)
+                                    )
                                     Switch(
                                         checked = isCategoryGridModeEnabled,
                                         onCheckedChange = { onCategoryGridModeToggle() },
                                     )
                                 }
-                            )
-                        }
-                    )
+                            }
+                        })
 
                     CustomPaddedListItem(
                         onClick = {
@@ -547,9 +572,7 @@ fun Settings(
                         }
                         Text(
                             text = formatNotificationTime(
-                                context,
-                                notificationHour,
-                                notificationMinute
+                                context, notificationHour, notificationMinute
                             ),
                             style = MaterialTheme.typography.labelLargeCondensed,
                             color = MaterialTheme.colorScheme.primary
@@ -583,9 +606,7 @@ fun Settings(
                         }
                         Text(
                             text = formatNotificationTime(
-                                context,
-                                recurrentNotificationHour,
-                                recurrentNotificationMinute
+                                context, recurrentNotificationHour, recurrentNotificationMinute
                             ),
                             style = MaterialTheme.typography.labelLargeCondensed,
                             color = MaterialTheme.colorScheme.primary
@@ -650,8 +671,7 @@ fun Settings(
                         onClick = {
                             onExportCsv()
                             view.toggleFeedback()
-                        },
-                        position = PaddedListItemPosition.First
+                        }, position = PaddedListItemPosition.First
                     ) {
                         Icon(
                             imageVector = Icons.Default.Backup,
@@ -677,8 +697,7 @@ fun Settings(
                         onClick = {
                             onImportCsv()
                             view.toggleFeedback()
-                        },
-                        position = PaddedListItemPosition.Last
+                        }, position = PaddedListItemPosition.Last
                     ) {
                         Icon(
                             imageVector = Icons.Default.Publish,
@@ -745,8 +764,7 @@ fun Settings(
                         onClick = {
                             Utils.openWebLink(context, "https://www.github.com/isaacsa51/Minus")
                             view.weakHapticFeedback()
-                        },
-                        position = PaddedListItemPosition.Middle
+                        }, position = PaddedListItemPosition.Middle
                     ) {
                         Icon(
                             imageVector = Icons.Default.QuestionMark,
@@ -772,8 +790,7 @@ fun Settings(
                         onClick = {
                             onBugReportClick()
                             view.weakHapticFeedback()
-                        },
-                        position = PaddedListItemPosition.Middle
+                        }, position = PaddedListItemPosition.Middle
                     ) {
                         Icon(
                             imageVector = Icons.Default.BugReport,
@@ -901,8 +918,7 @@ fun Settings(
                 onTimeSelected = { hour, minute ->
                     onNotificationTimeChange(hour, minute)
                     dismissNotificationTimePicker()
-                }
-            )
+                })
         }
 
         if (showRecurrentNotificationTimePicker) {
@@ -913,17 +929,14 @@ fun Settings(
                 onTimeSelected = { hour, minute ->
                     onRecurrentNotificationTimeChange(hour, minute)
                     dismissRecurrentNotificationTimePicker()
-                }
-            )
+                })
         }
     }
 }
 
 @Composable
 fun ThemePickerDialog(
-    currentTheme: String,
-    onThemeSelected: (String) -> Unit,
-    onDismiss: () -> Unit
+    currentTheme: String, onThemeSelected: (String) -> Unit, onDismiss: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -953,8 +966,7 @@ fun ThemePickerDialog(
                     onClick = {
                         onThemeSelected("Light")
                         onDismiss()
-                    }
-                )
+                    })
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -966,8 +978,7 @@ fun ThemePickerDialog(
                     onClick = {
                         onThemeSelected("Dark")
                         onDismiss()
-                    }
-                )
+                    })
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -979,8 +990,7 @@ fun ThemePickerDialog(
                     onClick = {
                         onThemeSelected("System")
                         onDismiss()
-                    }
-                )
+                    })
             }
         }
     }
@@ -988,11 +998,7 @@ fun ThemePickerDialog(
 
 @Composable
 private fun ThemeOption(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    isSelected: Boolean,
-    onClick: () -> Unit
+    title: String, subtitle: String, icon: ImageVector, isSelected: Boolean, onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -1010,14 +1016,11 @@ private fun ThemeOption(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = if (isSelected) {
+            imageVector = icon, contentDescription = null, tint = if (isSelected) {
                 MaterialTheme.colorScheme.onPrimaryContainer
             } else {
                 MaterialTheme.colorScheme.onSurfaceVariant
-            },
-            modifier = Modifier.size(24.dp)
+            }, modifier = Modifier.size(24.dp)
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -1046,9 +1049,7 @@ private fun ThemeOption(
 
         if (isSelected) {
             RadioButton(
-                selected = true,
-                onClick = null,
-                colors = RadioButtonDefaults.colors(
+                selected = true, onClick = null, colors = RadioButtonDefaults.colors(
                     selectedColor = MaterialTheme.colorScheme.primary
                 )
             )
@@ -1090,8 +1091,7 @@ fun TypographyPickerDialog(
                     onClick = {
                         onTypographySelected("Default")
                         onDismiss()
-                    }
-                )
+                    })
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -1103,8 +1103,7 @@ fun TypographyPickerDialog(
                     onClick = {
                         onTypographySelected("Condensed")
                         onDismiss()
-                    }
-                )
+                    })
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -1116,8 +1115,7 @@ fun TypographyPickerDialog(
                     onClick = {
                         onTypographySelected("Expressive")
                         onDismiss()
-                    }
-                )
+                    })
             }
         }
     }
@@ -1157,8 +1155,7 @@ fun RecurrentPaymentsViewModePickerDialog(
                     onClick = {
                         onModeSelected(RecurrentPaymentsViewMode.HORIZONTAL_LIST)
                         onDismiss()
-                    }
-                )
+                    })
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -1170,8 +1167,7 @@ fun RecurrentPaymentsViewModePickerDialog(
                     onClick = {
                         onModeSelected(RecurrentPaymentsViewMode.VERTICAL_LIST)
                         onDismiss()
-                    }
-                )
+                    })
             }
         }
     }
@@ -1179,10 +1175,7 @@ fun RecurrentPaymentsViewModePickerDialog(
 
 @Composable
 private fun NotificationTimePickerDialog(
-    initialHour: Int,
-    initialMinute: Int,
-    onDismiss: () -> Unit,
-    onTimeSelected: (Int, Int) -> Unit
+    initialHour: Int, initialMinute: Int, onDismiss: () -> Unit, onTimeSelected: (Int, Int) -> Unit
 ) {
     val context = LocalContext.current
     val state = rememberTimePickerState(
@@ -1225,6 +1218,7 @@ private fun RecurrentPaymentsViewMode.label(): String {
         RecurrentPaymentsViewMode.HORIZONTAL_LIST -> stringResource(
             R.string.settings_recurrent_payments_view_mode_horizontal_title
         )
+
         RecurrentPaymentsViewMode.VERTICAL_LIST -> stringResource(
             R.string.settings_recurrent_payments_view_mode_vertical_title
         )
@@ -1242,9 +1236,7 @@ private fun Context.copyAppEnvironmentMetadataToClipboard() {
 }
 
 private fun formatNotificationTime(
-    context: Context,
-    hour: Int,
-    minute: Int
+    context: Context, hour: Int, minute: Int
 ): String {
     val pattern = if (android.text.format.DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a"
     return LocalTime.of(hour, minute)
@@ -1277,7 +1269,6 @@ private fun PreviewSettings() {
             onOpenExactAlarmSettings = {},
             onOpenNotificationSettings = {},
             periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
-            onPeriodMappingModeChange = {}
-        )
+            onPeriodMappingModeChange = {})
     }
 }

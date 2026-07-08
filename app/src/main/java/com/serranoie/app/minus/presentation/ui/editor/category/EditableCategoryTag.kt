@@ -87,7 +87,6 @@ fun EditableCategoryTag(
     onSaveExpense: () -> Unit = {},
     onDeleteTag: (String) -> Unit = {},
     directCategoryPopupEnabled: Boolean = false,
-    categoryLayoutModeEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
     onShowCategoryGrid: () -> Unit = {},
 ) {

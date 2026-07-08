@@ -135,7 +135,6 @@ fun Editor(
     onCreditToggle: (Boolean) -> Unit = {},
     showCreditQuickToggleFeature: Boolean = false,
     directCategoryPopupEnabled: Boolean = false,
-    categoryLayoutModeEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
     onShowCategoryGrid: () -> Unit = {},
     onDismissRecurrentDialog: () -> Unit = {},
@@ -409,7 +408,6 @@ fun Editor(
                         onDeleteTag = onDeleteTag,
                         editorFocusController = editorFocusController,
                         directCategoryPopupEnabled = directCategoryPopupEnabled,
-                        categoryLayoutModeEnabled = categoryLayoutModeEnabled,
                         categoryGridModeEnabled = categoryGridModeEnabled,
                         onShowCategoryGrid = onShowCategoryGrid,
                         modifier = Modifier
@@ -492,7 +490,6 @@ private fun EditingContent(
     onDeleteTag: (String) -> Unit,
     editorFocusController: FocusController,
     directCategoryPopupEnabled: Boolean = false,
-    categoryLayoutModeEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
     onShowCategoryGrid: () -> Unit = {},
     modifier: Modifier = Modifier
@@ -647,7 +644,6 @@ private fun EditingContent(
                         onSaveExpense = {},
                         onDeleteTag = onDeleteTag,
                         directCategoryPopupEnabled = directCategoryPopupEnabled,
-                        categoryLayoutModeEnabled = categoryLayoutModeEnabled,
                         categoryGridModeEnabled = categoryGridModeEnabled,
                         onShowCategoryGrid = onShowCategoryGrid,
                     )
@@ -661,7 +657,6 @@ private fun EditingContent(
                     onDeleteTag = onDeleteTag,
                     editorFocusController = editorFocusController,
                     directCategoryPopupEnabled = directCategoryPopupEnabled,
-                    categoryLayoutModeEnabled = categoryLayoutModeEnabled,
                     categoryGridModeEnabled = categoryGridModeEnabled,
                     onShowCategoryGrid = onShowCategoryGrid,
                     modifier = Modifier

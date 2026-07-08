@@ -39,7 +39,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.app.minus.data.repository.BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME
 import com.serranoie.app.minus.data.repository.CATEGORY_GRID_MODE_KEY_NAME
-import com.serranoie.app.minus.data.repository.CATEGORY_LAYOUT_MODE_KEY_NAME
 import com.serranoie.app.minus.data.repository.CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME
 import com.serranoie.app.minus.data.repository.CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME
 import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_ID_KEY_NAME
@@ -99,7 +98,6 @@ val TYPOGRAPHY_MODE_KEY = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
 val DYNAMIC_COLOR_KEY = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
 val CREDIT_QUICK_TOGGLE_FEATURE_KEY = booleanPreferencesKey(CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME)
 val CATEGORY_PICKER_DIRECT_POPUP_KEY = booleanPreferencesKey(CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME)
-val CATEGORY_LAYOUT_MODE_KEY = booleanPreferencesKey(CATEGORY_LAYOUT_MODE_KEY_NAME)
 val CATEGORY_GRID_MODE_KEY = booleanPreferencesKey(CATEGORY_GRID_MODE_KEY_NAME)
 val RECURRENT_PAYMENTS_VIEW_MODE_KEY = stringPreferencesKey(RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME)
 val EARLY_FINISH_ACTIVE_KEY = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
