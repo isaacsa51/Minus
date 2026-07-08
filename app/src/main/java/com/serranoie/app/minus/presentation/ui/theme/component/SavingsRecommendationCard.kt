@@ -47,17 +47,23 @@ import java.time.LocalDateTime
 /**
  * Recommendation card based on the popular 50/30/20 rule.
  * 50% Needs (Recurrent), 30% Wants (Variable), 20% Savings.
+ *
+ * [recurringInPeriod] should contain every recurring charge that falls inside
+ * the current budget period — both already-paid ones and upcoming ones still
+ * scheduled. [oneTimeSpends] are the discretionary (non-recurring) transactions
+ * already paid in the period.
  */
 @Composable
 fun SavingsRecommendationCard(
 	modifier: Modifier = Modifier,
 	budget: BigDecimal,
-	spends: List<Transaction>,
+	recurringInPeriod: List<Transaction> = emptyList(),
+	oneTimeSpends: List<Transaction> = emptyList(),
 	currency: String = "MXN",
 ) {
-	val totalSpent = spends.sumOf { it.amount }
-	val recurrentSpent = spends.filter { it.isRecurrent }.sumOf { it.amount }
-	val variableSpent = totalSpent.subtract(recurrentSpent)
+	val recurrentSpent = recurringInPeriod.sumOf { it.amount }
+	val variableSpent = oneTimeSpends.sumOf { it.amount }
+	val totalSpent = recurrentSpent.add(variableSpent)
 	val savings = budget.subtract(totalSpent).max(BigDecimal.ZERO)
 
 	val safeBudget = if (budget <= BigDecimal.ZERO) BigDecimal.ONE else budget
@@ -317,20 +323,23 @@ private fun SavingsRecommendationPreview() {
 	MinusTheme {
 		Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
 			SavingsRecommendationCard(
-				budget = BigDecimal("20000"), spends = listOf(
+				budget = BigDecimal("20000"),
+				recurringInPeriod = listOf(
 					Transaction(
 						amount = BigDecimal("6000"),
 						isRecurrent = true,
 						comment = "Renta",
 						date = LocalDateTime.now()
 					),
+				),
+				oneTimeSpends = listOf(
 					Transaction(
 						amount = BigDecimal("4000"),
 						isRecurrent = false,
 						comment = "Súper",
 						date = LocalDateTime.now()
 					),
-				)
+				),
 			)
 		}
 	}
@@ -347,7 +356,9 @@ private fun SavingsRecommendationNoRecurrentPreview() {
 
 			Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
 				SavingsRecommendationCard(
-					budget = BigDecimal("12000"), spends = listOf(
+					budget = BigDecimal("12000"),
+					recurringInPeriod = emptyList(),
+					oneTimeSpends = listOf(
 						Transaction(
 							amount = BigDecimal("6000"),
 							isRecurrent = false,

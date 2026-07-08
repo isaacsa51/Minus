@@ -36,7 +36,7 @@ class SavingsRecommendationCardScreenshotTest {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                         SavingsRecommendationCard(
                             budget = BigDecimal("20000"),
-                            spends = listOf(
+                            recurringInPeriod = listOf(
                                 Transaction(
                                     id = 1L,
                                     amount = BigDecimal("6000"),
@@ -45,6 +45,8 @@ class SavingsRecommendationCardScreenshotTest {
                                     date = LocalDateTime.now(),
                                     periodId = 7L,
                                 ),
+                            ),
+                            oneTimeSpends = listOf(
                                 Transaction(
                                     id = 2L,
                                     amount = BigDecimal("4000"),
@@ -72,7 +74,7 @@ class SavingsRecommendationCardScreenshotTest {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                         SavingsRecommendationCard(
                             budget = BigDecimal("12000"),
-                            spends = listOf(
+                            recurringInPeriod = listOf(
                                 Transaction(
                                     id = 1L,
                                     amount = BigDecimal("8000"),
@@ -81,6 +83,8 @@ class SavingsRecommendationCardScreenshotTest {
                                     date = LocalDateTime.now(),
                                     periodId = 7L,
                                 ),
+                            ),
+                            oneTimeSpends = listOf(
                                 Transaction(
                                     id = 2L,
                                     amount = BigDecimal("5000"),

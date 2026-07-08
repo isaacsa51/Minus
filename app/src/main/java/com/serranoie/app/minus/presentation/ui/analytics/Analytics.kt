@@ -71,6 +71,8 @@ data class AnalyticsState(
     val periodFinished: Boolean = false,
     val transactions: List<Transaction> = emptyList(),
     val spends: List<Transaction> = emptyList(),
+    val recurringInPeriod: List<Transaction> = emptyList(),
+    val oneTimeSpends: List<Transaction> = emptyList(),
     val wholeBudget: BigDecimal = BigDecimal.ZERO,
     val currencyCode: String = "USD",
     val finishPeriodActualDate: Date? = null,
@@ -168,11 +170,12 @@ fun Analytics(
                 Spacer(modifier = Modifier.height(16.dp))
                 SavingsRecommendationCard(
                     budget = state.wholeBudget,
-                    spends = state.spends,
+                    recurringInPeriod = state.recurringInPeriod,
+                    oneTimeSpends = state.oneTimeSpends,
                     currency = state.currencyCode,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
-                // Spacer to push content up, making room for the fixed button at bottom
+
                 Spacer(modifier = Modifier.height(80.dp + navigationBarHeight))
             }
 
@@ -206,13 +209,7 @@ fun Analytics(
             onDismissRequest = { selectedCategory = null },
             sheetState = sheetState,
         ) {
-            CategoryAnalytics(
-                state = selectedCategory!!,
-//                actions = CategoryAnalyticsActions(
-//                    onClose = { selectedCategory = null },
-//                    onCreateNewPeriod = actions.onCreateNewPeriod
-//                )
-            )
+            CategoryAnalytics(state = selectedCategory!!)
         }
     }
 

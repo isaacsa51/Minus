@@ -14,15 +14,19 @@ import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCas
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTIVE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
+import com.serranoie.app.minus.presentation.ui.history.calculateNextChargeDate
+import com.serranoie.app.minus.presentation.ui.history.getRecurringChargesInPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import logcat.logcat
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Date
@@ -93,11 +97,13 @@ class AnalyticsViewModel @Inject constructor(
         val lastPeriodEnd = prefs?.get(LAST_PERIOD_END_KEY)?.let {
             Date(it).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
         }
-        val remainingFromLastPeriod = prefs?.get(REMAINING_FROM_LAST_PERIOD_KEY)?.toBigDecimalOrNull()
+        val remainingFromLastPeriod =
+            prefs?.get(REMAINING_FROM_LAST_PERIOD_KEY)?.toBigDecimalOrNull()
 
-        val shouldShowEndedSnapshot = lastPeriodEnd != null &&
-            remainingFromLastPeriod != null &&
-            !lastPeriodEnd.isBefore(settings.startDate)
+        val shouldShowEndedSnapshot =
+            lastPeriodEnd != null && remainingFromLastPeriod != null && !lastPeriodEnd.isBefore(
+                settings.startDate
+            )
 
         val endedPeriodStartDate = if (shouldShowEndedSnapshot) {
             val currentEnd = settings.getPeriodEndDate()
@@ -114,24 +120,38 @@ class AnalyticsViewModel @Inject constructor(
             lastPeriodEnd = lastPeriodEnd,
         )
 
+        val (recurringInPeriod, oneTimeSpends) = splitRecurringAndOneTime(
+            allTransactions = allTransactions,
+            filteredTransactions = transactions,
+            periodStart = settings.startDate,
+            periodEnd = settings.getPeriodEndDate(),
+            today = today,
+        )
+
         val startDate = if (shouldShowEndedSnapshot && endedPeriodStartDate != null) {
-            Date.from(endedPeriodStartDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+            Date.from(
+                endedPeriodStartDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
+            )
         } else {
-            settings.startDate.atStartOfDay().atZone(ZoneId.systemDefault()).let { Date.from(it.toInstant()) }
+            settings.startDate.atStartOfDay().atZone(ZoneId.systemDefault())
+                .let { Date.from(it.toInstant()) }
         }
 
         val plannedFinishDate = if (shouldShowEndedSnapshot && lastPeriodEnd != null) {
             Date.from(lastPeriodEnd.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
         } else {
-            settings.getPeriodEndDate().atStartOfDay().atZone(ZoneId.systemDefault()).let { Date.from(it.toInstant()) }
+            settings.getPeriodEndDate().atStartOfDay().atZone(ZoneId.systemDefault())
+                .let { Date.from(it.toInstant()) }
         }
 
         val earlyFinishActive = prefs?.get(EARLY_FINISH_ACTIVE_KEY) ?: false
         val earlyFinishActualDate = prefs?.get(EARLY_FINISH_ACTUAL_DATE_KEY)?.let { Date(it) }
-        val earlyFinishOriginalEndDate = prefs?.get(EARLY_FINISH_ORIGINAL_END_DATE_KEY)?.let { Date(it) }
+        val earlyFinishOriginalEndDate =
+            prefs?.get(EARLY_FINISH_ORIGINAL_END_DATE_KEY)?.let { Date(it) }
 
-        val periodFinishedNaturally = settings.getPeriodEndDate().isBefore(today) ||
-            settings.getPeriodEndDate().isEqual(today)
+        val periodFinishedNaturally =
+            settings.getPeriodEndDate().isBefore(today) || settings.getPeriodEndDate()
+                .isEqual(today)
         val periodFinished = periodFinishedNaturally || earlyFinishActive
 
         val wholeBudget = if (shouldShowEndedSnapshot && remainingFromLastPeriod != null) {
@@ -144,19 +164,21 @@ class AnalyticsViewModel @Inject constructor(
         val totalSpent = transactions.filter { !it.isDeleted }.sumOf { it.amount }
         val remainingBudget = wholeBudget.subtract(totalSpent)
 
-        val plannedPeriodDays = if (shouldShowEndedSnapshot && endedPeriodStartDate != null && lastPeriodEnd != null) {
-            ChronoUnit.DAYS.between(endedPeriodStartDate, lastPeriodEnd).toInt() + 1
-        } else {
-            ChronoUnit.DAYS.between(settings.startDate, settings.getPeriodEndDate()).toInt() + 1
-        }
+        val plannedPeriodDays =
+            if (shouldShowEndedSnapshot && endedPeriodStartDate != null && lastPeriodEnd != null) {
+                ChronoUnit.DAYS.between(endedPeriodStartDate, lastPeriodEnd).toInt() + 1
+            } else {
+                ChronoUnit.DAYS.between(settings.startDate, settings.getPeriodEndDate()).toInt() + 1
+            }
 
         val dailyBudget = if (wholeBudget > BigDecimal.ZERO && plannedPeriodDays > 0) {
             wholeBudget.divide(BigDecimal(plannedPeriodDays), 2, RoundingMode.HALF_UP)
         } else BigDecimal.ZERO
 
-        val extraAffordableDays = if (earlyFinishActive && remainingBudget > BigDecimal.ZERO && dailyBudget > BigDecimal.ZERO) {
-            remainingBudget.divide(dailyBudget, 0, RoundingMode.DOWN).toInt().coerceAtLeast(0)
-        } else 0
+        val extraAffordableDays =
+            if (earlyFinishActive && remainingBudget > BigDecimal.ZERO && dailyBudget > BigDecimal.ZERO) {
+                remainingBudget.divide(dailyBudget, 0, RoundingMode.DOWN).toInt().coerceAtLeast(0)
+            } else 0
 
         val displaySettings = settings.copy(
             totalBudget = if (shouldShowEndedSnapshot && remainingFromLastPeriod != null) {
@@ -167,13 +189,12 @@ class AnalyticsViewModel @Inject constructor(
 
         val daysRemaining = ChronoUnit.DAYS.between(today, endDate).coerceAtLeast(0).toInt()
         val progress = if (wholeBudget > BigDecimal.ZERO) {
-            totalSpent.divide(wholeBudget, 4, RoundingMode.HALF_UP)
-                .toFloat()
+            totalSpent.divide(wholeBudget, 4, RoundingMode.HALF_UP).toFloat()
         } else 0f
         val isOverBudget = totalSpent > wholeBudget
-        val totalSpentToday = transactions
-            .filter { tx -> !tx.isDeleted && tx.date?.toLocalDate() == today }
-            .fold(BigDecimal.ZERO) { acc, tx -> acc.add(tx.amount) }
+        val totalSpentToday =
+            transactions.filter { tx -> !tx.isDeleted && tx.date?.toLocalDate() == today }
+                .fold(BigDecimal.ZERO) { acc, tx -> acc.add(tx.amount) }
         val remainingToday = totalSpentToday
 
         val displayBudgetState = BudgetState(
@@ -187,13 +208,15 @@ class AnalyticsViewModel @Inject constructor(
             totalSpentInPeriod = totalSpent,
         )
 
-        val shouldShowRolloverStyle = !shouldShowEndedSnapshot &&
-            displaySettings.rollOverLimit?.let { it > BigDecimal.ZERO } == true
+        val shouldShowRolloverStyle =
+            !shouldShowEndedSnapshot && displaySettings.rollOverLimit?.let { it > BigDecimal.ZERO } == true
 
         return AnalyticsState(
             periodFinished = periodFinished,
             transactions = transactions,
             spends = transactions,
+            recurringInPeriod = recurringInPeriod,
+            oneTimeSpends = oneTimeSpends,
             wholeBudget = wholeBudget,
             currencyCode = settings.currencyCode,
             finishPeriodActualDate = if (earlyFinishActive) earlyFinishActualDate else null,
@@ -205,6 +228,90 @@ class AnalyticsViewModel @Inject constructor(
             showRolloverStyleInBudgetDisplay = shouldShowRolloverStyle,
             isLoading = false,
         )
+    }
+
+    private fun splitRecurringAndOneTime(
+        allTransactions: List<Transaction>,
+        filteredTransactions: List<Transaction>,
+        periodStart: LocalDate,
+        periodEnd: LocalDate,
+        today: LocalDate,
+    ): Pair<List<Transaction>, List<Transaction>> {
+        val oneTimeSpends =
+            filteredTransactions.filterNot { it.isDeleted }.filterNot { it.isRecurrent }
+
+        val paidRecurringInPeriod =
+            filteredTransactions.filterNot { it.isDeleted }.filter { it.isRecurrent }
+
+        val recurringParents = (paidRecurringInPeriod + allTransactions.filterNot { it.isDeleted }
+            .filter { it.isRecurrent }).distinctBy { it.id }.also { list ->
+            logcat(RECURRING_TAG) {
+                "---- Recurring debug for period $periodStart → $periodEnd (today=$today) ----"
+            }
+            logcat(RECURRING_TAG) {
+                "raw allTransactions=${allTransactions.size}, " + "filteredTransactions=${filteredTransactions.size}, " + "paidRecurringInPeriod=${paidRecurringInPeriod.size}, " + "recurringParents=${list.size}"
+            }
+            list.forEach { parent ->
+                logcat(RECURRING_TAG) {
+                    "  parent: id=${parent.id} '${parent.comment}' amount=${parent.amount} " + "periodId=${parent.periodId} date=${parent.date} freq=${parent.recurrentFrequency} " + "subDay=${parent.subscriptionDay} endDate=${parent.recurrentEndDate} " + "deleted=${parent.isDeleted}"
+                }
+            }
+        }
+
+        val paidCharges = recurringParents.flatMap { parent ->
+            getRecurringChargesInPeriod(parent, periodStart, periodEnd, today)
+        }.also { charges ->
+            logcat(RECURRING_TAG) {
+                "  paidCharges (from getRecurringChargesInPeriod): ${charges.size}"
+            }
+            charges.forEach { c ->
+                logcat(RECURRING_TAG) {
+                    "    paid: virtualId=${c.id} '${c.comment}' amount=${c.amount} date=${c.date}"
+                }
+            }
+        }
+
+        val upcomingCharges = recurringParents.mapNotNull { parent ->
+            val date = calculateNextChargeDate(parent, today) ?: parent.date?.toLocalDate()
+                ?.takeIf { it.isAfter(today) } ?: run {
+                logcat(RECURRING_TAG) {
+                    "    no upcoming date for parent id=${parent.id} '${parent.comment}'"
+                }
+                return@mapNotNull null
+            }
+            if (date.isBefore(periodStart) || date.isAfter(periodEnd)) {
+                logcat(RECURRING_TAG) {
+                    "    upcoming for parent id=${parent.id} '${parent.comment}' = $date " + "is OUTSIDE [$periodStart, $periodEnd], skipped"
+                }
+                return@mapNotNull null
+            }
+            val chargeId = parent.id * 1_000_000L + date.toEpochDay()
+            logcat(RECURRING_TAG) {
+                "    upcoming for parent id=${parent.id} '${parent.comment}' = $date (chargeId=$chargeId)"
+            }
+            parent.copy(
+                date = date.atTime(parent.date?.toLocalTime() ?: LocalTime.MIDNIGHT),
+                id = chargeId,
+            )
+        }
+
+        // De-duplicate by generated id so we never double-sum the same charge.
+        val recurringInPeriod = (paidCharges + upcomingCharges).distinctBy { it.id }.also { list ->
+            logcat(RECURRING_TAG) {
+                "  recurringInPeriod total: ${list.size}  sum=${list.sumOf { it.amount }}"
+            }
+            list.forEach { c ->
+                logcat(RECURRING_TAG) {
+                    "    final: virtualId=${c.id} '${c.comment}' amount=${c.amount} date=${c.date}"
+                }
+            }
+            logcat(RECURRING_TAG) {
+                "  oneTimeSpends: ${oneTimeSpends.size}  sum=${oneTimeSpends.sumOf { it.amount }}"
+            }
+            logcat(RECURRING_TAG) { "---- end recurring debug ----" }
+        }
+
+        return recurringInPeriod to oneTimeSpends
     }
 
     private fun filterTransactions(
@@ -257,5 +364,9 @@ class AnalyticsViewModel @Inject constructor(
 
     fun consumeEffect() {
         _effects.value = null
+    }
+
+    companion object {
+        private const val RECURRING_TAG = "Analytics/Recurring"
     }
 }
