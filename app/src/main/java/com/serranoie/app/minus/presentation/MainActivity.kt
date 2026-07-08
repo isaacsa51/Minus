@@ -38,6 +38,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.app.minus.data.repository.BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME
+import com.serranoie.app.minus.data.repository.CATEGORY_GRID_MODE_KEY_NAME
+import com.serranoie.app.minus.data.repository.CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME
 import com.serranoie.app.minus.data.repository.CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME
 import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_ID_KEY_NAME
 import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_STARTED_AT_KEY_NAME
@@ -95,6 +97,8 @@ val THEME_MODE_KEY = stringPreferencesKey(THEME_MODE_KEY_NAME)
 val TYPOGRAPHY_MODE_KEY = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
 val DYNAMIC_COLOR_KEY = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
 val CREDIT_QUICK_TOGGLE_FEATURE_KEY = booleanPreferencesKey(CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME)
+val CATEGORY_PICKER_DIRECT_POPUP_KEY = booleanPreferencesKey(CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME)
+val CATEGORY_GRID_MODE_KEY = booleanPreferencesKey(CATEGORY_GRID_MODE_KEY_NAME)
 val RECURRENT_PAYMENTS_VIEW_MODE_KEY = stringPreferencesKey(RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME)
 val EARLY_FINISH_ACTIVE_KEY = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
 val EARLY_FINISH_ACTUAL_DATE_KEY = longPreferencesKey(EARLY_FINISH_ACTUAL_DATE_KEY_NAME)
@@ -136,11 +140,12 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var midnightTransitionManager: MidnightTransitionManager
 
-    private val requestNotificationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        permissionHandler.onNotificationPermissionResult(isGranted, notificationScheduler)
-    }
+    private val requestNotificationPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            permissionHandler.onNotificationPermissionResult(isGranted, notificationScheduler)
+        }
 
     private fun checkAndRequestNotificationPermission() {
         permissionHandler.requestNotificationPermissionIfNeeded(
@@ -204,23 +209,27 @@ class MainActivity : ComponentActivity() {
             notificationScheduler.initializeNotifications()
         }
 
-        settingsRepository.observeSettings().onEach { settings ->
-            val previous = onboardingComplete.value
-            logcat("ISAAC:Main") {
-                "Settings observer -> onboarding_completed=${settings.onboardingCompleted} (was $previous), earlyFinishActive=${settings.earlyFinishActive}"
-            }
-            onboardingComplete.value = settings.onboardingCompleted
-            earlyFinishPending.value = settings.earlyFinishActive
-            themeManager.applyUserSettings(applicationContext, settings)
-        }.launchIn(lifecycleScope)
-
-        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStart(owner: LifecycleOwner) {
-                lifecycleScope.launch {
-                    midnightTransitionManager.handleAppStart()
+        settingsRepository
+            .observeSettings()
+            .onEach { settings ->
+                val previous = onboardingComplete.value
+                logcat("ISAAC:Main") {
+                    "Settings observer -> onboarding_completed=${settings.onboardingCompleted} (was $previous), earlyFinishActive=${settings.earlyFinishActive}"
                 }
-            }
-        })
+                onboardingComplete.value = settings.onboardingCompleted
+                earlyFinishPending.value = settings.earlyFinishActive
+                themeManager.applyUserSettings(applicationContext, settings)
+            }.launchIn(lifecycleScope)
+
+        ProcessLifecycleOwner.get().lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onStart(owner: LifecycleOwner) {
+                    lifecycleScope.launch {
+                        midnightTransitionManager.handleAppStart()
+                    }
+                }
+            },
+        )
 
         setContent {
             val activityResultRegistryOwner = LocalActivityResultRegistryOwner.current
@@ -242,11 +251,12 @@ class MainActivity : ComponentActivity() {
                 val dynamicColor = context.dynamicColorEnabled
                 val isCensored by censorManager.isCensored.collectAsStateWithLifecycle()
 
-                val startDestination = when {
-                    earlyFinishPending.value -> Screen.Analytics.route
-                    !onboardingComplete.value -> Screen.Onboarding.route
-                    else -> Screen.Main.route
-                }
+                val startDestination =
+                    when {
+                        earlyFinishPending.value -> Screen.Analytics.route
+                        !onboardingComplete.value -> Screen.Onboarding.route
+                        else -> Screen.Main.route
+                    }
                 logcat("ISAAC:Main") {
                     "Resolved startDestination=$startDestination (earlyFinishPending=${earlyFinishPending.value}, onboardingComplete=${onboardingComplete.value})"
                 }
@@ -258,7 +268,7 @@ class MainActivity : ComponentActivity() {
                         LocalCensorMode provides isCensored,
                     ) {
                         Surface(
-                            color = MaterialTheme.colorScheme.background
+                            color = MaterialTheme.colorScheme.background,
                         ) {
                             val navController = rememberNavController()
 
@@ -267,18 +277,14 @@ class MainActivity : ComponentActivity() {
                                 startDestination = startDestination,
                                 navController = navController,
                                 onOnboardingComplete = {
-                                    logcat("ISAAC:Main") { "AppNavGraph.onOnboardingComplete fired -> writing onboarding_completed=true + dismissing midnight transition manager (user has no budget yet)" }
+                                    logcat("ISAAC:Main") {
+                                        "AppNavGraph.onOnboardingComplete fired -> writing onboarding_completed=true + dismissing midnight transition manager (user has no budget yet)"
+                                    }
                                     lifecycleScope.launch {
                                         logcat {
                                             "onOnboardingComplete -> writing onboarding_completed=true"
                                         }
                                         settingsRepository.setOnboardingCompleted(true)
-                                        // Clear the budget-setup prompt: a brand-new user coming from
-                                        // onboarding has no budget period active, so the
-                                        // MidnightTransitionManager signal is redundant — the
-                                        // AppNavGraph onOnboardingComplete path already navigates
-                                        // to Main with openWallet=true so the wallet sheet surfaces
-                                        // the budget-setup CTA on its own.
                                         midnightTransitionManager.onBudgetSetupHandled()
                                     }
                                 },
@@ -288,7 +294,8 @@ class MainActivity : ComponentActivity() {
                                 },
                             )
 
-                            val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()
+                            val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog
+                                .collectAsStateWithLifecycle()
                             val midnightTransitionData by midnightTransitionManager.midnightTransitionData.collectAsStateWithLifecycle()
 
                             if (shouldShowMidnightDialog && midnightTransitionData != null) {
@@ -298,7 +305,7 @@ class MainActivity : ComponentActivity() {
                                         data.periodEndDate,
                                         data.remainingAmount,
                                         data.totalBudget,
-                                        data.totalSpent
+                                        data.totalSpent,
                                     ) {
                                         midnightTransitionManager.onTransitionDialogConfirmed()
                                         navController.navigate(Screen.Analytics.route) {
@@ -343,36 +350,34 @@ class MainActivity : ComponentActivity() {
                                         },
                                         onDismiss = {
                                             midnightTransitionManager.onTransitionDialogDismissed()
-                                        }
+                                        },
                                     )
                                 }
                             }
 
                             val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()
-                            // Only react to the wallet setup prompt AFTER onboarding completes.
-                            // Without this guard, MidnightPeriodChecker.handleEndingPeriod flips
-                            // _needsBudgetSetup=true on first launch (no budget yet) and the
-                            // LaunchedEffect below would auto-navigate us out of OnboardingScreen.
                             LaunchedEffect(needsBudgetSetup, onboardingComplete.value) {
                                 if (needsBudgetSetup && onboardingComplete.value) {
-                                    logcat("ISAAC:Main") { "needsBudgetSetup detected AND onboardingComplete=true -> navigating to wallet setup" }
+                                    logcat(
+                                        "ISAAC:Main",
+                                    ) { "needsBudgetSetup detected AND onboardingComplete=true -> navigating to wallet setup" }
                                     midnightTransitionManager.onBudgetSetupHandled()
-                                    // Only force edit mode if no budget has ever been created.
-                                    // Use BUDGET_END_DATE_KEY as a proxy: if it's null, no budget was ever saved.
-                                    // If a budget exists, open wallet in view mode so user sees period info.
+
                                     val prefs = context.settingsDataStore.data.first()
                                     val hasBudget = prefs[BUDGET_END_DATE_KEY] != null
                                     navController.navigate(
                                         Screen.Main.createRoute(
                                             openWallet = true,
-                                            forceWalletSetup = !hasBudget
-                                        )
+                                            forceWalletSetup = !hasBudget,
+                                        ),
                                     ) {
                                         popUpTo(Screen.Main.route) { inclusive = true }
                                         launchSingleTop = true
                                     }
                                 } else if (needsBudgetSetup && !onboardingComplete.value) {
-                                    logcat("ISAAC:Main") { "needsBudgetSetup detected but onboarding NOT complete -> suppressing wallet setup navigation until onboarding finishes" }
+                                    logcat("ISAAC:Main") {
+                                        "needsBudgetSetup detected but onboarding NOT complete -> suppressing wallet setup navigation until onboarding finishes"
+                                    }
                                 }
                             }
                         }

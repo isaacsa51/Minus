@@ -60,7 +60,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Density
@@ -75,9 +74,7 @@ import androidx.wear.compose.material.rememberSwipeableState
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
-import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
@@ -96,6 +93,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetValue
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
+import com.serranoie.app.minus.presentation.ui.theme.component.numpad.SavedCategoriesGrid
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
@@ -118,6 +116,8 @@ fun MainScreenContent(
     onboardingCompleted: Boolean,
     tutorialStage: FirstLaunchTutorialStage,
     showCreditQuickToggleFeature: Boolean,
+    directCategoryPopupEnabled: Boolean,
+    categoryGridModeEnabled: Boolean,
     onProcessIntent: (MainScreenUiIntent) -> Unit,
     onNavigateToAnalytics: () -> Unit,
     onNavigateToSettings: () -> Unit,
@@ -132,6 +132,16 @@ fun MainScreenContent(
 ) {
     val topSheetState = rememberSwipeableState(TopSheetValue.HalfExpanded)
     var nightMode by remember { mutableStateOf(false) }
+    var showCategoryGrid by remember { mutableStateOf(false) }
+
+    // Auto-hide the category list when the input is cleared (long-press delete, backspace to zero, etc.)
+    // so the numpad comes back and the user can start typing again.
+    LaunchedEffect(budgetUiState.numpadInput) {
+        if (budgetUiState.numpadInput.isEmpty() && showCategoryGrid) {
+            showCategoryGrid = false
+        }
+    }
+
     val coroutineScope = rememberCoroutineScope()
 
     val localDensity = LocalDensity.current
@@ -275,6 +285,11 @@ fun MainScreenContent(
                     localDensity = localDensity,
                     windowInsets = windowInsets,
                     showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+                    directCategoryPopupEnabled = directCategoryPopupEnabled,
+                    categoryGridModeEnabled = categoryGridModeEnabled,
+                    showCategoryGrid = showCategoryGrid,
+                    onShowCategoryGrid = { showCategoryGrid = true },
+                    onHideCategoryGrid = { showCategoryGrid = false },
                     onNavigateToSettings = onNavigateToSettings,
                     onNavigateToAnalytics = onNavigateToAnalytics,
                     onNavigateToWallet = onNavigateToWallet,
@@ -300,6 +315,11 @@ fun MainScreenContent(
                     localDensity = localDensity,
                     windowInsets = windowInsets,
                     showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+                    directCategoryPopupEnabled = directCategoryPopupEnabled,
+                    categoryGridModeEnabled = categoryGridModeEnabled,
+                    showCategoryGrid = showCategoryGrid,
+                    onShowCategoryGrid = { showCategoryGrid = true },
+                    onHideCategoryGrid = { showCategoryGrid = false },
                     onNavigateToWallet = onNavigateToWallet,
                     openWalletOnStart = openWalletOnStart,
                     onProcessIntent = onProcessIntent,
@@ -382,6 +402,11 @@ private fun PhoneLayout(
     localDensity: Density,
     windowInsets: PaddingValues,
     showCreditQuickToggleFeature: Boolean,
+    directCategoryPopupEnabled: Boolean,
+    categoryGridModeEnabled: Boolean,
+    showCategoryGrid: Boolean,
+    onShowCategoryGrid: () -> Unit,
+    onHideCategoryGrid: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToAnalytics: () -> Unit,
     onNavigateToWallet: () -> Unit,
@@ -534,100 +559,124 @@ private fun PhoneLayout(
                             editedTransaction = null,
                         )
                     }
-                Numpad(
-                    editorState = editorState,
-                    numberHintAnchorModifier = Modifier,
-                    applyHintAnchorModifier = Modifier,
-                    onNumberInput = { digit ->
-                        onProcessIntent(
-                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                BudgetNumpadIntent.NumberTapped(digit.toString()),
-                            ),
-                        )
-                        onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
-                    },
-                    onDotInput = {
-                        onProcessIntent(
-                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                BudgetNumpadIntent.DotTapped,
-                            ),
-                        )
-                    },
-                    onBackspace = {
-                        onProcessIntent(
-                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                BudgetNumpadIntent.BackspaceTapped,
-                            ),
-                        )
-                    },
-                    onBackspaceLongPress = {
-                        onProcessIntent(
-                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                BudgetNumpadIntent.ResetInputTapped,
-                            ),
-                        )
-                    },
-                    onOperatorInput = { op ->
-                        onProcessIntent(
-                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                BudgetNumpadIntent.OperatorTapped(op),
-                            ),
-                        )
-                    },
-                    onEqualsInput = {
-                        onProcessIntent(
-                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                BudgetNumpadIntent.EqualsTapped,
-                            ),
-                        )
-                    },
-                    onApply = {
-                        onProcessIntent(
-                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                BudgetNumpadIntent.ApplyTapped,
-                            ),
-                        )
-                        onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
-                    },
-                    onDragProgressChanged = { progress -> localDragProgress = progress },
-                    dragProgress = effectiveProgress,
-                    isCalculation = budgetUiState.isCalculation,
-                    onCalculationModeChanged = { enabled ->
-                        onProcessIntent(
-                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                BudgetNumpadIntent.SetCalculationMode(enabled),
-                            ),
-                        )
-                    },
-                    onShowSnackbar = { message ->
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = message,
-                                duration = SnackbarDuration.Short,
-                            )
+                    val categoryGridLeftContent: (@Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit)? =
+                        if (showCategoryGrid && categoryGridModeEnabled) {
+                            {
+                                SavedCategoriesGrid(
+                                    tags = budgetUiState.tags,
+                                    selectedCategory = budgetUiState.currentComment,
+                                    onCategorySelected = { category ->
+                                        onProcessIntent(
+                                            MainScreenUiIntent.ProcessBudgetEditorIntent(
+                                                BudgetEditorIntent.CommentUpdated(category),
+                                            ),
+                                        )
+                                    },
+                                    applyWindowInsets = false,
+                                )
+                            }
+                        } else {
+                            null
                         }
-                    },
-                    onTestNotifications = {
-                        onProcessIntent(
-                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                BudgetNumpadIntent.TriggerTestNotifications,
-                            ),
-                        )
-                    },
-                    rowHeight = with(localDensity) { rowHeightPx.toDp() },
-                )
-            }
+                    Numpad(
+                        editorState = editorState,
+                        numberHintAnchorModifier = Modifier,
+                        applyHintAnchorModifier = Modifier,
+                        onNumberInput = { digit ->
+                            onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped(digit.toString()),
+                                ),
+                            )
+                            onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
+                        },
+                        onDotInput = {
+                            onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.DotTapped,
+                                ),
+                            )
+                        },
+                        onBackspace = {
+                            onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.BackspaceTapped,
+                                ),
+                            )
+                        },
+                        onBackspaceLongPress = {
+                            onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.ResetInputTapped,
+                                ),
+                            )
+                        },
+                        onOperatorInput = { op ->
+                            onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.OperatorTapped(op),
+                                ),
+                            )
+                        },
+                        onEqualsInput = {
+                            onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.EqualsTapped,
+                                ),
+                            )
+                        },
+                        onApply = {
+                            onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.ApplyTapped,
+                                ),
+                            )
+                            onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+                        },
+                        onDragProgressChanged = { progress -> localDragProgress = progress },
+                        dragProgress = effectiveProgress,
+                        isCalculation = budgetUiState.isCalculation,
+                        onCalculationModeChanged = { enabled ->
+                            onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.SetCalculationMode(enabled),
+                                ),
+                            )
+                        },
+                        onShowSnackbar = { message ->
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = message,
+                                    duration = SnackbarDuration.Short,
+                                )
+                            }
+                        },
+                        onTestNotifications = {
+                            onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.TriggerTestNotifications,
+                                ),
+                            )
+                        },
+                        rowHeight = with(localDensity) { rowHeightPx.toDp() },
+                        enableCalculationMode = true,
+                        enableCalcModeSwipe = !showCategoryGrid,
+                        leftContent = categoryGridLeftContent,
+                    )
+                }
         }
 
         TopSheetLayout(
             swipeableState = topSheetState,
             customHalfHeight = editorHeightAnimated,
             isLockSwipeable = {
-                budgetUiState.lockSwipeable || localDragProgress > 0f || (budgetUiState.isCalculation && effectiveProgress < 1f) ||
+                budgetUiState.lockSwipeable || localDragProgress > 0f || showCategoryGrid ||
+                    (budgetUiState.isCalculation && effectiveProgress < 1f) ||
                     (!budgetUiState.isCalculation && effectiveProgress > 0f)
             },
             isLockDraggable = {
-                budgetUiState.lockDraggable || localDragProgress > 0f || (budgetUiState.isCalculation && effectiveProgress < 1f) ||
+                budgetUiState.lockDraggable || localDragProgress > 0f || showCategoryGrid ||
+                    (budgetUiState.isCalculation && effectiveProgress < 1f) ||
                     (!budgetUiState.isCalculation && effectiveProgress > 0f)
             },
             onDismiss = {},
@@ -693,6 +742,19 @@ private fun PhoneLayout(
                         )
                     },
                     showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+                    directCategoryPopupEnabled = directCategoryPopupEnabled,
+                    categoryGridModeEnabled = categoryGridModeEnabled,
+                    isCategoryGridVisible = showCategoryGrid,
+                    isCalculation = budgetUiState.isCalculation,
+                    onShowCategoryGrid = onShowCategoryGrid,
+                    onHideCategoryGrid = onHideCategoryGrid,
+                    onDisableCalculationMode = {
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.SetCalculationMode(false),
+                            ),
+                        )
+                    },
                     onDismissRecurrentDialog = {
                         onProcessIntent(
                             MainScreenUiIntent.ProcessBudgetEditorIntent(
@@ -752,7 +814,6 @@ private fun PhoneLayout(
             localDragProgress = 0f
         }
     }
-
     StatusBarPadding()
 }
 
@@ -765,6 +826,11 @@ private fun TabletLayout(
     localDensity: Density,
     windowInsets: PaddingValues,
     showCreditQuickToggleFeature: Boolean,
+    directCategoryPopupEnabled: Boolean,
+    categoryGridModeEnabled: Boolean,
+    showCategoryGrid: Boolean,
+    onShowCategoryGrid: () -> Unit,
+    onHideCategoryGrid: () -> Unit,
     onNavigateToWallet: () -> Unit,
     openWalletOnStart: Boolean,
     onProcessIntent: (MainScreenUiIntent) -> Unit,
@@ -920,6 +986,19 @@ private fun TabletLayout(
                         )
                     },
                     showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+                    directCategoryPopupEnabled = directCategoryPopupEnabled,
+                    categoryGridModeEnabled = categoryGridModeEnabled,
+                    isCategoryGridVisible = showCategoryGrid,
+                    isCalculation = budgetUiState.isCalculation,
+                    onShowCategoryGrid = onShowCategoryGrid,
+                    onHideCategoryGrid = onHideCategoryGrid,
+                    onDisableCalculationMode = {
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.SetCalculationMode(false),
+                            ),
+                        )
+                    },
                     onDismissRecurrentDialog = {
                         onProcessIntent(
                             MainScreenUiIntent.ProcessBudgetEditorIntent(
@@ -992,6 +1071,25 @@ private fun TabletLayout(
                                 currentComment = budgetUiState.currentComment,
                                 editedTransaction = null,
                             )
+                        }
+                    val tabletGridLeftContent: (@Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit)? =
+                        if (showCategoryGrid && categoryGridModeEnabled) {
+                            {
+                                SavedCategoriesGrid(
+                                    tags = budgetUiState.tags,
+                                    selectedCategory = budgetUiState.currentComment,
+                                    onCategorySelected = { category ->
+                                        onProcessIntent(
+                                            MainScreenUiIntent.ProcessBudgetEditorIntent(
+                                                BudgetEditorIntent.CommentUpdated(category),
+                                            ),
+                                        )
+                                    },
+                                    applyWindowInsets = false,
+                                )
+                            }
+                        } else {
+                            null
                         }
                     Numpad(
                         editorState = editorState,
@@ -1076,6 +1174,9 @@ private fun TabletLayout(
                             )
                         },
                         rowHeight = with(localDensity) { rowHeightPx.toDp() },
+                        enableCalculationMode = true,
+                        enableCalcModeSwipe = !showCategoryGrid,
+                        leftContent = tabletGridLeftContent,
                     )
                 }
             }
@@ -1094,10 +1195,6 @@ private fun MainScreenPreview() {
             configuration.screenWidthDp < 840 -> WindowWidthSizeClass.Medium
             else -> WindowWidthSizeClass.Expanded
         }
-    // Both Compact and Medium use PhoneLayout; only Expanded uses TabletLayout.
-    // The @PreviewScreenSizes annotation covers a range of dp values so both
-    // layouts get previewed regardless of how the classification maps them.
-
     CompositionLocalProvider(LocalWindowSize provides windowSizeClass) {
         MinusTheme {
             MainScreenContent(
@@ -1129,6 +1226,8 @@ private fun MainScreenPreview() {
                 onboardingCompleted = true,
                 tutorialStage = FirstLaunchTutorialStage.COMPLETED,
                 showCreditQuickToggleFeature = true,
+                directCategoryPopupEnabled = false,
+                categoryGridModeEnabled = false,
                 onProcessIntent = {},
                 onNavigateToAnalytics = {},
                 onNavigateToSettings = {},

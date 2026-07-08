@@ -80,11 +80,19 @@ fun EditableCategoryTag(
     tags: List<String>,
     onCommentUpdate: (String) -> Unit,
     editorFocusController: FocusController,
+    modifier: Modifier = Modifier,
     extendWidth: Dp = 0.dp,
     onlyIcon: Boolean = false,
     onEdit: (Boolean) -> Unit = {},
     onSaveExpense: () -> Unit = {},
     onDeleteTag: (String) -> Unit = {},
+    directCategoryPopupEnabled: Boolean = false,
+    categoryGridModeEnabled: Boolean = false,
+    isCategoryGridVisible: Boolean = false,
+    isCalculation: Boolean = false,
+    onShowCategoryGrid: () -> Unit = {},
+    onHideCategoryGrid: () -> Unit = {},
+    onDisableCalculationMode: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
     val localDensity = LocalDensity.current
@@ -131,7 +139,7 @@ fun EditableCategoryTag(
             shape = CircleShape,
             color = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
+            modifier = modifier
                 .menuAnchor()
                 .clip(CircleShape)
                 .then(
@@ -139,12 +147,32 @@ fun EditableCategoryTag(
                         Modifier
                     } else {
                         Modifier.clickable {
-                            editorFocusController.blur()
-                            focusManager.clearFocus()
-                            scope.launch {
-                                delay(120)
-                                isEdit = true
-                                onEdit(true)
+                            if (categoryGridModeEnabled) {
+                                // First: ensure calc mode is off so the grid has full height.
+                                if (isCalculation) {
+                                    onDisableCalculationMode()
+                                }
+                                if (isCategoryGridVisible) {
+                                    // Second tap while grid is open: close the grid
+                                    // and open the inline editor (focus + keyboard).
+                                    onHideCategoryGrid()
+                                    scope.launch {
+                                        delay(120)
+                                        isEdit = true
+                                        onEdit(true)
+                                    }
+                                } else {
+                                    // First tap: reveal the categories list in the numpad area.
+                                    onShowCategoryGrid()
+                                }
+                            } else {
+                                editorFocusController.blur()
+                                focusManager.clearFocus()
+                                scope.launch {
+                                    delay(120)
+                                    isEdit = true
+                                    onEdit(true)
+                                }
                             }
                         }
                     })) {
@@ -208,7 +236,12 @@ fun EditableCategoryTag(
                                 )
                                 .heightIn(min = 28.dp)
                                 .wrapContentHeight(align = Alignment.CenterVertically),
-                            text = value.text.ifEmpty { stringResource(R.string.add_new_category) },
+                            text = value.text.ifEmpty {
+                                stringResource(
+                                    if (isCategoryGridVisible) R.string.add_new_category_action
+                                    else R.string.add_new_category
+                                )
+                            },
                             style = MaterialTheme.typography.bodyMediumCondensed,
                             softWrap = false,
                             overflow = TextOverflow.Ellipsis,
@@ -220,18 +253,24 @@ fun EditableCategoryTag(
 
         val trimmedValue = value.text.trim()
         val filteredItems = if (trimmedValue.isBlank()) {
-            emptyList()
+            if (directCategoryPopupEnabled) tags else emptyList()
         } else {
             tags.filter { tag ->
                 tag.contains(trimmedValue, ignoreCase = true) && tag != trimmedValue
             }
         }
 
-        LaunchedEffect(renderPopup, filteredItems.isNotEmpty()) {
-            isShowSuggestions = renderPopup && filteredItems.isNotEmpty()
+        LaunchedEffect(isEdit, directCategoryPopupEnabled) {
+            if (isEdit && directCategoryPopupEnabled && filteredItems.isNotEmpty()) {
+                isShowSuggestions = true
+            }
         }
 
-        if (renderPopup && filteredItems.isNotEmpty()) {
+        LaunchedEffect(renderPopup, filteredItems.isNotEmpty()) {
+            isShowSuggestions = filteredItems.isNotEmpty()
+        }
+
+        if ((renderPopup || (directCategoryPopupEnabled && isEdit)) && filteredItems.isNotEmpty()) {
             val topBarHeight = LocalWindowInsets.current.calculateTopPadding()
 
             val height = remember { mutableStateOf(1000.dp) }

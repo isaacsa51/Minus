@@ -135,6 +135,8 @@ class MainScreenE2ETest {
                         onboardingCompleted = onboardingCompleted,
                         tutorialStage = FirstLaunchTutorialStage.COMPLETED,
                         showCreditQuickToggleFeature = true,
+                        directCategoryPopupEnabled = false,
+                        categoryGridModeEnabled = false,
                         onProcessIntent = { intent -> capturedIntents += intent },
                         onNavigateToAnalytics = {},
                         onNavigateToSettings = {},
@@ -186,6 +188,8 @@ class MainScreenE2ETest {
                     onRecurrentExpenseConfirm = { _, _, _, _ -> },
                     onCreditCutoffConfirm = {},
                     onSaveBudget = { capturedIntents += "SaveBudget" },
+                    directCategoryPopupEnabled = false,
+                    categoryGridModeEnabled = false,
                 )
             }
         }

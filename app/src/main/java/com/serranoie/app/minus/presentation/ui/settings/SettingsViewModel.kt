@@ -16,6 +16,8 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
+import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.DYNAMIC_COLOR_KEY
 import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
@@ -49,6 +51,8 @@ data class SettingsUiState(
     val currentTypography: String = "Expressive",
     val isMaterialYouEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,
+    val isCategoryPickerDirectPopupEnabled: Boolean = false,
+    val isCategoryGridModeEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val notificationHour: Int = 9,
     val notificationMinute: Int = 0,
@@ -159,6 +163,8 @@ class SettingsViewModel @Inject constructor(
             context.settingsDataStore.data.collect { prefs ->
                 _uiState.update { it.copy(
                     isCreditQuickToggleEnabled = prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false,
+                    isCategoryPickerDirectPopupEnabled = prefs[CATEGORY_PICKER_DIRECT_POPUP_KEY] ?: false,
+                    isCategoryGridModeEnabled = prefs[CATEGORY_GRID_MODE_KEY] ?: false,
                     periodMappingMode = try {
                         PeriodMappingMode.valueOf(
                             prefs[PERIOD_MAPPING_MODE_KEY] ?: ""
@@ -218,6 +224,26 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             context.settingsDataStore.edit { prefs ->
                 prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY] = newValue
+            }
+        }
+    }
+
+    fun onCategoryPickerDirectPopupFeatureToggle() {
+        val newValue = !_uiState.value.isCategoryPickerDirectPopupEnabled
+        _uiState.update { it.copy(isCategoryPickerDirectPopupEnabled = newValue) }
+        viewModelScope.launch {
+            context.settingsDataStore.edit { prefs ->
+                prefs[CATEGORY_PICKER_DIRECT_POPUP_KEY] = newValue
+            }
+        }
+    }
+
+    fun onCategoryGridModeToggle() {
+        val newValue = !_uiState.value.isCategoryGridModeEnabled
+        _uiState.update { it.copy(isCategoryGridModeEnabled = newValue) }
+        viewModelScope.launch {
+            context.settingsDataStore.edit { prefs ->
+                prefs[CATEGORY_GRID_MODE_KEY] = newValue
             }
         }
     }
