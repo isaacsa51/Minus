@@ -88,7 +88,11 @@ fun EditableCategoryTag(
     onDeleteTag: (String) -> Unit = {},
     directCategoryPopupEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
+    isCategoryGridVisible: Boolean = false,
+    isCalculation: Boolean = false,
     onShowCategoryGrid: () -> Unit = {},
+    onHideCategoryGrid: () -> Unit = {},
+    onDisableCalculationMode: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
     val localDensity = LocalDensity.current
@@ -144,7 +148,23 @@ fun EditableCategoryTag(
                     } else {
                         Modifier.clickable {
                             if (categoryGridModeEnabled) {
-                                onShowCategoryGrid()
+                                // First: ensure calc mode is off so the grid has full height.
+                                if (isCalculation) {
+                                    onDisableCalculationMode()
+                                }
+                                if (isCategoryGridVisible) {
+                                    // Second tap while grid is open: close the grid
+                                    // and open the inline editor (focus + keyboard).
+                                    onHideCategoryGrid()
+                                    scope.launch {
+                                        delay(120)
+                                        isEdit = true
+                                        onEdit(true)
+                                    }
+                                } else {
+                                    // First tap: reveal the categories list in the numpad area.
+                                    onShowCategoryGrid()
+                                }
                             } else {
                                 editorFocusController.blur()
                                 focusManager.clearFocus()
@@ -216,7 +236,12 @@ fun EditableCategoryTag(
                                 )
                                 .heightIn(min = 28.dp)
                                 .wrapContentHeight(align = Alignment.CenterVertically),
-                            text = value.text.ifEmpty { stringResource(R.string.add_new_category) },
+                            text = value.text.ifEmpty {
+                                stringResource(
+                                    if (isCategoryGridVisible) R.string.add_new_category_action
+                                    else R.string.add_new_category
+                                )
+                            },
                             style = MaterialTheme.typography.bodyMediumCondensed,
                             softWrap = false,
                             overflow = TextOverflow.Ellipsis,

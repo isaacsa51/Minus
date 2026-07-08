@@ -24,45 +24,45 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 
-private const val MAX_ITEMS_FOR_FILL = 4
-
 @Composable
 fun SavedCategoriesGrid(
-    tags: List<String>,
-    onCategorySelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    selectedCategory: String? = null,
+	tags: List<String>,
+	onCategorySelected: (String) -> Unit,
+	modifier: Modifier = Modifier,
+	selectedCategory: String? = null,
+	applyWindowInsets: Boolean = true,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-    ) {
-        tags.forEachIndexed { index, tag ->
-            val position = when {
-                tags.size == 1 -> PaddedListItemPosition.Single
-                index == 0 -> PaddedListItemPosition.First
-                index == tags.lastIndex -> PaddedListItemPosition.Last
-                else -> PaddedListItemPosition.Middle
-            }
-            val isSelected = tag == selectedCategory
+	val baseModifier = if (applyWindowInsets) {
+		modifier
+			.fillMaxSize()
+			.windowInsetsPadding(WindowInsets.navigationBars)
+			.padding(horizontal = 14.dp, vertical = 8.dp)
+	} else {
+		modifier
+			.fillMaxSize()
+			.padding(horizontal = 14.dp, vertical = 8.dp)
+	}
+	Column(
+		baseModifier,
+	) {
+		tags.forEachIndexed { index, tag ->
+			val position = when {
+				tags.size == 1 -> PaddedListItemPosition.Single
+				index == 0 -> PaddedListItemPosition.First
+				index == tags.lastIndex -> PaddedListItemPosition.Last
+				else -> PaddedListItemPosition.Middle
+			}
+			val isSelected = tag == selectedCategory
 
-            val itemModifier = if (tags.size <= MAX_ITEMS_FOR_FILL) {
-                Modifier.weight(1f)
-            } else {
-                Modifier
-            }
-
-            CategoryListItem(
-                label = tag,
-                isSelected = isSelected,
-                position = position,
-                onClick = { onCategorySelected(tag) },
-                modifier = itemModifier,
-            )
-        }
-    }
+			CategoryListItem(
+				label = tag,
+				isSelected = isSelected,
+				position = position,
+				onClick = { onCategorySelected(tag) },
+				modifier = Modifier.weight(1f),
+			)
+		}
+	}
 }
 
 @Composable

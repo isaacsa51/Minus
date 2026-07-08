@@ -136,7 +136,11 @@ fun Editor(
     showCreditQuickToggleFeature: Boolean = false,
     directCategoryPopupEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
+    isCategoryGridVisible: Boolean = false,
+    isCalculation: Boolean = false,
     onShowCategoryGrid: () -> Unit = {},
+    onHideCategoryGrid: () -> Unit = {},
+    onDisableCalculationMode: () -> Unit = {},
     onDismissRecurrentDialog: () -> Unit = {},
     onDismissCreditCutoffDialog: () -> Unit = {},
     onRecurrentExpenseConfirm: (RecurrentFrequency, LocalDate, Int?, String) -> Unit = { _, _, _, _ -> },
@@ -409,7 +413,11 @@ fun Editor(
                         editorFocusController = editorFocusController,
                         directCategoryPopupEnabled = directCategoryPopupEnabled,
                         categoryGridModeEnabled = categoryGridModeEnabled,
+                        isCategoryGridVisible = isCategoryGridVisible,
+                        isCalculation = isCalculation,
                         onShowCategoryGrid = onShowCategoryGrid,
+                        onHideCategoryGrid = onHideCategoryGrid,
+                        onDisableCalculationMode = onDisableCalculationMode,
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
@@ -491,7 +499,11 @@ private fun EditingContent(
     editorFocusController: FocusController,
     directCategoryPopupEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
+    isCategoryGridVisible: Boolean = false,
+    isCalculation: Boolean = false,
     onShowCategoryGrid: () -> Unit = {},
+    onHideCategoryGrid: () -> Unit = {},
+    onDisableCalculationMode: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
@@ -645,7 +657,11 @@ private fun EditingContent(
                         onDeleteTag = onDeleteTag,
                         directCategoryPopupEnabled = directCategoryPopupEnabled,
                         categoryGridModeEnabled = categoryGridModeEnabled,
+                        isCategoryGridVisible = isCategoryGridVisible,
+                        isCalculation = isCalculation,
                         onShowCategoryGrid = onShowCategoryGrid,
+                        onHideCategoryGrid = onHideCategoryGrid,
+                        onDisableCalculationMode = onDisableCalculationMode,
                     )
                 }
             } else {
@@ -658,7 +674,11 @@ private fun EditingContent(
                     editorFocusController = editorFocusController,
                     directCategoryPopupEnabled = directCategoryPopupEnabled,
                     categoryGridModeEnabled = categoryGridModeEnabled,
+                    isCategoryGridVisible = isCategoryGridVisible,
+                    isCalculation = isCalculation,
                     onShowCategoryGrid = onShowCategoryGrid,
+                    onHideCategoryGrid = onHideCategoryGrid,
+                    onDisableCalculationMode = onDisableCalculationMode,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 26.dp),
