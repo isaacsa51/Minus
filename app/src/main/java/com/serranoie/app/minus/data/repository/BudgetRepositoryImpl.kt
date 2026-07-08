@@ -13,6 +13,7 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
 import com.serranoie.app.minus.domain.calculator.BudgetCalculator
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
@@ -120,7 +121,12 @@ class BudgetRepositoryImpl @Inject constructor(
             } catch (_: Exception) {
                 RemainingBudgetStrategy.ASK_ALWAYS
             },
-            creditCardCutoffDay = this.creditCardCutoffDay
+            creditCardCutoffDay = this.creditCardCutoffDay,
+            splitMode = try {
+                BudgetSplitMode.valueOf(this.splitMode)
+            } catch (_: Exception) {
+                BudgetSplitMode.STATIC
+            }
         )
         logcat { "toDomain: entity=$this -> domain=$domain" }
         return domain
@@ -138,7 +144,8 @@ class BudgetRepositoryImpl @Inject constructor(
             rollOverEnabled = this.rollOverEnabled,
             rollOverCarryForward = this.rollOverCarryForward,
             remainingBudgetStrategy = this.remainingBudgetStrategy.name,
-            creditCardCutoffDay = this.creditCardCutoffDay
+            creditCardCutoffDay = this.creditCardCutoffDay,
+            splitMode = this.splitMode.name
         )
         logcat { "toEntity: domain=$this -> entity=$entity" }
         return entity

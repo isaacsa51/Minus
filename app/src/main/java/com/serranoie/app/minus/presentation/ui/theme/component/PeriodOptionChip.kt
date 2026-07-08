@@ -27,9 +27,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.presentation.ui.onboarding.availablePeriodsFor
-import com.serranoie.app.minus.presentation.ui.onboarding.budgetForPeriod
 import com.serranoie.app.minus.presentation.ui.onboarding.label
+import com.serranoie.app.minus.presentation.ui.onboarding.splitBudget
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import java.math.BigDecimal
 
@@ -93,9 +94,12 @@ fun PeriodOptionChip(
 @Composable
 fun PeriodOptionGroup(
 	totalBudget: BigDecimal,
+	totalSpent: BigDecimal = BigDecimal.ZERO,
 	totalDays: Int,
+	daysRemaining: Int = totalDays,
 	currencyCode: String = "USD",
 	selectedPeriod: BudgetPeriod,
+	splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
 	onPeriodSelected: (BudgetPeriod) -> Unit,
 	modifier: Modifier = Modifier,
 ) {
@@ -106,7 +110,14 @@ fun PeriodOptionGroup(
 		horizontalArrangement = Arrangement.spacedBy(8.dp),
 	) {
 		availablePeriods.forEach { period ->
-			val budgetPreview = budgetForPeriod(totalBudget, totalDays, period)
+			val budgetPreview = splitBudget(
+				totalBudget = totalBudget,
+				totalSpent = totalSpent,
+				totalDays = totalDays,
+				daysRemaining = daysRemaining,
+				period = period,
+				mode = splitMode,
+			)
 			val isSelected = period == selectedPeriod
 
 			PeriodOptionChip(
