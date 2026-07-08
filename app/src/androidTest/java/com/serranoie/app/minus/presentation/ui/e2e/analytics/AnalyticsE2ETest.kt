@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.analytics.Analytics
@@ -92,6 +93,10 @@ class AnalyticsE2ETest {
     private fun allTransactions(): List<Transaction> = foodTransactions() + moveTransactions() + funTransactions()
 
     private fun setAnalyticsContent() {
+        // Android 17 is stricter about activity launch timing. Ensure the test
+        // activity is fully resumed before setContent is called, and let the
+        // framework idle after so the Compose hierarchy is discoverable.
+        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
         composeTestRule.setContent {
             MinusTheme {
                 CompositionLocalProvider(LocalWindowInsets provides PaddingValues(0.dp)) {
@@ -108,6 +113,7 @@ class AnalyticsE2ETest {
                 }
             }
         }
+        composeTestRule.waitForIdle()
     }
 
     @Test

@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.lifecycle.Lifecycle
 import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
@@ -36,6 +37,10 @@ class BudgetPeriodSheetEditModeE2ETest {
         onFinishEarly: (() -> Unit)? = null,
         selectedPeriod: BudgetPeriod = BudgetPeriod.DAILY,
     ) {
+        // Android 17 is stricter about activity launch timing. Ensure the test
+        // activity is fully resumed before setContent is called, and let the
+        // framework idle after so the Compose hierarchy is discoverable.
+        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
         composeTestRule.setContent {
             MinusTheme {
                 BudgetPeriodSheet(
@@ -52,6 +57,7 @@ class BudgetPeriodSheetEditModeE2ETest {
                 )
             }
         }
+        composeTestRule.waitForIdle()
     }
 
     @Test
