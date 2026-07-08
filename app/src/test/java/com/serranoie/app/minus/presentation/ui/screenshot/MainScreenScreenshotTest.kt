@@ -81,6 +81,8 @@ private fun MainScreenPreviewContent(
                 onboardingCompleted = true,
                 tutorialStage = FirstLaunchTutorialStage.COMPLETED,
                 showCreditQuickToggleFeature = true,
+                directCategoryPopupEnabled = false,
+                categoryGridModeEnabled = false,
                 onProcessIntent = {},
                 onNavigateToAnalytics = {},
                 onNavigateToSettings = {},
