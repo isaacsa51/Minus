@@ -1,0 +1,17 @@
+- fix: make sure changelog appears on updated app
+- chore: decrease arrow thickness and wavy divider
+- chore: rounded typography styles
+- feat: implement dynamic budget split mode (#105)
+- deploy: keystore secrets and fastlane updated info
+- add privacy policy for Minus
+- deploy: play store signing configs hidden
+- fix: update category ID when editing transaction category (#104)
+- feat: implement gregorian lari currency (#103)
+- fix: show next recurring payments on saving card on current period
+- feat: behaviour and view mode changes for categories on settings (#101)
+- fix: tablet UI on smaller screens (#98)
+- fix: use proper Locale on date range selector (#97)
+- feat: support currency-specific decimal formatting (#96)
+- feat: added ukranian hryvnia currency (#95)
+- updating README
+- fix: budget split persistence & enhancement (#94)
