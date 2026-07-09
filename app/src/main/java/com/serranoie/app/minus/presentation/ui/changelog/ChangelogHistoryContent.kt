@@ -40,8 +40,7 @@ internal fun ChangelogHistoryContent(
 ) {
     if (releases.isEmpty()) {
         Column(
-            modifier = modifier
-                .fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
@@ -94,6 +93,7 @@ private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) 
                             modifier = Modifier.fillMaxWidth(),
                             showDivider = showDivider,
                         )
+
                         else -> ChangelogItemCard(
                             item = item,
                             modifier = Modifier.fillMaxWidth(),
@@ -115,7 +115,6 @@ private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) 
 @Composable
 private fun ChangelogReleaseMeta(release: VersionRelease) {
     Surface(
-        color = MaterialTheme.colorScheme.surface,
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(

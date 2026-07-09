@@ -55,14 +55,16 @@ class ChangelogTriggerEvaluatorTest {
     }
 
     @Test
-    fun `when lastSeen is null then decision is Skip`() {
+    fun `when lastSeen is null then decision is Show (bootstrap from pre-gate build)`() {
         val decision = decideChangelog(
             currentVersionCode = 200,
             lastSeenVersionCode = null,
             latestRelease = latestRelease,
         )
 
-        assertThat(decision).isEqualTo(ChangelogDecision.Skip)
+        assertThat(decision).isInstanceOf(ChangelogDecision.Show::class.java)
+        val show = decision as ChangelogDecision.Show
+        assertThat(show.release).isEqualTo(latestRelease)
     }
 
     @Test
@@ -147,14 +149,14 @@ class ChangelogTriggerEvaluatorTest {
     }
 
     @Test
-    fun `when current versionCode is one and lastSeen is null then Skip (first install)`() {
+    fun `when current versionCode is one and lastSeen is null then Show (bootstrap first launch)`() {
         val decision = decideChangelog(
             currentVersionCode = 1,
             lastSeenVersionCode = null,
             latestRelease = latestRelease,
         )
 
-        assertThat(decision).isEqualTo(ChangelogDecision.Skip)
+        assertThat(decision).isInstanceOf(ChangelogDecision.Show::class.java)
     }
 
     @Test

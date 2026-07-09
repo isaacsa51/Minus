@@ -101,16 +101,23 @@ class ChangelogGateE2ETest {
     }
 
     @Test
-    fun when_first_install_then_no_bottom_sheet() = runTest {
+    fun when_first_install_bootstrap_then_bottom_sheet_is_displayed() = runTest {
+        // After the lastSeen-null-as-zero fix: first ever launch of a
+        // changelog-equipped build (or any upgrade from a pre-gate build
+        // whose DataStore key was never seeded) now resolves to Show, not
+        // Skip. The evaluator returns Show directly here to cover that path
+        // at the ViewModel/UI boundary.
         val mockEvaluator = mockk<ChangelogTriggerEvaluator>()
-        coEvery { mockEvaluator.invoke(any()) } returns ChangelogDecision.Skip
+        coEvery { mockEvaluator.invoke(any()) } returns ChangelogDecision.Show(testRelease)
         val viewModel = ChangelogGateViewModel(mockEvaluator)
 
         setGateContent(viewModel)
         composeTestRule.waitForIdle()
         advanceUntilIdle()
 
-        composeTestRule.onAllNodesWithText(releaseHeaderText()).assertCountEquals(0)
+        composeTestRule.onAllNodesWithText(releaseHeaderText()).onFirst().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("Sample upgrade feature").assertCountEquals(1)
+        composeTestRule.onAllNodesWithText("Critical bug fix").assertCountEquals(1)
     }
 
     @Test
