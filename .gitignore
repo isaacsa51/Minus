@@ -40,3 +40,6 @@ fastlane/report.xml
 # .txt already exists. Gitignored — restore manually with `mv <bak> .txt`
 # if you want to recover a previous curation.
 fastlane/metadata/**/changelogs/*.bak.*
+
+# Playstore sign config
+/app/src/main/assets
