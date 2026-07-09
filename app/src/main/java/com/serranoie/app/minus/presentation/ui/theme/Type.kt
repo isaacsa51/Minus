@@ -11,12 +11,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 
+@OptIn(ExperimentalTextApi::class)
 val GoogleSansFlex = FontFamily(
-    Font(R.font.google_sans_flex, FontWeight.Normal),
-    Font(R.font.google_sans_flex, FontWeight.Medium),
-    Font(R.font.google_sans_flex, FontWeight.SemiBold),
-    Font(R.font.google_sans_flex, FontWeight.Bold)
+    Font(
+        R.font.google_sans_flex,
+        variationSettings = FontVariation.Settings(roundness(100f))
+    )
 )
+
+fun roundness(value: Float): FontVariation.Setting {
+    require(value in 0f..100f) { "Roundness (ROND) value must be between 0f and 100f" }
+    return FontVariation.Setting("ROND", value)
+}
+
 
 @OptIn(ExperimentalTextApi::class)
 val GoogleSansFlexDisplayLargeEmphasized = FontFamily(
@@ -24,7 +31,8 @@ val GoogleSansFlexDisplayLargeEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(155f)
+            FontVariation.width(155f),
+            roundness(100f)
         )
     )
 )
@@ -35,7 +43,8 @@ val GoogleSansFlexDisplayMediumEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(600),
-            FontVariation.width(132f)
+            FontVariation.width(132f),
+            roundness(100f)
         )
     )
 )
@@ -46,7 +55,8 @@ val GoogleSansFlexDisplaySmallEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(125f)
+            FontVariation.width(125f),
+            roundness(100f)
         )
     )
 )
@@ -57,7 +67,8 @@ val GoogleSansFlexHeadlineLargeEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(800),
-            FontVariation.width(150f)
+            FontVariation.width(150f),
+            roundness(100f)
         )
     )
 )
@@ -68,7 +79,8 @@ val GoogleSansFlexHeadlineMediumEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(150f)
+            FontVariation.width(150f),
+            roundness(100f)
         )
     )
 )
@@ -79,7 +91,8 @@ val GoogleSansFlexHeadlineSmallEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(135f)
+            FontVariation.width(135f),
+            roundness(100f)
         )
     )
 )
@@ -90,7 +103,8 @@ val GoogleSansFlexTitleLargeEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(135f)
+            FontVariation.width(135f),
+            roundness(100f)
         )
     )
 )
@@ -101,7 +115,8 @@ val GoogleSansFlexTitleMediumEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(600),
-            FontVariation.width(135f)
+            FontVariation.width(135f),
+            roundness(100f)
         )
     )
 )
@@ -112,7 +127,8 @@ val GoogleSansFlexTitleSmallEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(600),
-            FontVariation.width(115f)
+            FontVariation.width(115f),
+            roundness(100f)
         )
     )
 )
@@ -123,7 +139,8 @@ val GoogleSansFlexBodyLargeEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(500),
-            FontVariation.width(115f)
+            FontVariation.width(115f),
+            roundness(100f)
         )
     )
 )
@@ -134,7 +151,8 @@ val GoogleSansFlexBodyMediumEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(500),
-            FontVariation.width(115f)
+            FontVariation.width(115f),
+            roundness(100f)
         )
     )
 )
@@ -145,7 +163,8 @@ val GoogleSansFlexBodySmallEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(500),
-            FontVariation.width(115f)
+            FontVariation.width(115f),
+            roundness(100f)
         )
     )
 )
@@ -156,7 +175,8 @@ val GoogleSansFlexLabelLargeEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(500),
-            FontVariation.width(115f)
+            FontVariation.width(115f),
+            roundness(100f)
         )
     )
 )
@@ -167,7 +187,8 @@ val GoogleSansFlexLabelMediumEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(125f)
+            FontVariation.width(125f),
+            roundness(100f)
         )
     )
 )
@@ -178,7 +199,8 @@ val GoogleSansFlexLabelSmallEmphasized = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(125f)
+            FontVariation.width(125f),
+            roundness(100f)
         )
     )
 )
@@ -190,7 +212,8 @@ val GoogleSansFlexDisplayLargeCondensed = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(500),
-            FontVariation.width(65f)
+            FontVariation.width(65f),
+            roundness(100f)
         )
     )
 )
@@ -201,7 +224,8 @@ val GoogleSansFlexDisplayMediumCondensed = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(75f)
+            FontVariation.width(75f),
+            roundness(100f)
         )
     )
 )
@@ -212,7 +236,8 @@ val GoogleSansFlexDisplaySmallCondensed = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(600),
-            FontVariation.width(75f)
+            FontVariation.width(75f),
+            roundness(100f)
         )
     )
 )
@@ -223,7 +248,8 @@ val GoogleSansFlexHeadlineLargeCondensed = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(800),
-            FontVariation.width(85f)
+            FontVariation.width(85f),
+            roundness(100f)
         )
     )
 )
@@ -234,7 +260,8 @@ val GoogleSansFlexHeadlineMediumCondensed = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(85f)
+            FontVariation.width(85f),
+            roundness(100f)
         )
     )
 )
@@ -245,7 +272,8 @@ val GoogleSansFlexHeadlineSmallCondensed = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(85f)
+            FontVariation.width(85f),
+            roundness(100f)
         )
     )
 )
@@ -256,7 +284,8 @@ val GoogleSansFlexTitleLargeCondensed = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(700),
-            FontVariation.width(85f)
+            FontVariation.width(85f),
+            roundness(100f)
         )
     )
 )
@@ -267,7 +296,8 @@ val GoogleSansFlexTitleMediumCondensed = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(600),
-            FontVariation.width(85f)
+            FontVariation.width(85f),
+            roundness(100f)
         )
     )
 )
@@ -278,7 +308,8 @@ val GoogleSansFlexTitleSmallCondensed = FontFamily(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(600),
-            FontVariation.width(85f)
+            FontVariation.width(85f),
+            roundness(100f)
         )
     )
 )
@@ -288,8 +319,9 @@ val GoogleSansFlexBodyLargeCondensed = FontFamily(
     Font(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
-            FontVariation.weight(500),
-            FontVariation.width(70f)
+            FontVariation.weight(400),
+            FontVariation.width(70f),
+            roundness(100f)
         )
     )
 )
@@ -299,8 +331,9 @@ val GoogleSansFlexBodyMediumCondensed = FontFamily(
     Font(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
-            FontVariation.weight(500),
-            FontVariation.width(80f)
+            FontVariation.weight(400),
+            FontVariation.width(80f),
+            roundness(100f)
         )
     )
 )
@@ -310,8 +343,9 @@ val GoogleSansFlexBodySmallCondensed = FontFamily(
     Font(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
-            FontVariation.weight(500),
-            FontVariation.width(85f)
+            FontVariation.weight(400),
+            FontVariation.width(85f),
+            roundness(100f)
         )
     )
 )
@@ -321,8 +355,9 @@ val GoogleSansFlexLabelLargeCondensed = FontFamily(
     Font(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
-            FontVariation.weight(500),
-            FontVariation.width(75f)
+            FontVariation.weight(400),
+            FontVariation.width(75f),
+            roundness(100f)
         )
     )
 )
@@ -332,8 +367,9 @@ val GoogleSansFlexLabelMediumCondensed = FontFamily(
     Font(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
-            FontVariation.weight(500),
-            FontVariation.width(65f)
+            FontVariation.weight(400),
+            FontVariation.width(65f),
+            roundness(100f)
         )
     )
 )
@@ -343,8 +379,9 @@ val GoogleSansFlexLabelSmallCondensed = FontFamily(
     Font(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
-            FontVariation.weight(500),
-            FontVariation.width(75f)
+            FontVariation.weight(400),
+            FontVariation.width(75f),
+            roundness(100f)
         )
     )
 )

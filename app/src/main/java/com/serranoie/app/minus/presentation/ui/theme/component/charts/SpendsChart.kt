@@ -52,7 +52,6 @@ fun SpendsChart(
     showAfterMarked: Int = spends.size,
     chartPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    // ! Handle empty spends list to avoid NoSuchElementException
     if (spends.isEmpty()) {
         return
     }
