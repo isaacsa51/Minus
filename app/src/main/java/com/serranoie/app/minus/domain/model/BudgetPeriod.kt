@@ -16,6 +16,17 @@ enum class RemainingBudgetStrategy {
     ASK_ALWAYS, SPLIT_EQUALLY, ADD_TO_FIRST_DAY,
 }
 
+/**
+ * How the period's total budget is divided for the per-period pill shown in the UI.
+ *
+ * - [STATIC]: totalBudget / (totalDays / period.toDays()), unchanged regardless of spend.
+ * - [DYNAMIC]: (totalBudget - totalSpent) / daysRemaining, so the pill updates as you spend.
+ */
+enum class BudgetSplitMode {
+    STATIC,
+    DYNAMIC,
+}
+
 enum class SymbolPosition {
     START,
     END,
@@ -142,6 +153,7 @@ data class BudgetSettings(
     val rollOverCarryForward: Boolean = false,
     val remainingBudgetStrategy: RemainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
     val creditCardCutoffDay: Int? = null,
+    val splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
 ) {
     fun getDaysForPeriod(): Int {
         return when (period) {
@@ -178,6 +190,7 @@ data class BudgetSettings(
             rollOverCarryForward = false,
             remainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
             creditCardCutoffDay = null,
+            splitMode = BudgetSplitMode.STATIC,
         )
     }
 }

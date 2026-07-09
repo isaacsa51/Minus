@@ -89,13 +89,14 @@ import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.SupportedCurrencyData
 import com.serranoie.app.minus.presentation.ui.onboarding.FinishDateSelector
 import com.serranoie.app.minus.presentation.ui.onboarding.availablePeriodsFor
-import com.serranoie.app.minus.presentation.ui.onboarding.budgetForPeriod
+import com.serranoie.app.minus.presentation.ui.onboarding.splitBudget
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
@@ -129,6 +130,7 @@ const val BUDGET_PERIOD_DATE_ROW_TAG = "BudgetPeriodSheet.DateRow"
 const val BUDGET_PERIOD_STRATEGY_ROW_TAG = "BudgetPeriodSheet.StrategyRow"
 const val BUDGET_PERIOD_CURRENCY_ROW_TAG = "BudgetPeriodSheet.CurrencyRow"
 const val BUDGET_PERIOD_SPLIT_TOGGLE_ROW_TAG = "BudgetPeriodSheet.SplitToggleRow"
+const val BUDGET_PERIOD_SPLIT_MODE_ROW_TAG = "BudgetPeriodSheet.SplitModeRow"
 const val BUDGET_PERIOD_CALCULATED_CARD_TAG = "BudgetPeriodSheet.CalculatedCard"
 
 fun budgetPeriodCardTag(period: BudgetPeriod) = "BudgetPeriodSheet.Period.${period.name}"
@@ -170,6 +172,17 @@ fun BudgetPeriodSheet(
     val startDateAsDate = remember(startDate) { startDate.toDate() }
     val endDateAsDate = remember(endDate) { endDate?.toDate() }
     val totalSpent = budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO
+
+    // For dynamic split: how many days of the period are still ahead of us.
+    // Clamped to [0, totalDays] so we never divide by a negative or get values
+    // outside the period's window.
+    val today = remember { LocalDate.now() }
+    val daysRemaining =
+        remember(startDate, endDate, today) {
+            if (endDate == null) totalDays
+            else ((ChronoUnit.DAYS.between(today, endDate).toInt() + 1)
+                .coerceIn(0, totalDays))
+        }
 
     val available =
         if (totalDays > 0) availablePeriodsFor(totalDays) else listOf(BudgetPeriod.DAILY)
@@ -240,6 +253,7 @@ fun BudgetPeriodSheet(
                 totalBudget = totalBudget,
                 totalSpent = totalSpent,
                 totalDays = totalDays,
+                daysRemaining = daysRemaining,
                 startDateAsDate = startDateAsDate,
                 endDateAsDate = endDateAsDate,
                 available = available,
@@ -308,6 +322,7 @@ private fun ViewBudgetContent(
     totalBudget: BigDecimal,
     totalSpent: BigDecimal,
     totalDays: Int,
+    daysRemaining: Int,
     startDateAsDate: Date,
     endDateAsDate: Date?,
     available: List<BudgetPeriod>,
@@ -495,7 +510,10 @@ private fun ViewBudgetContent(
             CalculatedSplitCard(
                 periodCache = periodCache,
                 totalBudget = totalBudget,
+                totalSpent = totalSpent,
                 totalDays = totalDays,
+                daysRemaining = daysRemaining,
+                splitMode = budgetSettings?.splitMode ?: BudgetSplitMode.STATIC,
                 currencyFormat = currencyFormat,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -563,6 +581,7 @@ fun EditBudgetContent(
     val currentCurrency = budgetSettings?.currencyCode ?: "USD"
     val currentStrategy =
         budgetSettings?.remainingBudgetStrategy ?: RemainingBudgetStrategy.ASK_ALWAYS
+    val currentSplitMode = budgetSettings?.splitMode ?: BudgetSplitMode.STATIC
 
     val previousPeriodDays =
         remember(currentStart, currentEnd) {
@@ -594,10 +613,12 @@ fun EditBudgetContent(
     var endCache by remember(currentEnd) { mutableStateOf(currentEnd) }
     var currencyCache by remember(currentCurrency) { mutableStateOf(currentCurrency) }
     var strategyCache by remember(currentStrategy) { mutableStateOf(currentStrategy) }
+    var splitModeCache by remember(currentSplitMode) { mutableStateOf(currentSplitMode) }
 
     var showDateSelector by remember { mutableStateOf(false) }
     var showCurrencyPicker by remember { mutableStateOf(false) }
     var showStrategyPicker by remember { mutableStateOf(false) }
+    var showSplitModePicker by remember { mutableStateOf(false) }
     var showPreviousValues by remember { mutableStateOf(false) }
 
     val parsedBudget = budgetText.toBigDecimalOrNull()?.movePointLeft(currencyFractionDigits)
@@ -880,6 +901,20 @@ fun EditBudgetContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        SettingsRow(
+            modifier = Modifier.testTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG),
+            icon = Icons.Rounded.Sync,
+            label = stringResource(R.string.split_mode_label),
+            trailingText =
+                when (splitModeCache) {
+                    BudgetSplitMode.STATIC -> stringResource(R.string.split_mode_static)
+                    BudgetSplitMode.DYNAMIC -> stringResource(R.string.split_mode_dynamic)
+                },
+            onClick = { showSplitModePicker = true },
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         val currencyDisplay = SupportedCurrency.findByCode(currencyCache)
         SettingsRow(
             modifier = Modifier.testTag(BUDGET_PERIOD_CURRENCY_ROW_TAG),
@@ -959,10 +994,11 @@ fun EditBudgetContent(
                         daysInPeriod = periodDays,
                         currencyCode = currencyCache,
                         remainingBudgetStrategy = strategyCache,
+                        splitMode = splitModeCache,
                         period = period,
                     )
                 logcat {
-                    "Apply tapped: budget=$parsedBudget, start=$startCache, end=$endCache, periodDays=$periodDays, resolvedPeriod=$period, strategy=$strategyCache, currency=$currencyCache"
+                    "Apply tapped: budget=$parsedBudget, start=$startCache, end=$endCache, periodDays=$periodDays, resolvedPeriod=$period, strategy=$strategyCache, splitMode=$splitModeCache, currency=$currencyCache"
                 }
                 onApply(newSettings)
             },
@@ -1022,6 +1058,17 @@ fun EditBudgetContent(
             onSelect = { strategy ->
                 strategyCache = strategy
                 showStrategyPicker = false
+            },
+        )
+    }
+
+    if (showSplitModePicker) {
+        SplitModePickerDialog(
+            currentMode = splitModeCache,
+            onDismiss = { showSplitModePicker = false },
+            onSelect = { mode ->
+                splitModeCache = mode
+                showSplitModePicker = false
             },
         )
     }
@@ -1169,6 +1216,99 @@ private fun StrategyPickerDialog(
 }
 
 @Composable
+private fun SplitModePickerDialog(
+    currentMode: BudgetSplitMode,
+    onDismiss: () -> Unit,
+    onSelect: (BudgetSplitMode) -> Unit,
+) {
+    val modes = listOf(BudgetSplitMode.STATIC, BudgetSplitMode.DYNAMIC)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.split_mode_dialog_title),
+                style = MaterialTheme.typography.titleLargeEmphasized,
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = stringResource(R.string.split_mode_dialog_description),
+                    style = MaterialTheme.typography.bodySmallCondensed,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                modes.forEach { mode ->
+                    val isSelected = mode == currentMode
+                    val title = when (mode) {
+                        BudgetSplitMode.STATIC -> stringResource(R.string.split_mode_static)
+                        BudgetSplitMode.DYNAMIC -> stringResource(R.string.split_mode_dynamic)
+                    }
+                    val description = when (mode) {
+                        BudgetSplitMode.STATIC -> stringResource(R.string.split_mode_static_desc)
+                        BudgetSplitMode.DYNAMIC -> stringResource(R.string.split_mode_dynamic_desc)
+                    }
+                    OutlinedCard(
+                        onClick = { onSelect(mode) },
+                        modifier = Modifier.fillMaxWidth(),
+                        border = BorderStroke(
+                            width = if (isSelected) 2.dp else 1.dp,
+                            color = if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                            },
+                        ),
+                        colors = CardDefaults.outlinedCardColors(
+                            containerColor = if (isSelected) {
+                                MaterialTheme.colorScheme.primaryContainer.copy(
+                                    alpha = 0.3f
+                                )
+                            } else {
+                                MaterialTheme.colorScheme.surface
+                            },
+                        ),
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = title,
+                                    style = MaterialTheme.typography.bodyMediumEmphasized,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                if (isSelected) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                }
+                            }
+                            Text(
+                                text = description,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(R.string.close),
+                    style = MaterialTheme.typography.labelMediumEmphasized,
+                )
+            }
+        },
+    )
+}
+
+@Composable
 private fun periodLabel(period: BudgetPeriod): String = stringResource(
     when (period) {
         BudgetPeriod.DAILY -> R.string.budget_period_daily
@@ -1192,12 +1332,22 @@ private fun periodWordLabel(period: BudgetPeriod): String = stringResource(
 private fun CalculatedSplitCard(
     periodCache: BudgetPeriod,
     totalBudget: BigDecimal,
+    totalSpent: BigDecimal,
     totalDays: Int,
+    daysRemaining: Int,
+    splitMode: BudgetSplitMode,
     currencyFormat: NumberFormat,
     modifier: Modifier = Modifier,
 ) {
     val calculatedAmount = if (totalBudget > BigDecimal.ZERO && totalDays > 0) {
-        budgetForPeriod(totalBudget, totalDays, periodCache)
+        splitBudget(
+            totalBudget = totalBudget,
+            totalSpent = totalSpent,
+            totalDays = totalDays,
+            daysRemaining = daysRemaining,
+            period = periodCache,
+            mode = splitMode,
+        )
     } else {
         BigDecimal.ZERO
     }
@@ -1240,13 +1390,17 @@ private fun CalculatedSplitCard(
 private fun BudgetPeriodSheetPreview() {
     MinusTheme {
         Surface {
+            // Pinned dates keep the dynamic split card stable across re-renders.
+            // see `MEMORY.md` note on Paparazzi/LocalDate drift.
+            val pinnedStart = LocalDate.of(2099, 6, 1)
+            val pinnedEnd = LocalDate.of(2099, 6, 30)
             BudgetPeriodSheet(
                 budgetSettings =
                     BudgetSettings(
                         totalBudget = BigDecimal("17725"),
                         period = BudgetPeriod.DAILY,
-                        startDate = LocalDate.now().minusDays(29),
-                        endDate = LocalDate.now(),
+                        startDate = pinnedStart,
+                        endDate = pinnedEnd,
                         currencyCode = "MXN",
                         daysInPeriod = 30,
                         rollOverEnabled = false,
@@ -1287,8 +1441,8 @@ private fun EditModePreview() {
                     BudgetSettings(
                         totalBudget = BigDecimal("17725"),
                         period = BudgetPeriod.DAILY,
-                        startDate = LocalDate.now().minusDays(29),
-                        endDate = LocalDate.now(),
+                        startDate = LocalDate.of(2099, 6, 1),
+                        endDate = LocalDate.of(2099, 6, 30),
                         currencyCode = "MXN",
                         daysInPeriod = 30,
                     ),
@@ -1312,8 +1466,8 @@ private fun EditEmptyModePreview() {
             budgetSettings = BudgetSettings(
                 totalBudget = BigDecimal("0"),
                 period = BudgetPeriod.DAILY,
-                startDate = LocalDate.now().minusDays(29),
-                endDate = LocalDate.now(),
+                startDate = LocalDate.of(2099, 6, 1),
+                endDate = LocalDate.of(2099, 6, 30),
                 currencyCode = "MXN",
                 daysInPeriod = 30,
             ),
