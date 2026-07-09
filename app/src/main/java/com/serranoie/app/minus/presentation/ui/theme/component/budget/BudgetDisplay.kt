@@ -340,14 +340,14 @@ fun Arrow(
 ) {
     Canvas(modifier = modifier) {
         val d = density
-        val triSide = 16f * d
+        val triSide = 9f * d
         val triHeight = triSide
         val halfSide = triSide / 2
 
         val right = size.width
         val centerY = size.height / 2
 
-        val thickness = size.height * 0.15f
+        val thickness = size.height * 0.095f
         val halfThick = thickness / 2
         val lineEnd = right - triHeight + halfThick
 

@@ -43,9 +43,9 @@ fun WavyDivider(
     text: String,
     modifier: Modifier = Modifier,
     horizontalPadding: Dp = 16.dp,
-    amplitude: Float = 3f,
-    wavelength: Float = 60f,
-    strokeWidth: Float = 2f,
+    amplitude: Float = 2f,
+    wavelength: Float = 30f,
+    strokeWidth: Float = 1.5f,
     color: Color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
 ) {
     BoxWithConstraints(
@@ -145,9 +145,7 @@ private fun WavyLine(
 private fun WavyDividerPreview() {
     MinusTheme {
         WavyDivider(
-            text = stringResource(R.string.wavy_divider_show_all_past_period_expenses),
-            amplitude = 3f,
-            wavelength = 60f
+            text = stringResource(R.string.wavy_divider_show_all_past_period_expenses)
         )
     }
 }
@@ -156,8 +154,6 @@ private fun WavyDividerPreview() {
 @Composable
 private fun WavyDividerHighAmplitudePreview() {
     MinusTheme {
-        WavyDivider(
-            text = "Testiiiing...", amplitude = 4f, wavelength = 50f
-        )
+        WavyDivider(text = "Testiiiing...")
     }
 }

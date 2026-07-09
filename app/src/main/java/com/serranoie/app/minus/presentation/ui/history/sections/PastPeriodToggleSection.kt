@@ -40,8 +40,6 @@ internal fun LazyListScope.pastPeriodToggleSection(
             WavyDivider(
                 text = if (showPastPeriod) "Ocultar gastos del periodo pasado" else "Mostrar gastos del periodo pasado",
                 horizontalPadding = 0.dp,
-                amplitude = 4f,
-                wavelength = 45f,
             )
         }
     }
