@@ -1,1 +1,1 @@
-Control de presupuesto fácil de usar con estilo de calculadora.
+Registre gastos, calcula y crea recordatorios para tus gastos recurrentes.

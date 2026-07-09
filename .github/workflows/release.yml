@@ -71,6 +71,19 @@ jobs:
         run: |
           echo "$MINUS_RELEASE_KEYSTORE_BASE64" | base64 --decode > release-keystore.jks
 
+      - name: Write keystore.properties for CI build
+        env:
+          MINUS_RELEASE_STORE_PASSWORD: ${{ secrets.MINUS_RELEASE_STORE_PASSWORD }}
+          MINUS_RELEASE_KEY_ALIAS: ${{ secrets.MINUS_RELEASE_KEY_ALIAS }}
+          MINUS_RELEASE_KEY_PASSWORD: ${{ secrets.MINUS_RELEASE_KEY_PASSWORD }}
+        run: |
+          cat > keystore.properties << EOF
+          storeFile=${{ github.workspace }}/release-keystore.jks
+          storePassword=${MINUS_RELEASE_STORE_PASSWORD}
+          keyAlias=${MINUS_RELEASE_KEY_ALIAS}
+          keyPassword=${MINUS_RELEASE_KEY_PASSWORD}
+          EOF
+
       - name: Run Detekt
         run: ./gradlew detekt
 

@@ -1,4 +1,6 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import java.util.Properties
+import java.io.File
 
 plugins {
     alias(libs.plugins.android.application)
@@ -89,13 +91,22 @@ android {
         version = release(36)
     }
 
-    val releaseStoreFile = System.getenv("MINUS_RELEASE_STORE_FILE")
+    val keystorePropsFile = rootProject.file("keystore.properties")
+    val keystoreProps = Properties().apply {
+        if (keystorePropsFile.exists()) {
+            keystorePropsFile.inputStream().use { stream -> load(stream) }
+        }
+    }
+    val releaseStoreFile = keystoreProps.getProperty("storeFile")?.takeIf { it.isNotBlank() }
+    val releaseStorePassword = keystoreProps.getProperty("storePassword")
+    val releaseKeyAlias = keystoreProps.getProperty("keyAlias")
+    val releaseKeyPassword = keystoreProps.getProperty("keyPassword")
     val hasReleaseSigningConfig = listOf(
         releaseStoreFile,
-        System.getenv("MINUS_RELEASE_STORE_PASSWORD"),
-        System.getenv("MINUS_RELEASE_KEY_ALIAS"),
-        System.getenv("MINUS_RELEASE_KEY_PASSWORD")
-    ).all { !it.isNullOrBlank() }
+        releaseStorePassword,
+        releaseKeyAlias,
+        releaseKeyPassword,
+    ).all { v -> !v.isNullOrBlank() }
 
     defaultConfig {
         applicationId = "com.serranoie.app.minus"
@@ -120,10 +131,10 @@ android {
     signingConfigs {
         if (hasReleaseSigningConfig) {
             create("release") {
-                storeFile = file(releaseStoreFile!!)
-                storePassword = System.getenv("MINUS_RELEASE_STORE_PASSWORD")
-                keyAlias = System.getenv("MINUS_RELEASE_KEY_ALIAS")
-                keyPassword = System.getenv("MINUS_RELEASE_KEY_PASSWORD")
+                storeFile = File(releaseStoreFile!!)
+                storePassword = releaseStorePassword!!
+                keyAlias = releaseKeyAlias!!
+                keyPassword = releaseKeyPassword!!
             }
         }
     }

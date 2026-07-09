@@ -43,3 +43,7 @@ fastlane/metadata/**/changelogs/*.bak.*
 
 # Playstore sign config
 app/src/main/assets/adi-registration.properties
+
+# Release signing config
+# For CI (release.yml), the same file is generated at build time from secrets.
+/keystore.properties

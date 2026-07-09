@@ -1,1 +1,1 @@
-Easy to use calculator-style budget tracking for Android.
+Register expenses, calculate and make reminders for your recurring expenses
