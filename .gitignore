@@ -42,4 +42,4 @@ fastlane/report.xml
 fastlane/metadata/**/changelogs/*.bak.*
 
 # Playstore sign config
-/app/src/main/assets
+app/src/main/assets/adi-registration.properties
