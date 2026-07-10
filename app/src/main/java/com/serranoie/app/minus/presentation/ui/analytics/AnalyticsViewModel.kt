@@ -267,7 +267,6 @@ class AnalyticsViewModel @Inject constructor(
             budgetStateForDisplay = displayBudgetState,
             showRolloverStyleInBudgetDisplay = shouldShowRolloverStyle,
             isLoading = false,
-            savingsPreferences = savingsPreferences,
         )
     }
 
