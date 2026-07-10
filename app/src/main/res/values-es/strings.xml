@@ -203,6 +203,7 @@
     <string name="settings_section_app_info">Información de la aplicación</string>
     <string name="settings_section_data_backup">Copia de seguridad de datos</string>
     <string name="settings_section_tutorial">Tutorial</string>
+    <string name="settings_section_savings">Ahorros</string>
 
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_subtitle">Cambiar el estilo del tema de la aplicación</string>
@@ -365,7 +366,7 @@
     <string name="finished_period_header_summary">Aquí están las estadísticas de todos sus gastos.</string>
 
     <string name="savings_recommendation_title">Recomendación de ahorro</string>
-    <string name="savings_recommendation_method_brief" formatted="false">El método clásico 50/30/20 divide su presupuesto en 50 % de necesidades, 30 % de deseos y 20 % de ahorro, lo que le ayuda a controlar los gastos y ahorrar de forma constante.</string>
+    <string name="savings_recommendation_method_brief" formatted="false">Este método %1$d/%2$d/%3$d divide tu presupuesto en %1$d%% de necesidades, %2$d%% de deseos y %3$d%% de ahorro, ayudándote a controlar los gastos y ahorrar de forma constante.</string>
     <string name="savings_recommendation_current_savings_label">Ahorros actuales</string>
     <string name="savings_recommendation_available_format">Disponible: %1$s</string>
     <string name="savings_recommendation_ideal_savings_format">Ahorros ideales: %1$s</string>
@@ -373,6 +374,32 @@
     <string name="savings_recommendation_recurrent_expenses_label">Gastos recurrentes</string>
     <string name="savings_recommendation_one_time_expenses_label">Gastos únicos</string>
     <string name="savings_recommendation_six_month_example_intro">Si ahorras el 20% en cada período durante aproximadamente 6 meses, podrías construir:</string>
+    <string name="savings_recommendation_goal_format" formatted="false">Para alcanzar %1$s en %2$d meses, ahorra %3$s por período.</string>
+    <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando el ejemplo por defecto del %1$d%%. Define una meta de ahorro en Ajustes para apuntar a un monto específico.</string>
+
+    <!-- Settings: Savings Preferences -->
+    <string name="settings_savings_preferences_title">Preferencias de ahorro</string>
+    <string name="settings_savings_preferences_subtitle">Personaliza la división 50/30/20 y define una meta de ahorro opcional</string>
+    <string name="settings_savings_dialog_split_label">División del presupuesto</string>
+    <string name="settings_savings_dialog_split_hint">Los tres valores deben sumar 100%%.</string>
+    <string name="settings_savings_dialog_split_invalid">Los tres valores deben sumar 100%% (actualmente %1$d%%).</string>
+    <string name="settings_savings_preset_balanced_title">Equilibrado</string>
+    <string name="settings_savings_preset_balanced_subtitle">50/30/20 — la división clásica</string>
+    <string name="settings_savings_preset_aggressive_title">Ahorrador agresivo</string>
+    <string name="settings_savings_preset_aggressive_subtitle">40/20/40 — ahorra más cada período</string>
+    <string name="settings_savings_preset_conservative_title">Conservador</string>
+    <string name="settings_savings_preset_conservative_subtitle">70/20/10 — muchas necesidades, menos ahorro</string>
+    <string name="settings_savings_preset_custom_title">Personalizado</string>
+    <string name="settings_savings_preset_custom_subtitle">%1$d/%2$d/%3$d — define tu propia división</string>
+    <string name="settings_savings_dialog_custom_section">División personalizada</string>
+    <string name="settings_savings_dialog_needs_label">Necesidades — %1$d%%</string>
+    <string name="settings_savings_dialog_wants_label">Deseos — %1$d%%</string>
+    <string name="settings_savings_dialog_savings_label">Ahorro — %1$d%%</string>
+    <string name="settings_savings_dialog_goal_section">Meta de ahorro (opcional)</string>
+    <string name="settings_savings_dialog_goal_amount_label">Monto objetivo</string>
+    <string name="settings_savings_dialog_goal_months_label">Período objetivo (meses)</string>
+    <string name="settings_savings_dialog_goal_hint">Déjalo en blanco para mantener el ejemplo por defecto de %1$d%% × 6.</string>
+    <string name="settings_savings_dialog_reset">Restablecer valores predeterminados</string>
 
     <string name="wavy_divider_show_all_past_period_expenses">Mostrar todos los gastos del período anterior...</string>
 
@@ -412,7 +439,6 @@
     <string name="recurrence_end">Fin recurrencia</string>
 
     <!-- Transaction Detail Ticket Card -->
-    <string name="ticket_operation_number">Op. #%1$d</string>
     <string name="ticket_expense">GASTO</string>
     <string name="ticket_recurrent_expense">GASTO RECURRENTE</string>
     <string name="ticket_total_amount">MONTO TOTAL</string>

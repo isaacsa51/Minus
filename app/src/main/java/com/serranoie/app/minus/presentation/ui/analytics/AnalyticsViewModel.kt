@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.SavingsPreferences
+import com.serranoie.app.minus.domain.model.SavingsSplitPreset
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
@@ -14,6 +16,12 @@ import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCas
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTIVE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
 import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
+import com.serranoie.app.minus.presentation.SAVINGS_GOAL_AMOUNT_KEY
+import com.serranoie.app.minus.presentation.SAVINGS_GOAL_MONTHS_KEY
+import com.serranoie.app.minus.presentation.SAVINGS_NEEDS_PCT_KEY
+import com.serranoie.app.minus.presentation.SAVINGS_PRESET_KEY
+import com.serranoie.app.minus.presentation.SAVINGS_SAVINGS_PCT_KEY
+import com.serranoie.app.minus.presentation.SAVINGS_WANTS_PCT_KEY
 import com.serranoie.app.minus.presentation.ui.history.calculateNextChargeDate
 import com.serranoie.app.minus.presentation.ui.history.getRecurringChargesInPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -149,6 +157,25 @@ class AnalyticsViewModel @Inject constructor(
         val earlyFinishOriginalEndDate =
             prefs?.get(EARLY_FINISH_ORIGINAL_END_DATE_KEY)?.let { Date(it) }
 
+        val savingsNeedsPct = prefs?.get(SAVINGS_NEEDS_PCT_KEY)
+            ?: SavingsPreferences.DEFAULT_NEEDS_PCT
+        val savingsWantsPct = prefs?.get(SAVINGS_WANTS_PCT_KEY)
+            ?: SavingsPreferences.DEFAULT_WANTS_PCT
+        val savingsSavingsPct = prefs?.get(SAVINGS_SAVINGS_PCT_KEY)
+            ?: SavingsPreferences.DEFAULT_SAVINGS_PCT
+        val savingsPreset = prefs?.get(SAVINGS_PRESET_KEY)?.let { name ->
+            runCatching { SavingsSplitPreset.valueOf(name) }
+                .getOrElse { SavingsSplitPreset.fromValues(savingsNeedsPct, savingsWantsPct, savingsSavingsPct) }
+        } ?: SavingsSplitPreset.fromValues(savingsNeedsPct, savingsWantsPct, savingsSavingsPct)
+        val savingsPreferences = SavingsPreferences(
+            preset = savingsPreset,
+            needsPct = savingsNeedsPct,
+            wantsPct = savingsWantsPct,
+            savingsPct = savingsSavingsPct,
+            savingsGoalAmount = prefs?.get(SAVINGS_GOAL_AMOUNT_KEY)?.toBigDecimalOrNull(),
+            savingsGoalMonths = prefs?.get(SAVINGS_GOAL_MONTHS_KEY),
+        )
+
         val periodFinishedNaturally =
             settings.getPeriodEndDate().isBefore(today) || settings.getPeriodEndDate()
                 .isEqual(today)
@@ -227,6 +254,7 @@ class AnalyticsViewModel @Inject constructor(
             budgetStateForDisplay = displayBudgetState,
             showRolloverStyleInBudgetDisplay = shouldShowRolloverStyle,
             isLoading = false,
+            savingsPreferences = savingsPreferences,
         )
     }
 

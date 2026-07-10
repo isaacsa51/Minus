@@ -41,6 +41,12 @@ import com.serranoie.app.minus.data.repository.BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME
 import com.serranoie.app.minus.data.repository.CATEGORY_GRID_MODE_KEY_NAME
 import com.serranoie.app.minus.data.repository.CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME
 import com.serranoie.app.minus.data.repository.CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME
+import com.serranoie.app.minus.data.repository.SAVINGS_GOAL_AMOUNT_KEY_NAME
+import com.serranoie.app.minus.data.repository.SAVINGS_GOAL_MONTHS_KEY_NAME
+import com.serranoie.app.minus.data.repository.SAVINGS_NEEDS_PCT_KEY_NAME
+import com.serranoie.app.minus.data.repository.SAVINGS_PRESET_KEY_NAME
+import com.serranoie.app.minus.data.repository.SAVINGS_SAVINGS_PCT_KEY_NAME
+import com.serranoie.app.minus.data.repository.SAVINGS_WANTS_PCT_KEY_NAME
 import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_ID_KEY_NAME
 import com.serranoie.app.minus.data.repository.CURRENT_PERIOD_STARTED_AT_KEY_NAME
 import com.serranoie.app.minus.data.repository.DYNAMIC_COLOR_KEY_NAME
@@ -106,6 +112,12 @@ val EARLY_FINISH_ORIGINAL_END_DATE_KEY = longPreferencesKey(EARLY_FINISH_ORIGINA
 val CURRENT_PERIOD_STARTED_AT_KEY = longPreferencesKey(CURRENT_PERIOD_STARTED_AT_KEY_NAME)
 val CURRENT_PERIOD_ID_KEY = longPreferencesKey(CURRENT_PERIOD_ID_KEY_NAME)
 val BUDGET_SPLIT_VIEW_PERIOD_KEY = stringPreferencesKey(BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME)
+val SAVINGS_PRESET_KEY = stringPreferencesKey(SAVINGS_PRESET_KEY_NAME)
+val SAVINGS_NEEDS_PCT_KEY = intPreferencesKey(SAVINGS_NEEDS_PCT_KEY_NAME)
+val SAVINGS_WANTS_PCT_KEY = intPreferencesKey(SAVINGS_WANTS_PCT_KEY_NAME)
+val SAVINGS_SAVINGS_PCT_KEY = intPreferencesKey(SAVINGS_SAVINGS_PCT_KEY_NAME)
+val SAVINGS_GOAL_AMOUNT_KEY = stringPreferencesKey(SAVINGS_GOAL_AMOUNT_KEY_NAME)
+val SAVINGS_GOAL_MONTHS_KEY = intPreferencesKey(SAVINGS_GOAL_MONTHS_KEY_NAME)
 const val DEFAULT_NOTIFICATION_HOUR = 9
 const val DEFAULT_NOTIFICATION_MINUTE = 0
 const val DEFAULT_RECURRENT_NOTIFICATION_HOUR = 8

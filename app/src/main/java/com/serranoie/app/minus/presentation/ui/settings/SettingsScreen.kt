@@ -101,6 +101,8 @@ fun SettingsScreen(
         },
         periodMappingMode = uiState.periodMappingMode,
         onPeriodMappingModeChange = viewModel::onPeriodMappingModeChange,
+        savingsPreferences = uiState.savingsPreferences,
+        onSavingsPreferencesChange = viewModel::onSavingsPreferencesChange,
         onExportCsv = viewModel::onExportCsv,
         onImportCsv = viewModel::onImportCsv,
         onResetTutorial = viewModel::onResetTutorial,
