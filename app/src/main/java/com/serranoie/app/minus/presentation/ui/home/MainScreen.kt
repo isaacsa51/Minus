@@ -3,10 +3,18 @@ package com.serranoie.app.minus.presentation.ui.home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
+import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
 import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
@@ -112,6 +120,19 @@ fun MainScreen(
         }
     }
 
+    val showNumpadTutorial = remember { mutableStateOf(true) }
+
+    // Note: we intentionally do NOT flip showNumpadTutorial to false in
+    // onTutorialCompleted. The walk's `isCompleted` flag (managed inside
+    // TutorialBoxState) already hides the overlay when the walk finishes; if we
+    // also flipped showNumpadTutorial to false, the rewind logic that brings the
+    // user back to gated targets (category tag, recurrent toggle) when they enter
+    // edit mode would have no effect because the overlay would stay hidden. With
+    // this wiring, the walk can complete, then un-complete when a gated target
+    // becomes available, and the overlay re-shows to walk through the gated
+    // targets on the user's first edit-mode entry.
+    val tutorialBoxState = rememberTutorialBoxState()
+
     ChangelogGate(
         currentVersionCode = run {
             val info = context.packageManager.getPackageInfo(
@@ -121,47 +142,79 @@ fun MainScreen(
             @Suppress("DEPRECATION") info.longVersionCode.toInt()
         },
     ) {
-        MainScreenContent(
-            mainScreenState = mainScreenState,
-            budgetUiState = budgetUiState,
-            onboardingCompleted = onboardingCompleted,
-            tutorialStage = tutorialStage,
-            showCreditQuickToggleFeature = showCreditQuickToggleFeature,
-            directCategoryPopupEnabled = directCategoryPopupEnabled,
-            categoryGridModeEnabled = categoryGridModeEnabled,
-            onProcessIntent = { intent ->
-                when (intent) {
-                    is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
-                        budgetViewModel.processIntent(intent.intent)
-                    }
-
-                    is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
-                        budgetViewModel.processIntent(intent.intent)
-                    }
-
-                    is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
-                        budgetViewModel.processIntent(intent.intent)
-                    }
-
-                    else -> {
-                        mainScreenViewModel.processIntent(intent, tutorialStage)
-                    }
+        TutorialBox(
+            showTutorial = showNumpadTutorial.value,
+            onTutorialCompleted = { /* see comment above showNumpadTutorial */ },
+            state = tutorialBoxState,
+            tutorialTarget = { index ->
+                when (index) {
+                    0 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_numpad_title),
+                        description = stringResource(R.string.tutorial_numpad_description),
+                    )
+                    1 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_comment_title),
+                        description = stringResource(R.string.tutorial_comment_description),
+                    )
+                    2 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_budget_pill_title),
+                        description = stringResource(R.string.tutorial_budget_pill_description),
+                    )
+                    3 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_settings_title),
+                        description = stringResource(R.string.tutorial_settings_description),
+                    )
+                    4 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_recurrent_title),
+                        description = stringResource(R.string.tutorial_recurrent_description),
+                    )
+                    else -> Text(text = "")
                 }
             },
-            onNavigateToAnalytics = onNavigateToAnalytics,
-            onNavigateToSettings = onNavigateToSettings,
-            onNavigateToWallet = onNavigateToWallet,
-            openWalletOnStart = openWalletOnStart,
-            showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet,
-            forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup,
-            selectedViewPeriod = effectiveSelectedPeriod,
-            onPeriodSelected = { period ->
-                mainScreenViewModel.processIntent(
-                    MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
-                )
-            },
-            settingsDataStore = context.settingsDataStore,
-            undoSnackbarActionLabel = undoSnackbarActionLabel,
-        )
+        ) {
+            MainScreenContent(
+                mainScreenState = mainScreenState,
+                budgetUiState = budgetUiState,
+                onboardingCompleted = onboardingCompleted,
+                tutorialStage = tutorialStage,
+                showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+                directCategoryPopupEnabled = directCategoryPopupEnabled,
+                categoryGridModeEnabled = categoryGridModeEnabled,
+                onProcessIntent = { intent ->
+                    when (intent) {
+                        is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
+                            budgetViewModel.processIntent(intent.intent)
+                        }
+
+                        is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
+                            budgetViewModel.processIntent(intent.intent)
+                        }
+
+                        is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
+                            budgetViewModel.processIntent(intent.intent)
+                        }
+
+                        else -> {
+                            mainScreenViewModel.processIntent(intent, tutorialStage)
+                        }
+                    }
+                },
+                onNavigateToAnalytics = onNavigateToAnalytics,
+                onNavigateToSettings = onNavigateToSettings,
+                onNavigateToWallet = onNavigateToWallet,
+                openWalletOnStart = openWalletOnStart,
+                showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet,
+                forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup,
+                selectedViewPeriod = effectiveSelectedPeriod,
+                onPeriodSelected = { period ->
+                    mainScreenViewModel.processIntent(
+                        MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
+                    )
+                },
+                settingsDataStore = context.settingsDataStore,
+                undoSnackbarActionLabel = undoSnackbarActionLabel,
+                tutorialBoxState = tutorialBoxState,
+            )
+        }
     }
 }

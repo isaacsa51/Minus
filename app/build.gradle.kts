@@ -228,6 +228,19 @@ tasks.named("preBuild").configure {
 dependencies {
     implementation(project(":sync-contract"))
 
+    // Pin kotlin-stdlib to match the Kotlin Gradle Plugin version. Some transitive
+    // deps (Compose 2.3.x bundles, KSP downstream plugins) leak stdlib 2.4.0+
+    // into the classpath when the project itself is on Kotlin 2.2.x. Forcing
+    // exact match keeps the stdlib in sync with the compiler.
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.20") {
+            because("stdlib pulled in transitively at 2.4.0 by Compose/KSP, compiler on 2.2.x")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-reflect:2.2.20") {
+            because("keep kotlin-reflect aligned with stdlib + compiler")
+        }
+    }
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.process)
