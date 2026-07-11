@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Minus</string>
+    <string name="app_name">Menos</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="tomorrow">Tomorrow</string>
@@ -198,7 +198,7 @@
     <string name="onboarding_finish_date_selector_days_range">%1$d days · %2$s - %3$s</string>
     <string name="onboarding_finish_date_selector_budget_view_question">How do you want to view your budget?</string>
     <!-- Settings -->
-    <string name="settings_title">Settings</string>
+    <string name="settings_title">Ajustes</string>
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_notifications">Notifications</string>
     <string name="settings_section_features">Features</string>
