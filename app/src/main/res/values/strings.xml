@@ -89,9 +89,13 @@
     <string name="new_budget_period">New Budget Period</string>
     <string name="budget_split_calculated_amount">Calculated amount</string>
     <string name="budget_split_helper_format">You will have %1$s to spend every %2$s</string>
+    <string name="budget_split_helper_static">Total ÷ period days</string>
+    <string name="budget_split_helper_dynamic">(Total − Spent) ÷ days left</string>
+    <string name="budget_split_helper_static_brief">%1$s (total budget) / %2$d %3$s</string>
+    <string name="budget_split_helper_dynamic_brief">%1$s (remaining) / %2$d %3$s</string>
     <string name="budget_split_period_daily">day</string>
     <string name="budget_split_period_weekly">week</string>
-    <string name="budget_split_period_biweekly">fortnight</string>
+    <string name="budget_split_period_biweekly">biweekly</string>
     <string name="budget_split_period_monthly">month</string>
 
     <!-- History -->
@@ -175,14 +179,27 @@
 
     <string name="budget_period_label_today">Today</string>
     <string name="budget_period_label_this_week">This week</string>
-    <string name="budget_period_label_this_biweek">This fortnight</string>
+    <string name="budget_period_label_this_biweek">This biweekly</string>
     <string name="budget_period_label_this_month">This month</string>
+
+    <string name="budget_pill_label_per_daily">Per day</string>
+    <string name="budget_pill_label_per_weekly">Per week</string>
+    <string name="budget_pill_label_per_biweekly">Biweekly</string>
+    <string name="budget_pill_label_per_monthly">Per month</string>
+
+    <string name="budget_pill_label_daily_exceeded">Daily Amount Exceeded</string>
+    <string name="budget_pill_label_weekly_exceeded">Weekly Amount Exceeded</string>
+    <string name="budget_pill_label_biweekly_exceeded">Biweekly Amount Exceeded</string>
+    <string name="budget_pill_label_monthly_exceeded">Monthly Amount Exceeded</string>
+    <string name="budget_pill_sub_exceeded_single">%1$s amount Exceeded</string>
+    <string name="budget_pill_sub_exceeded_double">%1$s and %2$s amount Exceeded</string>
+    <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s and %3$s amount Exceeded</string>
 
     <string name="day_total_format">Total: %1$s</string>
 
     <string name="onboarding_welcome_title">Welcome to Minus</string>
     <string name="onboarding_welcome_subtitle">Hi and welcome, lets start saving together.</string>
-    <string name="onboarding_welcome_intro">A simple budget tracker that helps you decide how much you can spend each day, week, fortnight, or month.</string>
+    <string name="onboarding_welcome_intro">A simple budget tracker that helps you decide how much you can spend each day, week, biweekly, or month.</string>
     <string name="onboarding_step_1_title">Set a budget</string>
     <string name="onboarding_step_1_subtitle">Define your spending limit for any period.</string>
     <string name="onboarding_step_2_title">Track expenses</string>
@@ -349,7 +366,7 @@
     <string name="collapse">Collapse</string>
 
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">Budget exhausted</string>
+    <string name="budget_pill_over_budget">Budget amount Exceeded</string>
     <string name="budget_pill_no_budget">No budget</string>
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Weekly</string>

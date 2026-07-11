@@ -1,9 +1,13 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
 import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
+import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.splitBudget
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -63,15 +67,31 @@ class BudgetStateCalculator @Inject constructor(
 
         val effectiveTotalBudget = settings.totalBudget.add(rolloverAmount)
         val remainingBudget = effectiveTotalBudget.subtract(totalSpentInPeriod)
+        val originalDailyBudget = when (settings.splitMode) {
+            BudgetSplitMode.DYNAMIC -> {
+                if (daysRemaining <= 0) {
+                    BigDecimal.ZERO
+                } else {
+                    val remaining = effectiveTotalBudget.subtract(totalSpentInPeriod)
+                    if (remaining <= BigDecimal.ZERO) {
+                        BigDecimal.ZERO
+                    } else {
+                        remaining.divide(BigDecimal(daysRemaining), 2, RoundingMode.HALF_UP)
+                    }
+                }
+            }
 
-        val originalDailyBudget = if (originalTotalDays > 0) {
-            settings.totalBudget.divide(
-                BigDecimal(originalTotalDays),
-                2,
-                RoundingMode.HALF_UP,
-            )
-        } else {
-            BigDecimal.ZERO
+            BudgetSplitMode.STATIC -> {
+                if (originalTotalDays > 0) {
+                    settings.totalBudget.divide(
+                        BigDecimal(originalTotalDays),
+                        2,
+                        RoundingMode.HALF_UP,
+                    )
+                } else {
+                    BigDecimal.ZERO
+                }
+            }
         }
 
         val regularSpentToday =
@@ -90,6 +110,52 @@ class BudgetStateCalculator @Inject constructor(
             0f
         }
 
+        val allocations = if (settings.splitMode == BudgetSplitMode.DYNAMIC) {
+            // DYNAMIC: (remaining) / blocksRemaining(daysRemaining, period)
+            // See computeDynamicAllocations for the full spec.
+            val a = computeDynamicAllocations(
+                totalBudget = effectiveTotalBudget,
+                totalSpentInPeriod = totalSpentInPeriod.add(recurringDueToday),
+                totalSpentToday = spentToday,
+                daysRemaining = daysRemaining.coerceAtLeast(0),
+            )
+            Quintuple(
+                a.dailyAllocation, a.weeklyAllocation,
+                a.biweeklyAllocation, a.monthlyAllocation,
+                a.isTodayOverDailyAllocation,
+            )
+        } else {
+            // STATIC: totalBudget / (totalDays / periodBlockDays) for each
+            // period. Uses the existing splitBudget helper for the formula.
+            // (Static mode has no "today over" sub-period signal — the
+            // state just has the static allocation per period.)
+            val totalDaysClamped = originalTotalDays.coerceAtLeast(1)
+            val totalSpent = totalSpentInPeriod.add(recurringDueToday)
+            Quintuple(
+                daily = splitBudget(
+                    totalBudget = effectiveTotalBudget, totalSpent = totalSpent,
+                    totalDays = totalDaysClamped, daysRemaining = daysRemaining.coerceAtLeast(0),
+                    period = BudgetPeriod.DAILY, mode = BudgetSplitMode.STATIC,
+                ),
+                weekly = splitBudget(
+                    totalBudget = effectiveTotalBudget, totalSpent = totalSpent,
+                    totalDays = totalDaysClamped, daysRemaining = daysRemaining.coerceAtLeast(0),
+                    period = BudgetPeriod.WEEKLY, mode = BudgetSplitMode.STATIC,
+                ),
+                biweekly = splitBudget(
+                    totalBudget = effectiveTotalBudget, totalSpent = totalSpent,
+                    totalDays = totalDaysClamped, daysRemaining = daysRemaining.coerceAtLeast(0),
+                    period = BudgetPeriod.BIWEEKLY, mode = BudgetSplitMode.STATIC,
+                ),
+                monthly = splitBudget(
+                    totalBudget = effectiveTotalBudget, totalSpent = totalSpent,
+                    totalDays = totalDaysClamped, daysRemaining = daysRemaining.coerceAtLeast(0),
+                    period = BudgetPeriod.MONTHLY, mode = BudgetSplitMode.STATIC,
+                ),
+                isOverDaily = false,
+            )
+        }
+
         return BudgetState(
             remainingToday = remainingToday,
             totalSpentToday = spentToday,
@@ -99,6 +165,24 @@ class BudgetStateCalculator @Inject constructor(
             isOverBudget = remainingBudget < BigDecimal.ZERO,
             totalBudget = effectiveTotalBudget,
             totalSpentInPeriod = totalSpentInPeriod.add(recurringDueToday),
+            dailyAllocation = allocations.daily,
+            weeklyAllocation = allocations.weekly,
+            biweeklyAllocation = allocations.biweekly,
+            monthlyAllocation = allocations.monthly,
+            isTodayOverDailyAllocation = allocations.isOverDaily,
         )
     }
 }
+
+/**
+ * Local 5-tuple for the four per-mode allocations + the today-over flag.
+ * Lets the DYNAMIC and STATIC branches share a single copy-site in the
+ * BudgetState constructor without dragging an interface across packages.
+ */
+private data class Quintuple(
+    val daily: BigDecimal,
+    val weekly: BigDecimal,
+    val biweekly: BigDecimal,
+    val monthly: BigDecimal,
+    val isOverDaily: Boolean,
+)

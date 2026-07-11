@@ -10,6 +10,7 @@ import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_EDIT_BUTTON_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SHEET_TAG
@@ -119,6 +120,44 @@ class BudgetPeriodSheetInteractionScreenshotTest {
 		paparazzi.gif(view, start = 1, end = 1_600)
 	}
 
+	@Test
+	fun calculatedCardDynamicHelper() {
+		Locale.setDefault(Locale.US)
+
+		paparazzi.snapshot {
+			MinusTheme {
+				BudgetPeriodSheet(
+					budgetSettings = sampleBudgetSettings.copy(
+						splitMode = BudgetSplitMode.DYNAMIC,
+					),
+					budgetState = sampleBudgetState,
+					selectedPeriod = BudgetPeriod.DAILY,
+					currencyCode = "USD",
+					onPeriodSelected = {},
+					onSaveBudget = {},
+				)
+			}
+		}
+	}
+
+	@Test
+	fun calculatedCardStaticHelper() {
+		Locale.setDefault(Locale.US)
+
+		paparazzi.snapshot {
+			MinusTheme {
+				BudgetPeriodSheet(
+					budgetSettings = sampleBudgetSettings,
+					budgetState = sampleBudgetState,
+					selectedPeriod = BudgetPeriod.DAILY,
+					currencyCode = "USD",
+					onPeriodSelected = {},
+					onSaveBudget = {},
+				)
+			}
+		}
+	}
+
 	private val sampleBudgetSettings = BudgetSettings(
 		totalBudget = BigDecimal("900.00"),
 		period = BudgetPeriod.MONTHLY,
@@ -137,5 +176,10 @@ class BudgetPeriodSheetInteractionScreenshotTest {
 		isOverBudget = false,
 		totalBudget = BigDecimal("900.00"),
 		totalSpentInPeriod = BigDecimal("600.00"),
+		dailyAllocation = BigDecimal("30.00"),
+		weeklyAllocation = BigDecimal("150.00"),
+		biweeklyAllocation = BigDecimal("300.00"),
+		monthlyAllocation = BigDecimal("300.00"),
+		isTodayOverDailyAllocation = false,
 	)
 }

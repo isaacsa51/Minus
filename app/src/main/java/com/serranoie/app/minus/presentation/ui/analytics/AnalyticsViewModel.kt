@@ -22,6 +22,7 @@ import com.serranoie.app.minus.presentation.SAVINGS_NEEDS_PCT_KEY
 import com.serranoie.app.minus.presentation.SAVINGS_PRESET_KEY
 import com.serranoie.app.minus.presentation.SAVINGS_SAVINGS_PCT_KEY
 import com.serranoie.app.minus.presentation.SAVINGS_WANTS_PCT_KEY
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
 import com.serranoie.app.minus.presentation.ui.history.calculateNextChargeDate
 import com.serranoie.app.minus.presentation.ui.history.getRecurringChargesInPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -224,6 +225,13 @@ class AnalyticsViewModel @Inject constructor(
                 .fold(BigDecimal.ZERO) { acc, tx -> acc.add(tx.amount) }
         val remainingToday = totalSpentToday
 
+        val allocations = computeDynamicAllocations(
+            totalBudget = wholeBudget,
+            totalSpentInPeriod = totalSpent,
+            totalSpentToday = totalSpentToday,
+            daysRemaining = daysRemaining,
+        )
+
         val displayBudgetState = BudgetState(
             remainingToday = remainingBudget.coerceAtLeast(BigDecimal.ZERO),
             totalSpentToday = totalSpentToday,
@@ -233,6 +241,11 @@ class AnalyticsViewModel @Inject constructor(
             isOverBudget = isOverBudget,
             totalBudget = wholeBudget,
             totalSpentInPeriod = totalSpent,
+            dailyAllocation = allocations.dailyAllocation,
+            weeklyAllocation = allocations.weeklyAllocation,
+            biweeklyAllocation = allocations.biweeklyAllocation,
+            monthlyAllocation = allocations.monthlyAllocation,
+            isTodayOverDailyAllocation = allocations.isTodayOverDailyAllocation,
         )
 
         val shouldShowRolloverStyle =

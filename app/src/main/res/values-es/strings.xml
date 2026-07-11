@@ -86,10 +86,33 @@
     <string name="new_budget_period">Nuevo período de ahorro</string>
     <string name="budget_split_calculated_amount">Monto calculado</string>
     <string name="budget_split_helper_format">Tendrás %1$s para gastar cada %2$s</string>
+    <string name="budget_split_helper_static">Total ÷ días del período</string>
+    <string name="budget_split_helper_dynamic">(Total − Gastado) ÷ días restantes</string>
+    <string name="budget_split_helper_static_brief">%1$s (presupuesto total) / %2$d %3$s</string>
+    <string name="budget_split_helper_dynamic_brief">%1$s (restante) / %2$d %3$s</string>
     <string name="budget_split_period_daily">día</string>
     <string name="budget_split_period_weekly">semana</string>
     <string name="budget_split_period_biweekly">quincena</string>
     <string name="budget_split_period_monthly">mes</string>
+
+    <string name="budget_pill_label_per_daily">Por día</string>
+    <string name="budget_pill_label_per_weekly">Por semana</string>
+    <string name="budget_pill_label_per_biweekly">Por quincena</string>
+    <string name="budget_pill_label_per_monthly">Por mes</string>
+
+    <string name="budget_pill_label_daily_exceeded">Monto diario excedido</string>
+    <string name="budget_pill_label_weekly_exceeded">Monto semanal excedido</string>
+    <string name="budget_pill_label_biweekly_exceeded">Monto quincenal excedido</string>
+    <string name="budget_pill_label_monthly_exceeded">Monto mensual excedido</string>
+
+    <string name="budget_pill_sub_exceeded_single">Monto %1$s excedido</string>
+    <string name="budget_pill_sub_exceeded_double">Monto %1$s y %2$s excedido</string>
+    <string name="budget_pill_sub_exceeded_triple">Monto %1$s, %2$s y %3$s excedido</string>
+
+    <string name="budget_pill_label_per_daily_exceeded">Por día Monto excedido</string>
+    <string name="budget_pill_label_per_weekly_exceeded">Por semana Monto excedido</string>
+    <string name="budget_pill_label_per_biweekly_exceeded">Por quincena Monto excedido</string>
+    <string name="budget_pill_label_per_monthly_exceeded">Por mes Monto excedido</string>
 
     <string name="expense_deleted_format">%1$s eliminado</string>
     <string name="expense_modified_format">%1$s ha sido modificado</string>
@@ -309,7 +332,7 @@
     <string name="expand">Expandir</string>
     <string name="collapse">Colapsar</string>
 
-    <string name="budget_pill_over_budget">Presupuesto agotado</string>
+    <string name="budget_pill_over_budget">Monto del presupuesto excedido</string>
     <string name="budget_pill_no_budget">Sin presupuesto</string>
     <string name="budget_pill_exhausted_daily_label">diario</string>
     <string name="budget_pill_exhausted_weekly_label">semanalmente</string>

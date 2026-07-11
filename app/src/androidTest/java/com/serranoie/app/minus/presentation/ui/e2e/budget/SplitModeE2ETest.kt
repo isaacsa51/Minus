@@ -20,12 +20,14 @@ import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.Editor
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_APPLY_BUTTON_TAG
-import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_CALCULATED_CARD_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_EDIT_BUTTON_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SHEET_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SPLIT_MODE_ROW_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
 import com.serranoie.app.minus.presentation.ui.editor.sheets.budgetPeriodToggleTag
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.BUDGET_PERIOD_CALCULATED_CARD_TAG
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.splitBudget
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import org.junit.Rule
 import org.junit.Test
@@ -80,15 +82,61 @@ class SplitModeE2ETest {
             )
         }
 
-    private fun dynamicState() = BudgetState(
-        remainingToday = BigDecimal("554.82"),
-        totalSpentToday = BigDecimal("0.00"),
-        dailyBudget = BigDecimal("554.82"),
-        daysRemaining = 28,
-        progress = (totalSpent.divide(totalBudget, 2, RoundingMode.HALF_UP).toFloat()).coerceIn(0f, 1f),
-        isOverBudget = false,
-        totalBudget = totalBudget,
-        totalSpentInPeriod = totalSpent,
+    /**
+     * Builds the shared BudgetState fixture. The four allocation fields are
+     * computed mode-aware: STATIC uses [splitBudget] with `mode=STATIC`
+     * (the formula the production calculator now uses for STATIC), DYNAMIC
+     * uses [computeDynamicAllocations]. This mirrors the production
+     * BudgetStateCalculator which branches on `settings.splitMode`.
+     */
+    private fun dynamicState(splitMode: BudgetSplitMode = BudgetSplitMode.DYNAMIC): BudgetState {
+        val base = BudgetState(
+            remainingToday = BigDecimal("554.82"),
+            totalSpentToday = BigDecimal("0.00"),
+            dailyBudget = BigDecimal("554.82"),
+            daysRemaining = 28,
+            progress = (totalSpent.divide(totalBudget, 2, RoundingMode.HALF_UP).toFloat()).coerceIn(0f, 1f),
+            isOverBudget = false,
+            totalBudget = totalBudget,
+            totalSpentInPeriod = totalSpent,
+        )
+        val alloc = if (splitMode == BudgetSplitMode.DYNAMIC) {
+            val a = computeDynamicAllocations(
+                totalBudget = totalBudget,
+                totalSpentInPeriod = totalSpent,
+                totalSpentToday = BigDecimal.ZERO,
+                daysRemaining = 28,
+            )
+            Quintuple(
+                a.dailyAllocation, a.weeklyAllocation,
+                a.biweeklyAllocation, a.monthlyAllocation,
+                a.isTodayOverDailyAllocation,
+            )
+        } else {
+            // STATIC: totalBudget / (30 / periodBlockDays) for each period.
+            Quintuple(
+                daily = splitBudget(totalBudget, totalSpent, 30, 28, BudgetPeriod.DAILY, BudgetSplitMode.STATIC),
+                weekly = splitBudget(totalBudget, totalSpent, 30, 28, BudgetPeriod.WEEKLY, BudgetSplitMode.STATIC),
+                biweekly = splitBudget(totalBudget, totalSpent, 30, 28, BudgetPeriod.BIWEEKLY, BudgetSplitMode.STATIC),
+                monthly = splitBudget(totalBudget, totalSpent, 30, 28, BudgetPeriod.MONTHLY, BudgetSplitMode.STATIC),
+                isOverDaily = false,
+            )
+        }
+        return base.copy(
+            dailyAllocation = alloc.daily,
+            weeklyAllocation = alloc.weekly,
+            biweeklyAllocation = alloc.biweekly,
+            monthlyAllocation = alloc.monthly,
+            isTodayOverDailyAllocation = alloc.isOverDaily,
+        )
+    }
+
+    private data class Quintuple(
+        val daily: BigDecimal,
+        val weekly: BigDecimal,
+        val biweekly: BigDecimal,
+        val monthly: BigDecimal,
+        val isOverDaily: Boolean,
     )
 
     private fun formatExpected(
@@ -201,7 +249,7 @@ class SplitModeE2ETest {
     fun when_static_mode_then_calculated_card_shows_554_82() {
         renderSheet(
             budgetSettings = dynamicSettings(BudgetSplitMode.STATIC),
-            budgetState = dynamicState(),
+            budgetState = dynamicState(BudgetSplitMode.STATIC),
         )
 
         // 554.82 = 16644.45 / 30
@@ -343,7 +391,7 @@ class SplitModeE2ETest {
     fun when_editor_renders_with_static_sheet_open_then_calculated_card_shows_static_number() {
         renderEditorWithSheet(
             budgetSettings = dynamicSettings(BudgetSplitMode.STATIC),
-            budgetState = dynamicState(),
+            budgetState = dynamicState(BudgetSplitMode.STATIC),
         )
 
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_SHEET_TAG).assertIsDisplayed()
@@ -380,10 +428,10 @@ class SplitModeE2ETest {
             daysInPeriod = 30,
             splitMode = splitMode,
         )
-        val state = BudgetState(
+        val baseState = BudgetState(
             remainingToday = budget.subtract(spent).coerceAtLeast(BigDecimal.ZERO),
             totalSpentToday = BigDecimal.ZERO,
-            dailyBudget = BigDecimal.ZERO, // not used by the calculated card
+            dailyBudget = BigDecimal.ZERO,
             daysRemaining = daysLeft,
             progress = if (budget > BigDecimal.ZERO) {
                 spent.divide(budget, 2, RoundingMode.HALF_UP).toFloat().coerceIn(0f, 1f)
@@ -391,6 +439,21 @@ class SplitModeE2ETest {
             isOverBudget = spent > budget,
             totalBudget = budget,
             totalSpentInPeriod = spent,
+        )
+        // Fill the new per-mode allocation fields so the
+        // CalculatedSplitCard can render without recomputing.
+        val alloc = computeDynamicAllocations(
+            totalBudget = budget,
+            totalSpentInPeriod = spent,
+            totalSpentToday = BigDecimal.ZERO,
+            daysRemaining = daysLeft,
+        )
+        val state = baseState.copy(
+            dailyAllocation = alloc.dailyAllocation,
+            weeklyAllocation = alloc.weeklyAllocation,
+            biweeklyAllocation = alloc.biweeklyAllocation,
+            monthlyAllocation = alloc.monthlyAllocation,
+            isTodayOverDailyAllocation = alloc.isTodayOverDailyAllocation,
         )
         return settings to state
     }
@@ -447,8 +510,9 @@ class SplitModeE2ETest {
     }
 
     @Test
-    fun when_dynamic_weekly_period_then_card_scales_daily_by_7() {
-        // 16644.45 - 200 = 16444.45 / 28 = 587.30/day -> 587.30 * 7 = 4111.10/week
+    fun when_dynamic_weekly_period_then_card_shows_remaining_split_into_week_blocks() {
+        // New formula: weekly = remaining / ceil(daysRemaining / 7)
+        //   = (16644.45 - 200) / ceil(28/7) = 16444.45 / 4 = 4111.11
         val (settings, state) = customDynamicScenario(
             budget = totalBudget,
             spent = totalSpent,
@@ -462,7 +526,7 @@ class SplitModeE2ETest {
             .performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("4111.10"))).onLast()
+        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("4111.11"))).onLast()
             .assertIsDisplayed()
     }
 }

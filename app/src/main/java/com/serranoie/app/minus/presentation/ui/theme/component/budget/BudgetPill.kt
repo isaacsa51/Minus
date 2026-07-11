@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -58,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -86,6 +86,7 @@ fun BudgetPill(
     onOpenBudgetSheet: () -> Unit = {},
     bigVariant: Boolean = false,
     centerRemainingAmount: Boolean = false,
+    splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
     modifier: Modifier = Modifier,
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
@@ -105,7 +106,15 @@ fun BudgetPill(
     val weeklyRemainingAmount = weeklyBudgetAmount.subtract(periodSpentAggregate)
     val biweeklyRemainingAmount = biweeklyBudgetAmount.subtract(periodSpentAggregate)
     val monthlyRemainingAmount = monthlyBudgetAmount.subtract(periodSpentAggregate)
-    val (periodBudget, periodSpent, periodRemaining) = when (period) {
+
+    val periodAllocation = when (period) {
+        BudgetPeriod.DAILY -> budgetState?.dailyAllocation ?: BigDecimal.ZERO
+        BudgetPeriod.WEEKLY -> budgetState?.weeklyAllocation ?: BigDecimal.ZERO
+        BudgetPeriod.BIWEEKLY -> budgetState?.biweeklyAllocation ?: BigDecimal.ZERO
+        BudgetPeriod.MONTHLY -> budgetState?.monthlyAllocation ?: BigDecimal.ZERO
+    }
+
+    val (periodBudget, periodSpent, staticPeriodRemaining) = when (period) {
         BudgetPeriod.DAILY -> Triple(dailyBudgetAmount, dailySpent, dailyRemainingAmount)
         BudgetPeriod.WEEKLY -> Triple(
             weeklyBudgetAmount, periodSpentAggregate, weeklyRemainingAmount
@@ -120,11 +129,35 @@ fun BudgetPill(
         )
     }
 
-    val isCurrentPeriodOverBudget = periodRemaining < BigDecimal.ZERO
+    val periodRemaining = when (splitMode) {
+        BudgetSplitMode.DYNAMIC -> periodAllocation
+        BudgetSplitMode.STATIC -> staticPeriodRemaining
+    }
+
+    val isCurrentPeriodOverBudget = when (splitMode) {
+        BudgetSplitMode.DYNAMIC -> budgetState?.isOverBudget == true
+        BudgetSplitMode.STATIC -> staticPeriodRemaining < BigDecimal.ZERO
+    }
+    val isOverDailyAllocation = budgetState?.isTodayOverDailyAllocation == true
+    val weeklyAllocation = budgetState?.weeklyAllocation ?: BigDecimal.ZERO
+    val biweeklyAllocation = budgetState?.biweeklyAllocation ?: BigDecimal.ZERO
+    val monthlyAllocation = budgetState?.monthlyAllocation ?: BigDecimal.ZERO
+    val isOverWeeklyAllocation = totalSpentInPeriod > weeklyAllocation && weeklyAllocation > BigDecimal.ZERO
+    val isOverBiweeklyAllocation = totalSpentInPeriod > biweeklyAllocation && biweeklyAllocation > BigDecimal.ZERO
+    val isOverMonthlyAllocation = totalSpentInPeriod > monthlyAllocation && monthlyAllocation > BigDecimal.ZERO
+
+    val isOverCurrentSubPeriod = when (period) {
+        BudgetPeriod.DAILY -> isOverDailyAllocation
+        BudgetPeriod.WEEKLY -> isOverWeeklyAllocation
+        BudgetPeriod.BIWEEKLY -> isOverBiweeklyAllocation
+        BudgetPeriod.MONTHLY -> isOverMonthlyAllocation
+    }
+
     val isDailyExhausted = dailyRemainingAmount <= BigDecimal.ZERO
     val isWeeklyExhausted = weeklyRemainingAmount <= BigDecimal.ZERO
     val isBiweeklyExhausted = biweeklyRemainingAmount <= BigDecimal.ZERO
-    val exhaustedMessage = when (period) {
+
+    val staticExhaustedMessage = when (period) {
         BudgetPeriod.WEEKLY -> {
             if (weeklyRemainingAmount > BigDecimal.ZERO && isDailyExhausted) {
                 stringResource(
@@ -183,6 +216,67 @@ fun BudgetPill(
         }
 
         else -> null
+    }
+
+    val dynamicExceededSubMessage = when (period) {
+        BudgetPeriod.DAILY -> null
+        BudgetPeriod.WEEKLY -> {
+            if (!isOverWeeklyAllocation && isOverDailyAllocation) {
+                stringResource(
+                    R.string.budget_pill_sub_exceeded_single,
+                    stringResource(R.string.budget_pill_exhausted_daily_label)
+                )
+            } else null
+        }
+
+        BudgetPeriod.BIWEEKLY -> {
+            if (!isOverBiweeklyAllocation) {
+                val overspent = buildList {
+                    if (isOverDailyAllocation) add(stringResource(R.string.budget_pill_exhausted_daily_label))
+                    if (isOverWeeklyAllocation) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
+                }
+                when (overspent.size) {
+                    0 -> null
+                    1 -> stringResource(R.string.budget_pill_sub_exceeded_single, overspent.first())
+                    2 -> stringResource(
+                        R.string.budget_pill_sub_exceeded_double,
+                        overspent[0], overspent[1]
+                    )
+
+                    else -> null
+                }
+            } else null
+        }
+
+        BudgetPeriod.MONTHLY -> {
+            if (!isOverMonthlyAllocation) {
+                val overspent = buildList {
+                    if (isOverDailyAllocation) add(stringResource(R.string.budget_pill_exhausted_daily_label))
+                    if (isOverWeeklyAllocation) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
+                    if (isOverBiweeklyAllocation) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
+                }
+                when (overspent.size) {
+                    0 -> null
+                    1 -> stringResource(R.string.budget_pill_sub_exceeded_single, overspent.first())
+                    2 -> stringResource(
+                        R.string.budget_pill_sub_exceeded_double,
+                        overspent[0], overspent[1]
+                    )
+
+                    else -> stringResource(
+                        R.string.budget_pill_sub_exceeded_triple,
+                        overspent[0], overspent[1], overspent[2]
+                    )
+                }
+            } else null
+        }
+
+        else -> null
+    }
+
+    val exhaustedMessage = when (splitMode) {
+        BudgetSplitMode.STATIC -> staticExhaustedMessage
+        BudgetSplitMode.DYNAMIC -> dynamicExceededSubMessage
     }
 
     val showExhaustedMessage = exhaustedMessage != null
@@ -305,12 +399,13 @@ fun BudgetPill(
                             )
                         }
                     } else {
+                        val isCentered = isCurrentPeriodOverBudget || isOverCurrentSubPeriod || bigVariant
                         Row(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(horizontal = if (isCurrentPeriodOverBudget || bigVariant) 0.dp else 18.dp),
+                                .padding(horizontal = if (isCentered) 0.dp else 18.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = if (isCurrentPeriodOverBudget || bigVariant) {
+                            horizontalArrangement = if (isCentered) {
                                 Arrangement.Center
                             } else {
                                 Arrangement.spacedBy(
@@ -322,11 +417,13 @@ fun BudgetPill(
                                 budgetState = budgetState,
                                 budgetPeriod = period,
                                 isOverBudget = isCurrentPeriodOverBudget,
+                                isOverSubPeriodAllocation = isOverCurrentSubPeriod,
                                 exhaustedMessage = exhaustedMessage,
                                 bigVariant = bigVariant,
+                                splitMode = splitMode,
                                 wrapContent = true,
                                 modifier = when {
-                                    isCurrentPeriodOverBudget || bigVariant -> Modifier.padding(
+                                    isCentered -> Modifier.padding(
                                         horizontal = 32.dp
                                     )
 
@@ -334,7 +431,7 @@ fun BudgetPill(
                                 },
                             )
 
-                            if (!isCurrentPeriodOverBudget && !bigVariant) {
+                            if (!isCurrentPeriodOverBudget && !isOverCurrentSubPeriod && !bigVariant) {
                                 AdaptiveSingleLineText(
                                     text = currencyFormat.format(periodRemaining),
                                     style = MaterialTheme.typography.titleMediumCondensed,
@@ -359,8 +456,10 @@ private fun StatusLabel(
     budgetState: BudgetState?,
     budgetPeriod: BudgetPeriod = BudgetPeriod.DAILY,
     isOverBudget: Boolean,
+    isOverSubPeriodAllocation: Boolean = false,
     exhaustedMessage: String? = null,
     bigVariant: Boolean = false,
+    splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
     wrapContent: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
@@ -369,6 +468,24 @@ private fun StatusLabel(
     val label = when {
         isOverBudget -> stringResource(R.string.budget_pill_over_budget)
         budgetState == null -> stringResource(R.string.budget_pill_no_budget)
+        isOverSubPeriodAllocation -> stringResource(
+            when (budgetPeriod) {
+                BudgetPeriod.DAILY -> R.string.budget_pill_label_daily_exceeded
+                BudgetPeriod.WEEKLY -> R.string.budget_pill_label_weekly_exceeded
+                BudgetPeriod.BIWEEKLY -> R.string.budget_pill_label_biweekly_exceeded
+                BudgetPeriod.MONTHLY -> R.string.budget_pill_label_monthly_exceeded
+            }
+        )
+
+        splitMode == BudgetSplitMode.DYNAMIC -> stringResource(
+            when (budgetPeriod) {
+                BudgetPeriod.DAILY -> R.string.budget_pill_label_per_daily
+                BudgetPeriod.WEEKLY -> R.string.budget_pill_label_per_weekly
+                BudgetPeriod.BIWEEKLY -> R.string.budget_pill_label_per_biweekly
+                BudgetPeriod.MONTHLY -> R.string.budget_pill_label_per_monthly
+            }
+        )
+
         else -> budgetPeriod.periodLabel()
     }
 
@@ -400,7 +517,7 @@ private fun StatusLabel(
                 text = label,
                 style = if (bigVariant) {
                     MaterialTheme.typography.titleMediumEmphasized
-                } else if (isOverBudget) {
+                } else if (isOverBudget || isOverSubPeriodAllocation) {
                     MaterialTheme.typography.titleMediumEmphasized
                 } else {
                     MaterialTheme.typography.titleMediumCondensed
@@ -463,6 +580,7 @@ private fun AdaptiveSingleLineText(
             textAlign = textAlign,
             modifier = (if (fillWidth) Modifier
                 .fillMaxWidth()
+                .basicMarquee()
                 .wrapContentHeight() else Modifier).align(Alignment.Center),
         )
     }
@@ -586,6 +704,165 @@ private fun PreviewBudgetPill() {
                 ),
                 viewPeriod = BudgetPeriod.WEEKLY,
                 currencyCode = "MXN",
+                onOpenBudgetSheet = { },
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun PreviewBudgetPillDynamic() {
+    MinusTheme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.background(
+                MaterialTheme.colorScheme.surface
+            )
+        ) {
+            BudgetPill(
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal("110.00"),
+                    totalSpentToday = BigDecimal("12.50"),
+                    dailyBudget = BigDecimal("122.50"),
+                    daysRemaining = 15,
+                    progress = 0.1f,
+                    isOverBudget = false,
+                    totalBudget = BigDecimal("500.00"),
+                    totalSpentInPeriod = BigDecimal("12.50"),
+                    dailyAllocation = BigDecimal("32.50"),
+                    weeklyAllocation = BigDecimal("162.50"),
+                    biweeklyAllocation = BigDecimal("487.50"),
+                    monthlyAllocation = BigDecimal("487.50"),
+                    isTodayOverDailyAllocation = false,
+                ),
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("500.00"),
+                    period = BudgetPeriod.DAILY,
+                    startDate = LocalDate.now(),
+                    currencyCode = "MXN",
+                    splitMode = BudgetSplitMode.DYNAMIC,
+                ),
+                viewPeriod = BudgetPeriod.DAILY,
+                currencyCode = "MXN",
+                splitMode = BudgetSplitMode.DYNAMIC,
+                onOpenBudgetSheet = { },
+            )
+
+            BudgetPill(
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal("15200.62"),
+                    totalSpentToday = BigDecimal("80.50"),
+                    dailyBudget = BigDecimal("122.50"),
+                    daysRemaining = 10,
+                    progress = 0.1f,
+                    isOverBudget = false,
+                    totalBudget = BigDecimal("1500.00"),
+                    totalSpentInPeriod = BigDecimal("80.50"),
+                    dailyAllocation = BigDecimal("149.15"),
+                    weeklyAllocation = BigDecimal("1044.05"),
+                    biweeklyAllocation = BigDecimal("1491.50"),
+                    monthlyAllocation = BigDecimal("1491.50"),
+                    isTodayOverDailyAllocation = false,
+                ),
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("1500.00"),
+                    period = BudgetPeriod.DAILY,
+                    startDate = LocalDate.now(),
+                    currencyCode = "MXN",
+                    splitMode = BudgetSplitMode.DYNAMIC,
+                ),
+                viewPeriod = BudgetPeriod.DAILY,
+                currencyCode = "MXN",
+                centerRemainingAmount = true,
+                modifier = Modifier.fillMaxWidth(),
+                splitMode = BudgetSplitMode.DYNAMIC,
+                onOpenBudgetSheet = { },
+            )
+
+            BudgetPill(
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal("110.00"),
+                    totalSpentToday = BigDecimal("12.50"),
+                    dailyBudget = BigDecimal("122.50"),
+                    daysRemaining = 15,
+                    progress = 0.1f,
+                    isOverBudget = false,
+                    totalBudget = BigDecimal("500.00"),
+                    totalSpentInPeriod = BigDecimal("12.50"),
+                    dailyAllocation = BigDecimal("32.50"),
+                    weeklyAllocation = BigDecimal("162.50"),
+                    biweeklyAllocation = BigDecimal("487.50"),
+                    monthlyAllocation = BigDecimal("487.50"),
+                    isTodayOverDailyAllocation = false,
+                ),
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("500.00"),
+                    period = BudgetPeriod.DAILY,
+                    startDate = LocalDate.now(),
+                    currencyCode = "MXN",
+                    splitMode = BudgetSplitMode.DYNAMIC,
+                ),
+                viewPeriod = BudgetPeriod.WEEKLY,
+                currencyCode = "MXN",
+                splitMode = BudgetSplitMode.DYNAMIC,
+                onOpenBudgetSheet = { },
+            )
+
+            BudgetPill(
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal("40.00"),
+                    totalSpentToday = BigDecimal("500.00"),
+                    dailyBudget = BigDecimal("100.00"),
+                    daysRemaining = 10,
+                    progress = 0.6f,
+                    isOverBudget = false,
+                    totalBudget = BigDecimal("1000.00"),
+                    totalSpentInPeriod = BigDecimal("600.00"),
+                    dailyAllocation = BigDecimal("40.00"),
+                    weeklyAllocation = BigDecimal("200.00"),
+                    biweeklyAllocation = BigDecimal("400.00"),
+                    monthlyAllocation = BigDecimal("400.00"),
+                    isTodayOverDailyAllocation = true,
+                ),
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("1000.00"),
+                    period = BudgetPeriod.DAILY,
+                    startDate = LocalDate.now(),
+                    currencyCode = "MXN",
+                    splitMode = BudgetSplitMode.DYNAMIC,
+                ),
+                viewPeriod = BudgetPeriod.DAILY,
+                currencyCode = "MXN",
+                splitMode = BudgetSplitMode.DYNAMIC,
+                onOpenBudgetSheet = { },
+            )
+
+            BudgetPill(
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal("-25.00"),
+                    totalSpentToday = BigDecimal("150.00"),
+                    dailyBudget = BigDecimal("100.00"),
+                    daysRemaining = 5,
+                    progress = 1.0f,
+                    isOverBudget = true,
+                    totalBudget = BigDecimal("500.00"),
+                    totalSpentInPeriod = BigDecimal("600.00"),
+                    dailyAllocation = BigDecimal.ZERO,
+                    weeklyAllocation = BigDecimal.ZERO,
+                    biweeklyAllocation = BigDecimal.ZERO,
+                    monthlyAllocation = BigDecimal.ZERO,
+                    isTodayOverDailyAllocation = true,
+                ),
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("500.00"),
+                    period = BudgetPeriod.DAILY,
+                    startDate = LocalDate.now(),
+                    currencyCode = "MXN",
+                    splitMode = BudgetSplitMode.DYNAMIC,
+                ),
+                viewPeriod = BudgetPeriod.DAILY,
+                currencyCode = "MXN",
+                splitMode = BudgetSplitMode.DYNAMIC,
                 onOpenBudgetSheet = { },
             )
         }

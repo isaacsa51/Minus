@@ -78,6 +78,7 @@ import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.SupportedCurrency
@@ -199,6 +200,7 @@ fun Editor(
                 viewPeriod = selectedViewPeriod ?: BudgetPeriod.DAILY,
                 currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
                 centerRemainingAmount = animState == AnimState.EDITING,
+                splitMode = uiState.budgetSettings?.splitMode ?: BudgetSplitMode.STATIC,
                 onOpenBudgetSheet = {
                     view.weakHapticFeedback()
                     onShowBudgetPeriodSheet()
