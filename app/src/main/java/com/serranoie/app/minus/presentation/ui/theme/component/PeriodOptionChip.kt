@@ -28,15 +28,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
-import com.serranoie.app.minus.presentation.ui.onboarding.availablePeriodsFor
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.availablePeriodsFor
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.splitBudget
 import com.serranoie.app.minus.presentation.ui.onboarding.label
-import com.serranoie.app.minus.presentation.ui.onboarding.splitBudget
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import java.math.BigDecimal
 
-/**
- * Single period option chip using Card for selection.
- */
 @Composable
 fun PeriodOptionChip(
 	period: BudgetPeriod,

@@ -42,6 +42,7 @@ import androidx.compose.ui.zIndex
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalytics
@@ -83,6 +84,7 @@ data class AnalyticsState(
     val budgetStateForDisplay: BudgetState? = null,
     val showRolloverStyleInBudgetDisplay: Boolean = false,
     val isLoading: Boolean = false,
+    val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
 )
 
 data class AnalyticsActions(
@@ -173,6 +175,7 @@ fun Analytics(
                     recurringInPeriod = state.recurringInPeriod,
                     oneTimeSpends = state.oneTimeSpends,
                     currency = state.currencyCode,
+                    preferences = state.savingsPreferences,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
 

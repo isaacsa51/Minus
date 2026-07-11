@@ -8,6 +8,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPreferences
+import com.serranoie.app.minus.domain.model.SavingsSplitPreset
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.model.UserSettings
@@ -44,6 +46,12 @@ const val EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME = "early_finish_original_end_d
 const val CURRENT_PERIOD_STARTED_AT_KEY_NAME = "current_period_started_at_millis"
 const val CURRENT_PERIOD_ID_KEY_NAME = "current_period_id"
 const val BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME = "budget_split_view_period"
+const val SAVINGS_PRESET_KEY_NAME = "savings_preset"
+const val SAVINGS_NEEDS_PCT_KEY_NAME = "savings_needs_pct"
+const val SAVINGS_WANTS_PCT_KEY_NAME = "savings_wants_pct"
+const val SAVINGS_SAVINGS_PCT_KEY_NAME = "savings_savings_pct"
+const val SAVINGS_GOAL_AMOUNT_KEY_NAME = "savings_goal_amount"
+const val SAVINGS_GOAL_MONTHS_KEY_NAME = "savings_goal_months"
 
 private val ONBOARDING_COMPLETED = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NAME)
 private val EARLY_FINISH_ACTIVE = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
@@ -66,6 +74,12 @@ private val CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD =
 private val PENDING_ROLLOVER_AMOUNT = stringPreferencesKey(PENDING_ROLLOVER_AMOUNT_KEY_NAME)
 private val PENDING_ROLLOVER_STRATEGY = stringPreferencesKey(PENDING_ROLLOVER_STRATEGY_KEY_NAME)
 private val BUDGET_SPLIT_VIEW_PERIOD = stringPreferencesKey(BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME)
+private val SAVINGS_PRESET = stringPreferencesKey(SAVINGS_PRESET_KEY_NAME)
+private val SAVINGS_NEEDS_PCT = intPreferencesKey(SAVINGS_NEEDS_PCT_KEY_NAME)
+private val SAVINGS_WANTS_PCT = intPreferencesKey(SAVINGS_WANTS_PCT_KEY_NAME)
+private val SAVINGS_SAVINGS_PCT = intPreferencesKey(SAVINGS_SAVINGS_PCT_KEY_NAME)
+private val SAVINGS_GOAL_AMOUNT = stringPreferencesKey(SAVINGS_GOAL_AMOUNT_KEY_NAME)
+private val SAVINGS_GOAL_MONTHS = intPreferencesKey(SAVINGS_GOAL_MONTHS_KEY_NAME)
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
@@ -93,9 +107,35 @@ class SettingsRepositoryImpl @Inject constructor(
                     preferences[RECURRENT_PAYMENTS_VIEW_MODE]
                 ),
                 budgetSplitViewPeriod = preferences[BUDGET_SPLIT_VIEW_PERIOD]?.let { name ->
-                    try { BudgetPeriod.valueOf(name) } catch (_: Exception) { null }
-                }
-            )
+                    try {
+                        BudgetPeriod.valueOf(name)
+                    } catch (_: Exception) {
+                        null
+                    }
+                },
+                savingsPreferences = run {
+                    val needsPct =
+                        preferences[SAVINGS_NEEDS_PCT] ?: SavingsPreferences.DEFAULT_NEEDS_PCT
+                    val wantsPct =
+                        preferences[SAVINGS_WANTS_PCT] ?: SavingsPreferences.DEFAULT_WANTS_PCT
+                    val savingsPct =
+                        preferences[SAVINGS_SAVINGS_PCT] ?: SavingsPreferences.DEFAULT_SAVINGS_PCT
+                    val preset = preferences[SAVINGS_PRESET]?.let { name ->
+                        runCatching { SavingsSplitPreset.valueOf(name) }.getOrElse {
+                            SavingsSplitPreset.fromValues(
+                                needsPct, wantsPct, savingsPct
+                            )
+                        }
+                    } ?: SavingsSplitPreset.fromValues(needsPct, wantsPct, savingsPct)
+                    SavingsPreferences(
+                        preset = preset,
+                        needsPct = needsPct,
+                        wantsPct = wantsPct,
+                        savingsPct = savingsPct,
+                        savingsGoalAmount = preferences[SAVINGS_GOAL_AMOUNT]?.toBigDecimalOrNull(),
+                        savingsGoalMonths = preferences[SAVINGS_GOAL_MONTHS],
+                    )
+                })
         }
     }
 
@@ -105,9 +145,8 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override fun observeCurrentPeriodRollover(): Flow<Pair<BigDecimal, Boolean>> {
         return context.settingsDataStore.data.map { preferences ->
-            val amount = preferences[CURRENT_PERIOD_ROLLOVER_AMOUNT]
-                ?.toBigDecimalOrNull()
-                ?: BigDecimal.ZERO
+            val amount =
+                preferences[CURRENT_PERIOD_ROLLOVER_AMOUNT]?.toBigDecimalOrNull() ?: BigDecimal.ZERO
             val carryForward = preferences[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD] ?: false
             amount to carryForward
         }
@@ -132,9 +171,7 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun setEarlyFinishActive(
-        active: Boolean,
-        actualDate: Long,
-        originalEndDate: Long
+        active: Boolean, actualDate: Long, originalEndDate: Long
     ) {
         context.settingsDataStore.edit { preferences ->
             preferences[EARLY_FINISH_ACTIVE] = active
@@ -205,6 +242,27 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setBudgetSplitViewPeriod(period: BudgetPeriod) {
         context.settingsDataStore.edit { preferences ->
             preferences[BUDGET_SPLIT_VIEW_PERIOD] = period.name
+        }
+    }
+
+    override suspend fun setSavingsPreferences(prefs: SavingsPreferences) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[SAVINGS_PRESET] = prefs.preset.name
+            preferences[SAVINGS_NEEDS_PCT] = prefs.needsPct
+            preferences[SAVINGS_WANTS_PCT] = prefs.wantsPct
+            preferences[SAVINGS_SAVINGS_PCT] = prefs.savingsPct
+            val goalAmount = prefs.savingsGoalAmount
+            if (goalAmount == null) {
+                preferences.remove(SAVINGS_GOAL_AMOUNT)
+            } else {
+                preferences[SAVINGS_GOAL_AMOUNT] = goalAmount.toPlainString()
+            }
+            val goalMonths = prefs.savingsGoalMonths
+            if (goalMonths == null) {
+                preferences.remove(SAVINGS_GOAL_MONTHS)
+            } else {
+                preferences[SAVINGS_GOAL_MONTHS] = goalMonths
+            }
         }
     }
 

@@ -3,9 +3,6 @@ package com.serranoie.app.minus.domain.model
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-/**
- * Represents a single transaction (expense) in the budget tracker.
- */
 data class Transaction(
     val id: Long = 0,
     val amount: BigDecimal,
@@ -18,7 +15,7 @@ data class Transaction(
     val isRecurrent: Boolean = false,
     val recurrentFrequency: RecurrentFrequency? = null,
     val recurrentEndDate: LocalDateTime? = null,
-    val subscriptionDay: Int? = null, // Day of month (1-31) for monthly subscriptions
+    val subscriptionDay: Int? = null,
     val categoryId: Long? = null,
     val isCredit: Boolean = false,
     val sourceTransactionId: Long? = null
@@ -54,11 +51,9 @@ data class Transaction(
     }
 }
 
-/**
- * Enum representing the frequency of a recurrent expense.
- */
+
 enum class RecurrentFrequency {
-    WEEKLY, // Every 7 days from start date
-    BIWEEKLY, // Every 14 days from start date
-    MONTHLY // Specific day of month (use subscriptionDay)
+    WEEKLY,
+    BIWEEKLY,
+    MONTHLY
 }

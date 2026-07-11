@@ -2,8 +2,11 @@ package com.serranoie.app.minus.domain.calculator
 
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.splitBudget
 import logcat.logcat
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -12,15 +15,6 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 class BudgetCalculator @Inject constructor() {
-
-    /**
-     * Calculate the current budget state.
-     *
-     * @param settings User's budget settings
-     * @param transactions List of all transactions in the period
-     * @param currentDate The date to calculate for (usually today)
-     * @return BudgetState with all calculated values
-     */
     fun calculate(
         settings: BudgetSettings,
         transactions: List<Transaction>,
@@ -45,16 +39,33 @@ class BudgetCalculator @Inject constructor() {
         val remainingBudget = settings.totalBudget.subtract(totalSpentInPeriod)
         logcat { "remainingBudget: $remainingBudget" }
 
-        val dailyBudget = if (totalDaysInPeriod > 0) {
-            settings.totalBudget.divide(
-                BigDecimal(totalDaysInPeriod),
-                2,
-                RoundingMode.HALF_UP
-            )
-        } else {
-            BigDecimal.ZERO
+        val dailyBudget = when (settings.splitMode) {
+            BudgetSplitMode.DYNAMIC -> {
+                if (daysRemaining <= 0) {
+                    BigDecimal.ZERO
+                } else {
+                    val remaining = settings.totalBudget.subtract(totalSpentInPeriod)
+                    if (remaining <= BigDecimal.ZERO) {
+                        BigDecimal.ZERO
+                    } else {
+                        remaining.divide(BigDecimal(daysRemaining), 2, RoundingMode.HALF_UP)
+                    }
+                }
+            }
+
+            BudgetSplitMode.STATIC -> {
+                if (totalDaysInPeriod > 0) {
+                    settings.totalBudget.divide(
+                        BigDecimal(totalDaysInPeriod),
+                        2,
+                        RoundingMode.HALF_UP
+                    )
+                } else {
+                    BigDecimal.ZERO
+                }
+            }
         }
-        logcat { "dailyBudget: $dailyBudget (totalBudget=${settings.totalBudget} / totalDaysInPeriod=$totalDaysInPeriod)" }
+        logcat { "dailyBudget: $dailyBudget (splitMode=${settings.splitMode}, totalBudget=${settings.totalBudget}, daysRemaining=$daysRemaining, totalSpentInPeriod=$totalSpentInPeriod)" }
 
         val spentToday = transactions
             .filter {
@@ -68,26 +79,79 @@ class BudgetCalculator @Inject constructor() {
 
         val progress = if (settings.totalBudget > BigDecimal.ZERO) {
             totalSpentInPeriod
-                .divide(settings.totalBudget, 4, RoundingMode.HALF_UP)
+                .divide(settings.totalBudget, 4, java.math.RoundingMode.HALF_UP)
                 .toFloat()
                 .coerceIn(0f, 1f)
         } else {
             0f
         }
 
+        val totalDaysClamped = totalDaysInPeriod.coerceAtLeast(1)
+        val daysRemainingClamped = daysRemaining.coerceAtLeast(0)
+        val (daily, weekly, biweekly, monthly, isOverDaily) = if (settings.splitMode == BudgetSplitMode.DYNAMIC) {
+            val a = computeDynamicAllocations(
+                totalBudget = settings.totalBudget,
+                totalSpentInPeriod = totalSpentInPeriod,
+                totalSpentToday = spentToday,
+                daysRemaining = daysRemainingClamped,
+            )
+            Quintuple(
+                a.dailyAllocation, a.weeklyAllocation,
+                a.biweeklyAllocation, a.monthlyAllocation,
+                a.isTodayOverDailyAllocation,
+            )
+        } else {
+            Quintuple(
+                daily = splitBudget(
+                    totalBudget = settings.totalBudget, totalSpent = totalSpentInPeriod,
+                    totalDays = totalDaysClamped, daysRemaining = daysRemainingClamped,
+                    period = BudgetPeriod.DAILY, mode = BudgetSplitMode.STATIC,
+                ),
+                weekly = splitBudget(
+                    totalBudget = settings.totalBudget, totalSpent = totalSpentInPeriod,
+                    totalDays = totalDaysClamped, daysRemaining = daysRemainingClamped,
+                    period = BudgetPeriod.WEEKLY, mode = BudgetSplitMode.STATIC,
+                ),
+                biweekly = splitBudget(
+                    totalBudget = settings.totalBudget, totalSpent = totalSpentInPeriod,
+                    totalDays = totalDaysClamped, daysRemaining = daysRemainingClamped,
+                    period = BudgetPeriod.BIWEEKLY, mode = BudgetSplitMode.STATIC,
+                ),
+                monthly = splitBudget(
+                    totalBudget = settings.totalBudget, totalSpent = totalSpentInPeriod,
+                    totalDays = totalDaysClamped, daysRemaining = daysRemainingClamped,
+                    period = BudgetPeriod.MONTHLY, mode = BudgetSplitMode.STATIC,
+                ),
+                isOverDaily = false,
+            )
+        }
+
         return BudgetState(
             remainingToday = remainingToday,
             totalSpentToday = spentToday,
             dailyBudget = dailyBudget,
-            daysRemaining = daysRemaining.coerceAtLeast(0),
+            daysRemaining = daysRemainingClamped,
             progress = progress,
             isOverBudget = remainingBudget < BigDecimal.ZERO,
             totalBudget = settings.totalBudget,
-            totalSpentInPeriod = totalSpentInPeriod
+            totalSpentInPeriod = totalSpentInPeriod,
+            dailyAllocation = daily,
+            weeklyAllocation = weekly,
+            biweeklyAllocation = biweekly,
+            monthlyAllocation = monthly,
+            isTodayOverDailyAllocation = isOverDaily,
         ).also {
             logcat { "BudgetState result: $it" }
         }
     }
+
+    private data class Quintuple(
+        val daily: BigDecimal,
+        val weekly: BigDecimal,
+        val biweekly: BigDecimal,
+        val monthly: BigDecimal,
+        val isOverDaily: Boolean,
+    )
 
     private fun calculatePeriodEnd(start: LocalDate, period: BudgetPeriod): LocalDate {
         return when (period) {

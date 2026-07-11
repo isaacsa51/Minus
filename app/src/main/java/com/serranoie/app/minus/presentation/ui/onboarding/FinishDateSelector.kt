@@ -41,21 +41,15 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.availablePeriodsFor
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.splitBudget
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.PeriodOptionChip
 import java.math.BigDecimal
-import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Date
-
-fun BudgetPeriod.toDays(): Int = when (this) {
-	BudgetPeriod.DAILY -> 1
-	BudgetPeriod.WEEKLY -> 7
-	BudgetPeriod.BIWEEKLY -> 14
-	BudgetPeriod.MONTHLY -> 30
-}
 
 @Composable
 @ReadOnlyComposable
@@ -73,64 +67,6 @@ fun BudgetPeriod.periodLabel(): String = when (this) {
 	BudgetPeriod.WEEKLY -> stringResource(R.string.budget_period_label_this_week)
 	BudgetPeriod.BIWEEKLY -> stringResource(R.string.budget_period_label_this_biweek)
 	BudgetPeriod.MONTHLY -> stringResource(R.string.budget_period_label_this_month)
-}
-
-fun availablePeriodsFor(totalDays: Int): List<BudgetPeriod> = buildList {
-	add(BudgetPeriod.DAILY)
-	if (totalDays >= 7) add(BudgetPeriod.WEEKLY)
-	if (totalDays >= 14) add(BudgetPeriod.BIWEEKLY)
-	if (totalDays >= 30) add(BudgetPeriod.MONTHLY)
-}
-
-/**
- * Static split: how much you can spend per period if the totalBudget is divided
- * equally across all periods in the range. Unaffected by how much you've already spent.
- *
- * Kept for the onboarding flow where the period hasn't started yet, so dynamic
- * has nothing meaningful to compute. Use [splitBudget] for everything else.
- */
-fun budgetForPeriod(
-	totalBudget: BigDecimal,
-	totalDays: Int,
-	period: BudgetPeriod,
-): BigDecimal {
-	if (totalBudget == BigDecimal.ZERO || totalDays <= 0) return BigDecimal.ZERO
-
-	val periodDays = period.toDays()
-	val numPeriods = totalDays / periodDays
-
-	return totalBudget.divide(BigDecimal(numPeriods), 2, RoundingMode.HALF_UP)
-}
-
-/**
- * Per-period budget amount, honoring the [BudgetSplitMode].
- *
- * - STATIC: totalBudget / (totalDays / period.toDays()).
- * - DYNAMIC: (totalBudget - totalSpent) / daysRemaining, then multiplied by the
- *   period's day count. Falls back to 0 if [daysRemaining] is 0 (period ended)
- *   or if the remaining balance is non-positive (don't show negative numbers).
- */
-fun splitBudget(
-	totalBudget: BigDecimal,
-	totalSpent: BigDecimal,
-	totalDays: Int,
-	daysRemaining: Int,
-	period: BudgetPeriod,
-	mode: com.serranoie.app.minus.domain.model.BudgetSplitMode,
-): BigDecimal {
-	if (totalBudget == BigDecimal.ZERO || totalDays <= 0) return BigDecimal.ZERO
-	return when (mode) {
-		com.serranoie.app.minus.domain.model.BudgetSplitMode.STATIC ->
-			budgetForPeriod(totalBudget, totalDays, period)
-
-		com.serranoie.app.minus.domain.model.BudgetSplitMode.DYNAMIC -> {
-			if (daysRemaining <= 0) return BigDecimal.ZERO
-			val remaining = totalBudget.subtract(totalSpent)
-			if (remaining <= BigDecimal.ZERO) return BigDecimal.ZERO
-			val daily = remaining.divide(BigDecimal(daysRemaining), 2, RoundingMode.HALF_UP)
-			daily.multiply(BigDecimal(period.toDays()))
-		}
-	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

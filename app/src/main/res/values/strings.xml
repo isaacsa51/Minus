@@ -89,9 +89,13 @@
     <string name="new_budget_period">New Budget Period</string>
     <string name="budget_split_calculated_amount">Calculated amount</string>
     <string name="budget_split_helper_format">You will have %1$s to spend every %2$s</string>
+    <string name="budget_split_helper_static">Total ÷ period days</string>
+    <string name="budget_split_helper_dynamic">(Total − Spent) ÷ days left</string>
+    <string name="budget_split_helper_static_brief">%1$s (total budget) / %2$d %3$s</string>
+    <string name="budget_split_helper_dynamic_brief">%1$s (remaining) / %2$d %3$s</string>
     <string name="budget_split_period_daily">day</string>
     <string name="budget_split_period_weekly">week</string>
-    <string name="budget_split_period_biweekly">fortnight</string>
+    <string name="budget_split_period_biweekly">biweekly</string>
     <string name="budget_split_period_monthly">month</string>
 
     <!-- History -->
@@ -175,14 +179,27 @@
 
     <string name="budget_period_label_today">Today</string>
     <string name="budget_period_label_this_week">This week</string>
-    <string name="budget_period_label_this_biweek">This fortnight</string>
+    <string name="budget_period_label_this_biweek">This biweekly</string>
     <string name="budget_period_label_this_month">This month</string>
+
+    <string name="budget_pill_label_per_daily">Per day</string>
+    <string name="budget_pill_label_per_weekly">Per week</string>
+    <string name="budget_pill_label_per_biweekly">Biweekly</string>
+    <string name="budget_pill_label_per_monthly">Per month</string>
+
+    <string name="budget_pill_label_daily_exceeded">Daily Amount Exceeded</string>
+    <string name="budget_pill_label_weekly_exceeded">Weekly Amount Exceeded</string>
+    <string name="budget_pill_label_biweekly_exceeded">Biweekly Amount Exceeded</string>
+    <string name="budget_pill_label_monthly_exceeded">Monthly Amount Exceeded</string>
+    <string name="budget_pill_sub_exceeded_single">%1$s amount Exceeded</string>
+    <string name="budget_pill_sub_exceeded_double">%1$s and %2$s amount Exceeded</string>
+    <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s and %3$s amount Exceeded</string>
 
     <string name="day_total_format">Total: %1$s</string>
 
     <string name="onboarding_welcome_title">Welcome to Minus</string>
     <string name="onboarding_welcome_subtitle">Hi and welcome, lets start saving together.</string>
-    <string name="onboarding_welcome_intro">A simple budget tracker that helps you decide how much you can spend each day, week, fortnight, or month.</string>
+    <string name="onboarding_welcome_intro">A simple budget tracker that helps you decide how much you can spend each day, week, biweekly, or month.</string>
     <string name="onboarding_step_1_title">Set a budget</string>
     <string name="onboarding_step_1_subtitle">Define your spending limit for any period.</string>
     <string name="onboarding_step_2_title">Track expenses</string>
@@ -228,6 +245,7 @@
     <string name="settings_section_app_info">App information</string>
     <string name="settings_section_data_backup">Data backup</string>
     <string name="settings_section_tutorial">Tutorial</string>
+    <string name="settings_section_savings">Savings</string>
 
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_subtitle">Change the app theme style</string>
@@ -348,7 +366,7 @@
     <string name="collapse">Collapse</string>
 
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">Budget exhausted</string>
+    <string name="budget_pill_over_budget">Budget amount Exceeded</string>
     <string name="budget_pill_no_budget">No budget</string>
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Weekly</string>
@@ -364,8 +382,8 @@
     <!-- Categories Chart -->
     <string name="categories_chart_uncategorized">Uncategorized</string>
     <string name="categories_chart_rest">Remaining</string>
-    <string name="categories_chart_empty_title">We can\'t split your spending by categories</string>
-    <string name="categories_chart_empty_subtitle">Use tags to see the chart by categories</string>
+    <string name="categories_chart_empty_title">We can\'t split your expenses</string>
+    <string name="categories_chart_empty_subtitle">Save expenses with a category to split them</string>
     <string name="category_no_expenses">No expenses in this category</string>
 
     <!-- Calendar Heatmap -->
@@ -417,7 +435,7 @@
 
     <!-- Savings Recommendation Card -->
     <string name="savings_recommendation_title">Savings recommendation</string>
-    <string name="savings_recommendation_method_brief" formatted="false">The classic 50/30/20 method divides your budget into 50% needs, 30% wants, and 20% savings, helping you control spending and save consistently.</string>
+    <string name="savings_recommendation_method_brief" formatted="false">This %1$d/%2$d/%3$d method divides your budget into %1$d%% needs, %2$d%% wants, and %3$d%% savings, helping you control spending and save consistently.</string>
     <string name="savings_recommendation_current_savings_label">Current savings</string>
     <string name="savings_recommendation_available_format">Available: %1$s</string>
     <string name="savings_recommendation_ideal_savings_format">Ideal savings: %1$s</string>
@@ -426,6 +444,33 @@
     <string name="savings_recommendation_one_time_expenses_label">One-time expenses</string>
     <string name="savings_recommendation_six_month_example_intro" formatted="false">If you save the 20% each period for about 6 months, you could build:</string>
     <string name="savings_recommendation_six_month_example_equation" translatable="false">%1$s × 6 = %2$s</string>
+    <string name="savings_recommendation_goal_format" formatted="false">To reach %1$s in %2$d months, save %3$s per period.</string>
+    <string name="savings_recommendation_goal_disabled" formatted="false">Showing the default %1$d%% example. Set a savings goal in Settings to target a specific amount.</string>
+
+    <!-- Settings: Savings Preferences -->
+    <string name="settings_savings_preferences_title">Savings preferences</string>
+    <string name="settings_savings_preferences_subtitle">Customize the 50/30/20 split and set an optional savings goal</string>
+    <string name="settings_savings_dialog_split_label">Budget split</string>
+    <string name="settings_savings_dialog_split_format" translatable="false">%1$d / %2$d / %3$d</string>
+    <string name="settings_savings_dialog_split_hint">The three values must add up to 100%%.</string>
+    <string name="settings_savings_dialog_split_invalid">The three values must add up to 100%% (currently %1$d%%).</string>
+    <string name="settings_savings_preset_balanced_title">Balanced</string>
+    <string name="settings_savings_preset_balanced_subtitle">50/30/20 — the classic split</string>
+    <string name="settings_savings_preset_aggressive_title">Aggressive saver</string>
+    <string name="settings_savings_preset_aggressive_subtitle">40/20/40 — save more each period</string>
+    <string name="settings_savings_preset_conservative_title">Conservative</string>
+    <string name="settings_savings_preset_conservative_subtitle">70/20/10 — high needs, lower savings</string>
+    <string name="settings_savings_preset_custom_title">Custom</string>
+    <string name="settings_savings_preset_custom_subtitle">%1$d/%2$d/%3$d — choose your own split</string>
+    <string name="settings_savings_dialog_custom_section">Custom split</string>
+    <string name="settings_savings_dialog_needs_label">Needs — %1$d%%</string>
+    <string name="settings_savings_dialog_wants_label">Wants — %1$d%%</string>
+    <string name="settings_savings_dialog_savings_label">Savings — %1$d%%</string>
+    <string name="settings_savings_dialog_goal_section">Savings goal (optional)</string>
+    <string name="settings_savings_dialog_goal_amount_label">Target amount</string>
+    <string name="settings_savings_dialog_goal_months_label">Target period (months)</string>
+    <string name="settings_savings_dialog_goal_hint">Leave blank to keep the default %1$d%% × 6 example.</string>
+    <string name="settings_savings_dialog_reset">Reset to defaults</string>
 
     <!-- Wavy Divider -->
     <string name="wavy_divider_show_all_past_period_expenses">Show all expenses from the previous period…</string>

@@ -1,10 +1,5 @@
 package com.serranoie.app.minus.domain.model
 
-/**
- * Represents a category/tag for organizing transactions.
- * Categories can be hidden (soft-deleted) to remove them from the UI
- * while preserving their association with existing transactions.
- */
 data class Category(
     val id: Long = 0,
     val name: String,

@@ -1,7 +1,9 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
-import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -50,6 +52,7 @@ import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
+import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.countDays
 import com.serranoie.app.minus.presentation.util.prettyDate
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
@@ -114,16 +117,12 @@ fun BudgetDisplay(
         MaterialTheme.typography.titleLarge.fontSize
     }
     val useAnnotatedValue = currencySymbol.length > 2
-    val symbolFontSize = valueFontSize * 0.5f
     val annotatedDisplayValue: AnnotatedString? = if (useAnnotatedValue) {
         AnnotatedString.Builder().run {
             pushStyle(
-                SpanStyle(
-                    fontSize = symbolFontSize,
-                    fontWeight = FontWeight.Light,
-                    baselineShift = BaselineShift(
-                        0.25f
-                    )
+                MaterialTheme.typography.titleSmallCondensed.toSpanStyle().copy(
+                    fontSize = valueFontSize,
+                    baselineShift = BaselineShift.None
                 )
             )
             append(currencySymbol)
@@ -386,53 +385,6 @@ private fun PreviewArrow() {
 
 @Preview(showBackground = true)
 @Composable
-private fun PreviewCross() {
-    MinusTheme {
-        Cross {
-            Text(text = "Just a normal date here")
-        }
-    }
-}
-
-@Preview(
-    device = "spec:width=800px,height=500px", locale = "es",
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
-)
-@Preview(device = "spec:width=800px,height=500px", locale = "en")
-@Preview(device = "spec:width=800px,height=500px", locale = "fr")
-@Composable
-private fun BudgetDisplayPreview_HealthyBudget() {
-    MinusTheme {
-        val startDate = Date()
-        val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 15) }.time
-
-        BudgetDisplay(
-            budget = BigDecimal("500.00"),
-            budgetState = BudgetState(
-                remainingToday = BigDecimal("45.50"),
-                totalSpentToday = BigDecimal("12.50"),
-                dailyBudget = BigDecimal("58.00"),
-                daysRemaining = 15,
-                progress = 0.21f,
-                isOverBudget = false,
-                totalBudget = BigDecimal("500.00"),
-                totalSpentInPeriod = BigDecimal("100.00")
-            ),
-            budgetSettings = BudgetSettings(
-                totalBudget = BigDecimal("500.00"),
-                period = BudgetPeriod.MONTHLY,
-                startDate = LocalDate.now(),
-                currencyCode = "USD"
-            ),
-            currencyCode = "USD",
-            startDate = startDate,
-            finishDate = finishDate
-        )
-    }
-}
-
-@Preview(device = "spec:width=800px,height=500px")
-@Composable
 private fun BudgetDisplayPreview_OverBudget() {
     MinusTheme {
         val startDate = Date()
@@ -466,7 +418,7 @@ private fun BudgetDisplayPreview_OverBudget() {
     }
 }
 
-@Preview(device = "spec:width=1800px,height=900px,dpi=320")
+@Preview(device = "spec:width=800px,height=500px,dpi=320")
 @Composable
 private fun BudgetDisplayPreview_RolloverSplit() {
     MinusTheme {

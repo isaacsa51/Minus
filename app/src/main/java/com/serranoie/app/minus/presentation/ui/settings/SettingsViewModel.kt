@@ -13,9 +13,10 @@ import androidx.core.net.toUri
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.serranoie.app.minus.domain.model.PeriodMappingMode
-import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.model.PeriodMappingMode
+import com.serranoie.app.minus.domain.model.SavingsPreferences
+import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
 import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
 import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
@@ -61,6 +62,7 @@ data class SettingsUiState(
     val exactAlarmEnabled: Boolean = true,
     val notificationPermissionGranted: Boolean = false,
     val periodMappingMode: PeriodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
+    val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
 )
 
 sealed interface SettingsUiEffect {
@@ -89,10 +91,6 @@ class SettingsViewModel @Inject constructor(
         refreshNotificationPermission()
     }
 
-    /**
-     * Re-checks POST_NOTIFICATIONS (Android 13+) so the Settings row reflects
-     * the latest state when the user returns from the system app-info screen.
-     */
     fun refreshNotificationPermission() {
         val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
@@ -107,10 +105,6 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(notificationPermissionGranted = granted) }
     }
 
-    /**
-     * Opens the system app-info page for this package so the user can
-     * enable/deny POST_NOTIFICATIONS, exact alarms, etc.
-     */
     fun onOpenAppSettings() {
         logcat("ISAAC:Settings") { "onOpenAppSettings" }
         val intent = Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -150,29 +144,33 @@ class SettingsViewModel @Inject constructor(
                         recurrentNotificationHour = settings.notificationHour, // Fixed to match repo if needed, but repo has separate? No, repo only has one.
                         recurrentNotificationMinute = settings.notificationMinute,
                         exactAlarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                            val alarmManager =
+                                context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                             alarmManager.canScheduleExactAlarms()
                         } else true,
-                        // PeriodMappingMode is not in UserSettings yet, keeping direct access for now or just ignoring if not critical
+                        savingsPreferences = settings.savingsPreferences,
                     )
                 }
             }
         }
-        // Need to also handle PeriodMappingMode and isCreditQuickToggleEnabled which are NOT in UserSettings
         viewModelScope.launch {
             context.settingsDataStore.data.collect { prefs ->
-                _uiState.update { it.copy(
-                    isCreditQuickToggleEnabled = prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false,
-                    isCategoryPickerDirectPopupEnabled = prefs[CATEGORY_PICKER_DIRECT_POPUP_KEY] ?: false,
-                    isCategoryGridModeEnabled = prefs[CATEGORY_GRID_MODE_KEY] ?: false,
-                    periodMappingMode = try {
-                        PeriodMappingMode.valueOf(
-                            prefs[PERIOD_MAPPING_MODE_KEY] ?: ""
-                        )
-                    } catch (_: Exception) {
-                        PeriodMappingMode.ACTIVE_BUDGET
-                    },
-                ) }
+                _uiState.update {
+                    it.copy(
+                        isCreditQuickToggleEnabled = prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY]
+                            ?: false,
+                        isCategoryPickerDirectPopupEnabled = prefs[CATEGORY_PICKER_DIRECT_POPUP_KEY]
+                            ?: false,
+                        isCategoryGridModeEnabled = prefs[CATEGORY_GRID_MODE_KEY] ?: false,
+                        periodMappingMode = try {
+                            PeriodMappingMode.valueOf(
+                                prefs[PERIOD_MAPPING_MODE_KEY] ?: ""
+                            )
+                        } catch (_: Exception) {
+                            PeriodMappingMode.ACTIVE_BUDGET
+                        },
+                    )
+                }
             }
         }
     }
@@ -267,7 +265,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onRecurrentNotificationTimeChange(hour: Int, minute: Int) {
-        _uiState.update { it.copy(recurrentNotificationHour = hour, recurrentNotificationMinute = minute) }
+        _uiState.update {
+            it.copy(
+                recurrentNotificationHour = hour, recurrentNotificationMinute = minute
+            )
+        }
         viewModelScope.launch {
             context.settingsDataStore.edit { prefs ->
                 prefs[RECURRENT_NOTIFICATION_HOUR_KEY] = hour
@@ -283,6 +285,13 @@ class SettingsViewModel @Inject constructor(
             context.settingsDataStore.edit { prefs ->
                 prefs[PERIOD_MAPPING_MODE_KEY] = mode.name
             }
+        }
+    }
+
+    fun onSavingsPreferencesChange(prefs: SavingsPreferences) {
+        _uiState.update { it.copy(savingsPreferences = prefs) }
+        viewModelScope.launch {
+            settingsRepository.setSavingsPreferences(prefs)
         }
     }
 
@@ -325,7 +334,8 @@ class SettingsViewModel @Inject constructor(
     fun onResetTutorial() {
         viewModelScope.launch {
             context.settingsDataStore.edit { prefs ->
-                prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] = FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
+                prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] =
+                    FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
             }
         }
     }

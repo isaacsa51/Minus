@@ -32,6 +32,8 @@ import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
@@ -39,6 +41,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.outlined.RemoveRedEye
@@ -87,11 +90,15 @@ import androidx.compose.ui.window.Dialog
 import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
+import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.buildAppEnvironmentMetadata
 import com.serranoie.app.minus.presentation.ui.settings.components.NotificationPermissionItem
+import com.serranoie.app.minus.presentation.ui.settings.savings.SavingsPreferencesEditor
+import com.serranoie.app.minus.presentation.ui.settings.savings.savingsPreferencesSummary
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedExpandableList
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
@@ -137,6 +144,8 @@ fun Settings(
     onOpenNotificationSettings: () -> Unit,
     periodMappingMode: PeriodMappingMode,
     onPeriodMappingModeChange: (PeriodMappingMode) -> Unit,
+    savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
+    onSavingsPreferencesChange: (SavingsPreferences) -> Unit = {},
     onExportCsv: () -> Unit = {},
     onImportCsv: () -> Unit = {},
     onResetTutorial: () -> Unit = {},
@@ -151,6 +160,7 @@ fun Settings(
     var showRecurrentNotificationTimePicker by remember { mutableStateOf(false) }
     var isCreditFeatureExpanded by remember { mutableStateOf(false) }
     var isCategoryFeatureExpanded by remember { mutableStateOf(false) }
+    var isSavingsExpanded by remember { mutableStateOf(false) }
     val dismissThemeDialog = { showThemeDialog = false }
     val dismissTypographyDialog = { showTypographyDialog = false }
     val dismissRecurrentPaymentsViewModeDialog = { showRecurrentPaymentsViewModeDialog = false }
@@ -532,6 +542,58 @@ fun Settings(
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
+                }
+            }
+
+            item {
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_section_savings)
+                ) {
+                    CustomPaddedExpandableItem(
+                        isExpanded = isSavingsExpanded,
+                        onToggleExpanded = { isSavingsExpanded = !isSavingsExpanded },
+                        position = PaddedListItemPosition.Single,
+                        modifier = Modifier.testTag("SettingsSavingsPreferencesItem"),
+                        defaultContent = {
+                            Icon(
+                                imageVector = Icons.Default.Savings,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.settings_savings_preferences_title),
+                                    style = MaterialTheme.typography.bodyMediumEmphasized,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = savingsPreferencesSummary(savingsPreferences),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Icon(
+                                imageVector = if (isSavingsExpanded) {
+                                    Icons.Default.ExpandLess
+                                } else {
+                                    Icons.Default.ExpandMore
+                                },
+                                contentDescription = if (isSavingsExpanded) {
+                                    "Collapse"
+                                } else {
+                                    "Expand"
+                                },
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        expandedContent = {
+                            SavingsPreferencesEditor(
+                                current = savingsPreferences,
+                                onChange = onSavingsPreferencesChange,
+                            )
+                        },
+                    )
                 }
             }
 
@@ -931,6 +993,7 @@ fun Settings(
                     dismissRecurrentNotificationTimePicker()
                 })
         }
+
     }
 }
 

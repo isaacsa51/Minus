@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.onboarding
+package com.serranoie.app.minus.presentation.ui.editor.sheets.split
 
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.domain.model.BudgetPeriod
@@ -392,7 +392,8 @@ class SplitBudgetTest {
             totalBudget = totalBudget,
             totalSpent = BigDecimal.ZERO,
             totalDays = 30, daysRemaining = 30,
-            period = BudgetPeriod.BIWEEKLY, mode = BudgetSplitMode.STATIC,
+            period = BudgetPeriod.BIWEEKLY,
+            mode = BudgetSplitMode.STATIC,
         )
 
         assertThat(result).isEqualTo(BigDecimal("8322.23"))
@@ -404,7 +405,8 @@ class SplitBudgetTest {
             totalBudget = totalBudget,
             totalSpent = BigDecimal.ZERO,
             totalDays = 30, daysRemaining = 30,
-            period = BudgetPeriod.MONTHLY, mode = BudgetSplitMode.STATIC,
+            period = BudgetPeriod.MONTHLY,
+            mode = BudgetSplitMode.STATIC,
         )
 
         assertThat(result).isEqualTo(BigDecimal("16644.45"))

@@ -2,6 +2,7 @@ package com.serranoie.app.minus.data.repository
 
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.model.UserSettings
@@ -43,6 +44,8 @@ interface SettingsRepository {
     suspend fun setRecurrentPaymentsViewMode(mode: com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode)
 
     suspend fun setBudgetSplitViewPeriod(period: BudgetPeriod)
+
+    suspend fun setSavingsPreferences(prefs: SavingsPreferences)
 
     suspend fun clearEarlyFinish()
 }

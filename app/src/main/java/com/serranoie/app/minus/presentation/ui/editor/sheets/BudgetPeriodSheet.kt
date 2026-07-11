@@ -73,6 +73,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -95,12 +96,14 @@ import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.SupportedCurrencyData
 import com.serranoie.app.minus.presentation.ui.onboarding.FinishDateSelector
-import com.serranoie.app.minus.presentation.ui.onboarding.availablePeriodsFor
-import com.serranoie.app.minus.presentation.ui.onboarding.splitBudget
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.CalculatedSplitCard
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.SplitModePickerDialog
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.availablePeriodsFor
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
+import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
@@ -108,7 +111,6 @@ import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.CurrencyAmountInputVisualTransformation
-import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import logcat.logcat
 import java.math.BigDecimal
@@ -131,7 +133,6 @@ const val BUDGET_PERIOD_STRATEGY_ROW_TAG = "BudgetPeriodSheet.StrategyRow"
 const val BUDGET_PERIOD_CURRENCY_ROW_TAG = "BudgetPeriodSheet.CurrencyRow"
 const val BUDGET_PERIOD_SPLIT_TOGGLE_ROW_TAG = "BudgetPeriodSheet.SplitToggleRow"
 const val BUDGET_PERIOD_SPLIT_MODE_ROW_TAG = "BudgetPeriodSheet.SplitModeRow"
-const val BUDGET_PERIOD_CALCULATED_CARD_TAG = "BudgetPeriodSheet.CalculatedCard"
 
 fun budgetPeriodCardTag(period: BudgetPeriod) = "BudgetPeriodSheet.Period.${period.name}"
 fun budgetPeriodToggleTag(period: BudgetPeriod) = "BudgetPeriodSheet.SplitToggle.${period.name}"
@@ -331,6 +332,7 @@ private fun ViewBudgetContent(
     onFinishEarlyClick: () -> Unit,
     showFinishEarly: Boolean,
 ) {
+    val view = LocalView.current
     Column(
         modifier =
             Modifier
@@ -476,7 +478,10 @@ private fun ViewBudgetContent(
                     val isSelected = p == periodCache
                     ToggleButton(
                         checked = isSelected,
-                        onCheckedChange = { onPeriodSelected(p) },
+                        onCheckedChange = {
+                            view.confirmFeedback()
+                            onPeriodSelected(p)
+                        },
                         shapes = when (index) {
                             0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
                             available.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
@@ -509,15 +514,15 @@ private fun ViewBudgetContent(
 
             CalculatedSplitCard(
                 periodCache = periodCache,
-                totalBudget = totalBudget,
-                totalSpent = totalSpent,
-                totalDays = totalDays,
-                daysRemaining = daysRemaining,
+                allocation = budgetState?.allocationFor(periodCache) ?: BigDecimal.ZERO,
                 splitMode = budgetSettings?.splitMode ?: BudgetSplitMode.STATIC,
                 currencyFormat = currencyFormat,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(BUDGET_PERIOD_CALCULATED_CARD_TAG)
+                totalBudget = budgetState?.totalBudget ?: BigDecimal.ZERO,
+                remaining = (budgetState?.totalBudget ?: BigDecimal.ZERO)
+                    .subtract(budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO),
+                totalDays = totalDays,
+                daysRemaining = budgetState?.daysRemaining ?: 0,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 
@@ -1216,99 +1221,6 @@ private fun StrategyPickerDialog(
 }
 
 @Composable
-private fun SplitModePickerDialog(
-    currentMode: BudgetSplitMode,
-    onDismiss: () -> Unit,
-    onSelect: (BudgetSplitMode) -> Unit,
-) {
-    val modes = listOf(BudgetSplitMode.STATIC, BudgetSplitMode.DYNAMIC)
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(R.string.split_mode_dialog_title),
-                style = MaterialTheme.typography.titleLargeEmphasized,
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = stringResource(R.string.split_mode_dialog_description),
-                    style = MaterialTheme.typography.bodySmallCondensed,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                modes.forEach { mode ->
-                    val isSelected = mode == currentMode
-                    val title = when (mode) {
-                        BudgetSplitMode.STATIC -> stringResource(R.string.split_mode_static)
-                        BudgetSplitMode.DYNAMIC -> stringResource(R.string.split_mode_dynamic)
-                    }
-                    val description = when (mode) {
-                        BudgetSplitMode.STATIC -> stringResource(R.string.split_mode_static_desc)
-                        BudgetSplitMode.DYNAMIC -> stringResource(R.string.split_mode_dynamic_desc)
-                    }
-                    OutlinedCard(
-                        onClick = { onSelect(mode) },
-                        modifier = Modifier.fillMaxWidth(),
-                        border = BorderStroke(
-                            width = if (isSelected) 2.dp else 1.dp,
-                            color = if (isSelected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                            },
-                        ),
-                        colors = CardDefaults.outlinedCardColors(
-                            containerColor = if (isSelected) {
-                                MaterialTheme.colorScheme.primaryContainer.copy(
-                                    alpha = 0.3f
-                                )
-                            } else {
-                                MaterialTheme.colorScheme.surface
-                            },
-                        ),
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = title,
-                                    style = MaterialTheme.typography.bodyMediumEmphasized,
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                if (isSelected) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                }
-                            }
-                            Text(
-                                text = description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = stringResource(R.string.close),
-                    style = MaterialTheme.typography.labelMediumEmphasized,
-                )
-            }
-        },
-    )
-}
-
-@Composable
 private fun periodLabel(period: BudgetPeriod): String = stringResource(
     when (period) {
         BudgetPeriod.DAILY -> R.string.budget_period_daily
@@ -1318,70 +1230,6 @@ private fun periodLabel(period: BudgetPeriod): String = stringResource(
     }
 )
 
-@Composable
-private fun periodWordLabel(period: BudgetPeriod): String = stringResource(
-    when (period) {
-        BudgetPeriod.DAILY -> R.string.budget_split_period_daily
-        BudgetPeriod.WEEKLY -> R.string.budget_split_period_weekly
-        BudgetPeriod.BIWEEKLY -> R.string.budget_split_period_biweekly
-        BudgetPeriod.MONTHLY -> R.string.budget_split_period_monthly
-    }
-)
-
-@Composable
-private fun CalculatedSplitCard(
-    periodCache: BudgetPeriod,
-    totalBudget: BigDecimal,
-    totalSpent: BigDecimal,
-    totalDays: Int,
-    daysRemaining: Int,
-    splitMode: BudgetSplitMode,
-    currencyFormat: NumberFormat,
-    modifier: Modifier = Modifier,
-) {
-    val calculatedAmount = if (totalBudget > BigDecimal.ZERO && totalDays > 0) {
-        splitBudget(
-            totalBudget = totalBudget,
-            totalSpent = totalSpent,
-            totalDays = totalDays,
-            daysRemaining = daysRemaining,
-            period = periodCache,
-            mode = splitMode,
-        )
-    } else {
-        BigDecimal.ZERO
-    }
-    val formattedAmount = currencyFormat.format(calculatedAmount)
-
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-        ),
-        shape = MaterialTheme.shapes.large,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(R.string.budget_split_calculated_amount),
-                style = MaterialTheme.typography.labelMediumCondensed,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = formattedAmount,
-                style = MaterialTheme.typography.headlineMediumEmphasized,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.censor(),
-            )
-        }
-    }
-}
-
 @Preview(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
@@ -1390,8 +1238,6 @@ private fun CalculatedSplitCard(
 private fun BudgetPeriodSheetPreview() {
     MinusTheme {
         Surface {
-            // Pinned dates keep the dynamic split card stable across re-renders.
-            // see `MEMORY.md` note on Paparazzi/LocalDate drift.
             val pinnedStart = LocalDate.of(2099, 6, 1)
             val pinnedEnd = LocalDate.of(2099, 6, 30)
             BudgetPeriodSheet(

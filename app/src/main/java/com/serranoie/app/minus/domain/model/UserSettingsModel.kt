@@ -16,6 +16,7 @@ data class UserSettings(
     val dynamicColorEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val budgetSplitViewPeriod: BudgetPeriod? = null,
+    val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
 ) {
     companion object {
         const val DEFAULT_NOTIFICATION_HOUR = 9

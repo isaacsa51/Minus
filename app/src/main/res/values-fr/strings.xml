@@ -88,10 +88,33 @@
     <string name="new_budget_period">Nouvelle période budgétaire</string>
     <string name="budget_split_calculated_amount">Montant calculé</string>
     <string name="budget_split_helper_format">Vous aurez %1$s à dépenser chaque %2$s</string>
+    <string name="budget_split_helper_static">Total ÷ jours de la période</string>
+    <string name="budget_split_helper_dynamic">(Total − Dépensé) ÷ jours restants</string>
+    <string name="budget_split_helper_static_brief">%1$s (budget total) / %2$d %3$s</string>
+    <string name="budget_split_helper_dynamic_brief">%1$s (restant) / %2$d %3$s</string>
     <string name="budget_split_period_daily">jour</string>
     <string name="budget_split_period_weekly">semaine</string>
     <string name="budget_split_period_biweekly">quinzaine</string>
     <string name="budget_split_period_monthly">mois</string>
+
+    <string name="budget_pill_label_per_daily">Par jour</string>
+    <string name="budget_pill_label_per_weekly">Par semaine</string>
+    <string name="budget_pill_label_per_biweekly">Par quinzaine</string>
+    <string name="budget_pill_label_per_monthly">Par mois</string>
+
+    <string name="budget_pill_label_daily_exceeded">Montant quotidien dépassé</string>
+    <string name="budget_pill_label_weekly_exceeded">Montant hebdomadaire dépassé</string>
+    <string name="budget_pill_label_biweekly_exceeded">Montant par quinzaine dépassé</string>
+    <string name="budget_pill_label_monthly_exceeded">Montant mensuel dépassé</string>
+
+    <string name="budget_pill_sub_exceeded_single">Montant %1$s dépassé</string>
+    <string name="budget_pill_sub_exceeded_double">Montant %1$s et %2$s dépassé</string>
+    <string name="budget_pill_sub_exceeded_triple">Montant %1$s, %2$s et %3$s dépassé</string>
+
+    <string name="budget_pill_label_per_daily_exceeded">Par jour Montant dépassé</string>
+    <string name="budget_pill_label_per_weekly_exceeded">Par semaine Montant dépassé</string>
+    <string name="budget_pill_label_per_biweekly_exceeded">Par quinzaine Montant dépassé</string>
+    <string name="budget_pill_label_per_monthly_exceeded">Par mois Montant dépassé</string>
 
     <!-- History -->
     <string name="expense_deleted_format">%1$s supprimé</string>
@@ -208,6 +231,7 @@
     <string name="settings_section_app_info">Informations sur l\'application</string>
     <string name="settings_section_data_backup">Sauvegarde des données</string>
     <string name="settings_section_tutorial">Tutoriel</string>
+    <string name="settings_section_savings">Épargne</string>
 
     <string name="settings_theme_title">Thème</string>
     <string name="settings_theme_subtitle">Changer le style de thème de l\'application</string>
@@ -313,7 +337,7 @@
     <string name="collapse">Réduire</string>
 
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">Budget épuisé</string>
+    <string name="budget_pill_over_budget">Montant du budget dépassé</string>
     <string name="budget_pill_no_budget">Aucun budget</string>
     <string name="budget_pill_exhausted_daily_label">quotidien</string>
     <string name="budget_pill_exhausted_weekly_label">hebdomadaire</string>
@@ -380,7 +404,7 @@
 
     <!-- Savings Recommendation Card -->
     <string name="savings_recommendation_title">Recommandation d\'épargne</string>
-    <string name="savings_recommendation_method_brief" formatted="false">La méthode classique 50/30/20 divise votre budget en 50 % de besoins, 30 % d\'envies et 20 % d\'épargne, vous aidant ainsi à contrôler vos dépenses et à épargner régulièrement.</string>
+    <string name="savings_recommendation_method_brief" formatted="false">Cette méthode %1$d/%2$d/%3$d divise votre budget en %1$d %% de besoins, %2$d %% d\'envies et %3$d %% d\'épargne, vous aidant ainsi à contrôler vos dépenses et à épargner régulièrement.</string>
     <string name="savings_recommendation_current_savings_label">Épargne actuelle</string>
     <string name="savings_recommendation_available_format">Disponible : %1$s</string>
     <string name="savings_recommendation_ideal_savings_format">Épargne idéale : %1$s</string>
@@ -388,6 +412,32 @@
     <string name="savings_recommendation_recurrent_expenses_label">Dépenses récurrentes</string>
     <string name="savings_recommendation_one_time_expenses_label">Dépenses ponctuelles</string>
     <string name="savings_recommendation_six_month_example_intro" formatted="false">Si vous épargnez les 20 % à chaque période pendant environ 6 mois, vous pourriez constituer :</string>
+    <string name="savings_recommendation_goal_format" formatted="false">Pour atteindre %1$s en %2$d mois, épargnez %3$s par période.</string>
+    <string name="savings_recommendation_goal_disabled" formatted="false">Affichage de l\'exemple par défaut %1$d%%. Définissez un objectif d\'épargne dans les Paramètres pour cibler un montant précis.</string>
+
+    <!-- Settings: Savings Preferences -->
+    <string name="settings_savings_preferences_title">Préférences d\'épargne</string>
+    <string name="settings_savings_preferences_subtitle">Personnalisez la répartition 50/30/20 et définissez un objectif d\'épargne facultatif</string>
+    <string name="settings_savings_dialog_split_label">Répartition du budget</string>
+    <string name="settings_savings_dialog_split_hint">Les trois valeurs doivent totaliser 100 %%.</string>
+    <string name="settings_savings_dialog_split_invalid">Les trois valeurs doivent totaliser 100 %% (actuellement %1$d%%).</string>
+    <string name="settings_savings_preset_balanced_title">Équilibré</string>
+    <string name="settings_savings_preset_balanced_subtitle">50/30/20 — la répartition classique</string>
+    <string name="settings_savings_preset_aggressive_title">Épargne agressive</string>
+    <string name="settings_savings_preset_aggressive_subtitle">40/20/40 — épargnez plus à chaque période</string>
+    <string name="settings_savings_preset_conservative_title">Conservateur</string>
+    <string name="settings_savings_preset_conservative_subtitle">70/20/10 — besoins élevés, épargne réduite</string>
+    <string name="settings_savings_preset_custom_title">Personnalisé</string>
+    <string name="settings_savings_preset_custom_subtitle">%1$d/%2$d/%3$d — définissez votre propre répartition</string>
+    <string name="settings_savings_dialog_custom_section">Répartition personnalisée</string>
+    <string name="settings_savings_dialog_needs_label">Besoins · %1$d%%</string>
+    <string name="settings_savings_dialog_wants_label">Envies · %1$d%%</string>
+    <string name="settings_savings_dialog_savings_label">Épargne · %1$d%%</string>
+    <string name="settings_savings_dialog_goal_section">Objectif d\'épargne (facultatif)</string>
+    <string name="settings_savings_dialog_goal_amount_label">Montant cible</string>
+    <string name="settings_savings_dialog_goal_months_label">Période cible (mois)</string>
+    <string name="settings_savings_dialog_goal_hint">Laissez vide pour conserver l\'exemple par défaut %1$d%% × 6.</string>
+    <string name="settings_savings_dialog_reset">Réinitialiser les valeurs par défaut</string>
 
     <!-- Wavy Divider -->
     <string name="wavy_divider_show_all_past_period_expenses">Afficher toutes les dépenses de la période précédente…</string>
@@ -421,7 +471,6 @@
     <string name="recurrence_end">Fin de récurrence</string>
 
     <!-- Transaction Detail Ticket Card -->
-    <string name="ticket_operation_number">Op. #%1$d</string>
     <string name="ticket_expense">DÉPENSE</string>
     <string name="ticket_recurrent_expense">DÉPENSE RÉCURRENTE</string>
     <string name="ticket_total_amount">MONTANT TOTAL</string>
