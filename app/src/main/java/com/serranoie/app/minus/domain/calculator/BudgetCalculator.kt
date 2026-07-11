@@ -86,9 +86,6 @@ class BudgetCalculator @Inject constructor() {
             0f
         }
 
-        // Mode-aware allocation: STATIC uses totalBudget / (totalDays /
-        // periodBlockDays); DYNAMIC uses remaining / blocksRemaining.
-        // Both branches are delegated to the same helpers the UI uses.
         val totalDaysClamped = totalDaysInPeriod.coerceAtLeast(1)
         val daysRemainingClamped = daysRemaining.coerceAtLeast(0)
         val (daily, weekly, biweekly, monthly, isOverDaily) = if (settings.splitMode == BudgetSplitMode.DYNAMIC) {

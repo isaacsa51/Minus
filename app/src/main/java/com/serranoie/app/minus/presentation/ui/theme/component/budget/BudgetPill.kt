@@ -130,7 +130,13 @@ fun BudgetPill(
     }
 
     val periodRemaining = when (splitMode) {
-        BudgetSplitMode.DYNAMIC -> periodAllocation
+        BudgetSplitMode.DYNAMIC -> when (period) {
+            BudgetPeriod.DAILY -> periodAllocation.subtract(dailySpent)
+                .coerceAtLeast(BigDecimal.ZERO)
+
+            else -> periodAllocation.subtract(periodSpentAggregate)
+                .coerceAtLeast(BigDecimal.ZERO)
+        }
         BudgetSplitMode.STATIC -> staticPeriodRemaining
     }
 
