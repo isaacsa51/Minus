@@ -30,7 +30,7 @@
     <string name="previous_day">Día anterior</string>
     <string name="next_day">Día siguiente</string>
     <string name="monthly_on_day_format">Día %1$d de cada mes</string>
-    <string name="limit_date">Fecha limite</string>
+    <string name="limit_date">Fecha límite</string>
     <string name="date_placeholder">Fecha</string>
     <string name="change_date">Cambiar fecha</string>
     <string name="summary_weekly_format">Se cobrará todas las semanas hasta %1$s.</string>
@@ -48,7 +48,7 @@
     <string name="carry_to_next_day">Llevar a mañana</string>
     <string name="carry_to_next_day_desc">Agregar %1$s al presupuesto\'de mañana</string>
     <string name="view_analytics">Ver análisis</string>
-    <string name="view_analytics_desc">Revisar el resumen del periodo finalizado.</string>
+    <string name="view_analytics_desc">Revisar el resumen del periodo finalizado</string>
     <!-- Edit Transaction -->
     <string name="edit_recurrent_expense_title">Editar gasto recurrente</string>
     <string name="edit_expense_title">Editar gasto</string>
@@ -104,10 +104,10 @@
     <string name="show_past_period_expenses">Mostrar gastos del período pasado</string>
     <string name="add_new_category">Categoría</string>
     <string name="add_new_category_action">Añadir nueva categoría</string>
-    <string name="budget_validation_major_zero">El presupuesto debe ser mayor que 0.</string>
+    <string name="budget_validation_major_zero">El presupuesto debe ser mayor que 0</string>
     <string name="budget_no_date_defined">No hay fecha de finalización definida</string>
     <string name="budget_no_days_defined">No hay días definidos</string>
-    <string name="budget_less_than_one_day_validation">El presupuesto debe ser para al menos un día.</string>
+    <string name="budget_less_than_one_day_validation">El presupuesto debe ser para al menos un día</string>
     <!--  Analytics  -->
     <string name="analytics_title">Análisis</string>
     <plurals name="days">
@@ -167,7 +167,7 @@
     <string name="onboarding_step_2_title">Seguimiento de gastos</string>
     <string name="onboarding_step_2_subtitle">Registra lo que gastas y mira lo que queda cada día.</string>
     <string name="onboarding_step_3_title">Gastos recurrentes</string>
-    <string name="onboarding_step_3_subtitle">Añade suscripciones y Minus las seguirá por ti automáticamente.</string>
+    <string name="onboarding_step_3_subtitle">Añade suscripciones y Menos las seguirá por ti automáticamente.</string>
     <string name="onboarding_step_4_title">Calcula al instante</string>
     <string name="onboarding_step_4_subtitle">Tu presupuesto restante se actualiza en tiempo real mientras gastas.</string>
     <string name="onboarding_step_5_title">Consulta tus analíticas</string>
@@ -214,38 +214,38 @@
     <string name="settings_material_you_subtitle">Utilice colores de fondo de pantalla para aplicar un tema de aplicación dinámico</string>
     <string name="settings_feature_credit_toggle_title">Utilizar Tarjeta de Crédito como pago</string>
     <string name="settings_feature_credit_toggle_subtitle">Toca para ver los detalles</string>
-    <string name="settings_feature_credit_toggle_details">Cuando está activado, ahora podrás marcar pagos hechos con tarjeta de crédito.\\nDeclarando una fecha de corte sabrás cuanto pagarle a tu banco antes que tengas que pagar intereses mediante una notificiación independiente del periodo que estes.</string>
+    <string name="settings_feature_credit_toggle_details">Cuando está activado, ahora podrás marcar pagos hechos con tarjeta de crédito.\\nDeclarando una fecha de corte sabrás cuanto pagarle a tu banco antes que tengas que pagar intereses mediante una notificación independiente del periodo que estés.</string>
     <string name="settings_feature_credit_toggle_switch_label">Habilitar uso de TDC</string>
     <string name="settings_category_behavior_title">Comportamiento de las categorias</string>
     <string name="settings_category_behavior_subtitle">Configure el comportamiento del selector de categorías al etiquetar una transacción.</string>
-    <string name="settings_category_picker_direct_popup_switch_label">Mostrar categorias al dar tap</string>
-    <string name="settings_category_picker_direct_popup_description">Abrir sugerencias de categorias al momento de dar tap en el field de categorias. Si esta apagado, las sugerencias solo aparecerán al momento que empieces a escribir.</string>
+    <string name="settings_category_picker_direct_popup_switch_label">Mostrar categorías al dar tap</string>
+    <string name="settings_category_picker_direct_popup_description">Abrir sugerencias de categorías al momento de dar tap en el campo de categorías. Si está apagado, las sugerencias solo aparecerán al momento que empieces a escribir.</string>
     <string name="settings_category_grid_mode_switch_label">Mostrar como una lista (Experimental)</string>
-    <string name="settings_category_grid_mode_description">Al dar tap en la cateogría se abrirá una lista con todas las categorías guardadas, en vez de escribirlos directamente. Este ajuste apaga el Numpad al escribir la categoria.</string>
+    <string name="settings_category_grid_mode_description">Al dar tap en la categoría se abrirá una lista con todas las categorías guardadas, en vez de escribirlos directamente. Este ajuste apaga el Numpad al escribir la categoría.</string>
     <string name="settings_recurrent_payments_view_mode_title">Modo de visualización de pagos recurrentes</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">Cambia el tipo de visualización para mostrar tus pagos recurrentes.</string>
+    <string name="settings_recurrent_payments_view_mode_subtitle">Cambia el tipo de visualización para mostrar tus pagos recurrentes</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Modo de visualización de pagos recurrentes</string>
     <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
     <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Mostrar los pagos recurrentes como tarjetas horizontales</string>
     <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Mostrar los pagos recurrentes como una lista de gastos regulares.</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Mostrar los pagos recurrentes como una lista de gastos regulares</string>
     <string name="settings_period_end_time_title">Hora de finalización del período</string>
-    <string name="settings_period_end_time_subtitle">La notificación se mostrará el día que termina el período a esta hora.</string>
+    <string name="settings_period_end_time_subtitle">La notificación se mostrará el día que termina el período a esta hora</string>
     <string name="settings_recurrent_notification_time_title">Hora de pagos recurrentes</string>
-    <string name="settings_recurrent_notification_time_subtitle">La revisión diaria de pagos recurrentes se ejecuta a esta hora.</string>
+    <string name="settings_recurrent_notification_time_subtitle">La revisión diaria de pagos recurrentes se ejecuta a esta hora</string>
     <string name="settings_notification_permission_title">Permiso de notificaciones</string>
     <string name="settings_notification_permission_granted_subtitle">Concedido — recibirás notificaciones</string>
     <string name="settings_notification_permission_denied_subtitle">Denegado — toca para abrir los ajustes del sistema y permitir las notificaciones</string>
     <string name="settings_notification_permission_action">Abrir</string>
     <string name="settings_exact_alarm_title">Alarmas exactas</string>
-    <string name="settings_exact_alarm_enabled_subtitle">Habilitado para intentar mostrar notificaciones a la hora seleccionada.</string>
+    <string name="settings_exact_alarm_enabled_subtitle">Habilitado para intentar mostrar notificaciones a la hora seleccionada</string>
     <string name="settings_exact_alarm_disabled_subtitle">Desactivado; Android puede retrasar la notificación</string>
     <string name="settings_time_picker_cancel">Cancelar</string>
     <string name="settings_time_picker_confirm">Aceptar</string>
     <string name="settings_about_title">Acerca de</string>
     <string name="settings_about_subtitle">Obtenga más información sobre la aplicación y su desarrollo.</string>
     <string name="settings_bug_report_title">¿Encontraste un error?</string>
-    <string name="settings_bug_report_subtitle">Crea un informe de error y lo solucionaremos pronto.</string>
+    <string name="settings_bug_report_subtitle">Crea un informe de error y lo solucionaremos pronto</string>
     <string name="settings_version_title">Versión</string>
     <string name="settings_version_metadata_copied">Metadatos de la app y del dispositivo copiados al portapapeles</string>
     <!-- Bug Report -->
@@ -275,9 +275,9 @@
     <string name="bug_report_submit">Enviar reporte</string>
     <string name="bug_report_share_title">Enviar reporte</string>
     <string name="bug_report_email_subject">%1$s</string>
-    <string name="bug_report_email_body">Hola, adjunto mi reporte generado de Minus.</string>
+    <string name="bug_report_email_body">Hola, adjunto mi reporte generado de Menos.</string>
     <string name="bug_report_help_title">Ayúdanos a mejorar</string>
-    <string name="bug_report_help_message_prefix">"¿Encontraste un error o tienes una gran idea?\n\nEsta pantalla nos ayuda a crear todos los detalles necesarios en un reporte. Incluiremos automáticamente diagnósticos técnicos sobre tu dispositivo y la version de la aplicación para ayudarnos a solucionar problemas más rápido.\n\nUna vez finalizado, puedes enviar el reporte por correo electrónico o publicarlo en "</string>
+    <string name="bug_report_help_message_prefix">"¿Encontraste un error o tienes una gran idea?\n\nEsta pantalla nos ayuda a crear todos los detalles necesarios en un reporte. Incluiremos automáticamente diagnósticos técnicos sobre tu dispositivo y la versión de la aplicación para ayudarnos a solucionar problemas más rápido.\n\nUna vez finalizado, puedes enviar el reporte por correo electrónico o publicarlo en "</string>
     <string name="bug_report_help_github_issues">" GitHub Issues "</string>
     <string name="bug_report_help_message_suffix"> directamente en nuestro repositorio.</string>
     <string name="bug_report_steps_to_reproduce_label">Pasos para reproducir</string>
@@ -332,13 +332,13 @@
     <string name="categories_chart_empty_subtitle">Agregue categorías para ver el gráfico</string>
     <string name="category_no_expenses">No hay gastos en esta categoría</string>
     <!-- Calendar Heatmap -->
-    <string name="calendar_heatmap_info_text">Este gráfico muestra el dinero gastado por cada día del período.</string>
+    <string name="calendar_heatmap_info_text">Este gráfico muestra el dinero gastado por cada día del período</string>
     <!-- No Transactions -->
     <string name="no_transactions_title">No hay gastos registrados</string>
     <string name="no_transactions_subtitle">Agregue un gasto para comenzar</string>
     <!-- Recurrent Payments Divider -->
     <string name="recurrent_payments_divider_title_upcoming">Próximos pagos recurrentes</string>
-    <string name="recurrent_payments_divider_title_current_period">Pago recurrentes en este periodo</string>
+    <string name="recurrent_payments_divider_title_current_period">Pagos recurrentes en este periodo</string>
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">Hoy</string>
     <string name="upcoming_recurrent_tomorrow">Mañana</string>
@@ -365,12 +365,12 @@
     <string name="rollover_dialog_carry_to_tomorrow_title">Llevar a mañana</string>
     <string name="rollover_dialog_carry_to_tomorrow_desc">Agregar %1$s al presupuesto\'de mañana</string>
     <string name="rollover_dialog_view_analytics_title">Ver análisis</string>
-    <string name="rollover_dialog_view_analytics_desc">Revisar el resumen del periodo finalizado.</string>
+    <string name="rollover_dialog_view_analytics_desc">Revisar el resumen del periodo finalizado</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Periodo terminado</string>
     <string name="finished_period_header_no_spends">¿Eh? No gastaste nada este período</string>
     <string name="finished_period_header_over_budget">¡Cuidado! Te excediste del presupuesto en este período</string>
-    <string name="finished_period_header_summary">Aquí están las estadísticas de todos sus gastos.</string>
+    <string name="finished_period_header_summary">Aquí están las estadísticas de todos sus gastos</string>
     <!-- Savings Recommendation Card -->
     <string name="savings_recommendation_title">Recomendación de ahorro</string>
     <string name="savings_recommendation_method_brief" formatted="false">Este método %1$d/%2$d/%3$d divide tu presupuesto en %1$d%% de necesidades, %2$d%% de deseos y %3$d%% de ahorro, ayudándote a controlar los gastos y ahorrar de forma constante.</string>
@@ -407,19 +407,19 @@
     <string name="settings_savings_dialog_goal_hint">Déjalo en blanco para mantener el ejemplo por defecto de %1$d%% × 6.</string>
     <string name="settings_savings_dialog_reset">Restablecer valores predeterminados</string>
     <!-- Wavy Divider -->
-    <string name="wavy_divider_show_all_past_period_expenses">Mostrar todos los gastos del período anterior...</string>
+    <string name="wavy_divider_show_all_past_period_expenses">Mostrar todos los gastos del período anterior…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">Usar %d días</string>
     <string name="remaining_budget_label">Sobrante</string>
     <string name="currency_label">Divisa</string>
     <string name="select_currency">Seleccionar divisa</string>
-    <string name="search_currency">Buscar divisa</string>
+    <string name="search_currency">Buscar divisa…</string>
     <string name="clear">Borrar</string>
     <string name="currency_no_results">No se encontró la divisa</string>
     <string name="currency_selected">Seleccionado</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">Sobrante del presupuesto</string>
-    <string name="strategy_dialog_description" formatted="false">Puedes elegir como distribuir el balance del presupuesto al final de cada día.\\n\\nFor ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: puedes repartir 100 en los días que queda, o gastar 600 (presupuesto por día + sobrante del periodo anterior) hoy.</string>
+    <string name="strategy_dialog_description" formatted="false">Puedes elegir como distribuir el balance del presupuesto al final de cada día.\n\nPor ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: puedes repartir 100 en los días que queda, o gastar 600 (presupuesto por día + sobrante del periodo anterior) hoy.</string>
     <string name="strategy_ask_always">Preguntarme siempre</string>
     <string name="strategy_ask_always_desc">Al final del período te preguntaremos qué hacer con el sobrante</string>
     <string name="strategy_split_equally">Repartir entre todos los días</string>
