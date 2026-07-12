@@ -3,10 +3,10 @@ package com.serranoie.app.minus.presentation.ui.tutorial
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,32 +38,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import logcat.logcat
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import kotlinx.coroutines.delay
+import logcat.logcat
+import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * Wraps [content] with a first-launch coachmark overlay.
- *
- * When [showTutorial] is `true` and [state] has at least one registered target, draws a
- * dim scrim with a focus cutout around the current target and a tooltip card
- * (rendered by [tutorialTarget]) positioned next to the target. Tapping anywhere on the
- * overlay advances to the next target; after the last target, [onTutorialCompleted] is
- * invoked exactly once.
- *
- * Implementation note: the overlay is a sibling of [content] in a [Box] and uses
- * [onGloballyPositioned] to learn its own size, NOT [androidx.compose.foundation.layout.BoxWithConstraints].
- * `BoxWithConstraints` uses subcomposition and was causing layout interference with the
- * content (which is also a subcomposing layout via its own `BoxWithConstraints`).
- *
- * @param showTutorial toggles the overlay on/off; pass a Boolean derived from a
- *   remembered `MutableState` so re-compositions don't re-create the state.
- * @param onTutorialCompleted invoked once when the user taps through the last target.
- *   The caller typically flips a "do not show again" flag here.
- * @param state the [TutorialBoxState] shared with [markForTutorial] call sites.
- * @param tutorialTarget composable that renders the tooltip body for the currently
- *   highlighted target. Receives the target's index so it can pick the right text.
- * @param content the actual app UI to coachmark over.
- */
 @Composable
 fun TutorialBox(
     showTutorial: Boolean,
@@ -72,6 +52,15 @@ fun TutorialBox(
     content: @Composable () -> Unit,
 ) {
     var canvasSize by remember { mutableStateOf(Size.Zero) }
+
+    val isCompleted by remember { derivedStateOf { state.isCompleted } }
+    val currentIndex by remember { derivedStateOf { state.currentIndexState.value } }
+    val activeBounds by remember { derivedStateOf { state.currentBounds } }
+    val shouldShow by remember(showTutorial, canvasSize) {
+        derivedStateOf {
+            showTutorial && !isCompleted && activeBounds != null && canvasSize.isSpecified
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -84,31 +73,86 @@ fun TutorialBox(
     ) {
         content()
 
-        val activeBounds = state.currentBounds
-        val shouldShow = showTutorial && !state.isCompleted && activeBounds != null && canvasSize.isSpecified
-        logcat(TUTORIAL_LOG_TAG) {
-            "TutorialBox render: showTutorial=$showTutorial " +
-                "isCompleted=${state.isCompleted} " +
-                "activeBounds=$activeBounds " +
-                "canvasSize=$canvasSize " +
-                "currentIndex=${state.currentIndexState.value} " +
-                "registrationOrder=${state.registrationOrder.toList()} " +
-                "shouldShow=$shouldShow"
-        }
-        if (shouldShow) {
+        if (shouldShow && activeBounds != null) {
             TutorialOverlay(
-                bounds = activeBounds,
+                bounds = activeBounds!!,
                 canvasSize = canvasSize,
-                index = state.currentIndexState.value,
+                index = currentIndex,
                 tutorialTarget = tutorialTarget,
                 onTap = { state.advance() },
             )
         }
     }
 
-    LaunchedEffect(state.isCompleted) {
-        logcat(TUTORIAL_LOG_TAG) { "TutorialBox isCompleted changed → ${state.isCompleted}, firing onTutorialCompleted=${state.isCompleted}" }
-        if (state.isCompleted) onTutorialCompleted()
+    LaunchedEffect(currentIndex, state.targetBounds.size) {
+        if (currentIndex != -1 &&
+            !isCompleted &&
+            state.currentBounds == null
+        ) {
+            logcat(TUTORIAL_LOG_TAG) {
+                "TutorialBox: current target $currentIndex " +
+                    "has no bounds, auto-advancing"
+            }
+            state.advance()
+        }
+    }
+
+    LaunchedEffect(state.pendingRewindCandidates.size) {
+        if (state.pendingRewindCandidates.isNotEmpty()) {
+            val currentIndexBeforeDelay = state.currentIndexState.value
+            val isCompletedBeforeDelay = state.isCompleted
+            delay(50.milliseconds)
+            
+            if (state.currentIndexState.value != currentIndexBeforeDelay ||
+                state.isCompleted != isCompletedBeforeDelay
+            ) {
+                state.pendingRewindCandidates.clear()
+                return@LaunchedEffect
+            }
+            if (state.pendingRewindCandidates.isEmpty()) return@LaunchedEffect
+            val order = state.registrationOrder
+            val lowest = state.pendingRewindCandidates
+                .minByOrNull { order.indexOf(it) }
+            
+            state.pendingRewindCandidates.clear()
+            if (lowest != null) {
+                val targetPos = order.indexOf(lowest)
+                if (state.isCompleted) {
+                    state.isCompleted = false
+                    state.currentIndexState.value = lowest
+                    logcat(TUTORIAL_LOG_TAG) {
+                        "rewind-apply: index=$lowest AFTER completion " +
+                            "(targetPos=$targetPos)"
+                    }
+                } else {
+                    val currentPos = order
+                        .indexOf(state.currentIndexState.value)
+                        .coerceAtLeast(0)
+                    if (currentPos > targetPos) {
+                        val outgoing = state.currentIndexState.value
+
+                        if (outgoing in order && outgoing != 3 && outgoing != 4) {
+                            state.visitedIndices.add(outgoing)
+                        }
+                        state.currentIndexState.value = lowest
+                        logcat(TUTORIAL_LOG_TAG) {
+                            "rewind-apply: index=$lowest " +
+                                "(currentPos=$currentPos, targetPos=$targetPos) " +
+                                "marked outgoing index=$outgoing as visited"
+                        }
+                    } else {
+                        logcat(TUTORIAL_LOG_TAG) {
+                            "rewind-apply: skipped index=$lowest " +
+                                "(currentPos=$currentPos not > targetPos=$targetPos)"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(isCompleted) {
+        if (isCompleted) onTutorialCompleted()
     }
 }
 
@@ -200,11 +244,6 @@ private fun TutorialOverlay(
     }
 }
 
-/**
- * Pick the side of the target with the most free space and anchor the tooltip just
- * outside the cutout. Clamps the result so the tooltip never falls off-screen even on
- * small phones.
- */
 private fun computeTooltipPosition(
     targetBounds: Rect,
     canvasSize: Size,
@@ -267,57 +306,19 @@ private fun TutorialBoxPreview() {
             state = state,
             tutorialTarget = { index ->
                 Text(
-                    text = when (index) {
-                        0 -> "This is the first element you should look at."
-                        1 -> "And this is the second one, further down."
-                        else -> "Tutorial step $index"
-                    },
+                    text = "Tutorial step $index",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(32.dp)
-            ) {
-                Surface(
-                    tonalElevation = 2.dp,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.markForTutorial(state, 0)
-                ) {
-                    Text(
-                        text = "Highlight Me 1",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(64.dp))
-
-                Surface(
-                    tonalElevation = 2.dp,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.markForTutorial(state, 1)
-                ) {
-                    Text(
-                        text = "Highlight Me 2",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            }
+            Box(modifier = Modifier.fillMaxSize())
         }
     }
 }
 
-/**
- * Renders the tooltip body shown inside the [TutorialBox] coachmark overlay for a
- * single step. Title in `titleMedium` (bold) on top, description in `bodyMedium`
- * (regular) below with an 8dp gap — kept inside the [Surface] that [TutorialBox] draws
- * around `tutorialTarget`, so this composable just paints text, no chrome.
- */
 @Composable
 fun TutorialTooltip(
-    title: String,
+    title: String?,
     description: String,
     modifier: Modifier = Modifier,
 ) {
@@ -325,11 +326,13 @@ fun TutorialTooltip(
         modifier = modifier,
         verticalArrangement = Arrangement.Top,
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
+        if (title != null) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
         if (description.isNotBlank()) {
             Spacer(Modifier.height(6.dp))
             Text(

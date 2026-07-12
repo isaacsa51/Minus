@@ -1,24 +1,21 @@
 package com.serranoie.app.minus.presentation.ui.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
-import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
-import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
 import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
-import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.settingsDataStore
@@ -27,12 +24,16 @@ import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadInt
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.changelog.ChangelogGate
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
 import com.serranoie.app.minus.presentation.ui.tutorial.firstLaunchTutorialStageFlow
+import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
 import kotlinx.coroutines.flow.map
 import logcat.logcat
 
 private const val TAG = "ISAAC:MainScreen"
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun MainScreen(
     onNavigateToAnalytics: () -> Unit = {},
@@ -121,16 +122,6 @@ fun MainScreen(
     }
 
     val showNumpadTutorial = remember { mutableStateOf(true) }
-
-    // Note: we intentionally do NOT flip showNumpadTutorial to false in
-    // onTutorialCompleted. The walk's `isCompleted` flag (managed inside
-    // TutorialBoxState) already hides the overlay when the walk finishes; if we
-    // also flipped showNumpadTutorial to false, the rewind logic that brings the
-    // user back to gated targets (category tag, recurrent toggle) when they enter
-    // edit mode would have no effect because the overlay would stay hidden. With
-    // this wiring, the walk can complete, then un-complete when a gated target
-    // becomes available, and the overlay re-shows to walk through the gated
-    // targets on the user's first edit-mode entry.
     val tutorialBoxState = rememberTutorialBoxState()
 
     ChangelogGate(
@@ -149,20 +140,20 @@ fun MainScreen(
             tutorialTarget = { index ->
                 when (index) {
                     0 -> TutorialTooltip(
-                        title = stringResource(R.string.tutorial_numpad_title),
+                        title = null,
                         description = stringResource(R.string.tutorial_numpad_description),
                     )
-                    1 -> TutorialTooltip(
-                        title = stringResource(R.string.tutorial_comment_title),
-                        description = stringResource(R.string.tutorial_comment_description),
-                    )
                     2 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_settings_title),
+                        description = stringResource(R.string.tutorial_settings_description),
+                    )
+                    1 -> TutorialTooltip(
                         title = stringResource(R.string.tutorial_budget_pill_title),
                         description = stringResource(R.string.tutorial_budget_pill_description),
                     )
                     3 -> TutorialTooltip(
-                        title = stringResource(R.string.tutorial_settings_title),
-                        description = stringResource(R.string.tutorial_settings_description),
+                        title = stringResource(R.string.tutorial_comment_title),
+                        description = stringResource(R.string.tutorial_comment_description),
                     )
                     4 -> TutorialTooltip(
                         title = stringResource(R.string.tutorial_recurrent_title),

@@ -800,7 +800,7 @@ private fun PhoneLayout(
                         )
                     },
                     budgetPillHintAnchorModifier = tutorialBoxState
-                        ?.let { state -> Modifier.markForTutorial(state, index = 2) }
+                        ?.let { state -> Modifier.markForTutorial(state, index = 1) }
                         ?: Modifier,
                     analyticsHintAnchorModifier = Modifier,
                     tutorialBoxState = tutorialBoxState,
@@ -1051,7 +1051,7 @@ private fun TabletLayout(
                     showAnalyticsButton = false,
                     showSettingsButton = false,
                     budgetPillHintAnchorModifier = tutorialBoxState
-                        ?.let { state -> Modifier.markForTutorial(state, index = 2) }
+                        ?.let { state -> Modifier.markForTutorial(state, index = 1) }
                         ?: Modifier,
                     analyticsHintAnchorModifier = Modifier,
                     tutorialBoxState = tutorialBoxState,

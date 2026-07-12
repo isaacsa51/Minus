@@ -387,7 +387,7 @@ fun Editor(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .let { m ->
-                                        if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 3) else m
+                                        if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 2) else m
                                     }
                             ) {
                                 BadgedBox(
@@ -671,7 +671,7 @@ private fun EditingContent(
                         onCommentUpdate = onCommentUpdate,
                         editorFocusController = editorFocusController,
                         modifier = Modifier.let { m ->
-                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 1) else m
+                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 3) else m
                         },
                         extendWidth = toolbarWidth,
                         onlyIcon = false,
@@ -706,7 +706,7 @@ private fun EditingContent(
                         .fillMaxWidth()
                         .padding(bottom = 26.dp)
                         .let { m ->
-                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 1) else m
+                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 3) else m
                         },
                 )
             }

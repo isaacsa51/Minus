@@ -9,7 +9,7 @@
     <string name="tutorial_budget_pill_description">Tap to switch between daily, weekly, and monthly budget views, or to edit the period setup.</string>
     <string name="tutorial_settings_title">Settings</string>
     <string name="tutorial_settings_description">Open Settings to enable features, set up home-screen widgets, or reset this tutorial.</string>
-    <string name="tutorial_recurrent_title">Recurrent payment</string>
+    <string name="tutorial_recurrent_title">Recurrent payments</string>
     <string name="tutorial_recurrent_description">Tap here to mark this spend as a recurring payment (weekly, biweekly, or monthly). The app will remind you to log it on schedule.</string>
 
     <string name="empty" translatable="false">—</string>
