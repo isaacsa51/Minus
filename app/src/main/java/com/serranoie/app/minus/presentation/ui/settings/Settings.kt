@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material.icons.filled.QuestionMark
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Sell
@@ -515,7 +516,7 @@ fun Settings(
                             showRecurrentPaymentsViewModeDialog = true
                             view.weakHapticFeedback()
                         },
-                        position = PaddedListItemPosition.Last,
+                        position = PaddedListItemPosition.Middle,
                         modifier = Modifier.testTag("SettingsRecurrentPaymentsViewModeItem")
                     ) {
                         Icon(
@@ -541,6 +542,34 @@ fun Settings(
                             style = MaterialTheme.typography.labelLargeCondensed,
                             color = MaterialTheme.colorScheme.primary
                         )
+                    }
+
+                    CustomPaddedListItem(
+                        onClick = {
+                            view.toggleFeedback()
+                            onResetTutorial()
+                        },
+                        position = PaddedListItemPosition.Last,
+                        modifier = Modifier.testTag("SettingsResetTutorialItem")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_reset_tutorial_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_reset_tutorial_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
@@ -911,41 +940,6 @@ fun Settings(
                     }
                 }
             }
-
-//
-// 			item {
-// 				PaddedListGroup(
-// 					title = stringResource(R.string.settings_section_tutorial)
-// 				) {
-// 					CustomPaddedListItem(
-// 						onClick = {
-// 							onResetTutorial()
-// 							view.toggleFeedback()
-// 						},
-// 						position = PaddedListItemPosition.Single,
-// 						modifier = Modifier.testTag("SettingsResetTutorialItem")
-// 					) {
-// 						Icon(
-// 							imageVector = Icons.Default.Refresh,
-// 							contentDescription = null,
-// 							tint = MaterialTheme.colorScheme.primary
-// 						)
-// 						Spacer(modifier = Modifier.width(16.dp))
-// 						Column(modifier = Modifier.weight(1f)) {
-// 							Text(
-// 								text = stringResource(R.string.settings_reset_tutorial_title),
-// 								style = MaterialTheme.typography.bodyMediumEmphasized,
-// 								color = MaterialTheme.colorScheme.onSurface
-// 							)
-// 							Text(
-// 								text = stringResource(R.string.settings_reset_tutorial_subtitle),
-// 								style = MaterialTheme.typography.bodySmall,
-// 								color = MaterialTheme.colorScheme.onSurfaceVariant
-// 							)
-// 						}
-// 					}
-// 				}
-// 			}
         }
 
         if (showThemeDialog) {

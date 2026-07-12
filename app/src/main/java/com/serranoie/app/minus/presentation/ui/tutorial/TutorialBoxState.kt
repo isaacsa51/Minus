@@ -83,9 +83,13 @@ class TutorialBoxState {
         }
     }
 
-    internal fun reset() {
+    fun resetForReplay() {
         isCompleted = false
-        currentIndexState.value = if (registrationOrder.isEmpty()) -1 else registrationOrder.first()
+        currentIndexState.value =
+            if (registrationOrder.isEmpty()) -1 else registrationOrder.first()
+        visitedIndices.clear()
+        measuredIndices.clear()
+        pendingRewindCandidates.clear()
     }
 }
 

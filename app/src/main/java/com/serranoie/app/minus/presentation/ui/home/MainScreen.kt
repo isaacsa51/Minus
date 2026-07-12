@@ -6,10 +6,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
@@ -18,6 +18,7 @@ import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
 import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
+import com.serranoie.app.minus.presentation.TUTORIAL_BOX_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
@@ -28,7 +29,9 @@ import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
 import com.serranoie.app.minus.presentation.ui.tutorial.firstLaunchTutorialStageFlow
 import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
+import com.serranoie.app.minus.presentation.ui.tutorial.tutorialBoxCompletedFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import logcat.logcat
 
 private const val TAG = "ISAAC:MainScreen"
@@ -121,8 +124,17 @@ fun MainScreen(
         }
     }
 
-    val showNumpadTutorial = remember { mutableStateOf(true) }
+    val tutorialBoxCompleted by context.tutorialBoxCompletedFlow()
+        .collectAsStateWithLifecycle(initialValue = false)
+    val showNumpadTutorial = !tutorialBoxCompleted
     val tutorialBoxState = rememberTutorialBoxState()
+    val tutorialScope = rememberCoroutineScope()
+
+    LaunchedEffect(tutorialBoxCompleted) {
+        if (!tutorialBoxCompleted) {
+            tutorialBoxState.resetForReplay()
+        }
+    }
 
     ChangelogGate(
         currentVersionCode = run {
@@ -134,8 +146,15 @@ fun MainScreen(
         },
     ) {
         TutorialBox(
-            showTutorial = showNumpadTutorial.value,
-            onTutorialCompleted = { /* see comment above showNumpadTutorial */ },
+            showTutorial = showNumpadTutorial,
+            onTutorialCompleted = {
+                logcat(TAG) { "TutorialBox completed → persisting tutorialBoxCompleted=true" }
+                tutorialScope.launch {
+                    context.settingsDataStore.edit { prefs ->
+                        prefs[TUTORIAL_BOX_COMPLETED_KEY] = true
+                    }
+                }
+            },
             state = tutorialBoxState,
             tutorialTarget = { index ->
                 when (index) {
