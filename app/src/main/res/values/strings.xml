@@ -175,6 +175,7 @@
     <string name="widget_month_heatmap_preview_month" translatable="false">JUNE</string>
     <string name="widget_add_expense_description">Quick shortcut to add a new expense</string>
     <string name="widget_add_expense_label">Add new expense</string>
+    <string name="widget_add_expense_compact_label">Add expense</string>
     <string name="widget_add_expense_plus" translatable="false">+</string>
 
     <!-- Widget Labels -->

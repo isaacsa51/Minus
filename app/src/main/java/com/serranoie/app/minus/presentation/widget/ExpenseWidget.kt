@@ -3,20 +3,20 @@
 package com.serranoie.app.minus.presentation.widget
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.Button
-import androidx.glance.Image
-import androidx.glance.ImageProvider
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -33,20 +33,16 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
-import androidx.glance.layout.size
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
-import androidx.glance.layout.width
-import androidx.glance.text.FontWeight
-import androidx.glance.text.Text
-import androidx.glance.text.TextAlign
-import androidx.glance.text.TextStyle
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
+import androidx.glance.text.FontWeight
+import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
 import com.serranoie.app.minus.R
 
 class ExpenseWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -60,7 +56,9 @@ fun ExpenseWidgetPreviewLowSpend() {
         ExpenseWidget().ExpenseWidgetContent(
             spend = 3740,
             budget = 60000,
-            currency = "$"
+            currency = "USD",
+            totalSpentLabel = "Total Spent",
+            addExpenseContentDescription = "Add expense",
         )
     }
 }
@@ -72,7 +70,9 @@ fun ExpenseWidgetPreviewMediumSpend() {
         ExpenseWidget().ExpenseWidgetContent(
             spend = 30740,
             budget = 60000,
-            currency = "$"
+            currency = "USD",
+            totalSpentLabel = "Total Spent",
+            addExpenseContentDescription = "Add expense",
         )
     }
 }
@@ -84,7 +84,9 @@ fun ExpenseWidgetPreviewHighSpend() {
         ExpenseWidget().ExpenseWidgetContent(
             spend = 45740,
             budget = 60000,
-            currency = "$"
+            currency = "USD",
+            totalSpentLabel = "Total Spent",
+            addExpenseContentDescription = "Add expense",
         )
     }
 }
@@ -96,7 +98,9 @@ fun ExpenseWidgetPreviewEmpty() {
         ExpenseWidget().ExpenseWidgetContent(
             spend = 0,
             budget = 60000,
-            currency = "$"
+            currency = "USD",
+            totalSpentLabel = "Total Spent",
+            addExpenseContentDescription = "Add expense",
         )
     }
 }
@@ -106,35 +110,45 @@ class ExpenseWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             GlanceTheme {
-                WidgetContent()
+                WidgetContent(context)
             }
         }
     }
 
     @Composable
-    private fun WidgetContent() {
+    private fun WidgetContent(context: Context) {
         val prefs = currentState<Preferences>()
         val spend = prefs[intPreferencesKey("spend")] ?: 0
         val budget = prefs[intPreferencesKey("budget")] ?: 1
-        val currency = prefs[stringPreferencesKey("currency")] ?: "$"
+        val currency = prefs[stringPreferencesKey("currency")] ?: "USD"
 
-        ExpenseWidgetContent(spend, budget, currency)
+        ExpenseWidgetContent(
+            spend = spend,
+            budget = budget,
+            currency = currency,
+            totalSpentLabel = context.getString(R.string.total_spent),
+            addExpenseContentDescription = context.getString(R.string.widget_add_expense_label),
+        )
     }
 
     @Composable
-    internal fun ExpenseWidgetContent(spend: Int, budget: Int, currency: String) {
-        // Calculate percentage spent (0.0 to 1.0+)
+    internal fun ExpenseWidgetContent(
+        spend: Int,
+        budget: Int,
+        currency: String,
+        totalSpentLabel: String = "Total Spent",
+        addExpenseContentDescription: String = "Add expense",
+    ) {
         val percentSpent = if (budget > 0) {
             spend.toFloat() / budget.toFloat()
         } else 0f
 
         val percentRemaining = ((1f - percentSpent) * 100).toInt().coerceAtLeast(0)
 
-        // Get color based on percentage spent
         val progressColor = when {
-            percentSpent < 0.33f -> Color(0xFF81C784) // Good - Green
-            percentSpent < 0.66f ->Color(0xFFFFB74D) // Not Good - Orange
-            else -> Color(0xFFE57373) // Bad - Red
+            percentSpent < 0.33f -> Color(0xFF81C784)
+            percentSpent < 0.66f ->Color(0xFFFFB74D)
+            else -> Color(0xFFE57373)
         }
 
         val progressPercent = percentSpent.coerceIn(0f, 1f)
@@ -149,15 +163,13 @@ class ExpenseWidget : GlanceAppWidget() {
             Column(
                 modifier = GlanceModifier.fillMaxSize()
             ) {
-                // Main content row (spend amount + plus button)
                 Row(
                     modifier = GlanceModifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Spend amount
                     Column {
                         Text(
-                            text = "Total gastado",
+                            text = totalSpentLabel,
                             style = TextStyle(
                                 color = GlanceTheme.colors.onSurfaceVariant,
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
@@ -174,10 +186,8 @@ class ExpenseWidget : GlanceAppWidget() {
                         )
                     }
 
-                    // Push button to the right
                     Spacer(modifier = GlanceModifier.fillMaxWidth())
 
-                    // Plus button
                     Button(
                         text = "+",
                         onClick = actionRunCallback<OpenAppAction>(),
@@ -186,14 +196,13 @@ class ExpenseWidget : GlanceAppWidget() {
                 }
             }
 
-            // Small plus icon at bottom right corner
             Box(
                 modifier = GlanceModifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomEnd
             ) {
                 Image(
                     provider = ImageProvider(R.drawable.ic_plus),
-                    contentDescription = "Add expense",
+                    contentDescription = addExpenseContentDescription,
                     modifier = GlanceModifier.size(20.dp)
                 )
             }
@@ -210,8 +219,8 @@ class OpenAppAction : ActionCallback {
     ) {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         intent?.let {
-            it.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
-                    android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP
             context.startActivity(it)
         }
     }

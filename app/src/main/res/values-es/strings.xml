@@ -145,12 +145,13 @@
     <string name="widget_month_heatmap_description">Calendario del mapa de calor del mes actual</string>
     <string name="widget_add_expense_description">Acceso directo rápido para agregar un nuevo gasto</string>
     <string name="widget_add_expense_label">Agregar nuevo gasto</string>
+    <string name="widget_add_expense_compact_label">Gasto</string>
     <!-- Widget Labels -->
     <string name="spent">Gastado</string>
     <string name="left">Restante</string>
     <string name="remaining">Restante</string>
     <string name="total_spent">Total gastado</string>
-    <string name="days_left">días</string>
+    <string name="days_left">días restantes</string>
     <string name="budget_overview">Resumen del presupuesto</string>
     <string name="spent_per_day">Gastado por día</string>
     <string name="budget_period_daily">A diario</string>

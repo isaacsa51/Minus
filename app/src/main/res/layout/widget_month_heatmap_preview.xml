@@ -22,43 +22,43 @@
         android:orientation="vertical">
 
         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_2" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_2" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
         </LinearLayout>
 
         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_2" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_1" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_2" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
         </LinearLayout>
 
         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_2" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_2" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_1" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_2" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_2" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_2" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_2" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
         </LinearLayout>
 
         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_1" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_2" />
-            <View android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_warn_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_empty_dark" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_bad_1" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_2" />
+            <FrameLayout android:layout_width="12dp" android:layout_height="12dp" android:layout_margin="1dp" android:background="@color/widget_heatmap_good_1" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

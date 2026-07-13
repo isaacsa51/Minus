@@ -37,7 +37,7 @@
             android:textColor="#A3A6AD"
             android:textSize="12sp" />
 
-        <View
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="2dp"
             android:layout_marginHorizontal="8dp"
@@ -55,7 +55,7 @@
             android:textSize="11sp"
             android:textStyle="bold" />
 
-        <View
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="2dp"
             android:layout_marginHorizontal="8dp"

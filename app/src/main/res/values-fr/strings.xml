@@ -145,6 +145,7 @@
     <string name="widget_month_heatmap_description">Calendrier thermique du mois en cours</string>
     <string name="widget_add_expense_description">Raccourci rapide pour ajouter une nouvelle dépense</string>
     <string name="widget_add_expense_label">Ajouter une nouvelle dépense</string>
+    <string name="widget_add_expense_compact_label">Dépense</string>
     <!-- Widget Labels -->
     <string name="spent">Dépensé</string>
     <string name="left">Restant</string>

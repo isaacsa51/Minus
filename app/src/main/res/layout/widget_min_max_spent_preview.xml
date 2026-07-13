@@ -19,14 +19,14 @@
             android:gravity="bottom"
             android:orientation="horizontal"
             android:paddingHorizontal="8dp">
-            <View android:layout_width="0dp" android:layout_height="12dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#333F7DD5" />
-            <View android:layout_width="0dp" android:layout_height="10dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
-            <View android:layout_width="0dp" android:layout_height="8dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
-            <View android:layout_width="0dp" android:layout_height="18dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
-            <View android:layout_width="0dp" android:layout_height="12dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
-            <View android:layout_width="0dp" android:layout_height="24dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
-            <View android:layout_width="0dp" android:layout_height="20dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
-            <View android:layout_width="0dp" android:layout_height="10dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#333F7DD5" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="12dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#333F7DD5" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="10dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="8dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="18dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="12dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="24dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="20dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="10dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#333F7DD5" />
         </LinearLayout>
 
         <LinearLayout
@@ -41,7 +41,7 @@
         </LinearLayout>
     </FrameLayout>
 
-    <Space
+    <FrameLayout
         android:layout_width="8dp"
         android:layout_height="1dp" />
 
@@ -58,14 +58,14 @@
             android:gravity="bottom"
             android:orientation="horizontal"
             android:paddingHorizontal="8dp">
-            <View android:layout_width="0dp" android:layout_height="12dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
-            <View android:layout_width="0dp" android:layout_height="10dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
-            <View android:layout_width="0dp" android:layout_height="24dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
-            <View android:layout_width="0dp" android:layout_height="18dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
-            <View android:layout_width="0dp" android:layout_height="36dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#99DD1414" />
-            <View android:layout_width="0dp" android:layout_height="22dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
-            <View android:layout_width="0dp" android:layout_height="12dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#333F7DD5" />
-            <View android:layout_width="0dp" android:layout_height="8dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#333F7DD5" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="12dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="10dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="24dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="18dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33A96776" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="36dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#99DD1414" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="22dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#33DD1414" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="12dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#333F7DD5" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="8dp" android:layout_marginHorizontal="2dp" android:layout_weight="1" android:background="#333F7DD5" />
         </LinearLayout>
 
         <LinearLayout

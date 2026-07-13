@@ -34,6 +34,7 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
+import com.serranoie.app.minus.R
 
 class DaysCountdownWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = DaysCountdownWidget()
@@ -44,17 +45,18 @@ class DaysCountdownWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             GlanceTheme {
-                WidgetContent()
+                WidgetContent(context)
             }
         }
     }
 
     @Composable
-    private fun WidgetContent() {
+    private fun WidgetContent(context: Context) {
         val prefs = currentState<Preferences>()
         val daysRemaining = prefs[intPreferencesKey("days_remaining")] ?: 0
         val totalDays = prefs[intPreferencesKey("total_days")] ?: 30
-        val periodLabel = prefs[stringPreferencesKey("period_label")] ?: "days"
+        val periodLabel =
+            prefs[stringPreferencesKey("period_label")] ?: context.getString(R.string.days_left)
 
         DaysCountdownContent(daysRemaining, totalDays, periodLabel)
     }
@@ -76,9 +78,9 @@ class DaysCountdownWidget : GlanceAppWidget() {
                     text = "$daysRemaining",
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
-                        color = if (daysRemaining <= 3) 
-                            GlanceTheme.colors.error 
-                        else 
+                        color = if (daysRemaining <= 3)
+                            GlanceTheme.colors.error
+                        else
                             GlanceTheme.colors.primary,
                         textAlign = TextAlign.Center,
                         fontSize = 28.sp
@@ -103,8 +105,9 @@ suspend fun updateDaysCountdownWidget(
     context: Context,
     daysRemaining: Int,
     totalDays: Int,
-    periodLabel: String = "days left"
+    periodLabel: String = "",
 ) {
+    val resolvedLabel = periodLabel.ifEmpty { context.getString(R.string.days_left) }
     val manager = GlanceAppWidgetManager(context)
     val glanceIds = manager.getGlanceIds(DaysCountdownWidget::class.java)
 
@@ -112,7 +115,7 @@ suspend fun updateDaysCountdownWidget(
         updateAppWidgetState(context, glanceId) { prefs ->
             prefs[intPreferencesKey("days_remaining")] = daysRemaining
             prefs[intPreferencesKey("total_days")] = totalDays
-            prefs[stringPreferencesKey("period_label")] = periodLabel
+            prefs[stringPreferencesKey("period_label")] = resolvedLabel
         }
         DaysCountdownWidget().update(context, glanceId)
     }

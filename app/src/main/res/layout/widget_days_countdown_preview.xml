@@ -7,21 +7,19 @@
     android:padding="8dp"
     android:gravity="center">
 
-    <!-- Days number (large) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="12"
-        android:textSize="46sp"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="?android:attr/colorPrimary" />
 
-    <!-- Period label -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/days_left"
-        android:textSize="12sp"
+        android:textSize="8sp"
         android:textColor="?android:attr/textColorSecondary" />
 
 </LinearLayout>
