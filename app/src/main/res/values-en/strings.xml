@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
+    <string name="tutorial_numpad_title">Numpad</string>
+    <string name="tutorial_numpad_description">Enter the amount you spent and tap the green checkmark to save. Swipe up on the numpad to calculate.</string>
+    <string name="tutorial_comment_title">Add a category</string>
+    <string name="tutorial_comment_description">Add a category or short note to remember what the spend was for.</string>
+    <string name="tutorial_budget_pill_title">Budget progress</string>
+    <string name="tutorial_budget_pill_description">Tap to switch between daily, weekly, and monthly budget views, or to edit the period setup.</string>
+    <string name="tutorial_settings_title">Settings</string>
+    <string name="tutorial_settings_description">Open Settings to enable features, set up home-screen widgets, or reset this tutorial.</string>
+    <string name="tutorial_recurrent_title">Recurrent payments</string>
+    <string name="tutorial_recurrent_description">Tap here to mark this spend as a recurring payment (weekly, biweekly, or monthly). The app will remind you to log it on schedule.</string>
+    <string name="tutorial_analytics_title">View your analytics</string>
+    <string name="tutorial_analytics_description">Open Analytics to see how your spending breaks down over time, by category, and against your budget goals.</string>
+    <string name="tutorial_privacy_title">Privacy mode</string>
+    <string name="tutorial_privacy_description">Cover the top of the phone (where the front camera sits) with your hand for about a second to blur every amount on screen. Cover it again to turn it off.</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="tomorrow">Tomorrow</string>
