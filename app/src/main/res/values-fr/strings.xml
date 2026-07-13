@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
+    <string name="tutorial_numpad_title">Numpad</string>
+    <string name="tutorial_numpad_description">Entrez le montant que vous avez dépensé et appuyez sur la coche verte pour enregistrer. Glissez vers le haut sur le pavé numérique pour calculer.</string>
+    <string name="tutorial_comment_title">Ajouter une catégorie</string>
+    <string name="tutorial_comment_description">Ajouter une catégorie ou une note courte pour se rappeler à quoi était destiné la dépense.</string>
+    <string name="tutorial_budget_pill_title">Progression du budget</string>
+    <string name="tutorial_budget_pill_description">Appuyez pour basculer entre les vues quotidiennes, hebdomadaires et mensuelles du budget, ou pour modifier la configuration de la période.</string>
+    <string name="tutorial_settings_title">Réglages</string>
+    <string name="tutorial_settings_description">Ouvrez Réglages pour activer les fonctionnalités, configurer les widgets de l\'écran d\'accueil ou réinitialiser ce tutoriel.</string>
+    <string name="tutorial_recurrent_title">Paiements récurrents</string>
+    <string name="tutorial_recurrent_description">Tapotez ici pour marquer cette dépense comme un paiement récurrent (hebdomadaire, bihebdomadaire ou mensuel). L\'application vous rappellera de la connecter au calendrier.</string>
+    <string name="tutorial_analytics_title">View your analytics</string>
+    <string name="tutorial_analytics_description">Open Analytics to see how your spending breaks down over time, by category, and against your budget goals.</string>
+    <string name="tutorial_privacy_title">Privacy mode</string>
+    <string name="tutorial_privacy_description">Cover the top of the phone (where the front camera sits) with your hand for about a second to blur every amount on screen. Cover it again to turn it off.</string>
     <string name="today">Aujourd\'hui</string>
     <string name="yesterday">Hier</string>
     <string name="tomorrow">Demain</string>
