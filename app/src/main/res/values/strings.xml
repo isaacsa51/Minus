@@ -11,6 +11,10 @@
     <string name="tutorial_settings_description">Open Settings to enable features, set up home-screen widgets, or reset this tutorial.</string>
     <string name="tutorial_recurrent_title">Recurrent payments</string>
     <string name="tutorial_recurrent_description">Tap here to mark this spend as a recurring payment (weekly, biweekly, or monthly). The app will remind you to log it on schedule.</string>
+    <string name="tutorial_analytics_title">View your analytics</string>
+    <string name="tutorial_analytics_description">Open Analytics to see how your spending breaks down over time, by category, and against your budget goals.</string>
+    <string name="tutorial_privacy_title">Privacy mode</string>
+    <string name="tutorial_privacy_description">Cover the top of the phone (where the front camera sits) with your hand for about a second to blur every amount on screen. Cover it again to turn it off.</string>
 
     <string name="empty" translatable="false">—</string>
 

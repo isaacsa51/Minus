@@ -131,7 +131,7 @@ fun MainScreen(
     val tutorialScope = rememberCoroutineScope()
 
     LaunchedEffect(tutorialBoxCompleted) {
-        if (!tutorialBoxCompleted) {
+        if (!tutorialBoxCompleted && tutorialBoxState.isCompleted) {
             tutorialBoxState.resetForReplay()
         }
     }
@@ -152,6 +152,14 @@ fun MainScreen(
                 tutorialScope.launch {
                     context.settingsDataStore.edit { prefs ->
                         prefs[TUTORIAL_BOX_COMPLETED_KEY] = true
+                    }
+                }
+            },
+            onTutorialReopened = {
+                logcat(TAG) { "TutorialBox reopened (gated target became measurable) → persisting tutorialBoxCompleted=false" }
+                tutorialScope.launch {
+                    context.settingsDataStore.edit { prefs ->
+                        prefs[TUTORIAL_BOX_COMPLETED_KEY] = false
                     }
                 }
             },
@@ -177,6 +185,14 @@ fun MainScreen(
                     4 -> TutorialTooltip(
                         title = stringResource(R.string.tutorial_recurrent_title),
                         description = stringResource(R.string.tutorial_recurrent_description),
+                    )
+                    5 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_analytics_title),
+                        description = stringResource(R.string.tutorial_analytics_description),
+                    )
+                    6 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_privacy_title),
+                        description = stringResource(R.string.tutorial_privacy_description),
                     )
                     else -> Text(text = "")
                 }

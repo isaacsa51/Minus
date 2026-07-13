@@ -266,6 +266,7 @@ fun MainScreenContent(
                 expanded = shouldExpandRail,
                 onNavigateToAnalytics = onNavigateToAnalytics,
                 onNavigateToSettings = onNavigateToSettings,
+                tutorialBoxState = tutorialBoxState,
             )
         }
 
@@ -363,8 +364,13 @@ private fun MainNavigationRail(
     expanded: Boolean,
     onNavigateToAnalytics: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    tutorialBoxState: TutorialBoxState? = null,
 ) {
     val itemModifier = if (expanded) Modifier.fillMaxWidth() else Modifier
+    val analyticsItemModifier = itemModifier.let { base ->
+        if (tutorialBoxState != null) base.markForTutorial(tutorialBoxState, index = 5)
+        else base
+    }
 
     NavigationRail(
         modifier = if (expanded) Modifier.width(104.dp) else Modifier,
@@ -373,7 +379,7 @@ private fun MainNavigationRail(
     ) {
         Spacer(Modifier.weight(1f))
         NavigationRailItem(
-            modifier = itemModifier,
+            modifier = analyticsItemModifier,
             selected = false,
             onClick = onNavigateToAnalytics,
             icon = { Icon(Icons.Rounded.BarChart, contentDescription = "Analytics") },
@@ -802,7 +808,9 @@ private fun PhoneLayout(
                     budgetPillHintAnchorModifier = tutorialBoxState
                         ?.let { state -> Modifier.markForTutorial(state, index = 1) }
                         ?: Modifier,
-                    analyticsHintAnchorModifier = Modifier,
+                    analyticsHintAnchorModifier = tutorialBoxState
+                        ?.let { state -> Modifier.markForTutorial(state, index = 5) }
+                        ?: Modifier,
                     tutorialBoxState = tutorialBoxState,
                 )
             },
@@ -1053,7 +1061,9 @@ private fun TabletLayout(
                     budgetPillHintAnchorModifier = tutorialBoxState
                         ?.let { state -> Modifier.markForTutorial(state, index = 1) }
                         ?: Modifier,
-                    analyticsHintAnchorModifier = Modifier,
+                    analyticsHintAnchorModifier = tutorialBoxState
+                        ?.let { state -> Modifier.markForTutorial(state, index = 5) }
+                        ?: Modifier,
                     tutorialBoxState = tutorialBoxState,
                 )
             }

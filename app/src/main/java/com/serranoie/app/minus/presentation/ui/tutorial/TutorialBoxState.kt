@@ -93,11 +93,18 @@ class TutorialBoxState {
     }
 }
 
-private val DefaultWalkOrder: List<Int> = listOf(0, 1, 2, 3, 4)
+private val DefaultWalkOrder: List<Int> = listOf(0, 1, 2, 3, 4, 5, 6)
+
+internal val VirtualIndices: Set<Int> = setOf(6)
+
+internal val GatedIndices: Set<Int> = setOf(3, 4)
 
 @Composable
 fun rememberTutorialBoxState(): TutorialBoxState = remember {
-    TutorialBoxState().also { it.registrationOrder.addAll(DefaultWalkOrder) }
+    TutorialBoxState().also {
+        it.registrationOrder.addAll(DefaultWalkOrder)
+        VirtualIndices.forEach { idx -> it.targetBounds[idx] = Rect.Zero }
+    }
 }
 
 fun Modifier.markForTutorial(
@@ -136,6 +143,8 @@ fun Modifier.markForTutorial(
                 if (state.isCompleted) {
                     state.pendingRewindCandidates.add(index)
                 } else if (currentPos > targetPos) {
+                    state.pendingRewindCandidates.add(index)
+                } else if (index in GatedIndices && currentPos < targetPos && state.registrationOrder[currentPos] !in GatedIndices) {
                     state.pendingRewindCandidates.add(index)
                 }
             }

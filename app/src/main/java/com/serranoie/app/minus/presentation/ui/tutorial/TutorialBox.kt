@@ -49,6 +49,7 @@ fun TutorialBox(
     onTutorialCompleted: () -> Unit,
     state: TutorialBoxState,
     tutorialTarget: @Composable (index: Int) -> Unit,
+    onTutorialReopened: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     var canvasSize by remember { mutableStateOf(Size.Zero) }
@@ -56,9 +57,13 @@ fun TutorialBox(
     val isCompleted by remember { derivedStateOf { state.isCompleted } }
     val currentIndex by remember { derivedStateOf { state.currentIndexState.value } }
     val activeBounds by remember { derivedStateOf { state.currentBounds } }
+    val isVirtual by remember {
+        derivedStateOf { state.currentIndexState.value in VirtualIndices }
+    }
     val shouldShow by remember(showTutorial, canvasSize) {
         derivedStateOf {
-            showTutorial && !isCompleted && activeBounds != null && canvasSize.isSpecified
+            showTutorial && !isCompleted && (isVirtual || activeBounds != null) &&
+                canvasSize.isSpecified
         }
     }
 
@@ -73,11 +78,12 @@ fun TutorialBox(
     ) {
         content()
 
-        if (shouldShow && activeBounds != null) {
+        if (shouldShow && (isVirtual || activeBounds != null)) {
             TutorialOverlay(
-                bounds = activeBounds!!,
+                bounds = activeBounds ?: Rect.Zero,
                 canvasSize = canvasSize,
                 index = currentIndex,
+                isVirtual = isVirtual,
                 tutorialTarget = tutorialTarget,
                 onTap = { state.advance() },
             )
@@ -87,13 +93,17 @@ fun TutorialBox(
     LaunchedEffect(currentIndex, state.targetBounds.size) {
         if (currentIndex != -1 &&
             !isCompleted &&
+            !isVirtual &&
             state.currentBounds == null
         ) {
-            logcat(TUTORIAL_LOG_TAG) {
-                "TutorialBox: current target $currentIndex " +
-                    "has no bounds, auto-advancing"
+            delay(250.milliseconds)
+            if (state.currentBounds == null) {
+                logcat(TUTORIAL_LOG_TAG) {
+                    "TutorialBox: current target $currentIndex " +
+                        "still has no bounds after settle delay, auto-advancing"
+                }
+                state.advance()
             }
-            state.advance()
         }
     }
 
@@ -120,18 +130,18 @@ fun TutorialBox(
                 if (state.isCompleted) {
                     state.isCompleted = false
                     state.currentIndexState.value = lowest
+                    onTutorialReopened()
                     logcat(TUTORIAL_LOG_TAG) {
                         "rewind-apply: index=$lowest AFTER completion " +
-                            "(targetPos=$targetPos)"
+                            "(targetPos=$targetPos) — fired onTutorialReopened"
                     }
                 } else {
                     val currentPos = order
                         .indexOf(state.currentIndexState.value)
                         .coerceAtLeast(0)
-                    if (currentPos > targetPos) {
+                    if (currentPos != targetPos) {
                         val outgoing = state.currentIndexState.value
-
-                        if (outgoing in order && outgoing != 3 && outgoing != 4) {
+                        if (outgoing in order && outgoing !in GatedIndices) {
                             state.visitedIndices.add(outgoing)
                         }
                         state.currentIndexState.value = lowest
@@ -143,7 +153,7 @@ fun TutorialBox(
                     } else {
                         logcat(TUTORIAL_LOG_TAG) {
                             "rewind-apply: skipped index=$lowest " +
-                                "(currentPos=$currentPos not > targetPos=$targetPos)"
+                                "(currentPos=$currentPos == targetPos=$targetPos)"
                         }
                     }
                 }
@@ -161,10 +171,11 @@ private fun TutorialOverlay(
     bounds: Rect,
     canvasSize: Size,
     index: Int,
+    isVirtual: Boolean,
     tutorialTarget: @Composable (Int) -> Unit,
     onTap: () -> Unit,
 ) {
-    if (bounds.isEmpty) return
+    if (!isVirtual && bounds.isEmpty) return
 
     val scrimColor = Color.Black.copy(alpha = 0.55f)
     val highlightStrokeColor = MaterialTheme.colorScheme.primary
@@ -177,20 +188,26 @@ private fun TutorialOverlay(
     val tooltipMaxWidth = with(density) { tooltipMaxWidthPx.toDp() }
     val tooltipMinHeightEstimate = 96f
 
-    val cutout = Rect(
-        left = bounds.left - paddingPx,
-        top = bounds.top - paddingPx,
-        right = bounds.right + paddingPx,
-        bottom = bounds.bottom + paddingPx,
-    )
-
-    val (tooltipX, tooltipY) = computeTooltipPosition(
-        targetBounds = bounds,
-        canvasSize = canvasSize,
-        gapPx = tooltipGapPx,
-        tooltipWidthPx = tooltipMaxWidthPx,
-        tooltipHeightPx = tooltipMinHeightEstimate,
-    )
+    val (tooltipX, tooltipY) = if (isVirtual) {
+        // No on-screen anchor — centre the tooltip on the canvas.
+        val centredX = (canvasSize.width - tooltipMaxWidthPx) / 2f
+        val centredY = (canvasSize.height - tooltipMinHeightEstimate) / 2f
+        centredX.toInt() to centredY.toInt()
+    } else {
+        val cutout = Rect(
+            left = bounds.left - paddingPx,
+            top = bounds.top - paddingPx,
+            right = bounds.right + paddingPx,
+            bottom = bounds.bottom + paddingPx,
+        )
+        computeTooltipPosition(
+            targetBounds = cutout,
+            canvasSize = canvasSize,
+            gapPx = tooltipGapPx,
+            tooltipWidthPx = tooltipMaxWidthPx,
+            tooltipHeightPx = tooltipMinHeightEstimate,
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -202,28 +219,38 @@ private fun TutorialOverlay(
             ),
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val outer = Path().apply {
-                addRect(Rect(offset = Offset.Zero, size = this@Canvas.size))
-            }
-            val hole = Path().apply {
-                addRoundRect(
-                    RoundRect(
-                        rect = cutout,
-                        cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx),
-                    ),
+            if (isVirtual) {
+                drawRect(color = scrimColor)
+            } else {
+                val cutout = Rect(
+                    left = bounds.left - paddingPx,
+                    top = bounds.top - paddingPx,
+                    right = bounds.right + paddingPx,
+                    bottom = bounds.bottom + paddingPx,
+                )
+                val outer = Path().apply {
+                    addRect(Rect(offset = Offset.Zero, size = this@Canvas.size))
+                }
+                val hole = Path().apply {
+                    addRoundRect(
+                        RoundRect(
+                            rect = cutout,
+                            cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx),
+                        ),
+                    )
+                }
+                val scrimPath = Path().apply {
+                    op(outer, hole, PathOperation.Difference)
+                }
+                drawPath(path = scrimPath, color = scrimColor)
+                drawRoundRect(
+                    color = highlightStrokeColor,
+                    topLeft = Offset(cutout.left, cutout.top),
+                    size = Size(cutout.width, cutout.height),
+                    cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx),
+                    style = Stroke(width = 3f),
                 )
             }
-            val scrimPath = Path().apply {
-                op(outer, hole, PathOperation.Difference)
-            }
-            drawPath(path = scrimPath, color = scrimColor)
-            drawRoundRect(
-                color = highlightStrokeColor,
-                topLeft = Offset(cutout.left, cutout.top),
-                size = Size(cutout.width, cutout.height),
-                cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx),
-                style = Stroke(width = 3f),
-            )
         }
 
         Surface(
