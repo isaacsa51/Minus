@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.tutorial
 
 import android.content.Context
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.serranoie.app.minus.presentation.TUTORIAL_BOX_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.settingsDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -35,5 +36,11 @@ enum class FirstLaunchTutorialStage {
 fun Context.firstLaunchTutorialStageFlow(): Flow<FirstLaunchTutorialStage> {
     return settingsDataStore.data.map { prefs ->
         FirstLaunchTutorialStage.from(prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY])
+    }
+}
+
+fun Context.tutorialBoxCompletedFlow(): Flow<Boolean> {
+    return settingsDataStore.data.map { prefs ->
+        prefs[TUTORIAL_BOX_COMPLETED_KEY] ?: false
     }
 }

@@ -64,8 +64,6 @@ internal fun LazyListScope.futureRecurrentSection(
                     stringResource(R.string.show_subscriptions_outside_period)
                 },
                 horizontalPadding = 0.dp,
-                amplitude = 4f,
-                wavelength = 45f,
             )
         }
     }

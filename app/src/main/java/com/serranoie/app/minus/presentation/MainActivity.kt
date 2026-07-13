@@ -63,6 +63,7 @@ import com.serranoie.app.minus.data.repository.SETTINGS_DATASTORE_NAME
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.data.repository.THEME_MODE_KEY_NAME
 import com.serranoie.app.minus.data.repository.TYPOGRAPHY_MODE_KEY_NAME
+import com.serranoie.app.minus.data.repository.TUTORIAL_BOX_COMPLETED_KEY_NAME
 import com.serranoie.app.minus.data.wearable.WearableService
 import com.serranoie.app.minus.domain.time.MidnightTransitionManager
 import com.serranoie.app.minus.navigation.AppNavGraph
@@ -118,6 +119,7 @@ val SAVINGS_WANTS_PCT_KEY = intPreferencesKey(SAVINGS_WANTS_PCT_KEY_NAME)
 val SAVINGS_SAVINGS_PCT_KEY = intPreferencesKey(SAVINGS_SAVINGS_PCT_KEY_NAME)
 val SAVINGS_GOAL_AMOUNT_KEY = stringPreferencesKey(SAVINGS_GOAL_AMOUNT_KEY_NAME)
 val SAVINGS_GOAL_MONTHS_KEY = intPreferencesKey(SAVINGS_GOAL_MONTHS_KEY_NAME)
+val TUTORIAL_BOX_COMPLETED_KEY = booleanPreferencesKey(TUTORIAL_BOX_COMPLETED_KEY_NAME)
 const val DEFAULT_NOTIFICATION_HOUR = 9
 const val DEFAULT_NOTIFICATION_MINUTE = 0
 const val DEFAULT_RECURRENT_NOTIFICATION_HOUR = 8
