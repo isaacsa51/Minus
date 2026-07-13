@@ -13,20 +13,17 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import java.math.BigDecimal
 import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.Currency
-import java.util.Locale
 import kotlin.math.min
 
-fun formatCurrency(amount: BigDecimal): String {
-    val format = NumberFormat.getCurrencyInstance(Locale.US)
-    format.currency = Currency.getInstance("USD")
-    return format.format(amount)
-}
+fun formatCurrency(
+    amount: BigDecimal,
+    currencyCode: String = "USD",
+): String = formatCurrencySymbolOnly(amount, currencyCode)
 
-fun getCurrencySymbol(): String = "$"
+fun getCurrencySymbol(currencyCode: String = "USD"): String = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
 
 fun getAnnotatedString(
     value: String,
@@ -44,8 +41,7 @@ fun getAnnotatedString(
     value: String,
     hintParts: List<Pair<Int, Int>>,
     hintColor: Color,
-): AnnotatedString =
-    getAnnotatedString(value, hintParts, hintParts.map { SpanStyle(color = hintColor) })
+): AnnotatedString = getAnnotatedString(value, hintParts, hintParts.map { SpanStyle(color = hintColor) })
 
 fun getAnnotatedString(
     value: String,
@@ -70,18 +66,18 @@ private fun calcShift(
 }
 
 private fun visualTransformationAsCurrency(
+    context: Context,
     input: AnnotatedString,
     hintColor: Color,
+    currencyCode: String = "USD",
 ): TransformedText {
     val floatDivider = getFloatDivider()
     val fixed = tryConvertStringToNumber(input.text)
 
-    // Format as currency
     val amount = input.text.ifEmpty { "0" }.toBigDecimalOrNull() ?: BigDecimal.ZERO
-    val formatted = formatCurrency(amount)
+    val formatted = formatCurrency(amount, currencyCode)
 
-    // Remove $ symbol for the raw number display
-    val currSymbol = getCurrencySymbol()
+    val currSymbol = getCurrencySymbol(currencyCode)
     var output = formatted.replace(currSymbol, "").trim()
 
     val forceShowAfterDot = input.text.contains(".0")
@@ -144,30 +140,26 @@ private fun visualTransformationAsCurrency(
 }
 
 fun visualTransformationAsCurrency(
+    context: Context,
     hintColor: Color,
+    currencyCode: String = "USD",
 ): ((input: AnnotatedString) -> TransformedText) =
     {
-        visualTransformationAsCurrency(it, hintColor)
+        visualTransformationAsCurrency(context, it, hintColor, currencyCode)
     }
 
 /**
- * Takes raw digits as input and formats them as currency with [fractionDigits]
- * decimal places (matching the active currency's natural precision - e.g. 2 for
- * USD, 0 for JPY/KRW/COP).
+ * Currency amount input visual transformation following the blog post approach.
+ * Takes raw digits as input and formats them as currency with two decimal places.
  *
  * Original input => Integer part + Decimal part => Output
- * 123 => 1 + 23 => 1.23         (fractionDigits = 2)
- * 542010 => 5420 + 10 => 5420.10 (fractionDigits = 2)
- * 1 => 0 + 01 => 0.01           (fractionDigits = 2)
- * 1234 => 1234 => 1,234         (fractionDigits = 0, JPY-style)
+ * 123 => 1 + 23 => 1.23
+ * 542010 => 5420 + 10 => 5420.10
+ * 1 => 0 + 01 => 0.01
  */
 class CurrencyAmountInputVisualTransformation(
     private val fractionDigits: Int = 2,
 ) : VisualTransformation {
-    init {
-        require(fractionDigits >= 0) { "fractionDigits must be >= 0, was $fractionDigits" }
-    }
-
     override fun filter(text: AnnotatedString): TransformedText {
         val symbols = DecimalFormat().decimalFormatSymbols
         val thousandsSeparator = symbols.groupingSeparator
@@ -175,13 +167,12 @@ class CurrencyAmountInputVisualTransformation(
 
         val inputText = text.text
 
-        // Handle empty input - show currency-shaped placeholder
         if (inputText.isEmpty()) {
             val placeholder =
-                if (fractionDigits == 0) {
-                    "0"
-                } else {
+                if (fractionDigits > 0) {
                     "0$decimalSeparator${"0".repeat(fractionDigits)}"
+                } else {
+                    "0"
                 }
             val newText =
                 AnnotatedString(
@@ -199,30 +190,22 @@ class CurrencyAmountInputVisualTransformation(
             return TransformedText(newText, offsetMapping)
         }
 
-        val intPart: String
-        val fractionPart: String
-        if (fractionDigits == 0) {
-            intPart = inputText
-            fractionPart = ""
-        } else {
-            intPart =
-                if (inputText.length > fractionDigits) {
-                    inputText.dropLast(fractionDigits)
-                } else {
-                    "0"
-                }
-
-            var frac =
-                if (inputText.length >= fractionDigits) {
-                    inputText.substring(inputText.length - fractionDigits, inputText.length)
-                } else {
-                    inputText
-                }
-
-            if (frac.length < fractionDigits) {
-                frac = frac.padStart(fractionDigits, '0')
+        val intPart =
+            if (inputText.length > fractionDigits) {
+                inputText.substring(0, inputText.length - fractionDigits)
+            } else {
+                "0"
             }
-            fractionPart = frac
+
+        var fractionPart =
+            if (inputText.length >= fractionDigits) {
+                inputText.substring(inputText.length - fractionDigits, inputText.length)
+            } else {
+                inputText
+            }
+
+        if (fractionPart.length < fractionDigits) {
+            fractionPart = fractionPart.padStart(fractionDigits, '0')
         }
 
         val thousandsReplacementPattern = Regex("\\B(?=(?:\\d{3})+(?!\\d))")
@@ -232,13 +215,16 @@ class CurrencyAmountInputVisualTransformation(
                 thousandsSeparator.toString(),
             )
 
+        val formatted =
+            if (fractionDigits > 0) {
+                "$formattedIntWithThousandsSeparator$decimalSeparator$fractionPart"
+            } else {
+                formattedIntWithThousandsSeparator
+            }
+
         val newText =
             AnnotatedString(
-                if (fractionDigits == 0) {
-                    formattedIntWithThousandsSeparator
-                } else {
-                    "$formattedIntWithThousandsSeparator$decimalSeparator$fractionPart"
-                },
+                formatted,
                 text.spanStyles,
                 text.paragraphStyles,
             )
@@ -289,12 +275,11 @@ fun isNumber(char: Char): Boolean =
     try {
         char.toString().toInt()
         true
-    } catch (_: Exception) {
+    } catch (e: Exception) {
         false
     }
 
-fun Triple<String, String, String>.join(third: Boolean = true): String =
-    this.first + this.second + if (third) this.third else ""
+fun Triple<String, String, String>.join(third: Boolean = true): String = this.first + this.second + if (third) this.third else ""
 
 fun fixedNumberString(input: String): String {
     val dotExist = input.contains(".")
@@ -330,7 +315,7 @@ fun fixedNumberString(input: String): String {
 
 fun tryConvertStringToNumber(input: String): Triple<String, String, String> {
     val afterDot = input.dropWhile { it != '.' }
-    val beforeDot = input.dropLast(afterDot.length)
+    val beforeDot = input.substring(0, input.length - afterDot.length)
 
     val start = beforeDot.filter { isNumber(it) }.dropWhile { it == '0' }
     val hintStart = if (start.isEmpty()) "0" else ""
@@ -348,7 +333,7 @@ fun tryConvertStringToNumber(input: String): Triple<String, String, String> {
 
     return Triple(
         hintStart,
-        "$start$middle${end.take(min(2, end.length))}",
+        "$start$middle${end.substring(0, min(2, end.length))}",
         hintEnd,
     )
 }
@@ -356,23 +341,20 @@ fun tryConvertStringToNumber(input: String): Triple<String, String, String> {
 @Preview(name = "Currency visual transformations", showBackground = true)
 @Composable
 private fun VisualTransformationAsCurrencyPreview() {
+    val context = LocalContext.current
     val legacyTransformation =
-        visualTransformationAsCurrency(hintColor = Color.Green)
+        visualTransformationAsCurrency(
+            context = context,
+            hintColor = Color.Green,
+        )
     val amountInputTransformation = CurrencyAmountInputVisualTransformation()
     val decimalInputs = listOf("", "0", "12", "1000", "12233.45")
     val digitInputs = listOf("", "1", "12", "123", "542010", "123456789")
 
     Column {
+        Text(text = "visualTransformationAsCurrency(context, hintColor)")
         decimalInputs.forEach { input ->
-            Text(
-                text = "${input.ifEmpty { "empty" }} -> ${
-                    legacyTransformation(
-                        AnnotatedString(
-                            input,
-                        ),
-                    ).text
-                }",
-            )
+            Text(text = "${input.ifEmpty { "empty" }} → ${legacyTransformation(AnnotatedString(input)).text}")
         }
 
         Text(text = "CurrencyAmountInputVisualTransformation")
@@ -390,15 +372,15 @@ private fun VisualTransformationAsCurrencyPreview() {
                     transformed.offsetMapping.originalToTransformed(input.length)
                 }
             Text(
-                text = "${input.ifEmpty { "empty" }} -> ${transformed.text} | caret $start..$end",
+                text = "${input.ifEmpty { "empty" }} → ${transformed.text} | caret $start..$end",
             )
         }
 
         Text(text = "formatCurrency(BigDecimal)")
         listOf(BigDecimal.ZERO, BigDecimal("12.34"), BigDecimal("1234567.89")).forEach { amount ->
-            Text(text = "$amount -> ${formatCurrency(amount)}")
+            Text(text = "$amount → ${formatCurrency(amount)}")
         }
 
-        Text(text = "getCurrencySymbol() -> ${getCurrencySymbol()}")
+        Text(text = "getCurrencySymbol() → ${getCurrencySymbol()}")
     }
 }

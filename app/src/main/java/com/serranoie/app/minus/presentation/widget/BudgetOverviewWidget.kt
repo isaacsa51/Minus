@@ -38,6 +38,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
+import com.serranoie.app.minus.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -51,22 +52,32 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 	override suspend fun provideGlance(context: Context, id: GlanceId) {
 		provideContent {
 			GlanceTheme {
-				WidgetContent()
+				WidgetContent(context)
 			}
 		}
 	}
 
 	@Composable
-	private fun WidgetContent() {
+	private fun WidgetContent(context: Context) {
 		val prefs = currentState<Preferences>()
 		val budgetAmount =
 			prefs[androidx.datastore.preferences.core.intPreferencesKey("budget_amount")] ?: 0
 		val currency = prefs[stringPreferencesKey("currency_code")] ?: "USD"
 		val startDate = prefs[stringPreferencesKey("start_date")] ?: "-"
 		val endDate = prefs[stringPreferencesKey("end_date")] ?: "-"
-		val daysCount = prefs[stringPreferencesKey("days_count")] ?: "-"
+		val daysCount = prefs[androidx.datastore.preferences.core.intPreferencesKey("days_count")] ?: -1
 
-		BudgetOverviewContent(budgetAmount, currency, startDate, endDate, daysCount)
+		BudgetOverviewContent(
+			budgetAmount = budgetAmount,
+			currency = currency,
+			startDate = startDate,
+			endDate = endDate,
+			daysCount = daysCount,
+			totalBudgetLabel = context.getString(R.string.total_budget),
+			daysCountFormat = { count ->
+				context.resources.getQuantityString(R.plurals.analytics_days_left, count, count)
+			},
+		)
 	}
 
 	@Composable
@@ -75,7 +86,9 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 		currency: String,
 		startDate: String,
 		endDate: String,
-		daysCount: String
+		daysCount: Int,
+		totalBudgetLabel: String = "Total Budget",
+		daysCountFormat: (Int) -> String = { count -> "$count days" },
 	) {
 		Column(
 			modifier = GlanceModifier.fillMaxSize().background(GlanceTheme.colors.surface)
@@ -83,7 +96,6 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 				.padding(horizontal = 16.dp, vertical = 2.dp),
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-			// Budget amount
 			Text(
 				text = formatWidgetCurrency(currency, budgetAmount), style = TextStyle(
 					fontSize = MaterialTheme.typography.h4.fontSize,
@@ -91,9 +103,8 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 				)
 			)
 
-			// Label
 			Text(
-				text = "Total Budget", style = TextStyle(
+				text = totalBudgetLabel, style = TextStyle(
 					color = GlanceTheme.colors.onSurfaceVariant,
 					fontSize = MaterialTheme.typography.subtitle1.fontSize
 				)
@@ -101,13 +112,17 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 
 			Spacer(modifier = GlanceModifier.height(12.dp))
 
-			// Date range with arrow and days chip
-			DateRangeRow(startDate, endDate, daysCount)
+			DateRangeRow(startDate, endDate, daysCount, daysCountFormat)
 		}
 	}
 
 	@Composable
-	private fun DateRangeRow(startDate: String, endDate: String, daysCount: String) {
+	private fun DateRangeRow(
+		startDate: String,
+		endDate: String,
+		daysCount: Int,
+		daysCountFormat: (Int) -> String,
+	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically, modifier = GlanceModifier.fillMaxWidth()
 		) {
@@ -135,7 +150,7 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 					) {}
 				}
 
-				if (daysCount != "-") {
+				if (daysCount > 0) {
 					Box(
 						modifier = GlanceModifier.fillMaxWidth(),
 						contentAlignment = Alignment.TopCenter
@@ -147,7 +162,7 @@ class BudgetOverviewWidget : GlanceAppWidget() {
 								.padding(horizontal = 8.dp, vertical = 2.dp)
 						) {
 							Text(
-								text = daysCount, style = TextStyle(
+								text = daysCountFormat(daysCount), style = TextStyle(
 									color = GlanceTheme.colors.surface,
 									textAlign = TextAlign.Center,
 									fontSize = MaterialTheme.typography.caption.fontSize
@@ -181,7 +196,7 @@ private fun BudgetOverviewWidgetPreview() {
 			currency = "USD",
 			startDate = "06 Mar",
 			endDate = "21 Mar",
-			daysCount = "16 días"
+			daysCount = 16,
 		)
 	}
 }
@@ -195,7 +210,7 @@ private fun BudgetOverviewWidgetPreviewShort() {
 			currency = "USD",
 			startDate = "06 Mar",
 			endDate = "09 Mar",
-			daysCount = "3 días"
+			daysCount = 3,
 		)
 	}
 }
@@ -220,8 +235,7 @@ suspend fun updateBudgetOverviewWidget(
 			prefs[stringPreferencesKey("currency_code")] = currency
 			prefs[stringPreferencesKey("start_date")] = dateFormat.format(startDate)
 			prefs[stringPreferencesKey("end_date")] = dateFormat.format(endDate)
-			prefs[stringPreferencesKey("days_count")] =
-				if (daysCount > 1) "$daysCount días" else "$daysCount día"
+			prefs[androidx.datastore.preferences.core.intPreferencesKey("days_count")] = daysCount
 		}
 		BudgetOverviewWidget().update(context, glanceId)
 	}

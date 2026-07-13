@@ -27,6 +27,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
+import com.serranoie.app.minus.R
 
 class AddExpenseWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = AddExpenseWidget()
@@ -36,13 +37,21 @@ class AddExpenseWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             GlanceTheme {
-                AddExpenseContent()
+                AddExpenseContent(
+                    label = context.getString(R.string.widget_add_expense_label),
+                    compactLabel = context.getString(R.string.widget_add_expense_compact_label),
+                    plus = context.getString(R.string.widget_add_expense_plus),
+                )
             }
         }
     }
 
     @Composable
-    internal fun AddExpenseContent() {
+    internal fun AddExpenseContent(
+        label: String = "Add new expense",
+        compactLabel: String = "Add expense",
+        plus: String = "+",
+    ) {
         val widgetSize = LocalSize.current
         val compactMode = widgetSize.width < 150.dp
 
@@ -58,16 +67,16 @@ class AddExpenseWidget : GlanceAppWidget() {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = if (compactMode) "Gasto" else "Añadir gasto",
+                    text = if (compactMode) compactLabel else label,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         color = GlanceTheme.colors.onSurface,
-                        fontSize = 15.sp
+                        fontSize = if (compactMode) 13.sp else 15.sp,
                     )
                 )
 
                 Text(
-                    text = "   +",
+                    text = "   $plus",
                     style = TextStyle(
                         color = GlanceTheme.colors.onSurface,
                         fontSize = 22.sp
