@@ -1,30 +1,42 @@
 package com.serranoie.app.minus.presentation.ui.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
 import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
-import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
+import com.serranoie.app.minus.presentation.TUTORIAL_BOX_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.changelog.ChangelogGate
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
 import com.serranoie.app.minus.presentation.ui.tutorial.firstLaunchTutorialStageFlow
+import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
+import com.serranoie.app.minus.presentation.ui.tutorial.tutorialBoxCompletedFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import logcat.logcat
 
 private const val TAG = "ISAAC:MainScreen"
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun MainScreen(
     onNavigateToAnalytics: () -> Unit = {},
@@ -112,6 +124,18 @@ fun MainScreen(
         }
     }
 
+    val tutorialBoxCompleted by context.tutorialBoxCompletedFlow()
+        .collectAsStateWithLifecycle(initialValue = false)
+    val showNumpadTutorial = !tutorialBoxCompleted
+    val tutorialBoxState = rememberTutorialBoxState()
+    val tutorialScope = rememberCoroutineScope()
+
+    LaunchedEffect(tutorialBoxCompleted) {
+        if (!tutorialBoxCompleted && tutorialBoxState.isCompleted) {
+            tutorialBoxState.resetForReplay()
+        }
+    }
+
     ChangelogGate(
         currentVersionCode = run {
             val info = context.packageManager.getPackageInfo(
@@ -121,47 +145,102 @@ fun MainScreen(
             @Suppress("DEPRECATION") info.longVersionCode.toInt()
         },
     ) {
-        MainScreenContent(
-            mainScreenState = mainScreenState,
-            budgetUiState = budgetUiState,
-            onboardingCompleted = onboardingCompleted,
-            tutorialStage = tutorialStage,
-            showCreditQuickToggleFeature = showCreditQuickToggleFeature,
-            directCategoryPopupEnabled = directCategoryPopupEnabled,
-            categoryGridModeEnabled = categoryGridModeEnabled,
-            onProcessIntent = { intent ->
-                when (intent) {
-                    is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
-                        budgetViewModel.processIntent(intent.intent)
-                    }
-
-                    is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
-                        budgetViewModel.processIntent(intent.intent)
-                    }
-
-                    is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
-                        budgetViewModel.processIntent(intent.intent)
-                    }
-
-                    else -> {
-                        mainScreenViewModel.processIntent(intent, tutorialStage)
+        TutorialBox(
+            showTutorial = showNumpadTutorial,
+            onTutorialCompleted = {
+                logcat(TAG) { "TutorialBox completed → persisting tutorialBoxCompleted=true" }
+                tutorialScope.launch {
+                    context.settingsDataStore.edit { prefs ->
+                        prefs[TUTORIAL_BOX_COMPLETED_KEY] = true
                     }
                 }
             },
-            onNavigateToAnalytics = onNavigateToAnalytics,
-            onNavigateToSettings = onNavigateToSettings,
-            onNavigateToWallet = onNavigateToWallet,
-            openWalletOnStart = openWalletOnStart,
-            showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet,
-            forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup,
-            selectedViewPeriod = effectiveSelectedPeriod,
-            onPeriodSelected = { period ->
-                mainScreenViewModel.processIntent(
-                    MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
-                )
+            onTutorialReopened = {
+                logcat(TAG) { "TutorialBox reopened (gated target became measurable) → persisting tutorialBoxCompleted=false" }
+                tutorialScope.launch {
+                    context.settingsDataStore.edit { prefs ->
+                        prefs[TUTORIAL_BOX_COMPLETED_KEY] = false
+                    }
+                }
             },
-            settingsDataStore = context.settingsDataStore,
-            undoSnackbarActionLabel = undoSnackbarActionLabel,
-        )
+            state = tutorialBoxState,
+            tutorialTarget = { index ->
+                when (index) {
+                    0 -> TutorialTooltip(
+                        title = null,
+                        description = stringResource(R.string.tutorial_numpad_description),
+                    )
+                    2 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_settings_title),
+                        description = stringResource(R.string.tutorial_settings_description),
+                    )
+                    1 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_budget_pill_title),
+                        description = stringResource(R.string.tutorial_budget_pill_description),
+                    )
+                    3 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_comment_title),
+                        description = stringResource(R.string.tutorial_comment_description),
+                    )
+                    4 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_recurrent_title),
+                        description = stringResource(R.string.tutorial_recurrent_description),
+                    )
+                    5 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_analytics_title),
+                        description = stringResource(R.string.tutorial_analytics_description),
+                    )
+                    6 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_privacy_title),
+                        description = stringResource(R.string.tutorial_privacy_description),
+                    )
+                    else -> Text(text = "")
+                }
+            },
+        ) {
+            MainScreenContent(
+                mainScreenState = mainScreenState,
+                budgetUiState = budgetUiState,
+                onboardingCompleted = onboardingCompleted,
+                tutorialStage = tutorialStage,
+                showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+                directCategoryPopupEnabled = directCategoryPopupEnabled,
+                categoryGridModeEnabled = categoryGridModeEnabled,
+                onProcessIntent = { intent ->
+                    when (intent) {
+                        is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
+                            budgetViewModel.processIntent(intent.intent)
+                        }
+
+                        is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
+                            budgetViewModel.processIntent(intent.intent)
+                        }
+
+                        is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
+                            budgetViewModel.processIntent(intent.intent)
+                        }
+
+                        else -> {
+                            mainScreenViewModel.processIntent(intent, tutorialStage)
+                        }
+                    }
+                },
+                onNavigateToAnalytics = onNavigateToAnalytics,
+                onNavigateToSettings = onNavigateToSettings,
+                onNavigateToWallet = onNavigateToWallet,
+                openWalletOnStart = openWalletOnStart,
+                showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet,
+                forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup,
+                selectedViewPeriod = effectiveSelectedPeriod,
+                onPeriodSelected = { period ->
+                    mainScreenViewModel.processIntent(
+                        MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
+                    )
+                },
+                settingsDataStore = context.settingsDataStore,
+                undoSnackbarActionLabel = undoSnackbarActionLabel,
+                tutorialBoxState = tutorialBoxState,
+            )
+        }
     }
 }

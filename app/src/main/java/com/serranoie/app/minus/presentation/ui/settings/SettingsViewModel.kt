@@ -24,6 +24,7 @@ import com.serranoie.app.minus.presentation.DYNAMIC_COLOR_KEY
 import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
 import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_MINUTE_KEY
 import com.serranoie.app.minus.presentation.THEME_MODE_KEY
+import com.serranoie.app.minus.presentation.TUTORIAL_BOX_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
@@ -334,6 +335,7 @@ class SettingsViewModel @Inject constructor(
     fun onResetTutorial() {
         viewModelScope.launch {
             context.settingsDataStore.edit { prefs ->
+                prefs[TUTORIAL_BOX_COMPLETED_KEY] = false
                 prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] =
                     FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
             }

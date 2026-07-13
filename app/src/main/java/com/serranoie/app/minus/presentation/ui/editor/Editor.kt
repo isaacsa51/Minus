@@ -83,6 +83,8 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
+import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalculation
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.EditableCategoryTag
@@ -150,6 +152,7 @@ fun Editor(
     showSettingsButton: Boolean = true,
     budgetPillHintAnchorModifier: Modifier = Modifier,
     analyticsHintAnchorModifier: Modifier = Modifier,
+    tutorialBoxState: TutorialBoxState? = null,
     modifier: Modifier = Modifier,
 ) {
     val view = LocalView.current
@@ -289,7 +292,11 @@ fun Editor(
                                         checked = uiState.isRecurrentEnabled,
                                         onCheckedChange = onRecurrentToggle,
                                         shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                                        modifier = Modifier.semantics { role = Role.RadioButton },
+                                        modifier = Modifier
+                                            .semantics { role = Role.RadioButton }
+                                            .let { m ->
+                                                if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 4) else m
+                                            },
                                         colors = ToggleButtonDefaults.toggleButtonColors(
                                             containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
                                                 alpha = 0.5f
@@ -326,7 +333,11 @@ fun Editor(
                                     checked = uiState.isRecurrentEnabled,
                                     onCheckedChange = onRecurrentToggle,
                                     shapes = ToggleButtonDefaults.shapes(),
-                                    modifier = Modifier.semantics { role = Role.RadioButton },
+                                    modifier = Modifier
+                                        .semantics { role = Role.RadioButton }
+                                        .let { m ->
+                                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 4) else m
+                                        },
                                     colors = ToggleButtonDefaults.toggleButtonColors(
                                         containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
                                             alpha = 0.5f
@@ -373,7 +384,11 @@ fun Editor(
                                     onOpenSettings()
                                     view.weakHapticFeedback()
                                 },
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .let { m ->
+                                        if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 2) else m
+                                    }
                             ) {
                                 BadgedBox(
                                     badge = { if (isCensored) Badge() },
@@ -405,6 +420,7 @@ fun Editor(
         ) { state ->
             when (state) {
                 AnimState.EDITING -> {
+                    logcat("IMPL:TUTORIAL") { "Editor entered EDITING state → composing EditingContent (category tag + recurrent will register)" }
                     EditingContent(
                         input = uiState.numpadInput,
                         currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
@@ -420,6 +436,7 @@ fun Editor(
                         onShowCategoryGrid = onShowCategoryGrid,
                         onHideCategoryGrid = onHideCategoryGrid,
                         onDisableCalculationMode = onDisableCalculationMode,
+                        tutorialBoxState = tutorialBoxState,
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
@@ -506,6 +523,7 @@ private fun EditingContent(
     onShowCategoryGrid: () -> Unit = {},
     onHideCategoryGrid: () -> Unit = {},
     onDisableCalculationMode: () -> Unit = {},
+    tutorialBoxState: TutorialBoxState? = null,
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
@@ -652,6 +670,9 @@ private fun EditingContent(
                         tags = tags,
                         onCommentUpdate = onCommentUpdate,
                         editorFocusController = editorFocusController,
+                        modifier = Modifier.let { m ->
+                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 3) else m
+                        },
                         extendWidth = toolbarWidth,
                         onlyIcon = false,
                         onEdit = {},
@@ -683,7 +704,10 @@ private fun EditingContent(
                     onDisableCalculationMode = onDisableCalculationMode,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 26.dp),
+                        .padding(bottom = 26.dp)
+                        .let { m ->
+                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 3) else m
+                        },
                 )
             }
         }

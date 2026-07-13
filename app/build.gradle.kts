@@ -1,6 +1,5 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import java.util.Properties
-import java.io.File
 
 plugins {
     alias(libs.plugins.android.application)
@@ -28,15 +27,6 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     }
 }
 
-// Paparazzi snapshot tests run in the test JVM. These system properties must be
-// passed explicitly to that JVM (gradle.properties alone only affects Gradle's
-// own JVM, not forked test JVMs).
-//
-// `app.cash.paparazzi.differ=offbytwo`  — allows 2-pixel offset per pixel
-// `paparazzi.maxPercentDifferenceDefault` — up to 5% of pixels may differ
-//
-// Together these absorb cross-platform rasterization drift (Linux CI vs
-// Windows/macOS dev machines) without hiding real layout regressions.
 tasks.withType<Test>().configureEach {
     systemProperty("app.cash.paparazzi.differ", "offbytwo")
     systemProperty("paparazzi.maxPercentDifferenceDefault", "5.0")
@@ -228,6 +218,15 @@ tasks.named("preBuild").configure {
 dependencies {
     implementation(project(":sync-contract"))
 
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.20") {
+            because("stdlib pulled in transitively at 2.4.0 by Compose/KSP, compiler on 2.2.x")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-reflect:2.2.20") {
+            because("keep kotlin-reflect aligned with stdlib + compiler")
+        }
+    }
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.process)
@@ -306,26 +305,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.testmanifest.v183)
 }
 
-/*
- * Single source of truth for release notes is fastlane/metadata/android/en-US/
- * changelogs/<versionCode>.txt. Two Gradle tasks produce the runtime asset:
- *
- *   :app:prepareReleaseNotes      — writes the <versionCode>.txt from
- *                                   `git log` between tags (mirrors fastlane's
- *                                   :generate_changelog lane). Run this BEFORE
- *                                   tagging so the committed JSON is
- *                                   reproducible across IzzyOnDroid / F-Droid.
- *   :app:generateAppChangelogJson — reads those .txt files (+ optional
- *                                   fastlane/changelogs/<versionName>.json
- *                                   overrides) and writes
- *                                   app/src/main/assets/changelog.json so
- *                                   ChangelogRepository.kt has structured
- *                                   release notes without anyone hand-editing
- *                                   JSON.
- *
- * prepareReleaseNotes.finalizedBy(generateAppChangelogJson) so the canonical
- * workflow is a single command.
- */
 val prepareReleaseNotes by tasks.registering {
     group = "minus"
     description =

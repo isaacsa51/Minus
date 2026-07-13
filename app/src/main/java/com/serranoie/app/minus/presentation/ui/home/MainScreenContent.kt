@@ -97,6 +97,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.SavedCateg
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
+import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.StatusBarPadding
 import kotlinx.coroutines.delay
@@ -129,6 +131,7 @@ fun MainScreenContent(
     onPeriodSelected: (BudgetPeriod) -> Unit,
     settingsDataStore: DataStore<Preferences>?,
     undoSnackbarActionLabel: String,
+    tutorialBoxState: TutorialBoxState? = null,
 ) {
     val topSheetState = rememberSwipeableState(TopSheetValue.HalfExpanded)
     var nightMode by remember { mutableStateOf(false) }
@@ -263,6 +266,7 @@ fun MainScreenContent(
                 expanded = shouldExpandRail,
                 onNavigateToAnalytics = onNavigateToAnalytics,
                 onNavigateToSettings = onNavigateToSettings,
+                tutorialBoxState = tutorialBoxState,
             )
         }
 
@@ -305,6 +309,7 @@ fun MainScreenContent(
                     forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
                     selectedViewPeriod = selectedViewPeriod,
                     onPeriodSelected = onPeriodSelected,
+                    tutorialBoxState = tutorialBoxState,
                 )
             } else {
                 // Expanded (>= 840dp): two-pane tablet layout
@@ -333,6 +338,7 @@ fun MainScreenContent(
                     forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
                     selectedViewPeriod = selectedViewPeriod,
                     onPeriodSelected = onPeriodSelected,
+                    tutorialBoxState = tutorialBoxState,
                 )
             }
 
@@ -358,8 +364,13 @@ private fun MainNavigationRail(
     expanded: Boolean,
     onNavigateToAnalytics: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    tutorialBoxState: TutorialBoxState? = null,
 ) {
     val itemModifier = if (expanded) Modifier.fillMaxWidth() else Modifier
+    val analyticsItemModifier = itemModifier.let { base ->
+        if (tutorialBoxState != null) base.markForTutorial(tutorialBoxState, index = 5)
+        else base
+    }
 
     NavigationRail(
         modifier = if (expanded) Modifier.width(104.dp) else Modifier,
@@ -368,7 +379,7 @@ private fun MainNavigationRail(
     ) {
         Spacer(Modifier.weight(1f))
         NavigationRailItem(
-            modifier = itemModifier,
+            modifier = analyticsItemModifier,
             selected = false,
             onClick = onNavigateToAnalytics,
             icon = { Icon(Icons.Rounded.BarChart, contentDescription = "Analytics") },
@@ -422,6 +433,7 @@ private fun PhoneLayout(
     forceBudgetPeriodSheetSetup: Boolean,
     selectedViewPeriod: BudgetPeriod?,
     onPeriodSelected: (BudgetPeriod) -> Unit,
+    tutorialBoxState: TutorialBoxState? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val navigationBarOffset = windowInsets.calculateBottomPadding()
@@ -579,6 +591,9 @@ private fun PhoneLayout(
                             null
                         }
                     Numpad(
+                        modifier = tutorialBoxState?.let { state ->
+                            Modifier.markForTutorial(state, index = 0)
+                        } ?: Modifier,
                         editorState = editorState,
                         numberHintAnchorModifier = Modifier,
                         applyHintAnchorModifier = Modifier,
@@ -790,8 +805,13 @@ private fun PhoneLayout(
                             ),
                         )
                     },
-                    budgetPillHintAnchorModifier = Modifier,
-                    analyticsHintAnchorModifier = Modifier,
+                    budgetPillHintAnchorModifier = tutorialBoxState
+                        ?.let { state -> Modifier.markForTutorial(state, index = 1) }
+                        ?: Modifier,
+                    analyticsHintAnchorModifier = tutorialBoxState
+                        ?.let { state -> Modifier.markForTutorial(state, index = 5) }
+                        ?: Modifier,
+                    tutorialBoxState = tutorialBoxState,
                 )
             },
             sheetContentExpand = {
@@ -844,6 +864,7 @@ private fun TabletLayout(
     forceBudgetPeriodSheetSetup: Boolean,
     selectedViewPeriod: BudgetPeriod?,
     onPeriodSelected: (BudgetPeriod) -> Unit,
+    tutorialBoxState: TutorialBoxState? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val navigationBarOffset = windowInsets.calculateBottomPadding()
@@ -853,6 +874,7 @@ private fun TabletLayout(
         (contentWidth / 2f)
             .coerceAtMost(with(localDensity) { 500.dp.toPx() })
             .coerceAtMost(contentHeight / 2)
+            .coerceAtLeast(contentHeight)
     val rowHeightPx = defaultInternalKeyboardHeightBase / 4
     val defaultInternalKeyboardHeight = rowHeightPx * 4
     val calcModeKeyboardHeight = rowHeightPx * 5
@@ -1036,8 +1058,13 @@ private fun TabletLayout(
                     },
                     showAnalyticsButton = false,
                     showSettingsButton = false,
-                    budgetPillHintAnchorModifier = Modifier,
-                    analyticsHintAnchorModifier = Modifier,
+                    budgetPillHintAnchorModifier = tutorialBoxState
+                        ?.let { state -> Modifier.markForTutorial(state, index = 1) }
+                        ?: Modifier,
+                    analyticsHintAnchorModifier = tutorialBoxState
+                        ?.let { state -> Modifier.markForTutorial(state, index = 5) }
+                        ?: Modifier,
+                    tutorialBoxState = tutorialBoxState,
                 )
             }
 
@@ -1092,6 +1119,9 @@ private fun TabletLayout(
                             null
                         }
                     Numpad(
+                        modifier = tutorialBoxState?.let { state ->
+                            Modifier.markForTutorial(state, index = 0)
+                        } ?: Modifier,
                         editorState = editorState,
                         numberHintAnchorModifier = Modifier,
                         applyHintAnchorModifier = Modifier,
