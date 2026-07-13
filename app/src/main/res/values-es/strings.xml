@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Menos</string>
     <string name="tutorial_numpad_title">Teclado numérico</string>
-    <string name="tutorial_numpad_description">Ingresa el monto que gastaste. Toca los dígitos, usa la flecha para corregir y toca el check verde para guardar. Desliza hacia arriba en el teclado para ingresar un cálculo como 5+3.</string>
+    <string name="tutorial_numpad_description">Ingresa el monto que gastaste. Toca los dígitos, usa la flecha para corregir y toca el botón verde para guardar. Desliza hacia arriba en el teclado para ingresar al modo calculadora.</string>
     <string name="tutorial_comment_title">Añadir categoría</string>
     <string name="tutorial_comment_description">Añade una categoría o nota corta para recordar en qué gastaste. Tus categorías más recientes aparecen como chips para etiquetar con un solo toque.</string>
     <string name="tutorial_budget_pill_title">Período de presupuesto</string>
@@ -11,10 +11,10 @@
     <string name="tutorial_settings_description">Abre Ajustes para activar funciones como la cuadrícula de categorías y el atajo de crédito, activar el modo privado, cambiar la moneda, configurar widgets o restablecer este tutorial.</string>
     <string name="tutorial_recurrent_title">Pago recurrente</string>
     <string name="tutorial_recurrent_description">Toca aquí para marcar este gasto como un pago recurrente (semanal, quincenal o mensual). La aplicación te recordará registrarlo según el calendario.</string>
-    <string name="tutorial_analytics_title">View your analytics</string>
-    <string name="tutorial_analytics_description">Open Analytics to see how your spending breaks down over time, by category, and against your budget goals.</string>
-    <string name="tutorial_privacy_title">Privacy mode</string>
-    <string name="tutorial_privacy_description">Cover the top of the phone (where the front camera sits) with your hand for about a second to blur every amount on screen. Cover it again to turn it off.</string>
+    <string name="tutorial_analytics_title">Ver tus análisis</string>
+    <string name="tutorial_analytics_description">Abre Análisis para ver como tus gastos se comportan con el tiempo por su categoría, y sobre tus metas de ahorro.</string>
+    <string name="tutorial_privacy_title">Modo de privacidad</string>
+    <string name="tutorial_privacy_description">Tapa la parte inferior del teléfono (donde la cámara está) con tu mano por al menos un segundo para esconder todo monto en la pantalla. Cúbrelo de nuevo para apagarlo.</string>
     <string name="today">Hoy</string>
     <string name="yesterday">Ayer</string>
     <string name="tomorrow">Mañana</string>
@@ -224,7 +224,7 @@
     <string name="settings_theme_subtitle">Cambiar el estilo del tema de la aplicación</string>
     <string name="settings_typography_title">Tipografía</string>
     <string name="settings_typography_subtitle">Cambiar el estilo de tipografía de la aplicación</string>
-    <string name="settings_material_you_title">Material que usted</string>
+    <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Utilice colores de fondo de pantalla para aplicar un tema de aplicación dinámico</string>
     <string name="settings_feature_credit_toggle_title">Utilizar Tarjeta de Crédito como pago</string>
     <string name="settings_feature_credit_toggle_subtitle">Toca para ver los detalles</string>
@@ -257,7 +257,7 @@
     <string name="settings_time_picker_cancel">Cancelar</string>
     <string name="settings_time_picker_confirm">Aceptar</string>
     <string name="settings_about_title">Acerca de</string>
-    <string name="settings_about_subtitle">Obtenga más información sobre la aplicación y su desarrollo.</string>
+    <string name="settings_about_subtitle">Obtenga más información sobre la aplicación y su desarrollo</string>
     <string name="settings_bug_report_title">¿Encontraste un error?</string>
     <string name="settings_bug_report_subtitle">Crea un informe de error y lo solucionaremos pronto</string>
     <string name="settings_version_title">Versión</string>
