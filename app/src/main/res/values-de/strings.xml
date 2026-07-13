@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
+    <string name="tutorial_numpad_title">Ziffernblock</string>
+    <string name="tutorial_numpad_description">Gebe den Betrag ein, den du ausgegeben haben, und tippe auf das grüne Häkchen zum Speichern. Wische auf dem Ziffernblock nach oben, um zu rechnen.</string>
+    <string name="tutorial_comment_title">Kategorie hinzufügen</string>
+    <string name="tutorial_comment_description">Füge eine Kategorie oder eine kurze Notiz hinzu, um dich daran zu erinnern, wofür die Ausgaben waren.</string>
+    <string name="tutorial_budget_pill_title">Budgetfortschritt</string>
+    <string name="tutorial_budget_pill_description">Tippe, um zwischen täglichen, wöchentlichen und monatlichen Budgetansichten zu wechseln oder um den Zeitraum zu verändern.</string>
+    <string name="tutorial_settings_title">Einstellungen</string>
+    <string name="tutorial_settings_description">Öffne die Einstellungen, um Funktionen zu aktivieren, Home-Screen-Widgets einzurichten oder dieses Tutorial zurückzusetzen.</string>
+    <string name="tutorial_recurrent_title">Wiederkehrende Zahlungen</string>
+    <string name="tutorial_recurrent_description">Tippe hier, um diese Ausgabe als wiederkehrende Ausgabe zu markieren (wöchentlich, alle zwei Wochen oder monatlich). Die App erinnert dich dann daran, sie gemäß dem Zeitplan zu erfassen.</string>
+    <string name="tutorial_analytics_title">View your analytics</string>
+    <string name="tutorial_analytics_description">Open Analytics to see how your spending breaks down over time, by category, and against your budget goals.</string>
+    <string name="tutorial_privacy_title">Privacy mode</string>
+    <string name="tutorial_privacy_description">Cover the top of the phone (where the front camera sits) with your hand for about a second to blur every amount on screen. Cover it again to turn it off.</string>
     <string name="today">Heute</string>
     <string name="yesterday">Gestern</string>
     <string name="tomorrow">Morgen</string>
