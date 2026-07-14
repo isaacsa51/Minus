@@ -27,12 +27,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.isSpecified
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -42,7 +47,8 @@ import androidx.wear.compose.material.rememberSwipeableState
 import androidx.wear.compose.material.swipeable
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
-import com.serranoie.app.minus.presentation.ui.theme.colorEditor
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import logcat.logcat
 import kotlin.coroutines.cancellation.CancellationException
@@ -51,7 +57,7 @@ import kotlin.math.roundToInt
 
 private val ScrimColor: Color
     @Composable
-    get() = MaterialTheme.colorScheme.outline.copy(alpha = 0.32f)
+    get() = Color.Black.copy(alpha = 0.45f)
 
 enum class TopSheetValue {
     Expanded,
@@ -65,11 +71,14 @@ fun TopSheetLayout(
     modifier: Modifier = Modifier,
     swipeableState: SwipeableState<TopSheetValue> = rememberSwipeableState(TopSheetValue.HalfExpanded),
     customHalfHeight: Float? = null,
+    customCardHeight: () -> Float? = { null },
     isLockSwipeable: () -> Boolean = { false },
     isLockDraggable: () -> Boolean = { false },
     canDismissBySwipeUp: () -> Boolean = { false },
     onTopSheetDownChanged: (Boolean) -> Unit = {},
     onDismiss: (() -> Unit)? = null,
+    externalDragOffset: () -> Float = { 0f },
+    cardOffsetAdjustment: () -> Float = { 0f },
     sheetContentHalfExpand: @Composable () -> Unit,
     sheetContentExpand: @Composable () -> Unit,
 ) {
@@ -83,24 +92,57 @@ fun TopSheetLayout(
     val navigationBarHeight = LocalWindowInsets.current.calculateBottomPadding()
         .coerceAtLeast(16.dp)
 
+    val nestedScrollConnection = remember(swipeableState) {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                if (source == NestedScrollSource.UserInput && available.y > 0f) {
+                    if (swipeableState.currentValue == TopSheetValue.Expanded) {
+                        coroutineScope.launch {
+                            swipeableState.animateTo(TopSheetValue.Dismissed)
+                        }
+                        return available
+                    }
+                }
+                return Offset.Zero
+            }
+        }
+    }
+
     BoxWithConstraints(
-        modifier = modifier,
+        modifier = modifier.nestedScroll(nestedScrollConnection),
         contentAlignment = Alignment.TopCenter,
     ) {
         val fullHeight = constraints.maxHeight.toFloat()
         val halfHeight = customHalfHeight ?: (fullHeight / 2)
         val expandHeight =
             with(localDensity) { (fullHeight - navigationBarHeight.toPx() - 16.dp.toPx()) }
-        val currOffset = swipeableState.offset.value
+        val currOffset = swipeableState.offset.value + externalDragOffset()
         val maxOffset = (-(expandHeight - halfHeight)).coerceAtMost(0f)
 
         val prevHalfHeight = remember { mutableFloatStateOf(halfHeight) }
-        val isLockProgress = remember(swipeableState.isAnimationRunning) {
-            mutableStateOf(prevHalfHeight.value != halfHeight && swipeableState.isAnimationRunning)
+        val halfHeightChanging = remember { mutableStateOf(false) }
+        LaunchedEffect(halfHeight) {
+            halfHeightChanging.value = true
+            snapshotFlow { swipeableState.isAnimationRunning }
+                .filter { !it }
+                .first()
+            halfHeightChanging.value = false
         }
 
-        val progress = if (isLockProgress.value) {
-            if (swipeableState.currentValue === TopSheetValue.HalfExpanded) 0f else 1f
+        val prevHalfHeightValue = remember { mutableFloatStateOf(halfHeight) }
+        val halfHeightMovingSync = halfHeight != prevHalfHeightValue.floatValue
+        prevHalfHeightValue.floatValue = halfHeight
+
+        val progress = if (halfHeightChanging.value || halfHeightMovingSync || isLockDraggable() || isLockSwipeable()) {
+            when (swipeableState.currentValue) {
+                TopSheetValue.HalfExpanded -> 0f
+                TopSheetValue.Expanded -> 1f
+                TopSheetValue.Dismissed -> 0f
+            }
         } else {
             (1f - (currOffset / maxOffset)).coerceIn(0f, 1f)
         }
@@ -114,9 +156,30 @@ fun TopSheetLayout(
             )
         }
 
-        val halfExpanedOffset = (-(expandHeight - halfHeight)).coerceAtMost(0f)
+        val halfExpanedOffset = (-(expandHeight - halfHeight)).coerceAtMost(-1f)
         val dismissOffsetAbove = -expandHeight * 0.5f
         val dismissOffsetBelow = expandHeight * 0.8f
+
+        val anchors = remember(halfExpanedOffset, dismissOffsetAbove, dismissOffsetBelow, onDismiss, canDismissBySwipeUp) {
+            val map = mutableMapOf<Float, TopSheetValue>()
+            map[0f] = TopSheetValue.Expanded
+
+            var hOffset = halfExpanedOffset
+
+            if (hOffset == 0f) hOffset = -0.5f
+            map[hOffset] = TopSheetValue.HalfExpanded
+
+            if (onDismiss != null) {
+                var dOffset = if (canDismissBySwipeUp()) dismissOffsetAbove else dismissOffsetBelow
+
+                while (map.containsKey(dOffset)) {
+                    dOffset += 1f
+                }
+
+                map[dOffset] = TopSheetValue.Dismissed
+            }
+            map
+        }
 
         Card(
             shape = RoundedCornerShape(bottomStart = 36.dp, bottomEnd = 36.dp),
@@ -127,16 +190,22 @@ fun TopSheetLayout(
             modifier = modifier
                 .fillMaxWidth()
                 .height(with(localDensity) {
-                    (fullHeight - navigationBarHeight.toPx() - 16.dp.toPx()).toDp()
+                    (customCardHeight()
+                        ?: (fullHeight - navigationBarHeight.toPx() - 16.dp.toPx()))
+                        .toDp()
                 })
                 .offset {
-                    val swipeOffset = swipeableState.offset.value
+                    val swipeOffset =
+                        swipeableState.offset.value + externalDragOffset() + cardOffsetAdjustment()
                     val predictiveOffset = halfExpanedOffset * predictiveBackProgress * 0.3f
+
+                    val minAnchor = anchors.keys.minOrNull() ?: halfExpanedOffset
+                    val maxAnchor = anchors.keys.maxOrNull() ?: 0f
 
                     IntOffset(
                         x = 0,
                         y = (swipeOffset + predictiveOffset)
-                            .coerceIn(halfExpanedOffset, if (onDismiss != null) dismissOffsetBelow else 0f)
+                            .coerceIn(minAnchor, maxAnchor)
                             .roundToInt(),
                     )
                 }
@@ -144,19 +213,12 @@ fun TopSheetLayout(
                     enabled = !isLockDraggable() && onDismiss != null,
                     state = swipeableState,
                     orientation = Orientation.Vertical,
-                    anchors = if (onDismiss != null && !isLockSwipeable()) {
-                        val baseAnchors = mutableMapOf(
-                            halfExpanedOffset to TopSheetValue.HalfExpanded,
-                            0f to TopSheetValue.Expanded
-                        )
-                        if (canDismissBySwipeUp()) {
-                            baseAnchors[dismissOffsetAbove] = TopSheetValue.Dismissed
-                        }
-                        baseAnchors
-                    } else {
+                    anchors = if (!isLockSwipeable()) anchors else {
+                        val hAnchor = anchors.filterValues { it == TopSheetValue.HalfExpanded }.keys.firstOrNull() ?: halfExpanedOffset
+                        val eAnchor = anchors.filterValues { it == TopSheetValue.Expanded }.keys.firstOrNull() ?: 0f
                         mapOf(
-                            halfExpanedOffset to TopSheetValue.HalfExpanded,
-                            0f to TopSheetValue.Expanded
+                            hAnchor to TopSheetValue.HalfExpanded,
+                            eAnchor to TopSheetValue.Expanded
                         )
                     },
                     resistance = null
@@ -188,17 +250,16 @@ fun TopSheetLayout(
                             .fillMaxSize()
                             .alpha(max(1f - progress * 2, 0f)),
                     ) {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .weight(1F)
-                                .background(colorEditor)
-                        )
                         sheetContentHalfExpand()
+//                        Box(
+//                            Modifier
+//                                .fillMaxWidth()
+//                                .weight(1F)
+//                                .background(colorEditor)
+//                        )
                     }
                 }
 
-                // Drag handle at bottom
                 Box(
                     Modifier
                         .padding(bottom = 10.dp, top = 32.dp)

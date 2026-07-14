@@ -1,8 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.history.sections
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
@@ -52,6 +53,7 @@ internal fun LazyListScope.transactionDateSections(
     onClick: (Transaction) -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    disableAnimations: Boolean = false,
 ) {
     groupedTransactions.forEach { (date, transactions) ->
         val isExpanded = date?.let { expandedDates.contains(it) } ?: false
@@ -93,10 +95,12 @@ internal fun LazyListScope.transactionDateSections(
                             AnimatedVisibility(
                                 visible = !isBeingDeleted,
                                 enter = EnterTransition.None,
-                                exit = slideOutHorizontally(
-                                    animationSpec = tween(durationMillis = 280),
-                                    targetOffsetX = { fullWidth -> fullWidth },
-                                ) + fadeOut(animationSpec = tween(durationMillis = 280)),
+                                exit = if (!disableAnimations) {
+                                    slideOutHorizontally(
+                                        animationSpec = tween(durationMillis = 280),
+                                        targetOffsetX = { fullWidth -> fullWidth },
+                                    ) + fadeOut(animationSpec = tween(durationMillis = 280))
+                                } else ExitTransition.None,
                             ) {
                                 SwipeableExpenseItem(
                                     transaction = transaction,
@@ -110,6 +114,7 @@ internal fun LazyListScope.transactionDateSections(
                                     onEdit = { onEdit(transaction) },
                                     onMarkAsPaid = { onMarkAsPaid(transaction) },
                                     readOnly = readOnly,
+                                    disableAnimations = disableAnimations,
                                     onClick = { onClick(transaction) },
                                 )
                             }

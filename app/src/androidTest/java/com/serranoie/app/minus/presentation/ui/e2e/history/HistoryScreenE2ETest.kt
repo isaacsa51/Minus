@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.e2e.history
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -100,18 +101,18 @@ class HistoryScreenE2ETest {
         ),
     )
 
-    private fun setHistoryContent(
+    @Composable
+    private fun HistoryTestContent(
         uiState: HistoryUiState,
         onProcessIntent: (HistoryUiIntent) -> Unit = {},
     ) {
-        composeTestRule.setContent {
-            MinusTheme {
-                History(
-                    uiState = uiState,
-                    modifier = Modifier.fillMaxSize(),
-                    onProcessIntent = onProcessIntent,
-                )
-            }
+        MinusTheme {
+            History(
+                uiState = uiState,
+                modifier = Modifier.fillMaxSize(),
+                disableAnimations = true,
+                onProcessIntent = onProcessIntent,
+            )
         }
     }
 
@@ -132,17 +133,17 @@ class HistoryScreenE2ETest {
     @Test
     fun when_recurrent_view_mode_is_horizontal_then_recurrent_items_are_shown_as_cards() {
         val recurrentItems = sampleUpcomingRecurrentItems()
-        setHistoryContent(
-            uiState = HistoryUiState(
-                budgetSettings = sampleBudgetSettings(),
-                budgetState = sampleBudgetState(),
-                upcomingRecurrentInPeriod = recurrentItems,
-                showUpcomingRecurrentInPeriod = true,
-                recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
-            ),
-        )
-
-        composeTestRule.waitForIdle()
+        composeTestRule.setContent {
+            HistoryTestContent(
+                uiState = HistoryUiState(
+                    budgetSettings = sampleBudgetSettings(),
+                    budgetState = sampleBudgetState(),
+                    upcomingRecurrentInPeriod = recurrentItems,
+                    showUpcomingRecurrentInPeriod = true,
+                    recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
+                ),
+            )
+        }
 
         composeTestRule.onNodeWithText("Netflix").assertIsDisplayed()
         val monthlyLabel =
@@ -153,17 +154,17 @@ class HistoryScreenE2ETest {
     @Test
     fun when_recurrent_view_mode_is_vertical_then_recurrent_items_are_shown_as_list_items() {
         val recurrentItems = sampleUpcomingRecurrentItems()
-        setHistoryContent(
-            uiState = HistoryUiState(
-                budgetSettings = sampleBudgetSettings(),
-                budgetState = sampleBudgetState(),
-                upcomingRecurrentInPeriod = recurrentItems,
-                showUpcomingRecurrentInPeriod = true,
-                recurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
-            ),
-        )
-
-        composeTestRule.waitForIdle()
+        composeTestRule.setContent {
+            HistoryTestContent(
+                uiState = HistoryUiState(
+                    budgetSettings = sampleBudgetSettings(),
+                    budgetState = sampleBudgetState(),
+                    upcomingRecurrentInPeriod = recurrentItems,
+                    showUpcomingRecurrentInPeriod = true,
+                    recurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
+                ),
+            )
+        }
 
         composeTestRule.onNodeWithText("Netflix").assertIsDisplayed()
 
@@ -176,19 +177,19 @@ class HistoryScreenE2ETest {
         val transactions = sampleTransactions()
         var capturedIntent: HistoryUiIntent? = null
 
-        setHistoryContent(
-            uiState = HistoryUiState(
-                budgetSettings = sampleBudgetSettings(),
-                budgetState = sampleBudgetState(),
-                transactions = transactions,
-                displayTransactions = transactions,
-                groupedCurrentTransactions = mapOf(today to transactions),
-                expandedDates = setOf(today),
-            ),
-            onProcessIntent = { capturedIntent = it }
-        )
-
-        composeTestRule.waitForIdle()
+        composeTestRule.setContent {
+            HistoryTestContent(
+                uiState = HistoryUiState(
+                    budgetSettings = sampleBudgetSettings(),
+                    budgetState = sampleBudgetState(),
+                    transactions = transactions,
+                    displayTransactions = transactions,
+                    groupedCurrentTransactions = mapOf(today to transactions),
+                    expandedDates = setOf(today),
+                ),
+                onProcessIntent = { capturedIntent = it }
+            )
+        }
 
         composeTestRule.onNodeWithText("Coffee").performClick()
 
@@ -201,38 +202,36 @@ class HistoryScreenE2ETest {
     @Test
     fun when_swiping_right_on_transaction_then_it_is_removed_from_list() {
         val transactions = sampleTransactions()
-        var uiState by mutableStateOf(
-            HistoryUiState(
-                budgetSettings = sampleBudgetSettings(),
-                budgetState = sampleBudgetState(),
-                transactions = transactions,
-                displayTransactions = transactions,
-                groupedCurrentTransactions = mapOf(today to transactions),
-                expandedDates = setOf(today),
-            )
-        )
 
         composeTestRule.setContent {
-            MinusTheme {
-                History(
-                    uiState = uiState,
-                    modifier = Modifier.fillMaxSize(),
-                    onProcessIntent = { intent ->
-                        if (intent is HistoryUiIntent.DeleteTransaction) {
-                            val newTransactions =
-                                uiState.transactions.filterNot { it.id == intent.transaction.id }
-                            uiState = uiState.copy(
-                                transactions = newTransactions,
-                                displayTransactions = newTransactions,
-                                groupedCurrentTransactions = mapOf(today to newTransactions)
-                            )
-                        }
-                    },
+            var uiState by androidx.compose.runtime.remember {
+                mutableStateOf(
+                    HistoryUiState(
+                        budgetSettings = sampleBudgetSettings(),
+                        budgetState = sampleBudgetState(),
+                        transactions = transactions,
+                        displayTransactions = transactions,
+                        groupedCurrentTransactions = mapOf(today to transactions),
+                        expandedDates = setOf(today),
+                    )
                 )
             }
-        }
 
-        composeTestRule.waitForIdle()
+            HistoryTestContent(
+                uiState = uiState,
+                onProcessIntent = { intent ->
+                    if (intent is HistoryUiIntent.DeleteTransaction) {
+                        val newTransactions =
+                            uiState.transactions.filterNot { it.id == intent.transaction.id }
+                        uiState = uiState.copy(
+                            transactions = newTransactions,
+                            displayTransactions = newTransactions,
+                            groupedCurrentTransactions = mapOf(today to newTransactions)
+                        )
+                    }
+                },
+            )
+        }
 
         composeTestRule.onNodeWithText("Coffee").assertIsDisplayed()
 
@@ -240,45 +239,43 @@ class HistoryScreenE2ETest {
             swipeRight()
         }
 
-        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.onAllNodesWithText("Coffee").assertCountEquals(0)
     }
 
     @Test
     fun when_swiping_left_on_transaction_then_transaction_edit_screen_is_displayed() {
         val transactions = sampleTransactions()
-        var uiState by mutableStateOf(
-            HistoryUiState(
-                budgetSettings = sampleBudgetSettings(),
-                budgetState = sampleBudgetState(),
-                transactions = transactions,
-                displayTransactions = transactions,
-                groupedCurrentTransactions = mapOf(today to transactions),
-                expandedDates = setOf(today),
-            )
-        )
 
         composeTestRule.setContent {
-            MinusTheme {
-                History(
-                    uiState = uiState,
-                    modifier = Modifier.fillMaxSize(),
-                    onProcessIntent = { intent ->
-                        if (intent is HistoryUiIntent.SetEditingTransaction) {
-                            uiState = uiState.copy(editingTransaction = intent.transaction)
-                        }
-                    },
+            var uiState by androidx.compose.runtime.remember {
+                mutableStateOf(
+                    HistoryUiState(
+                        budgetSettings = sampleBudgetSettings(),
+                        budgetState = sampleBudgetState(),
+                        transactions = transactions,
+                        displayTransactions = transactions,
+                        groupedCurrentTransactions = mapOf(today to transactions),
+                        expandedDates = setOf(today),
+                    )
                 )
             }
-        }
 
-        composeTestRule.waitForIdle()
+            HistoryTestContent(
+                uiState = uiState,
+                onProcessIntent = { intent ->
+                    if (intent is HistoryUiIntent.SetEditingTransaction) {
+                        uiState = uiState.copy(editingTransaction = intent.transaction)
+                    }
+                },
+            )
+        }
 
         composeTestRule.onNodeWithText("Coffee").performTouchInput {
             swipeLeft()
         }
 
-        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(500)
 
         val editTitle = composeTestRule.activity.getString(R.string.edit_expense_title)
         composeTestRule.onNodeWithText(editTitle).assertIsDisplayed()
@@ -289,105 +286,100 @@ class HistoryScreenE2ETest {
     @Test
     fun when_tapping_transaction_then_deleting_from_dialog_removes_it_from_list() {
         val transactions = sampleTransactions()
-        var uiState by mutableStateOf(
-            HistoryUiState(
-                budgetSettings = sampleBudgetSettings(),
-                budgetState = sampleBudgetState(),
-                transactions = transactions,
-                displayTransactions = transactions,
-                groupedCurrentTransactions = mapOf(today to transactions),
-                expandedDates = setOf(today),
-            )
-        )
 
         composeTestRule.setContent {
-            MinusTheme {
-                History(
-                    uiState = uiState,
-                    modifier = Modifier.fillMaxSize(),
-                    onProcessIntent = { intent ->
-                        when (intent) {
-                            is HistoryUiIntent.ToggleExpandedTransaction -> {
-                                uiState = uiState.copy(expandedTransactionId = intent.transactionId)
-                            }
-
-                            is HistoryUiIntent.DeleteTransaction -> {
-                                val newTransactions =
-                                    uiState.transactions.filterNot { it.id == intent.transaction.id }
-                                uiState = uiState.copy(
-                                    transactions = newTransactions,
-                                    displayTransactions = newTransactions,
-                                    groupedCurrentTransactions = mapOf(today to newTransactions),
-                                    expandedTransactionId = null
-                                )
-                            }
-
-                            else -> {}
-                        }
-                    },
+            var uiState by androidx.compose.runtime.remember {
+                mutableStateOf(
+                    HistoryUiState(
+                        budgetSettings = sampleBudgetSettings(),
+                        budgetState = sampleBudgetState(),
+                        transactions = transactions,
+                        displayTransactions = transactions,
+                        groupedCurrentTransactions = mapOf(today to transactions),
+                        expandedDates = setOf(today),
+                    )
                 )
             }
+
+            HistoryTestContent(
+                uiState = uiState,
+                onProcessIntent = { intent ->
+                    when (intent) {
+                        is HistoryUiIntent.ToggleExpandedTransaction -> {
+                            uiState = uiState.copy(expandedTransactionId = intent.transactionId)
+                        }
+
+                        is HistoryUiIntent.DeleteTransaction -> {
+                            val newTransactions =
+                                uiState.transactions.filterNot { it.id == intent.transaction.id }
+                            uiState = uiState.copy(
+                                transactions = newTransactions,
+                                displayTransactions = newTransactions,
+                                groupedCurrentTransactions = mapOf(today to newTransactions),
+                                expandedTransactionId = null
+                            )
+                        }
+
+                        else -> {}
+                    }
+                },
+            )
         }
 
-        composeTestRule.waitForIdle()
-
         composeTestRule.onNodeWithText("Coffee").performClick()
-        composeTestRule.waitForIdle()
 
         val deleteLabel = composeTestRule.activity.getString(R.string.delete)
         composeTestRule.onNodeWithText(deleteLabel).performClick()
-        composeTestRule.waitForIdle()
 
+        composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.onAllNodesWithText("Coffee").assertCountEquals(0)
     }
 
     @Test
     fun when_tapping_transaction_then_editing_from_dialog_shows_edit_screen() {
         val transactions = sampleTransactions()
-        var uiState by mutableStateOf(
-            HistoryUiState(
-                budgetSettings = sampleBudgetSettings(),
-                budgetState = sampleBudgetState(),
-                transactions = transactions,
-                displayTransactions = transactions,
-                groupedCurrentTransactions = mapOf(today to transactions),
-                expandedDates = setOf(today),
-            )
-        )
 
         composeTestRule.setContent {
-            MinusTheme {
-                History(
-                    uiState = uiState,
-                    modifier = Modifier.fillMaxSize(),
-                    onProcessIntent = { intent ->
-                        when (intent) {
-                            is HistoryUiIntent.ToggleExpandedTransaction -> {
-                                uiState = uiState.copy(expandedTransactionId = intent.transactionId)
-                            }
+            var uiState by androidx.compose.runtime.remember {
+                mutableStateOf(
+                    HistoryUiState(
+                        budgetSettings = sampleBudgetSettings(),
+                        budgetState = sampleBudgetState(),
+                        transactions = transactions,
+                        displayTransactions = transactions,
+                        groupedCurrentTransactions = mapOf(today to transactions),
+                        expandedDates = setOf(today),
+                    )
+                )
+            }
 
-                            is HistoryUiIntent.SetEditingTransaction -> {
-                                uiState = uiState.copy(
-                                    editingTransaction = intent.transaction,
-                                    expandedTransactionId = null
-                                )
-                            }
+            HistoryTestContent(
+                uiState = uiState,
+                onProcessIntent = { intent ->
+                    when (intent) {
+                        is HistoryUiIntent.ToggleExpandedTransaction -> {
+                            uiState = uiState.copy(expandedTransactionId = intent.transactionId)
+                        }
+
+                        is HistoryUiIntent.SetEditingTransaction -> {
+                            uiState = uiState.copy(
+                                editingTransaction = intent.transaction,
+                                expandedTransactionId = null
+                            )
+                        }
 
                             else -> {}
                         }
                     },
                 )
             }
-        }
-
-        composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Coffee").performClick()
-        composeTestRule.waitForIdle()
 
         val editLabel = composeTestRule.activity.getString(R.string.edit)
         composeTestRule.onNodeWithText(editLabel).performClick()
-        composeTestRule.waitForIdle()
+
+        composeTestRule.mainClock.advanceTimeBy(500)
 
         val editTitle = composeTestRule.activity.getString(R.string.edit_expense_title)
         composeTestRule.onNodeWithText(editTitle).assertIsDisplayed()
@@ -416,20 +408,18 @@ class HistoryScreenE2ETest {
         val budgetState = sampleBudgetState()
         val transactions = sampleTransactions()
 
-        setHistoryContent(
-            uiState = HistoryUiState(
-                budgetSettings = budgetSettings,
-                budgetState = budgetState,
-                transactions = transactions,
-                displayTransactions = transactions,
-                groupedCurrentTransactions = mapOf(today to transactions),
-                expandedDates = setOf(today),
-            ),
-        )
-
-        composeTestRule.waitForIdle()
-        composeTestRule.mainClock.advanceTimeBy(500)
-        composeTestRule.waitForIdle()
+        composeTestRule.setContent {
+            HistoryTestContent(
+                uiState = HistoryUiState(
+                    budgetSettings = budgetSettings,
+                    budgetState = budgetState,
+                    transactions = transactions,
+                    displayTransactions = transactions,
+                    groupedCurrentTransactions = mapOf(today to transactions),
+                    expandedDates = setOf(today),
+                ),
+            )
+        }
 
         val totalBudgetLabel = composeTestRule.activity.getString(R.string.total_budget)
         composeTestRule.onAllNodesWithText(totalBudgetLabel).onLast().assertIsDisplayed()
@@ -458,20 +448,18 @@ class HistoryScreenE2ETest {
     fun when_history_has_transactions_then_expenses_are_visible_in_list() {
         val transactions = sampleTransactions()
 
-        setHistoryContent(
-            uiState = HistoryUiState(
-                budgetSettings = sampleBudgetSettings(),
-                budgetState = sampleBudgetState(),
-                transactions = transactions,
-                displayTransactions = transactions,
-                groupedCurrentTransactions = mapOf(today to transactions),
-                expandedDates = setOf(today),
-            ),
-        )
-
-        composeTestRule.waitForIdle()
-        composeTestRule.mainClock.advanceTimeBy(500)
-        composeTestRule.waitForIdle()
+        composeTestRule.setContent {
+            HistoryTestContent(
+                uiState = HistoryUiState(
+                    budgetSettings = sampleBudgetSettings(),
+                    budgetState = sampleBudgetState(),
+                    transactions = transactions,
+                    displayTransactions = transactions,
+                    groupedCurrentTransactions = mapOf(today to transactions),
+                    expandedDates = setOf(today),
+                ),
+            )
+        }
 
         composeTestRule.onAllNodesWithText("Groceries").onLast().assertIsDisplayed()
         composeTestRule.onAllNodesWithText("Coffee").onLast().assertIsDisplayed()
@@ -481,16 +469,14 @@ class HistoryScreenE2ETest {
 
     @Test
     fun when_history_is_displayed_then_total_budget_label_is_visible() {
-        setHistoryContent(
-            uiState = HistoryUiState(
-                budgetSettings = sampleBudgetSettings(),
-                budgetState = sampleBudgetState(),
-            ),
-        )
-
-        composeTestRule.waitForIdle()
-        composeTestRule.mainClock.advanceTimeBy(500)
-        composeTestRule.waitForIdle()
+        composeTestRule.setContent {
+            HistoryTestContent(
+                uiState = HistoryUiState(
+                    budgetSettings = sampleBudgetSettings(),
+                    budgetState = sampleBudgetState(),
+                ),
+            )
+        }
 
         val totalBudgetLabel = composeTestRule.activity.getString(R.string.total_budget)
         composeTestRule.onAllNodesWithText(totalBudgetLabel).onLast().assertIsDisplayed()

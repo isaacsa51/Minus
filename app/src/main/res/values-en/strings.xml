@@ -451,7 +451,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>
     <string name="no_name">No name</string>
-    <string name="description">Description</string>
+    <string name="description">Purchase Reason</string>
     <string name="date">Date</string>
     <string name="frequency">Frequency</string>
     <string name="charge_day">Charge day</string>

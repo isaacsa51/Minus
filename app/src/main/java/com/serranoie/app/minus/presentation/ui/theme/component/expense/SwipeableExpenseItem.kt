@@ -35,6 +35,7 @@ fun SwipeableExpenseItem(
     onDelete: () -> Unit,
     onEdit: () -> Unit,
     readOnly: Boolean,
+    disableAnimations: Boolean = false,
     isBeingDeleted: Boolean = false,
     isExpanded: Boolean = false,
     onClick: () -> Unit = {},
@@ -78,6 +79,7 @@ fun SwipeableExpenseItem(
                 onDelete = onDelete,
                 onMarkAsPaid = onMarkAsPaid,
                 readOnly = readOnly,
+                disableAnimations = disableAnimations,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
             )
@@ -117,6 +119,7 @@ fun SwipeableExpenseItem(
                 onDelete = onDelete,
                 onMarkAsPaid = onMarkAsPaid,
                 readOnly = readOnly,
+                disableAnimations = disableAnimations,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
             )

@@ -54,6 +54,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -101,6 +102,7 @@ import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.StatusBarPadding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -137,8 +139,6 @@ fun MainScreenContent(
     var nightMode by remember { mutableStateOf(false) }
     var showCategoryGrid by remember { mutableStateOf(false) }
 
-    // Auto-hide the category list when the input is cleared (long-press delete, backspace to zero, etc.)
-    // so the numpad comes back and the user can start typing again.
     LaunchedEffect(budgetUiState.numpadInput) {
         if (budgetUiState.numpadInput.isEmpty() && showCategoryGrid) {
             showCategoryGrid = false
@@ -449,6 +449,10 @@ private fun PhoneLayout(
 
     var localDragProgress by remember { mutableFloatStateOf(0f) }
 
+    var externalSheetDragOffset by remember { mutableFloatStateOf(0f) }
+    val collapseDragEndJob = remember { mutableStateOf<Job?>(null) }
+    val topSheetStateRef = rememberUpdatedState(topSheetState)
+
     val systemKeyboardHeight = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
     val systemKeyboardHeightPx = with(localDensity) { systemKeyboardHeight.toPx() }
 
@@ -484,9 +488,10 @@ private fun PhoneLayout(
         localDragProgress,
     ) {
         derivedStateOf {
+            val numpadBuffer = with(localDensity) { 16.dp.toPx() }
             contentHeight
                 .minus(
-                    targetKeyboardHeight.plus(navBarHeightPx).coerceAtLeast(0f),
+                    targetKeyboardHeight.plus(navBarHeightPx).plus(numpadBuffer).coerceAtLeast(0f),
                 ).coerceAtMost(contentHeight - (navBarHeightPx + with(localDensity) { 96.dp.toPx() }))
         }
     }
@@ -519,12 +524,13 @@ private fun PhoneLayout(
                     0f,
                 )
 
-            (
+            val computed =
                 topSheetState.offset.value.coerceIn(
                     halfExpanedOffset,
                     0f,
                 ) + contentHeight - navBarHeightPx - with(localDensity) { 16.dp.toPx() }
-            ).toDp()
+
+            minOf(computed, editorHeightAnimated).toDp()
         }
 
     Box(
@@ -549,11 +555,11 @@ private fun PhoneLayout(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(with(localDensity) { (keyboardHeightAnimated + navBarHeightPx).toDp() })
+                    .height(with(localDensity) { (keyboardHeightAnimated + navBarHeightPx + 16.dp.toPx()).toDp() })
                     .zIndex(if (isSheetExpanding) 0f else 1f),
         ) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(top = 16.dp),
                 contentAlignment = Alignment.BottomCenter,
             ) {
                 val editorState =
@@ -681,9 +687,20 @@ private fun PhoneLayout(
                 }
         }
 
+        val expandHeightPx = contentHeight - navBarHeightPx - with(localDensity) { 16.dp.toPx() }
         TopSheetLayout(
             swipeableState = topSheetState,
             customHalfHeight = editorHeightAnimated,
+            customCardHeight = {
+                val halfHeightPx = editorHeightAnimated
+                val maxOffset = (-(expandHeightPx - halfHeightPx)).coerceAtMost(0f)
+                val offset = runCatching { topSheetState.offset.value }.getOrDefault(maxOffset)
+                val progress = if (maxOffset == 0f) 1f else (1f - (offset / maxOffset)).coerceIn(0f, 1f)
+                halfHeightPx + (expandHeightPx - halfHeightPx) * progress
+            },
+            cardOffsetAdjustment = {
+                runCatching { -topSheetState.offset.value }.getOrDefault(0f)
+            },
             isLockSwipeable = {
                 budgetUiState.lockSwipeable || localDragProgress > 0f || showCategoryGrid ||
                     (budgetUiState.isCalculation && effectiveProgress < 1f) ||
@@ -694,6 +711,8 @@ private fun PhoneLayout(
                     (budgetUiState.isCalculation && effectiveProgress < 1f) ||
                     (!budgetUiState.isCalculation && effectiveProgress > 0f)
             },
+            canDismissBySwipeUp = { true },
+            externalDragOffset = { externalSheetDragOffset },
             onDismiss = {},
             sheetContentHalfExpand = {
                 Editor(
@@ -822,6 +841,49 @@ private fun PhoneLayout(
                                 .fillMaxSize()
                                 .background(colorButton)
                                 .then(quickLogSwipeModifier),
+                        onCollapseDragDelta = { delta ->
+                            externalSheetDragOffset += delta
+                            collapseDragEndJob.value?.cancel()
+                            collapseDragEndJob.value = coroutineScope.launch {
+                                delay(120.milliseconds)
+                                val committed = externalSheetDragOffset
+                                if (committed != 0f) {
+                                    val settleSpec = tween<Float>(300)
+                                    val targetState =
+                                        if (committed < -120f) TopSheetValue.Dismissed
+                                        else TopSheetValue.HalfExpanded
+                                    val dragAnim = launch {
+                                        val durationMs = 300L
+                                        val frameMs = 16L
+                                        val startNanos = System.nanoTime()
+                                        val startValue = committed
+                                        while (true) {
+                                            val elapsedMs =
+                                                (System.nanoTime() - startNanos) / 1_000_000L
+                                            if (elapsedMs >= durationMs) {
+                                                externalSheetDragOffset = 0f
+                                                break
+                                            }
+                                            val fraction =
+                                                elapsedMs.toFloat() / durationMs
+                                            val eased = FastOutSlowInEasing
+                                                .transform(fraction)
+                                            externalSheetDragOffset =
+                                                startValue * (1f - eased)
+                                            delay(frameMs)
+                                        }
+                                    }
+                                    val swipeAnim = launch {
+                                        runCatching {
+                                            topSheetStateRef.value
+                                                .animateTo(targetState, settleSpec)
+                                        }
+                                    }
+                                    dragAnim.join()
+                                    swipeAnim.join()
+                                }
+                            }
+                        },
                         onQueueDeleteWithUndo = { tx, msg, _ -> queueDeleteWithUndo(tx, msg) },
                         onCancelPendingDelete = { cancelPendingDelete() },
                         onShowInfoSnackbar = { msg -> showInfoSnackbar(msg) },
@@ -832,6 +894,8 @@ private fun PhoneLayout(
 
         LaunchedEffect(budgetUiState.isCalculation) {
             localDragProgress = 0f
+            externalSheetDragOffset = 0f
+            collapseDragEndJob.value?.cancel()
         }
     }
     StatusBarPadding()

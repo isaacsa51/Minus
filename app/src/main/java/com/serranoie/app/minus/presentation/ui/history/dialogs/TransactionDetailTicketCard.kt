@@ -1,35 +1,47 @@
 package com.serranoie.app.minus.presentation.ui.history.dialogs
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
-import com.serranoie.app.minus.presentation.ui.theme.component.ticket.TicketCard
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
+import java.math.BigDecimal
+import java.time.LocalDateTime
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-internal fun TransactionDetailTicketCard(
+fun TransactionDetailTicketCard(
+    modifier: Modifier = Modifier,
     transaction: Transaction,
     totalAmountText: String,
     details: List<Pair<String, String>>,
@@ -37,133 +49,191 @@ internal fun TransactionDetailTicketCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     readOnly: Boolean,
-    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
-    TicketCard(
-        backgroundColor = MaterialTheme.colorScheme.background,
-        teethWidthDp = 20f,
-        teethHeightDp = 4f,
-        modifier = modifier,
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable { onClick() },
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Box(
+        details.forEach { (label, value) ->
+            Row(
                 modifier = Modifier
-					.background(Color.Black)
-					.padding(vertical = 8.dp, horizontal = 18.dp)
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = if (transaction.isRecurrent) {
-                        stringResource(R.string.ticket_recurrent_expense)
-                    } else {
-                        stringResource(R.string.ticket_expense)
-                    },
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelLargeEmphasized,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = TextUnit(26f, TextUnitType.Sp),
+                    text = label,
+                    style = MaterialTheme.typography.titleSmallCondensed.copy(fontWeight = FontWeight.W200),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.titleMediumCondensed.copy(fontWeight = FontWeight.Medium),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .weight(1.8f)
+                        .then(
+                            if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                                with(sharedTransitionScope) {
+                                    val key = when (label) {
+                                        stringResource(R.string.description) -> "comment_${transaction.id}"
+                                        stringResource(R.string.date) -> "time_${transaction.id}"
+                                        else -> null
+                                    }
+                                    if (key != null) {
+                                        Modifier.sharedElement(
+                                            rememberSharedContentState(key = key),
+                                            animatedVisibilityScope = animatedVisibilityScope
+                                        )
+                                    } else Modifier
+                                }
+                            } else Modifier
+                        ),
+                    textAlign = TextAlign.End,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        HorizontalDivider()
+
+        Text(
+            text = stringResource(R.string.ticket_total_amount),
+            style = MaterialTheme.typography.bodyMediumEmphasized,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+
+        Text(
+            text = totalAmountText,
+            style = MaterialTheme.typography.headlineMediumEmphasized,
+            color = MaterialTheme.colorScheme.error,
+            fontWeight = FontWeight.Black,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.then(
+                if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                    with(sharedTransitionScope) {
+                        Modifier.sharedElement(
+                            rememberSharedContentState(key = "amount_${transaction.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                    }
+                } else Modifier
+            )
+        )
+
+        HorizontalDivider()
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        if (transaction.isRecurrent) {
+            Button(
+                onClick = onMarkAsPaid,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(R.string.mark_as_paid),
+                    style = MaterialTheme.typography.labelSmallEmphasized,
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TextButton(
+                onClick = onEdit,
+            ) {
+                Text(
+                    stringResource(R.string.edit),
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
-            Text(
-                text = stringResource(R.string.ticket_operation_number, transaction.id),
-                style = MaterialTheme.typography.bodyMediumCondensed,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-
-            HorizontalDivider()
-
-            Text(
-                text = stringResource(R.string.ticket_total_amount),
-                style = MaterialTheme.typography.labelLargeEmphasized,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-
-            Text(
-                text = totalAmountText,
-                style = MaterialTheme.typography.headlineLargeEmphasized,
-                color = MaterialTheme.colorScheme.error,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-            )
-
-            HorizontalDivider()
-
-            details.forEach { (label, value) ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
+            if (!readOnly) {
+                IconButton(
+                    onClick = onDelete,
                 ) {
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.bodyMediumCondensed.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.weight(1f),
-                        overflow = TextOverflow.Ellipsis,
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = stringResource(R.string.delete),
+                        tint = MaterialTheme.colorScheme.error
                     )
-                    Text(
-                        text = value,
-                        style = MaterialTheme.typography.bodyMediumCondensed,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.End,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
-
-            if (transaction.isRecurrent) {
-                Button(
-                    onClick = onMarkAsPaid,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        text = stringResource(R.string.mark_as_paid),
-                        style = MaterialTheme.typography.labelSmallEmphasized,
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    onClick = onEdit,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(stringResource(R.string.edit), style = MaterialTheme.typography.labelSmallEmphasized)
-                }
-
-                if (!readOnly) {
-                    Button(
-                        onClick = onDelete,
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onError,
-                        ),
-                    ) {
-                        Text(stringResource(R.string.delete), style = MaterialTheme.typography.labelSmallEmphasized)
-                    }
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TransactionDetailTicketCardPreview() {
+    MinusTheme {
+        TransactionDetailTicketCard(
+            transaction = Transaction(
+                id = 1L,
+                amount = BigDecimal("42.50"),
+                comment = "Lunch with team",
+                date = LocalDateTime.of(2026, 1, 15, 12, 30),
+                periodId = 7L,
+                isRecurrent = false
+            ),
+            totalAmountText = "$42.50",
+            details = listOf(
+                "Comment" to "Lunch with team",
+                "Date" to "Jan 15, 2026",
+                "Time" to "12:30 PM"
+            ),
+            onMarkAsPaid = {},
+            onEdit = {},
+            onDelete = {},
+            readOnly = false
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TransactionDetailTicketCardRecurrentPreview() {
+    MinusTheme {
+        TransactionDetailTicketCard(
+            transaction = Transaction(
+                id = 2L,
+                amount = BigDecimal("15.00"),
+                comment = "Netflix",
+                date = LocalDateTime.of(2026, 1, 15, 10, 0),
+                periodId = 7L,
+                isRecurrent = true
+            ),
+            totalAmountText = "$15.00",
+            details = listOf(
+                "Comment" to "Netflix",
+                "Frequency" to "Monthly",
+                "Next payment" to "Feb 15, 2026"
+            ),
+            onMarkAsPaid = {},
+            onEdit = {},
+            onDelete = {},
+            readOnly = false
+        )
     }
 }
