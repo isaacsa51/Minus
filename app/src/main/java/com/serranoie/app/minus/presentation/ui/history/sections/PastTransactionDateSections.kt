@@ -2,6 +2,9 @@ package com.serranoie.app.minus.presentation.ui.history.sections
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -35,10 +38,12 @@ import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDate
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 internal fun LazyListScope.pastTransactionDateSections(
     showPastPeriod: Boolean,
     groupedPastTransactions: Map<LocalDate?, List<Transaction>>,
     expandedDates: Set<LocalDate>,
+    expandedTransactionId: Long?,
     deletingTransactionIds: Set<Long>,
     currencyCode: String,
     currencyFormat: NumberFormat,
@@ -46,7 +51,10 @@ internal fun LazyListScope.pastTransactionDateSections(
     onToggleDate: (LocalDate) -> Unit,
     onDelete: (Transaction) -> Unit,
     onEdit: (Transaction) -> Unit,
+    onMarkAsPaid: (Transaction) -> Unit = {},
     onClick: (Transaction) -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     if (!showPastPeriod) return
 
@@ -98,10 +106,14 @@ internal fun LazyListScope.pastTransactionDateSections(
                                 SwipeableExpenseItem(
                                     transaction = transaction,
                                     currencyFormat = currencyFormat,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                                     position = position,
                                     isBeingDeleted = isBeingDeleted,
+                                    isExpanded = expandedTransactionId == transaction.id,
                                     onDelete = { onDelete(transaction) },
                                     onEdit = { onEdit(transaction) },
+                                    onMarkAsPaid = { onMarkAsPaid(transaction) },
                                     readOnly = readOnly,
                                     onClick = { onClick(transaction) },
                                 )
@@ -112,6 +124,8 @@ internal fun LazyListScope.pastTransactionDateSections(
                             }
                         }
                     }
+
+
 
                     val totalText = currencyFormat.format(dayTotal)
                     Row(
@@ -155,19 +169,11 @@ private fun PastTransactionDateSectionsPreview() {
     )
     MinusTheme {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            pastTransactionDateSections(
-                showPastPeriod = true,
-                groupedPastTransactions = mapOf(pastDate to listOf(tx)),
-                expandedDates = setOf(pastDate),
-                deletingTransactionIds = emptySet(),
-                currencyCode = "USD",
-                currencyFormat = NumberFormat.getCurrencyInstance(),
-                readOnly = false,
-                onToggleDate = {},
-                onDelete = {},
-                onEdit = {},
-                onClick = {},
-            )
+            // Previews for shared transitions are complex, usually no-op or mock
+            item("preview") {
+                Text("Past Transaction Date Sections Preview")
+            }
+
         }
     }
 }

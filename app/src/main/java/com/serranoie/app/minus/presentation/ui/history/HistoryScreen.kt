@@ -1,6 +1,12 @@
 package com.serranoie.app.minus.presentation.ui.history
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +29,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.dialogs.DeleteRecurrentExpenseDialog
-import com.serranoie.app.minus.presentation.ui.history.dialogs.TransactionDetailDialog
 import com.serranoie.app.minus.presentation.ui.history.dialogs.TransactionEditDialog
 import com.serranoie.app.minus.presentation.ui.history.sections.budgetDisplaySection
 import com.serranoie.app.minus.presentation.ui.history.sections.currentPeriodRecurrentSection
@@ -45,7 +50,7 @@ enum class RecurrentPaymentsViewMode {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun HistoryScreen(
     modifier: Modifier = Modifier,
@@ -65,21 +70,29 @@ fun HistoryScreen(
         }
     }
 
-    History(
-        uiState = uiState,
-        modifier = modifier,
-        readOnly = readOnly,
-        onQueueDeleteWithUndo = onQueueDeleteWithUndo,
-        onCancelPendingDelete = onCancelPendingDelete,
-        onShowInfoSnackbar = onShowInfoSnackbar,
-        onProcessIntent = viewModel::processIntent,
-    )
+    SharedTransitionLayout {
+        AnimatedVisibility(visible = true) {
+            History(
+                uiState = uiState,
+                modifier = modifier,
+                readOnly = readOnly,
+                onQueueDeleteWithUndo = onQueueDeleteWithUndo,
+                onCancelPendingDelete = onCancelPendingDelete,
+                onShowInfoSnackbar = onShowInfoSnackbar,
+                onProcessIntent = viewModel::processIntent,
+                sharedTransitionScope = this@SharedTransitionLayout,
+                animatedVisibilityScope = this,
+            )
+        }
+    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun History(
     uiState: HistoryUiState,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
     readOnly: Boolean = false,
     onQueueDeleteWithUndo: (transaction: Transaction, message: String, onUndo: () -> Unit) -> Unit = { _, _, _ -> },
@@ -122,6 +135,7 @@ fun History(
             currentPeriodRecurrentSection(
                 upcomingRecurrentInPeriod = uiState.upcomingRecurrentInPeriod,
                 showUpcomingRecurrentInPeriod = uiState.showUpcomingRecurrentInPeriod,
+                expandedTransactionId = uiState.expandedTransactionId,
                 onToggleShowUpcomingRecurrentInPeriod = {
                     onProcessIntent(
                         HistoryUiIntent.ToggleUpcomingRecurrentInPeriod(!uiState.showUpcomingRecurrentInPeriod)
@@ -129,14 +143,33 @@ fun History(
                 },
                 recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
                 currencyFormat = currencyFormat,
-                onDelete = { tx -> onProcessIntent(HistoryUiIntent.SetRecurrentToDelete(tx)) },
-                onEdit = { tx -> onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(tx)) },
-                onClick = { tx -> onProcessIntent(HistoryUiIntent.SetSelectedTransaction(tx)) },
+                onDelete = { tx ->
+                    if (tx.isRecurrent) {
+                        onProcessIntent(HistoryUiIntent.SetRecurrentToDelete(tx))
+                    } else {
+                        onQueueDeleteWithUndo(
+                            tx,
+                            resources.getString(
+                                R.string.expense_deleted_format,
+                                tx.comment.ifEmpty { resources.getString(R.string.generic_expense) }
+                            ),
+                        ) { onCancelPendingDelete() }
+                        onProcessIntent(HistoryUiIntent.DeleteTransaction(tx))
+                    }
+                },
+                onEdit = { tx -> onProcessIntent(HistoryUiIntent.SetEditingTransaction(tx)) },
+                onMarkAsPaid = { tx ->
+                    onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
+                },
+                onClick = { tx -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(tx.id)) },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
             )
 
             transactionDateSections(
                 groupedTransactions = uiState.groupedCurrentTransactions,
                 expandedDates = uiState.expandedDates,
+                expandedTransactionId = uiState.expandedTransactionId,
                 deletingTransactionIds = uiState.pendingRemovedTransactions.keys,
                 currencyCode = currencyCode,
                 currencyFormat = currencyFormat,
@@ -156,12 +189,18 @@ fun History(
                     onProcessIntent(HistoryUiIntent.DeleteTransaction(tx))
                 },
                 onEdit = { tx -> onProcessIntent(HistoryUiIntent.SetEditingTransaction(tx)) },
-                onClick = { tx -> onProcessIntent(HistoryUiIntent.SetSelectedTransaction(tx)) },
+                onMarkAsPaid = { tx ->
+                    onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
+                },
+                onClick = { tx -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(tx.id)) },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
             )
 
             futureRecurrentSection(
                 futureRecurrentOutOfPeriod = uiState.futureRecurrentOutOfPeriod,
                 showOutOfPeriodSubscriptions = uiState.showOutOfPeriodSubscriptions,
+                expandedTransactionId = uiState.expandedTransactionId,
                 onToggleShowOutOfPeriodSubscriptions = {
                     onProcessIntent(
                         HistoryUiIntent.ToggleOutOfPeriodSubscriptions(!uiState.showOutOfPeriodSubscriptions)
@@ -171,7 +210,12 @@ fun History(
                 currencyFormat = currencyFormat,
                 onDelete = { tx -> onProcessIntent(HistoryUiIntent.SetRecurrentToDelete(tx)) },
                 onEdit = { tx -> onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(tx)) },
-                onClick = { tx -> onProcessIntent(HistoryUiIntent.SetSelectedTransaction(tx)) },
+                onMarkAsPaid = { tx ->
+                    onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
+                },
+                onClick = { tx -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(tx.id)) },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
             )
 
             pastPeriodToggleSection(
@@ -186,6 +230,7 @@ fun History(
                 showPastPeriod = uiState.showPastPeriod,
                 groupedPastTransactions = uiState.groupedPastTransactions,
                 expandedDates = uiState.expandedDates,
+                expandedTransactionId = uiState.expandedTransactionId,
                 deletingTransactionIds = uiState.pendingRemovedTransactions.keys,
                 currencyCode = currencyCode,
                 currencyFormat = currencyFormat,
@@ -204,8 +249,14 @@ fun History(
                     onProcessIntent(HistoryUiIntent.DeleteTransaction(tx))
                 },
                 onEdit = { tx -> onProcessIntent(HistoryUiIntent.SetEditingTransaction(tx)) },
-                onClick = { tx -> onProcessIntent(HistoryUiIntent.SetSelectedTransaction(tx)) },
+                onMarkAsPaid = { tx ->
+                    onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
+                },
+                onClick = { tx -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(tx.id)) },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
             )
+
 
             item("spacer-bottom") {
                 Spacer(modifier = Modifier.height(32.dp))
@@ -219,35 +270,6 @@ fun History(
                     .padding(32.dp),
             )
         }
-
-        TransactionDetailDialog(
-            transaction = uiState.selectedTransaction,
-            currencyFormat = currencyFormat,
-            readOnly = readOnly,
-            isDismissingTransactionDialog = uiState.isDismissingTransactionDialog,
-            onDismissStart = { onProcessIntent(HistoryUiIntent.SetDismissingDialog(true)) },
-            onDismiss = { onProcessIntent(HistoryUiIntent.SetSelectedTransaction(null)) },
-            onMarkAsPaid = { onProcessIntent(HistoryUiIntent.SetSelectedTransaction(null)) },
-            onEdit = { tx ->
-                onProcessIntent(HistoryUiIntent.SetSelectedTransaction(null))
-                onProcessIntent(HistoryUiIntent.SetEditingTransaction(tx))
-            },
-            onDelete = { tx ->
-                onProcessIntent(HistoryUiIntent.SetSelectedTransaction(null))
-                if (tx.isRecurrent) {
-                    onProcessIntent(HistoryUiIntent.SetRecurrentToDelete(tx))
-                } else {
-                    onQueueDeleteWithUndo(
-                        tx,
-                        resources.getString(
-                            R.string.expense_deleted_format,
-                            tx.comment.ifEmpty { resources.getString(R.string.generic_expense) }
-                        ),
-                    ) { onCancelPendingDelete() }
-                    onProcessIntent(HistoryUiIntent.DeleteTransaction(tx))
-                }
-            },
-        )
     }
 
     TransactionEditDialog(

@@ -11,12 +11,11 @@ sealed interface HistoryUiIntent {
     data class SetEditingTransaction(val transaction: Transaction?) : HistoryUiIntent
     data class SetRecurrentToDelete(val transaction: Transaction?) : HistoryUiIntent
     data class SetRecurrentToEdit(val transaction: Transaction?) : HistoryUiIntent
-    data class SetSelectedTransaction(val transaction: Transaction?) : HistoryUiIntent
     data object DismissDeleteRecurrentDialog : HistoryUiIntent
     data class TogglePastPeriod(val visible: Boolean) : HistoryUiIntent
     data class ToggleOutOfPeriodSubscriptions(val visible: Boolean) : HistoryUiIntent
     data class ToggleUpcomingRecurrentInPeriod(val visible: Boolean) : HistoryUiIntent
-    data class SetDismissingDialog(val dismissing: Boolean) : HistoryUiIntent
+    data class ToggleExpandedTransaction(val transactionId: Long?) : HistoryUiIntent
 
     data class DeleteTransaction(val transaction: Transaction) : HistoryUiIntent
     data class SaveEditedTransaction(val transaction: Transaction) : HistoryUiIntent
@@ -44,8 +43,7 @@ data class HistoryUiState(
     val recurrentToDelete: Transaction? = null,
     val recurrentToEdit: Transaction? = null,
     val showDeleteRecurrentDialog: Boolean = false,
-    val selectedTransaction: Transaction? = null,
-    val isDismissingTransactionDialog: Boolean = false,
+    val expandedTransactionId: Long? = null,
 
     val expandedDates: Set<LocalDate> = emptySet(),
     val showPastPeriod: Boolean = false,

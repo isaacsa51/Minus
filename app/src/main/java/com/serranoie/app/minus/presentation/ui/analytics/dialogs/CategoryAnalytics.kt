@@ -185,7 +185,9 @@ fun CategoryAnalytics(
                             modifier = Modifier.fillMaxWidth(),
                             transaction = transaction,
                             currencyFormat = currencyFormat,
-                            position = position
+                            position = position,
+                            sharedTransitionScope = null,
+                            animatedVisibilityScope = null
                         )
                     }
 

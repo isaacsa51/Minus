@@ -1,6 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.history.sections
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -29,15 +32,20 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 internal fun LazyListScope.currentPeriodRecurrentSection(
     upcomingRecurrentInPeriod: List<UpcomingRecurrentItem>,
     showUpcomingRecurrentInPeriod: Boolean,
+    expandedTransactionId: Long?,
     onToggleShowUpcomingRecurrentInPeriod: () -> Unit,
     recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
     currencyFormat: NumberFormat,
     onDelete: (Transaction) -> Unit,
     onEdit: (Transaction) -> Unit,
+    onMarkAsPaid: (Transaction) -> Unit = {},
     onClick: (Transaction) -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     if (upcomingRecurrentInPeriod.isEmpty()) return
 
@@ -71,9 +79,13 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
                     SwipeableUpcomingRecurrentItem(
                         item = item,
                         currencyFormat = currencyFormat,
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
                         position = position,
+                        isExpanded = expandedTransactionId == item.transaction.id,
                         onDelete = { onDelete(item.transaction) },
                         onEdit = { onEdit(item.transaction) },
+                        onMarkAsPaid = { onMarkAsPaid(item.transaction) },
                         onClick = { onClick(item.transaction) },
                     )
                 },
@@ -83,6 +95,8 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
         }
     }
 }
+
+
 
 @PreviewLightDark
 @Composable
@@ -106,13 +120,17 @@ private fun CurrentPeriodRecurrentSectionPreview() {
             currentPeriodRecurrentSection(
                 upcomingRecurrentInPeriod = listOf(sampleItem),
                 showUpcomingRecurrentInPeriod = true,
+                expandedTransactionId = null,
                 onToggleShowUpcomingRecurrentInPeriod = {},
                 recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
                 currencyFormat = NumberFormat.getCurrencyInstance(),
                 onDelete = {},
                 onEdit = {},
                 onClick = {},
+                sharedTransitionScope = null,
+                animatedVisibilityScope = null,
             )
         }
     }
 }
+

@@ -32,9 +32,6 @@ import com.serranoie.app.minus.presentation.ui.theme.headlineSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import java.time.LocalDateTime
 
-/**
- * Content for the "fake" dialog that displays transaction details.
- */
 @Composable
 fun ExpenseDetailContent(
 	transaction: Transaction,
@@ -54,30 +51,6 @@ fun ExpenseDetailContent(
 		verticalArrangement = Arrangement.spacedBy(8.dp),
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
-		Box(
-			modifier = Modifier
-				.background(Color.Black)
-				.padding(vertical = 8.dp, horizontal = 18.dp)
-		) {
-			Text(
-				text = if (isRecurrentExpense) "GASTO RECURRENTE" else "GASTO",
-				color = Color.White,
-				style = MaterialTheme.typography.labelLargeEmphasized,
-				fontWeight = FontWeight.Bold,
-				fontSize = TextUnit(26f, TextUnitType.Sp),
-				fontFamily = FontFamily.Monospace
-			)
-		}
-
-		Text(
-			text = "Num. de Operación: $operationNumber",
-			style = MaterialTheme.typography.bodyMediumCondensed,
-			color = MaterialTheme.colorScheme.onSurface,
-			textAlign = TextAlign.Center
-		)
-
-		HorizontalDivider()
-
 		Text(
 			text = "MONTO TOTAL",
 			style = MaterialTheme.typography.labelLargeCondensed,

@@ -1,5 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.expense
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,6 +26,7 @@ import java.util.Locale
 
 private const val SWIPE_ACTION_THRESHOLD = 0.25f
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SwipeableExpenseItem(
     transaction: Transaction,
@@ -32,7 +36,11 @@ fun SwipeableExpenseItem(
     onEdit: () -> Unit,
     readOnly: Boolean,
     isBeingDeleted: Boolean = false,
-    onClick: () -> Unit = {}
+    isExpanded: Boolean = false,
+    onClick: () -> Unit = {},
+    onMarkAsPaid: () -> Unit = {},
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val shape = when (position) {
         PaddedListItemPosition.First -> RoundedCornerShape(
@@ -64,59 +72,75 @@ fun SwipeableExpenseItem(
                 transaction = transaction,
                 currencyFormat = currencyFormat,
                 position = position,
+                isExpanded = isExpanded,
                 onClick = onClick,
+                onEdit = onEdit,
+                onDelete = onDelete,
+                onMarkAsPaid = onMarkAsPaid,
+                readOnly = readOnly,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
             )
         }
     } else {
-        Surface(
+        SwipeActions(
+            modifier = Modifier.fillMaxWidth(),
             shape = shape,
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            SwipeActions(
-                modifier = Modifier.fillMaxWidth(),
-                shape = shape,
-                enabled = !isBeingDeleted,
-                startActionsConfig = SwipeActionsConfig(
-                    threshold = SWIPE_ACTION_THRESHOLD,
-                    icon = Icons.Default.Edit,
-                    iconTint = MaterialTheme.colorScheme.onPrimary,
-                    background = MaterialTheme.colorScheme.primary,
-                    backgroundActive = MaterialTheme.colorScheme.primary,
-                    stayDismissed = false,
-                    onDismiss = onEdit
-                ),
-                endActionsConfig = SwipeActionsConfig(
-                    threshold = SWIPE_ACTION_THRESHOLD,
-                    icon = Icons.Default.Delete,
-                    iconTint = MaterialTheme.colorScheme.onError,
-                    background = MaterialTheme.colorScheme.error,
-                    backgroundActive = MaterialTheme.colorScheme.error,
-                    stayDismissed = true,
-                    onDismiss = onDelete
-                )
-            ) {
-                ExpenseItem(
-                    modifier = Modifier,
-                    transaction = transaction,
-                    currencyFormat = currencyFormat,
-                    position = position,
-                    onClick = onClick,
-                )
-            }
+            enabled = !isBeingDeleted,
+            startActionsConfig = SwipeActionsConfig(
+                threshold = SWIPE_ACTION_THRESHOLD,
+                icon = Icons.Default.Edit,
+                iconTint = MaterialTheme.colorScheme.onPrimary,
+                background = MaterialTheme.colorScheme.primary,
+                backgroundActive = MaterialTheme.colorScheme.primary,
+                stayDismissed = false,
+                onDismiss = onEdit
+            ),
+            endActionsConfig = SwipeActionsConfig(
+                threshold = SWIPE_ACTION_THRESHOLD,
+                icon = Icons.Default.Delete,
+                iconTint = MaterialTheme.colorScheme.onError,
+                background = MaterialTheme.colorScheme.error,
+                backgroundActive = MaterialTheme.colorScheme.error,
+                stayDismissed = true,
+                onDismiss = onDelete
+            )
+        ) { _ ->
+            ExpenseItem(
+                modifier = Modifier,
+                transaction = transaction,
+                currencyFormat = currencyFormat,
+                position = position,
+                isExpanded = isExpanded,
+                onClick = onClick,
+                onEdit = onEdit,
+                onDelete = onDelete,
+                onMarkAsPaid = onMarkAsPaid,
+                readOnly = readOnly,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+            )
         }
+
     }
+
 }
 
+
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SwipeableUpcomingRecurrentItem(
     item: UpcomingRecurrentItem,
     currencyFormat: NumberFormat,
     position: PaddedListItemPosition,
     isOutOfPeriod: Boolean = false,
+    isExpanded: Boolean = false,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
-    onClick: () -> Unit = {}
+    onMarkAsPaid: () -> Unit = {},
+    onClick: () -> Unit = {},
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val shape = when (position) {
         PaddedListItemPosition.First -> RoundedCornerShape(
@@ -137,47 +161,53 @@ fun SwipeableUpcomingRecurrentItem(
         PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
     }
 
-    Surface(
+    SwipeActions(
+        modifier = Modifier.fillMaxWidth(),
         shape = shape,
-        color = if (isOutOfPeriod) {
+        background = if (isOutOfPeriod) {
             MaterialTheme.colorScheme.surfaceVariant
         } else {
             MaterialTheme.colorScheme.surfaceContainer
         },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        SwipeActions(
-            modifier = Modifier.fillMaxWidth(),
-            shape = shape,
-            startActionsConfig = SwipeActionsConfig(
-                threshold = SWIPE_ACTION_THRESHOLD,
-                icon = Icons.Default.Edit,
-                iconTint = MaterialTheme.colorScheme.onPrimary,
-                background = MaterialTheme.colorScheme.primary,
-                backgroundActive = MaterialTheme.colorScheme.primary,
-                stayDismissed = false,
-                onDismiss = onEdit
-            ),
-            endActionsConfig = SwipeActionsConfig(
-                threshold = SWIPE_ACTION_THRESHOLD,
-                icon = Icons.Default.Delete,
-                iconTint = MaterialTheme.colorScheme.onError,
-                background = MaterialTheme.colorScheme.error,
-                backgroundActive = MaterialTheme.colorScheme.error,
-                stayDismissed = true,
-                onDismiss = onDelete
-            )
-        ) {
-            UpcomingRecurrentItemRow(
-                item = item,
-                currencyFormat = currencyFormat,
-                position = position,
-                isOutOfPeriod = isOutOfPeriod,
-                onClick = onClick
-            )
-        }
+        startActionsConfig = SwipeActionsConfig(
+            threshold = SWIPE_ACTION_THRESHOLD,
+            icon = Icons.Default.Edit,
+            iconTint = MaterialTheme.colorScheme.onPrimary,
+            background = MaterialTheme.colorScheme.primary,
+            backgroundActive = MaterialTheme.colorScheme.primary,
+            stayDismissed = false,
+            onDismiss = onEdit
+        ),
+        endActionsConfig = SwipeActionsConfig(
+            threshold = SWIPE_ACTION_THRESHOLD,
+            icon = Icons.Default.Delete,
+            iconTint = MaterialTheme.colorScheme.onError,
+            background = MaterialTheme.colorScheme.error,
+            backgroundActive = MaterialTheme.colorScheme.error,
+            stayDismissed = true,
+            onDismiss = onDelete
+        )
+    ) { _ ->
+        UpcomingRecurrentItemRow(
+            item = item,
+            currencyFormat = currencyFormat,
+            position = position,
+            isOutOfPeriod = isOutOfPeriod,
+            isExpanded = isExpanded,
+            onClick = onClick,
+            onEdit = onEdit,
+            onDelete = onDelete,
+            onMarkAsPaid = onMarkAsPaid,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope,
+        )
     }
 }
+
+
+
+
+
 
 @Preview
 @Composable
@@ -198,7 +228,9 @@ private fun SwipeableExpenseItemPreview() {
             onEdit = {},
             readOnly = false,
             isBeingDeleted = false,
-            onClick = {}
+            onClick = {},
+            sharedTransitionScope = null,
+            animatedVisibilityScope = null,
         )
     }
 }
@@ -225,7 +257,10 @@ private fun SwipeableUpcomingRecurrentItemPreview() {
             isOutOfPeriod = false,
             onDelete = {},
             onEdit = {},
-            onClick = {}
+            onClick = {},
+            sharedTransitionScope = null,
+            animatedVisibilityScope = null,
         )
     }
 }
+

@@ -193,9 +193,9 @@ class HistoryScreenE2ETest {
         composeTestRule.onNodeWithText("Coffee").performClick()
 
         Truth.assertThat(capturedIntent)
-            .isInstanceOf(HistoryUiIntent.SetSelectedTransaction::class.java)
-        val selectedTx = (capturedIntent as HistoryUiIntent.SetSelectedTransaction).transaction
-        Truth.assertThat(selectedTx?.comment).isEqualTo("Coffee")
+            .isInstanceOf(HistoryUiIntent.ToggleExpandedTransaction::class.java)
+        val transactionId = (capturedIntent as HistoryUiIntent.ToggleExpandedTransaction).transactionId
+        Truth.assertThat(transactionId).isEqualTo(transactions.find { it.comment == "Coffee" }?.id)
     }
 
     @Test
@@ -307,8 +307,8 @@ class HistoryScreenE2ETest {
                     modifier = Modifier.fillMaxSize(),
                     onProcessIntent = { intent ->
                         when (intent) {
-                            is HistoryUiIntent.SetSelectedTransaction -> {
-                                uiState = uiState.copy(selectedTransaction = intent.transaction)
+                            is HistoryUiIntent.ToggleExpandedTransaction -> {
+                                uiState = uiState.copy(expandedTransactionId = intent.transactionId)
                             }
 
                             is HistoryUiIntent.DeleteTransaction -> {
@@ -318,7 +318,7 @@ class HistoryScreenE2ETest {
                                     transactions = newTransactions,
                                     displayTransactions = newTransactions,
                                     groupedCurrentTransactions = mapOf(today to newTransactions),
-                                    selectedTransaction = null
+                                    expandedTransactionId = null
                                 )
                             }
 
@@ -362,14 +362,14 @@ class HistoryScreenE2ETest {
                     modifier = Modifier.fillMaxSize(),
                     onProcessIntent = { intent ->
                         when (intent) {
-                            is HistoryUiIntent.SetSelectedTransaction -> {
-                                uiState = uiState.copy(selectedTransaction = intent.transaction)
+                            is HistoryUiIntent.ToggleExpandedTransaction -> {
+                                uiState = uiState.copy(expandedTransactionId = intent.transactionId)
                             }
 
                             is HistoryUiIntent.SetEditingTransaction -> {
                                 uiState = uiState.copy(
                                     editingTransaction = intent.transaction,
-                                    selectedTransaction = null
+                                    expandedTransactionId = null
                                 )
                             }
 

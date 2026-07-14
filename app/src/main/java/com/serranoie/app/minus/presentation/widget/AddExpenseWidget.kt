@@ -46,6 +46,7 @@ class AddExpenseWidget : GlanceAppWidget() {
         }
     }
 
+    // TODO: DELETE HARDODED STRINGS
     @Composable
     internal fun AddExpenseContent(
         label: String = "Add new expense",

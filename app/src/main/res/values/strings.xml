@@ -536,4 +536,5 @@
     <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
     <string name="ticket_total_amount">TOTAL AMOUNT</string>
     <string name="mark_as_paid">Mark as paid</string>
+    <string name="mark_as_paid_success">Marked as paid</string>
 </resources>

@@ -82,11 +82,6 @@ class HistoryViewModel @Inject constructor(
             is HistoryUiIntent.SetRecurrentToEdit -> _uiState.value =
                 _uiState.value.copy(recurrentToEdit = intent.transaction)
 
-            is HistoryUiIntent.SetSelectedTransaction -> _uiState.value = _uiState.value.copy(
-                selectedTransaction = intent.transaction,
-                isDismissingTransactionDialog = false,
-            )
-
             is HistoryUiIntent.DismissDeleteRecurrentDialog -> _uiState.value = _uiState.value.copy(
                 recurrentToDelete = null,
                 showDeleteRecurrentDialog = false,
@@ -101,14 +96,21 @@ class HistoryViewModel @Inject constructor(
             is HistoryUiIntent.ToggleUpcomingRecurrentInPeriod -> _uiState.value =
                 _uiState.value.copy(showUpcomingRecurrentInPeriod = intent.visible)
 
-            is HistoryUiIntent.SetDismissingDialog -> _uiState.value =
-                _uiState.value.copy(isDismissingTransactionDialog = intent.dismissing)
-
             is HistoryUiIntent.DeleteTransaction -> deleteTransaction(intent.transaction)
             is HistoryUiIntent.SaveEditedTransaction -> saveEditedTransaction(intent.transaction)
             is HistoryUiIntent.ConfirmDeleteRecurrent -> confirmDeleteRecurrent(intent.transaction)
             is HistoryUiIntent.SetLockSwipeable -> _uiState.value =
                 _uiState.value.copy(lockSwipeable = intent.locked)
+
+            is HistoryUiIntent.ToggleExpandedTransaction -> toggleExpandedTransaction(intent.transactionId)
+        }
+    }
+
+    private fun toggleExpandedTransaction(id: Long?) {
+        _uiState.update { state ->
+            state.copy(
+                expandedTransactionId = if (state.expandedTransactionId == id) null else id
+            )
         }
     }
 

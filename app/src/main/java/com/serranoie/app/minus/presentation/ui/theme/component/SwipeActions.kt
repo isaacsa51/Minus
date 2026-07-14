@@ -1,51 +1,73 @@
 package com.serranoie.app.minus.presentation.ui.theme.component
 
-import android.view.HapticFeedbackConstants
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.BoundsTransform
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.SharedTransitionScope.OverlayClip
-import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.scaleToBounds
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutSlowInEasing
+import android.view.MotionEvent
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
-private const val SWIPE_ACTION_SHARED_TRANSITION_DURATION_MS = 700
-
-/**
- * Configuration for swipe actions.
- */
 data class SwipeActionsConfig(
     val threshold: Float,
     val icon: ImageVector,
@@ -66,235 +88,241 @@ val DefaultSwipeActionsConfig = SwipeActionsConfig(
     onDismiss = {},
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SwipeActions(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
     enabled: Boolean = true,
+    background: Color = MaterialTheme.colorScheme.surface,
     startActionsConfig: SwipeActionsConfig = DefaultSwipeActionsConfig,
     endActionsConfig: SwipeActionsConfig = DefaultSwipeActionsConfig,
-    content: @Composable () -> Unit,
+    showTutorial: Boolean = false,
+    content: @Composable (SwipeToDismissBoxState) -> Unit,
 ) {
-    val view = LocalView.current
-    
-    // Track if user has crossed threshold for haptic
-    var hasTriggeredHaptic by remember { mutableStateOf(false) }
-    
-    // Track if action will trigger based on threshold
-    var willDismiss by remember { mutableStateOf(false) }
+    val currentEnabled by rememberUpdatedState(enabled)
+    val currentBackground by rememberUpdatedState(background)
+    val currentStartActionsConfig by rememberUpdatedState(startActionsConfig)
+    val currentEndActionsConfig by rememberUpdatedState(endActionsConfig)
+    val currentShape by rememberUpdatedState(shape)
+    val currentContent by rememberUpdatedState(content)
 
-    val state = rememberSwipeToDismissBoxState(
-        positionalThreshold = { distance -> 
-            // Use the larger threshold of the two configs
-            val threshold = maxOf(startActionsConfig.threshold, endActionsConfig.threshold)
-            distance * threshold 
-        }
-    )
-    
-    LaunchedEffect(enabled) {
-        if (!enabled) {
-            hasTriggeredHaptic = false
-            willDismiss = false
-        }
-    }
-    
-    val currentConfig = when (state.dismissDirection) {
-        SwipeToDismissBoxValue.StartToEnd -> endActionsConfig
-        SwipeToDismissBoxValue.EndToStart -> startActionsConfig
-        else -> null
-    }
+    BoxWithConstraints(modifier) {
+        val width = constraints.maxWidth.toFloat()
+        val haptic = LocalHapticFeedback.current
 
-    LaunchedEffect(state.progress, state.dismissDirection) {
-        val threshold = currentConfig?.threshold ?: 0.32f
-        val newWillDismiss = state.progress >= threshold
-        
-        // Trigger haptic when crossing threshold
-        if (newWillDismiss && !hasTriggeredHaptic && state.dismissDirection != SwipeToDismissBoxValue.Settled) {
-            @Suppress("DEPRECATION")
-            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            hasTriggeredHaptic = true
-        } else if (!newWillDismiss) {
-            hasTriggeredHaptic = false
+        var willDismissDirection: SwipeToDismissBoxValue? by remember {
+            mutableStateOf(null)
         }
-        
-        willDismiss = newWillDismiss
-    }
 
-    LaunchedEffect(state.currentValue) {
-        when (state.currentValue) {
-            SwipeToDismissBoxValue.EndToStart -> {
-                startActionsConfig.onDismiss()
-                hasTriggeredHaptic = false
-                if (!startActionsConfig.stayDismissed) {
-                    state.snapTo(SwipeToDismissBoxValue.Settled)
+        val state = rememberSwipeToDismissBoxState(
+            confirmValueChange = { value ->
+                if (!currentEnabled) return@rememberSwipeToDismissBoxState false
+                when (value) {
+                    SwipeToDismissBoxValue.EndToStart -> {
+                        if (currentStartActionsConfig == DefaultSwipeActionsConfig) return@rememberSwipeToDismissBoxState false
+                        currentStartActionsConfig.onDismiss()
+                        currentStartActionsConfig.stayDismissed
+                    }
+
+                    SwipeToDismissBoxValue.StartToEnd -> {
+                        if (currentEndActionsConfig == DefaultSwipeActionsConfig) return@rememberSwipeToDismissBoxState false
+                        currentEndActionsConfig.onDismiss()
+                        currentEndActionsConfig.stayDismissed
+                    }
+
+                    else -> false
                 }
             }
-            SwipeToDismissBoxValue.StartToEnd -> {
-                endActionsConfig.onDismiss()
-                hasTriggeredHaptic = false
-                if (!endActionsConfig.stayDismissed) {
-                    state.snapTo(SwipeToDismissBoxValue.Settled)
+        )
+
+        var showingTutorial by remember { mutableStateOf(showTutorial) }
+
+        LaunchedEffect(Unit) {
+            snapshotFlow {
+                runCatching { state.requireOffset() }.getOrDefault(0f)
+            }.collect { offset ->
+                willDismissDirection = when {
+                    offset > width * currentEndActionsConfig.threshold -> SwipeToDismissBoxValue.StartToEnd
+                    offset < -width * currentStartActionsConfig.threshold -> SwipeToDismissBoxValue.EndToStart
+                    else -> null
                 }
             }
-            else -> {}
         }
-    }
 
-    val iconScale by animateFloatAsState(
-        targetValue = if (willDismiss) 1.3f else 1f,
-        animationSpec = if (willDismiss) {
-            spring(
-                dampingRatio = Spring.DampingRatioHighBouncy,
-                stiffness = Spring.StiffnessMedium
-            )
-        } else {
-            spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = Spring.StiffnessMedium
-            )
-        },
-        label = "iconScale"
-    )
+        LaunchedEffect(willDismissDirection) {
+            if (willDismissDirection != null) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            }
+        }
 
-    SwipeToDismissBox(
-        modifier = modifier,
-        state = state,
-        backgroundContent = {
-            val direction = state.dismissDirection
-            
-            if (direction != SwipeToDismissBoxValue.Settled && state.progress > 0f) {
-                val config = currentConfig ?: return@SwipeToDismissBox
-                
-                val alignment = when (direction) {
-                    SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
-                    SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
-                    else -> Alignment.Center
+        SwipeToDismissBox(
+            state = state,
+            modifier = Modifier
+                .clip(currentShape)
+                .pointerInteropFilter {
+                    if (it.action == MotionEvent.ACTION_DOWN) {
+                        showingTutorial = false
+                    }
+                    false
+                },
+            enableDismissFromStartToEnd = currentEnabled && currentEndActionsConfig != DefaultSwipeActionsConfig,
+            enableDismissFromEndToStart = currentEnabled && currentStartActionsConfig != DefaultSwipeActionsConfig,
+            backgroundContent = {
+                val direction = state.dismissDirection
+                val isActivating = willDismissDirection != null
+
+                AnimatedContent(
+                    targetState = direction to isActivating,
+                    transitionSpec = {
+                        fadeIn(tween(0), initialAlpha = if (targetState.second) 1f else 0f) togetherWith
+                                fadeOut(tween(0), targetAlpha = if (targetState.second) 0.7f else 0f)
+                    },
+                    label = "background_content"
+                ) { (dir, activating) ->
+                    val revealSize = remember { Animatable(if (activating) 0f else 1f) }
+                    val iconSize = remember { Animatable(if (activating) 1f else 1.25f) }
+
+                    LaunchedEffect(activating) {
+                        if (activating) {
+                            revealSize.snapTo(0f)
+                            launch { revealSize.animateTo(1f, animationSpec = tween(400)) }
+                            iconSize.snapTo(1f)
+                            iconSize.animateTo(
+                                1.6f,
+                                spring(dampingRatio = Spring.DampingRatioHighBouncy)
+                            )
+                            iconSize.animateTo(
+                                1.25f,
+                                spring(dampingRatio = Spring.DampingRatioLowBouncy)
+                            )
+                        }
+                    }
+
+                    val config = when (dir) {
+                        SwipeToDismissBoxValue.StartToEnd -> currentEndActionsConfig
+                        SwipeToDismissBoxValue.EndToStart -> currentStartActionsConfig
+                        else -> null
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(
+                                CirclePath(
+                                    revealSize.value,
+                                    dir == SwipeToDismissBoxValue.StartToEnd
+                                )
+                            )
+                            .background(
+                                color = when (dir) {
+                                    SwipeToDismissBoxValue.StartToEnd -> if (activating) currentEndActionsConfig.backgroundActive else Color.Transparent
+                                    SwipeToDismissBoxValue.EndToStart -> if (activating) currentStartActionsConfig.backgroundActive else Color.Transparent
+                                    else -> Color.Transparent
+                                }
+                            )
+                    ) {
+                        if (config != null) {
+                            Box(
+                                modifier = Modifier
+                                    .align(
+                                        if (dir == SwipeToDismissBoxValue.StartToEnd) Alignment.CenterStart
+                                        else Alignment.CenterEnd
+                                    )
+                                    .fillMaxHeight()
+                                    .aspectRatio(1f)
+                                    .scale(iconSize.value)
+                                    .offset {
+                                        IntOffset(
+                                            x = 0,
+                                            y = (10 * (1.25f - iconSize.value)).roundToInt()
+                                        )
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = rememberVectorPainter(image = config.icon),
+                                    colorFilter = ColorFilter.tint(if (activating) config.iconTint else config.background),
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(horizontal = 20.dp)
+                                )
+                            }
+                        }
+                    }
                 }
-                
-                // Background color animation - invert when willDismiss
-                val backgroundColor = if (willDismiss) {
-                    config.backgroundActive
-                } else {
-                    config.background.copy(alpha = 0.6f)
+            }
+        ) {
+
+            val currentOffset by remember {
+                derivedStateOf { runCatching { state.requireOffset() }.getOrDefault(0f) }
+            }
+
+            val animateCorners by remember {
+                derivedStateOf {
+                    currentOffset.absoluteValue > 30
                 }
-                
+            }
+
+            val cornerAnim by animateDpAsState(
+                targetValue = if (animateCorners) 16.dp else 0.dp,
+                animationSpec = tween(200),
+                label = "corners"
+            )
+
+            val swipingStart = state.dismissDirection == SwipeToDismissBoxValue.StartToEnd
+            val swipingEnd = state.dismissDirection == SwipeToDismissBoxValue.EndToStart
+
+            val currentShapeInner = remember(animateCorners, currentShape, cornerAnim, swipingStart, swipingEnd) {
+                RoundedCornerShape(
+                    topStart = if (swipingStart && animateCorners) cornerAnim else 16.dp,
+                    bottomStart = if (swipingStart && animateCorners) cornerAnim else 16.dp,
+                    topEnd = if (swipingEnd && animateCorners) cornerAnim else 16.dp,
+                    bottomEnd = if (swipingEnd && animateCorners) cornerAnim else 16.dp
+                )
+            }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = currentBackground,
+                shape = currentShape
+            ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            color = backgroundColor,
-                            shape = shape
-                        ),
-                    contentAlignment = alignment
-                ) {
-                    // Animate tint separately from scale
-                    val iconTint by animateColorAsState(
-                        targetValue = if (willDismiss) config.iconTint else config.iconTint.copy(alpha = 0.7f),
-                        animationSpec = tween(150),
-                        label = "iconTint"
-                    )
-                    
-                    Icon(
-                        imageVector = config.icon,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(horizontal = 18.dp)
-                            .graphicsLayer {
-                                scaleX = iconScale
-                                scaleY = iconScale
-                            },
-                        tint = iconTint
-                    )
+                        .graphicsLayer {
+                            shadowElevation =
+                                if (animateCorners) 6f * (currentOffset.absoluteValue / width).coerceIn(
+                                    0f,
+                                    1f
+                                ) else 0f
+                        }
+                        .clip(currentShapeInner)) {
+                    currentContent(state)
                 }
             }
         }
-    ) {
-        content()
     }
+
 }
 
-/**
- * SwipeActions with shared element transition support for smooth morphing animations.
- * Use this when the swipe action item should animate into a detail view (like TicketView).
- *
- * @param modifier Modifier for the swipe container
- * @param shape Shape for the background
- * @param enabled Whether swipe is enabled
- * @param startActionsConfig Configuration for start (left) swipe action
- * @param endActionsConfig Configuration for end (right) swipe action
- * @param sharedTransitionScope The shared transition scope from SharedTransitionLayout
- * @param animatedVisibilityScope The animated visibility scope
- * @param sharedContentKey Unique key to identify this item for shared element transitions
- * @param content The swipeable content
- */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
-@Composable
-fun SwipeActionsWithSharedTransition(
-    modifier: Modifier = Modifier,
-    shape: Shape = MaterialTheme.shapes.medium,
-    enabled: Boolean = true,
-    startActionsConfig: SwipeActionsConfig = DefaultSwipeActionsConfig,
-    endActionsConfig: SwipeActionsConfig = DefaultSwipeActionsConfig,
-    sharedTransitionScope: SharedTransitionScope? = null,
-    animatedVisibilityScope: AnimatedVisibilityScope? = null,
-    sharedContentKey: Any? = null,
-    content: @Composable () -> Unit,
-) {
-    val wrappedContent: @Composable () -> Unit = {
-        if (sharedTransitionScope != null && animatedVisibilityScope != null && sharedContentKey != null) {
-            with(sharedTransitionScope) {
-                Box(
-                    modifier = Modifier.swipeActionSharedBounds(
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        sharedContentKey = sharedContentKey
-                    )
-                ) {
-                    content()
-                }
+class CirclePath(private val progress: Float, private val start: Boolean) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density,
+    ): Outline {
+        val origin = Offset(
+            x = if (start) 0f else size.width,
+            y = size.center.y,
+        )
+
+        val radius = (sqrt(
+            size.height * size.height + size.width * size.width
+        ) * 1.5f) * progress
+
+        return Outline.Generic(
+            Path().apply {
+                addOval(Rect(center = origin, radius = radius))
             }
-        } else {
-            content()
-        }
-    }
-
-    SwipeActions(
-        modifier = modifier,
-        shape = shape,
-        enabled = enabled,
-        startActionsConfig = startActionsConfig,
-        endActionsConfig = endActionsConfig,
-        content = wrappedContent
-    )
-}
-
-/**
- * Applies shared element bounds transformation to enable smooth morphing animations.
- */
-@OptIn(ExperimentalSharedTransitionApi::class)
-@Composable
-private fun Modifier.swipeActionSharedBounds(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope,
-    sharedContentKey: Any
-): Modifier {
-    return with(sharedTransitionScope) {
-        this@swipeActionSharedBounds.sharedBounds(
-            sharedContentState = rememberSharedContentState(key = sharedContentKey),
-            animatedVisibilityScope = animatedVisibilityScope,
-            boundsTransform = swipeActionBoundsTransform,
-            resizeMode = scaleToBounds(),
-            clipInOverlayDuringTransition = OverlayClip(
-                clipShape = RoundedCornerShape(16.dp)
-            )
         )
     }
-}
-
-private val swipeActionBoundsTransform = BoundsTransform { _, _ ->
-    tween(
-        durationMillis = SWIPE_ACTION_SHARED_TRANSITION_DURATION_MS,
-        easing = FastOutSlowInEasing
-    )
 }

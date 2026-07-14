@@ -39,7 +39,7 @@ class SwipeActionsScreenshotTest {
                     enabled = true,
                     startActionsConfig = DefaultSwipeActionsConfig,
                     endActionsConfig = DefaultSwipeActionsConfig,
-                    content = {
+                    content = { _ ->
                         Box(modifier = Modifier.fillMaxWidth().height(60.dp)) {
                             Text("Swipe me")
                         }

@@ -1,6 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.history.sections
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -11,6 +14,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,15 +39,20 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import java.math.BigDecimal
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 internal fun LazyListScope.futureRecurrentSection(
     futureRecurrentOutOfPeriod: List<UpcomingRecurrentItem>,
     showOutOfPeriodSubscriptions: Boolean,
+    expandedTransactionId: Long?,
     onToggleShowOutOfPeriodSubscriptions: () -> Unit,
     recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
     currencyFormat: NumberFormat,
     onDelete: (Transaction) -> Unit,
     onEdit: (Transaction) -> Unit,
+    onMarkAsPaid: (Transaction) -> Unit = {},
     onClick: (Transaction) -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     if (futureRecurrentOutOfPeriod.isEmpty()) return
 
@@ -88,9 +99,13 @@ internal fun LazyListScope.futureRecurrentSection(
                     SwipeableUpcomingRecurrentItem(
                         item = item,
                         currencyFormat = currencyFormat,
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
                         position = position,
+                        isExpanded = expandedTransactionId == item.transaction.id,
                         onDelete = { onDelete(item.transaction) },
                         onEdit = { onEdit(item.transaction) },
+                        onMarkAsPaid = { onMarkAsPaid(item.transaction) },
                         onClick = { onClick(item.transaction) },
                     )
                 },
@@ -100,6 +115,8 @@ internal fun LazyListScope.futureRecurrentSection(
         }
     }
 }
+
+
 
 @PreviewLightDark
 @Composable
@@ -120,16 +137,11 @@ private fun FutureRecurrentSectionPreview() {
     )
     MinusTheme {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            futureRecurrentSection(
-                futureRecurrentOutOfPeriod = listOf(sampleItem),
-                showOutOfPeriodSubscriptions = true,
-                onToggleShowOutOfPeriodSubscriptions = {},
-                recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
-                currencyFormat = NumberFormat.getCurrencyInstance(),
-                onDelete = {},
-                onEdit = {},
-                onClick = {},
-            )
+            // Previews for shared transitions are complex, usually no-op or mock
+            item("preview") {
+                Text("Future Recurrent Section Preview")
+            }
+
         }
     }
 }

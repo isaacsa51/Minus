@@ -463,4 +463,5 @@
     <string name="ticket_recurrent_expense">GASTO RECURRENTE</string>
     <string name="ticket_total_amount">MONTO TOTAL</string>
     <string name="mark_as_paid">Marcar como pagado</string>
+    <string name="mark_as_paid_success">Marcado como pagado</string>
 </resources>
