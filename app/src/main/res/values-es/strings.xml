@@ -452,7 +452,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Sin fecha</string>
     <string name="no_name">Sin nombre</string>
-    <string name="description">Descripción</string>
+    <string name="description">Razón de Compra</string>
     <string name="date">Fecha</string>
     <string name="frequency">Frecuencia</string>
     <string name="charge_day">Día de cobro</string>

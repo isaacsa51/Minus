@@ -452,7 +452,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Sans date</string>
     <string name="no_name">Sans nom</string>
-    <string name="description">Libellé</string>
+    <string name="description">Motif d\'achat</string>
     <string name="date">Date</string>
     <string name="frequency">Fréquence</string>
     <string name="charge_day">Jour de facturation</string>

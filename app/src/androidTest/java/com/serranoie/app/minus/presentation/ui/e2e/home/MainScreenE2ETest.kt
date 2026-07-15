@@ -1,5 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.e2e.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -295,17 +298,24 @@ class MainScreenE2ETest {
         }
     }
 
+    @OptIn(ExperimentalSharedTransitionApi::class)
     private fun setHistoryContent(
         uiState: HistoryUiState = HistoryUiState(),
         capturedIntents: MutableList<Any> = mutableListOf(),
     ) {
         composeTestRule.setContent {
             MinusTheme {
-                History(
-                    uiState = uiState,
-                    modifier = Modifier.fillMaxSize(),
-                    onProcessIntent = { capturedIntents += "Intent:$it" },
-                )
+                SharedTransitionLayout {
+                    AnimatedVisibility(visible = true) {
+                        History(
+                            uiState = uiState,
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedVisibilityScope = this,
+                            modifier = Modifier.fillMaxSize(),
+                            onProcessIntent = { capturedIntents += "Intent:$it" },
+                        )
+                    }
+                }
             }
         }
     }

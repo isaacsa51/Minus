@@ -307,7 +307,7 @@ val GoogleSansFlexTitleSmallCondensed = FontFamily(
     Font(
         R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
-            FontVariation.weight(600),
+            FontVariation.weight(400),
             FontVariation.width(85f),
             roundness(100f)
         )

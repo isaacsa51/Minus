@@ -1,5 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.e2e.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -830,23 +833,30 @@ class MainScreenCoverageTest {
         composeTestRule.waitForIdle()
     }
 
+    @OptIn(ExperimentalSharedTransitionApi::class)
     @Test
     fun when_history_has_no_transactions_then_no_transactions_view_is_displayed() {
         val intents = mutableListOf<Any>()
         composeTestRule.setContent {
             MinusTheme {
-                History(
-                    uiState = HistoryUiState(
-                        budgetSettings = sampleBudgetSettings(),
-                        budgetState = sampleBudgetState(),
-                        transactions = emptyList(),
-                    ),
-                    modifier = Modifier.fillMaxSize(),
-                    onQueueDeleteWithUndo = { _, _, _ -> },
-                    onCancelPendingDelete = {},
-                    onShowInfoSnackbar = {},
-                    onProcessIntent = { intents += "Intent:$it" },
-                )
+                SharedTransitionLayout {
+                    AnimatedVisibility(visible = true) {
+                        History(
+                            uiState = HistoryUiState(
+                                budgetSettings = sampleBudgetSettings(),
+                                budgetState = sampleBudgetState(),
+                                transactions = emptyList(),
+                            ),
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedVisibilityScope = this,
+                            modifier = Modifier.fillMaxSize(),
+                            onQueueDeleteWithUndo = { _, _, _ -> },
+                            onCancelPendingDelete = {},
+                            onShowInfoSnackbar = {},
+                            onProcessIntent = { intents += "Intent:$it" },
+                        )
+                    }
+                }
             }
         }
 
