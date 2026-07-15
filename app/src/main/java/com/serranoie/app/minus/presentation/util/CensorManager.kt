@@ -75,7 +75,7 @@ class CensorManager @Inject constructor(
 		censorToggleJob = null
 	}
 
-	private fun toggleCensor() {
+	fun toggleCensor() {
 		val newState = !_isCensored.value
 		_isCensored.value = newState
 
@@ -84,6 +84,15 @@ class CensorManager @Inject constructor(
 		Toast.makeText(context, context.getString(messageRes), Toast.LENGTH_SHORT).show()
 
 		logcat { "Censor mode toggled: $newState (after 0.8s hold)" }
+	}
+
+	fun setCensored(enabled: Boolean) {
+		if (_isCensored.value == enabled) return
+		_isCensored.value = enabled
+		val messageRes = if (enabled) R.string.censor_mode_toast_enabled
+		else R.string.censor_mode_toast_disabled
+		Toast.makeText(context, context.getString(messageRes), Toast.LENGTH_SHORT).show()
+		logcat { "Censor mode manually set: $enabled" }
 	}
 
 	override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}

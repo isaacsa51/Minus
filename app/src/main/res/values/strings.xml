@@ -269,6 +269,8 @@
     <string name="settings_typography_subtitle">Change the app typography style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Use wallpaper colors to apply a dynamic app theme</string>
+    <string name="settings_censor_mode_title">Privacy mode</string>
+    <string name="settings_censor_mode_subtitle">Hide and blur all financial values across the app</string>
     <string name="settings_feature_credit_toggle_title">Use Credit Card as payment</string>
     <string name="settings_feature_credit_toggle_subtitle">Tap to see more details</string>
     <string name="settings_feature_credit_toggle_details">When activated, you can now mark payments made with a credit card. \nBy declaring a billing date, you\'ll know how much to pay your bank before you have to pay interest, through a notification separate from the billing period.</string>

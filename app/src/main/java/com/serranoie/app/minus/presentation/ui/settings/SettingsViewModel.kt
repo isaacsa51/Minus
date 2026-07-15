@@ -37,6 +37,7 @@ import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
 import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.ui.tutorial.PERIOD_MAPPING_MODE_KEY
+import com.serranoie.app.minus.presentation.util.CensorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,6 +63,7 @@ data class SettingsUiState(
     val recurrentNotificationMinute: Int = 0,
     val exactAlarmEnabled: Boolean = true,
     val notificationPermissionGranted: Boolean = false,
+    val isCensored: Boolean = false,
     val periodMappingMode: PeriodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
 )
@@ -76,6 +78,7 @@ class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settingsRepository: SettingsRepository,
     private val updateNotificationTimeUseCase: UpdatePeriodEndNotificationTimeUseCase,
+    private val censorManager: CensorManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -90,6 +93,15 @@ class SettingsViewModel @Inject constructor(
     init {
         loadPreferences()
         refreshNotificationPermission()
+        observeCensorMode()
+    }
+
+    private fun observeCensorMode() {
+        viewModelScope.launch {
+            censorManager.isCensored.collect { isCensored ->
+                _uiState.update { it.copy(isCensored = isCensored) }
+            }
+        }
     }
 
     fun refreshNotificationPermission() {
@@ -215,6 +227,10 @@ class SettingsViewModel @Inject constructor(
                 prefs[DYNAMIC_COLOR_KEY] = newValue
             }
         }
+    }
+
+    fun onCensorModeToggle() {
+        censorManager.setCensored(!_uiState.value.isCensored)
     }
 
     fun onCreditQuickToggleFeatureToggle() {
