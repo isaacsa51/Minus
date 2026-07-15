@@ -133,6 +133,7 @@ fun Settings(
     onThemeChange: (String) -> Unit,
     onTypographyChange: (String) -> Unit,
     onMaterialYouToggle: () -> Unit,
+    onCensorModeToggle: () -> Unit = {},
     onCreditQuickToggleFeatureToggle: () -> Unit,
     isCategoryPickerDirectPopupEnabled: Boolean = false,
     isCategoryGridModeEnabled: Boolean = false,
@@ -327,7 +328,7 @@ fun Settings(
 
                     CustomPaddedListItem(
                         onClick = onMaterialYouToggle,
-                        position = PaddedListItemPosition.Last,
+                        position = PaddedListItemPosition.Middle,
                         modifier = Modifier.testTag("SettingsMaterialYouItem")
                     ) {
                         Icon(
@@ -353,6 +354,37 @@ fun Settings(
                             checked = isMaterialYouEnabled, onCheckedChange = {
                                 onMaterialYouToggle()
                             }, modifier = Modifier.testTag("SettingsMaterialYouSwitch")
+                        )
+                    }
+
+                    CustomPaddedListItem(
+                        onClick = onCensorModeToggle,
+                        position = PaddedListItemPosition.Last,
+                        modifier = Modifier.testTag("SettingsCensorModeItem")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.RemoveRedEye,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_censor_mode_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_censor_mode_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(end = 4.dp)
+                            )
+                        }
+                        Switch(
+                            checked = isCensored, onCheckedChange = {
+                                onCensorModeToggle()
+                            }, modifier = Modifier.testTag("SettingsCensorModeSwitch")
                         )
                     }
                 }
@@ -1319,6 +1351,7 @@ private fun PreviewSettings() {
             onThemeChange = {},
             onTypographyChange = {},
             onMaterialYouToggle = {},
+            onCensorModeToggle = {},
             onCreditQuickToggleFeatureToggle = {},
             onRecurrentPaymentsViewModeChange = {},
             onNotificationTimeChange = { _, _ -> },

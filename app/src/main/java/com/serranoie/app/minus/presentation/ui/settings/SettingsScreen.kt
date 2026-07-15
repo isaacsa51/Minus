@@ -13,7 +13,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferEntryPoint
-import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import dagger.hilt.android.EntryPointAccessors
 
 @Composable
@@ -26,7 +25,6 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val isCensored = LocalCensorMode.current
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
@@ -71,7 +69,7 @@ fun SettingsScreen(
     }
 
     Settings(
-        isCensored = isCensored,
+        isCensored = uiState.isCensored,
         currentTheme = uiState.currentTheme,
         currentTypography = uiState.currentTypography,
         isMaterialYouEnabled = uiState.isMaterialYouEnabled,
@@ -90,6 +88,7 @@ fun SettingsScreen(
         onThemeChange = viewModel::onThemeChange,
         onTypographyChange = viewModel::onTypographyChange,
         onMaterialYouToggle = viewModel::onMaterialYouToggle,
+        onCensorModeToggle = viewModel::onCensorModeToggle,
         onCreditQuickToggleFeatureToggle = viewModel::onCreditQuickToggleFeatureToggle,
         onRecurrentPaymentsViewModeChange = viewModel::onRecurrentPaymentsViewModeChange,
         onNotificationTimeChange = viewModel::onNotificationTimeChange,

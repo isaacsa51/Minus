@@ -227,6 +227,8 @@
     <string name="settings_typography_subtitle">Changer le style de typographie de l\'application</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Utiliser les couleurs du fond d\'écran pour appliquer un thème dynamique</string>
+    <string name="settings_censor_mode_title">Privacy mode</string>
+    <string name="settings_censor_mode_subtitle">Hide and blur all financial values across the app</string>
     <string name="settings_feature_credit_toggle_title">Utiliser la carte de crédit comme paiement</string>
     <string name="settings_feature_credit_toggle_subtitle">Appuyez pour voir plus de détails</string>
     <string name="settings_feature_credit_toggle_details">Une fois activé, vous pouvez marquer les paiements effectués avec une carte de crédit. \nEn déclarant une date de facturation, vous saurez combien payer à votre banque avant de devoir payer des intérêts.</string>
