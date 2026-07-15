@@ -89,7 +89,7 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 **NEW CROWDING PLATFORM TO CREATE AND FIX ANY EXISTING TRANSLATIONS WITHOUT NEEDED TO FORK THE PROJECT!**
 
 Feel free to see, check and fix current translation, any help will be appretiated.
-Access to Crowdin [here](https://crowdin.com/project/minus-budget-tracker-app)
+Access to Crowdin [here](https://crwd.in/minus-budget-tracker-app/75d145a97ecee054c41b758477be3d542825683)
 
 ---
 
