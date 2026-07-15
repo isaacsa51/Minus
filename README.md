@@ -84,8 +84,14 @@
 Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more information.
 
 ## Translations
+[![Crowdin](https://badges.crowdin.net/minus-budget-tracker-app/localized.svg)](https://crowdin.com/project/minus-budget-tracker-app)
 
-Any contributions to translate Minus into other languages are greatly appreciated. Please submit a pull request with your translations.
+**NEW CROWDING PLATFORM TO CREATE AND FIX ANY EXISTING TRANSLATIONS WITHOUT NEEDED TO FORK THE PROJECT!**
+
+Feel free to see, check and fix current translation, any help will be appretiated.
+Access to Crowdin [here](https://crowdin.com/project/minus-budget-tracker-app)
+
+---
 
 > [!NOTE]
 > While Minus incorporates visual artifacts from [Buckwheat](https://github.com/danilkinkin/buckwheat), it's totally different from the original with a vastly more advanced architectural paradigm. Any superficial similarities are merely legacy design cues within a fundamentally different and more robust ecosystem.
