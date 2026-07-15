@@ -148,7 +148,7 @@
     <string name="widget_add_expense_compact_label">Gasto</string>
     <!-- Widget Labels -->
     <string name="spent">Gastado</string>
-    <string name="left">Restante</string>
+    <string name="left">Faltante</string>
     <string name="remaining">Restante</string>
     <string name="total_spent">Total gastado</string>
     <string name="days_left">días restantes</string>
@@ -191,8 +191,8 @@
     <string name="onboarding_step_6_subtitle">Con el tiempo, aprende cuánto puedes ahorrar y cuánto puedes gastar.</string>
     <string name="onboarding_set_budget_button">Continuar</string>
     <string name="recurrent_toggle_label">Recurrente</string>
-    <string name="censor_mode_alert_title">Modo de censura activo</string>
-    <string name="censor_mode_alert_message">Todos tus valores financieros están difuminados.</string>
+    <string name="censor_mode_alert_title">Modo de privacidad activo</string>
+    <string name="censor_mode_alert_message">Todos tus valores financieros están ocultos.</string>
     <string name="censor_mode_alert_dismiss">Entendido</string>
     <string name="censor_mode_card_label">Modo privado activado</string>
     <string name="censor_mode_card_body">Cubre la parte superior del teléfono (donde está la cámara) con la mano durante un segundo para desactivarlo.</string>
@@ -258,7 +258,7 @@
     <string name="settings_exact_alarm_enabled_subtitle">Habilitado para intentar mostrar notificaciones a la hora seleccionada</string>
     <string name="settings_exact_alarm_disabled_subtitle">Desactivado; Android puede retrasar la notificación</string>
     <string name="settings_time_picker_cancel">Cancelar</string>
-    <string name="settings_time_picker_confirm">Aceptar</string>
+    <string name="settings_time_picker_confirm">OK</string>
     <string name="settings_about_title">Acerca de</string>
     <string name="settings_about_subtitle">Obtenga más información sobre la aplicación y su desarrollo</string>
     <string name="settings_bug_report_title">¿Encontraste un error?</string>

@@ -150,7 +150,7 @@
     <string name="left">Left</string>
     <string name="remaining">Remaining</string>
     <string name="total_spent">Total Spent</string>
-    <string name="days_left">days left</string>
+    <string name="days_left">Days left</string>
     <string name="budget_overview">Budget Overview</string>
     <string name="spent_per_day">Spent per day</string>
     <string name="budget_period_daily">Daily</string>
@@ -174,7 +174,7 @@
     <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s and %3$s amount Exceeded</string>
     <string name="day_total_format">Total: %1$s</string>
     <string name="onboarding_welcome_title">Welcome to Minus</string>
-    <string name="onboarding_welcome_subtitle">Hi and welcome, lets start saving together.</string>
+    <string name="onboarding_welcome_subtitle">Hi and welcome, let\'s start saving together.</string>
     <string name="onboarding_welcome_intro">A simple budget tracker that helps you decide how much you can spend each day, week, biweekly, or month.</string>
     <string name="onboarding_step_1_title">Set a budget</string>
     <string name="onboarding_step_1_subtitle">Define your spending limit for any period.</string>
@@ -190,7 +190,7 @@
     <string name="onboarding_step_6_subtitle">Over time, learn how much you can save and how much you can spend.</string>
     <string name="onboarding_set_budget_button">Continue</string>
     <string name="recurrent_toggle_label">Recurrent</string>
-    <string name="censor_mode_alert_title">Censor mode is active</string>
+    <string name="censor_mode_alert_title">Privacy mode is active</string>
     <string name="censor_mode_alert_message">All your financial values are currently blurred.</string>
     <string name="censor_mode_alert_dismiss">Got it</string>
     <string name="censor_mode_card_label">Privacy mode activated</string>
@@ -362,7 +362,7 @@
     <string name="upcoming_recurrent_in_weeks">In %1$d weeks</string>
     <string name="upcoming_recurrent_unnamed_expense">Unnamed recurrent expense</string>
     <string name="delete_recurrent_expense_title">Delete recurrent expense</string>
-    <string name="delete_recurrent_expense_fallback_name">this recurrent expense</string>
+    <string name="delete_recurrent_expense_fallback_name">This recurrent expense</string>
     <string name="delete_recurrent_expense_message">Are you sure you want to delete \"%1$s\"?</string>
     <string name="delete_recurrent_expense_warning">This action will remove the whole recurrent expense configuration and you will not receive more notifications.</string>
     <!-- Recurrent Ticket -->
