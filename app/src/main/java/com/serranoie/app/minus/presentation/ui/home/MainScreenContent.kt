@@ -81,7 +81,6 @@ import com.serranoie.app.minus.presentation.LocalWindowSize
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
-import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.Editor
 import com.serranoie.app.minus.presentation.ui.history.HistoryScreen
@@ -176,14 +175,6 @@ fun MainScreenContent(
                 SnackbarResult.Dismissed -> onProcessIntent(MainScreenUiIntent.DismissSnackbar)
             }
         }
-    }
-
-    fun executeDelete(transaction: Transaction) {
-        onProcessIntent(
-            MainScreenUiIntent.ProcessBudgetTransactionIntent(
-                BudgetTransactionIntent.DeleteTransactionTapped(transaction),
-            ),
-        )
     }
 
     fun queueDeleteWithUndo(
@@ -456,15 +447,17 @@ private fun PhoneLayout(
     val systemKeyboardHeight = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
     val systemKeyboardHeightPx = with(localDensity) { systemKeyboardHeight.toPx() }
 
+    val isShowSystemKeyboard = systemKeyboardHeightPx > 0f
     var keepImeLayout by remember { mutableStateOf(false) }
     var lastImeHeightPx by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(systemKeyboardHeightPx) {
         if (systemKeyboardHeightPx > 0f) {
-            lastImeHeightPx = systemKeyboardHeightPx
+            lastImeHeightPx = maxOf(lastImeHeightPx, systemKeyboardHeightPx)
             keepImeLayout = true
         } else {
             delay(140.milliseconds)
             keepImeLayout = false
+            lastImeHeightPx = 0f
         }
     }
 
@@ -473,26 +466,31 @@ private fun PhoneLayout(
 
     val internalKeyboardTarget =
         defaultInternalKeyboardHeight + (calcModeKeyboardHeight - defaultInternalKeyboardHeight) * effectiveProgress
-    val targetKeyboardHeight =
-        if (keepImeLayout && lastImeHeightPx > 0f) {
-            lastImeHeightPx
-        } else {
-            internalKeyboardTarget
-        }
+
+    val currentKeyboardHeight = if (isShowSystemKeyboard || keepImeLayout) {
+        lastImeHeightPx
+    } else {
+        internalKeyboardTarget
+    }
 
     val editorHeight by remember(
         contentHeight,
-        targetKeyboardHeight,
+        currentKeyboardHeight,
+        isShowSystemKeyboard,
+        keepImeLayout,
         navBarHeightPx,
         budgetUiState.isCalculation,
         localDragProgress,
     ) {
         derivedStateOf {
-            val numpadBuffer = with(localDensity) { 16.dp.toPx() }
+            val additionalOffset =
+                with(localDensity) { if (isShowSystemKeyboard || keepImeLayout) 16.dp.toPx() else 16.dp.toPx() }
             contentHeight
                 .minus(
-                    targetKeyboardHeight.plus(navBarHeightPx).plus(numpadBuffer).coerceAtLeast(0f),
-                ).coerceAtMost(contentHeight - (navBarHeightPx + with(localDensity) { 96.dp.toPx() }))
+                    currentKeyboardHeight.plus(navBarHeightPx).plus(additionalOffset)
+                        .coerceAtLeast(0f),
+                )
+                .coerceAtMost(contentHeight - (navBarHeightPx + with(localDensity) { 96.dp.toPx() }))
         }
     }
 
@@ -513,7 +511,7 @@ private fun PhoneLayout(
 
     val keyboardHeightAnimated by animateFloatAsState(
         label = "keyboardHeightAnimatedValue",
-        targetValue = targetKeyboardHeight,
+        targetValue = currentKeyboardHeight,
         animationSpec = keyboardAnimationSpec,
     )
 
@@ -539,7 +537,9 @@ private fun PhoneLayout(
     ) {
         val halfExpandedOffsetPx =
             with(localDensity) {
-                (-contentHeight + navBarHeightPx + 16.dp.toPx() + editorHeightAnimated).coerceAtMost(0f)
+                (-contentHeight + navBarHeightPx + 16.dp.toPx() + editorHeightAnimated).coerceAtMost(
+                    0f
+                )
             }
         val isSheetExpanding by remember(halfExpandedOffsetPx) {
             derivedStateOf { topSheetState.offset.value > halfExpandedOffsetPx + 10f }
@@ -559,7 +559,9 @@ private fun PhoneLayout(
                     .zIndex(if (isSheetExpanding) 0f else 1f),
         ) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(top = 16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp),
                 contentAlignment = Alignment.BottomCenter,
             ) {
                 val editorState =
@@ -577,114 +579,114 @@ private fun PhoneLayout(
                             editedTransaction = null,
                         )
                     }
-                    val categoryGridLeftContent: (@Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit)? =
-                        if (showCategoryGrid && categoryGridModeEnabled) {
-                            {
-                                SavedCategoriesGrid(
-                                    tags = budgetUiState.tags,
-                                    selectedCategory = budgetUiState.currentComment,
-                                    onCategorySelected = { category ->
-                                        onProcessIntent(
-                                            MainScreenUiIntent.ProcessBudgetEditorIntent(
-                                                BudgetEditorIntent.CommentUpdated(category),
-                                            ),
-                                        )
-                                    },
-                                    applyWindowInsets = false,
-                                )
-                            }
-                        } else {
-                            null
+                val categoryGridLeftContent: (@Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit)? =
+                    if (showCategoryGrid && categoryGridModeEnabled) {
+                        {
+                            SavedCategoriesGrid(
+                                tags = budgetUiState.tags,
+                                selectedCategory = budgetUiState.currentComment,
+                                onCategorySelected = { category ->
+                                    onProcessIntent(
+                                        MainScreenUiIntent.ProcessBudgetEditorIntent(
+                                            BudgetEditorIntent.CommentUpdated(category),
+                                        ),
+                                    )
+                                },
+                                applyWindowInsets = false,
+                            )
                         }
-                    Numpad(
-                        modifier = tutorialBoxState?.let { state ->
-                            Modifier.markForTutorial(state, index = 0)
-                        } ?: Modifier,
-                        editorState = editorState,
-                        numberHintAnchorModifier = Modifier,
-                        applyHintAnchorModifier = Modifier,
-                        onNumberInput = { digit ->
-                            onProcessIntent(
-                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                    BudgetNumpadIntent.NumberTapped(digit.toString()),
-                                ),
+                    } else {
+                        null
+                    }
+                Numpad(
+                    modifier = tutorialBoxState?.let { state ->
+                        Modifier.markForTutorial(state, index = 0)
+                    } ?: Modifier,
+                    editorState = editorState,
+                    numberHintAnchorModifier = Modifier,
+                    applyHintAnchorModifier = Modifier,
+                    onNumberInput = { digit ->
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.NumberTapped(digit.toString()),
+                            ),
+                        )
+                        onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
+                    },
+                    onDotInput = {
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.DotTapped,
+                            ),
+                        )
+                    },
+                    onBackspace = {
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.BackspaceTapped,
+                            ),
+                        )
+                    },
+                    onBackspaceLongPress = {
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.ResetInputTapped,
+                            ),
+                        )
+                    },
+                    onOperatorInput = { op ->
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.OperatorTapped(op),
+                            ),
+                        )
+                    },
+                    onEqualsInput = {
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.EqualsTapped,
+                            ),
+                        )
+                    },
+                    onApply = {
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.ApplyTapped,
+                            ),
+                        )
+                        onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+                    },
+                    onDragProgressChanged = { progress -> localDragProgress = progress },
+                    dragProgress = effectiveProgress,
+                    isCalculation = budgetUiState.isCalculation,
+                    onCalculationModeChanged = { enabled ->
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.SetCalculationMode(enabled),
+                            ),
+                        )
+                    },
+                    onShowSnackbar = { message ->
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = message,
+                                duration = SnackbarDuration.Short,
                             )
-                            onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
-                        },
-                        onDotInput = {
-                            onProcessIntent(
-                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                    BudgetNumpadIntent.DotTapped,
-                                ),
-                            )
-                        },
-                        onBackspace = {
-                            onProcessIntent(
-                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                    BudgetNumpadIntent.BackspaceTapped,
-                                ),
-                            )
-                        },
-                        onBackspaceLongPress = {
-                            onProcessIntent(
-                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                    BudgetNumpadIntent.ResetInputTapped,
-                                ),
-                            )
-                        },
-                        onOperatorInput = { op ->
-                            onProcessIntent(
-                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                    BudgetNumpadIntent.OperatorTapped(op),
-                                ),
-                            )
-                        },
-                        onEqualsInput = {
-                            onProcessIntent(
-                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                    BudgetNumpadIntent.EqualsTapped,
-                                ),
-                            )
-                        },
-                        onApply = {
-                            onProcessIntent(
-                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                    BudgetNumpadIntent.ApplyTapped,
-                                ),
-                            )
-                            onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
-                        },
-                        onDragProgressChanged = { progress -> localDragProgress = progress },
-                        dragProgress = effectiveProgress,
-                        isCalculation = budgetUiState.isCalculation,
-                        onCalculationModeChanged = { enabled ->
-                            onProcessIntent(
-                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                    BudgetNumpadIntent.SetCalculationMode(enabled),
-                                ),
-                            )
-                        },
-                        onShowSnackbar = { message ->
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = message,
-                                    duration = SnackbarDuration.Short,
-                                )
-                            }
-                        },
-                        onTestNotifications = {
-                            onProcessIntent(
-                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                                    BudgetNumpadIntent.TriggerTestNotifications,
-                                ),
-                            )
-                        },
-                        rowHeight = with(localDensity) { rowHeightPx.toDp() },
-                        enableCalculationMode = true,
-                        enableCalcModeSwipe = !showCategoryGrid,
-                        leftContent = categoryGridLeftContent,
-                    )
-                }
+                        }
+                    },
+                    onTestNotifications = {
+                        onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.TriggerTestNotifications,
+                            ),
+                        )
+                    },
+                    rowHeight = with(localDensity) { rowHeightPx.toDp() },
+                    enableCalculationMode = true,
+                    enableCalcModeSwipe = !showCategoryGrid,
+                    leftContent = categoryGridLeftContent,
+                )
+            }
         }
 
         val expandHeightPx = contentHeight - navBarHeightPx - with(localDensity) { 16.dp.toPx() }
@@ -695,7 +697,8 @@ private fun PhoneLayout(
                 val halfHeightPx = editorHeightAnimated
                 val maxOffset = (-(expandHeightPx - halfHeightPx)).coerceAtMost(0f)
                 val offset = runCatching { topSheetState.offset.value }.getOrDefault(maxOffset)
-                val progress = if (maxOffset == 0f) 1f else (1f - (offset / maxOffset)).coerceIn(0f, 1f)
+                val progress =
+                    if (maxOffset == 0f) 1f else (1f - (offset / maxOffset)).coerceIn(0f, 1f)
                 halfHeightPx + (expandHeightPx - halfHeightPx) * progress
             },
             cardOffsetAdjustment = {
@@ -703,13 +706,13 @@ private fun PhoneLayout(
             },
             isLockSwipeable = {
                 budgetUiState.lockSwipeable || localDragProgress > 0f || showCategoryGrid ||
-                    (budgetUiState.isCalculation && effectiveProgress < 1f) ||
-                    (!budgetUiState.isCalculation && effectiveProgress > 0f)
+                        (budgetUiState.isCalculation && effectiveProgress < 1f) ||
+                        (!budgetUiState.isCalculation && effectiveProgress > 0f)
             },
             isLockDraggable = {
                 budgetUiState.lockDraggable || localDragProgress > 0f || showCategoryGrid ||
-                    (budgetUiState.isCalculation && effectiveProgress < 1f) ||
-                    (!budgetUiState.isCalculation && effectiveProgress > 0f)
+                        (budgetUiState.isCalculation && effectiveProgress < 1f) ||
+                        (!budgetUiState.isCalculation && effectiveProgress > 0f)
             },
             canDismissBySwipeUp = { true },
             externalDragOffset = { externalSheetDragOffset },
@@ -806,7 +809,12 @@ private fun PhoneLayout(
                     onRecurrentExpenseConfirm = { freq, date, day, fallbackComment ->
                         onProcessIntent(
                             MainScreenUiIntent.ProcessBudgetEditorIntent(
-                                BudgetEditorIntent.RecurrentExpenseApplied(freq, date, day, fallbackComment),
+                                BudgetEditorIntent.RecurrentExpenseApplied(
+                                    freq,
+                                    date,
+                                    day,
+                                    fallbackComment
+                                ),
                             ),
                         )
                     },
@@ -1102,7 +1110,12 @@ private fun TabletLayout(
                     onRecurrentExpenseConfirm = { freq, date, day, fallbackComment ->
                         onProcessIntent(
                             MainScreenUiIntent.ProcessBudgetEditorIntent(
-                                BudgetEditorIntent.RecurrentExpenseApplied(freq, date, day, fallbackComment),
+                                BudgetEditorIntent.RecurrentExpenseApplied(
+                                    freq,
+                                    date,
+                                    day,
+                                    fallbackComment
+                                ),
                             ),
                         )
                     },
