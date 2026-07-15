@@ -1,0 +1,8 @@
+- feat: toggle for privacy mode on settings
+- feat: enable swipe to dismiss sheet on history (#120)
+- feat: enhanced expense details card item
+- feat: localize and improve app widgets (#118)
+- chore(i18n): integrate translations
+- feat: implement step-by-step coachmark tutorial system (#117)
+- Update Crowdin configuration file
+- feat: implement enhanced dynamic budget split mode (#114)
