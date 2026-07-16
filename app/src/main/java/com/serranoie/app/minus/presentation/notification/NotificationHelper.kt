@@ -48,28 +48,28 @@ class NotificationHelper @Inject constructor(
 
         val periodEndChannel = NotificationChannel(
             CHANNEL_PERIOD_END,
-            "Budget Period End",
+            context.getString(R.string.notification_channel_period_end_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Notifications when your budget period ends with remaining balance"
+            description = context.getString(R.string.notification_channel_period_end_description)
             enableVibration(true)
         }
 
         val recurrentChannel = NotificationChannel(
             CHANNEL_RECURRENT,
-            "Recurrent Expenses",
+            context.getString(R.string.notification_channel_recurrent_name),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-            description = "Notifications when recurrent expenses are due"
+            description = context.getString(R.string.notification_channel_recurrent_description)
             enableVibration(true)
         }
 
         val creditChannel = NotificationChannel(
             CHANNEL_CREDIT,
-            "Credit Card Reminders",
+            context.getString(R.string.notification_channel_credit_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Reminders before credit card cutoff date"
+            description = context.getString(R.string.notification_channel_credit_description)
             enableVibration(true)
         }
 
@@ -115,7 +115,7 @@ class NotificationHelper @Inject constructor(
 
         val notification = NotificationCompat.Builder(context, CHANNEL_PERIOD_END)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Periodo de ahorro finalizado")
+            .setContentTitle(context.getString(R.string.notification_period_end_title))
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -132,11 +132,14 @@ class NotificationHelper @Inject constructor(
     private fun buildPeriodEndMessage(remainingBudget: String): String {
         val amount = remainingBudget.toDoubleOrNull() ?: 0.0
         return if (amount > 0) {
-            "El periodo terminó con $$remainingBudget sobrante. Tap para ver detalles."
+            context.getString(R.string.notification_period_end_message_positive, remainingBudget)
         } else if (amount < 0) {
-            "El periodo se acabó. Gastaste $${kotlin.math.abs(amount)} de más. Ver más detalles."
+            context.getString(
+                R.string.notification_period_end_message_negative,
+                kotlin.math.abs(amount).toString()
+            )
         } else {
-            "El periodo se acabó. No gastaste nada. Ver más detalles."
+            context.getString(R.string.notification_period_end_message_neutral)
         }
     }
 
@@ -158,11 +161,18 @@ class NotificationHelper @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val title = "Gasto recurrente"
+        val title = context.getString(R.string.notification_recurrent_expense_title)
         val message = if (comment.isNotBlank()) {
-            "Tu gasto recurrente de \"$comment\" por \"$$amount\" es hoy."
+            context.getString(
+                R.string.notification_recurrent_expense_message_with_comment,
+                comment,
+                amount
+            )
         } else {
-            "Tu gasto recurrente con un total de \"$$amount\" es hoy."
+            context.getString(
+                R.string.notification_recurrent_expense_message_without_comment,
+                amount
+            )
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_RECURRENT)
@@ -204,15 +214,24 @@ class NotificationHelper @Inject constructor(
         )
 
         val daysText = when (daysUntil) {
-            1L -> "mañana"
-            else -> "en $daysUntil días"
+            1L -> context.getString(R.string.notification_tomorrow)
+            else -> context.getString(R.string.notification_in_days, daysUntil)
         }
 
-        val title = "Suscripción próxima"
+        val title = context.getString(R.string.notification_upcoming_subscription_title)
         val message = if (comment.isNotBlank()) {
-            "Tu suscripción \"$comment\" de \"$amount\" se cobrará $daysText. Prepárate para el cargo."
+            context.getString(
+                R.string.notification_upcoming_subscription_message_with_comment,
+                comment,
+                amount,
+                daysText
+            )
         } else {
-            "Tienes una suscripción de \"$amount\" que se cobrará $daysText."
+            context.getString(
+                R.string.notification_upcoming_subscription_message_without_comment,
+                amount,
+                daysText
+            )
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_RECURRENT)
@@ -254,12 +273,15 @@ class NotificationHelper @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val message =
-            "Tu fecha de corte es el $cutoffDateText. Se recomienda saldar $totalAmount para evitar intereses."
+        val message = context.getString(
+            R.string.notification_credit_cutoff_message,
+            cutoffDateText,
+            totalAmount
+        )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_CREDIT)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Pago de tarjeta próximo")
+            .setContentTitle(context.getString(R.string.notification_credit_cutoff_title))
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setPriority(NotificationCompat.PRIORITY_HIGH)

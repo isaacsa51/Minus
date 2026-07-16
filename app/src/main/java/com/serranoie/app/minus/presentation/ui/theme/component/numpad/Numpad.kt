@@ -315,9 +315,24 @@ fun Numpad(
 							.fillMaxWidth()
 							.weight(1F)
 					) {
+						if (effectiveDragProgress > 0.01f || isCalculation) {
+							NumpadButton(
+								modifier = Modifier
+									.weight(effectiveDragProgress.coerceAtLeast(0.01f))
+									.padding(BUTTON_GAP)
+									.graphicsLayer(alpha = effectiveDragProgress),
+								type = NumpadButtonType.OPERATOR,
+								text = getFloatDivider(),
+								onClick = {
+									onDotInput()
+									debugProgress =
+										(debugProgress + 1).coerceAtMost(TEST_NOTIFICATION_TAP_COUNT)
+									haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+								})
+						}
 						NumpadButton(
 							modifier = Modifier
-								.weight(if (isCalculation) 1f else 3f)
+								.weight(3f - (2f * effectiveDragProgress))
 								.padding(BUTTON_GAP),
 							type = NumpadButtonType.DEFAULT,
 							text = "0",
@@ -326,28 +341,44 @@ fun Numpad(
 								onNumberPressedForTutorial?.invoke()
 								haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 							})
-						NumpadButton(
+						Box(
 							modifier = Modifier
-								.weight(if (isCalculation) 1f else 1.5f)
-								.padding(BUTTON_GAP),
-							type = NumpadButtonType.DEFAULT,
-							text = getFloatDivider(),
-							onClick = {
-								onDotInput()
-								debugProgress = (debugProgress + 1).coerceAtMost(TEST_NOTIFICATION_TAP_COUNT)
-								haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-							})
-						if (isCalculation) {
-							NumpadButton(
-								modifier = Modifier
-									.weight(1F)
-									.padding(BUTTON_GAP),
-								type = NumpadButtonType.OPERATOR,
-								text = "=",
-								onClick = {
-									onEqualsInput()
-									haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-								})
+								.weight(1.5f - (0.5f * effectiveDragProgress))
+								.fillMaxHeight()
+						) {
+							AnimatedContent(
+								targetState = isCalculation || effectiveDragProgress > 0.5f,
+								label = "LastButtonSwap",
+								transitionSpec = {
+									fadeIn(tween(150)) togetherWith fadeOut(tween(150))
+								}
+							) { showEquals ->
+								if (showEquals) {
+									NumpadButton(
+										modifier = Modifier
+											.fillMaxSize()
+											.padding(BUTTON_GAP),
+										type = NumpadButtonType.OPERATOR,
+										text = "=",
+										onClick = {
+											onEqualsInput()
+											haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+										})
+								} else {
+									NumpadButton(
+										modifier = Modifier
+											.fillMaxSize()
+											.padding(BUTTON_GAP),
+										type = NumpadButtonType.OPERATOR,
+										text = getFloatDivider(),
+										onClick = {
+											onDotInput()
+											debugProgress =
+												(debugProgress + 1).coerceAtMost(TEST_NOTIFICATION_TAP_COUNT)
+											haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+										})
+								}
+							}
 						}
 					}
 						}

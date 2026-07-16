@@ -465,4 +465,25 @@
     <string name="ticket_total_amount">TOTAL AMOUNT</string>
     <string name="mark_as_paid">Mark as paid</string>
     <string name="mark_as_paid_success">Marked as paid</string>
+    <string name="widget_add_expense_compact_label">Add expense</string>
+    <string name="notification_channel_period_end_name">Budget Period End</string>
+    <string name="notification_channel_period_end_description">Notifications when your budget period ends with remaining balance</string>
+    <string name="notification_channel_recurrent_name">Recurring Expenses</string>
+    <string name="notification_channel_recurrent_description">Notifications when recurring expenses are due</string>
+    <string name="notification_channel_credit_name">Credit Card Reminders</string>
+    <string name="notification_channel_credit_description">Reminders before credit card cutoff date</string>
+    <string name="notification_period_end_title">Budget period finished</string>
+    <string name="notification_period_end_message_positive">The period ended with $%1$s remaining. Tap to see details.</string>
+    <string name="notification_period_end_message_negative">The period ended. You spent $%1$s extra. See more details.</string>
+    <string name="notification_period_end_message_neutral">The period ended. You didn\'t spend anything. See more details.</string>
+    <string name="notification_recurrent_expense_title">Recurring expense</string>
+    <string name="notification_recurrent_expense_message_with_comment">Your recurring expense of \"%1$s\" for \"%2$s\" is today.</string>
+    <string name="notification_recurrent_expense_message_without_comment">Your recurring expense with a total of \"%1$s\" is today.</string>
+    <string name="notification_tomorrow">tomorrow</string>
+    <string name="notification_in_days">in %1$d days</string>
+    <string name="notification_upcoming_subscription_title">Upcoming subscription</string>
+    <string name="notification_upcoming_subscription_message_with_comment">Your subscription \"%1$s\" of \"%2$s\" will be charged %3$s. Prepare for the charge.</string>
+    <string name="notification_upcoming_subscription_message_without_comment">You have a subscription of \"%1$s\" that will be charged %2$s.</string>
+    <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
+    <string name="notification_credit_cutoff_message">Your cutoff date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
 </resources>
