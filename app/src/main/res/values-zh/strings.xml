@@ -3,7 +3,7 @@
     <string name="app_name">Minus</string>
     <string name="tutorial_numpad_title">Numpad</string>
     <string name="tutorial_numpad_description">Enter the amount you spent and tap the green checkmark to save. Swipe up on the numpad to calculate.</string>
-    <string name="tutorial_comment_title">Add a category</string>
+    <string name="tutorial_comment_title">創建分類</string>
     <string name="tutorial_comment_description">Add a category or short note to remember what the spend was for.</string>
     <string name="tutorial_budget_pill_title">Budget progress</string>
     <string name="tutorial_budget_pill_description">Tap to switch between daily, weekly, and monthly budget views, or to edit the period setup.</string>
