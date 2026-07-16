@@ -24,6 +24,7 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
 import androidx.glance.currentState
+import androidx.glance.LocalContext
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -68,7 +69,8 @@ private val monthWidgetCurrencyKey = stringPreferencesKey("month_heatmap_currenc
 
 private fun monthWidgetRatioKey(day: Int) = floatPreferencesKey("month_heatmap_ratio_$day")
 
-private fun monthWidgetHasSpendingKey(day: Int) = intPreferencesKey("month_heatmap_has_spending_$day")
+private fun monthWidgetHasSpendingKey(day: Int) =
+    intPreferencesKey("month_heatmap_has_spending_$day")
 
 private fun monthWidgetHeatColorRes(
     ratio: Float,
@@ -163,9 +165,10 @@ internal fun MonthHeatmapContent(
     yearMonth: YearMonth,
     monthCells: List<MonthWidgetCellState>,
     totalSpent: Int,
-    currency: String = "USD",
-    totalSpentLabel: String = "Total Spent",
     modifier: GlanceModifier = GlanceModifier,
+    context: Context = LocalContext.current,
+    currency: String = "USD",
+    totalSpentLabel: String = context.getString(R.string.total_spent),
 ) {
     val calendarCells = buildMonthWidgetCalendarCells(yearMonth, monthCells)
 
@@ -220,13 +223,13 @@ class MonthHeatmapWidget : GlanceAppWidget() {
     ) {
         provideContent {
             GlanceTheme {
-                WidgetContent(context)
+                WidgetContent()
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(context: Context) {
+    private fun WidgetContent() {
         val prefs = currentState<Preferences>()
         val now = YearMonth.now()
         val yearMonth =
@@ -258,7 +261,6 @@ class MonthHeatmapWidget : GlanceAppWidget() {
                 monthCells = monthCells,
                 totalSpent = totalSpent,
                 currency = currency,
-                totalSpentLabel = context.getString(R.string.total_spent),
             )
         }
     }
@@ -292,7 +294,9 @@ suspend fun updateMonthHeatmapWidget(
                     if (spending != null) {
                         val amountRatio =
                             if (spending.budget > BigDecimal.ZERO) {
-                                (spending.spending.toFloat() / spending.budget.toFloat()).coerceAtLeast(0f)
+                                (spending.spending.toFloat() / spending.budget.toFloat()).coerceAtLeast(
+                                    0f
+                                )
                             } else {
                                 0f
                             }
@@ -351,7 +355,6 @@ private fun MonthHeatmapContentPreview() {
                 monthCells = cells,
                 totalSpent = 1250,
                 currency = "USD",
-                totalSpentLabel = "Total Spent",
             )
         }
     }

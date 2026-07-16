@@ -9,12 +9,13 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
-import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.action.actionRunCallback
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
@@ -22,11 +23,11 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
+import androidx.glance.preview.ExperimentalGlancePreviewApi
+import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.preview.ExperimentalGlancePreviewApi
-import androidx.glance.preview.Preview
 import com.serranoie.app.minus.R
 
 class AddExpenseWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -37,21 +38,17 @@ class AddExpenseWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             GlanceTheme {
-                AddExpenseContent(
-                    label = context.getString(R.string.widget_add_expense_label),
-                    compactLabel = context.getString(R.string.widget_add_expense_compact_label),
-                    plus = context.getString(R.string.widget_add_expense_plus),
-                )
+                AddExpenseContent()
             }
         }
     }
 
-    // TODO: DELETE HARDODED STRINGS
     @Composable
     internal fun AddExpenseContent(
-        label: String = "Add new expense",
-        compactLabel: String = "Add expense",
-        plus: String = "+",
+        context: Context = LocalContext.current,
+        label: String = context.getString(R.string.widget_add_expense_label),
+        compactLabel: String = context.getString(R.string.widget_add_expense_compact_label),
+        plus: String = context.getString(R.string.widget_add_expense_plus),
     ) {
         val widgetSize = LocalSize.current
         val compactMode = widgetSize.width < 150.dp
@@ -88,7 +85,7 @@ class AddExpenseWidget : GlanceAppWidget() {
     }
 }
 
-@Preview(widthDp = 180, heightDp = 90)
+@Preview(widthDp = 280, heightDp = 120)
 @Composable
 private fun AddExpenseWidgetPreview() {
     GlanceTheme {
