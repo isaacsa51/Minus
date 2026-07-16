@@ -145,7 +145,7 @@
     <string name="widget_month_heatmap_description">Calendrier thermique du mois en cours</string>
     <string name="widget_add_expense_description">Raccourci rapide pour ajouter une nouvelle dépense</string>
     <string name="widget_add_expense_label">Ajouter une nouvelle dépense</string>
-    <string name="widget_add_expense_compact_label">Dépense</string>
+    <string name="widget_add_expense_compact_label">Add expense</string>
     <!-- Widget Labels -->
     <string name="spent">Dépensé</string>
     <string name="left">Restant</string>
@@ -191,7 +191,7 @@
     <string name="onboarding_step_6_subtitle">Avec le temps, apprenez combien vous pouvez économiser et dépenser.</string>
     <string name="onboarding_set_budget_button">Continuer</string>
     <string name="recurrent_toggle_label">Récurrent</string>
-    <string name="censor_mode_alert_title">Mode censure activé</string>
+    <string name="censor_mode_alert_title">Le mode censeur est actif</string>
     <string name="censor_mode_alert_message">Toutes vos valeurs financières sont floutées.</string>
     <string name="censor_mode_alert_dismiss">Compris</string>
     <string name="censor_mode_card_label">Mode privé activé</string>
@@ -454,16 +454,35 @@
     <!-- Transaction Detail -->
     <string name="without_date">Sans date</string>
     <string name="no_name">Sans nom</string>
-    <string name="description">Motif d\'achat</string>
+    <string name="description">Purchase Reason</string>
     <string name="date">Date</string>
     <string name="frequency">Fréquence</string>
     <string name="charge_day">Jour de facturation</string>
     <string name="day_number">Jour %1$d</string>
     <string name="recurrence_end">Fin de récurrence</string>
     <!-- Transaction Detail Ticket Card -->
-    <string name="ticket_expense">DÉPENSE</string>
-    <string name="ticket_recurrent_expense">DÉPENSE RÉCURRENTE</string>
     <string name="ticket_total_amount">MONTANT TOTAL</string>
     <string name="mark_as_paid">Marquer comme payé</string>
-    <string name="mark_as_paid_success">Marqué comme payé</string>
+    <string name="mark_as_paid_success">Marked as paid</string>
+    <!-- Notifications -->
+    <string name="notification_channel_period_end_name">Budget Period End</string>
+    <string name="notification_channel_period_end_description">Notifications when your budget period ends with remaining balance</string>
+    <string name="notification_channel_recurrent_name">Recurring Expenses</string>
+    <string name="notification_channel_recurrent_description">Notifications when recurring expenses are due</string>
+    <string name="notification_channel_credit_name">Credit Card Reminders</string>
+    <string name="notification_channel_credit_description">Reminders before credit card cutoff date</string>
+    <string name="notification_period_end_title">Budget period finished</string>
+    <string name="notification_period_end_message_positive">The period ended with $%1$s remaining. Tap to see details.</string>
+    <string name="notification_period_end_message_negative">The period ended. You spent $%1$s extra. See more details.</string>
+    <string name="notification_period_end_message_neutral">The period ended. You didn\'t spend anything. See more details.</string>
+    <string name="notification_recurrent_expense_title">Recurring expense</string>
+    <string name="notification_recurrent_expense_message_with_comment">Your recurring expense of \"%1$s\" for \"%2$s\" is today.</string>
+    <string name="notification_recurrent_expense_message_without_comment">Your recurring expense with a total of \"%1$s\" is today.</string>
+    <string name="notification_tomorrow">tomorrow</string>
+    <string name="notification_in_days">in %1$d days</string>
+    <string name="notification_upcoming_subscription_title">Upcoming subscription</string>
+    <string name="notification_upcoming_subscription_message_with_comment">Your subscription \"%1$s\" of \"%2$s\" will be charged %3$s. Prepare for the charge.</string>
+    <string name="notification_upcoming_subscription_message_without_comment">You have a subscription of \"%1$s\" that will be charged %2$s.</string>
+    <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
+    <string name="notification_credit_cutoff_message">Your cutoff date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
 </resources>
