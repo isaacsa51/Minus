@@ -12,8 +12,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -25,15 +27,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
-import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.ui.history.dialogs.TransactionDetailTicketCard
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
+import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.prettyDate
@@ -74,9 +77,23 @@ fun ExpenseItem(
                 transitionSpec = {
                     fadeIn(tween(200, delayMillis = 100)) togetherWith fadeOut(tween(100))
                 },
-                label = "expense_item_header"
+                label = "expense_item_header",
+                modifier = Modifier.weight(1f)
             ) { expanded ->
-                if (!expanded) {
+                if (expanded) {
+                    ExpenseItemExpandedContent(
+                        transaction = transaction,
+                        currencyFormat = currencyFormat,
+                        onMarkAsPaid = onMarkAsPaid,
+                        onEdit = onEdit,
+                        onDelete = onDelete,
+                        readOnly = readOnly,
+                        onClick = onClick,
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -141,71 +158,6 @@ fun ExpenseItem(
                 }
             }
         }
-
-        AnimatedVisibility(
-            visible = isExpanded,
-            enter = if (!disableAnimations) fadeIn(tween(200)) else EnterTransition.None,
-            exit = if (!disableAnimations) fadeOut(tween(100)) else ExitTransition.None
-        ) {
-            val withoutDate = stringResource(R.string.without_date)
-            val noName = stringResource(R.string.no_name)
-            val dateLabel = stringResource(R.string.date)
-            val frequencyLabel = stringResource(R.string.frequency)
-            val chargeDayLabel = stringResource(R.string.charge_day)
-
-            val transactionDateText = transaction.date?.let { date ->
-                prettyDate(date, showTime = true, forceHideDate = false, human = true)
-            } ?: withoutDate
-            val recurrenceLabel = when (transaction.recurrentFrequency) {
-                RecurrentFrequency.WEEKLY -> stringResource(R.string.recurrent_frequency_weekly)
-                RecurrentFrequency.BIWEEKLY -> stringResource(R.string.recurrent_frequency_biweekly)
-                RecurrentFrequency.MONTHLY -> stringResource(R.string.recurrent_frequency_monthly)
-                null -> ""
-            }
-
-            val details = buildList {
-                add(stringResource(R.string.description) to transaction.comment.ifEmpty { noName })
-                add(dateLabel to transactionDateText)
-                if (transaction.isRecurrent && recurrenceLabel.isNotEmpty()) {
-                    add(frequencyLabel to recurrenceLabel)
-                }
-                transaction.subscriptionDay?.let { day ->
-                    if (transaction.isRecurrent) {
-                        val dayLabel = stringResource(R.string.day_number, day)
-                        add(chargeDayLabel to dayLabel)
-                    }
-                }
-                transaction.recurrentEndDate?.let { endDate ->
-                    if (transaction.isRecurrent) {
-                        val recurrenceEndLabel = stringResource(R.string.recurrence_end)
-                        add(
-                            recurrenceEndLabel to prettyDate(
-                                endDate,
-                                showTime = false,
-                                forceHideDate = false,
-                                human = true,
-                            )
-                        )
-                    }
-                }
-            }
-
-            TransactionDetailTicketCard(
-                transaction = transaction,
-                totalAmountText = currencyFormat.format(transaction.amount),
-                details = details,
-                onMarkAsPaid = onMarkAsPaid,
-                onEdit = onEdit,
-                onDelete = onDelete,
-                readOnly = readOnly,
-                onClick = onClick,
-                sharedTransitionScope = sharedTransitionScope,
-                animatedVisibilityScope = animatedVisibilityScope,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 12.dp)
-            )
-        }
     }
 }
 
@@ -221,7 +173,7 @@ private fun ExpenseItemExpandedPreview() {
                 comment = "Compra en supermercado",
                 date = LocalDateTime.now(),
                 isDeleted = false,
-                isRecurrent = false
+                isRecurrent = false,
             ),
             currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
             position = PaddedListItemPosition.Single,
@@ -244,7 +196,7 @@ private fun ExpenseItemPreview() {
                 comment = "Compra en supermercado",
                 date = LocalDateTime.now(),
                 isDeleted = false,
-                isRecurrent = false
+                isRecurrent = false,
             ),
             currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
             position = PaddedListItemPosition.Single,

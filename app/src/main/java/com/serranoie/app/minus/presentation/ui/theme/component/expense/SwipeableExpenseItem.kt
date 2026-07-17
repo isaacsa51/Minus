@@ -170,7 +170,7 @@ fun SwipeableUpcomingRecurrentItem(
         background = if (isOutOfPeriod) {
             MaterialTheme.colorScheme.surfaceVariant
         } else {
-            MaterialTheme.colorScheme.surfaceContainer
+            MaterialTheme.colorScheme.surface
         },
         startActionsConfig = SwipeActionsConfig(
             threshold = SWIPE_ACTION_THRESHOLD,
