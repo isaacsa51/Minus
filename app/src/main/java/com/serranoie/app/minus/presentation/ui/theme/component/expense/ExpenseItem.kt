@@ -19,14 +19,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +47,8 @@ import com.serranoie.app.minus.presentation.util.censor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material3.Icon
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
+import com.serranoie.app.minus.presentation.util.calculateDaysToCutoff
 import com.serranoie.app.minus.presentation.util.prettyDate
 import java.text.NumberFormat
 import java.time.LocalDateTime
@@ -62,8 +68,10 @@ fun ExpenseItem(
     readOnly: Boolean = false,
     disableAnimations: Boolean = false,
     modifier: Modifier = Modifier,
+    customShape: androidx.compose.ui.graphics.Shape? = null,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    creditCardCutoffDay: Int? = null,
 ) {
     Column(
         modifier = modifier
@@ -74,7 +82,8 @@ fun ExpenseItem(
             onClick = onClick,
             position = position,
             background = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.onSurface
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            customShape = customShape
         ) {
             AnimatedContent(
                 targetState = isExpanded,
@@ -104,19 +113,11 @@ fun ExpenseItem(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                if (transaction.isCredit) {
-                                    Icon(
-                                        imageVector = Icons.Default.CreditCard,
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                            .padding(end = 4.dp),
-                                        tint = MaterialTheme.colorScheme.secondary
-                                    )
-                                }
                                 Text(
                                     text = transaction.comment.ifEmpty { stringResource(R.string.expense_item_unnamed_expense) },
-                                    style = MaterialTheme.typography.titleMediumCondensed,
+                                    style = MaterialTheme.typography.titleMediumCondensed.copy(
+                                        fontStyle = if (transaction.isCredit) FontStyle.Italic else FontStyle.Normal
+                                    ),
                                     color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Medium,
                                     modifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
@@ -128,14 +129,45 @@ fun ExpenseItem(
                                         }
                                     } else Modifier
                                 )
+
+                                if (transaction.isCredit) {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                                        shape = RoundedCornerShape(4.dp)
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.credit_badge),
+                                            style = MaterialTheme.typography.labelSmallCondensed,
+                                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
                             }
                             val timeText = prettyDate(
                                 date = transaction.date, showTime = true, forceHideDate = true
                             )
-                            val subtitle = if (transaction.isRecurrent) {
-                                stringResource(R.string.expense_item_recurrent_subtitle_format, timeText)
-                            } else {
-                                timeText
+                            val subtitle = when {
+                                transaction.isCredit && creditCardCutoffDay != null -> {
+                                    val daysToCutoff = calculateDaysToCutoff(creditCardCutoffDay)
+                                    if (daysToCutoff == 0) {
+                                        stringResource(R.string.credit_cutoff_subtitle_today, timeText)
+                                    } else {
+                                        stringResource(R.string.credit_cutoff_subtitle, timeText, daysToCutoff)
+                                    }
+                                }
+
+                                transaction.isRecurrent -> {
+                                    stringResource(
+                                        R.string.expense_item_recurrent_subtitle_format,
+                                        timeText
+                                    )
+                                }
+
+                                else -> {
+                                    timeText
+                                }
                             }
                             Text(
                                 text = subtitle,

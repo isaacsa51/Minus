@@ -171,7 +171,7 @@ fun History(
                 budgetState = uiState.budgetState,
                 budgetSettings = uiState.budgetSettings,
                 currencyCode = currencyCode,
-                debtAdjustedBalance = uiState.debtAdjustedBalance,
+                creditOwed = uiState.creditOwed,
             )
 
             currentPeriodRecurrentSection(
@@ -206,6 +206,7 @@ fun History(
                 onClick = { expense -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(expense.id)) },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
+                creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
             )
 
             transactionDateSections(
@@ -238,6 +239,7 @@ fun History(
                 onClick = { expense -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(expense.id)) },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
+                creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
             )
 
             futureRecurrentSection(
@@ -259,6 +261,7 @@ fun History(
                 onClick = { expense -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(expense.id)) },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
+                creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
             )
 
             pastPeriodToggleSection(
@@ -298,6 +301,7 @@ fun History(
                 onClick = { expense -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(expense.id)) },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
+                creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
             )
 
 

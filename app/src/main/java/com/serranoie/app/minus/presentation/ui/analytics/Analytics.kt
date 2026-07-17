@@ -159,7 +159,7 @@ fun Analytics(
                     actualFinishDate = state.finishPeriodActualDate,
                     extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
                     showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
-                    debtAdjustedBalance = state.debtAdjustedBalance,
+                    creditOwed = state.creditOwed,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -530,6 +530,7 @@ private fun AnalyticsState.toCategoryAnalyticsState(
     categoryName = categoryName,
     categorySpends = categorySpends,
     currencyCode = currencyCode,
+    creditCardCutoffDay = budgetSettingsForDisplay?.creditCardCutoffDay,
 )
 
 @Preview

@@ -12,7 +12,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -42,6 +49,7 @@ fun SwipeableExpenseItem(
     onMarkAsPaid: () -> Unit = {},
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    creditCardCutoffDay: Int? = null,
 ) {
     val shape = when (position) {
         PaddedListItemPosition.First -> RoundedCornerShape(
@@ -80,8 +88,10 @@ fun SwipeableExpenseItem(
                 onMarkAsPaid = onMarkAsPaid,
                 readOnly = readOnly,
                 disableAnimations = disableAnimations,
+                customShape = shape,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
+                creditCardCutoffDay = creditCardCutoffDay,
             )
         }
     } else {
@@ -120,8 +130,10 @@ fun SwipeableExpenseItem(
                 onMarkAsPaid = onMarkAsPaid,
                 readOnly = readOnly,
                 disableAnimations = disableAnimations,
+                customShape = shape,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
+                creditCardCutoffDay = creditCardCutoffDay,
             )
         }
 
@@ -144,6 +156,7 @@ fun SwipeableUpcomingRecurrentItem(
     onClick: () -> Unit = {},
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    creditCardCutoffDay: Int? = null,
 ) {
     val shape = when (position) {
         PaddedListItemPosition.First -> RoundedCornerShape(
@@ -201,8 +214,10 @@ fun SwipeableUpcomingRecurrentItem(
             onEdit = onEdit,
             onDelete = onDelete,
             onMarkAsPaid = onMarkAsPaid,
+            customShape = shape,
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope,
+            creditCardCutoffDay = creditCardCutoffDay,
         )
     }
 }
@@ -211,6 +226,33 @@ fun SwipeableUpcomingRecurrentItem(
 
 
 
+
+@Preview
+@Composable
+private fun SwipeableExpenseItemCreditPreview() {
+    MinusTheme {
+        SwipeableExpenseItem(
+            transaction = Transaction(
+                id = 1L,
+                amount = java.math.BigDecimal("150.50"),
+                comment = "Credit Card Expense",
+                date = LocalDateTime.now(),
+                isDeleted = false,
+                isRecurrent = false,
+                isCredit = true
+            ),
+            currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
+            position = PaddedListItemPosition.Single,
+            onDelete = {},
+            onEdit = {},
+            readOnly = false,
+            isBeingDeleted = false,
+            onClick = {},
+            sharedTransitionScope = null,
+            animatedVisibilityScope = null,
+        )
+    }
+}
 
 @Preview
 @Composable
