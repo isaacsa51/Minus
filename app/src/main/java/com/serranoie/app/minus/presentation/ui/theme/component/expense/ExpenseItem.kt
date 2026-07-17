@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +40,9 @@ import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.censor
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material3.Icon
 import com.serranoie.app.minus.presentation.util.prettyDate
 import java.text.NumberFormat
 import java.time.LocalDateTime
@@ -99,20 +103,32 @@ fun ExpenseItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = transaction.comment.ifEmpty { stringResource(R.string.expense_item_unnamed_expense) },
-                                style = MaterialTheme.typography.titleMediumCondensed,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Medium,
-                                modifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
-                                    with(sharedTransitionScope) {
-                                        Modifier.sharedElement(
-                                            rememberSharedContentState(key = "comment_${transaction.id}"),
-                                            animatedVisibilityScope = animatedVisibilityScope
-                                        )
-                                    }
-                                } else Modifier
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (transaction.isCredit) {
+                                    Icon(
+                                        imageVector = Icons.Default.CreditCard,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(16.dp)
+                                            .padding(end = 4.dp),
+                                        tint = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+                                Text(
+                                    text = transaction.comment.ifEmpty { stringResource(R.string.expense_item_unnamed_expense) },
+                                    style = MaterialTheme.typography.titleMediumCondensed,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                                        with(sharedTransitionScope) {
+                                            Modifier.sharedElement(
+                                                rememberSharedContentState(key = "comment_${transaction.id}"),
+                                                animatedVisibilityScope = animatedVisibilityScope
+                                            )
+                                        }
+                                    } else Modifier
+                                )
+                            }
                             val timeText = prettyDate(
                                 date = transaction.date, showTime = true, forceHideDate = true
                             )

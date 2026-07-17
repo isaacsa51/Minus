@@ -40,13 +40,26 @@ fun previewAnalyticsTransactions(): List<Transaction> {
     }
 }
 
-fun previewAnalyticsState(periodFinished: Boolean): AnalyticsState =
-    AnalyticsState(
+fun previewAnalyticsState(periodFinished: Boolean): AnalyticsState {
+    val txs = previewAnalyticsTransactions()
+    val creditTxs = listOf(
+        Transaction(
+            id = 100L,
+            amount = BigDecimal("121.00"),
+            date = LocalDateTime.now(),
+            comment = "Credit Card Payment",
+            isCredit = true
+        )
+    )
+    return AnalyticsState(
         periodFinished = periodFinished,
-        transactions = previewAnalyticsTransactions(),
-        spends = previewAnalyticsTransactions(),
+        transactions = txs + creditTxs,
+        spends = txs + creditTxs,
         wholeBudget = BigDecimal(2400),
         startPeriodDate = previewStartDate,
         finishPeriodDate = if (periodFinished) Date() else previewFinishDate,
         finishPeriodActualDate = if (periodFinished) Date() else null,
+        creditOwed = BigDecimal("121.00"),
+        creditTransactions = creditTxs
     )
+}

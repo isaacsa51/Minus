@@ -87,6 +87,7 @@ class MinusCsvParser {
             ?: 0L
 
         val isCredit = raw.valueOf(MinusCsvContract.COL_IS_CREDIT).trim() == "1"
+        val isCreditPaid = raw.valueOf(MinusCsvContract.COL_IS_CREDIT_PAID).trim() == "1"
 
         return CsvTransactionRow(
             id = id,
@@ -98,6 +99,7 @@ class MinusCsvParser {
             endDate = endDate,
             subscriptionDay = subDay,
             isCredit = isCredit,
+            isCreditPaid = isCreditPaid,
         )
     }
 

@@ -122,6 +122,7 @@ class RecurrentExpenseNotificationWorker(
             .filter { tx ->
                 tx.isCredit &&
                     !tx.isDeleted &&
+                    !tx.isCreditPaid &&
                     tx.date != null &&
                     tx.date.toLocalDate().month == cutoffThisMonth.month &&
                     tx.date.toLocalDate().year == cutoffThisMonth.year &&

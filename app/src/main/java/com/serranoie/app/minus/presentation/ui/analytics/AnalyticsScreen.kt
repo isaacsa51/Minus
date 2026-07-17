@@ -51,6 +51,9 @@ fun AnalyticsScreen(
             onClose = {
                 viewModel.onClose()
             },
+            onMarkCreditPaid = {
+                viewModel.onMarkCreditPaid()
+            }
         ),
         activityResultRegistryOwner = activityResultRegistryOwner,
     )

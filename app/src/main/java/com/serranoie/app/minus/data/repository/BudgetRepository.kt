@@ -57,4 +57,6 @@ interface BudgetRepository {
     suspend fun incrementCategoryUsage(name: String)
 
     suspend fun getPeriodCount(): Int
+
+    suspend fun markCreditTransactionsAsPaid(start: LocalDate, end: LocalDate)
 }

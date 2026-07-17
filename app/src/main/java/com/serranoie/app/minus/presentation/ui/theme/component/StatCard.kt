@@ -48,7 +48,7 @@ fun StatCard(
 	contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
 	colors: CardColors = CardDefaults.cardColors(
 		containerColor = MaterialTheme.colorScheme.surfaceDim,
-		contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+		contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
 	),
 	valueFontSize: TextUnit = MaterialTheme.typography.titleLargeEmphasized.fontSize,
 	valueFontStyle: TextStyle = MaterialTheme.typography.displayMediumCondensed.copy(fontWeight = FontWeight.Light),

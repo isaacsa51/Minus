@@ -12,6 +12,7 @@ object MinusCsvContract {
     const val COL_SUB_DAY = "sub_day"
     const val COL_ID = "id"
     const val COL_IS_CREDIT = "is_credit"
+    const val COL_IS_CREDIT_PAID = "is_credit_paid"
 
     const val COL_BUDGET_TOTAL = "budget_total"
     const val COL_BUDGET_PERIOD = "budget_period"
@@ -36,6 +37,7 @@ object MinusCsvContract {
         COL_SUB_DAY,
         COL_ID,
         COL_IS_CREDIT,
+        COL_IS_CREDIT_PAID,
         COL_BUDGET_TOTAL,
         COL_BUDGET_PERIOD,
         COL_BUDGET_START_DATE,

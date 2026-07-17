@@ -34,7 +34,9 @@ data class BudgetUiState(
 	val dragProgress: Float = 0f,
 	val lockSwipeable: Boolean = false,
 	val lockDraggable: Boolean = false,
-	val pendingExpensesForNextPeriod: List<Transaction> = emptyList()
+	val pendingExpensesForNextPeriod: List<Transaction> = emptyList(),
+	val creditOwed: BigDecimal = BigDecimal.ZERO,
+	val debtAdjustedBalance: BigDecimal = BigDecimal.ZERO,
 ) {
 	companion object {
 		val INITIAL = BudgetUiState()

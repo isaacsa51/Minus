@@ -51,6 +51,7 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.countDays
@@ -75,6 +76,7 @@ fun BudgetDisplay(
     actualFinishDate: Date? = null,
     extraDaysFromRemaining: Int = 0,
     showRolloverStyle: Boolean = true,
+    debtAdjustedBalance: BigDecimal? = null,
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 18.dp),
 ) {
     val currencyFormat =
@@ -269,6 +271,29 @@ fun BudgetDisplay(
                             style = MaterialTheme.typography.bodyMediumCondensed,
                         )
                     }
+                }
+            }
+
+            if (debtAdjustedBalance != null && debtAdjustedBalance != (budgetState?.remainingToday ?: BigDecimal.ZERO)) {
+                androidx.compose.material3.HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.debt_adjusted_balance_label),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                    )
+                    Text(
+                        text = currencyFormat.format(debtAdjustedBalance),
+                        style = MaterialTheme.typography.bodySmallCondensed,
+                        color = if (debtAdjustedBalance < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.surfaceVariant
+                    )
                 }
             }
         }

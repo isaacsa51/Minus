@@ -171,6 +171,7 @@ fun History(
                 budgetState = uiState.budgetState,
                 budgetSettings = uiState.budgetSettings,
                 currencyCode = currencyCode,
+                debtAdjustedBalance = uiState.debtAdjustedBalance,
             )
 
             currentPeriodRecurrentSection(

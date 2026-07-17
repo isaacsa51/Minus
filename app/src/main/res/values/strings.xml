@@ -562,4 +562,8 @@
 
     <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
     <string name="notification_credit_cutoff_message">Your cutoff date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+
+    <string name="credit_owed_label">TOTAL OWED</string>
+    <string name="debt_adjusted_balance_label">Debt-Adjusted Balance</string>
+    <string name="pay_card_action">Pay Card</string>
 </resources>

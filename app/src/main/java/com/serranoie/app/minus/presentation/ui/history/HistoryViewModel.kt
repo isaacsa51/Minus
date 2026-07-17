@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -195,6 +196,10 @@ class HistoryViewModel @Inject constructor(
 
         val groupedPast = groupTransactionsByDate(pastPeriodTx)
 
+        val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }.sumOf { it.amount }
+        val remainingBudget = budgetState?.remainingToday ?: BigDecimal.ZERO
+        val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
+
         // Auto-expand first date group on initial load
         val autoExpanded = if (current.expandedDates.isEmpty()) {
             groupedCurrent.keys.filterNotNull().sortedDescending().take(1).toSet()
@@ -213,6 +218,8 @@ class HistoryViewModel @Inject constructor(
             upcomingRecurrentInPeriod = upcomingInPeriod,
             futureRecurrentOutOfPeriod = futureOutOfPeriod,
             expandedDates = autoExpanded,
+            creditOwed = creditOwed,
+            debtAdjustedBalance = debtAdjustedBalance,
             recurrentPaymentsViewMode = userSettings?.recurrentPaymentsViewMode
                 ?: RecurrentPaymentsViewMode.VERTICAL_LIST,
         )

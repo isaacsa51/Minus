@@ -18,7 +18,7 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
         CategoryEntity::class,
         QueuedTransactionEntity::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
