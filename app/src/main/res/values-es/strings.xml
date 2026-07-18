@@ -492,4 +492,10 @@
 
     <string name="notification_credit_cutoff_title">Pago de tarjeta próximo</string>
     <string name="notification_credit_cutoff_message">Tu fecha de corte es el %1$s. Se recomienda saldar %2$s para evitar intereses.</string>
+    <string name="credit_owed_label">Total adeudado</string>
+    <string name="debt_adjusted_balance_label">Saldo ajustado por deuda</string>
+    <string name="debt_adjusted_label_format">%1$s - %2$s deuda de crédito</string>
+    <string name="credit_badge">CRÉDITO</string>
+    <string name="credit_cutoff_subtitle">%1$s — Fecha límite en %2$d días</string>
+    <string name="credit_cutoff_subtitle_today">%1$s — Fecha límite</string>
 </resources>

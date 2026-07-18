@@ -566,9 +566,10 @@
     <string name="credit_owed_label">Total owed</string>
     <string name="debt_adjusted_balance_label">Debt-Adjusted Balance</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s credit debt</string>
-    <string name="pay_card_action">Pay Card</string>
 
     <string name="credit_badge">CREDIT</string>
-    <string name="credit_cutoff_subtitle">%1$s · Cutoff in %2$d days</string>
-    <string name="credit_cutoff_subtitle_today">%1$s · Cutoff today</string>
+    <string name="credit_cutoff_subtitle">%1$s — Cutoff in %2$d days</string>
+    <string name="credit_cutoff_subtitle_today">%1$s — Cutoff today</string>
+    <string name="ticket_expense">EXPENSE</string>
+    <string name="ticket_recurrent_expense">RECURRING EXPENSE</string>
 </resources>
