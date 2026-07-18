@@ -161,18 +161,14 @@ fun BudgetDisplay(
             contentColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         label = if (hasCCDebt) {
-            stringResource(
-                R.string.debt_adjusted_label_format,
-                stringResource(R.string.total_budget),
-                currencyFormat.format(creditOwed)
-            )
+            "${stringResource(R.string.total_budget)} - ${currencyFormat.format(creditOwed)} (${stringResource(R.string.credit_owed_label)})"
         } else {
             stringResource(R.string.total_budget)
         },
         value = if (useAnnotatedValue) formattedAmount else formattedValue,
         annotatedValue = annotatedDisplayValue,
         crossedValue = when {
-            hasCCDebt -> null
+            hasCCDebt -> currencyFormat.format(displayBudget)
             shouldShowCrossedBaseBudget -> currencyFormat.format(baseBudget)
             else -> null
         },

@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
@@ -104,7 +105,8 @@ fun ExpenseItem(
                         onClick = onClick,
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        creditCardCutoffDay = creditCardCutoffDay,
                     )
                 } else {
                     Row(
@@ -120,14 +122,20 @@ fun ExpenseItem(
                                     ),
                                     color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Medium,
-                                    modifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
-                                        with(sharedTransitionScope) {
-                                            Modifier.sharedElement(
-                                                rememberSharedContentState(key = "comment_${transaction.id}"),
-                                                animatedVisibilityScope = animatedVisibilityScope
-                                            )
-                                        }
-                                    } else Modifier
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier
+                                        .weight(1f, fill = false)
+                                        .then(
+                                            if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                                                with(sharedTransitionScope) {
+                                                    Modifier.sharedElement(
+                                                        rememberSharedContentState(key = "comment_${transaction.id}"),
+                                                        animatedVisibilityScope = animatedVisibilityScope
+                                                    )
+                                                }
+                                            } else Modifier
+                                        )
                                 )
 
                                 if (transaction.isCredit) {
@@ -140,7 +148,8 @@ fun ExpenseItem(
                                             text = stringResource(R.string.credit_badge),
                                             style = MaterialTheme.typography.labelSmallCondensed,
                                             color = MaterialTheme.colorScheme.onTertiaryContainer,
-                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                            softWrap = false
                                         )
                                     }
                                 }

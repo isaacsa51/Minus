@@ -16,8 +16,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
@@ -34,6 +38,7 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.calculateDaysToCutoff
@@ -127,7 +132,8 @@ fun UpcomingRecurrentItemRow(
                         onClick = onClick,
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        creditCardCutoffDay = creditCardCutoffDay,
                     )
                 } else {
                     Row(
@@ -135,22 +141,46 @@ fun UpcomingRecurrentItemRow(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = transaction.comment.ifEmpty { stringResource(R.string.expense_item_unnamed_expense) },
-                                style = MaterialTheme.typography.titleMediumCondensed.copy(
-                                    fontStyle = if (transaction.isCredit) FontStyle.Italic else FontStyle.Normal
-                                ),
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Medium,
-                                modifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
-                                    with(sharedTransitionScope) {
-                                        Modifier.sharedElement(
-                                            rememberSharedContentState(key = "comment_${transaction.id}"),
-                                            animatedVisibilityScope = animatedVisibilityScope
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = transaction.comment.ifEmpty { stringResource(R.string.expense_item_unnamed_expense) },
+                                    style = MaterialTheme.typography.titleMediumCondensed.copy(
+                                        fontStyle = if (transaction.isCredit) FontStyle.Italic else FontStyle.Normal
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier
+                                        .weight(1f, fill = false)
+                                        .then(
+                                            if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                                                with(sharedTransitionScope) {
+                                                    Modifier.sharedElement(
+                                                        rememberSharedContentState(key = "comment_${transaction.id}"),
+                                                        animatedVisibilityScope = animatedVisibilityScope
+                                                    )
+                                                }
+                                            } else Modifier
+                                        )
+                                )
+
+                                if (transaction.isCredit) {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                                        shape = RoundedCornerShape(4.dp)
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.credit_badge),
+                                            style = MaterialTheme.typography.labelSmallCondensed,
+                                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                            softWrap = false
                                         )
                                     }
-                                } else Modifier
-                            )
+                                }
+                            }
                             Text(
                                 text = daysText,
                                 style = MaterialTheme.typography.bodySmall,
