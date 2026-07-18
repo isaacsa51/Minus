@@ -53,6 +53,9 @@ fun AnalyticsScreen(
             },
             onMarkCreditPaid = {
                 viewModel.onMarkCreditPaid()
+            },
+            onCutoffDayChanged = { day ->
+                viewModel.onCutoffDayChanged(day)
             }
         ),
         activityResultRegistryOwner = activityResultRegistryOwner,

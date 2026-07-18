@@ -18,11 +18,12 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 
 @Composable
-internal fun CreditCutoffDayDialog(
+fun CreditCutoffDayDialog(
+    initialDay: Int = 15,
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit,
 ) {
-    var cutoffDayInput by remember { mutableStateOf("15") }
+    var cutoffDayInput by remember { mutableStateOf(initialDay.toString()) }
     val cutoffDay = cutoffDayInput.toIntOrNull()
     val isValid = cutoffDay != null && cutoffDay in 1..31
 

@@ -441,6 +441,17 @@ class AnalyticsViewModel @Inject constructor(
         }
     }
 
+    fun onCutoffDayChanged(day: Int) {
+        val currentSettings = _uiState.value.budgetSettings ?: return
+        if (day !in 1..31) return
+
+        viewModelScope.launch {
+            budgetRepository.saveBudgetSettings(
+                currentSettings.copy(creditCardCutoffDay = day)
+            )
+        }
+    }
+
     fun consumeEffect() {
         _effects.value = null
     }

@@ -96,6 +96,7 @@ data class AnalyticsActions(
     val onClose: () -> Unit = {},
     val onExportCSV: () -> Unit = {},
     val onMarkCreditPaid: () -> Unit = {},
+    val onCutoffDayChanged: (Int) -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -250,7 +251,9 @@ fun Analytics(
                 onPayClick = {
                     actions.onMarkCreditPaid()
                     showCreditSheet = false
-                }
+                },
+                creditCardCutoffDay = state.budgetSettingsForDisplay?.creditCardCutoffDay,
+                onCutoffDayChanged = actions.onCutoffDayChanged
             )
         }
     }
