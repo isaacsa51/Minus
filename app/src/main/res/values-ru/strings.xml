@@ -478,8 +478,8 @@
     <string name="notification_channel_credit_name">Credit Card Reminders</string>
     <string name="notification_channel_credit_description">Reminders before credit card cutoff date</string>
     <string name="notification_period_end_title">Budget period finished</string>
-    <string name="notification_period_end_message_positive">The period ended with $%1$s remaining. Tap to see details.</string>
-    <string name="notification_period_end_message_negative">The period ended. You spent $%1$s extra. See more details.</string>
+    <string name="notification_period_end_message_positive">The period ended with %1$s remaining. Tap to see details.</string>
+    <string name="notification_period_end_message_negative">The period ended. You spent %1$s extra. See more details.</string>
     <string name="notification_period_end_message_neutral">The period ended. You didn\'t spend anything. See more details.</string>
     <string name="notification_recurrent_expense_title">Recurring expense</string>
     <string name="notification_recurrent_expense_message_with_comment">Your recurring expense of \"%1$s\" for \"%2$s\" is today.</string>
