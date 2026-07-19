@@ -41,7 +41,7 @@ import com.serranoie.app.minus.presentation.util.prettyDate
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
-internal fun ExpenseItemExpandedContent(
+fun ExpenseItemExpandedContent(
     transaction: Transaction,
     currencyFormat: NumberFormat,
     onEdit: () -> Unit,

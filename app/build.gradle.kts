@@ -27,9 +27,23 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     }
 }
 
+val mockkAgent by configurations.creating {
+    isVisible = false
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+
 tasks.withType<Test>().configureEach {
     systemProperty("app.cash.paparazzi.differ", "offbytwo")
     systemProperty("paparazzi.maxPercentDifferenceDefault", "5.0")
+    jvmArgs("-Djdk.attach.allowAttachSelf=true")
+    // Required for MockK / ByteBuddy on JDK 21.
+    jvmArgs(
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util=ALL-UNNAMED",
+        "--add-opens", "java.base/java.time=ALL-UNNAMED"
+    )
+    jvmArgs("-javaagent:${mockkAgent.files.single { it.name.startsWith("byte-buddy-agent-") }.absolutePath}")
 }
 
 fun gitOutput(vararg args: String): String? {
@@ -251,6 +265,7 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.google.truth)
     testImplementation(libs.mockk)
+    "mockkAgent"(libs.byte.buddy.agent)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
