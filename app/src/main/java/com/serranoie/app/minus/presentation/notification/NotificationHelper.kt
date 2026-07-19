@@ -13,17 +13,13 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.MainActivity
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import logcat.logcat
+import java.math.BigDecimal
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Helper class to manage notification channels and show notifications.
- * Creates two notification channels:
- * 1. Budget Period End - for notifications when budget period ends
- * 2. Recurrent Expenses - for notifications when recurrent expenses are due
- */
 @Singleton
 class NotificationHelper @Inject constructor(
     @param:ApplicationContext private val context: Context
@@ -111,7 +107,8 @@ class NotificationHelper @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val message = buildPeriodEndMessage(remainingBudget)
+        val formattedAmount = formatAmount(remainingBudget, currency)
+        val message = buildPeriodEndMessage(remainingBudget, formattedAmount)
 
         val notification = NotificationCompat.Builder(context, CHANNEL_PERIOD_END)
             .setSmallIcon(R.drawable.ic_notification)
@@ -129,21 +126,26 @@ class NotificationHelper @Inject constructor(
         logcat { "Period end notification shown successfully" }
     }
 
-    private fun buildPeriodEndMessage(remainingBudget: String): String {
+    private fun buildPeriodEndMessage(remainingBudget: String, formattedAmount: String): String {
         val amount = remainingBudget.toDoubleOrNull() ?: 0.0
         return if (amount > 0) {
-            context.getString(R.string.notification_period_end_message_positive, remainingBudget)
+            context.getString(R.string.notification_period_end_message_positive, formattedAmount)
         } else if (amount < 0) {
             context.getString(
                 R.string.notification_period_end_message_negative,
-                kotlin.math.abs(amount).toString()
+                formattedAmount
             )
         } else {
             context.getString(R.string.notification_period_end_message_neutral)
         }
     }
 
-    fun showRecurrentExpenseNotification(amount: String, comment: String) {
+    private fun formatAmount(amount: String, currency: String): String {
+        val decimalValue = amount.toBigDecimalOrNull() ?: BigDecimal.ZERO
+        return symbolOnlyCurrencyFormat(currency).format(decimalValue)
+    }
+
+    fun showRecurrentExpenseNotification(amount: String, comment: String, currency: String) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
             logcat { "Cannot show notification - permission not granted" }
@@ -161,17 +163,18 @@ class NotificationHelper @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val formattedAmount = formatAmount(amount, currency)
         val title = context.getString(R.string.notification_recurrent_expense_title)
         val message = if (comment.isNotBlank()) {
             context.getString(
                 R.string.notification_recurrent_expense_message_with_comment,
                 comment,
-                amount
+                formattedAmount
             )
         } else {
             context.getString(
                 R.string.notification_recurrent_expense_message_without_comment,
-                amount
+                formattedAmount
             )
         }
 
@@ -218,18 +221,19 @@ class NotificationHelper @Inject constructor(
             else -> context.getString(R.string.notification_in_days, daysUntil)
         }
 
+        val formattedAmount = formatAmount(amount, currency)
         val title = context.getString(R.string.notification_upcoming_subscription_title)
         val message = if (comment.isNotBlank()) {
             context.getString(
                 R.string.notification_upcoming_subscription_message_with_comment,
                 comment,
-                amount,
+                formattedAmount,
                 daysText
             )
         } else {
             context.getString(
                 R.string.notification_upcoming_subscription_message_without_comment,
-                amount,
+                formattedAmount,
                 daysText
             )
         }
@@ -273,10 +277,11 @@ class NotificationHelper @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val formattedAmount = formatAmount(totalAmount, currency)
         val message = context.getString(
             R.string.notification_credit_cutoff_message,
             cutoffDateText,
-            totalAmount
+            formattedAmount
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_CREDIT)
