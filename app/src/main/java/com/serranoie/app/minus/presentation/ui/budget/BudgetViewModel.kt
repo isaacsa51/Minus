@@ -388,7 +388,8 @@ class BudgetViewModel @Inject constructor(
             try {
                 notificationHelper.showRecurrentExpenseNotification(
                     amount = "50.00",
-                    comment = "Test expense"
+                    comment = "Test expense",
+                    currency = currency
                 )
             } catch (e: Exception) {
                 logcat(TAG) { e.asLog() }

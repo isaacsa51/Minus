@@ -476,8 +476,8 @@
     <string name="notification_channel_credit_description">Recordatorios antes de la fecha de corte de la tarjeta de crédito</string>
 
     <string name="notification_period_end_title">Periodo de ahorro finalizado</string>
-    <string name="notification_period_end_message_positive">El periodo terminó con $%1$s sobrante. Toca para ver detalles.</string>
-    <string name="notification_period_end_message_negative">El periodo se acabó. Gastaste $%1$s de más. Ver más detalles.</string>
+    <string name="notification_period_end_message_positive">El periodo terminó con %1$s sobrante. Toca para ver detalles.</string>
+    <string name="notification_period_end_message_negative">El periodo se acabó. Gastaste %1$s de más. Ver más detalles.</string>
     <string name="notification_period_end_message_neutral">El periodo se acabó. No gastaste nada. Ver más detalles.</string>
 
     <string name="notification_recurrent_expense_title">Gasto recurrente</string>

@@ -161,7 +161,8 @@ class RecurrentExpenseNotificationWorker(
 
         notificationHelper.showRecurrentExpenseNotification(
             amount = transaction.amount.toPlainString(),
-            comment = transaction.comment
+            comment = transaction.comment,
+            currency = settings.currencyCode
         )
         applicationContext.settingsDataStore.edit { prefs ->
             prefs[dedupeKey] = today.toString()
