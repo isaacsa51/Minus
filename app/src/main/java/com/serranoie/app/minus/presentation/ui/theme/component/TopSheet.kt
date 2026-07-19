@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -93,23 +92,7 @@ fun TopSheetLayout(
         .coerceAtLeast(16.dp)
 
     val nestedScrollConnection = remember(swipeableState) {
-        object : NestedScrollConnection {
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                if (source == NestedScrollSource.UserInput && available.y > 0f) {
-                    if (swipeableState.currentValue == TopSheetValue.Expanded) {
-                        coroutineScope.launch {
-                            swipeableState.animateTo(TopSheetValue.Dismissed)
-                        }
-                        return available
-                    }
-                }
-                return Offset.Zero
-            }
-        }
+        object : NestedScrollConnection {}
     }
 
     BoxWithConstraints(
