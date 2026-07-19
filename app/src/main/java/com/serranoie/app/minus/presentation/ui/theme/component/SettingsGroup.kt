@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -490,9 +491,10 @@ fun CustomPaddedListItem(
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     onLongClick: (() -> Unit)? = null,
     borderStroke: BorderStroke? = null,
+    customShape: Shape? = null,
     content: @Composable RowScope.() -> Unit
 ) {
-    val shape = when (position) {
+    val shape = customShape ?: when (position) {
         PaddedListItemPosition.First -> RoundedCornerShape(
             topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
         )

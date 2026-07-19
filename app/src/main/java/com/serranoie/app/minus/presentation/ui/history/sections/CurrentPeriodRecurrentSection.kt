@@ -46,6 +46,7 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
     onClick: (Transaction) -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    creditCardCutoffDay: Int? = null,
 ) {
     if (upcomingRecurrentInPeriod.isEmpty()) return
 
@@ -87,6 +88,7 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
                         onEdit = { onEdit(item.transaction) },
                         onMarkAsPaid = { onMarkAsPaid(item.transaction) },
                         onClick = { onClick(item.transaction) },
+                        creditCardCutoffDay = creditCardCutoffDay,
                     )
                 },
                 horizontalKeyPrefix = "upcoming",

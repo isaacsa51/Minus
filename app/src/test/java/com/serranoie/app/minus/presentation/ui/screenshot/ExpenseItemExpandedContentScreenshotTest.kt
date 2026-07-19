@@ -10,14 +10,15 @@ import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseDetailContent
+import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItemExpandedContent
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.Locale
 
-class ExpenseDetailContentScreenshotTest {
+class ExpenseItemExpandedContentScreenshotTest {
     @get:Rule
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_5,
@@ -31,7 +32,7 @@ class ExpenseDetailContentScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                    ExpenseDetailContent(
+                    ExpenseItemExpandedContent(
                         transaction = Transaction(
                             id = 1L,
                             amount = BigDecimal("42.50"),
@@ -39,16 +40,8 @@ class ExpenseDetailContentScreenshotTest {
                             date = LocalDate.of(2026, 1, 15).atTime(12, 30),
                             periodId = 7L,
                         ),
-                        isRecurrentExpense = false,
-                        operationNumber = "#42",
-                        operationTime = "12:30 PM",
-                        totalAmountText = "$42.50",
-                        details = listOf(
-                            "Category" to "Food",
-                            "Date" to "Jan 15, 2026",
-                            "Period" to "January 2026",
-                        ),
-                        onMarkAsPaid = null,
+                        currencyFormat = symbolOnlyCurrencyFormat("USD"),
+                        onMarkAsPaid = {},
                         onEdit = {},
                         onDelete = {},
                         readOnly = true,

@@ -4,6 +4,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
+import java.math.BigDecimal
 import java.time.LocalDate
 
 sealed interface HistoryUiIntent {
@@ -57,4 +58,6 @@ data class HistoryUiState(
     val groupedPastTransactions: Map<LocalDate?, List<Transaction>> = emptyMap(),
     val upcomingRecurrentInPeriod: List<UpcomingRecurrentItem> = emptyList(),
     val futureRecurrentOutOfPeriod: List<UpcomingRecurrentItem> = emptyList(),
+    val creditOwed: BigDecimal = BigDecimal.ZERO,
+    val debtAdjustedBalance: BigDecimal = BigDecimal.ZERO,
 )

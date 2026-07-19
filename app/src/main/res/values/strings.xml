@@ -562,4 +562,14 @@
 
     <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
     <string name="notification_credit_cutoff_message">Your cutoff date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+
+    <string name="credit_owed_label">Total owed</string>
+    <string name="debt_adjusted_balance_label">Debt-Adjusted Balance</string>
+    <string name="debt_adjusted_label_format">%1$s - %2$s credit debt</string>
+
+    <string name="credit_badge">CREDIT</string>
+    <string name="credit_cutoff_subtitle">%1$s — Cutoff in %2$d days</string>
+    <string name="credit_cutoff_subtitle_today">%1$s — Cutoff today</string>
+    <string name="ticket_expense">EXPENSE</string>
+    <string name="ticket_recurrent_expense">RECURRING EXPENSE</string>
 </resources>

@@ -54,7 +54,8 @@ data class CategoryAnalyticsState(
     val isLoading: Boolean = false,
     val categoryName: String = "",
     val categorySpends: List<Transaction> = emptyList(),
-    val currencyCode: String = "USD"
+    val currencyCode: String = "USD",
+    val creditCardCutoffDay: Int? = null,
 )
 
 @Composable
@@ -187,7 +188,8 @@ fun CategoryAnalytics(
                             currencyFormat = currencyFormat,
                             position = position,
                             sharedTransitionScope = null,
-                            animatedVisibilityScope = null
+                            animatedVisibilityScope = null,
+                            creditCardCutoffDay = state.creditCardCutoffDay,
                         )
                     }
 
@@ -237,11 +239,13 @@ private fun PreviewCategoryAnalytics() {
         CategoryAnalytics(
             state = CategoryAnalyticsState(
                 categoryName = "Comida",
+                creditCardCutoffDay = 15,
                 categorySpends = listOf(
                     Transaction(
                         amount = BigDecimal("150.00"),
                         comment = "Comida",
-                        date = LocalDateTime.now().minusDays(2)
+                        date = LocalDateTime.now().minusDays(2),
+                        isCredit = true
                     ),
                     Transaction(
                         amount = BigDecimal("85.50"),

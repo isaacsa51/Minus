@@ -60,7 +60,8 @@ class BudgetRepositoryImpl @Inject constructor(
         },
         subscriptionDay = this.subscriptionDay,
         categoryId = this.categoryId,
-        isCredit = this.isCredit
+        isCredit = this.isCredit,
+        isCreditPaid = this.isCreditPaid
     )
 
     private fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
@@ -76,7 +77,8 @@ class BudgetRepositoryImpl @Inject constructor(
         recurrentEndDate = this.recurrentEndDate?.toEpochSecond(ZoneOffset.UTC)?.times(1000),
         subscriptionDay = this.subscriptionDay,
         categoryId = this.categoryId,
-        isCredit = this.isCredit
+        isCredit = this.isCredit,
+        isCreditPaid = this.isCreditPaid
     )
 
     private fun QueuedTransactionEntity.toDomain(): Transaction = Transaction(
@@ -93,7 +95,8 @@ class BudgetRepositoryImpl @Inject constructor(
         recurrentEndDate = null,
         subscriptionDay = null,
         categoryId = this.categoryId,
-        isCredit = this.isCredit
+        isCredit = this.isCredit,
+        isCreditPaid = this.isCreditPaid
     )
 
     private fun Transaction.toQueuedEntity(): QueuedTransactionEntity = QueuedTransactionEntity(
@@ -103,7 +106,8 @@ class BudgetRepositoryImpl @Inject constructor(
         date = this.date!!.toEpochSecond(ZoneOffset.UTC) * 1000,
         createdAt = this.createdAt,
         categoryId = this.categoryId,
-        isCredit = this.isCredit
+        isCredit = this.isCredit,
+        isCreditPaid = this.isCreditPaid
     )
 
     private fun BudgetSettingsEntity.toDomain(): BudgetSettings {
@@ -329,5 +333,11 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun getPeriodCount(): Int {
         return transactionDao.countDistinctPeriods()
+    }
+
+    override suspend fun markCreditTransactionsAsPaid(start: LocalDate, end: LocalDate) {
+        val startMillis = start.toEpochDay() * 86400000
+        val endMillis = end.toEpochDay() * 86400000
+        transactionDao.markCreditAsPaidInRange(startMillis, endMillis)
     }
 }

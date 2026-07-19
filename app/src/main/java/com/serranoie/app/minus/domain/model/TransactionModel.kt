@@ -18,6 +18,7 @@ data class Transaction(
     val subscriptionDay: Int? = null,
     val categoryId: Long? = null,
     val isCredit: Boolean = false,
+    val isCreditPaid: Boolean = false,
     val sourceTransactionId: Long? = null
 ) {
     companion object {
@@ -32,7 +33,8 @@ data class Transaction(
             recurrentEndDate: LocalDateTime? = null,
             subscriptionDay: Int? = null,
             categoryId: Long? = null,
-            isCredit: Boolean = false
+            isCredit: Boolean = false,
+            isCreditPaid: Boolean = false
         ): Transaction = Transaction(
             id = 0,
             amount = amount,
@@ -46,7 +48,8 @@ data class Transaction(
             recurrentEndDate = recurrentEndDate,
             subscriptionDay = subscriptionDay,
             categoryId = categoryId,
-            isCredit = isCredit
+            isCredit = isCredit,
+            isCreditPaid = isCreditPaid
         )
     }
 }

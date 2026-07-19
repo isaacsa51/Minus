@@ -46,4 +46,13 @@ object AppDatabaseMigrations {
             )
         }
     }
+
+    val MIGRATION_11_12: Migration = object : Migration(11, 12) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE transactions ADD COLUMN isCreditPaid INTEGER NOT NULL DEFAULT 0")
+            db.execSQL(
+                "ALTER TABLE queued_transactions ADD COLUMN isCreditPaid INTEGER NOT NULL DEFAULT 0"
+            )
+        }
+    }
 }

@@ -227,6 +227,10 @@ class BudgetViewModel @Inject constructor(
         val numpadInput = numpadController.input.value
         val editorState = editorStateController.state.value
 
+        val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }.sumOf { it.amount }
+        val remainingBudget = budgetState?.remainingToday ?: BigDecimal.ZERO
+        val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
+
         return BudgetUiState(
             isLoading = false,
             budgetSettings = settingsWithRollover,
@@ -250,6 +254,8 @@ class BudgetViewModel @Inject constructor(
             dragProgress = numpadController.dragProgress.value,
             lockSwipeable = editorState.lockSwipeable,
             lockDraggable = editorState.lockDraggable,
+            creditOwed = creditOwed,
+            debtAdjustedBalance = debtAdjustedBalance,
         )
     }
 

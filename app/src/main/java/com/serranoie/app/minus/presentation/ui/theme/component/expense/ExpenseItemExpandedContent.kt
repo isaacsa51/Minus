@@ -32,6 +32,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.censor
+import com.serranoie.app.minus.presentation.util.calculateDaysToCutoff
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDateTime
@@ -40,7 +41,7 @@ import com.serranoie.app.minus.presentation.util.prettyDate
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
-internal fun ExpenseItemExpandedContent(
+fun ExpenseItemExpandedContent(
     transaction: Transaction,
     currencyFormat: NumberFormat,
     onEdit: () -> Unit,
@@ -51,6 +52,7 @@ internal fun ExpenseItemExpandedContent(
     onClick: () -> Unit = {},
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    creditCardCutoffDay: Int? = null,
 ) {
     val withoutDate = stringResource(R.string.without_date)
     val noName = stringResource(R.string.no_name)
@@ -71,6 +73,17 @@ internal fun ExpenseItemExpandedContent(
     val details = buildList {
         add(stringResource(R.string.description) to transaction.comment.ifEmpty { noName })
         add(dateLabel to transactionDateText)
+
+        if (transaction.isCredit && creditCardCutoffDay != null) {
+            val daysToCutoff = calculateDaysToCutoff(creditCardCutoffDay)
+            val cutoffValue = if (daysToCutoff == 0) {
+                stringResource(R.string.today)
+            } else {
+                stringResource(R.string.upcoming_recurrent_in_days, daysToCutoff.toLong())
+            }
+            add(stringResource(R.string.credit_cutoff_dialog_label) to cutoffValue)
+        }
+
         if (transaction.isRecurrent && recurrenceLabel.isNotEmpty()) {
             add(frequencyLabel to recurrenceLabel)
         }

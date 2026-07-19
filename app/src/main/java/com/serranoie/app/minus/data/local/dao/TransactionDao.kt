@@ -88,4 +88,11 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions ORDER BY date DESC LIMIT :limit")
     suspend fun getRecentTransactions(limit: Int): List<TransactionEntity>
+
+    @Query("""
+        UPDATE transactions 
+        SET isCreditPaid = 1 
+        WHERE isCredit = 1 AND date >= :startDate AND date < :endDate AND isCreditPaid = 0
+    """)
+    suspend fun markCreditAsPaidInRange(startDate: Long, endDate: Long)
 }

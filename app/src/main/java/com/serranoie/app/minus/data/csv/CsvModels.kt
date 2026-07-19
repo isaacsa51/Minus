@@ -16,7 +16,8 @@ data class CsvTransactionRow(
     val frequency: RecurrentFrequency?,
     val endDate: LocalDate?,
     val subscriptionDay: Int?,
-    val isCredit: Boolean
+    val isCredit: Boolean,
+    val isCreditPaid: Boolean
 )
 
 data class CsvBackupMetadata(
@@ -48,7 +49,8 @@ fun CsvTransactionRow.toDomainTransaction(): Transaction {
         recurrentFrequency = frequency,
         recurrentEndDate = endDate?.atStartOfDay(),
         subscriptionDay = subscriptionDay,
-        isCredit = isCredit
+        isCredit = isCredit,
+        isCreditPaid = isCreditPaid
     )
 }
 
