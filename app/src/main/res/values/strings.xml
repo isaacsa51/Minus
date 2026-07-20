@@ -183,7 +183,7 @@
     <string name="left">Left</string>
     <string name="remaining">Remaining</string>
     <string name="total_spent">Total Spent</string>
-    <string name="days_left">days left</string>
+    <string name="days_left">days\nleft</string>
     <string name="budget_overview">Budget Overview</string>
 
     <string name="spent_per_day">Spent per day</string>

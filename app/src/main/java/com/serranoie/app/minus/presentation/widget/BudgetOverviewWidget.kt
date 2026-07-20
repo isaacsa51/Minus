@@ -160,7 +160,7 @@ class BudgetOverviewWidget : GlanceAppWidget() {
                             modifier = GlanceModifier
                                 .background(GlanceTheme.colors.onSurfaceVariant)
                                 .cornerRadius(16.dp)
-                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                                .padding(horizontal = 12.dp, vertical = 4.dp)
                         ) {
                             Text(
                                 text = daysCountFormat(daysCount), style = TextStyle(

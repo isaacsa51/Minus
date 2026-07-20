@@ -151,7 +151,7 @@
     <string name="left">Faltante</string>
     <string name="remaining">Restante</string>
     <string name="total_spent">Total gastado</string>
-    <string name="days_left">días restantes</string>
+    <string name="days_left">días\nrestantes</string>
     <string name="budget_overview">Resumen del presupuesto</string>
     <string name="spent_per_day">Gastado por día</string>
     <string name="budget_period_daily">A diario</string>
