@@ -7,16 +7,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onLast
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
+import androidx.compose.ui.test.waitUntilDoesNotExist
 import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
@@ -79,22 +83,26 @@ class HistoryScreenE2ETest {
     )
 
     private fun sampleTransactions(): List<Transaction> = listOf(
-        Transaction.create(
+        Transaction(
+            id = 1L,
             amount = BigDecimal("45.50"),
             comment = "Groceries",
             date = LocalDateTime.now().minusHours(2),
         ),
-        Transaction.create(
+        Transaction(
+            id = 2L,
             amount = BigDecimal("12.00"),
             comment = "Coffee",
             date = LocalDateTime.now().minusHours(5),
         ),
-        Transaction.create(
+        Transaction(
+            id = 3L,
             amount = BigDecimal("85.00"),
             comment = "Gas",
             date = LocalDateTime.now().minusDays(1),
         ),
-        Transaction.create(
+        Transaction(
+            id = 4L,
             amount = BigDecimal("30.00"),
             comment = "Lunch",
             date = LocalDateTime.now().minusDays(2),
@@ -118,7 +126,8 @@ class HistoryScreenE2ETest {
 
     private fun sampleUpcomingRecurrentItems(): List<UpcomingRecurrentItem> = listOf(
         UpcomingRecurrentItem(
-            transaction = Transaction.create(
+            transaction = Transaction(
+                id = 5L,
                 amount = BigDecimal("15.00"),
                 comment = "Netflix",
                 date = LocalDateTime.now().minusDays(10),
@@ -283,6 +292,7 @@ class HistoryScreenE2ETest {
         composeTestRule.onAllNodesWithText("Coffee").onLast().assertIsDisplayed()
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun when_tapping_transaction_then_deleting_from_dialog_removes_it_from_list() {
         val transactions = sampleTransactions()
@@ -327,12 +337,12 @@ class HistoryScreenE2ETest {
         }
 
         composeTestRule.onNodeWithText("Coffee").performClick()
+        composeTestRule.waitForIdle()
 
-        val deleteLabel = composeTestRule.activity.getString(R.string.delete)
-        composeTestRule.onNodeWithText(deleteLabel).performClick()
+        composeTestRule.onNodeWithTag("ExpenseItem_DeleteButton_2").performClick()
 
-        composeTestRule.mainClock.advanceTimeBy(500)
-        composeTestRule.onAllNodesWithText("Coffee").assertCountEquals(0)
+        composeTestRule.waitForIdle()
+        composeTestRule.waitUntilDoesNotExist(hasText("Coffee"), timeoutMillis = 2000L)
     }
 
     @Test
@@ -375,14 +385,14 @@ class HistoryScreenE2ETest {
             }
 
         composeTestRule.onNodeWithText("Coffee").performClick()
+        composeTestRule.waitForIdle()
 
-        val editLabel = composeTestRule.activity.getString(R.string.edit)
-        composeTestRule.onNodeWithText(editLabel).performClick()
+        composeTestRule.onNodeWithTag("ExpenseItem_EditButton_2").performClick()
 
-        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
 
         val editTitle = composeTestRule.activity.getString(R.string.edit_expense_title)
-        composeTestRule.onNodeWithText(editTitle).assertIsDisplayed()
+        composeTestRule.onNodeWithText(editTitle, substring = true).assertIsDisplayed()
         composeTestRule.onAllNodesWithText("Coffee").onLast().assertIsDisplayed()
     }
 

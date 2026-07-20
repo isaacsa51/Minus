@@ -69,6 +69,7 @@ fun ExpenseItem(
     readOnly: Boolean = false,
     disableAnimations: Boolean = false,
     modifier: Modifier = Modifier,
+    containerColor: Color = Color.Transparent,
     customShape: androidx.compose.ui.graphics.Shape? = null,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -82,7 +83,7 @@ fun ExpenseItem(
         CustomPaddedListItem(
             onClick = onClick,
             position = position,
-            background = Color.Transparent,
+            background = containerColor,
             contentColor = MaterialTheme.colorScheme.onSurface,
             customShape = customShape
         ) {

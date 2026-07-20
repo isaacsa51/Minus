@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,9 +34,11 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.DetailedChart
+import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
@@ -56,6 +60,7 @@ data class CategoryAnalyticsState(
     val categorySpends: List<Transaction> = emptyList(),
     val currencyCode: String = "USD",
     val creditCardCutoffDay: Int? = null,
+    val isDayView: Boolean = false,
 )
 
 @Composable
@@ -93,7 +98,7 @@ fun CategoryAnalytics(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (state.categorySpends.size >= 2) {
+        if (state.categorySpends.size >= 2 && !state.isDayView) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -150,7 +155,7 @@ fun CategoryAnalytics(
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        if (state.categorySpends.size > 1) {
+        if (state.categorySpends.size > 1 && !state.isDayView) {
             AverageSpendCard(
                 spends = state.categorySpends,
                 startDate = state.startPeriodDate,
@@ -190,22 +195,22 @@ fun CategoryAnalytics(
                             sharedTransitionScope = null,
                             animatedVisibilityScope = null,
                             creditCardCutoffDay = state.creditCardCutoffDay,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         )
+
+                        if (index < transactions.size - 1) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
                     }
 
                     val dayTotal = transactions.sumOf { it.amount }
-                    Box(
+                    DayTotalItem(
+                        total = dayTotal,
+                        currencyFormat = currencyFormat,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "Total: ${currencyFormat.format(dayTotal)}",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.align(Alignment.CenterEnd)
-                        )
-                    }
+                    )
 
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -215,17 +220,21 @@ fun CategoryAnalytics(
         }
 
         if (state.categorySpends.isEmpty()) {
+            val emptyMessage = if (state.isDayView) {
+                stringResource(R.string.day_no_expenses)
+            } else {
+                stringResource(R.string.category_no_expenses)
+            }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = stringResource(R.string.category_no_expenses),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                PaddedListItem(
+                    title = emptyMessage,
+                    icon = Icons.Default.Info,
+                    onClick = {},
+                    position = PaddedListItemPosition.Single
                 )
             }
         }

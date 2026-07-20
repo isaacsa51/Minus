@@ -12,6 +12,7 @@ import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import com.google.common.truth.Truth
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -290,7 +291,8 @@ class SplitModeE2ETest {
 
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG)
             .assertIsDisplayed()
-        composeTestRule.onAllNodesWithText("Static").onLast().assertIsDisplayed()
+        val staticLabel = composeTestRule.activity.getString(R.string.split_mode_static)
+        composeTestRule.onAllNodesWithText(staticLabel, substring = true).onLast().assertIsDisplayed()
     }
 
     @Test
@@ -302,7 +304,8 @@ class SplitModeE2ETest {
 
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG)
             .assertIsDisplayed()
-        composeTestRule.onAllNodesWithText("Dynamic").onLast().assertIsDisplayed()
+        val dynamicLabel = composeTestRule.activity.getString(R.string.split_mode_dynamic)
+        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast().assertIsDisplayed()
     }
 
     @Test
@@ -327,13 +330,14 @@ class SplitModeE2ETest {
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG).performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithText("Dynamic").onLast().performClick()
+        val dynamicLabel = composeTestRule.activity.getString(R.string.split_mode_dynamic)
+        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast().performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithText("How should we split your budget?")
+        composeTestRule.onAllNodesWithText("How should we split your budget?", substring = true)
             .onLast()
             .assertIsNotDisplayed()
-        composeTestRule.onAllNodesWithText("Dynamic").onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast().assertIsDisplayed()
     }
 
     @Test
@@ -347,7 +351,8 @@ class SplitModeE2ETest {
 
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG).performClick()
         composeTestRule.waitForIdle()
-        composeTestRule.onAllNodesWithText("Dynamic").onLast().performClick()
+        val dynamicLabel = composeTestRule.activity.getString(R.string.split_mode_dynamic)
+        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast().performClick()
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performClick()

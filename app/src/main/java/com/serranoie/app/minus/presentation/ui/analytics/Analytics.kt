@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +68,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarHeat
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 data class AnalyticsState(
@@ -115,9 +118,12 @@ fun Analytics(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var selectedCategory by remember { mutableStateOf<CategoryAnalyticsState?>(null) }
+    var selectedDayData by remember { mutableStateOf<CategoryAnalyticsState?>(null) }
 
     val navigationBarHeight =
         LocalWindowInsets.current.calculateBottomPadding().coerceAtLeast(16.dp)
+
+    val locale = LocalConfiguration.current.locales[0]
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -176,6 +182,18 @@ fun Analytics(
                         selectedCategory =
                             state.toCategoryAnalyticsState(categoryName, categorySpends)
                         view.weakHapticFeedback()
+                    },
+                    onDayClick = { date ->
+                        val daySpends = state.spends.filter { it.date?.toLocalDate() == date }
+                        val formatter = DateTimeFormatter.ofPattern(
+                            "dd MMMM",
+                            locale
+                        )
+                        selectedDayData = state.toCategoryAnalyticsState(
+                            categoryName = date.format(formatter),
+                            categorySpends = daySpends
+                        ).copy(isDayView = true)
+                        view.weakHapticFeedback()
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -216,12 +234,16 @@ fun Analytics(
         }
     }
 
-    if (selectedCategory != null) {
+    if (selectedCategory != null || selectedDayData != null) {
         ModalBottomSheet(
-            onDismissRequest = { selectedCategory = null },
+            onDismissRequest = {
+                selectedCategory = null
+                selectedDayData = null
+            },
             sheetState = sheetState,
         ) {
-            CategoryAnalytics(state = selectedCategory!!)
+            val displayState = selectedCategory ?: selectedDayData!!
+            CategoryAnalytics(state = displayState)
         }
     }
 
@@ -266,6 +288,7 @@ private fun AnalyticsResponsiveLayout(
     onShowHistory: () -> Unit,
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
+    onDayClick: (LocalDate) -> Unit,
 ) {
     if (useTabletLayout) {
         AnalyticsTabletLayout(
@@ -273,6 +296,7 @@ private fun AnalyticsResponsiveLayout(
             onShowHistory = onShowHistory,
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
+            onDayClick = onDayClick,
         )
     } else {
         AnalyticsCompactLayout(
@@ -280,6 +304,7 @@ private fun AnalyticsResponsiveLayout(
             onShowHistory = onShowHistory,
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
+            onDayClick = onDayClick,
         )
     }
 }
@@ -290,6 +315,7 @@ private fun AnalyticsCompactLayout(
     onShowHistory: () -> Unit,
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
+    onDayClick: (LocalDate) -> Unit,
 ) {
     Column {
         Row(
@@ -303,6 +329,7 @@ private fun AnalyticsCompactLayout(
                     budget = state.wholeBudget,
                     startDate = state.startPeriodDate,
                     finishDate = state.finishPeriodDate,
+                    onDayClick = onDayClick,
                     modifier = Modifier
                         .weight(1f)
                         .wrapContentHeight(),
@@ -408,6 +435,7 @@ private fun AnalyticsTabletLayout(
     onShowHistory: () -> Unit,
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
+    onDayClick: (LocalDate) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -431,6 +459,7 @@ private fun AnalyticsTabletLayout(
                         budget = state.wholeBudget,
                         startDate = state.startPeriodDate,
                         finishDate = state.finishPeriodDate,
+                        onDayClick = onDayClick,
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight(),
