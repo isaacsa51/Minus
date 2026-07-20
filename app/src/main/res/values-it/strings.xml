@@ -348,8 +348,11 @@
     <string name="categories_chart_empty_title">Non possiamo dividere le tue spese</string>
     <string name="categories_chart_empty_subtitle">Salva le spese con una categoria per dividerle</string>
     <string name="category_no_expenses">Nessuna spesa in questa categoria</string>
+    <string name="day_no_expenses">No expenses on this day, yet…</string>
     <!-- Calendar Heatmap -->
     <string name="calendar_heatmap_info_text">Questo grafico mostra i soldi spesi per ogni giorno nel periodo</string>
+    <string name="heatmap_legend_less">Less</string>
+    <string name="heatmap_legend_more">More</string>
     <!-- No Transactions -->
     <string name="no_transactions_title">Nessuna spesa registrata</string>
     <string name="no_transactions_subtitle">Aggiungi una spesa per iniziare</string>
