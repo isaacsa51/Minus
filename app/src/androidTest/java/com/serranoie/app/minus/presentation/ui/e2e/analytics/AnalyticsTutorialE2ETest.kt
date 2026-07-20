@@ -44,6 +44,7 @@ class AnalyticsTutorialE2ETest {
                 CompositionLocalProvider(LocalWindowInsets provides PaddingValues(0.dp)) {
                     Analytics(
                         state = AnalyticsState(
+                            transactions = spends,
                             spends = spends,
                             wholeBudget = BigDecimal("1000.00"),
                             isLoading = false,
