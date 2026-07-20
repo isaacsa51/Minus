@@ -449,7 +449,7 @@
     <string name="split_mode_dialog_description" formatted="false">Choose how the per-period amount is calculated.</string>
     <string name="split_mode_static">Static</string>
     <string name="split_mode_static_desc">Total budget is split equally across all periods, regardless of how much you spend.</string>
-    <string name="split_mode_dynamic">Dynamic</string>
+    <string name="split_mode_dynamic">Dynamic (Recommended)</string>
     <string name="split_mode_dynamic_desc">Recalculates daily as you spend. The remaining balance is spread over the days still left in the period.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>
