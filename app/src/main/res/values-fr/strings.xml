@@ -348,8 +348,11 @@
     <string name="categories_chart_empty_title">Nous ne pouvons pas répartir vos dpenses par catégories</string>
     <string name="categories_chart_empty_subtitle">Utilisez des étiquettes pour voir le graphique par catégories</string>
     <string name="category_no_expenses">Aucune dépense dans cette catégorie</string>
+    <string name="day_no_expenses">No expenses on this day, yet…</string>
     <!-- Calendar Heatmap -->
     <string name="calendar_heatmap_info_text">Ce graphique montre l\'argent dépensé pour chaque jour de la période</string>
+    <string name="heatmap_legend_less">Less</string>
+    <string name="heatmap_legend_more">More</string>
     <!-- No Transactions -->
     <string name="no_transactions_title">Aucune dépense enregistrée</string>
     <string name="no_transactions_subtitle">Ajoutez une dépense pour commencer</string>
