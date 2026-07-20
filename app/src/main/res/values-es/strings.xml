@@ -348,8 +348,11 @@
     <string name="categories_chart_empty_title">No podemos dividir los gastos sin categoría</string>
     <string name="categories_chart_empty_subtitle">Agregue categorías para ver el gráfico</string>
     <string name="category_no_expenses">No hay gastos en esta categoría</string>
+    <string name="day_no_expenses">No hay gastos este día, aún…</string>
     <!-- Calendar Heatmap -->
     <string name="calendar_heatmap_info_text">Este gráfico muestra el dinero gastado por cada día del período</string>
+    <string name="heatmap_legend_less">Menos</string>
+    <string name="heatmap_legend_more">Más</string>
     <!-- No Transactions -->
     <string name="no_transactions_title">No hay gastos registrados</string>
     <string name="no_transactions_subtitle">Agregue un gasto para comenzar</string>
