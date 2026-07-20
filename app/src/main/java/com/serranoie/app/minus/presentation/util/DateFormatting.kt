@@ -213,3 +213,23 @@ fun roundToDay(date: Date): Date {
 		.time
 }
 
+fun calculateDaysToCutoff(cutoffDay: Int, fromDate: LocalDate = LocalDate.now()): Int {
+    val cutoffThisMonth = try {
+        fromDate.withDayOfMonth(cutoffDay)
+    } catch (e: Exception) {
+        fromDate.withDayOfMonth(fromDate.lengthOfMonth())
+    }
+
+    return if (!fromDate.isAfter(cutoffThisMonth)) {
+        java.time.temporal.ChronoUnit.DAYS.between(fromDate, cutoffThisMonth).toInt()
+    } else {
+        val nextMonth = fromDate.plusMonths(1)
+        val cutoffNextMonth = try {
+            nextMonth.withDayOfMonth(cutoffDay)
+        } catch (e: Exception) {
+            nextMonth.withDayOfMonth(nextMonth.lengthOfMonth())
+        }
+        java.time.temporal.ChronoUnit.DAYS.between(fromDate, cutoffNextMonth).toInt()
+    }
+}
+

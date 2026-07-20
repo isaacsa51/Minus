@@ -2,15 +2,18 @@ package com.serranoie.app.minus.data.repository
 
 import androidx.room.withTransaction
 import com.serranoie.app.minus.data.local.AppDatabase
+import com.serranoie.app.minus.data.local.dao.ArchivedBudgetDao
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
 import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
+import com.serranoie.app.minus.data.local.entity.ArchivedBudgetEntity
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
 import com.serranoie.app.minus.data.local.entity.CategoryEntity
 import com.serranoie.app.minus.data.local.entity.QueuedTransactionEntity
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
 import com.serranoie.app.minus.domain.calculator.BudgetCalculator
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -34,6 +37,7 @@ class BudgetRepositoryImpl @Inject constructor(
     private val appDatabase: AppDatabase,
     private val transactionDao: TransactionDao,
     private val settingsDao: BudgetSettingsDao,
+    private val archivedBudgetDao: ArchivedBudgetDao,
     private val categoryDao: CategoryDao,
     private val queuedTransactionDao: QueuedTransactionDao,
     private val budgetCalculator: BudgetCalculator
@@ -60,7 +64,8 @@ class BudgetRepositoryImpl @Inject constructor(
         },
         subscriptionDay = this.subscriptionDay,
         categoryId = this.categoryId,
-        isCredit = this.isCredit
+        isCredit = this.isCredit,
+        isCreditPaid = this.isCreditPaid
     )
 
     private fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
@@ -76,7 +81,8 @@ class BudgetRepositoryImpl @Inject constructor(
         recurrentEndDate = this.recurrentEndDate?.toEpochSecond(ZoneOffset.UTC)?.times(1000),
         subscriptionDay = this.subscriptionDay,
         categoryId = this.categoryId,
-        isCredit = this.isCredit
+        isCredit = this.isCredit,
+        isCreditPaid = this.isCreditPaid
     )
 
     private fun QueuedTransactionEntity.toDomain(): Transaction = Transaction(
@@ -93,7 +99,8 @@ class BudgetRepositoryImpl @Inject constructor(
         recurrentEndDate = null,
         subscriptionDay = null,
         categoryId = this.categoryId,
-        isCredit = this.isCredit
+        isCredit = this.isCredit,
+        isCreditPaid = this.isCreditPaid
     )
 
     private fun Transaction.toQueuedEntity(): QueuedTransactionEntity = QueuedTransactionEntity(
@@ -103,7 +110,8 @@ class BudgetRepositoryImpl @Inject constructor(
         date = this.date!!.toEpochSecond(ZoneOffset.UTC) * 1000,
         createdAt = this.createdAt,
         categoryId = this.categoryId,
-        isCredit = this.isCredit
+        isCredit = this.isCredit,
+        isCreditPaid = this.isCreditPaid
     )
 
     private fun BudgetSettingsEntity.toDomain(): BudgetSettings {
@@ -166,6 +174,17 @@ class BudgetRepositoryImpl @Inject constructor(
         isHidden = this.isHidden,
         usageCount = this.usageCount,
         lastUsedAt = this.lastUsedAt,
+        createdAt = this.createdAt
+    )
+
+    private fun ArchivedBudgetEntity.toDomain(): ArchivedBudget = ArchivedBudget(
+        periodId = this.periodId,
+        totalBudget = BigDecimal(this.totalBudget),
+        spentAmount = BigDecimal(this.spentAmount),
+        startDate = LocalDate.ofEpochDay(this.startDate / 86400000),
+        endDate = LocalDate.ofEpochDay(this.endDate / 86400000),
+        currencyCode = this.currencyCode,
+        periodType = BudgetPeriod.valueOf(this.periodType),
         createdAt = this.createdAt
     )
 
@@ -329,5 +348,104 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun getPeriodCount(): Int {
         return transactionDao.countDistinctPeriods()
+    }
+
+    override suspend fun markCreditTransactionsAsPaid(start: LocalDate, end: LocalDate) {
+        val startMillis = start.toEpochDay() * 86400000
+        val endMillis = end.toEpochDay() * 86400000
+        transactionDao.markCreditAsPaidInRange(startMillis, endMillis)
+    }
+
+    override fun getArchivedBudgets(): Flow<List<ArchivedBudget>> {
+        return archivedBudgetDao.getAllArchivedBudgets().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun archiveCurrentPeriod(
+        periodId: Long,
+        settings: BudgetSettings,
+        spentAmount: BigDecimal
+    ) {
+        val entity = ArchivedBudgetEntity(
+            periodId = periodId,
+            totalBudget = settings.totalBudget.toPlainString(),
+            spentAmount = spentAmount.toPlainString(),
+            startDate = settings.startDate.toEpochDay() * 86400000,
+            endDate = settings.getPeriodEndDate().toEpochDay() * 86400000,
+            currencyCode = settings.currencyCode,
+            periodType = settings.period.name
+        )
+        archivedBudgetDao.insert(entity)
+        logcat { "Archived period $periodId: total=${settings.totalBudget}, spent=$spentAmount" }
+    }
+
+    override suspend fun deleteArchivedBudget(periodId: Long) {
+        archivedBudgetDao.deleteById(periodId)
+    }
+
+    override suspend fun seedArchivedData() {
+        val budgets = listOf(
+            ArchivedBudgetEntity(
+                periodId = 20260501L,
+                totalBudget = "1000.00",
+                spentAmount = "1250.00",
+                startDate = LocalDate.of(2026, 5, 1).toEpochDay() * 86400000,
+                endDate = LocalDate.of(2026, 5, 31).toEpochDay() * 86400000,
+                currencyCode = "USD",
+                periodType = BudgetPeriod.MONTHLY.name
+            ),
+            ArchivedBudgetEntity(
+                periodId = 20260601L,
+                totalBudget = "500.00",
+                spentAmount = "12.50",
+                startDate = LocalDate.of(2026, 6, 1).toEpochDay() * 86400000,
+                endDate = LocalDate.of(2026, 6, 30).toEpochDay() * 86400000,
+                currencyCode = "USD",
+                periodType = BudgetPeriod.MONTHLY.name
+            ),
+            ArchivedBudgetEntity(
+                periodId = 20260708L,
+                totalBudget = "200.00",
+                spentAmount = "185.00",
+                startDate = LocalDate.of(2026, 7, 8).toEpochDay() * 86400000,
+                endDate = LocalDate.of(2026, 7, 14).toEpochDay() * 86400000,
+                currencyCode = "USD",
+                periodType = BudgetPeriod.WEEKLY.name
+            ),
+            ArchivedBudgetEntity(
+                periodId = 20260615L,
+                totalBudget = "1000.00",
+                spentAmount = "750.00",
+                startDate = LocalDate.of(2026, 6, 15).toEpochDay() * 86400000,
+                endDate = LocalDate.of(2026, 7, 14).toEpochDay() * 86400000,
+                currencyCode = "USD",
+                periodType = BudgetPeriod.MONTHLY.name
+            )
+        )
+
+        budgets.forEach { archivedBudgetDao.insert(it) }
+
+        // Insert some fake transactions for these periods
+        val fakeTransactions = listOf(
+            // Overbudget Period
+            TransactionEntity(periodId = 20260501L, amount = "500.00", comment = "Rent", date = LocalDate.of(2026, 5, 1).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
+            TransactionEntity(periodId = 20260501L, amount = "400.00", comment = "Groceries", date = LocalDate.of(2026, 5, 10).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
+            TransactionEntity(periodId = 20260501L, amount = "350.00", comment = "Shopping", date = LocalDate.of(2026, 5, 20).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
+            
+            // Low Spend Period
+            TransactionEntity(periodId = 20260601L, amount = "12.50", comment = "Coffee", date = LocalDate.of(2026, 6, 15).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
+
+            // Normal Period
+            TransactionEntity(periodId = 20260708L, amount = "100.00", comment = "Gas", date = LocalDate.of(2026, 7, 9).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
+            TransactionEntity(periodId = 20260708L, amount = "85.00", comment = "Dining", date = LocalDate.of(2026, 7, 12).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
+
+            // Good Saving Period
+            TransactionEntity(periodId = 20260615L, amount = "300.00", comment = "Electricity", date = LocalDate.of(2026, 6, 20).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
+            TransactionEntity(periodId = 20260615L, amount = "250.00", comment = "Water", date = LocalDate.of(2026, 6, 25).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
+            TransactionEntity(periodId = 20260615L, amount = "200.00", comment = "Internet", date = LocalDate.of(2026, 7, 5).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
+        )
+
+        transactionDao.insertAllOrReplace(fakeTransactions)
     }
 }

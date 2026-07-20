@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.serranoie.app.minus.data.local.AppDatabase
 import com.serranoie.app.minus.data.local.AppDatabaseMigrations
+import com.serranoie.app.minus.data.local.dao.ArchivedBudgetDao
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
 import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
@@ -33,6 +34,7 @@ object DatabaseModule {
             .addMigrations(AppDatabaseMigrations.MIGRATION_8_9)
             .addMigrations(AppDatabaseMigrations.MIGRATION_9_10)
             .addMigrations(AppDatabaseMigrations.MIGRATION_10_11)
+            .addMigrations(AppDatabaseMigrations.MIGRATION_11_12)
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -45,6 +47,11 @@ object DatabaseModule {
     @Provides
     fun provideBudgetSettingsDao(database: AppDatabase): BudgetSettingsDao {
         return database.budgetSettingsDao()
+    }
+
+    @Provides
+    fun provideArchivedBudgetDao(database: AppDatabase): ArchivedBudgetDao {
+        return database.archivedBudgetDao()
     }
 
     @Provides

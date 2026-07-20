@@ -55,6 +55,7 @@ internal fun LazyListScope.pastTransactionDateSections(
     onClick: (Transaction) -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    creditCardCutoffDay: Int? = null,
 ) {
     if (!showPastPeriod) return
 
@@ -116,6 +117,7 @@ internal fun LazyListScope.pastTransactionDateSections(
                                     onMarkAsPaid = { onMarkAsPaid(transaction) },
                                     readOnly = readOnly,
                                     onClick = { onClick(transaction) },
+                                    creditCardCutoffDay = creditCardCutoffDay,
                                 )
                             }
 

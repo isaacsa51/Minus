@@ -227,6 +227,10 @@ class BudgetViewModel @Inject constructor(
         val numpadInput = numpadController.input.value
         val editorState = editorStateController.state.value
 
+        val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }.sumOf { it.amount }
+        val remainingBudget = budgetState?.remainingToday ?: BigDecimal.ZERO
+        val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
+
         return BudgetUiState(
             isLoading = false,
             budgetSettings = settingsWithRollover,
@@ -250,6 +254,8 @@ class BudgetViewModel @Inject constructor(
             dragProgress = numpadController.dragProgress.value,
             lockSwipeable = editorState.lockSwipeable,
             lockDraggable = editorState.lockDraggable,
+            creditOwed = creditOwed,
+            debtAdjustedBalance = debtAdjustedBalance,
         )
     }
 
@@ -382,7 +388,8 @@ class BudgetViewModel @Inject constructor(
             try {
                 notificationHelper.showRecurrentExpenseNotification(
                     amount = "50.00",
-                    comment = "Test expense"
+                    comment = "Test expense",
+                    currency = currency
                 )
             } catch (e: Exception) {
                 logcat(TAG) { e.asLog() }
@@ -611,15 +618,27 @@ class BudgetViewModel @Inject constructor(
     }
 
     private fun handleCreditCutoffDayConfirmed(cutoffDay: Int) {
-        if (cutoffDay !in 1..31) return
-        val currentSettings = _uiState.value.budgetSettings ?: return
+        logcat(TAG) { "handleCreditCutoffDayConfirmed: day=$cutoffDay" }
+        if (cutoffDay !in 1..31) {
+            logcat(TAG) { "handleCreditCutoffDayConfirmed: INVALID day=$cutoffDay" }
+            return
+        }
+
+        editorStateController.applyCreditCutoffDay()
+        _uiState.update { it.copy(showCreditCutoffDialog = false, isCreditEnabled = true) }
+
+        val currentSettings = _uiState.value.budgetSettings
+        if (currentSettings == null) {
+            logcat(TAG) { "handleCreditCutoffDayConfirmed: currentSettings is NULL, skipping persistence" }
+            return
+        }
+
         viewModelScope.launch {
+            logcat(TAG) { "handleCreditCutoffDayConfirmed: launching persistence for day=$cutoffDay" }
             persistBudgetSettings(
                 currentSettings.copy(creditCardCutoffDay = cutoffDay),
                 forceNewPeriodBoundary = false,
             )
-            editorStateController.applyCreditCutoffDay()
-            _uiState.update { it.copy(showCreditCutoffDialog = false, isCreditEnabled = true) }
         }
     }
 

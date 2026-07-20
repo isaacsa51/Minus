@@ -24,6 +24,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +52,7 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.countDays
@@ -59,6 +61,7 @@ import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 
@@ -75,6 +78,7 @@ fun BudgetDisplay(
     actualFinishDate: Date? = null,
     extraDaysFromRemaining: Int = 0,
     showRolloverStyle: Boolean = true,
+    creditOwed: BigDecimal = BigDecimal.ZERO,
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 18.dp),
 ) {
     val currencyFormat =
@@ -107,8 +111,13 @@ fun BudgetDisplay(
         displayBudget.subtract(baseBudget).takeIf { it > BigDecimal.ZERO } ?: BigDecimal.ZERO
     val shouldShowCrossedBaseBudget = showRolloverStyle && rolloverAmount > BigDecimal.ZERO
 
+    val totalBudgetAdjusted = displayBudget.subtract(creditOwed)
+    val hasCCDebt = creditOwed > BigDecimal.ZERO
+
+    val finalDisplayBudget = if (hasCCDebt) totalBudgetAdjusted else displayBudget
+
     val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
-    val formattedValue = currencyFormat.format(displayBudget)
+    val formattedValue = currencyFormat.format(finalDisplayBudget)
     val formattedAmount = formattedValue.removePrefix(currencySymbol)
 
     val valueFontSize = if (bigVariant) {
@@ -121,13 +130,20 @@ fun BudgetDisplay(
         AnnotatedString.Builder().run {
             pushStyle(
                 MaterialTheme.typography.titleSmallCondensed.toSpanStyle().copy(
-                    fontSize = valueFontSize,
-                    baselineShift = BaselineShift.None
+                    fontSize = valueFontSize * 0.65f,
+                    fontWeight = FontWeight.Bold,
+                    baselineShift = BaselineShift(0.1f)
                 )
             )
             append(currencySymbol)
             pop()
-            pushStyle(SpanStyle(fontSize = valueFontSize, fontWeight = FontWeight.Light))
+            append(" ")
+            pushStyle(
+                SpanStyle(
+                    fontSize = valueFontSize,
+                    fontWeight = FontWeight.Light
+                )
+            )
             append(formattedAmount)
             pop()
             toAnnotatedString()
@@ -144,11 +160,21 @@ fun BudgetDisplay(
             containerColor = MaterialTheme.colorScheme.onSurface,
             contentColor = MaterialTheme.colorScheme.surfaceVariant
         ),
-        label = stringResource(R.string.total_budget),
+        label = if (hasCCDebt) {
+            "${stringResource(R.string.total_budget)} - ${currencyFormat.format(creditOwed)} (${stringResource(R.string.credit_owed_label)})"
+        } else {
+            stringResource(R.string.total_budget)
+        },
         value = if (useAnnotatedValue) formattedAmount else formattedValue,
         annotatedValue = annotatedDisplayValue,
-        crossedValue = if (shouldShowCrossedBaseBudget) currencyFormat.format(baseBudget) else null,
-        crossedValueColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
+        crossedValue = when {
+            hasCCDebt -> currencyFormat.format(displayBudget)
+            shouldShowCrossedBaseBudget -> currencyFormat.format(baseBudget)
+            else -> null
+        },
+        isWavyCross = false,
+        showCrossLine = !hasCCDebt,
+        crossedValueColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
         valueFontStyle = MaterialTheme.typography.displaySmallEmphasized,
         valueFontSize = valueFontSize,
         content = {
@@ -311,23 +337,47 @@ fun CountDaysChip(
 fun Cross(
     modifier: Modifier = Modifier,
     tint: Color = MaterialTheme.colorScheme.error,
+    isWavy: Boolean = false,
+    enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     Box(modifier = modifier) {
         content()
-        Canvas(modifier = Modifier.matchParentSize()) {
-            val width = this.size.width
-            val height = this.size.height
-            val offset = Offset(4f, 4f)
-            val thickness = 6f
+        if (enabled) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                val width = this.size.width
+                val height = this.size.height
+                val offset = Offset(4f, 4f)
+                val thickness = 6f
 
-            drawLine(
-                color = tint,
-                start = Offset(offset.x, height - offset.y),
-                end = Offset(width - offset.x, offset.y),
-                strokeWidth = thickness,
-                cap = StrokeCap.Round
-            )
+                if (isWavy) {
+                    val centerY = height / 2
+                    val amplitude = height * 0.15f
+                    val wavelength = width / 6
+                    val path = Path().apply {
+                        moveTo(offset.x, centerY)
+                        var x = offset.x
+                        while (x < width - offset.x) {
+                            val y = centerY + kotlin.math.sin((x / wavelength) * 2 * Math.PI.toFloat()) * amplitude
+                            lineTo(x, y)
+                            x += 2f
+                        }
+                    }
+                    drawPath(
+                        path = path,
+                        color = tint,
+                        style = Stroke(width = thickness, cap = StrokeCap.Round)
+                    )
+                } else {
+                    drawLine(
+                        color = tint,
+                        start = Offset(offset.x, height - offset.y),
+                        end = Offset(width - offset.x, offset.y),
+                        strokeWidth = thickness,
+                        cap = StrokeCap.Round
+                    )
+                }
+            }
         }
     }
 }
@@ -383,7 +433,7 @@ private fun PreviewArrow() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(device = "spec:width=800px,height=500px,dpi=320")
 @Composable
 private fun BudgetDisplayPreview_OverBudget() {
     MinusTheme {
@@ -464,6 +514,39 @@ private fun BudgetDisplayPreview_NullState() {
             currencyCode = "MAD",
             startDate = startDate,
             finishDate = finishDate
+        )
+    }
+}
+
+@Preview(device = "spec:width=800px,height=500px")
+@Composable
+private fun BudgetDisplayPreview_DebtAdjusted() {
+    MinusTheme {
+        val startDate = Date()
+        val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 7) }.time
+
+        BudgetDisplay(
+            budget = BigDecimal("500.00"),
+            budgetState = BudgetState(
+                remainingToday = BigDecimal("120.50"),
+                totalSpentToday = BigDecimal("30.00"),
+                dailyBudget = BigDecimal("70.00"),
+                daysRemaining = 7,
+                progress = 0.75f,
+                isOverBudget = false,
+                totalBudget = BigDecimal("500.00"),
+                totalSpentInPeriod = BigDecimal("379.50")
+            ),
+            budgetSettings = BudgetSettings(
+                totalBudget = BigDecimal("500.00"),
+                period = BudgetPeriod.WEEKLY,
+                startDate = LocalDate.now(),
+                currencyCode = "USD"
+            ),
+            currencyCode = "USD",
+            startDate = startDate,
+            finishDate = finishDate,
+            creditOwed = BigDecimal("35.25")
         )
     }
 }

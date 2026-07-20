@@ -54,6 +54,7 @@ internal fun LazyListScope.transactionDateSections(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     disableAnimations: Boolean = false,
+    creditCardCutoffDay: Int? = null,
 ) {
     groupedTransactions.forEach { (date, transactions) ->
         val isExpanded = date?.let { expandedDates.contains(it) } ?: false
@@ -116,6 +117,7 @@ internal fun LazyListScope.transactionDateSections(
                                     readOnly = readOnly,
                                     disableAnimations = disableAnimations,
                                     onClick = { onClick(transaction) },
+                                    creditCardCutoffDay = creditCardCutoffDay,
                                 )
                             }
 

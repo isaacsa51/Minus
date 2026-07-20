@@ -20,13 +20,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
@@ -51,6 +49,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,6 +75,13 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 
+private data class BudgetMetrics(
+    val periodRemaining: BigDecimal,
+    val spendProgress: Float,
+    val isCurrentPeriodOverBudget: Boolean,
+    val isOverCurrentSubPeriod: Boolean,
+)
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BudgetPill(
@@ -89,226 +95,37 @@ fun BudgetPill(
     splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
     modifier: Modifier = Modifier,
 ) {
-    val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
+    val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
 
-    val dailyBudget = budgetState?.dailyBudget ?: BigDecimal.ZERO
-    val totalSpentInPeriod = budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO
-    val totalSpentToday = budgetState?.totalSpentToday ?: BigDecimal.ZERO
-
-    val period = viewPeriod
-    val dailyBudgetAmount = dailyBudget
-    val weeklyBudgetAmount = dailyBudget.multiply(BigDecimal(7))
-    val biweeklyBudgetAmount = dailyBudget.multiply(BigDecimal(14))
-    val monthlyBudgetAmount = dailyBudget.multiply(BigDecimal(30))
-    val dailySpent = totalSpentToday
-    val periodSpentAggregate = totalSpentInPeriod
-    val dailyRemainingAmount = dailyBudgetAmount.subtract(dailySpent)
-    val weeklyRemainingAmount = weeklyBudgetAmount.subtract(periodSpentAggregate)
-    val biweeklyRemainingAmount = biweeklyBudgetAmount.subtract(periodSpentAggregate)
-    val monthlyRemainingAmount = monthlyBudgetAmount.subtract(periodSpentAggregate)
-
-    val periodAllocation = when (period) {
-        BudgetPeriod.DAILY -> budgetState?.dailyAllocation ?: BigDecimal.ZERO
-        BudgetPeriod.WEEKLY -> budgetState?.weeklyAllocation ?: BigDecimal.ZERO
-        BudgetPeriod.BIWEEKLY -> budgetState?.biweeklyAllocation ?: BigDecimal.ZERO
-        BudgetPeriod.MONTHLY -> budgetState?.monthlyAllocation ?: BigDecimal.ZERO
-    }
-
-    val (periodBudget, periodSpent, staticPeriodRemaining) = when (period) {
-        BudgetPeriod.DAILY -> Triple(dailyBudgetAmount, dailySpent, dailyRemainingAmount)
-        BudgetPeriod.WEEKLY -> Triple(
-            weeklyBudgetAmount, periodSpentAggregate, weeklyRemainingAmount
-        )
-
-        BudgetPeriod.BIWEEKLY -> Triple(
-            biweeklyBudgetAmount, periodSpentAggregate, biweeklyRemainingAmount
-        )
-
-        BudgetPeriod.MONTHLY -> Triple(
-            monthlyBudgetAmount, periodSpentAggregate, monthlyRemainingAmount
+    val metrics = remember(budgetState, viewPeriod, splitMode) {
+        budgetState?.let { calculateBudgetMetrics(it, viewPeriod, splitMode) } ?: BudgetMetrics(
+            BigDecimal.ZERO, 0f, false, false
         )
     }
 
-    val periodRemaining = when (splitMode) {
-        BudgetSplitMode.DYNAMIC -> when (period) {
-            BudgetPeriod.DAILY -> periodAllocation.subtract(dailySpent)
-                .coerceAtLeast(BigDecimal.ZERO)
+    val exhaustedMessage = resolveExhaustedMessage(budgetState, viewPeriod, splitMode)
 
-            else -> periodAllocation.subtract(periodSpentAggregate)
-                .coerceAtLeast(BigDecimal.ZERO)
-        }
-        BudgetSplitMode.STATIC -> staticPeriodRemaining
-    }
-
-    val isCurrentPeriodOverBudget = when (splitMode) {
-        BudgetSplitMode.DYNAMIC -> budgetState?.isOverBudget == true
-        BudgetSplitMode.STATIC -> staticPeriodRemaining < BigDecimal.ZERO
-    }
-    val isOverDailyAllocation = budgetState?.isTodayOverDailyAllocation == true
-    val weeklyAllocation = budgetState?.weeklyAllocation ?: BigDecimal.ZERO
-    val biweeklyAllocation = budgetState?.biweeklyAllocation ?: BigDecimal.ZERO
-    val monthlyAllocation = budgetState?.monthlyAllocation ?: BigDecimal.ZERO
-    val isOverWeeklyAllocation = totalSpentInPeriod > weeklyAllocation && weeklyAllocation > BigDecimal.ZERO
-    val isOverBiweeklyAllocation = totalSpentInPeriod > biweeklyAllocation && biweeklyAllocation > BigDecimal.ZERO
-    val isOverMonthlyAllocation = totalSpentInPeriod > monthlyAllocation && monthlyAllocation > BigDecimal.ZERO
-
-    val isOverCurrentSubPeriod = when (period) {
-        BudgetPeriod.DAILY -> isOverDailyAllocation
-        BudgetPeriod.WEEKLY -> isOverWeeklyAllocation
-        BudgetPeriod.BIWEEKLY -> isOverBiweeklyAllocation
-        BudgetPeriod.MONTHLY -> isOverMonthlyAllocation
-    }
-
-    val isDailyExhausted = dailyRemainingAmount <= BigDecimal.ZERO
-    val isWeeklyExhausted = weeklyRemainingAmount <= BigDecimal.ZERO
-    val isBiweeklyExhausted = biweeklyRemainingAmount <= BigDecimal.ZERO
-
-    val staticExhaustedMessage = when (period) {
-        BudgetPeriod.WEEKLY -> {
-            if (weeklyRemainingAmount > BigDecimal.ZERO && isDailyExhausted) {
-                stringResource(
-                    R.string.budget_pill_exhausted_single,
-                    stringResource(R.string.budget_pill_exhausted_daily_label)
-                )
-            } else {
-                null
-            }
-        }
-
-        BudgetPeriod.BIWEEKLY -> {
-            if (biweeklyRemainingAmount > BigDecimal.ZERO) {
-                val exhausted = buildList {
-                    if (isDailyExhausted) add(stringResource(R.string.budget_pill_exhausted_daily_label))
-                    if (isWeeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
-                }
-                when (exhausted.size) {
-                    0 -> null
-                    1 -> stringResource(R.string.budget_pill_exhausted_single, exhausted.first())
-                    2 -> stringResource(
-                        R.string.budget_pill_exhausted_double, exhausted[0], exhausted[1]
-                    )
-
-                    else -> null
-                }
-            } else {
-                null
-            }
-        }
-
-        BudgetPeriod.MONTHLY -> {
-            if (monthlyRemainingAmount > BigDecimal.ZERO) {
-                val exhausted = buildList {
-                    if (isDailyExhausted) add(stringResource(R.string.budget_pill_exhausted_daily_label))
-                    if (isWeeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
-                    if (isBiweeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
-                }
-                when (exhausted.size) {
-                    0 -> null
-                    1 -> stringResource(R.string.budget_pill_exhausted_single, exhausted.first())
-                    2 -> stringResource(
-                        R.string.budget_pill_exhausted_double, exhausted[0], exhausted[1]
-                    )
-
-                    else -> stringResource(
-                        R.string.budget_pill_exhausted_triple,
-                        exhausted[0],
-                        exhausted[1],
-                        exhausted[2]
-                    )
-                }
-            } else {
-                null
-            }
-        }
-
-        else -> null
-    }
-
-    val dynamicExceededSubMessage = when (period) {
-        BudgetPeriod.DAILY -> null
-        BudgetPeriod.WEEKLY -> {
-            if (!isOverWeeklyAllocation && isOverDailyAllocation) {
-                stringResource(
-                    R.string.budget_pill_sub_exceeded_single,
-                    stringResource(R.string.budget_pill_exhausted_daily_label)
-                )
-            } else null
-        }
-
-        BudgetPeriod.BIWEEKLY -> {
-            if (!isOverBiweeklyAllocation) {
-                val overspent = buildList {
-                    if (isOverDailyAllocation) add(stringResource(R.string.budget_pill_exhausted_daily_label))
-                    if (isOverWeeklyAllocation) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
-                }
-                when (overspent.size) {
-                    0 -> null
-                    1 -> stringResource(R.string.budget_pill_sub_exceeded_single, overspent.first())
-                    2 -> stringResource(
-                        R.string.budget_pill_sub_exceeded_double,
-                        overspent[0], overspent[1]
-                    )
-
-                    else -> null
-                }
-            } else null
-        }
-
-        BudgetPeriod.MONTHLY -> {
-            if (!isOverMonthlyAllocation) {
-                val overspent = buildList {
-                    if (isOverDailyAllocation) add(stringResource(R.string.budget_pill_exhausted_daily_label))
-                    if (isOverWeeklyAllocation) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
-                    if (isOverBiweeklyAllocation) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
-                }
-                when (overspent.size) {
-                    0 -> null
-                    1 -> stringResource(R.string.budget_pill_sub_exceeded_single, overspent.first())
-                    2 -> stringResource(
-                        R.string.budget_pill_sub_exceeded_double,
-                        overspent[0], overspent[1]
-                    )
-
-                    else -> stringResource(
-                        R.string.budget_pill_sub_exceeded_triple,
-                        overspent[0], overspent[1], overspent[2]
-                    )
-                }
-            } else null
-        }
-
-        else -> null
-    }
-
-    val exhaustedMessage = when (splitMode) {
-        BudgetSplitMode.STATIC -> staticExhaustedMessage
-        BudgetSplitMode.DYNAMIC -> dynamicExceededSubMessage
-    }
-
-    val showExhaustedMessage = exhaustedMessage != null
+    val isNoBudget = budgetState == null
     val shouldCenterRemainingAmount =
-        centerRemainingAmount && !isCurrentPeriodOverBudget && !bigVariant
-    val spendProgress = if (periodBudget > BigDecimal.ZERO) {
-        periodSpent.divide(periodBudget, 2, RoundingMode.HALF_UP).toFloat().coerceIn(0f, 1f)
-    } else {
-        0f
-    }
+        remember(centerRemainingAmount, metrics.isCurrentPeriodOverBudget, bigVariant, isNoBudget) {
+            (centerRemainingAmount && !metrics.isCurrentPeriodOverBudget && !bigVariant) || isNoBudget
+        }
 
     val isDarkTheme = isSystemInDarkTheme()
     val primaryColor = MaterialTheme.colorScheme.primary
     val good = colorGood
     val notGood = colorNotGood
     val bad = colorBad
-    val harmonizedColor = remember(spendProgress, primaryColor, isDarkTheme, good, notGood, bad) {
-        val combined = combineColors(
-            listOf(good, notGood, bad), spendProgress.coerceIn(0f, 1f)
-        )
-        val harmonized = harmonizeWithColor(combined, primaryColor)
-        toPaletteWithTheme(harmonized, isDarkTheme)
-    }
+
+    val harmonizedColor =
+        remember(metrics.spendProgress, primaryColor, isDarkTheme, good, notGood, bad) {
+            val combined = combineColors(listOf(good, notGood, bad), metrics.spendProgress)
+            val harmonized = harmonizeWithColor(combined, primaryColor)
+            toPaletteWithTheme(harmonized, isDarkTheme)
+        }
 
     val animatedProgress by animateFloatAsState(
-        targetValue = if (isCurrentPeriodOverBudget) 1f else spendProgress.coerceIn(0f, 1f),
+        targetValue = if (metrics.isCurrentPeriodOverBudget) 1f else metrics.spendProgress,
         animationSpec = tween(500),
         label = "progress"
     )
@@ -322,18 +139,15 @@ fun BudgetPill(
         modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
-            modifier = Modifier.height(if (showExhaustedMessage) 50.dp else 50.dp),
-            shape = CircleShape,
-            colors = CardDefaults.cardColors(
+            modifier = Modifier.height(50.dp), // Fixed height as both states were 50.dp
+            shape = CircleShape, colors = CardDefaults.cardColors(
                 containerColor = harmonizedColor.container.copy(alpha = 0.6f),
                 contentColor = harmonizedColor.onContainer,
-            ),
-            onClick = onOpenBudgetSheet
+            ), onClick = onOpenBudgetSheet
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
-                // Background progress indicator
                 if (!bigVariant) {
                     LinearProgressIndicator(
                         progress = { animatedProgress },
@@ -343,37 +157,22 @@ fun BudgetPill(
                         color = harmonizedColor.main,
                         trackColor = Color.Transparent,
                         drawStopIndicator = {})
-
-// 					val density  = LocalDensity.current
-// 					val strokeWidthPx = with(density) { 28.dp.toPx() }
-
-// 					LinearWavyProgressIndicator(
-// 						progress = { animatedProgress },
-// 						modifier = Modifier
-// 							.fillMaxSize()
-// 							.padding(horizontal = 16.dp),
-// 						color = harmonizedColor.onContainer.copy(alpha = 0.65f),
-// 						trackColor = harmonizedColor.container.copy(alpha = 0.15f),
-// 						trackStroke = Stroke(width = 36f, cap = StrokeCap.Round),
-// 						amplitude = { 1f },
-// 						wavelength = 48.dp,
-// 						stroke = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
-// 					)
                 }
 
                 AnimatedContent(
                     targetState = shouldCenterRemainingAmount,
                     modifier = Modifier.fillMaxSize(),
                     transitionSpec = {
+                        val fadeSpec = tween<Float>(180)
                         if (targetState) {
                             (slideInHorizontally(animationSpec = tween(220)) { it / 5 } + fadeIn(
-                                tween(180)
+                                fadeSpec
                             )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { -it / 5 } + fadeOut(
                                 tween(120)
                             ))
                         } else {
                             (slideInHorizontally(animationSpec = tween(220)) { -it / 5 } + fadeIn(
-                                tween(180)
+                                fadeSpec
                             )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { it / 5 } + fadeOut(
                                 tween(120)
                             ))
@@ -390,56 +189,48 @@ fun BudgetPill(
                             contentAlignment = Alignment.Center,
                         ) {
                             AdaptiveSingleLineText(
-                                text = currencyFormat.format(periodRemaining),
+                                text = if (isNoBudget) stringResource(R.string.budget_pill_no_budget_action) else currencyFormat.format(
+                                    metrics.periodRemaining
+                                ),
                                 style = MaterialTheme.typography.titleMediumCondensed,
                                 color = textColor,
                                 minFontSize = 16.sp,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .graphicsLayer {
+                                modifier = Modifier.fillMaxWidth().graphicsLayer {
+                                    if (!isNoBudget) {
                                         scaleX = centeredAmountScale
                                         scaleY = centeredAmountScale
                                     }
-                                    .censor(),
+                                }.let { if (!isNoBudget) it else it.censor() },
                                 textAlign = TextAlign.Center,
                             )
                         }
                     } else {
-                        val isCentered = isCurrentPeriodOverBudget || isOverCurrentSubPeriod || bigVariant
+                        val isCentered =
+                            metrics.isCurrentPeriodOverBudget || metrics.isOverCurrentSubPeriod || bigVariant
                         Row(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(horizontal = if (isCentered) 0.dp else 18.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = if (isCentered) {
-                                Arrangement.Center
-                            } else {
-                                Arrangement.spacedBy(
-                                    8.dp
-                                )
-                            }
+                            horizontalArrangement = if (isCentered) Arrangement.Center else Arrangement.spacedBy(
+                                8.dp
+                            )
                         ) {
                             StatusLabel(
                                 budgetState = budgetState,
-                                budgetPeriod = period,
-                                isOverBudget = isCurrentPeriodOverBudget,
-                                isOverSubPeriodAllocation = isOverCurrentSubPeriod,
+                                budgetPeriod = viewPeriod,
+                                isOverBudget = metrics.isCurrentPeriodOverBudget,
+                                isOverSubPeriodAllocation = metrics.isOverCurrentSubPeriod,
                                 exhaustedMessage = exhaustedMessage,
                                 bigVariant = bigVariant,
                                 splitMode = splitMode,
                                 wrapContent = true,
-                                modifier = when {
-                                    isCentered -> Modifier.padding(
-                                        horizontal = 32.dp
-                                    )
-
-                                    else -> Modifier.wrapContentWidth()
-                                },
+                                modifier = if (isCentered) Modifier.padding(horizontal = 32.dp) else Modifier.wrapContentWidth(),
                             )
 
-                            if (!isCurrentPeriodOverBudget && !isOverCurrentSubPeriod && !bigVariant) {
+                            if (!metrics.isCurrentPeriodOverBudget && !metrics.isOverCurrentSubPeriod && !bigVariant) {
                                 AdaptiveSingleLineText(
-                                    text = currencyFormat.format(periodRemaining),
+                                    text = currencyFormat.format(metrics.periodRemaining),
                                     style = MaterialTheme.typography.titleMediumCondensed,
                                     color = textColor,
                                     minFontSize = 16.sp,
@@ -452,6 +243,142 @@ fun BudgetPill(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+private fun calculateBudgetMetrics(
+    state: BudgetState, period: BudgetPeriod, splitMode: BudgetSplitMode
+): BudgetMetrics {
+    val dailyBudget = state.dailyBudget
+    val spentInPeriod = state.totalSpentInPeriod
+    val spentToday = state.totalSpentToday
+
+    // Period total calculations
+    val multiplier = when (period) {
+        BudgetPeriod.DAILY -> BigDecimal.ONE
+        BudgetPeriod.WEEKLY -> BigDecimal(7)
+        BudgetPeriod.BIWEEKLY -> BigDecimal(14)
+        BudgetPeriod.MONTHLY -> BigDecimal(30)
+    }
+    val periodBudget = dailyBudget.multiply(multiplier)
+    val periodSpent = if (period == BudgetPeriod.DAILY) spentToday else spentInPeriod
+    val staticRemaining = periodBudget.subtract(periodSpent)
+
+    val periodRemaining = when (splitMode) {
+        BudgetSplitMode.DYNAMIC -> {
+            val allocation = state.allocationFor(period)
+            allocation.subtract(periodSpent).coerceAtLeast(BigDecimal.ZERO)
+        }
+
+        BudgetSplitMode.STATIC -> staticRemaining
+    }
+
+    val isOverBudget = when (splitMode) {
+        BudgetSplitMode.DYNAMIC -> state.isOverBudget
+        BudgetSplitMode.STATIC -> staticRemaining.signum() == -1
+    }
+
+    val isOverSubPeriod = when (period) {
+        BudgetPeriod.DAILY -> state.isTodayOverDailyAllocation
+        BudgetPeriod.WEEKLY -> spentInPeriod > state.weeklyAllocation && state.weeklyAllocation > BigDecimal.ZERO
+        BudgetPeriod.BIWEEKLY -> spentInPeriod > state.biweeklyAllocation && state.biweeklyAllocation > BigDecimal.ZERO
+        BudgetPeriod.MONTHLY -> spentInPeriod > state.monthlyAllocation && state.monthlyAllocation > BigDecimal.ZERO
+    }
+
+    val progress = if (periodBudget.signum() == 1) {
+        periodSpent.divide(periodBudget, 2, RoundingMode.HALF_UP).toFloat().coerceIn(0f, 1f)
+    } else 0f
+
+    return BudgetMetrics(periodRemaining, progress, isOverBudget, isOverSubPeriod)
+}
+
+@Composable
+private fun resolveExhaustedMessage(
+    state: BudgetState?, period: BudgetPeriod, splitMode: BudgetSplitMode
+): String? {
+    if (state == null) return null
+
+    val dailyRem = state.dailyBudget.subtract(state.totalSpentToday)
+    val isDailyExhausted = dailyRem.signum() <= 0
+    val isWeeklyExhausted =
+        (state.dailyBudget.multiply(BigDecimal(7))).subtract(state.totalSpentInPeriod).signum() <= 0
+    val isBiweeklyExhausted =
+        (state.dailyBudget.multiply(BigDecimal(14))).subtract(state.totalSpentInPeriod)
+            .signum() <= 0
+
+    return when (splitMode) {
+        BudgetSplitMode.STATIC -> {
+            val staticRem = when (period) {
+                BudgetPeriod.WEEKLY -> state.dailyBudget.multiply(BigDecimal(7))
+                    .subtract(state.totalSpentInPeriod)
+
+                BudgetPeriod.BIWEEKLY -> state.dailyBudget.multiply(BigDecimal(14))
+                    .subtract(state.totalSpentInPeriod)
+
+                BudgetPeriod.MONTHLY -> state.dailyBudget.multiply(BigDecimal(30))
+                    .subtract(state.totalSpentInPeriod)
+
+                else -> BigDecimal.ZERO
+            }
+            if (staticRem.signum() <= 0) return null
+
+            val labels = buildList {
+                if (isDailyExhausted) add(stringResource(R.string.budget_pill_exhausted_daily_label))
+                if (period >= BudgetPeriod.BIWEEKLY && isWeeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
+                if (period == BudgetPeriod.MONTHLY && isBiweeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
+            }
+
+            when (labels.size) {
+                1 -> stringResource(R.string.budget_pill_exhausted_single, labels[0])
+                2 -> stringResource(R.string.budget_pill_exhausted_double, labels[0], labels[1])
+                3 -> stringResource(
+                    R.string.budget_pill_exhausted_triple, labels[0], labels[1], labels[2]
+                )
+
+                else -> null
+            }
+        }
+
+        BudgetSplitMode.DYNAMIC -> {
+            // Logic for dynamic exceeded sub-messages
+            val isOverDaily = state.isTodayOverDailyAllocation
+            val isOverWeekly =
+                state.totalSpentInPeriod > state.weeklyAllocation && state.weeklyAllocation > BigDecimal.ZERO
+            val isOverBiweekly =
+                state.totalSpentInPeriod > state.biweeklyAllocation && state.biweeklyAllocation > BigDecimal.ZERO
+            val isOverMonthly =
+                state.totalSpentInPeriod > state.monthlyAllocation && state.monthlyAllocation > BigDecimal.ZERO
+
+            val currentOver = when (period) {
+                BudgetPeriod.DAILY -> isOverDaily
+                BudgetPeriod.WEEKLY -> isOverWeekly
+                BudgetPeriod.BIWEEKLY -> isOverBiweekly
+                BudgetPeriod.MONTHLY -> isOverMonthly
+            }
+            if (currentOver) return null
+
+            val overspent = buildList {
+                if (isOverDaily) add(stringResource(R.string.budget_pill_exhausted_daily_label))
+                if (period >= BudgetPeriod.BIWEEKLY && isOverWeekly) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
+                if (period == BudgetPeriod.MONTHLY && isOverBiweekly) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
+            }
+
+            when (overspent.size) {
+                1 -> stringResource(R.string.budget_pill_sub_exceeded_single, overspent[0])
+                2 -> stringResource(
+                    R.string.budget_pill_sub_exceeded_double, overspent[0], overspent[1]
+                )
+
+                3 -> stringResource(
+                    R.string.budget_pill_sub_exceeded_triple,
+                    overspent[0],
+                    overspent[1],
+                    overspent[2]
+                )
+
+                else -> null
             }
         }
     }
@@ -495,11 +422,6 @@ private fun StatusLabel(
         else -> budgetPeriod.periodLabel()
     }
 
-    val textStartOffset by animateDpAsState(
-        label = "textStartOffset",
-        targetValue = 0.dp,
-        animationSpec = tween(250),
-    )
     val labelVerticalOffset by animateDpAsState(
         label = "labelVerticalOffset",
         targetValue = if (exhaustedMessage != null && !bigVariant) (-2).dp else 0.dp,
@@ -516,14 +438,12 @@ private fun StatusLabel(
         Row(
             modifier = Modifier
                 .then(if (wrapContent) Modifier.wrapContentWidth() else Modifier.fillMaxWidth())
-                .offset(y = labelVerticalOffset), verticalAlignment = Alignment.CenterVertically
+                .offset { IntOffset(0, labelVerticalOffset.roundToPx()) },
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.width(textStartOffset))
             AdaptiveSingleLineText(
                 text = label,
-                style = if (bigVariant) {
-                    MaterialTheme.typography.titleMediumEmphasized
-                } else if (isOverBudget || isOverSubPeriodAllocation) {
+                style = if (bigVariant || isOverBudget || isOverSubPeriodAllocation) {
                     MaterialTheme.typography.titleMediumEmphasized
                 } else {
                     MaterialTheme.typography.titleMediumCondensed
@@ -568,6 +488,7 @@ private fun AdaptiveSingleLineText(
         val availableWidth = with(density) { maxWidth.toPx() }
         val maxFontSize = style.fontSize.takeIf { it != TextUnit.Unspecified }
             ?: MaterialTheme.typography.bodyLarge.fontSize
+
         val adaptiveFontSize = calcAdaptiveFont(
             height = with(density) { maxFontSize.toPx() },
             width = availableWidth,
@@ -597,9 +518,8 @@ private fun AdaptiveSingleLineText(
 private fun PreviewBudgetPill() {
     MinusTheme {
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.background(
-                MaterialTheme.colorScheme.surface
-            )
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
             BudgetPill(
                 budgetState = BudgetState(

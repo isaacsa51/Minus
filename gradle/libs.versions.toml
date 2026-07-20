@@ -50,6 +50,7 @@ truth = "1.4.4"
 kotlinxCoroutinesTest = "1.10.2"
 turbine = "1.2.0"
 mockk = "1.13.13"
+byteBuddyAgent = "1.14.17"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -123,6 +124,7 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+byte-buddy-agent = { group = "net.bytebuddy", name = "byte-buddy-agent", version.ref = "byteBuddyAgent" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

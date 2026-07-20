@@ -8,15 +8,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.Button
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalContext
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -56,9 +59,7 @@ fun ExpenseWidgetPreviewLowSpend() {
         ExpenseWidget().ExpenseWidgetContent(
             spend = 3740,
             budget = 60000,
-            currency = "USD",
-            totalSpentLabel = "Total Spent",
-            addExpenseContentDescription = "Add expense",
+            currency = "USD"
         )
     }
 }
@@ -70,9 +71,7 @@ fun ExpenseWidgetPreviewMediumSpend() {
         ExpenseWidget().ExpenseWidgetContent(
             spend = 30740,
             budget = 60000,
-            currency = "USD",
-            totalSpentLabel = "Total Spent",
-            addExpenseContentDescription = "Add expense",
+            currency = "USD"
         )
     }
 }
@@ -84,9 +83,7 @@ fun ExpenseWidgetPreviewHighSpend() {
         ExpenseWidget().ExpenseWidgetContent(
             spend = 45740,
             budget = 60000,
-            currency = "USD",
-            totalSpentLabel = "Total Spent",
-            addExpenseContentDescription = "Add expense",
+            currency = "USD"
         )
     }
 }
@@ -98,9 +95,7 @@ fun ExpenseWidgetPreviewEmpty() {
         ExpenseWidget().ExpenseWidgetContent(
             spend = 0,
             budget = 60000,
-            currency = "USD",
-            totalSpentLabel = "Total Spent",
-            addExpenseContentDescription = "Add expense",
+            currency = "USD"
         )
     }
 }
@@ -110,13 +105,13 @@ class ExpenseWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             GlanceTheme {
-                WidgetContent(context)
+                WidgetContent()
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(context: Context) {
+    private fun WidgetContent() {
         val prefs = currentState<Preferences>()
         val spend = prefs[intPreferencesKey("spend")] ?: 0
         val budget = prefs[intPreferencesKey("budget")] ?: 1
@@ -125,9 +120,7 @@ class ExpenseWidget : GlanceAppWidget() {
         ExpenseWidgetContent(
             spend = spend,
             budget = budget,
-            currency = currency,
-            totalSpentLabel = context.getString(R.string.total_spent),
-            addExpenseContentDescription = context.getString(R.string.widget_add_expense_label),
+            currency = currency
         )
     }
 
@@ -136,22 +129,14 @@ class ExpenseWidget : GlanceAppWidget() {
         spend: Int,
         budget: Int,
         currency: String,
-        totalSpentLabel: String = "Total Spent",
-        addExpenseContentDescription: String = "Add expense",
+        context: Context = LocalContext.current,
+        totalSpentLabel: String = context.getString(R.string.total_spent),
+        addExpenseContentDescription: String = context.getString(R.string.widget_add_expense_label),
+        plusSymbol: String = context.getString(R.string.widget_add_expense_plus)
     ) {
         val percentSpent = if (budget > 0) {
             spend.toFloat() / budget.toFloat()
         } else 0f
-
-        val percentRemaining = ((1f - percentSpent) * 100).toInt().coerceAtLeast(0)
-
-        val progressColor = when {
-            percentSpent < 0.33f -> Color(0xFF81C784)
-            percentSpent < 0.66f ->Color(0xFFFFB74D)
-            else -> Color(0xFFE57373)
-        }
-
-        val progressPercent = percentSpent.coerceIn(0f, 1f)
 
         Box(
             modifier = GlanceModifier
@@ -188,11 +173,21 @@ class ExpenseWidget : GlanceAppWidget() {
 
                     Spacer(modifier = GlanceModifier.fillMaxWidth())
 
-                    Button(
-                        text = "+",
-                        onClick = actionRunCallback<OpenAppAction>(),
-                        modifier = GlanceModifier.size(32.dp)
-                    )
+                    Box(
+                        modifier = GlanceModifier
+                            .size(32.dp)
+                            .clickable(actionRunCallback<OpenAppAction>()),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = plusSymbol,
+                            style = TextStyle(
+                                color = GlanceTheme.colors.onSurface,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
                 }
             }
 
@@ -203,7 +198,8 @@ class ExpenseWidget : GlanceAppWidget() {
                 Image(
                     provider = ImageProvider(R.drawable.ic_plus),
                     contentDescription = addExpenseContentDescription,
-                    modifier = GlanceModifier.size(20.dp)
+                    modifier = GlanceModifier.size(20.dp),
+                    colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface)
                 )
             }
         }

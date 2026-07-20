@@ -27,7 +27,8 @@ data class TransactionEntity(
     val recurrentEndDate: Long? = null,
     val subscriptionDay: Int? = null,
     val categoryId: Long? = null,
-    val isCredit: Boolean = false
+    val isCredit: Boolean = false,
+    val isCreditPaid: Boolean = false
 ) {
     companion object {
         fun fromDomain(
@@ -39,7 +40,8 @@ data class TransactionEntity(
             recurrentEndDate: LocalDateTime? = null,
             subscriptionDay: Int? = null,
             categoryId: Long? = null,
-            isCredit: Boolean = false
+            isCredit: Boolean = false,
+            isCreditPaid: Boolean = false
         ): TransactionEntity = TransactionEntity(
             id = 0,
             amount = amount,
@@ -50,7 +52,8 @@ data class TransactionEntity(
             recurrentEndDate = recurrentEndDate?.toEpochSecond(ZoneOffset.UTC)?.times(1000),
             subscriptionDay = subscriptionDay,
             categoryId = categoryId,
-            isCredit = isCredit
+            isCredit = isCredit,
+            isCreditPaid = isCreditPaid
         )
     }
 }

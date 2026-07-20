@@ -1,12 +1,18 @@
 package com.serranoie.app.minus.presentation.ui.analytics
 
 import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
@@ -28,23 +36,38 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.datastore.preferences.core.edit
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY
+import com.serranoie.app.minus.presentation.ANALYTICS_TUTORIAL_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.LocalWindowInsets
+import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalytics
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalyticsState
 import com.serranoie.app.minus.presentation.ui.analytics.util.previewAnalyticsState
@@ -55,19 +78,33 @@ import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeade
 import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditOwedCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.MinMaxSpentCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendsCountCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.CategoriesChartCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarHeatmap
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
+import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
+import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import logcat.logcat
 import java.math.BigDecimal
-import java.time.LocalDateTime
-import java.util.Calendar
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
 
+private val STABLE_DEFAULT_DATE = Date(0)
+
+@Immutable
 data class AnalyticsState(
     val periodFinished: Boolean = false,
     val transactions: List<Transaction> = emptyList(),
@@ -77,20 +114,27 @@ data class AnalyticsState(
     val wholeBudget: BigDecimal = BigDecimal.ZERO,
     val currencyCode: String = "USD",
     val finishPeriodActualDate: Date? = null,
-    val startPeriodDate: Date = Date(),
+    val startPeriodDate: Date = STABLE_DEFAULT_DATE,
     val finishPeriodDate: Date? = null,
     val extraAffordableDaysFromRemaining: Int = 0,
     val budgetSettingsForDisplay: BudgetSettings? = null,
     val budgetStateForDisplay: BudgetState? = null,
     val showRolloverStyleInBudgetDisplay: Boolean = false,
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
+    val creditOwed: BigDecimal = BigDecimal.ZERO,
+    val debtAdjustedBalance: BigDecimal = BigDecimal.ZERO,
+    val creditTransactions: List<Transaction> = emptyList(),
+    val isHistoricalView: Boolean = false,
 )
 
 data class AnalyticsActions(
     val onCreateNewPeriod: () -> Unit = {},
     val onClose: () -> Unit = {},
     val onExportCSV: () -> Unit = {},
+    val onMarkCreditPaid: () -> Unit = {},
+    val onCutoffDayChanged: (Int) -> Unit = {},
+    val onHistoricalPeriodSelected: (Long) -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -99,120 +143,290 @@ data class Size(val width: Dp, val height: Dp)
 @Composable
 fun Analytics(
     state: AnalyticsState = AnalyticsState(),
+    archivedBudgets: List<ArchivedBudget> = emptyList(),
     actions: AnalyticsActions = AnalyticsActions(),
     activityResultRegistryOwner: ActivityResultRegistryOwner? = null,
+    showTutorialOverride: Boolean? = null,
 ) {
+    val context = LocalContext.current
     val view = LocalView.current
     val scrollState = rememberScrollState()
     var showHistorySheet by remember { mutableStateOf(false) }
+    var showCreditSheet by remember { mutableStateOf(false) }
+    var showPastPeriodsSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    val hasSpends = state.spends.isNotEmpty()
+    val tutorialCompletedKey =
+        if (hasSpends) ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY else ANALYTICS_TUTORIAL_COMPLETED_KEY
+
+    val tutorialCompletedFlow = remember(context, tutorialCompletedKey) {
+        context.settingsDataStore.data.map {
+            it[tutorialCompletedKey] ?: false
+        }
+    }
+    val tutorialCompleted by tutorialCompletedFlow.collectAsStateWithLifecycle(initialValue = true)
+
+    val effectiveTutorialCompleted = showTutorialOverride?.let { !it } ?: tutorialCompleted
+
+    val tutorialOrder = remember(hasSpends) {
+        if (hasSpends) listOf(3, 0, 2) else listOf(1, 2, 5)
+    }
+
+    val tutorialBoxState = rememberTutorialBoxState(
+        order = tutorialOrder,
+        virtual = setOf(6),
+    )
+
+    var scrollableContainerCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val componentPositions = remember { mutableStateMapOf<Int, Pair<Float, Float>>() }
+
+    val markIfInOrder: Modifier.(Int) -> Modifier = { index ->
+        if (index in tutorialOrder) {
+            this
+                .onGloballyPositioned { coords ->
+                    scrollableContainerCoordinates?.let { container ->
+                        val position = container.localPositionOf(
+                            coords, androidx.compose.ui.geometry.Offset.Zero
+                        )
+                        componentPositions[index] = position.y to coords.size.height.toFloat()
+                    }
+                }
+                .markForTutorial(tutorialBoxState, index)
+        } else this
+    }
+
+    val bringIntoViewRequesters = remember {
+        mapOf(
+            0 to BringIntoViewRequester(),
+            1 to BringIntoViewRequester(),
+            2 to BringIntoViewRequester(),
+            3 to BringIntoViewRequester(),
+            4 to BringIntoViewRequester(),
+            5 to BringIntoViewRequester(),
+        )
+    }
+
+    LaunchedEffect(tutorialBoxState.currentIndexState.value) {
+        val index = tutorialBoxState.currentIndexState.value
+        if ((index != -1) && !effectiveTutorialCompleted) {
+            delay(600.milliseconds)
+
+            val position = componentPositions[index]
+            if (position != null && scrollableContainerCoordinates != null) {
+                val (offsetY, height) = position
+                val containerHeight = scrollableContainerCoordinates!!.size.height
+                val targetScroll = (offsetY - (containerHeight - height) / 2f).toInt()
+                scrollState.animateScrollTo(targetScroll.coerceIn(0, scrollState.maxValue))
+            } else {
+                bringIntoViewRequesters[index]?.bringIntoView()
+            }
+        }
+    }
+
     var selectedCategory by remember { mutableStateOf<CategoryAnalyticsState?>(null) }
+    var selectedDayData by remember { mutableStateOf<CategoryAnalyticsState?>(null) }
+
+    val scope = rememberCoroutineScope()
 
     val navigationBarHeight =
         LocalWindowInsets.current.calculateBottomPadding().coerceAtLeast(16.dp)
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            if (!state.periodFinished) {
-                MiddlePeriodHeader(
-                    onClose = actions.onClose,
-                )
+    val locale = LocalConfiguration.current.locales[0]
+
+    TutorialBox(
+        showTutorial = !effectiveTutorialCompleted && !state.isLoading,
+        state = tutorialBoxState,
+        onTutorialCompleted = {
+            scope.launch {
+                context.settingsDataStore.edit { prefs ->
+                    prefs[tutorialCompletedKey] = true
+                }
             }
         },
-    ) { paddingValues ->
-        BoxWithConstraints(
-            modifier = Modifier
-				.fillMaxSize()
-				.padding(paddingValues)
-        ) {
-            val useWideAnalyticsLayout = maxWidth >= 840.dp
+        tutorialTarget = { index ->
+            when (index) {
+                0 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_minmax_title),
+                    description = stringResource(R.string.analytics_tutorial_minmax_desc)
+                )
 
-            Column(
-                Modifier
-					.fillMaxSize()
-					.verticalScroll(scrollState)
-            ) {
-                if (state.periodFinished) {
-                    FinishedPeriodHeader(
-                        scrollState = scrollState,
-                        hasSpends = state.spends.isNotEmpty(),
-                        isOverBudget = state.spends.sumOf { it.amount } > state.wholeBudget,
+                1 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_header_title),
+                    description = stringResource(R.string.analytics_tutorial_header_desc)
+                )
+
+                2 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_budget_title),
+                    description = stringResource(R.string.analytics_tutorial_budget_desc)
+                )
+
+                3 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_heatmap_title),
+                    description = stringResource(R.string.analytics_tutorial_heatmap_desc)
+                )
+
+                4 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_charts_title),
+                    description = stringResource(R.string.analytics_tutorial_charts_desc)
+                )
+
+                5 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_savings_title),
+                    description = stringResource(R.string.analytics_tutorial_savings_desc)
+                )
+
+                else -> TutorialTooltip(
+                    title = "Tutorial Step $index", description = "Description for step $index"
+                )
+            }
+        }) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                if (!state.periodFinished || state.isHistoricalView) {
+                    MiddlePeriodHeader(
+                        onClose = actions.onClose,
+                        onShowPastPeriods = { showPastPeriodsSheet = true },
+                        historyIconModifier = Modifier.bringIntoViewRequester(
+                            bringIntoViewRequesters[1]!!
+                        ).markIfInOrder(1)
                     )
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-                BudgetDisplay(
-                    budget = state.wholeBudget,
-                    currencyCode = state.currencyCode,
-                    startDate = state.startPeriodDate,
-                    finishDate = state.finishPeriodDate,
-                    actualFinishDate = state.finishPeriodActualDate,
-                    extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    budgetState = state.budgetStateForDisplay,
-                    budgetSettings = state.budgetSettingsForDisplay,
-                    showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                AnalyticsResponsiveLayout(
-                    useTabletLayout = useWideAnalyticsLayout,
-                    state = state,
-                    onShowHistory = {
-                        showHistorySheet = true
-                        view.weakHapticFeedback()
-                    },
-                    onCategoryClick = { categoryName, categorySpends ->
-                        selectedCategory =
-                            state.toCategoryAnalyticsState(categoryName, categorySpends)
-                        view.weakHapticFeedback()
-                    }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                SavingsRecommendationCard(
-                    budget = state.wholeBudget,
-                    recurringInPeriod = state.recurringInPeriod,
-                    oneTimeSpends = state.oneTimeSpends,
-                    currency = state.currencyCode,
-                    preferences = state.savingsPreferences,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                )
-
-                Spacer(modifier = Modifier.height(80.dp + navigationBarHeight))
-            }
-
-            Box(
+            },
+        ) { paddingValues ->
+            BoxWithConstraints(
                 modifier = Modifier
-					.fillMaxWidth()
-					.align(androidx.compose.ui.Alignment.BottomCenter)
-					.zIndex(1f)
-					.padding(bottom = navigationBarHeight, start = 16.dp, end = 16.dp)
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
-                Button(
+                val useWideAnalyticsLayout = maxWidth >= 840.dp
+
+                val transitionKey = remember(state.periodFinished, state.isHistoricalView) {
+                    "${state.periodFinished}-${state.isHistoricalView}"
+                }
+                AnimatedContent(
+                    targetState = transitionKey, transitionSpec = {
+                        fadeIn(animationSpec = tween(500)) togetherWith fadeOut(
+                            animationSpec = tween(
+                                500
+                            )
+                        )
+                    }, label = "AnalyticsContentTransition"
+                ) { target ->
+                    logcat("Analytics") { "Displaying state for: $target" }
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .onGloballyPositioned { scrollableContainerCoordinates = it }
+                            .verticalScroll(scrollState)) {
+                        if (state.periodFinished) {
+                            FinishedPeriodHeader(
+                                scrollState = scrollState,
+                                hasSpends = state.spends.isNotEmpty(),
+                                isOverBudget = state.spends.sumOf { it.amount } > state.wholeBudget,
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        BudgetDisplay(
+                            budget = state.wholeBudget,
+                            budgetState = state.budgetStateForDisplay,
+                            budgetSettings = state.budgetSettingsForDisplay,
+                            currencyCode = state.currencyCode,
+                            startDate = state.startPeriodDate,
+                            finishDate = state.finishPeriodDate,
+                            actualFinishDate = state.finishPeriodActualDate,
+                            extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
+                            showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
+                            creditOwed = state.creditOwed,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                                .bringIntoViewRequester(bringIntoViewRequesters[2]!!)
+                                .markIfInOrder(2),
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        AnalyticsResponsiveLayout(
+                            useTabletLayout = useWideAnalyticsLayout,
+                            state = state,
+                            onShowHistory = {
+                                showHistorySheet = true
+                                view.weakHapticFeedback()
+                            },
+                            onShowCreditDetails = { showCreditSheet = true },
+                            onCategoryClick = { categoryName, categorySpends ->
+                                selectedCategory = state.toCategoryAnalyticsState(
+                                    categoryName, categorySpends
+                                )
+                                view.weakHapticFeedback()
+                            },
+                            onDayClick = { date ->
+                                val daySpends =
+                                    state.spends.filter { it.date?.toLocalDate() == date }
+                                val formatter = DateTimeFormatter.ofPattern(
+                                    "dd MMMM", locale
+                                )
+                                selectedDayData = state.toCategoryAnalyticsState(
+                                    categoryName = date.format(formatter),
+                                    categorySpends = daySpends
+                                ).copy(isDayView = true)
+                                view.weakHapticFeedback()
+                            },
+                            tutorialBoxState = tutorialBoxState,
+                            bringIntoViewRequesters = bringIntoViewRequesters,
+                            tutorialOrder = tutorialOrder,
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        SavingsRecommendationCard(
+                            budget = state.wholeBudget,
+                            recurringInPeriod = state.recurringInPeriod,
+                            oneTimeSpends = state.oneTimeSpends,
+                            currency = state.currencyCode,
+                            preferences = state.savingsPreferences,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                                .bringIntoViewRequester(bringIntoViewRequesters[5]!!)
+                                .markIfInOrder(5),
+                        )
+
+                        Spacer(modifier = Modifier.height(80.dp + navigationBarHeight))
+                    }
+                }
+
+                Box(
                     modifier = Modifier
-						.fillMaxWidth()
-						.heightIn(60.dp),
-                    onClick = {
-                        view.strongHapticFeedback()
-                        actions.onCreateNewPeriod()
-                    },
+                        .fillMaxWidth()
+                        .align(androidx.compose.ui.Alignment.BottomCenter)
+                        .zIndex(1f)
+                        .padding(bottom = navigationBarHeight, start = 16.dp, end = 16.dp)
                 ) {
-                    Text(
-                        text = stringResource(R.string.new_budget),
-                        style = MaterialTheme.typography.labelMediumEmphasized,
-                    )
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(60.dp),
+                        onClick = {
+                            view.strongHapticFeedback()
+                            actions.onCreateNewPeriod()
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(R.string.new_budget),
+                            style = MaterialTheme.typography.labelMediumEmphasized,
+                        )
+                    }
                 }
             }
         }
     }
 
-    if (selectedCategory != null) {
+    if (selectedCategory != null || selectedDayData != null) {
         ModalBottomSheet(
-            onDismissRequest = { selectedCategory = null },
+            onDismissRequest = {
+                selectedCategory = null
+                selectedDayData = null
+            },
             sheetState = sheetState,
         ) {
-            CategoryAnalytics(state = selectedCategory!!)
+            val displayState = selectedCategory ?: selectedDayData!!
+            CategoryAnalytics(state = displayState)
         }
     }
 
@@ -222,10 +436,46 @@ fun Analytics(
             sheetState = sheetState,
             dragHandle = {
                 BottomSheetDefaults.DragHandle()
-            }
-        ) {
+            }) {
             HistoryScreen(
                 readOnly = true,
+            )
+        }
+    }
+
+    if (showPastPeriodsSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showPastPeriodsSheet = false },
+            sheetState = sheetState,
+        ) {
+            com.serranoie.app.minus.presentation.ui.analytics.dialogs.PastPeriodsBottomSheet(
+                periods = archivedBudgets,
+                onPeriodClick = { archivedBudget ->
+                    scope.launch {
+                        sheetState.hide()
+                        showPastPeriodsSheet = false
+                        actions.onHistoricalPeriodSelected(archivedBudget.periodId)
+                    }
+                },
+            )
+        }
+    }
+
+    if (showCreditSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showCreditSheet = false },
+            sheetState = sheetState,
+        ) {
+            com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditTransactionsBottomSheet(
+                transactions = state.creditTransactions,
+                totalOwed = state.creditOwed,
+                currency = state.currencyCode,
+                onPayClick = {
+                    actions.onMarkCreditPaid()
+                    showCreditSheet = false
+                },
+                creditCardCutoffDay = state.budgetSettingsForDisplay?.creditCardCutoffDay,
+                onCutoffDayChanged = actions.onCutoffDayChanged
             )
         }
     }
@@ -236,19 +486,34 @@ private fun AnalyticsResponsiveLayout(
     useTabletLayout: Boolean,
     state: AnalyticsState,
     onShowHistory: () -> Unit,
+    onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
+    onDayClick: (LocalDate) -> Unit,
+    tutorialBoxState: TutorialBoxState,
+    bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
+    tutorialOrder: List<Int>,
 ) {
     if (useTabletLayout) {
         AnalyticsTabletLayout(
             state = state,
             onShowHistory = onShowHistory,
+            onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
+            onDayClick = onDayClick,
+            tutorialBoxState = tutorialBoxState,
+            bringIntoViewRequesters = bringIntoViewRequesters,
+            tutorialOrder = tutorialOrder,
         )
     } else {
         AnalyticsCompactLayout(
             state = state,
             onShowHistory = onShowHistory,
+            onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
+            onDayClick = onDayClick,
+            tutorialBoxState = tutorialBoxState,
+            bringIntoViewRequesters = bringIntoViewRequesters,
+            tutorialOrder = tutorialOrder,
         )
     }
 }
@@ -257,13 +522,18 @@ private fun AnalyticsResponsiveLayout(
 private fun AnalyticsCompactLayout(
     state: AnalyticsState,
     onShowHistory: () -> Unit,
+    onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
+    onDayClick: (LocalDate) -> Unit,
+    tutorialBoxState: TutorialBoxState,
+    bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
+    tutorialOrder: List<Int>,
 ) {
     Column {
         Row(
             Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
             if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
                 CalendarHeatmap(
@@ -271,33 +541,38 @@ private fun AnalyticsCompactLayout(
                     budget = state.wholeBudget,
                     startDate = state.startPeriodDate,
                     finishDate = state.finishPeriodDate,
+                    onDayClick = onDayClick,
                     modifier = Modifier
-						.weight(1f)
-						.wrapContentHeight(),
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .bringIntoViewRequester(bringIntoViewRequesters[3]!!)
+                        .markIfInOrder(3, tutorialBoxState, tutorialOrder),
                 )
             }
         }
         SpendsChart(
             spends = state.spends,
             modifier = Modifier
-				.fillMaxWidth()
-				.heightIn(0.dp, 400.dp)
-				.padding(horizontal = 16.dp),
+                .fillMaxWidth()
+                .heightIn(0.dp, 400.dp)
+                .padding(horizontal = 16.dp),
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
-				.height(IntrinsicSize.Min)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .height(IntrinsicSize.Min)
+                .bringIntoViewRequester(bringIntoViewRequesters[0]!!)
+                .markIfInOrder(0, tutorialBoxState, tutorialOrder)
         ) {
             MinMaxSpentCard(
                 isMin = true,
                 spends = state.spends,
                 currency = state.currencyCode,
                 modifier = Modifier
-					.weight(1f)
-					.fillMaxHeight(),
+                    .weight(1f)
+                    .fillMaxHeight(),
             )
             Spacer(modifier = Modifier.width(16.dp))
             MinMaxSpentCard(
@@ -305,22 +580,22 @@ private fun AnalyticsCompactLayout(
                 spends = state.spends,
                 currency = state.currencyCode,
                 modifier = Modifier
-					.weight(1f)
-					.fillMaxHeight(),
+                    .weight(1f)
+                    .fillMaxHeight(),
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
             SpendsCountCard(
                 count = state.spends.size,
                 onClick = onShowHistory,
                 modifier = Modifier
-					.weight(1f)
-					.fillMaxHeight(),
+                    .weight(1f)
+                    .fillMaxHeight(),
             )
             Spacer(modifier = Modifier.width(16.dp))
             AverageSpendCard(
@@ -329,27 +604,46 @@ private fun AnalyticsCompactLayout(
                 finishDate = state.finishPeriodDate,
                 currency = state.currencyCode,
                 modifier = Modifier
-					.weight(1f)
-					.fillMaxHeight(),
+                    .weight(1f)
+                    .fillMaxHeight(),
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
-        SpendBudgetCard(
-            budget = state.wholeBudget,
-            spend = state.spends.sumOf { it.amount },
-            currency = state.currencyCode,
+        Row(
             modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp),
-        )
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .height(IntrinsicSize.Min)
+        ) {
+            SpendBudgetCard(
+                budget = state.wholeBudget,
+                spend = state.spends.sumOf { it.amount },
+                currency = state.currencyCode,
+                modifier = Modifier.weight(1f),
+            )
+            if (state.creditOwed > BigDecimal.ZERO) {
+                Spacer(modifier = Modifier.width(16.dp))
+                CreditOwedCard(
+                    owed = state.creditOwed,
+                    currency = state.currencyCode,
+                    onClick = onShowCreditDetails,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .aspectRatio(1f)
+                        .markForTutorial(tutorialBoxState, 6),
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
         CategoriesChartCard(
             spends = state.spends,
             currency = state.currencyCode,
             modifier = Modifier
-				.padding(horizontal = 16.dp)
-				.fillMaxWidth(),
-            onCategoryClick = onCategoryClick
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .bringIntoViewRequester(bringIntoViewRequesters[4]!!)
+                .markIfInOrder(4, tutorialBoxState, tutorialOrder),
+            onCategoryClick = onCategoryClick,
         )
     }
 }
@@ -358,23 +652,28 @@ private fun AnalyticsCompactLayout(
 private fun AnalyticsTabletLayout(
     state: AnalyticsState,
     onShowHistory: () -> Unit,
+    onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
+    onDayClick: (LocalDate) -> Unit,
+    tutorialBoxState: TutorialBoxState,
+    bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
+    tutorialOrder: List<Int>,
 ) {
     Column(
         modifier = Modifier
-			.fillMaxWidth()
-			.padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
         Row(
             modifier = Modifier
-				.fillMaxWidth()
-				.height(IntrinsicSize.Min)
-				.requiredHeightIn(min = 180.dp)
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .requiredHeightIn(min = 180.dp)
         ) {
             Box(
                 modifier = Modifier
-					.weight(1f)
-					.fillMaxHeight()
+                    .weight(1f)
+                    .fillMaxHeight()
             ) {
                 if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
                     CalendarHeatmap(
@@ -382,25 +681,30 @@ private fun AnalyticsTabletLayout(
                         budget = state.wholeBudget,
                         startDate = state.startPeriodDate,
                         finishDate = state.finishPeriodDate,
+                        onDayClick = onDayClick,
                         modifier = Modifier
-							.fillMaxWidth()
-							.fillMaxHeight(),
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .bringIntoViewRequester(bringIntoViewRequesters[3]!!)
+                            .markIfInOrder(3, tutorialBoxState, tutorialOrder),
                     )
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Row(
                 modifier = Modifier
-					.weight(1f)
-					.fillMaxHeight()
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .bringIntoViewRequester(bringIntoViewRequesters[0]!!)
+                    .markIfInOrder(0, tutorialBoxState, tutorialOrder)
             ) {
                 MinMaxSpentCard(
                     isMin = true,
                     spends = state.spends,
                     currency = state.currencyCode,
                     modifier = Modifier
-						.weight(1f)
-						.fillMaxHeight(),
+                        .weight(1f)
+                        .fillMaxHeight(),
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 MinMaxSpentCard(
@@ -408,16 +712,16 @@ private fun AnalyticsTabletLayout(
                     spends = state.spends,
                     currency = state.currencyCode,
                     modifier = Modifier
-						.weight(1f)
-						.fillMaxHeight(),
+                        .weight(1f)
+                        .fillMaxHeight(),
                 )
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier
-				.fillMaxWidth()
-				.height(IntrinsicSize.Min)
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
         ) {
             SpendBudgetCard(
                 budget = state.wholeBudget,
@@ -425,18 +729,30 @@ private fun AnalyticsTabletLayout(
                 currency = state.currencyCode,
                 modifier = Modifier.weight(1f),
             )
+            if (state.creditOwed > BigDecimal.ZERO) {
+                Spacer(modifier = Modifier.width(16.dp))
+                CreditOwedCard(
+                    owed = state.creditOwed,
+                    currency = state.currencyCode,
+                    onClick = onShowCreditDetails,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .aspectRatio(1f)
+                        .markForTutorial(tutorialBoxState, 6),
+                )
+            }
             Spacer(modifier = Modifier.width(16.dp))
             Row(
                 modifier = Modifier
-					.weight(1f)
-					.fillMaxHeight()
+                    .weight(1.5f)
+                    .fillMaxHeight()
             ) {
                 SpendsCountCard(
                     count = state.spends.size,
                     onClick = onShowHistory,
                     modifier = Modifier
-						.weight(1f)
-						.fillMaxHeight(),
+                        .weight(1f)
+                        .fillMaxHeight(),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 AverageSpendCard(
@@ -452,11 +768,18 @@ private fun AnalyticsTabletLayout(
         CategoriesChartCard(
             spends = state.spends,
             currency = state.currencyCode,
-            modifier = Modifier.fillMaxWidth(),
-            onCategoryClick = onCategoryClick
+            modifier = Modifier
+                .fillMaxWidth()
+                .bringIntoViewRequester(bringIntoViewRequesters[4]!!)
+                .markIfInOrder(4, tutorialBoxState, tutorialOrder),
+            onCategoryClick = onCategoryClick,
         )
     }
 }
+
+private fun Modifier.markIfInOrder(
+    index: Int, state: TutorialBoxState, order: List<Int>
+): Modifier = if (index in order) this.markForTutorial(state, index) else this
 
 private fun AnalyticsState.toCategoryAnalyticsState(
     categoryName: String,
@@ -473,7 +796,20 @@ private fun AnalyticsState.toCategoryAnalyticsState(
     categoryName = categoryName,
     categorySpends = categorySpends,
     currencyCode = currencyCode,
+    creditCardCutoffDay = budgetSettingsForDisplay?.creditCardCutoffDay,
 )
+
+@Preview
+@Composable
+private fun PreviewAnalytics() {
+    MinusTheme {
+        Surface {
+            Analytics(
+                state = previewAnalyticsState(periodFinished = false),
+            )
+        }
+    }
+}
 
 @PreviewScreenSizes
 @Composable

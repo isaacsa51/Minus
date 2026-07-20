@@ -75,8 +75,11 @@ private const val MAX_DAYS_PER_MONTH = 31
 
 private fun monthYearKey(index: Int) = intPreferencesKey("heatmap_month_year_$index")
 private fun monthValueKey(index: Int) = intPreferencesKey("heatmap_month_value_$index")
-private fun ratioKey(monthIndex: Int, day: Int) = floatPreferencesKey("heatmap_ratio_${monthIndex}_$day")
-private fun hasSpendingKey(monthIndex: Int, day: Int) = intPreferencesKey("heatmap_has_spending_${monthIndex}_$day")
+private fun ratioKey(monthIndex: Int, day: Int) =
+    floatPreferencesKey("heatmap_ratio_${monthIndex}_$day")
+
+private fun hasSpendingKey(monthIndex: Int, day: Int) =
+    intPreferencesKey("heatmap_has_spending_${monthIndex}_$day")
 
 private fun heatColorRes(ratio: Float, hasSpending: Boolean): Int {
     if (!hasSpending) return R.color.widget_heatmap_empty_dark
@@ -156,7 +159,10 @@ private fun DayCell(cell: CalendarCellState) {
             .padding(2.dp)
             .cornerRadius(4.dp)
             .background(
-                if (hasDay) heatColorRes(cell.ratio, cell.hasSpending) else android.R.color.transparent
+                if (hasDay) heatColorRes(
+                    cell.ratio,
+                    cell.hasSpending
+                ) else android.R.color.transparent
             ),
         contentAlignment = Alignment.Center,
     ) {
@@ -325,7 +331,8 @@ suspend fun updateHeatmapWidget(
             for (monthIndex in 0 until MONTHS_TO_RENDER) {
                 val month = normalizedMonths.getOrNull(monthIndex)
                 val fallback = YearMonth.now().minusMonths((MONTHS_TO_RENDER - 1L - monthIndex))
-                val yearMonth = if (month != null) YearMonth.of(month.year, month.month) else fallback
+                val yearMonth =
+                    if (month != null) YearMonth.of(month.year, month.month) else fallback
 
                 prefs[monthYearKey(monthIndex)] = yearMonth.year
                 prefs[monthValueKey(monthIndex)] = yearMonth.monthValue
@@ -343,7 +350,8 @@ suspend fun updateHeatmapWidget(
                         0f
                     }
                     prefs[ratioKey(monthIndex, day)] = ratio
-                    prefs[hasSpendingKey(monthIndex, day)] = if ((spending?.transactionCount ?: 0) > 0) 1 else 0
+                    prefs[hasSpendingKey(monthIndex, day)] =
+                        if ((spending?.transactionCount ?: 0) > 0) 1 else 0
                 }
             }
         }

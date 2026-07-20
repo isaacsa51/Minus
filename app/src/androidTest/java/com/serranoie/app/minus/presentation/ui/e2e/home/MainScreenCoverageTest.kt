@@ -777,7 +777,7 @@ class MainScreenCoverageTest {
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(500)
 
-        val noBudgetLabel = composeTestRule.activity.getString(R.string.budget_pill_no_budget)
+        val noBudgetLabel = composeTestRule.activity.getString(R.string.budget_pill_no_budget_action)
         composeTestRule.onAllNodesWithText(noBudgetLabel).onLast().assertIsDisplayed()
     }
 

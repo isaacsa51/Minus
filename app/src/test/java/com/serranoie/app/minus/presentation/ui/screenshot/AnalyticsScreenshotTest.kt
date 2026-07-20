@@ -100,6 +100,7 @@ private fun AnalyticsPreview(
                         onExportCSV = {},
                     ),
                     activityResultRegistryOwner = null,
+                    showTutorialOverride = false,
                 )
             }
         }
