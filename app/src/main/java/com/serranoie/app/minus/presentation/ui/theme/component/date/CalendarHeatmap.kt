@@ -85,6 +85,7 @@ fun CalendarHeatmap(
 	startDate: Date,
 	finishDate: Date,
 	actualFinishDate: Date? = null,
+	onDayClick: (LocalDate) -> Unit = {},
 ) {
 	val context = LocalContext.current
 
@@ -115,7 +116,7 @@ fun CalendarHeatmap(
 		CalendarState(
 			context = context,
 			disableBeforeDate = startDate,
-			disableAfterDate = (actualFinishDate ?: finishDate).coerceAtMost(Date()),
+			disableAfterDate = actualFinishDate ?: finishDate,
 		)
 	}
 
@@ -179,13 +180,70 @@ fun CalendarHeatmap(
 								spendingDays = spendingDays,
 								budget = budget,
 								maxSpendsPerDay = maxSpendsPerDay,
+								onDayClick = onDayClick,
 							)
 						}
 					}
 				}
 			})
+
+		Box(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(end = 16.dp, bottom = 12.dp),
+			contentAlignment = Alignment.BottomEnd
+		) {
+			HeatmapLegend()
+		}
 	}
 
+}
+
+@Composable
+private fun HeatmapLegend() {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier.padding(top = 4.dp)
+	) {
+		Text(
+			text = stringResource(R.string.heatmap_legend_less),
+			style = MaterialTheme.typography.labelSmallCondensed,
+			color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+		)
+		Spacer(modifier = Modifier.width(4.dp))
+
+		listOf(0.0f, 0.25f, 0.5f, 0.75f, 1.0f).forEach { ratio ->
+			val color = if (ratio == 0f) Color.Transparent else {
+				val normalizedHeat = ratio.coerceIn(0f, 1.2f)
+				val heatColor = when {
+					normalizedHeat <= 0.5f -> lerp(colorGood, colorNotGood, normalizedHeat / 0.5f)
+					normalizedHeat <= 1.0f -> lerp(colorNotGood, colorBad, (normalizedHeat - 0.5f) / 0.5f)
+					else -> colorBad
+				}
+				val heatAlpha = 0.25f + (normalizedHeat * 0.55f)
+				heatColor.copy(alpha = heatAlpha)
+			}
+
+			Box(
+				modifier = Modifier
+					.size(10.dp)
+					.padding(1.dp)
+					.background(color, shape = RoundedCornerShape(2.dp))
+					.border(
+						width = 0.5.dp,
+						color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+						shape = RoundedCornerShape(2.dp)
+					)
+			)
+		}
+
+		Spacer(modifier = Modifier.width(4.dp))
+		Text(
+			text = stringResource(R.string.heatmap_legend_more),
+			style = MaterialTheme.typography.labelSmallCondensed,
+			color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+		)
+	}
 }
 
 @Composable
@@ -263,6 +321,7 @@ fun WeekRow(
 	spendingDays: Map<LocalDate, SpendingDay>,
 	budget: BigDecimal,
 	maxSpendsPerDay: Int,
+	onDayClick: (LocalDate) -> Unit,
 ) {
 	val beginningWeek = week.yearMonth.atDay(1).plusWeeks(week.number.toLong())
 	var currentDay = beginningWeek.with(TemporalAdjusters.previousOrSame(getWeek()[0]))
@@ -287,7 +346,7 @@ fun WeekRow(
 						modifier = Modifier.weight(1f),
 						calendarState = calendarUiState,
 						day = currentDay,
-						onDayClicked = {},
+						onDayClicked = onDayClick,
 						spendingRatio = heatIntensity,
 						hasSpending = spendingDay != null,
 					)

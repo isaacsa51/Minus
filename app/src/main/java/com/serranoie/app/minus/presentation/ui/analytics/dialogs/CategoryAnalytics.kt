@@ -56,6 +56,7 @@ data class CategoryAnalyticsState(
     val categorySpends: List<Transaction> = emptyList(),
     val currencyCode: String = "USD",
     val creditCardCutoffDay: Int? = null,
+    val isDayView: Boolean = false,
 )
 
 @Composable
@@ -223,7 +224,11 @@ fun CategoryAnalytics(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(R.string.category_no_expenses),
+                    text = if (state.isDayView) {
+                        stringResource(R.string.day_no_expenses)
+                    } else {
+                        stringResource(R.string.category_no_expenses)
+                    },
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
