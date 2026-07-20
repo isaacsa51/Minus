@@ -333,6 +333,7 @@
     <!-- Budget Pill -->
     <string name="budget_pill_over_budget">Valor do orçamento excedido</string>
     <string name="budget_pill_no_budget">Nenhum orçamento</string>
+    <string name="budget_pill_no_budget_action">Set up your budget</string>
     <string name="budget_pill_exhausted_daily_label">Diariamente</string>
     <string name="budget_pill_exhausted_weekly_label">Semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">Bienal</string>
@@ -496,4 +497,29 @@
     <string name="credit_cutoff_subtitle_today">%1$s — Cutoff today</string>
     <string name="ticket_expense">EXPÊNCIA</string>
     <string name="ticket_recurrent_expense">EXPÊNCIA DO RECURSO</string>
+    <!-- Past Periods -->
+    <string name="past_periods_title">Past periods</string>
+    <string name="past_periods_empty">No archived periods found</string>
+    <string name="past_periods_spent_label">Gasto</string>
+    <string name="past_periods_limit_label">Limit</string>
+    <string name="past_periods_status_on_track">On Track</string>
+    <string name="past_periods_status_over_budget">Over Budget</string>
+    <string name="past_periods_status_saved">Saved %1$s</string>
+    <!-- Analytics Tutorial -->
+    <string name="analytics_tutorial_minmax_title">Spending Trends</string>
+    <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>
+    <string name="analytics_tutorial_header_title">Historical Periods</string>
+    <string name="analytics_tutorial_header_desc">Tap the icon to see your past budget periods and review their performance.</string>
+    <string name="analytics_tutorial_budget_title">Budget Status</string>
+    <string name="analytics_tutorial_budget_desc">Check your total budget and see it\'s total days.</string>
+    <string name="analytics_tutorial_heatmap_title">Spending Intensity</string>
+    <string name="analytics_tutorial_heatmap_desc">This calendar shows when you spend the most. Darker days mean higher spending. Tap on any day to see all expenses registered for that specific date.</string>
+    <string name="analytics_tutorial_charts_title">Category Breakdown</string>
+    <string name="analytics_tutorial_charts_desc">See which categories are eating up your budget. Tap any slice or category name for details.</string>
+    <string name="analytics_tutorial_savings_title">Savings Recommendation</string>
+    <string name="analytics_tutorial_savings_desc">Based on the 50/30/20 rule, we suggest how much you should ideally be saving. This can be changed on settings.</string>
+    <string name="analytics_tutorial_credit_title">Credit Card Management</string>
+    <string name="analytics_tutorial_credit_desc">Tap the credit card to view all CC transactions, mark them as paid, or adjust your billing cutoff date to avoid interest.</string>
+    <string name="analytics_tutorial_history_title">Transaction History</string>
+    <string name="analytics_tutorial_history_desc">Tap here to see a list of all your expenses for this period.</string>
 </resources>
