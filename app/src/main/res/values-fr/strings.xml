@@ -151,7 +151,7 @@
     <string name="left">Restant</string>
     <string name="remaining">Restant</string>
     <string name="total_spent">Total dépensé</string>
-    <string name="days_left">jours restants</string>
+    <string name="days_left">days\nleft</string>
     <string name="budget_overview">Aperçu du budget</string>
     <string name="spent_per_day">Dépensé par jour</string>
     <string name="budget_period_daily">Quotidien</string>
@@ -448,8 +448,8 @@
     <string name="split_mode_dialog_title">Comment devrions-nous répartir votre budget?</string>
     <string name="split_mode_dialog_description" formatted="false">Choisissez le mode de calcul du montant par période.</string>
     <string name="split_mode_static">Statique</string>
-    <string name="split_mode_static_desc">Le budget total est réparti équitablement sur toutes les périodes, quel que soit le montant que vous dépensez.</string>
-    <string name="split_mode_dynamic">Dynamique</string>
+    <string name="split_mode_static_desc">Total budget is split equally across all days, regardless of how much you spend.</string>
+    <string name="split_mode_dynamic">Dynamic (Recommended)</string>
     <string name="split_mode_dynamic_desc">Recalcule chaque jour à mesure que vous dépensez. Le solde restant est réparti sur les jours restants de la période.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Sans date</string>
