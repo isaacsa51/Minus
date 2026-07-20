@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.analytics
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,6 +20,10 @@ fun AnalyticsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    BackHandler {
+        viewModel.onClose()
+    }
 
     LaunchedEffect(Unit) {
         context.settingsDataStore.data.collect { prefs: Preferences ->
@@ -44,6 +49,7 @@ fun AnalyticsScreen(
 
     Analytics(
         state = uiState.displayState,
+        archivedBudgets = uiState.archivedBudgets,
         actions = AnalyticsActions(
             onCreateNewPeriod = {
                 viewModel.onCreateNewPeriod()
@@ -56,6 +62,9 @@ fun AnalyticsScreen(
             },
             onCutoffDayChanged = { day ->
                 viewModel.onCutoffDayChanged(day)
+            },
+            onHistoricalPeriodSelected = { periodId ->
+                viewModel.onPeriodSelected(periodId)
             }
         ),
         activityResultRegistryOwner = activityResultRegistryOwner,

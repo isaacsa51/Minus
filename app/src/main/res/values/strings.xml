@@ -575,4 +575,13 @@
     <string name="credit_cutoff_subtitle_today">%1$s — Cutoff today</string>
     <string name="ticket_expense">EXPENSE</string>
     <string name="ticket_recurrent_expense">RECURRING EXPENSE</string>
+
+    <!-- Past Periods -->
+    <string name="past_periods_title">Past periods</string>
+    <string name="past_periods_empty">No archived periods found</string>
+    <string name="past_periods_spent_label">Spent</string>
+    <string name="past_periods_limit_label">Limit</string>
+    <string name="past_periods_status_on_track">On Track</string>
+    <string name="past_periods_status_over_budget">Over Budget</string>
+    <string name="past_periods_status_saved">Saved %1$s</string>
 </resources>

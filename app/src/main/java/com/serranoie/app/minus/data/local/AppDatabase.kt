@@ -2,10 +2,12 @@ package com.serranoie.app.minus.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.serranoie.app.minus.data.local.dao.ArchivedBudgetDao
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
 import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
+import com.serranoie.app.minus.data.local.entity.ArchivedBudgetEntity
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
 import com.serranoie.app.minus.data.local.entity.CategoryEntity
 import com.serranoie.app.minus.data.local.entity.QueuedTransactionEntity
@@ -16,9 +18,10 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
         TransactionEntity::class,
         BudgetSettingsEntity::class,
         CategoryEntity::class,
-        QueuedTransactionEntity::class
+        QueuedTransactionEntity::class,
+        ArchivedBudgetEntity::class
     ],
-    version = 12,
+    version = 13,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -26,6 +29,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
 
     abstract fun budgetSettingsDao(): BudgetSettingsDao
+
+    abstract fun archivedBudgetDao(): ArchivedBudgetDao
 
     abstract fun categoryDao(): CategoryDao
 

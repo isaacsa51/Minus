@@ -9,6 +9,7 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.SavingsSplitPreset
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
@@ -46,6 +47,8 @@ data class AnalyticsUiState(
     val budgetState: BudgetState? = null,
     val allTransactions: List<Transaction> = emptyList(),
     val currentPeriodId: Long = 0L,
+    val selectedPeriodId: Long? = null,
+    val archivedBudgets: List<ArchivedBudget> = emptyList(),
     val displayState: AnalyticsState = AnalyticsState(),
 )
 
@@ -69,6 +72,9 @@ class AnalyticsViewModel @Inject constructor(
 
     init {
         observeBudgetData()
+        viewModelScope.launch {
+            budgetRepository.seedArchivedData()
+        }
     }
 
     private fun observeBudgetData() {
@@ -76,19 +82,77 @@ class AnalyticsViewModel @Inject constructor(
             combine(
                 budgetRepository.getBudgetSettings(),
                 budgetRepository.getTransactions(),
+                budgetRepository.getArchivedBudgets(),
                 observeCurrentPeriodBoundaryUseCase(),
-            ) { settings, transactions, periodBoundary ->
-                Triple(settings, transactions, periodBoundary)
-            }.collect { (settings, transactions, periodBoundary) ->
+            ) { settings, transactions, archives, periodBoundary ->
                 val currentPeriodId = periodBoundary.second
                 _uiState.value = _uiState.value.copy(
                     budgetSettings = settings,
                     allTransactions = transactions,
+                    archivedBudgets = archives,
                     currentPeriodId = currentPeriodId,
-                    displayState = buildDisplayState(settings, transactions, currentPeriodId),
+                    displayState = if (_uiState.value.selectedPeriodId != null && _uiState.value.selectedPeriodId != currentPeriodId) {
+                        buildHistoricalDisplayState(_uiState.value.selectedPeriodId!!, transactions, archives)
+                    } else {
+                        buildDisplayState(settings, transactions, currentPeriodId)
+                    },
                 )
-            }
+            }.collect {}
         }
+    }
+
+    private fun buildHistoricalDisplayState(
+        periodId: Long,
+        allTransactions: List<Transaction>,
+        archives: List<ArchivedBudget>
+    ): AnalyticsState {
+        val archive = archives.find { it.periodId == periodId } ?: return buildDisplayState(_uiState.value.budgetSettings, allTransactions, _uiState.value.currentPeriodId)
+
+        val transactions = allTransactions.filter { it.periodId == periodId && !it.isDeleted }
+        val (paidRecurring, upcomingRecurring, oneTimeSpends) = splitRecurringAndOneTime(
+            allTransactions = allTransactions,
+            filteredTransactions = transactions,
+            periodStart = archive.startDate,
+            periodEnd = archive.endDate,
+            today = archive.endDate, // For archives, today is end date
+        )
+
+        val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
+        val totalSpent = actualSpends.sumOf { it.amount }
+
+        val budgetSettings = BudgetSettings(
+            totalBudget = archive.totalBudget,
+            period = archive.periodType,
+            startDate = archive.startDate,
+            endDate = archive.endDate,
+            currencyCode = archive.currencyCode
+        )
+
+        val budgetState = BudgetState(
+            remainingToday = archive.totalBudget.subtract(totalSpent).coerceAtLeast(BigDecimal.ZERO),
+            totalSpentToday = BigDecimal.ZERO,
+            dailyBudget = archive.totalBudget.divide(BigDecimal(ChronoUnit.DAYS.between(archive.startDate, archive.endDate).toInt() + 1), 2, RoundingMode.HALF_UP),
+            daysRemaining = 0,
+            progress = (totalSpent.divide(archive.totalBudget, 4, RoundingMode.HALF_UP).toFloat()).coerceIn(0f, 1f),
+            isOverBudget = totalSpent > archive.totalBudget,
+            totalBudget = archive.totalBudget,
+            totalSpentInPeriod = totalSpent
+        )
+
+        return AnalyticsState(
+            periodFinished = true,
+            transactions = actualSpends,
+            spends = actualSpends,
+            recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
+            oneTimeSpends = oneTimeSpends,
+            wholeBudget = archive.totalBudget,
+            currencyCode = archive.currencyCode,
+            startPeriodDate = Date.from(archive.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+            finishPeriodDate = Date.from(archive.endDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+            budgetSettingsForDisplay = budgetSettings,
+            budgetStateForDisplay = budgetState,
+            isHistoricalView = true
+        )
     }
 
     private fun buildDisplayState(
@@ -365,7 +429,23 @@ class AnalyticsViewModel @Inject constructor(
     }
 
     fun onClose() {
-        _effects.value = AnalyticsUiEffect.NavigateToMain
+        if (_uiState.value.selectedPeriodId != null) {
+            _uiState.value = _uiState.value.copy(selectedPeriodId = null)
+            observeBudgetData() // Refresh to current
+        } else {
+            _effects.value = AnalyticsUiEffect.NavigateToMain
+        }
+    }
+
+    fun onPeriodSelected(periodId: Long) {
+        _uiState.value = _uiState.value.copy(selectedPeriodId = periodId)
+        observeBudgetData()
+    }
+
+    fun seedFakeData() {
+        viewModelScope.launch {
+            budgetRepository.seedArchivedData()
+        }
     }
 
     fun onMarkCreditPaid() {

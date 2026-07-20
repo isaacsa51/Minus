@@ -30,6 +30,7 @@ import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.settingsDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
@@ -124,6 +125,12 @@ class BudgetPeriodManager @Inject constructor(
 
 		clearEarlyFinishState()
 		val previousSettings = budgetRepository.getBudgetSettingsSync()
+		val previousPeriodId = previousPrefs[CURRENT_PERIOD_ID_KEY]
+
+		if (forceNewPeriodBoundary && previousSettings != null && previousPeriodId != null) {
+			archivePeriod(previousPeriodId, previousSettings)
+		}
+
 		budgetRepository.saveBudgetSettings(effectiveSettings)
 
 		val shouldCreateNewPeriodBoundary =
@@ -179,5 +186,14 @@ class BudgetPeriodManager @Inject constructor(
 
 		notificationScheduler.schedulePeriodEndNotification(periodEndDate)
 		return PeriodBoundaryResult(periodStartMillis = periodStartMillis, periodId = periodId)
+	}
+
+	private suspend fun archivePeriod(periodId: Long, settings: BudgetSettings) {
+		val transactions = budgetRepository.getTransactions().firstOrNull() ?: emptyList()
+		val periodTransactions = transactions.filter {
+			it.periodId == periodId && !it.isDeleted
+		}
+		val totalSpent = periodTransactions.sumOf { it.amount }
+		budgetRepository.archiveCurrentPeriod(periodId, settings, totalSpent)
 	}
 }

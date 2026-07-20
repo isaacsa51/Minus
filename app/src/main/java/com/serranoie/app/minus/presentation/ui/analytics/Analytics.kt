@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,6 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SavingsPreferences
@@ -92,6 +95,7 @@ data class AnalyticsState(
     val creditOwed: BigDecimal = BigDecimal.ZERO,
     val debtAdjustedBalance: BigDecimal = BigDecimal.ZERO,
     val creditTransactions: List<Transaction> = emptyList(),
+    val isHistoricalView: Boolean = false,
 )
 
 data class AnalyticsActions(
@@ -100,6 +104,7 @@ data class AnalyticsActions(
     val onExportCSV: () -> Unit = {},
     val onMarkCreditPaid: () -> Unit = {},
     val onCutoffDayChanged: (Int) -> Unit = {},
+    val onHistoricalPeriodSelected: (Long) -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -108,6 +113,7 @@ data class Size(val width: Dp, val height: Dp)
 @Composable
 fun Analytics(
     state: AnalyticsState = AnalyticsState(),
+    archivedBudgets: List<ArchivedBudget> = emptyList(),
     actions: AnalyticsActions = AnalyticsActions(),
     activityResultRegistryOwner: ActivityResultRegistryOwner? = null,
 ) {
@@ -115,6 +121,7 @@ fun Analytics(
     val scrollState = rememberScrollState()
     var showHistorySheet by remember { mutableStateOf(false) }
     var showCreditSheet by remember { mutableStateOf(false) }
+    var showPastPeriodsSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var selectedCategory by remember { mutableStateOf<CategoryAnalyticsState?>(null) }
@@ -128,9 +135,10 @@ fun Analytics(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            if (!state.periodFinished) {
+            if (!state.periodFinished || state.isHistoricalView) {
                 MiddlePeriodHeader(
                     onClose = actions.onClose,
+                    onShowPastPeriods = { showPastPeriodsSheet = true }
                 )
             }
         },
@@ -257,6 +265,21 @@ fun Analytics(
         ) {
             HistoryScreen(
                 readOnly = true,
+            )
+        }
+    }
+
+    if (showPastPeriodsSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showPastPeriodsSheet = false },
+            sheetState = sheetState,
+        ) {
+            com.serranoie.app.minus.presentation.ui.analytics.dialogs.PastPeriodsBottomSheet(
+                periods = archivedBudgets,
+                onPeriodClick = {
+                    actions.onHistoricalPeriodSelected(it.periodId)
+                    showPastPeriodsSheet = false
+                }
             )
         }
     }

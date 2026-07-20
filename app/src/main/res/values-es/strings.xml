@@ -501,4 +501,13 @@
     <string name="credit_badge">CRÉDITO</string>
     <string name="credit_cutoff_subtitle">%1$s — Fecha límite en %2$d días</string>
     <string name="credit_cutoff_subtitle_today">%1$s — Fecha límite</string>
+
+    <!-- Past Periods -->
+    <string name="past_periods_title">Periodos pasados</string>
+    <string name="past_periods_empty">No se encontraron periodos archivados</string>
+    <string name="past_periods_spent_label">Gastado</string>
+    <string name="past_periods_limit_label">Límite</string>
+    <string name="past_periods_status_on_track">Al día</string>
+    <string name="past_periods_status_over_budget">Excedido</string>
+    <string name="past_periods_status_saved">Ahorrado %1$s</string>
 </resources>

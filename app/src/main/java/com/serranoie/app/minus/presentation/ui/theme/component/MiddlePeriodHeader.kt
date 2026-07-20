@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +30,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 fun MiddlePeriodHeader(
 	modifier: Modifier = Modifier,
 	onClose: () -> Unit = {},
+	onShowPastPeriods: () -> Unit = {},
 ) {
 	val localBottomSheetScrollState = LocalBottomSheetScrollState.current
 	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
@@ -59,7 +61,15 @@ fun MiddlePeriodHeader(
 				fontSize = MaterialTheme.typography.titleLarge.fontSize,
 			)
 			Spacer(Modifier.weight(1F))
-			Spacer(Modifier.width(48.dp))
+			IconButton(
+				onClick = onShowPastPeriods,
+			) {
+				Icon(
+					imageVector = Icons.Rounded.History,
+					contentDescription = "Past Periods",
+					modifier = Modifier.size(24.dp)
+				)
+			}
 		}
 	}
 }
