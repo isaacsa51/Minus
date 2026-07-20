@@ -63,6 +63,8 @@ import com.serranoie.app.minus.data.repository.SETTINGS_DATASTORE_NAME
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.data.repository.THEME_MODE_KEY_NAME
 import com.serranoie.app.minus.data.repository.TYPOGRAPHY_MODE_KEY_NAME
+import com.serranoie.app.minus.data.repository.ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME
+import com.serranoie.app.minus.data.repository.ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME
 import com.serranoie.app.minus.data.repository.TUTORIAL_BOX_COMPLETED_KEY_NAME
 import com.serranoie.app.minus.data.wearable.WearableService
 import com.serranoie.app.minus.domain.time.MidnightTransitionManager
@@ -120,6 +122,9 @@ val SAVINGS_SAVINGS_PCT_KEY = intPreferencesKey(SAVINGS_SAVINGS_PCT_KEY_NAME)
 val SAVINGS_GOAL_AMOUNT_KEY = stringPreferencesKey(SAVINGS_GOAL_AMOUNT_KEY_NAME)
 val SAVINGS_GOAL_MONTHS_KEY = intPreferencesKey(SAVINGS_GOAL_MONTHS_KEY_NAME)
 val TUTORIAL_BOX_COMPLETED_KEY = booleanPreferencesKey(TUTORIAL_BOX_COMPLETED_KEY_NAME)
+val ANALYTICS_TUTORIAL_COMPLETED_KEY = booleanPreferencesKey(ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME)
+val ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY =
+    booleanPreferencesKey(ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME)
 const val DEFAULT_NOTIFICATION_HOUR = 9
 const val DEFAULT_NOTIFICATION_MINUTE = 0
 const val DEFAULT_RECURRENT_NOTIFICATION_HOUR = 8
@@ -154,12 +159,11 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var midnightTransitionManager: MidnightTransitionManager
 
-    private val requestNotificationPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission(),
-        ) { isGranted ->
-            permissionHandler.onNotificationPermissionResult(isGranted, notificationScheduler)
-        }
+    private val requestNotificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        permissionHandler.onNotificationPermissionResult(isGranted, notificationScheduler)
+    }
 
     private fun checkAndRequestNotificationPermission() {
         permissionHandler.requestNotificationPermissionIfNeeded(
@@ -223,17 +227,15 @@ class MainActivity : ComponentActivity() {
             notificationScheduler.initializeNotifications()
         }
 
-        settingsRepository
-            .observeSettings()
-            .onEach { settings ->
-                val previous = onboardingComplete.value
-                logcat("ISAAC:Main") {
-                    "Settings observer -> onboarding_completed=${settings.onboardingCompleted} (was $previous), earlyFinishActive=${settings.earlyFinishActive}"
-                }
-                onboardingComplete.value = settings.onboardingCompleted
-                earlyFinishPending.value = settings.earlyFinishActive
-                themeManager.applyUserSettings(applicationContext, settings)
-            }.launchIn(lifecycleScope)
+        settingsRepository.observeSettings().onEach { settings ->
+            val previous = onboardingComplete.value
+            logcat("ISAAC:Main") {
+                "Settings observer -> onboarding_completed=${settings.onboardingCompleted} (was $previous), earlyFinishActive=${settings.earlyFinishActive}"
+            }
+            onboardingComplete.value = settings.onboardingCompleted
+            earlyFinishPending.value = settings.earlyFinishActive
+            themeManager.applyUserSettings(applicationContext, settings)
+        }.launchIn(lifecycleScope)
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(
             object : DefaultLifecycleObserver {
@@ -254,23 +256,17 @@ class MainActivity : ComponentActivity() {
 
             val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
 
-            // INFO: Seems like this is not needed anymore since we support tablet layouts.
-// 			if (widthSizeClass == WindowWidthSizeClass.Compact) {
-// 				lockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-// 			}
-
             val windowInsets = WindowInsets.systemBars.asPaddingValues()
 
             if (isReady.value && dataStoreLoaded.value) {
                 val dynamicColor = context.dynamicColorEnabled
                 val isCensored by censorManager.isCensored.collectAsStateWithLifecycle()
 
-                val startDestination =
-                    when {
-                        earlyFinishPending.value -> Screen.Analytics.route
-                        !onboardingComplete.value -> Screen.Onboarding.route
-                        else -> Screen.Main.route
-                    }
+                val startDestination = when {
+                    earlyFinishPending.value -> Screen.Analytics.route
+                    !onboardingComplete.value -> Screen.Onboarding.route
+                    else -> Screen.Main.route
+                }
                 logcat("ISAAC:Main") {
                     "Resolved startDestination=$startDestination (earlyFinishPending=${earlyFinishPending.value}, onboardingComplete=${onboardingComplete.value})"
                 }
@@ -308,8 +304,7 @@ class MainActivity : ComponentActivity() {
                                 },
                             )
 
-                            val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog
-                                .collectAsStateWithLifecycle()
+                            val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()
                             val midnightTransitionData by midnightTransitionManager.midnightTransitionData.collectAsStateWithLifecycle()
 
                             if (shouldShowMidnightDialog && midnightTransitionData != null) {

@@ -4,6 +4,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -59,4 +60,16 @@ interface BudgetRepository {
     suspend fun getPeriodCount(): Int
 
     suspend fun markCreditTransactionsAsPaid(start: LocalDate, end: LocalDate)
+
+    fun getArchivedBudgets(): Flow<List<ArchivedBudget>>
+
+    suspend fun archiveCurrentPeriod(
+        periodId: Long,
+        settings: BudgetSettings,
+        spentAmount: BigDecimal
+    )
+
+    suspend fun deleteArchivedBudget(periodId: Long)
+
+    suspend fun seedArchivedData()
 }

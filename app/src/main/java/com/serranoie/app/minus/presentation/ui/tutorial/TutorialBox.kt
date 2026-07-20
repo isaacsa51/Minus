@@ -39,6 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import kotlinx.coroutines.delay
 import logcat.logcat
 import kotlin.time.Duration.Companion.milliseconds
@@ -63,7 +65,7 @@ fun TutorialBox(
     val shouldShow by remember(showTutorial, canvasSize) {
         derivedStateOf {
             showTutorial && !isCompleted && (isVirtual || activeBounds != null) &&
-                canvasSize.isSpecified
+                    canvasSize.isSpecified
         }
     }
 
@@ -96,11 +98,11 @@ fun TutorialBox(
             !isVirtual &&
             state.currentBounds == null
         ) {
-            delay(250.milliseconds)
+            delay(1000.milliseconds)
             if (state.currentBounds == null) {
                 logcat(TUTORIAL_LOG_TAG) {
                     "TutorialBox: current target $currentIndex " +
-                        "still has no bounds after settle delay, auto-advancing"
+                            "still has no bounds after settle delay, auto-advancing"
                 }
                 state.advance()
             }
@@ -112,7 +114,7 @@ fun TutorialBox(
             val currentIndexBeforeDelay = state.currentIndexState.value
             val isCompletedBeforeDelay = state.isCompleted
             delay(50.milliseconds)
-            
+
             if (state.currentIndexState.value != currentIndexBeforeDelay ||
                 state.isCompleted != isCompletedBeforeDelay
             ) {
@@ -123,7 +125,7 @@ fun TutorialBox(
             val order = state.registrationOrder
             val lowest = state.pendingRewindCandidates
                 .minByOrNull { order.indexOf(it) }
-            
+
             state.pendingRewindCandidates.clear()
             if (lowest != null) {
                 val targetPos = order.indexOf(lowest)
@@ -133,7 +135,7 @@ fun TutorialBox(
                     onTutorialReopened()
                     logcat(TUTORIAL_LOG_TAG) {
                         "rewind-apply: index=$lowest AFTER completion " +
-                            "(targetPos=$targetPos) — fired onTutorialReopened"
+                                "(targetPos=$targetPos) — fired onTutorialReopened"
                     }
                 } else {
                     val currentPos = order
@@ -147,13 +149,13 @@ fun TutorialBox(
                         state.currentIndexState.value = lowest
                         logcat(TUTORIAL_LOG_TAG) {
                             "rewind-apply: index=$lowest " +
-                                "(currentPos=$currentPos, targetPos=$targetPos) " +
-                                "marked outgoing index=$outgoing as visited"
+                                    "(currentPos=$currentPos, targetPos=$targetPos) " +
+                                    "marked outgoing index=$outgoing as visited"
                         }
                     } else {
                         logcat(TUTORIAL_LOG_TAG) {
                             "rewind-apply: skipped index=$lowest " +
-                                "(currentPos=$currentPos == targetPos=$targetPos)"
+                                    "(currentPos=$currentPos == targetPos=$targetPos)"
                         }
                     }
                 }
@@ -186,10 +188,9 @@ private fun TutorialOverlay(
     val tooltipGapPx = with(density) { 16.dp.toPx() }
     val tooltipMaxWidthPx = with(density) { 260.dp.toPx() }
     val tooltipMaxWidth = with(density) { tooltipMaxWidthPx.toDp() }
-    val tooltipMinHeightEstimate = 96f
+    val tooltipMinHeightEstimate = with(density) { 160.dp.toPx() }
 
     val (tooltipX, tooltipY) = if (isVirtual) {
-        // No on-screen anchor — centre the tooltip on the canvas.
         val centredX = (canvasSize.width - tooltipMaxWidthPx) / 2f
         val centredY = (canvasSize.height - tooltipMinHeightEstimate) / 2f
         centredX.toInt() to centredY.toInt()
@@ -297,16 +298,21 @@ private fun computeTooltipPosition(
 
     val (rawX, rawY) = when (placement) {
         TooltipPlacement.Below -> {
-            val anchoredX = (centerX - tooltipWidth / 2f).coerceIn(16f, canvasSize.width - tooltipWidth - 16f)
+            val anchoredX =
+                (centerX - tooltipWidth / 2f).coerceIn(16f, canvasSize.width - tooltipWidth - 16f)
             anchoredX to (targetBounds.bottom + gapPx)
         }
+
         TooltipPlacement.Above -> {
-            val anchoredX = (centerX - tooltipWidth / 2f).coerceIn(16f, canvasSize.width - tooltipWidth - 16f)
+            val anchoredX =
+                (centerX - tooltipWidth / 2f).coerceIn(16f, canvasSize.width - tooltipWidth - 16f)
             anchoredX to (targetBounds.top - gapPx - tooltipHeightPx)
         }
+
         TooltipPlacement.Right -> {
             (targetBounds.right + gapPx) to (centerY - tooltipHeightPx / 2f)
         }
+
         TooltipPlacement.Left -> {
             (targetBounds.left - gapPx - tooltipWidth) to (centerY - tooltipHeightPx / 2f)
         }
@@ -327,14 +333,17 @@ private enum class TooltipPlacement { Above, Below, Left, Right }
 private fun TutorialBoxPreview() {
     MinusTheme {
         val state = rememberTutorialBoxState()
+        LaunchedEffect(Unit) {
+            state.advance()
+        }
         TutorialBox(
             showTutorial = true,
             onTutorialCompleted = {},
             state = state,
             tutorialTarget = { index ->
-                Text(
-                    text = "Tutorial step $index",
-                    style = MaterialTheme.typography.bodyMedium
+                TutorialTooltip(
+                    title = "Tutorial step $index",
+                    description = "This is a description for the tutorial step $index."
                 )
             }
         ) {
@@ -356,7 +365,7 @@ fun TutorialTooltip(
         if (title != null) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMediumCondensed,
                 color = MaterialTheme.colorScheme.onSurface,
             )
         }
@@ -364,7 +373,7 @@ fun TutorialTooltip(
             Spacer(Modifier.height(6.dp))
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMediumCondensed,
                 color = MaterialTheme.colorScheme.onSurface,
             )
         }
