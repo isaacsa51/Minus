@@ -446,7 +446,7 @@
     <string name="split_mode_dialog_description" formatted="false">Scegli come calcolare l\'importo per periodo.</string>
     <string name="split_mode_static">Statico</string>
     <string name="split_mode_static_desc">Il bilancio totale è ripartito equamente in tutti i periodi, indipendentemente da quanto spendi.</string>
-    <string name="split_mode_dynamic">Dinamico</string>
+    <string name="split_mode_dynamic">Dinamico (consigliato)</string>
     <string name="split_mode_dynamic_desc">Ricalcola quotidianamente mentre spendi. Il saldo rimanente è ripartito sui giorni rimasti nel periodo.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Senza data</string>
