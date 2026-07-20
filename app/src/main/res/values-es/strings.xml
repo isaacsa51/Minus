@@ -333,6 +333,7 @@
     <!-- Budget Pill -->
     <string name="budget_pill_over_budget">Monto del presupuesto excedido</string>
     <string name="budget_pill_no_budget">Sin presupuesto</string>
+    <string name="budget_pill_no_budget_action">Establece tu presupuesto</string>
     <string name="budget_pill_exhausted_daily_label">diario</string>
     <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
@@ -464,12 +465,9 @@
     <string name="day_number">Día %1$d</string>
     <string name="recurrence_end">Fin recurrencia</string>
     <!-- Transaction Detail Ticket Card -->
-    <string name="ticket_expense">GASTO</string>
-    <string name="ticket_recurrent_expense">GASTO RECURRENTE</string>
     <string name="ticket_total_amount">MONTO TOTAL</string>
     <string name="mark_as_paid">Marcar como pagado</string>
     <string name="mark_as_paid_success">Marcado como pagado</string>
-
     <!-- Notifications -->
     <string name="notification_channel_period_end_name">Fin del periodo de ahorro</string>
     <string name="notification_channel_period_end_description">Notificaciones cuando tu periodo de ahorro termina con balance sobrante</string>
@@ -477,22 +475,18 @@
     <string name="notification_channel_recurrent_description">Notificaciones cuando los gastos recurrentes vencen</string>
     <string name="notification_channel_credit_name">Recordatorios de tarjeta de crédito</string>
     <string name="notification_channel_credit_description">Recordatorios antes de la fecha de corte de la tarjeta de crédito</string>
-
     <string name="notification_period_end_title">Periodo de ahorro finalizado</string>
     <string name="notification_period_end_message_positive">El periodo terminó con %1$s sobrante. Toca para ver detalles.</string>
     <string name="notification_period_end_message_negative">El periodo se acabó. Gastaste %1$s de más. Ver más detalles.</string>
     <string name="notification_period_end_message_neutral">El periodo se acabó. No gastaste nada. Ver más detalles.</string>
-
     <string name="notification_recurrent_expense_title">Gasto recurrente</string>
     <string name="notification_recurrent_expense_message_with_comment">Tu gasto recurrente de \"%1$s\" por \"%2$s\" es hoy.</string>
     <string name="notification_recurrent_expense_message_without_comment">Tu gasto recurrente con un total de \"%1$s\" es hoy.</string>
-
     <string name="notification_tomorrow">mañana</string>
     <string name="notification_in_days">en %1$d días</string>
     <string name="notification_upcoming_subscription_title">Suscripción próxima</string>
     <string name="notification_upcoming_subscription_message_with_comment">Tu suscripción \"%1$s\" de \"%2$s\" se cobrará %3$s. Prepárate para el cargo.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Tienes una suscripción de \"%1$s\" que se cobrará %2$s.</string>
-
     <string name="notification_credit_cutoff_title">Pago de tarjeta próximo</string>
     <string name="notification_credit_cutoff_message">Tu fecha de corte es el %1$s. Se recomienda saldar %2$s para evitar intereses.</string>
     <string name="credit_owed_label">Total adeudado</string>
@@ -501,7 +495,8 @@
     <string name="credit_badge">CRÉDITO</string>
     <string name="credit_cutoff_subtitle">%1$s — Fecha límite en %2$d días</string>
     <string name="credit_cutoff_subtitle_today">%1$s — Fecha límite</string>
-
+    <string name="ticket_expense">GASTO</string>
+    <string name="ticket_recurrent_expense">GASTO RECURRENTE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Periodos pasados</string>
     <string name="past_periods_empty">No se encontraron periodos archivados</string>
@@ -510,4 +505,21 @@
     <string name="past_periods_status_on_track">Al día</string>
     <string name="past_periods_status_over_budget">Excedido</string>
     <string name="past_periods_status_saved">Ahorrado %1$s</string>
+    <!-- Analytics Tutorial -->
+    <string name="analytics_tutorial_minmax_title">Tendencias de gasto</string>
+    <string name="analytics_tutorial_minmax_desc">Estas gráficas muestran los gastos máximos y mínimos.\nComo vayas agregando más transacciones, estos te ayudaran a detectar valores atípicos.</string>
+    <string name="analytics_tutorial_header_title">Periodos Pasados</string>
+    <string name="analytics_tutorial_header_desc">Haz tap en el ícono para ver periodos pasados y revisar su desempeño.</string>
+    <string name="analytics_tutorial_budget_title">Estado del presupuesto</string>
+    <string name="analytics_tutorial_budget_desc">Checa el total del presupuesto y los días totales.</string>
+    <string name="analytics_tutorial_heatmap_title">Intensidad de Gastos</string>
+    <string name="analytics_tutorial_heatmap_desc">Este calendario muestra cuando gastas más. Los días más oscuros implican mayores gastos. Toca cualquier día para ver todos los gastos registrados para esa fecha.</string>
+    <string name="analytics_tutorial_charts_title">Desglose de Categorías</string>
+    <string name="analytics_tutorial_charts_desc">Ve cuáles categorías están consumiendo tu presupuesto. Haz tap en la gráfica o en el nombre para ver más detalles.</string>
+    <string name="analytics_tutorial_savings_title">Recomendaciones de Ahorro</string>
+    <string name="analytics_tutorial_savings_desc">Según la regla 50/30/20, te sugerimos cuánto deberías ahorrar idealmente. Puedes modificar esta configuración en ajustes.</string>
+    <string name="analytics_tutorial_credit_title">Gestión de tarjeta de crédito</string>
+    <string name="analytics_tutorial_credit_desc">Pulsa sobre la estrella para ver todas las transacciones realizadas con ella, marcarlas como pagadas o ajusta la fecha límite de facturación para evitar intereses.</string>
+    <string name="analytics_tutorial_history_title">Historial de Transacciones</string>
+    <string name="analytics_tutorial_history_desc">Haz tap aquí para ver la lista completa de gastos en este periodo.</string>
 </resources>

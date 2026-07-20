@@ -145,6 +145,7 @@
     <string name="widget_month_heatmap_description">Current month heatmap calendar</string>
     <string name="widget_add_expense_description">Quick shortcut to add a new expense</string>
     <string name="widget_add_expense_label">Add new expense</string>
+    <string name="widget_add_expense_compact_label">Add expense</string>
     <!-- Widget Labels -->
     <string name="spent">Spent</string>
     <string name="left">Left</string>
@@ -226,7 +227,7 @@
     <string name="settings_typography_subtitle">Change the app typography style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Use wallpaper colors to apply a dynamic app theme</string>
-    <string name="settings_censor_mode_title">Privacy mode</string>
+    <string name="settings_censor_mode_title">Privatsphäre-Modus</string>
     <string name="settings_censor_mode_subtitle">Hide and blur all financial values across the app</string>
     <string name="settings_feature_credit_toggle_title">Use Credit Card as payment</string>
     <string name="settings_feature_credit_toggle_subtitle">Tap to see more details</string>
@@ -332,6 +333,7 @@
     <!-- Budget Pill -->
     <string name="budget_pill_over_budget">Budget amount Exceeded</string>
     <string name="budget_pill_no_budget">No budget</string>
+    <string name="budget_pill_no_budget_action">Set up your budget</string>
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Wöchentlich</string>
     <string name="budget_pill_exhausted_biweekly_label">alle zwei Wochen</string>
@@ -347,8 +349,11 @@
     <string name="categories_chart_empty_title">We can\'t split your expenses</string>
     <string name="categories_chart_empty_subtitle">Save expenses with a category to split them</string>
     <string name="category_no_expenses">No expenses in this category</string>
+    <string name="day_no_expenses">No expenses on this day, yet…</string>
     <!-- Calendar Heatmap -->
     <string name="calendar_heatmap_info_text">This chart shows money spent for each day in the period</string>
+    <string name="heatmap_legend_less">Less</string>
+    <string name="heatmap_legend_more">More</string>
     <!-- No Transactions -->
     <string name="no_transactions_title">No recorded expenses</string>
     <string name="no_transactions_subtitle">Add an expense to get started</string>
@@ -460,9 +465,61 @@
     <string name="day_number">Day %1$d</string>
     <string name="recurrence_end">Recurrence end</string>
     <!-- Transaction Detail Ticket Card -->
-    <string name="ticket_expense">EXPENSE</string>
-    <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
     <string name="ticket_total_amount">TOTAL AMOUNT</string>
     <string name="mark_as_paid">Mark as paid</string>
     <string name="mark_as_paid_success">Marked as paid</string>
+    <!-- Notifications -->
+    <string name="notification_channel_period_end_name">Budget Period End</string>
+    <string name="notification_channel_period_end_description">Notifications when your budget period ends with remaining balance</string>
+    <string name="notification_channel_recurrent_name">Recurring Expenses</string>
+    <string name="notification_channel_recurrent_description">Notifications when recurring expenses are due</string>
+    <string name="notification_channel_credit_name">Credit Card Reminders</string>
+    <string name="notification_channel_credit_description">Reminders before credit card cutoff date</string>
+    <string name="notification_period_end_title">Budget period finished</string>
+    <string name="notification_period_end_message_positive">The period ended with %1$s remaining. Tap to see details.</string>
+    <string name="notification_period_end_message_negative">The period ended. You spent %1$s extra. See more details.</string>
+    <string name="notification_period_end_message_neutral">The period ended. You didn\'t spend anything. See more details.</string>
+    <string name="notification_recurrent_expense_title">Recurring expense</string>
+    <string name="notification_recurrent_expense_message_with_comment">Your recurring expense of \"%1$s\" for \"%2$s\" is today.</string>
+    <string name="notification_recurrent_expense_message_without_comment">Your recurring expense with a total of \"%1$s\" is today.</string>
+    <string name="notification_tomorrow">tomorrow</string>
+    <string name="notification_in_days">in %1$d days</string>
+    <string name="notification_upcoming_subscription_title">Upcoming subscription</string>
+    <string name="notification_upcoming_subscription_message_with_comment">Your subscription \"%1$s\" of \"%2$s\" will be charged %3$s. Prepare for the charge.</string>
+    <string name="notification_upcoming_subscription_message_without_comment">You have a subscription of \"%1$s\" that will be charged %2$s.</string>
+    <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
+    <string name="notification_credit_cutoff_message">Your cutoff date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="credit_owed_label">Total owed</string>
+    <string name="debt_adjusted_balance_label">Debt-Adjusted Balance</string>
+    <string name="debt_adjusted_label_format">%1$s - %2$s credit debt</string>
+    <string name="credit_badge">CREDIT</string>
+    <string name="credit_cutoff_subtitle">%1$s — Cutoff in %2$d days</string>
+    <string name="credit_cutoff_subtitle_today">%1$s — Cutoff today</string>
+    <string name="ticket_expense">EXPENSE</string>
+    <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
+    <!-- Past Periods -->
+    <string name="past_periods_title">Past periods</string>
+    <string name="past_periods_empty">No archived periods found</string>
+    <string name="past_periods_spent_label">Spent</string>
+    <string name="past_periods_limit_label">Limit</string>
+    <string name="past_periods_status_on_track">On Track</string>
+    <string name="past_periods_status_over_budget">Over Budget</string>
+    <string name="past_periods_status_saved">Saved %1$s</string>
+    <!-- Analytics Tutorial -->
+    <string name="analytics_tutorial_minmax_title">Spending Trends</string>
+    <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>
+    <string name="analytics_tutorial_header_title">Historical Periods</string>
+    <string name="analytics_tutorial_header_desc">Tap the icon to see your past budget periods and review their performance.</string>
+    <string name="analytics_tutorial_budget_title">Budget Status</string>
+    <string name="analytics_tutorial_budget_desc">Check your total budget and see it\'s total days.</string>
+    <string name="analytics_tutorial_heatmap_title">Spending Intensity</string>
+    <string name="analytics_tutorial_heatmap_desc">This calendar shows when you spend the most. Darker days mean higher spending. Tap on any day to see all expenses registered for that specific date.</string>
+    <string name="analytics_tutorial_charts_title">Category Breakdown</string>
+    <string name="analytics_tutorial_charts_desc">See which categories are eating up your budget. Tap any slice or category name for details.</string>
+    <string name="analytics_tutorial_savings_title">Savings Recommendation</string>
+    <string name="analytics_tutorial_savings_desc">Based on the 50/30/20 rule, we suggest how much you should ideally be saving. This can be changed on settings.</string>
+    <string name="analytics_tutorial_credit_title">Credit Card Management</string>
+    <string name="analytics_tutorial_credit_desc">Tap the credit card to view all CC transactions, mark them as paid, or adjust your billing cutoff date to avoid interest.</string>
+    <string name="analytics_tutorial_history_title">Transaction History</string>
+    <string name="analytics_tutorial_history_desc">Tap here to see a list of all your expenses for this period.</string>
 </resources>
