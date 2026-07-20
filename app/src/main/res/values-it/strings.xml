@@ -191,7 +191,7 @@
     <string name="onboarding_step_6_subtitle">Nel corso del tempo, impara quanto puoi risparmiare e quanto puoi spendere.</string>
     <string name="onboarding_set_budget_button">Continua</string>
     <string name="recurrent_toggle_label">Ricorrente</string>
-    <string name="censor_mode_alert_title">La modalità censura è attiva</string>
+    <string name="censor_mode_alert_title">Privacy mode is active</string>
     <string name="censor_mode_alert_message">Tutti i tuoi valori finanziari sono attualmente sfocati.</string>
     <string name="censor_mode_alert_dismiss">Ho capito</string>
     <string name="censor_mode_card_label">Modalità privacy attivata</string>
@@ -449,12 +449,12 @@
     <string name="split_mode_dialog_description" formatted="false">Scegli come calcolare l\'importo per periodo.</string>
     <string name="split_mode_static">Statico</string>
     <string name="split_mode_static_desc">Il bilancio totale è ripartito equamente in tutti i periodi, indipendentemente da quanto spendi.</string>
-    <string name="split_mode_dynamic">Dinamico</string>
+    <string name="split_mode_dynamic">Dinamico (consigliato)</string>
     <string name="split_mode_dynamic_desc">Ricalcola quotidianamente mentre spendi. Il saldo rimanente è ripartito sui giorni rimasti nel periodo.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Senza data</string>
     <string name="no_name">Nessun nome</string>
-    <string name="description">Purchase Reason</string>
+    <string name="description">Descrizione</string>
     <string name="date">Data</string>
     <string name="frequency">Frequenza</string>
     <string name="charge_day">Giorno di ricarica</string>
@@ -492,5 +492,5 @@
     <string name="credit_cutoff_subtitle">%1$s — Cutoff in %2$d days</string>
     <string name="credit_cutoff_subtitle_today">%1$s — Cutoff today</string>
     <string name="ticket_expense">SPESE</string>
-    <string name="ticket_recurrent_expense">RECURRING EXPENSE</string>
+    <string name="ticket_recurrent_expense">SPESE DI REITERAZIONE</string>
 </resources>
