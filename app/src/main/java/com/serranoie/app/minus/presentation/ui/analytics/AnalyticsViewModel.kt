@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import logcat.logcat
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -129,13 +128,15 @@ class AnalyticsViewModel @Inject constructor(
             lastPeriodEnd = lastPeriodEnd,
         )
 
-        val (recurringInPeriod, oneTimeSpends) = splitRecurringAndOneTime(
+        val (paidRecurring, upcomingRecurring, oneTimeSpends) = splitRecurringAndOneTime(
             allTransactions = allTransactions,
             filteredTransactions = transactions,
             periodStart = settings.startDate,
             periodEnd = settings.getPeriodEndDate(),
             today = today,
         )
+
+        val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
 
         val startDate = if (shouldShowEndedSnapshot && endedPeriodStartDate != null) {
             Date.from(
@@ -183,13 +184,13 @@ class AnalyticsViewModel @Inject constructor(
         val periodFinished = periodFinishedNaturally || earlyFinishActive
 
         val wholeBudget = if (shouldShowEndedSnapshot && remainingFromLastPeriod != null) {
-            val spent = transactions.filter { !it.isDeleted }.sumOf { it.amount }
+            val spent = actualSpends.sumOf { it.amount }
             spent.add(remainingFromLastPeriod)
         } else {
             settings.totalBudget
         }
 
-        val totalSpent = transactions.filter { !it.isDeleted }.sumOf { it.amount }
+        val totalSpent = actualSpends.sumOf { it.amount }
         val remainingBudget = wholeBudget.subtract(totalSpent)
 
         val plannedPeriodDays =
@@ -221,7 +222,7 @@ class AnalyticsViewModel @Inject constructor(
         } else 0f
         val isOverBudget = totalSpent > wholeBudget
         val totalSpentToday =
-            transactions.filter { tx -> !tx.isDeleted && tx.date?.toLocalDate() == today }
+            actualSpends.filter { tx -> tx.date?.toLocalDate() == today }
                 .fold(BigDecimal.ZERO) { acc, tx -> acc.add(tx.amount) }
         val remainingToday = totalSpentToday
 
@@ -261,9 +262,9 @@ class AnalyticsViewModel @Inject constructor(
 
         return AnalyticsState(
             periodFinished = periodFinished,
-            transactions = transactions,
-            spends = transactions,
-            recurringInPeriod = recurringInPeriod,
+            transactions = actualSpends,
+            spends = actualSpends,
+            recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
             wholeBudget = wholeBudget,
             currencyCode = settings.currencyCode,
@@ -288,7 +289,7 @@ class AnalyticsViewModel @Inject constructor(
         periodStart: LocalDate,
         periodEnd: LocalDate,
         today: LocalDate,
-    ): Pair<List<Transaction>, List<Transaction>> {
+    ): Triple<List<Transaction>, List<Transaction>, List<Transaction>> {
         val oneTimeSpends =
             filteredTransactions.filterNot { it.isDeleted }.filterNot { it.isRecurrent }
 
@@ -296,74 +297,27 @@ class AnalyticsViewModel @Inject constructor(
             filteredTransactions.filterNot { it.isDeleted }.filter { it.isRecurrent }
 
         val recurringParents = (paidRecurringInPeriod + allTransactions.filterNot { it.isDeleted }
-            .filter { it.isRecurrent }).distinctBy { it.id }.also { list ->
-            logcat(RECURRING_TAG) {
-                "---- Recurring debug for period $periodStart → $periodEnd (today=$today) ----"
-            }
-            logcat(RECURRING_TAG) {
-                "raw allTransactions=${allTransactions.size}, " + "filteredTransactions=${filteredTransactions.size}, " + "paidRecurringInPeriod=${paidRecurringInPeriod.size}, " + "recurringParents=${list.size}"
-            }
-            list.forEach { parent ->
-                logcat(RECURRING_TAG) {
-                    "  parent: id=${parent.id} '${parent.comment}' amount=${parent.amount} " + "periodId=${parent.periodId} date=${parent.date} freq=${parent.recurrentFrequency} " + "subDay=${parent.subscriptionDay} endDate=${parent.recurrentEndDate} " + "deleted=${parent.isDeleted}"
-                }
-            }
-        }
+            .filter { it.isRecurrent }).distinctBy { it.id }
 
         val paidCharges = recurringParents.flatMap { parent ->
             getRecurringChargesInPeriod(parent, periodStart, periodEnd, today)
-        }.also { charges ->
-            logcat(RECURRING_TAG) {
-                "  paidCharges (from getRecurringChargesInPeriod): ${charges.size}"
-            }
-            charges.forEach { c ->
-                logcat(RECURRING_TAG) {
-                    "    paid: virtualId=${c.id} '${c.comment}' amount=${c.amount} date=${c.date}"
-                }
-            }
         }
 
         val upcomingCharges = recurringParents.mapNotNull { parent ->
             val date = calculateNextChargeDate(parent, today) ?: parent.date?.toLocalDate()
-                ?.takeIf { it.isAfter(today) } ?: run {
-                logcat(RECURRING_TAG) {
-                    "    no upcoming date for parent id=${parent.id} '${parent.comment}'"
-                }
-                return@mapNotNull null
-            }
+                ?.takeIf { it.isAfter(today) } ?: return@mapNotNull null
+
             if (date.isBefore(periodStart) || date.isAfter(periodEnd)) {
-                logcat(RECURRING_TAG) {
-                    "    upcoming for parent id=${parent.id} '${parent.comment}' = $date " + "is OUTSIDE [$periodStart, $periodEnd], skipped"
-                }
                 return@mapNotNull null
             }
             val chargeId = parent.id * 1_000_000L + date.toEpochDay()
-            logcat(RECURRING_TAG) {
-                "    upcoming for parent id=${parent.id} '${parent.comment}' = $date (chargeId=$chargeId)"
-            }
             parent.copy(
                 date = date.atTime(parent.date?.toLocalTime() ?: LocalTime.MIDNIGHT),
                 id = chargeId,
             )
         }
 
-        // De-duplicate by generated id so we never double-sum the same charge.
-        val recurringInPeriod = (paidCharges + upcomingCharges).distinctBy { it.id }.also { list ->
-            logcat(RECURRING_TAG) {
-                "  recurringInPeriod total: ${list.size}  sum=${list.sumOf { it.amount }}"
-            }
-            list.forEach { c ->
-                logcat(RECURRING_TAG) {
-                    "    final: virtualId=${c.id} '${c.comment}' amount=${c.amount} date=${c.date}"
-                }
-            }
-            logcat(RECURRING_TAG) {
-                "  oneTimeSpends: ${oneTimeSpends.size}  sum=${oneTimeSpends.sumOf { it.amount }}"
-            }
-            logcat(RECURRING_TAG) { "---- end recurring debug ----" }
-        }
-
-        return recurringInPeriod to oneTimeSpends
+        return Triple(paidCharges, upcomingCharges, oneTimeSpends)
     }
 
     private fun filterTransactions(

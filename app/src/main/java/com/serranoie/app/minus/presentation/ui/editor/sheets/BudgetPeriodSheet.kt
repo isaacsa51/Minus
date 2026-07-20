@@ -1016,6 +1016,9 @@ fun EditBudgetContent(
         ) {
             Text(buttonLabel, style = MaterialTheme.typography.labelMediumEmphasized)
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
     }
 
     AnimatedVisibility(

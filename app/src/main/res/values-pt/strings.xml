@@ -446,7 +446,7 @@
     <string name="split_mode_dialog_description" formatted="false">Escolha como o valor por período é calculado.</string>
     <string name="split_mode_static">Estático</string>
     <string name="split_mode_static_desc">O orçamento total está dividido igualmente em todos os períodos, independentemente do quanto você gasta.</string>
-    <string name="split_mode_dynamic">Dinâmico</string>
+    <string name="split_mode_dynamic">Dinâmico (Recomendado)</string>
     <string name="split_mode_dynamic_desc">Recalcular diariamente conforme você gasta. O saldo restante está repartido pelos dias que ainda restam no período.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Sem data</string>
