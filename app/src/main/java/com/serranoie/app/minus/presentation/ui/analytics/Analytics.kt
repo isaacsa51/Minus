@@ -146,6 +146,7 @@ fun Analytics(
     archivedBudgets: List<ArchivedBudget> = emptyList(),
     actions: AnalyticsActions = AnalyticsActions(),
     activityResultRegistryOwner: ActivityResultRegistryOwner? = null,
+    showTutorialOverride: Boolean? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -165,6 +166,8 @@ fun Analytics(
         }
     }
     val tutorialCompleted by tutorialCompletedFlow.collectAsStateWithLifecycle(initialValue = true)
+
+    val effectiveTutorialCompleted = showTutorialOverride?.let { !it } ?: tutorialCompleted
 
     val tutorialOrder = remember(hasSpends) {
         if (hasSpends) listOf(3, 0, 2) else listOf(1, 2, 5)
@@ -206,7 +209,7 @@ fun Analytics(
 
     LaunchedEffect(tutorialBoxState.currentIndexState.value) {
         val index = tutorialBoxState.currentIndexState.value
-        if ((index != -1) && !tutorialCompleted) {
+        if ((index != -1) && !effectiveTutorialCompleted) {
             delay(600.milliseconds)
 
             val position = componentPositions[index]
@@ -232,7 +235,7 @@ fun Analytics(
     val locale = LocalConfiguration.current.locales[0]
 
     TutorialBox(
-        showTutorial = !tutorialCompleted && !state.isLoading,
+        showTutorial = !effectiveTutorialCompleted && !state.isLoading,
         state = tutorialBoxState,
         onTutorialCompleted = {
             scope.launch {

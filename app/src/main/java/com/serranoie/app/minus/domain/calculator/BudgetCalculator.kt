@@ -161,13 +161,4 @@ class BudgetCalculator @Inject constructor() {
             BudgetPeriod.MONTHLY -> start.plusMonths(1)
         }
     }
-
-    fun getPeriodLabel(period: BudgetPeriod): String {
-        return when (period) {
-            BudgetPeriod.DAILY -> "Daily"
-            BudgetPeriod.WEEKLY -> "Weekly"
-            BudgetPeriod.BIWEEKLY -> "Bi-weekly"
-            BudgetPeriod.MONTHLY -> "Monthly"
-        }
-    }
 }
