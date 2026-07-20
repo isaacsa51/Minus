@@ -354,8 +354,11 @@
     <string name="categories_chart_empty_title">We can\'t split your expenses</string>
     <string name="categories_chart_empty_subtitle">Save expenses with a category to split them</string>
     <string name="category_no_expenses">No expenses in this category</string>
+    <string name="day_no_expenses">No expenses on this day, yet…</string>
     <!-- Calendar Heatmap -->
     <string name="calendar_heatmap_info_text">This chart shows money spent for each day in the period</string>
+    <string name="heatmap_legend_less">Less</string>
+    <string name="heatmap_legend_more">More</string>
     <!-- No Transactions -->
     <string name="no_transactions_title">No recorded expenses</string>
     <string name="no_transactions_subtitle">Add an expense to get started</string>
