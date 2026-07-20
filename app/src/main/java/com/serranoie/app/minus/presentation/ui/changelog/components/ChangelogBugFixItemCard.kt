@@ -19,7 +19,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
@@ -55,7 +54,7 @@ internal fun ChangelogBugFixItemCard(
             )
             BugFixTitleWithLinks(
                 text = item.title,
-                style = MaterialTheme.typography.bodyMediumEmphasized,
+                style = MaterialTheme.typography.bodySmallEmphasized,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f),
             )
@@ -158,8 +157,7 @@ private fun ChangelogBugFixItemCardWithPrRefPreview() {
 
 @Preview(
     name = "Bug fix item - DARK",
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
-            or android.content.res.Configuration.UI_MODE_TYPE_NORMAL,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES or android.content.res.Configuration.UI_MODE_TYPE_NORMAL,
 )
 @Composable
 private fun ChangelogBugFixItemCardDarkPreview() {

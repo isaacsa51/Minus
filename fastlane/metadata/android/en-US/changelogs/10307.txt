@@ -1,0 +1,13 @@
+- feat: implement historical budget tracking and archiving (#142)
+- feat: implement clickable calendar heatmap (#141)
+- fix: refine budget analytics logic by considering recurring expenses (#140)
+- nit: improve budget overview widget "days left" layout (#139)
+- feat: implement dynamic currency formatting in notifications (#138)
+- fix: delete nested scroll down dismissal on transaction list
+- feat: implement credit payment tracking and debt-adjusted balance (#135)
+- fix: use proper background color for recurring items
+- feat: enhance widget theming (#129)
+- fix: use proper locales for notification builder (#128)
+- feat(i18n): add portuguese, italian and english fix translations (#125)
+- docs: fix Crowdin link in README
+- doc: translation section on README

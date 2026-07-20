@@ -69,7 +69,6 @@ import java.time.temporal.WeekFields
 import java.util.Date
 import java.util.Locale
 
-
 data class SpendingDay(
 	val date: Date,
 	val spends: List<Transaction>,
