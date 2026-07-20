@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -206,7 +207,7 @@ fun ExpenseItemExpandedContent(
                     contentColor = MaterialTheme.colorScheme.primary,
                 ),
                 onClick = onEdit,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).testTag("ExpenseItem_EditButton_${transaction.id}"),
             ) {
                 Text(stringResource(R.string.edit), style = MaterialTheme.typography.labelSmallEmphasized)
             }
@@ -214,7 +215,7 @@ fun ExpenseItemExpandedContent(
             if (!readOnly) {
                 Button(
                     onClick = onDelete,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag("ExpenseItem_DeleteButton_${transaction.id}"),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError,
