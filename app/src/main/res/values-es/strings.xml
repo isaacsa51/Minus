@@ -151,7 +151,7 @@
     <string name="left">Faltante</string>
     <string name="remaining">Restante</string>
     <string name="total_spent">Total gastado</string>
-    <string name="days_left">días</string>
+    <string name="days_left">días\nrestantes</string>
     <string name="budget_overview">Resumen del presupuesto</string>
     <string name="spent_per_day">Gastado por día</string>
     <string name="budget_period_daily">A diario</string>
@@ -448,8 +448,8 @@
     <string name="split_mode_dialog_title">¿Cómo deberíamos dividir tu presupuesto?</string>
     <string name="split_mode_dialog_description" formatted="false">Elija cómo se calcula la cantidad por período.</string>
     <string name="split_mode_static">Estático</string>
-    <string name="split_mode_static_desc">El presupuesto total se reparte por igual en todos los períodos, independientemente de cuánto gaste.</string>
-    <string name="split_mode_dynamic">Dinámica</string>
+    <string name="split_mode_static_desc">El presupuesto total se reparte por igual en los días, independientemente de cuánto gaste.</string>
+    <string name="split_mode_dynamic">Dinámica (Recomendado)</string>
     <string name="split_mode_dynamic_desc">Recalcula diariamente como gastas. El saldo restante se reparte a lo largo de los días que quedan en el período.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Sin fecha</string>
