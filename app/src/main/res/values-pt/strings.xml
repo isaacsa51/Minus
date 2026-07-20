@@ -348,8 +348,11 @@
     <string name="categories_chart_empty_title">Não podemos dividir suas despesas</string>
     <string name="categories_chart_empty_subtitle">Salve despesas com uma categoria para dividi-las</string>
     <string name="category_no_expenses">Sem despesas nesta categoria</string>
+    <string name="day_no_expenses">No expenses on this day, yet…</string>
     <!-- Calendar Heatmap -->
     <string name="calendar_heatmap_info_text">Este gráfico mostra o dinheiro gasto por cada dia na menstruação</string>
+    <string name="heatmap_legend_less">Less</string>
+    <string name="heatmap_legend_more">More</string>
     <!-- No Transactions -->
     <string name="no_transactions_title">Sem despesas registradas</string>
     <string name="no_transactions_subtitle">Adicione uma despesa para começar</string>
