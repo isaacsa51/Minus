@@ -333,7 +333,7 @@
     <!-- Budget Pill -->
     <string name="budget_pill_over_budget">Monto del presupuesto excedido</string>
     <string name="budget_pill_no_budget">Sin presupuesto</string>
-    <string name="budget_pill_no_budget_action">Set up your budget</string>
+    <string name="budget_pill_no_budget_action">Establece tu presupuesto</string>
     <string name="budget_pill_exhausted_daily_label">diario</string>
     <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
@@ -506,20 +506,20 @@
     <string name="past_periods_status_over_budget">Excedido</string>
     <string name="past_periods_status_saved">Ahorrado %1$s</string>
     <!-- Analytics Tutorial -->
-    <string name="analytics_tutorial_minmax_title">Spending Trends</string>
-    <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>
-    <string name="analytics_tutorial_header_title">Historical Periods</string>
-    <string name="analytics_tutorial_header_desc">Tap the icon to see your past budget periods and review their performance.</string>
-    <string name="analytics_tutorial_budget_title">Budget Status</string>
-    <string name="analytics_tutorial_budget_desc">Check your total budget and see it\'s total days.</string>
-    <string name="analytics_tutorial_heatmap_title">Spending Intensity</string>
-    <string name="analytics_tutorial_heatmap_desc">This calendar shows when you spend the most. Darker days mean higher spending. Tap on any day to see all expenses registered for that specific date.</string>
-    <string name="analytics_tutorial_charts_title">Category Breakdown</string>
-    <string name="analytics_tutorial_charts_desc">See which categories are eating up your budget. Tap any slice or category name for details.</string>
-    <string name="analytics_tutorial_savings_title">Savings Recommendation</string>
-    <string name="analytics_tutorial_savings_desc">Based on the 50/30/20 rule, we suggest how much you should ideally be saving. This can be changed on settings.</string>
-    <string name="analytics_tutorial_credit_title">Credit Card Management</string>
-    <string name="analytics_tutorial_credit_desc">Tap the credit card to view all CC transactions, mark them as paid, or adjust your billing cutoff date to avoid interest.</string>
-    <string name="analytics_tutorial_history_title">Transaction History</string>
-    <string name="analytics_tutorial_history_desc">Tap here to see a list of all your expenses for this period.</string>
+    <string name="analytics_tutorial_minmax_title">Tendencias de gasto</string>
+    <string name="analytics_tutorial_minmax_desc">Estas gráficas muestran los gastos máximos y mínimos.\nComo vayas agregando más transacciones, estos te ayudaran a detectar valores atípicos.</string>
+    <string name="analytics_tutorial_header_title">Periodos Pasados</string>
+    <string name="analytics_tutorial_header_desc">Haz tap en el ícono para ver periodos pasados y revisar su desempeño.</string>
+    <string name="analytics_tutorial_budget_title">Estado del presupuesto</string>
+    <string name="analytics_tutorial_budget_desc">Checa el total del presupuesto y los días totales.</string>
+    <string name="analytics_tutorial_heatmap_title">Intensidad de Gastos</string>
+    <string name="analytics_tutorial_heatmap_desc">Este calendario muestra cuando gastas más. Los días más oscuros implican mayores gastos. Toca cualquier día para ver todos los gastos registrados para esa fecha.</string>
+    <string name="analytics_tutorial_charts_title">Desglose de Categorías</string>
+    <string name="analytics_tutorial_charts_desc">Ve cuáles categorías están consumiendo tu presupuesto. Haz tap en la gráfica o en el nombre para ver más detalles.</string>
+    <string name="analytics_tutorial_savings_title">Recomendaciones de Ahorro</string>
+    <string name="analytics_tutorial_savings_desc">Según la regla 50/30/20, te sugerimos cuánto deberías ahorrar idealmente. Puedes modificar esta configuración en ajustes.</string>
+    <string name="analytics_tutorial_credit_title">Gestión de tarjeta de crédito</string>
+    <string name="analytics_tutorial_credit_desc">Pulsa sobre la estrella para ver todas las transacciones realizadas con ella, marcarlas como pagadas o ajusta la fecha límite de facturación para evitar intereses.</string>
+    <string name="analytics_tutorial_history_title">Historial de Transacciones</string>
+    <string name="analytics_tutorial_history_desc">Haz tap aquí para ver la lista completa de gastos en este periodo.</string>
 </resources>
