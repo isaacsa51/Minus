@@ -26,12 +26,6 @@ fun AnalyticsScreen(
     }
 
     LaunchedEffect(Unit) {
-        context.settingsDataStore.data.collect { prefs: Preferences ->
-            viewModel.updatePrefsSnapshot(prefs)
-        }
-    }
-
-    LaunchedEffect(uiState.displayState) {
         viewModel.effects.collect { effect ->
             when (effect) {
                 is AnalyticsUiEffect.NavigateToMainWithWallet -> {

@@ -70,7 +70,7 @@ fun PastPeriodsBottomSheet(
             ) {
                 Text(
                     text = stringResource(R.string.past_periods_empty),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLargeEmphasized,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
@@ -82,9 +82,7 @@ fun PastPeriodsBottomSheet(
             ) {
                 items(periods) { period ->
                     ArchivedPeriodCard(
-                        period = period,
-                        onClick = { onPeriodClick(period) }
-                    )
+                        period = period, onClick = { onPeriodClick(period) })
                 }
             }
         }
@@ -93,8 +91,7 @@ fun PastPeriodsBottomSheet(
 
 @Composable
 private fun ArchivedPeriodCard(
-    period: ArchivedBudget,
-    onClick: () -> Unit
+    period: ArchivedBudget, onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -106,8 +103,7 @@ private fun ArchivedPeriodCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -138,8 +134,7 @@ private fun ArchivedPeriodCard(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
                     Text(
@@ -162,14 +157,19 @@ private fun ArchivedPeriodCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "of ${formatCurrencySymbolOnly(period.totalBudget, period.currencyCode)}",
+                        text = "of ${
+                            formatCurrencySymbolOnly(
+                                period.totalBudget, period.currencyCode
+                            )
+                        }",
                         style = MaterialTheme.typography.titleLargeEmphasized,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            val progress = (period.spentAmount.toFloat() / period.totalBudget.toFloat()).coerceIn(0f, 1f)
+            val progress =
+                (period.spentAmount.toFloat() / period.totalBudget.toFloat()).coerceIn(0f, 1f)
             LinearWavyProgressIndicator(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth(),
@@ -204,8 +204,7 @@ private fun StatusChip(period: ArchivedBudget) {
     }
 
     Surface(
-        color = color.copy(alpha = 0.1f),
-        shape = RoundedCornerShape(16.dp)
+        color = color.copy(alpha = 0.1f), shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -240,8 +239,7 @@ private fun PastPeriodsBottomSheetPreview() {
             endDate = LocalDate.now().minusDays(1),
             currencyCode = "USD",
             periodType = BudgetPeriod.MONTHLY
-        ),
-        ArchivedBudget(
+        ), ArchivedBudget(
             periodId = 2L,
             totalBudget = BigDecimal("500.00"),
             spentAmount = BigDecimal("600.00"),
@@ -249,8 +247,7 @@ private fun PastPeriodsBottomSheetPreview() {
             endDate = LocalDate.now().minusDays(31),
             currencyCode = "USD",
             periodType = BudgetPeriod.BIWEEKLY
-        ),
-        ArchivedBudget(
+        ), ArchivedBudget(
             periodId = 3L,
             totalBudget = BigDecimal("1200.00"),
             spentAmount = BigDecimal("1200.00"),
@@ -264,9 +261,7 @@ private fun PastPeriodsBottomSheetPreview() {
     MinusTheme {
         Surface {
             PastPeriodsBottomSheet(
-                periods = samplePeriods,
-                onPeriodClick = {}
-            )
+                periods = samplePeriods, onPeriodClick = {})
         }
     }
 }
@@ -277,9 +272,7 @@ private fun PastPeriodsBottomSheetEmptyPreview() {
     MinusTheme {
         Surface {
             PastPeriodsBottomSheet(
-                periods = emptyList(),
-                onPeriodClick = {}
-            )
+                periods = emptyList(), onPeriodClick = {})
         }
     }
 }

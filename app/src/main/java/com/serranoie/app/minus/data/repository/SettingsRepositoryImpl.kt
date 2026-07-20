@@ -53,6 +53,8 @@ const val SAVINGS_SAVINGS_PCT_KEY_NAME = "savings_savings_pct"
 const val SAVINGS_GOAL_AMOUNT_KEY_NAME = "savings_goal_amount"
 const val SAVINGS_GOAL_MONTHS_KEY_NAME = "savings_goal_months"
 const val TUTORIAL_BOX_COMPLETED_KEY_NAME = "tutorial_box_completed"
+const val ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME = "analytics_tutorial_completed"
+const val ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME = "analytics_spends_tutorial_completed"
 
 private val ONBOARDING_COMPLETED = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NAME)
 private val EARLY_FINISH_ACTIVE = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)

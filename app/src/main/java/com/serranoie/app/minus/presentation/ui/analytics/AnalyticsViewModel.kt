@@ -10,20 +10,15 @@ import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.SavingsSplitPreset
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.ArchivedBudget
+import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
 import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
-import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTIVE_KEY
-import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
-import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
-import com.serranoie.app.minus.presentation.SAVINGS_GOAL_AMOUNT_KEY
-import com.serranoie.app.minus.presentation.SAVINGS_GOAL_MONTHS_KEY
-import com.serranoie.app.minus.presentation.SAVINGS_NEEDS_PCT_KEY
-import com.serranoie.app.minus.presentation.SAVINGS_PRESET_KEY
-import com.serranoie.app.minus.presentation.SAVINGS_SAVINGS_PCT_KEY
-import com.serranoie.app.minus.presentation.SAVINGS_WANTS_PCT_KEY
+import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
+import logcat.logcat
 import com.serranoie.app.minus.presentation.ui.history.calculateNextChargeDate
 import com.serranoie.app.minus.presentation.ui.history.getRecurringChargesInPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,6 +26,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -42,7 +38,7 @@ import java.util.Date
 import javax.inject.Inject
 
 data class AnalyticsUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val budgetSettings: BudgetSettings? = null,
     val budgetState: BudgetState? = null,
     val allTransactions: List<Transaction> = emptyList(),
@@ -50,6 +46,9 @@ data class AnalyticsUiState(
     val selectedPeriodId: Long? = null,
     val archivedBudgets: List<ArchivedBudget> = emptyList(),
     val displayState: AnalyticsState = AnalyticsState(),
+    val userSettings: UserSettings = UserSettings.DEFAULT,
+    val rolloverAmount: BigDecimal = BigDecimal.ZERO,
+    val rolloverCarryForward: Boolean = false,
 )
 
 sealed interface AnalyticsUiEffect {
@@ -60,8 +59,10 @@ sealed interface AnalyticsUiEffect {
 @HiltViewModel
 class AnalyticsViewModel @Inject constructor(
     private val budgetRepository: BudgetRepository,
+    private val settingsRepository: SettingsRepository,
     private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase,
     private val clearEarlyFinishStateUseCase: ClearEarlyFinishStateUseCase,
+    private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AnalyticsUiState())
@@ -80,33 +81,59 @@ class AnalyticsViewModel @Inject constructor(
     private fun observeBudgetData() {
         viewModelScope.launch {
             combine(
-                budgetRepository.getBudgetSettings(),
-                budgetRepository.getTransactions(),
-                budgetRepository.getArchivedBudgets(),
-                observeCurrentPeriodBoundaryUseCase(),
-            ) { settings, transactions, archives, periodBoundary ->
+                budgetRepository.getBudgetSettings().distinctUntilChanged(),
+                budgetRepository.getTransactions().distinctUntilChanged(),
+                budgetRepository.getArchivedBudgets().distinctUntilChanged(),
+                observeCurrentPeriodBoundaryUseCase().distinctUntilChanged(),
+                settingsRepository.observeSettings().distinctUntilChanged(),
+                settingsRepository.observeCurrentPeriodRollover().distinctUntilChanged(),
+            ) { args: Array<Any?> ->
+                val settings = args[0] as BudgetSettings?
+                val transactions = args[1] as List<Transaction>
+                val archives = args[2] as List<ArchivedBudget>
+                val periodBoundary = args[3] as Pair<Long, Long>
+                val userSettings = args[4] as UserSettings
+                val rollover = args[5] as Pair<BigDecimal, Boolean>
+
                 val currentPeriodId = periodBoundary.second
-                _uiState.value = _uiState.value.copy(
+                val updatedState = _uiState.value.copy(
+                    isLoading = false,
                     budgetSettings = settings,
                     allTransactions = transactions,
                     archivedBudgets = archives,
                     currentPeriodId = currentPeriodId,
+                    userSettings = userSettings,
+                    rolloverAmount = rollover.first,
+                    rolloverCarryForward = rollover.second,
                     displayState = if (_uiState.value.selectedPeriodId != null && _uiState.value.selectedPeriodId != currentPeriodId) {
-                        buildHistoricalDisplayState(_uiState.value.selectedPeriodId!!, transactions, archives)
+                        buildHistoricalDisplayState(
+                            _uiState.value.selectedPeriodId!!, transactions, archives
+                        )
                     } else {
-                        buildDisplayState(settings, transactions, currentPeriodId)
+                        buildDisplayState(
+                            settings = settings,
+                            allTransactions = transactions,
+                            currentPeriodId = currentPeriodId,
+                            userSettings = userSettings,
+                            rolloverAmountFromPref = rollover.first,
+                        )
                     },
                 )
-            }.collect {}
+                _uiState.value = updatedState
+            }.distinctUntilChanged().collect {}
         }
     }
 
     private fun buildHistoricalDisplayState(
-        periodId: Long,
-        allTransactions: List<Transaction>,
-        archives: List<ArchivedBudget>
+        periodId: Long, allTransactions: List<Transaction>, archives: List<ArchivedBudget>
     ): AnalyticsState {
-        val archive = archives.find { it.periodId == periodId } ?: return buildDisplayState(_uiState.value.budgetSettings, allTransactions, _uiState.value.currentPeriodId)
+        val archive = archives.find { it.periodId == periodId } ?: return buildDisplayState(
+            settings = _uiState.value.budgetSettings,
+            allTransactions = allTransactions,
+            currentPeriodId = _uiState.value.currentPeriodId,
+            userSettings = _uiState.value.userSettings,
+            rolloverAmountFromPref = _uiState.value.rolloverAmount
+        )
 
         val transactions = allTransactions.filter { it.periodId == periodId && !it.isDeleted }
         val (paidRecurring, upcomingRecurring, oneTimeSpends) = splitRecurringAndOneTime(
@@ -129,11 +156,19 @@ class AnalyticsViewModel @Inject constructor(
         )
 
         val budgetState = BudgetState(
-            remainingToday = archive.totalBudget.subtract(totalSpent).coerceAtLeast(BigDecimal.ZERO),
+            remainingToday = archive.totalBudget.subtract(totalSpent)
+                .coerceAtLeast(BigDecimal.ZERO),
             totalSpentToday = BigDecimal.ZERO,
-            dailyBudget = archive.totalBudget.divide(BigDecimal(ChronoUnit.DAYS.between(archive.startDate, archive.endDate).toInt() + 1), 2, RoundingMode.HALF_UP),
+            dailyBudget = archive.totalBudget.divide(
+                BigDecimal(
+                    ChronoUnit.DAYS.between(
+                        archive.startDate, archive.endDate
+                    ).toInt() + 1
+                ), 2, RoundingMode.HALF_UP
+            ),
             daysRemaining = 0,
-            progress = (totalSpent.divide(archive.totalBudget, 4, RoundingMode.HALF_UP).toFloat()).coerceIn(0f, 1f),
+            progress = (totalSpent.divide(archive.totalBudget, 4, RoundingMode.HALF_UP)
+                .toFloat()).coerceIn(0f, 1f),
             isOverBudget = totalSpent > archive.totalBudget,
             totalBudget = archive.totalBudget,
             totalSpentInPeriod = totalSpent
@@ -147,8 +182,12 @@ class AnalyticsViewModel @Inject constructor(
             oneTimeSpends = oneTimeSpends,
             wholeBudget = archive.totalBudget,
             currencyCode = archive.currencyCode,
-            startPeriodDate = Date.from(archive.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-            finishPeriodDate = Date.from(archive.endDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+            startPeriodDate = Date.from(
+                archive.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+            ),
+            finishPeriodDate = Date.from(
+                archive.endDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+            ),
             budgetSettingsForDisplay = budgetSettings,
             budgetStateForDisplay = budgetState,
             isHistoricalView = true
@@ -159,37 +198,25 @@ class AnalyticsViewModel @Inject constructor(
         settings: BudgetSettings?,
         allTransactions: List<Transaction>,
         currentPeriodId: Long,
+        userSettings: UserSettings,
+        rolloverAmountFromPref: BigDecimal,
     ): AnalyticsState {
         if (settings == null) return AnalyticsState()
 
-        val prefs = _prefsSnapshot
         val today = LocalDate.now()
         val endDate = settings.getPeriodEndDate()
 
-        val lastPeriodEnd = prefs?.get(LAST_PERIOD_END_KEY)?.let {
-            Date(it).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-        }
-        val remainingFromLastPeriod =
-            prefs?.get(REMAINING_FROM_LAST_PERIOD_KEY)?.toBigDecimalOrNull()
-
-        val shouldShowEndedSnapshot =
-            lastPeriodEnd != null && remainingFromLastPeriod != null && !lastPeriodEnd.isBefore(
-                settings.startDate
-            )
-
-        val endedPeriodStartDate = if (shouldShowEndedSnapshot) {
-            val currentEnd = settings.getPeriodEndDate()
-            val currentDays = ChronoUnit.DAYS.between(settings.startDate, currentEnd).toInt() + 1
-            lastPeriodEnd.minusDays((currentDays - 1).toLong())
-        } else null
+        // We use rolloverAmountFromPref instead of manually reading from preferences
+        val remainingFromLastPeriod = rolloverAmountFromPref
+        val shouldShowEndedSnapshot = false // Logic for snapshot can be added if needed
 
         val transactions = filterTransactions(
             allTransactions = allTransactions,
             currentPeriodId = currentPeriodId,
             settings = settings,
-            shouldShowEndedSnapshot = shouldShowEndedSnapshot,
-            endedPeriodStartDate = endedPeriodStartDate,
-            lastPeriodEnd = lastPeriodEnd,
+            shouldShowEndedSnapshot = false,
+            endedPeriodStartDate = null,
+            lastPeriodEnd = null,
         )
 
         val (paidRecurring, upcomingRecurring, oneTimeSpends) = splitRecurringAndOneTime(
@@ -202,67 +229,33 @@ class AnalyticsViewModel @Inject constructor(
 
         val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
 
-        val startDate = if (shouldShowEndedSnapshot && endedPeriodStartDate != null) {
-            Date.from(
-                endedPeriodStartDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
-            )
-        } else {
-            settings.startDate.atStartOfDay().atZone(ZoneId.systemDefault())
-                .let { Date.from(it.toInstant()) }
-        }
+        val startDate = settings.startDate.atStartOfDay().atZone(ZoneId.systemDefault())
+            .let { Date.from(it.toInstant()) }
 
-        val plannedFinishDate = if (shouldShowEndedSnapshot && lastPeriodEnd != null) {
-            Date.from(lastPeriodEnd.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
-        } else {
+        val plannedFinishDate =
             settings.getPeriodEndDate().atStartOfDay().atZone(ZoneId.systemDefault())
                 .let { Date.from(it.toInstant()) }
-        }
 
-        val earlyFinishActive = prefs?.get(EARLY_FINISH_ACTIVE_KEY) ?: false
-        val earlyFinishActualDate = prefs?.get(EARLY_FINISH_ACTUAL_DATE_KEY)?.let { Date(it) }
+        val earlyFinishActive = userSettings.earlyFinishActive
+        val earlyFinishActualDate =
+            if (userSettings.earlyFinishActualDate > 0) Date(userSettings.earlyFinishActualDate) else null
         val earlyFinishOriginalEndDate =
-            prefs?.get(EARLY_FINISH_ORIGINAL_END_DATE_KEY)?.let { Date(it) }
+            if (userSettings.earlyFinishOriginalEndDate > 0) Date(userSettings.earlyFinishOriginalEndDate) else null
 
-        val savingsNeedsPct = prefs?.get(SAVINGS_NEEDS_PCT_KEY)
-            ?: SavingsPreferences.DEFAULT_NEEDS_PCT
-        val savingsWantsPct = prefs?.get(SAVINGS_WANTS_PCT_KEY)
-            ?: SavingsPreferences.DEFAULT_WANTS_PCT
-        val savingsSavingsPct = prefs?.get(SAVINGS_SAVINGS_PCT_KEY)
-            ?: SavingsPreferences.DEFAULT_SAVINGS_PCT
-        val savingsPreset = prefs?.get(SAVINGS_PRESET_KEY)?.let { name ->
-            runCatching { SavingsSplitPreset.valueOf(name) }
-                .getOrElse { SavingsSplitPreset.fromValues(savingsNeedsPct, savingsWantsPct, savingsSavingsPct) }
-        } ?: SavingsSplitPreset.fromValues(savingsNeedsPct, savingsWantsPct, savingsSavingsPct)
-        val savingsPreferences = SavingsPreferences(
-            preset = savingsPreset,
-            needsPct = savingsNeedsPct,
-            wantsPct = savingsWantsPct,
-            savingsPct = savingsSavingsPct,
-            savingsGoalAmount = prefs?.get(SAVINGS_GOAL_AMOUNT_KEY)?.toBigDecimalOrNull(),
-            savingsGoalMonths = prefs?.get(SAVINGS_GOAL_MONTHS_KEY),
-        )
+        val savingsPreferences = userSettings.savingsPreferences
 
         val periodFinishedNaturally =
             settings.getPeriodEndDate().isBefore(today) || settings.getPeriodEndDate()
                 .isEqual(today)
         val periodFinished = periodFinishedNaturally || earlyFinishActive
 
-        val wholeBudget = if (shouldShowEndedSnapshot && remainingFromLastPeriod != null) {
-            val spent = actualSpends.sumOf { it.amount }
-            spent.add(remainingFromLastPeriod)
-        } else {
-            settings.totalBudget
-        }
+        val wholeBudget = settings.totalBudget
 
         val totalSpent = actualSpends.sumOf { it.amount }
         val remainingBudget = wholeBudget.subtract(totalSpent)
 
         val plannedPeriodDays =
-            if (shouldShowEndedSnapshot && endedPeriodStartDate != null && lastPeriodEnd != null) {
-                ChronoUnit.DAYS.between(endedPeriodStartDate, lastPeriodEnd).toInt() + 1
-            } else {
-                ChronoUnit.DAYS.between(settings.startDate, settings.getPeriodEndDate()).toInt() + 1
-            }
+            ChronoUnit.DAYS.between(settings.startDate, settings.getPeriodEndDate()).toInt() + 1
 
         val dailyBudget = if (wholeBudget > BigDecimal.ZERO && plannedPeriodDays > 0) {
             wholeBudget.divide(BigDecimal(plannedPeriodDays), 2, RoundingMode.HALF_UP)
@@ -273,22 +266,13 @@ class AnalyticsViewModel @Inject constructor(
                 remainingBudget.divide(dailyBudget, 0, RoundingMode.DOWN).toInt().coerceAtLeast(0)
             } else 0
 
-        val displaySettings = settings.copy(
-            totalBudget = if (shouldShowEndedSnapshot && remainingFromLastPeriod != null) {
-                wholeBudget.subtract(remainingFromLastPeriod)
-            } else settings.totalBudget,
-            rollOverLimit = if (shouldShowEndedSnapshot) remainingFromLastPeriod else settings.rollOverLimit,
-        )
-
         val daysRemaining = ChronoUnit.DAYS.between(today, endDate).coerceAtLeast(0).toInt()
         val progress = if (wholeBudget > BigDecimal.ZERO) {
             totalSpent.divide(wholeBudget, 4, RoundingMode.HALF_UP).toFloat()
         } else 0f
         val isOverBudget = totalSpent > wholeBudget
-        val totalSpentToday =
-            actualSpends.filter { tx -> tx.date?.toLocalDate() == today }
-                .fold(BigDecimal.ZERO) { acc, tx -> acc.add(tx.amount) }
-        val remainingToday = totalSpentToday
+        val totalSpentToday = actualSpends.filter { tx -> tx.date?.toLocalDate() == today }
+            .fold(BigDecimal.ZERO) { acc, tx -> acc.add(tx.amount) }
 
         val allocations = computeDynamicAllocations(
             totalBudget = wholeBudget,
@@ -313,15 +297,13 @@ class AnalyticsViewModel @Inject constructor(
             isTodayOverDailyAllocation = allocations.isTodayOverDailyAllocation,
         )
 
-        val shouldShowRolloverStyle =
-            !shouldShowEndedSnapshot && displaySettings.rollOverLimit?.let { it > BigDecimal.ZERO } == true
+        val shouldShowRolloverStyle = settings.rollOverLimit?.let { it > BigDecimal.ZERO } == true
 
-        val creditOwed = allTransactions
-            .filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
+        val creditOwed = allTransactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
             .sumOf { it.amount }
-        val creditTransactions = allTransactions
-            .filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
-            .sortedByDescending { it.date }
+        val creditTransactions =
+            allTransactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
+                .sortedByDescending { it.date }
         val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
 
         return AnalyticsState(
@@ -336,7 +318,7 @@ class AnalyticsViewModel @Inject constructor(
             startPeriodDate = startDate,
             finishPeriodDate = if (earlyFinishActive) earlyFinishOriginalEndDate else plannedFinishDate,
             extraAffordableDaysFromRemaining = extraAffordableDays,
-            budgetSettingsForDisplay = displaySettings,
+            budgetSettingsForDisplay = settings,
             budgetStateForDisplay = displayBudgetState,
             showRolloverStyleInBudgetDisplay = shouldShowRolloverStyle,
             isLoading = false,
@@ -407,20 +389,6 @@ class AnalyticsViewModel @Inject constructor(
         }
     }
 
-    private var _prefsSnapshot: Preferences? = null
-
-    fun updatePrefsSnapshot(prefs: Preferences) {
-        _prefsSnapshot = prefs
-        val current = _uiState.value
-        _uiState.value = current.copy(
-            displayState = buildDisplayState(
-                current.budgetSettings,
-                current.allTransactions,
-                current.currentPeriodId,
-            )
-        )
-    }
-
     fun onCreateNewPeriod() {
         viewModelScope.launch {
             clearEarlyFinishStateUseCase()
@@ -452,21 +420,23 @@ class AnalyticsViewModel @Inject constructor(
         val settings = _uiState.value.budgetSettings ?: return
         val cutoffDay = settings.creditCardCutoffDay ?: 15 // Fallback if not set
         val today = LocalDate.now()
-        
+
         // Use the same cycle logic as the reminder
         val cutoffThisMonth = runCatching { today.withDayOfMonth(cutoffDay) }.getOrElse {
             today.withDayOfMonth(today.lengthOfMonth())
         }
-        
+
         val cycle = if (today.isAfter(cutoffThisMonth)) {
-            val cutoffNextMonth = runCatching { today.plusMonths(1).withDayOfMonth(cutoffDay) }.getOrElse {
-                today.plusMonths(1).withDayOfMonth(today.plusMonths(1).lengthOfMonth())
-            }
+            val cutoffNextMonth =
+                runCatching { today.plusMonths(1).withDayOfMonth(cutoffDay) }.getOrElse {
+                    today.plusMonths(1).withDayOfMonth(today.plusMonths(1).lengthOfMonth())
+                }
             cutoffThisMonth to cutoffNextMonth
         } else {
-            val cutoffLastMonth = runCatching { today.minusMonths(1).withDayOfMonth(cutoffDay) }.getOrElse {
-                today.minusMonths(1).withDayOfMonth(today.minusMonths(1).lengthOfMonth())
-            }
+            val cutoffLastMonth =
+                runCatching { today.minusMonths(1).withDayOfMonth(cutoffDay) }.getOrElse {
+                    today.minusMonths(1).withDayOfMonth(today.minusMonths(1).lengthOfMonth())
+                }
             cutoffLastMonth to cutoffThisMonth
         }
 
@@ -476,12 +446,19 @@ class AnalyticsViewModel @Inject constructor(
     }
 
     fun onCutoffDayChanged(day: Int) {
-        val currentSettings = _uiState.value.budgetSettings ?: return
+        logcat("AnalyticsViewModel") { "onCutoffDayChanged: day=$day" }
+        val currentSettings = _uiState.value.budgetSettings
+        if (currentSettings == null) {
+            logcat("AnalyticsViewModel") { "onCutoffDayChanged: currentSettings is NULL, skipping persistence" }
+            return
+        }
         if (day !in 1..31) return
 
         viewModelScope.launch {
-            budgetRepository.saveBudgetSettings(
-                currentSettings.copy(creditCardCutoffDay = day)
+            logcat("AnalyticsViewModel") { "onCutoffDayChanged: launching persistence for day=$day" }
+            persistBudgetSettingsUseCase(
+                settings = currentSettings.copy(creditCardCutoffDay = day),
+                forceNewPeriodBoundary = false,
             )
         }
     }

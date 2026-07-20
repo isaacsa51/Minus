@@ -17,6 +17,7 @@ import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
+import com.serranoie.app.minus.presentation.ANALYTICS_TUTORIAL_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
 import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
@@ -352,6 +353,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             context.settingsDataStore.edit { prefs ->
                 prefs[TUTORIAL_BOX_COMPLETED_KEY] = false
+                prefs[ANALYTICS_TUTORIAL_COMPLETED_KEY] = false
                 prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] =
                     FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
             }

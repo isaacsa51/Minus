@@ -85,8 +85,7 @@ class TutorialBoxState {
 
     fun resetForReplay() {
         isCompleted = false
-        currentIndexState.value =
-            if (registrationOrder.isEmpty()) -1 else registrationOrder.first()
+        currentIndexState.value = if (registrationOrder.isEmpty()) -1 else registrationOrder.first()
         visitedIndices.clear()
         measuredIndices.clear()
         pendingRewindCandidates.clear()
@@ -100,10 +99,13 @@ internal val VirtualIndices: Set<Int> = setOf(6)
 internal val GatedIndices: Set<Int> = setOf(3, 4)
 
 @Composable
-fun rememberTutorialBoxState(): TutorialBoxState = remember {
+fun rememberTutorialBoxState(
+    order: List<Int> = DefaultWalkOrder,
+    virtual: Set<Int> = VirtualIndices,
+): TutorialBoxState = remember {
     TutorialBoxState().also {
-        it.registrationOrder.addAll(DefaultWalkOrder)
-        VirtualIndices.forEach { idx -> it.targetBounds[idx] = Rect.Zero }
+        it.registrationOrder.addAll(order)
+        virtual.forEach { idx -> it.targetBounds[idx] = Rect.Zero }
     }
 }
 

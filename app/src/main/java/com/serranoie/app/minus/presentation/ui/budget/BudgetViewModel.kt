@@ -618,15 +618,27 @@ class BudgetViewModel @Inject constructor(
     }
 
     private fun handleCreditCutoffDayConfirmed(cutoffDay: Int) {
-        if (cutoffDay !in 1..31) return
-        val currentSettings = _uiState.value.budgetSettings ?: return
+        logcat(TAG) { "handleCreditCutoffDayConfirmed: day=$cutoffDay" }
+        if (cutoffDay !in 1..31) {
+            logcat(TAG) { "handleCreditCutoffDayConfirmed: INVALID day=$cutoffDay" }
+            return
+        }
+
+        editorStateController.applyCreditCutoffDay()
+        _uiState.update { it.copy(showCreditCutoffDialog = false, isCreditEnabled = true) }
+
+        val currentSettings = _uiState.value.budgetSettings
+        if (currentSettings == null) {
+            logcat(TAG) { "handleCreditCutoffDayConfirmed: currentSettings is NULL, skipping persistence" }
+            return
+        }
+
         viewModelScope.launch {
+            logcat(TAG) { "handleCreditCutoffDayConfirmed: launching persistence for day=$cutoffDay" }
             persistBudgetSettings(
                 currentSettings.copy(creditCardCutoffDay = cutoffDay),
                 forceNewPeriodBoundary = false,
             )
-            editorStateController.applyCreditCutoffDay()
-            _uiState.update { it.copy(showCreditCutoffDialog = false, isCreditEnabled = true) }
         }
     }
 

@@ -176,6 +176,7 @@ fun Editor(
 
     if (uiState.showCreditCutoffDialog) {
         CreditCutoffDayDialog(
+            initialDay = uiState.budgetSettings?.creditCardCutoffDay ?: 15,
             onDismiss = onDismissCreditCutoffDialog,
             onConfirm = onCreditCutoffConfirm
         )
