@@ -191,7 +191,7 @@
     <string name="onboarding_step_6_subtitle">Ao longo do tempo, aprenda o quanto você pode economizar e o quanto você pode gastar.</string>
     <string name="onboarding_set_budget_button">Continuar</string>
     <string name="recurrent_toggle_label">Recorrente</string>
-    <string name="censor_mode_alert_title">Modo de censura está ativo</string>
+    <string name="censor_mode_alert_title">Privacy mode is active</string>
     <string name="censor_mode_alert_message">Todos os seus valores financeiros estão atualmente desfocados.</string>
     <string name="censor_mode_alert_dismiss">Eu tenho que</string>
     <string name="censor_mode_card_label">Modo de privacidade ativado</string>
@@ -449,12 +449,12 @@
     <string name="split_mode_dialog_description" formatted="false">Escolha como o valor por período é calculado.</string>
     <string name="split_mode_static">Estático</string>
     <string name="split_mode_static_desc">O orçamento total está dividido igualmente em todos os períodos, independentemente do quanto você gasta.</string>
-    <string name="split_mode_dynamic">Dinâmico</string>
+    <string name="split_mode_dynamic">Dinâmico (Recomendado)</string>
     <string name="split_mode_dynamic_desc">Recalcular diariamente conforme você gasta. O saldo restante está repartido pelos dias que ainda restam no período.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Sem data</string>
     <string name="no_name">Sem nome</string>
-    <string name="description">Purchase Reason</string>
+    <string name="description">Descrição:</string>
     <string name="date">Encontro</string>
     <string name="frequency">Frequência</string>
     <string name="charge_day">Carregar dia</string>
@@ -492,5 +492,5 @@
     <string name="credit_cutoff_subtitle">%1$s — Cutoff in %2$d days</string>
     <string name="credit_cutoff_subtitle_today">%1$s — Cutoff today</string>
     <string name="ticket_expense">EXPÊNCIA</string>
-    <string name="ticket_recurrent_expense">RECURRING EXPENSE</string>
+    <string name="ticket_recurrent_expense">EXPÊNCIA DO RECURSO</string>
 </resources>
