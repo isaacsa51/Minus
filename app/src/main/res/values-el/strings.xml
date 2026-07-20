@@ -191,7 +191,7 @@
     <string name="onboarding_step_6_subtitle">Over time, learn how much you can save and how much you can spend.</string>
     <string name="onboarding_set_budget_button">Continue</string>
     <string name="recurrent_toggle_label">Recurrent</string>
-    <string name="censor_mode_alert_title">Censor mode is active</string>
+    <string name="censor_mode_alert_title">Privacy mode is active</string>
     <string name="censor_mode_alert_message">All your financial values are currently blurred.</string>
     <string name="censor_mode_alert_dismiss">Got it</string>
     <string name="censor_mode_card_label">Privacy mode activated</string>
@@ -449,12 +449,12 @@
     <string name="split_mode_dialog_description" formatted="false">Choose how the per-period amount is calculated.</string>
     <string name="split_mode_static">Static</string>
     <string name="split_mode_static_desc">Total budget is split equally across all periods, regardless of how much you spend.</string>
-    <string name="split_mode_dynamic">Dynamic</string>
+    <string name="split_mode_dynamic">Dynamic (Recommended)</string>
     <string name="split_mode_dynamic_desc">Recalculates daily as you spend. The remaining balance is spread over the days still left in the period.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>
     <string name="no_name">No name</string>
-    <string name="description">Purchase Reason</string>
+    <string name="description">Description</string>
     <string name="date">Date</string>
     <string name="frequency">Frequency</string>
     <string name="charge_day">Charge day</string>
@@ -492,5 +492,5 @@
     <string name="credit_cutoff_subtitle">%1$s — Cutoff in %2$d days</string>
     <string name="credit_cutoff_subtitle_today">%1$s — Cutoff today</string>
     <string name="ticket_expense">EXPENSE</string>
-    <string name="ticket_recurrent_expense">RECURRING EXPENSE</string>
+    <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
 </resources>
