@@ -466,6 +466,7 @@
     <string name="recurrence_end">Fin recurrencia</string>
     <!-- Transaction Detail Ticket Card -->
     <string name="ticket_total_amount">MONTO TOTAL</string>
+    <string name="mark_all_as_paid">Marcar todo como pagado</string>
     <string name="mark_all_as_paid_success">Marcado todo como pagado</string>
     <string name="mark_as_paid">Marcar como pagado</string>
     <string name="mark_as_paid_success">Marcado como pagado</string>
@@ -523,5 +524,4 @@
     <string name="analytics_tutorial_credit_desc">Pulsa sobre la estrella para ver todas las transacciones realizadas con ella, marcarlas como pagadas o ajusta la fecha límite de facturación para evitar intereses.</string>
     <string name="analytics_tutorial_history_title">Historial de Transacciones</string>
     <string name="analytics_tutorial_history_desc">Haz tap aquí para ver la lista completa de gastos en este periodo.</string>
-    <string name="mark_all_as_paid">Marcar todo como pagado</string>
 </resources>

@@ -466,6 +466,8 @@
     <string name="recurrence_end">Fim de recorrência</string>
     <!-- Transaction Detail Ticket Card -->
     <string name="ticket_total_amount">VALOR TOTAL</string>
+    <string name="mark_all_as_paid">Mark all as paid</string>
+    <string name="mark_all_as_paid_success">Marked all as paid</string>
     <string name="mark_as_paid">Marcar como paga</string>
     <string name="mark_as_paid_success">Marked as paid</string>
     <!-- Notifications -->
