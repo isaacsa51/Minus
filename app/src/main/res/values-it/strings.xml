@@ -466,6 +466,8 @@
     <string name="recurrence_end">Fine ricorrenza</string>
     <!-- Transaction Detail Ticket Card -->
     <string name="ticket_total_amount">IMPORTO TOTALE</string>
+    <string name="mark_all_as_paid">Mark all as paid</string>
+    <string name="mark_all_as_paid_success">Marked all as paid</string>
     <string name="mark_as_paid">Segna come pagato</string>
     <string name="mark_as_paid_success">Marked as paid</string>
     <!-- Notifications -->
