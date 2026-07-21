@@ -95,4 +95,18 @@ interface TransactionDao {
         WHERE isCredit = 1 AND date >= :startDate AND date < :endDate AND isCreditPaid = 0
     """)
     suspend fun markCreditAsPaidInRange(startDate: Long, endDate: Long)
+
+    @Query("""
+        UPDATE transactions 
+        SET isCreditPaid = 1 
+        WHERE isCredit = 1 AND isCreditPaid = 0
+    """)
+    suspend fun markAllCreditAsPaid()
+
+    @Query("""
+        UPDATE transactions 
+        SET isCreditPaid = 1 
+        WHERE id = :transactionId AND isCredit = 1
+    """)
+    suspend fun markTransactionAsPaid(transactionId: Long)
 }

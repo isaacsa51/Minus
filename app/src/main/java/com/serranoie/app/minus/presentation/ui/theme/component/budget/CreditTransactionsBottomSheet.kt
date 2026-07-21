@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -61,6 +62,7 @@ fun CreditTransactionsBottomSheet(
     totalOwed: BigDecimal,
     currency: String,
     onPayClick: () -> Unit,
+    onPayTransactionClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     creditCardCutoffDay: Int? = null,
     onCutoffDayChanged: (Int) -> Unit = {},
@@ -125,6 +127,16 @@ fun CreditTransactionsBottomSheet(
                         style = MaterialTheme.typography.titleSmallEmphasized,
                         fontWeight = FontWeight.Bold
                     )
+                    IconButton(
+                        onClick = { onPayTransactionClick(tx.id) },
+                        modifier = Modifier.padding(start = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = stringResource(R.string.mark_as_paid),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
                 HorizontalDivider(
                     modifier = Modifier.padding(top = 8.dp),
@@ -144,7 +156,7 @@ fun CreditTransactionsBottomSheet(
             )
         ) {
             Text(
-                text = stringResource(R.string.mark_as_paid),
+                text = stringResource(R.string.mark_all_as_paid),
                 style = MaterialTheme.typography.labelMediumEmphasized
             )
         }
@@ -177,7 +189,7 @@ fun CreditCardVisualization(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(2f)
+            .aspectRatio(2.5f)
             .clip(MaterialTheme.shapes.extraLarge)
             .background(MaterialTheme.colorScheme.tertiaryContainer)
             .padding(18.dp)
@@ -280,6 +292,6 @@ private fun CreditTransactionsBottomSheetPreview() {
                     date = LocalDateTime.now().minusDays(1),
                     isCredit = true
                 )
-            ), totalOwed = BigDecimal("177.50"), currency = "USD", onPayClick = {}, creditCardCutoffDay = 15)
+            ), totalOwed = BigDecimal("177.50"), currency = "USD", onPayClick = {}, onPayTransactionClick = {}, creditCardCutoffDay = 15)
     }
 }

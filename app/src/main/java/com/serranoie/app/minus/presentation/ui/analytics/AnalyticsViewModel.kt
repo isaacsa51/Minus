@@ -69,7 +69,8 @@ class AnalyticsViewModel @Inject constructor(
     init {
         observeBudgetData()
         viewModelScope.launch {
-            budgetRepository.seedArchivedData()
+            val demoIds = listOf(20260501L, 20260601L, 20260708L, 20260615L)
+            demoIds.forEach { budgetRepository.deleteArchivedBudget(it) }
         }
     }
 
@@ -405,38 +406,15 @@ class AnalyticsViewModel @Inject constructor(
         observeBudgetData()
     }
 
-    fun seedFakeData() {
+    fun onMarkCreditPaid() {
         viewModelScope.launch {
-            budgetRepository.seedArchivedData()
+            budgetRepository.markAllCreditTransactionsAsPaid()
         }
     }
 
-    fun onMarkCreditPaid() {
-        val settings = _uiState.value.budgetSettings ?: return
-        val cutoffDay = settings.creditCardCutoffDay ?: 15 // Fallback if not set
-        val today = LocalDate.now()
-
-        // Use the same cycle logic as the reminder
-        val cutoffThisMonth = runCatching { today.withDayOfMonth(cutoffDay) }.getOrElse {
-            today.withDayOfMonth(today.lengthOfMonth())
-        }
-
-        val cycle = if (today.isAfter(cutoffThisMonth)) {
-            val cutoffNextMonth =
-                runCatching { today.plusMonths(1).withDayOfMonth(cutoffDay) }.getOrElse {
-                    today.plusMonths(1).withDayOfMonth(today.plusMonths(1).lengthOfMonth())
-                }
-            cutoffThisMonth to cutoffNextMonth
-        } else {
-            val cutoffLastMonth =
-                runCatching { today.minusMonths(1).withDayOfMonth(cutoffDay) }.getOrElse {
-                    today.minusMonths(1).withDayOfMonth(today.minusMonths(1).lengthOfMonth())
-                }
-            cutoffLastMonth to cutoffThisMonth
-        }
-
+    fun onPayTransactionClick(transactionId: Long) {
         viewModelScope.launch {
-            budgetRepository.markCreditTransactionsAsPaid(cycle.first, cycle.second)
+            budgetRepository.markTransactionAsPaid(transactionId)
         }
     }
 
