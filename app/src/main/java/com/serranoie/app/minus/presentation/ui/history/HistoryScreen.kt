@@ -325,6 +325,9 @@ fun History(
         budgetEndDate = uiState.budgetSettings?.getPeriodEndDate() ?: LocalDate.now(),
         currencyCode = currencyCode,
         tags = uiState.tags,
+        isCreditQuickToggleEnabled = uiState.isCreditQuickToggleEnabled,
+        creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
+        onUpdateCreditCutoffDay = { day -> onProcessIntent(HistoryUiIntent.UpdateCreditCutoffDay(day)) },
         onCancel = { onProcessIntent(HistoryUiIntent.SetEditingTransaction(null)) },
         onSave = { expense ->
             onProcessIntent(HistoryUiIntent.SaveEditedTransaction(expense))

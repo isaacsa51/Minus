@@ -14,6 +14,7 @@ data class UserSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val typographyMode: TypographyMode = TypographyMode.EXPRESSIVE,
     val dynamicColorEnabled: Boolean = false,
+    val isCreditQuickToggleEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val budgetSplitViewPeriod: BudgetPeriod? = null,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,

@@ -71,7 +71,9 @@ import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalytics
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalyticsState
 import com.serranoie.app.minus.presentation.ui.analytics.util.previewAnalyticsState
-import com.serranoie.app.minus.presentation.ui.history.HistoryScreen
+import com.serranoie.app.minus.presentation.ui.history.History
+import com.serranoie.app.minus.presentation.ui.history.HistoryUiIntent
+import com.serranoie.app.minus.presentation.ui.history.HistoryUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHeader
 import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeader
@@ -133,6 +135,7 @@ data class AnalyticsActions(
     val onClose: () -> Unit = {},
     val onExportCSV: () -> Unit = {},
     val onMarkCreditPaid: () -> Unit = {},
+    val onPayTransactionClick: (Long) -> Unit = {},
     val onCutoffDayChanged: (Int) -> Unit = {},
     val onHistoricalPeriodSelected: (Long) -> Unit = {},
 )
@@ -152,6 +155,7 @@ fun Analytics(
     val view = LocalView.current
     val scrollState = rememberScrollState()
     var showHistorySheet by remember { mutableStateOf(false) }
+    var historyExpandedDates by remember { mutableStateOf(setOf<LocalDate>()) }
     var showCreditSheet by remember { mutableStateOf(false) }
     var showPastPeriodsSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -437,9 +441,38 @@ fun Analytics(
             dragHandle = {
                 BottomSheetDefaults.DragHandle()
             }) {
-            HistoryScreen(
-                readOnly = true,
-            )
+            val groupedTransactions = remember(state.transactions) {
+                state.transactions.sortedByDescending { it.date }.groupBy { it.date?.toLocalDate() }
+                    .toSortedMap(compareByDescending { it })
+            }
+
+            LaunchedEffect(groupedTransactions) {
+                if (historyExpandedDates.isEmpty() && groupedTransactions.isNotEmpty()) {
+                    groupedTransactions.keys.firstOrNull()?.let {
+                        historyExpandedDates = setOf(it)
+                    }
+                }
+            }
+
+            History(
+                uiState = HistoryUiState(
+                    transactions = state.transactions,
+                    displayTransactions = state.transactions,
+                    groupedCurrentTransactions = groupedTransactions,
+                    budgetSettings = state.budgetSettingsForDisplay,
+                    budgetState = state.budgetStateForDisplay,
+                    creditOwed = state.creditOwed,
+                    debtAdjustedBalance = state.debtAdjustedBalance,
+                    expandedDates = historyExpandedDates,
+                ), readOnly = true, onProcessIntent = { intent ->
+                    if (intent is HistoryUiIntent.ToggleExpandedDate) {
+                        historyExpandedDates = if (historyExpandedDates.contains(intent.date)) {
+                            historyExpandedDates - intent.date
+                        } else {
+                            historyExpandedDates + intent.date
+                        }
+                    }
+                })
         }
     }
 
@@ -474,6 +507,7 @@ fun Analytics(
                     actions.onMarkCreditPaid()
                     showCreditSheet = false
                 },
+                onPayTransactionClick = actions.onPayTransactionClick,
                 creditCardCutoffDay = state.budgetSettingsForDisplay?.creditCardCutoffDay,
                 onCutoffDayChanged = actions.onCutoffDayChanged
             )

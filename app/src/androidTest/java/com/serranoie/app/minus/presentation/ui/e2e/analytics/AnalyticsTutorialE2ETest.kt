@@ -50,7 +50,8 @@ class AnalyticsTutorialE2ETest {
                             isLoading = false,
                             startPeriodDate = Date(),
                             finishPeriodDate = Date()
-                        )
+                        ),
+                        showTutorialOverride = true
                     )
                 }
             }

@@ -1,6 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.history.edit
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EventRepeat
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 
@@ -30,17 +33,16 @@ internal fun RecurrenceToggleButton(
     ElevatedToggleButton(
         checked = isRecurrent,
         onCheckedChange = onToggle,
-        modifier = modifier,
+        modifier = modifier.height(40.dp),
         colors = ToggleButtonColors(
-            // Unchecked: tertiary container tint at 50% — soft, secondary feel.
             containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.25f),
             contentColor = tertiary,
-            // Checked: tertiary tint at 22% — visually selected without screaming.
             checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
             checkedContentColor = tertiary,
             disabledContentColor = MaterialTheme.colorScheme.outline,
             disabledContainerColor = MaterialTheme.colorScheme.outlineVariant
         ),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
     ) {
         Icon(
             imageVector = Icons.Rounded.EventRepeat,

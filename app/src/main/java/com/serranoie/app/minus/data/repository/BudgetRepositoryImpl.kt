@@ -356,6 +356,14 @@ class BudgetRepositoryImpl @Inject constructor(
         transactionDao.markCreditAsPaidInRange(startMillis, endMillis)
     }
 
+    override suspend fun markAllCreditTransactionsAsPaid() {
+        transactionDao.markAllCreditAsPaid()
+    }
+
+    override suspend fun markTransactionAsPaid(transactionId: Long) {
+        transactionDao.markTransactionAsPaid(transactionId)
+    }
+
     override fun getArchivedBudgets(): Flow<List<ArchivedBudget>> {
         return archivedBudgetDao.getAllArchivedBudgets().map { entities ->
             entities.map { it.toDomain() }
@@ -382,70 +390,5 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun deleteArchivedBudget(periodId: Long) {
         archivedBudgetDao.deleteById(periodId)
-    }
-
-    override suspend fun seedArchivedData() {
-        val budgets = listOf(
-            ArchivedBudgetEntity(
-                periodId = 20260501L,
-                totalBudget = "1000.00",
-                spentAmount = "1250.00",
-                startDate = LocalDate.of(2026, 5, 1).toEpochDay() * 86400000,
-                endDate = LocalDate.of(2026, 5, 31).toEpochDay() * 86400000,
-                currencyCode = "USD",
-                periodType = BudgetPeriod.MONTHLY.name
-            ),
-            ArchivedBudgetEntity(
-                periodId = 20260601L,
-                totalBudget = "500.00",
-                spentAmount = "12.50",
-                startDate = LocalDate.of(2026, 6, 1).toEpochDay() * 86400000,
-                endDate = LocalDate.of(2026, 6, 30).toEpochDay() * 86400000,
-                currencyCode = "USD",
-                periodType = BudgetPeriod.MONTHLY.name
-            ),
-            ArchivedBudgetEntity(
-                periodId = 20260708L,
-                totalBudget = "200.00",
-                spentAmount = "185.00",
-                startDate = LocalDate.of(2026, 7, 8).toEpochDay() * 86400000,
-                endDate = LocalDate.of(2026, 7, 14).toEpochDay() * 86400000,
-                currencyCode = "USD",
-                periodType = BudgetPeriod.WEEKLY.name
-            ),
-            ArchivedBudgetEntity(
-                periodId = 20260615L,
-                totalBudget = "1000.00",
-                spentAmount = "750.00",
-                startDate = LocalDate.of(2026, 6, 15).toEpochDay() * 86400000,
-                endDate = LocalDate.of(2026, 7, 14).toEpochDay() * 86400000,
-                currencyCode = "USD",
-                periodType = BudgetPeriod.MONTHLY.name
-            )
-        )
-
-        budgets.forEach { archivedBudgetDao.insert(it) }
-
-        // Insert some fake transactions for these periods
-        val fakeTransactions = listOf(
-            // Overbudget Period
-            TransactionEntity(periodId = 20260501L, amount = "500.00", comment = "Rent", date = LocalDate.of(2026, 5, 1).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
-            TransactionEntity(periodId = 20260501L, amount = "400.00", comment = "Groceries", date = LocalDate.of(2026, 5, 10).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
-            TransactionEntity(periodId = 20260501L, amount = "350.00", comment = "Shopping", date = LocalDate.of(2026, 5, 20).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
-            
-            // Low Spend Period
-            TransactionEntity(periodId = 20260601L, amount = "12.50", comment = "Coffee", date = LocalDate.of(2026, 6, 15).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
-
-            // Normal Period
-            TransactionEntity(periodId = 20260708L, amount = "100.00", comment = "Gas", date = LocalDate.of(2026, 7, 9).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
-            TransactionEntity(periodId = 20260708L, amount = "85.00", comment = "Dining", date = LocalDate.of(2026, 7, 12).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
-
-            // Good Saving Period
-            TransactionEntity(periodId = 20260615L, amount = "300.00", comment = "Electricity", date = LocalDate.of(2026, 6, 20).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
-            TransactionEntity(periodId = 20260615L, amount = "250.00", comment = "Water", date = LocalDate.of(2026, 6, 25).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
-            TransactionEntity(periodId = 20260615L, amount = "200.00", comment = "Internet", date = LocalDate.of(2026, 7, 5).atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000),
-        )
-
-        transactionDao.insertAllOrReplace(fakeTransactions)
     }
 }

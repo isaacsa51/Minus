@@ -54,6 +54,9 @@ fun AnalyticsScreen(
             onMarkCreditPaid = {
                 viewModel.onMarkCreditPaid()
             },
+            onPayTransactionClick = { txId ->
+                viewModel.onPayTransactionClick(txId)
+            },
             onCutoffDayChanged = { day ->
                 viewModel.onCutoffDayChanged(day)
             },

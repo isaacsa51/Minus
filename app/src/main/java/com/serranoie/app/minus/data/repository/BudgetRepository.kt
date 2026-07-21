@@ -61,6 +61,10 @@ interface BudgetRepository {
 
     suspend fun markCreditTransactionsAsPaid(start: LocalDate, end: LocalDate)
 
+    suspend fun markAllCreditTransactionsAsPaid()
+
+    suspend fun markTransactionAsPaid(transactionId: Long)
+
     fun getArchivedBudgets(): Flow<List<ArchivedBudget>>
 
     suspend fun archiveCurrentPeriod(
@@ -70,6 +74,4 @@ interface BudgetRepository {
     )
 
     suspend fun deleteArchivedBudget(periodId: Long)
-
-    suspend fun seedArchivedData()
 }

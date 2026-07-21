@@ -68,6 +68,8 @@ private val NOTIFICATION_MINUTE = intPreferencesKey(NOTIFICATION_MINUTE_KEY_NAME
 private val THEME_MODE = stringPreferencesKey(THEME_MODE_KEY_NAME)
 private val TYPOGRAPHY_MODE = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
 private val DYNAMIC_COLOR = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
+private val CREDIT_QUICK_TOGGLE_FEATURE_ENABLED =
+    booleanPreferencesKey(CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME)
 private val RECURRENT_PAYMENTS_VIEW_MODE =
     stringPreferencesKey(RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME)
 private val CURRENT_PERIOD_ROLLOVER_AMOUNT =
@@ -106,6 +108,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 typographyMode = preferences[TYPOGRAPHY_MODE]?.toTypographyMode()
                     ?: TypographyMode.EXPRESSIVE,
                 dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false,
+                isCreditQuickToggleEnabled = preferences[CREDIT_QUICK_TOGGLE_FEATURE_ENABLED] ?: false,
                 recurrentPaymentsViewMode = RecurrentPaymentsViewMode.fromName(
                     preferences[RECURRENT_PAYMENTS_VIEW_MODE]
                 ),

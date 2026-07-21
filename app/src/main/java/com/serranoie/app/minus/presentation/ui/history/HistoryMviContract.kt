@@ -23,6 +23,8 @@ sealed interface HistoryUiIntent {
     data class ConfirmDeleteRecurrent(val transaction: Transaction) : HistoryUiIntent
 
     data class SetLockSwipeable(val locked: Boolean) : HistoryUiIntent
+
+    data class UpdateCreditCutoffDay(val day: Int) : HistoryUiIntent
 }
 
 sealed interface HistoryUiEffect {
@@ -34,6 +36,8 @@ data class HistoryUiState(
     val budgetState: BudgetState? = null,
     val currentPeriodId: Long = 0L,
     val currentPeriodStartedAtMillis: Long = 0L,
+
+    val isCreditQuickToggleEnabled: Boolean = false,
 
     val tags: List<String> = emptyList(),
 
