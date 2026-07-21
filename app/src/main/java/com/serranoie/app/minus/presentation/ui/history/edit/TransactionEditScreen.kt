@@ -10,11 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CreditCard
 import com.serranoie.app.minus.presentation.LocalWindowInsets
+import androidx.compose.material3.ElevatedToggleButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +39,7 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
+import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
 import com.serranoie.app.minus.presentation.ui.history.edit.dialogs.EditDatePickerDialog
 import com.serranoie.app.minus.presentation.ui.history.edit.dialogs.EditTimePickerDialog
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -53,7 +60,7 @@ import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Transaction as NumpadTransaction
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TransactionEditScreen(
     transaction: Transaction,
@@ -61,6 +68,9 @@ fun TransactionEditScreen(
     budgetEndDate: LocalDate,
     currencyCode: String = "USD",
     tags: List<String> = emptyList(),
+    isCreditQuickToggleEnabled: Boolean = false,
+    creditCardCutoffDay: Int? = null,
+    onUpdateCreditCutoffDay: (Int) -> Unit = {},
     onCancel: () -> Unit = {},
     onSave: (
         newAmount: BigDecimal,
@@ -69,8 +79,9 @@ fun TransactionEditScreen(
         newIsRecurrent: Boolean,
         newFrequency: RecurrentFrequency?,
         newEndDate: LocalDate?,
-        newSubscriptionDay: Int?
-    ) -> Unit = { _, _, _, _, _, _, _ -> },
+        newSubscriptionDay: Int?,
+        newIsCredit: Boolean
+    ) -> Unit = { _, _, _, _, _, _, _, _ -> },
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
@@ -95,16 +106,17 @@ fun TransactionEditScreen(
     var recurrentEndDate by remember {
         mutableStateOf(transaction.recurrentEndDate?.toLocalDate() ?: budgetEndDate.plusMonths(3))
     }
+    var isCredit by remember { mutableStateOf(transaction.isCredit) }
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     var showRecurrentBottomSheet by remember { mutableStateOf(false) }
+    var showCreditCutoffDialog by remember { mutableStateOf(false) }
 
     val focusController = remember { FocusController() }
 
     var isCalculation by remember { mutableStateOf(false) }
 
-    // Calculate dynamic target height for numpad to take 48% of screen height
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val targetNumpadHeight = screenHeight * 0.48f
@@ -147,7 +159,7 @@ fun TransactionEditScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             RecurrenceToggleButton(
                 isRecurrent = isRecurrent,
@@ -159,6 +171,33 @@ fun TransactionEditScreen(
                 },
                 modifier = Modifier.weight(1f),
             )
+
+            if (isCreditQuickToggleEnabled) {
+                ElevatedToggleButton(
+                    checked = isCredit,
+                    onCheckedChange = { checked ->
+                        if (checked && creditCardCutoffDay == null) {
+                            showCreditCutoffDialog = true
+                        } else {
+                            isCredit = checked
+                        }
+                    },
+                    modifier = Modifier.height(40.dp),
+                    colors = ToggleButtonDefaults.elevatedToggleButtonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
+                            alpha = 0.25f
+                        ),
+                        checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.tertiary,
+                        checkedContentColor = MaterialTheme.colorScheme.tertiary
+                    ),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CreditCard,
+                        contentDescription = "Credit card payment"
+                    )
+                }
+            }
 
             TransactionDateTimeRow(
                 date = editedDate,
@@ -251,7 +290,8 @@ fun TransactionEditScreen(
                     isRecurrent,
                     frequency,
                     endDate,
-                    subDay
+                    subDay,
+                    isCredit
                 )
             },
             isCalculation = isCalculation,
@@ -332,6 +372,18 @@ fun TransactionEditScreen(
             )
         }
     }
+
+    if (showCreditCutoffDialog) {
+        CreditCutoffDayDialog(
+            initialDay = creditCardCutoffDay ?: 15,
+            onDismiss = { showCreditCutoffDialog = false },
+            onConfirm = { day ->
+                onUpdateCreditCutoffDay(day)
+                isCredit = true
+                showCreditCutoffDialog = false
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true, device = "id:pixel_5")
@@ -349,8 +401,9 @@ fun TransactionEditScreenPreview() {
             budgetStartDate = LocalDate.now().minusDays(15),
             budgetEndDate = LocalDate.now().plusDays(15),
             currencyCode = "USD",
+            isCreditQuickToggleEnabled = true,
             onCancel = {},
-            onSave = { _, _, _, _, _, _, _ -> }
+            onSave = { _, _, _, _, _, _, _, _ -> }
         )
     }
 }
@@ -374,8 +427,9 @@ fun TransactionEditScreenRecurringPreview() {
             budgetStartDate = LocalDate.now().minusDays(15),
             budgetEndDate = LocalDate.now().plusDays(15),
             currencyCode = "USD",
+            isCreditQuickToggleEnabled = true,
             onCancel = {},
-            onSave = { _, _, _, _, _, _, _ -> }
+            onSave = { _, _, _, _, _, _, _, _ -> }
         )
     }
 }

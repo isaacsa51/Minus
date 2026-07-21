@@ -109,6 +109,7 @@ class AnalyticsE2ETest {
                                 startPeriodDate = startPeriodDate,
                                 finishPeriodDate = finishPeriodDate,
                             ),
+                        showTutorialOverride = false,
                     )
                 }
             }

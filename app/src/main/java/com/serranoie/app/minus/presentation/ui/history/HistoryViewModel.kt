@@ -6,6 +6,7 @@ import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetTransactionHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -27,6 +28,7 @@ import javax.inject.Inject
 class HistoryViewModel @Inject constructor(
     private val budgetTransactionHandler: BudgetTransactionHandler,
     private val settingsRepository: SettingsRepository,
+    private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryUiState())
@@ -104,6 +106,8 @@ class HistoryViewModel @Inject constructor(
                 _uiState.value.copy(lockSwipeable = intent.locked)
 
             is HistoryUiIntent.ToggleExpandedTransaction -> toggleExpandedTransaction(intent.transactionId)
+
+            is HistoryUiIntent.UpdateCreditCutoffDay -> updateCreditCutoffDay(intent.day)
         }
     }
 
@@ -111,6 +115,18 @@ class HistoryViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 expandedTransactionId = if (state.expandedTransactionId == id) null else id
+            )
+        }
+    }
+
+    private fun updateCreditCutoffDay(day: Int) {
+        val currentSettings = _uiState.value.budgetSettings ?: return
+        if (day !in 1..31) return
+
+        viewModelScope.launch {
+            persistBudgetSettingsUseCase(
+                settings = currentSettings.copy(creditCardCutoffDay = day),
+                forceNewPeriodBoundary = false,
             )
         }
     }
@@ -220,6 +236,7 @@ class HistoryViewModel @Inject constructor(
             expandedDates = autoExpanded,
             creditOwed = creditOwed,
             debtAdjustedBalance = debtAdjustedBalance,
+            isCreditQuickToggleEnabled = userSettings?.isCreditQuickToggleEnabled ?: false,
             recurrentPaymentsViewMode = userSettings?.recurrentPaymentsViewMode
                 ?: RecurrentPaymentsViewMode.VERTICAL_LIST,
         )
