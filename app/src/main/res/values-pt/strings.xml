@@ -215,6 +215,20 @@
     <!-- Settings -->
     <string name="settings_title">Confirgurações</string>
     <string name="settings_section_appearance">Aparência</string>
+    <string name="settings_section_language">Idioma</string>
+    <string name="settings_language_header">Idioma do app</string>
+    <string name="settings_language_currently_format">Atual: %1$s</string>
+    <string name="settings_language_disclaimer">As traduções podem estar incorretas.</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Fino</string>
+    <string name="settings_theme_dark">Escuro</string>
+    <string name="settings_contrast_title">Contrast</string>
+    <string name="settings_contrast_normal">Normal</string>
+    <string name="settings_contrast_medium">Medium</string>
+    <string name="settings_contrast_high">High</string>
+    <string name="settings_typography_condensed">Condensado</string>
+    <string name="settings_typography_expressive">Expressivo</string>
+    <string name="settings_color_scheme_title">App Color Scheme</string>
     <string name="settings_section_notifications">notificações</string>
     <string name="settings_section_features">Funcionalidades</string>
     <string name="settings_section_app_info">Informações do aplicativo</string>
@@ -223,6 +237,8 @@
     <string name="settings_section_savings">Economia</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_subtitle">Alterar o estilo do tema do aplicativo</string>
+    <string name="settings_appearance_title">Theming and color</string>
+    <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
     <string name="settings_typography_title">Tipografia</string>
     <string name="settings_typography_subtitle">Alterar o estilo da tipografia do aplicativo</string>
     <string name="settings_material_you_title">Material de que você</string>
