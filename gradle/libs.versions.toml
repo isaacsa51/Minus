@@ -28,6 +28,7 @@ kotlinxCoroutines = "1.10.2"
 composeFoundationOld = "1.8.3"
 composeFoundationLayoutOld = "1.8.3"
 composeUiUtil = "1.8.3"
+appcompat = "1.7.0"
 composeMaterial3 = "1.5.0-alpha17"
 composeMaterial3WindowSize = "1.5.0-alpha14"
 composeAnimation = "1.10.6"
@@ -54,6 +55,7 @@ byteBuddyAgent = "1.14.17"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

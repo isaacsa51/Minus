@@ -15,8 +15,10 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.preferences.core.edit
+import com.serranoie.app.minus.presentation.CONTRAST_MODE_KEY
 import com.serranoie.app.minus.presentation.THEME_MODE_KEY
 import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
+import com.serranoie.app.minus.presentation.appContrast
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
 import com.serranoie.app.minus.presentation.settingsDataStore
@@ -24,7 +26,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 enum class ThemeMode { LIGHT, NIGHT, SYSTEM }
-enum class TypographyMode { DEFAULT, CONDENSED, EXPRESSIVE }
+enum class TypographyMode { SYSTEM, DEFAULT, CONDENSED, EXPRESSIVE }
+enum class ContrastMode { NORMAL, MEDIUM, HIGH }
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -265,6 +268,8 @@ fun isNightMode(): Boolean = when (LocalContext.current.appTheme) {
 fun MinusTheme(
     darkTheme: Boolean = isNightMode(),
     dynamicColor: Boolean = false,
+    typographyMode: TypographyMode = LocalContext.current.appTypography,
+    contrastMode: ContrastMode = LocalContext.current.appContrast,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -273,15 +278,25 @@ fun MinusTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> darkScheme
-        else -> lightScheme
+        darkTheme -> when (contrastMode) {
+            ContrastMode.NORMAL -> darkScheme
+            ContrastMode.MEDIUM -> mediumContrastDarkColorScheme
+            ContrastMode.HIGH -> highContrastDarkColorScheme
+        }
+
+        else -> when (contrastMode) {
+            ContrastMode.NORMAL -> lightScheme
+            ContrastMode.MEDIUM -> mediumContrastLightColorScheme
+            ContrastMode.HIGH -> highContrastLightColorScheme
+        }
     }
 
-    val typography = when (context.appTypography) {
+    val typography = when (typographyMode) {
+        TypographyMode.SYSTEM -> androidx.compose.material3.Typography()
         TypographyMode.DEFAULT -> Typography
-        TypographyMode.CONDENSED -> CondensedTypography
-        TypographyMode.EXPRESSIVE -> ExpressiveTypography
-    }
+        TypographyMode.CONDENSED -> Typography.withCondensedStyles()
+        TypographyMode.EXPRESSIVE -> Typography.withEmphasizedStyles()
+    }.withEmphasizedStyles()
 
     MaterialExpressiveTheme(
         colorScheme = colorScheme,
@@ -308,7 +323,11 @@ fun syncTheme(context: Context) {
     val typographyMode = TypographyMode.valueOf(
         currentValue[TYPOGRAPHY_MODE_KEY] ?: TypographyMode.EXPRESSIVE.toString()
     )
+    val contrastMode = ContrastMode.valueOf(
+        currentValue[CONTRAST_MODE_KEY] ?: ContrastMode.NORMAL.toString()
+    )
 
     context.appTheme = mode
     context.appTypography = typographyMode
+    context.appContrast = contrastMode
 }

@@ -29,9 +29,6 @@ class SettingsScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 SettingsPreview(
-                    currentTheme = "system",
-                    currentTypography = "default",
-                    isMaterialYouEnabled = true,
                     isCreditQuickToggleFeatureEnabled = false,
                     recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
                     notificationHour = 19,
@@ -52,9 +49,6 @@ class SettingsScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 SettingsPreview(
-                    currentTheme = "dark",
-                    currentTypography = "default",
-                    isMaterialYouEnabled = false,
                     isCreditQuickToggleFeatureEnabled = true,
                     recurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
                     notificationHour = 20,
@@ -70,9 +64,6 @@ class SettingsScreenshotTest {
 
     @Composable
     private fun SettingsPreview(
-        currentTheme: String,
-        currentTypography: String,
-        isMaterialYouEnabled: Boolean,
         isCreditQuickToggleFeatureEnabled: Boolean,
         recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
         notificationHour: Int,
@@ -85,9 +76,6 @@ class SettingsScreenshotTest {
         MinusTheme {
             Settings(
                 modifier = Modifier.fillMaxSize(),
-                currentTheme = currentTheme,
-                currentTypography = currentTypography,
-                isMaterialYouEnabled = isMaterialYouEnabled,
                 isCreditQuickToggleFeatureEnabled = isCreditQuickToggleFeatureEnabled,
                 recurrentPaymentsViewMode = recurrentPaymentsViewMode,
                 notificationHour = notificationHour,
@@ -95,9 +83,6 @@ class SettingsScreenshotTest {
                 recurrentNotificationHour = recurrentNotificationHour,
                 recurrentNotificationMinute = recurrentNotificationMinute,
                 exactAlarmEnabled = exactAlarmEnabled,
-                onThemeChange = {},
-                onTypographyChange = {},
-                onMaterialYouToggle = {},
                 onCreditQuickToggleFeatureToggle = {},
                 onRecurrentPaymentsViewModeChange = {},
                 onNotificationTimeChange = { _, _ -> },

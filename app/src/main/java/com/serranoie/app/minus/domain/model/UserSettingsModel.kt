@@ -13,6 +13,7 @@ data class UserSettings(
     val notificationMinute: Int = DEFAULT_NOTIFICATION_MINUTE,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val typographyMode: TypographyMode = TypographyMode.EXPRESSIVE,
+    val language: String = "en",
     val dynamicColorEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
@@ -34,6 +35,7 @@ enum class ThemeMode {
 }
 
 enum class TypographyMode {
+    SYSTEM,
     DEFAULT,
     CONDENSED,
     EXPRESSIVE,

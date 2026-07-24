@@ -31,8 +31,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
@@ -216,8 +214,9 @@ fun SpendBudgetCard(
                 }
                 Text(
                     text = annotatedSpend,
-                    style = MaterialTheme.typography.displaySmallEmphasized.copy(fontWeight = FontWeight.Light),
+                    style = MaterialTheme.typography.displaySmallEmphasized,
                     fontSize = valueFontSize,
+                    fontWeight = FontWeight.Bold,
                     overflow = TextOverflow.Ellipsis,
                     softWrap = false,
                     lineHeight = TextUnit(0.2f, TextUnitType.Em),

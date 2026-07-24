@@ -215,6 +215,19 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_language">Language</string>
+    <string name="settings_language_header">App Language</string>
+    <string name="settings_language_currently_format">Currently: %1$s</string>
+    <string name="settings_language_disclaimer">Language translations might be incorrect.</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_contrast_title">Contrast</string>
+    <string name="settings_contrast_normal">Normal</string>
+    <string name="settings_contrast_medium">Medium</string>
+    <string name="settings_contrast_high">High</string>
+    <string name="settings_typography_condensed">Condensed</string>
+    <string name="settings_typography_expressive">Expressive</string>
     <string name="settings_section_notifications">Notifications</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>

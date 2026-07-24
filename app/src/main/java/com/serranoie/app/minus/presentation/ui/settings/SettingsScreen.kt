@@ -19,6 +19,7 @@ import dagger.hilt.android.EntryPointAccessors
 fun SettingsScreen(
     onNavigateToBugReport: () -> Unit,
     onNavigateToChangelog: () -> Unit = {},
+    onNavigateToAppearance: () -> Unit = {},
     onNavigateBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -70,9 +71,6 @@ fun SettingsScreen(
 
     Settings(
         isCensored = uiState.isCensored,
-        currentTheme = uiState.currentTheme,
-        currentTypography = uiState.currentTypography,
-        isMaterialYouEnabled = uiState.isMaterialYouEnabled,
         isCreditQuickToggleFeatureEnabled = uiState.isCreditQuickToggleEnabled,
         isCategoryPickerDirectPopupEnabled = uiState.isCategoryPickerDirectPopupEnabled,
         isCategoryGridModeEnabled = uiState.isCategoryGridModeEnabled,
@@ -85,9 +83,6 @@ fun SettingsScreen(
         recurrentNotificationMinute = uiState.recurrentNotificationMinute,
         exactAlarmEnabled = uiState.exactAlarmEnabled,
         notificationPermissionGranted = uiState.notificationPermissionGranted,
-        onThemeChange = viewModel::onThemeChange,
-        onTypographyChange = viewModel::onTypographyChange,
-        onMaterialYouToggle = viewModel::onMaterialYouToggle,
         onCensorModeToggle = viewModel::onCensorModeToggle,
         onCreditQuickToggleFeatureToggle = viewModel::onCreditQuickToggleFeatureToggle,
         onRecurrentPaymentsViewModeChange = viewModel::onRecurrentPaymentsViewModeChange,
@@ -107,6 +102,7 @@ fun SettingsScreen(
         onResetTutorial = viewModel::onResetTutorial,
         onBugReportClick = viewModel::onBugReportClick,
         onNavigateToChangelog = onNavigateToChangelog,
+        onNavigateToAppearance = onNavigateToAppearance,
         onBack = viewModel::onBack,
     )
 }

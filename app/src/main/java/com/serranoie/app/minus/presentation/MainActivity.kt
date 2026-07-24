@@ -2,11 +2,11 @@ package com.serranoie.app.minus.presentation
 
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -63,6 +63,7 @@ import com.serranoie.app.minus.data.repository.SETTINGS_DATASTORE_NAME
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.data.repository.THEME_MODE_KEY_NAME
 import com.serranoie.app.minus.data.repository.TYPOGRAPHY_MODE_KEY_NAME
+import com.serranoie.app.minus.data.repository.LANGUAGE_KEY_NAME
 import com.serranoie.app.minus.data.repository.ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME
 import com.serranoie.app.minus.data.repository.ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME
 import com.serranoie.app.minus.data.repository.TUTORIAL_BOX_COMPLETED_KEY_NAME
@@ -72,6 +73,7 @@ import com.serranoie.app.minus.navigation.AppNavGraph
 import com.serranoie.app.minus.navigation.Screen
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.permission.PermissionHandler
+import com.serranoie.app.minus.presentation.ui.theme.ContrastMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.ThemeManager
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
@@ -91,6 +93,7 @@ import javax.inject.Inject
 val Context.settingsDataStore by preferencesDataStore(SETTINGS_DATASTORE_NAME)
 var Context.appTheme by mutableStateOf(ThemeMode.SYSTEM)
 var Context.appTypography by mutableStateOf(TypographyMode.EXPRESSIVE)
+var Context.appContrast by mutableStateOf(ContrastMode.NORMAL)
 var Context.dynamicColorEnabled by mutableStateOf(false)
 
 val LocalWindowSize = compositionLocalOf { WindowWidthSizeClass.Compact }
@@ -104,6 +107,8 @@ val RECURRENT_NOTIFICATION_HOUR_KEY = intPreferencesKey(RECURRENT_NOTIFICATION_H
 val RECURRENT_NOTIFICATION_MINUTE_KEY = intPreferencesKey(RECURRENT_NOTIFICATION_MINUTE_KEY_NAME)
 val THEME_MODE_KEY = stringPreferencesKey(THEME_MODE_KEY_NAME)
 val TYPOGRAPHY_MODE_KEY = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
+val LANGUAGE_KEY = stringPreferencesKey(LANGUAGE_KEY_NAME)
+val CONTRAST_MODE_KEY = stringPreferencesKey("contrast_mode")
 val DYNAMIC_COLOR_KEY = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
 val CREDIT_QUICK_TOGGLE_FEATURE_KEY = booleanPreferencesKey(CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME)
 val CATEGORY_PICKER_DIRECT_POPUP_KEY = booleanPreferencesKey(CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME)
@@ -131,7 +136,7 @@ const val DEFAULT_RECURRENT_NOTIFICATION_HOUR = 8
 const val DEFAULT_RECURRENT_NOTIFICATION_MINUTE = 0
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val isDone: MutableState<Boolean> = mutableStateOf(false)
     private val isReady: MutableState<Boolean> = mutableStateOf(false)
     private val dataStoreLoaded: MutableState<Boolean> = mutableStateOf(false)

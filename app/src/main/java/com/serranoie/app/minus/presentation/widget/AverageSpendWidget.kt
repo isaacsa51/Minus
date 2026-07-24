@@ -47,7 +47,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Date
 
-private const val AVERAGE_CHART_BAR_COUNT = 12
+private const val AVERAGE_CHART_BAR_COUNT = 10
 
 private val averageSpendValueKey = stringPreferencesKey("average_spend_value")
 private val averageSpendDaysKey = intPreferencesKey("average_spend_days")

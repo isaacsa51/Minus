@@ -214,8 +214,12 @@
     <string name="onboarding_finish_date_selector_budget_view_question">How do you want to view your budget?</string>
     <!-- Settings -->
     <string name="settings_title">Settings</string>
-    <string name="settings_section_appearance">Appearance</string>
-    <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_section_appearance">Εμφάνιση</string>
+    <string name="settings_section_language">Γλώσσα</string>
+    <string name="settings_language_header">Γλώσσα εφαρμογής</string>
+    <string name="settings_language_currently_format">Τρέχουσα: %1$s</string>
+    <string name="settings_language_disclaimer">Οι μεταφράσεις γλωσσών ενδέχεται να είναι λανθασμένες.</string>
+    <string name="settings_section_notifications">Ειδοποιήσεις</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>
     <string name="settings_section_data_backup">Data backup</string>
