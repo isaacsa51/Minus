@@ -215,6 +215,10 @@
     <!-- Settings -->
     <string name="settings_title">Confirgurações</string>
     <string name="settings_section_appearance">Aparência</string>
+    <string name="settings_section_language">Idioma</string>
+    <string name="settings_language_header">Idioma do app</string>
+    <string name="settings_language_currently_format">Atual: %1$s</string>
+    <string name="settings_language_disclaimer">As traduções podem estar incorretas.</string>
     <string name="settings_section_notifications">notificações</string>
     <string name="settings_section_features">Funcionalidades</string>
     <string name="settings_section_app_info">Informações do aplicativo</string>

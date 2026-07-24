@@ -24,4 +24,6 @@ sealed class Screen(val route: String) {
     data object BugReport : Screen("bug_report")
 
     data object Changelog : Screen("changelog")
+
+    data object Appearance : Screen("appearance")
 }

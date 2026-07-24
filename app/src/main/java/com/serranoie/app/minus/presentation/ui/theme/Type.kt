@@ -500,307 +500,313 @@ val Typography = Typography(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 fun Typography.withEmphasizedStyles(): Typography {
+    val isCustomFont = this.bodyLarge.fontFamily == GoogleSansFlex
+    
     return this.copy(
-        displayLargeEmphasized = TextStyle(
+        displayLargeEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexDisplayLargeEmphasized,
             fontSize = 64.sp,
             lineHeight = 72.sp,
             letterSpacing = 0.sp
-        ),
-        displayMediumEmphasized = TextStyle(
+        ) else this.displayLarge,
+        displayMediumEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexDisplayMediumEmphasized,
             fontSize = 52.sp,
             lineHeight = 60.sp,
             letterSpacing = 0.sp
-        ),
-        displaySmallEmphasized = TextStyle(
+        ) else this.displayMedium,
+        displaySmallEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexDisplaySmallEmphasized,
             fontSize = 44.sp,
             lineHeight = 52.sp,
             letterSpacing = 0.sp
-        ),
+        ) else this.displaySmall,
 
-        // Emphasized Headline - Bold and wide for attention-grabbing headers
-        headlineLargeEmphasized = TextStyle(
+        headlineLargeEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexHeadlineLargeEmphasized,
             fontSize = 36.sp,
             lineHeight = 44.sp,
             letterSpacing = 0.sp
-        ),
-        headlineMediumEmphasized = TextStyle(
+        ) else this.headlineLarge,
+        headlineMediumEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexHeadlineMediumEmphasized,
             fontSize = 32.sp,
             lineHeight = 40.sp,
             letterSpacing = 0.sp
-        ),
-        headlineSmallEmphasized = TextStyle(
+        ) else this.headlineMedium,
+        headlineSmallEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexHeadlineSmallEmphasized,
             fontSize = 28.sp,
             lineHeight = 36.sp,
             letterSpacing = 0.sp
-        ),
-        titleLargeEmphasized = TextStyle(
+        ) else this.headlineSmall,
+        
+        titleLargeEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexTitleLargeEmphasized,
             fontSize = 24.sp,
             lineHeight = 32.sp,
             letterSpacing = 0.15.sp
-        ),
-        titleMediumEmphasized = TextStyle(
+        ) else this.titleLarge,
+        titleMediumEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexTitleMediumEmphasized,
             fontSize = 18.sp,
             lineHeight = 26.sp,
             letterSpacing = 0.2.sp
-        ),
-        titleSmallEmphasized = TextStyle(
+        ) else this.titleMedium,
+        titleSmallEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexTitleSmallEmphasized,
             fontSize = 16.sp,
             lineHeight = 24.sp,
             letterSpacing = 0.15.sp
-        ),
-        bodyLargeEmphasized = TextStyle(
+        ) else this.titleSmall,
+        
+        bodyLargeEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexBodyLargeEmphasized,
             fontSize = 18.sp,
             lineHeight = 28.sp,
             letterSpacing = 0.6.sp
-        ),
-        bodyMediumEmphasized = TextStyle(
+        ) else this.bodyLarge,
+        bodyMediumEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexBodyMediumEmphasized,
             fontSize = 16.sp,
             lineHeight = 16.sp,
             letterSpacing = 0.4.sp
-        ),
-        bodySmallEmphasized = TextStyle(
+        ) else this.bodyMedium,
+        bodySmallEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexBodySmallEmphasized,
             fontSize = 14.sp,
             lineHeight = 20.sp,
             letterSpacing = 0.5.sp
-        ),
-        labelLargeEmphasized = TextStyle(
+        ) else this.bodySmall,
+        
+        labelLargeEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexLabelLargeEmphasized,
             fontSize = 16.sp,
             lineHeight = 24.sp,
             letterSpacing = 0.15.sp
-        ),
-        labelMediumEmphasized = TextStyle(
+        ) else this.labelLarge,
+        labelMediumEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexLabelMediumEmphasized,
             fontSize = 14.sp,
             lineHeight = 20.sp,
             letterSpacing = 0.6.sp
-        ),
-        labelSmallEmphasized = TextStyle(
+        ) else this.labelMedium,
+        labelSmallEmphasized = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexLabelSmallEmphasized,
             fontSize = 12.sp,
             lineHeight = 16.sp,
             letterSpacing = 0.6.sp
-        )
+        ) else this.labelSmall
     )
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 fun Typography.withCondensedStyles(): Typography {
-    return Typography(
-        displayLarge = TextStyle(
+    val isCustomFont = this.bodyLarge.fontFamily == GoogleSansFlex
+
+    return this.copy(
+        displayLarge = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexDisplayLargeCondensed,
             fontSize = 64.sp,
             lineHeight = 72.sp,
             letterSpacing = 0.sp
-        ),
-        displayMedium = TextStyle(
+        ) else this.displayLarge,
+        displayMedium = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexDisplayMediumCondensed,
             fontSize = 52.sp,
             lineHeight = 60.sp,
             letterSpacing = 0.sp
-        ),
-        displaySmall = TextStyle(
+        ) else this.displayMedium,
+        displaySmall = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexDisplaySmallCondensed,
             fontSize = 44.sp,
             lineHeight = 52.sp,
             letterSpacing = 0.sp
-        ),
-        headlineLarge = TextStyle(
+        ) else this.displaySmall,
+        headlineLarge = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexHeadlineLargeCondensed,
             fontSize = 36.sp,
             lineHeight = 44.sp,
             letterSpacing = 0.sp
-        ),
-        headlineMedium = TextStyle(
+        ) else this.headlineLarge,
+        headlineMedium = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexHeadlineMediumCondensed,
             fontSize = 32.sp,
             lineHeight = 40.sp,
             letterSpacing = 0.sp
-        ),
-        headlineSmall = TextStyle(
+        ) else this.headlineMedium,
+        headlineSmall = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexHeadlineSmallCondensed,
             fontSize = 28.sp,
             lineHeight = 36.sp,
             letterSpacing = 0.sp
-        ),
-        titleLarge = TextStyle(
+        ) else this.headlineSmall,
+        titleLarge = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexTitleLargeCondensed,
             fontSize = 24.sp,
             lineHeight = 32.sp,
             letterSpacing = 0.15.sp
-        ),
-        titleMedium = TextStyle(
+        ) else this.titleLarge,
+        titleMedium = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexTitleMediumCondensed,
             fontSize = 18.sp,
             lineHeight = 26.sp,
             letterSpacing = 0.2.sp
-        ),
-        titleSmall = TextStyle(
+        ) else this.titleMedium,
+        titleSmall = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexTitleSmallCondensed,
             fontSize = 16.sp,
             lineHeight = 24.sp,
             letterSpacing = 0.15.sp
-        ),
-        bodyLarge = TextStyle(
+        ) else this.titleSmall,
+        bodyLarge = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexBodyLargeCondensed,
             fontSize = 18.sp,
             lineHeight = 28.sp,
             letterSpacing = 0.6.sp
-        ),
-        bodyMedium = TextStyle(
+        ) else this.bodyLarge,
+        bodyMedium = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexBodyMediumCondensed,
             fontSize = 16.sp,
             lineHeight = 24.sp,
             letterSpacing = 0.4.sp
-        ),
-        bodySmall = TextStyle(
+        ) else this.bodyMedium,
+        bodySmall = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexBodySmallCondensed,
             fontSize = 14.sp,
             lineHeight = 20.sp,
             letterSpacing = 0.5.sp
-        ),
-        labelLarge = TextStyle(
+        ) else this.bodySmall,
+        labelLarge = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexLabelLargeCondensed,
             fontSize = 16.sp,
             lineHeight = 24.sp,
             letterSpacing = 0.15.sp
-        ),
-        labelMedium = TextStyle(
+        ) else this.labelLarge,
+        labelMedium = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexLabelMediumCondensed,
             fontSize = 14.sp,
             lineHeight = 20.sp,
             letterSpacing = 0.6.sp
-        ),
-        labelSmall = TextStyle(
+        ) else this.labelMedium,
+        labelSmall = if (isCustomFont) TextStyle(
             fontFamily = GoogleSansFlexLabelSmallCondensed,
             fontSize = 12.sp,
             lineHeight = 16.sp,
             letterSpacing = 0.6.sp
-        )
+        ) else this.labelSmall
     )
 }
 
 val Typography.displayLargeCondensed: TextStyle
-    get() = displayLarge.copy(
+    get() = if (displayLarge.fontFamily == GoogleSansFlex) displayLarge.copy(
         fontFamily = GoogleSansFlexDisplayLargeCondensed,
         fontSize = 64.sp,
         lineHeight = 72.sp,
         letterSpacing = 0.sp
-    )
+    ) else displayLarge
 val Typography.displayMediumCondensed: TextStyle
-    get() = displayMedium.copy(
+    get() = if (displayMedium.fontFamily == GoogleSansFlex) displayMedium.copy(
         fontFamily = GoogleSansFlexDisplayMediumCondensed,
         fontSize = 52.sp,
         lineHeight = 60.sp,
         letterSpacing = 0.sp
-    )
+    ) else displayMedium
 val Typography.displaySmallCondensed: TextStyle
-    get() = displaySmall.copy(
+    get() = if (displaySmall.fontFamily == GoogleSansFlex) displaySmall.copy(
         fontFamily = GoogleSansFlexDisplaySmallCondensed,
         fontSize = 44.sp,
         lineHeight = 52.sp,
         letterSpacing = 0.sp
-    )
+    ) else displaySmall
 
 val Typography.headlineLargeCondensed: TextStyle
-    get() = headlineLarge.copy(
+    get() = if (headlineLarge.fontFamily == GoogleSansFlex) headlineLarge.copy(
         fontFamily = GoogleSansFlexHeadlineLargeCondensed,
         fontSize = 36.sp,
         lineHeight = 44.sp,
         letterSpacing = 0.sp
-    )
+    ) else headlineLarge
 val Typography.headlineMediumCondensed: TextStyle
-    get() = headlineMedium.copy(
+    get() = if (headlineMedium.fontFamily == GoogleSansFlex) headlineMedium.copy(
         fontFamily = GoogleSansFlexHeadlineMediumCondensed,
         fontSize = 32.sp,
         lineHeight = 40.sp,
         letterSpacing = 0.sp
-    )
+    ) else headlineMedium
 val Typography.headlineSmallCondensed: TextStyle
-    get() = headlineSmall.copy(
+    get() = if (headlineSmall.fontFamily == GoogleSansFlex) headlineSmall.copy(
         fontFamily = GoogleSansFlexHeadlineSmallCondensed,
         fontSize = 28.sp,
         lineHeight = 36.sp,
         letterSpacing = 0.sp
-    )
+    ) else headlineSmall
 
 val Typography.titleLargeCondensed: TextStyle
-    get() = titleLarge.copy(
+    get() = if (titleLarge.fontFamily == GoogleSansFlex) titleLarge.copy(
         fontFamily = GoogleSansFlexTitleLargeCondensed,
         fontSize = 24.sp,
         lineHeight = 32.sp,
         letterSpacing = 0.15.sp
-    )
+    ) else titleLarge
 val Typography.titleMediumCondensed: TextStyle
-    get() = titleMedium.copy(
+    get() = if (titleMedium.fontFamily == GoogleSansFlex) titleMedium.copy(
         fontFamily = GoogleSansFlexTitleMediumCondensed,
         fontSize = 18.sp,
         lineHeight = 26.sp,
         letterSpacing = 0.2.sp
-    )
+    ) else titleMedium
 val Typography.titleSmallCondensed: TextStyle
-    get() = titleSmall.copy(
+    get() = if (titleSmall.fontFamily == GoogleSansFlex) titleSmall.copy(
         fontFamily = GoogleSansFlexTitleSmallCondensed,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp
-    )
+    ) else titleSmall
 
 val Typography.bodyLargeCondensed: TextStyle
-    get() = bodyLarge.copy(
+    get() = if (bodyLarge.fontFamily == GoogleSansFlex) bodyLarge.copy(
         fontFamily = GoogleSansFlexBodyLargeCondensed,
         fontSize = 18.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.6.sp
-    )
+    ) else bodyLarge
 val Typography.bodyMediumCondensed: TextStyle
-    get() = bodyMedium.copy(
+    get() = if (bodyMedium.fontFamily == GoogleSansFlex) bodyMedium.copy(
         fontFamily = GoogleSansFlexBodyMediumCondensed,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.4.sp
-    )
+    ) else bodyMedium
 val Typography.bodySmallCondensed: TextStyle
-    get() = bodySmall.copy(
+    get() = if (bodySmall.fontFamily == GoogleSansFlex) bodySmall.copy(
         fontFamily = GoogleSansFlexBodySmallCondensed,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.5.sp
-    )
+    ) else bodySmall
 
 val Typography.labelLargeCondensed: TextStyle
-    get() = labelLarge.copy(
+    get() = if (labelLarge.fontFamily == GoogleSansFlex) labelLarge.copy(
         fontFamily = GoogleSansFlexLabelLargeCondensed,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp
-    )
+    ) else labelLarge
 val Typography.labelMediumCondensed: TextStyle
-    get() = labelMedium.copy(
+    get() = if (labelMedium.fontFamily == GoogleSansFlex) labelMedium.copy(
         fontFamily = GoogleSansFlexLabelMediumCondensed,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.6.sp
-    )
+    ) else labelMedium
 val Typography.labelSmallCondensed: TextStyle
-    get() = labelSmall.copy(
+    get() = if (labelSmall.fontFamily == GoogleSansFlex) labelSmall.copy(
         fontFamily = GoogleSansFlexLabelSmallCondensed,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.6.sp
-    )
+    ) else labelSmall
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 val ExpressiveTypography = Typography.withEmphasizedStyles()

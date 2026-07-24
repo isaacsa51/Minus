@@ -35,6 +35,7 @@ const val RECURRENT_NOTIFICATION_HOUR_KEY_NAME = "recurrent_notification_hour"
 const val RECURRENT_NOTIFICATION_MINUTE_KEY_NAME = "recurrent_notification_minute"
 const val THEME_MODE_KEY_NAME = "theme_mode"
 const val TYPOGRAPHY_MODE_KEY_NAME = "typography_mode"
+const val LANGUAGE_KEY_NAME = "language"
 const val DYNAMIC_COLOR_KEY_NAME = "dynamic_color_enabled"
 const val CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME = "credit_quick_toggle_feature_enabled"
 const val CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME = "category_picker_direct_popup_enabled"
@@ -67,6 +68,7 @@ private val NOTIFICATION_HOUR = intPreferencesKey(NOTIFICATION_HOUR_KEY_NAME)
 private val NOTIFICATION_MINUTE = intPreferencesKey(NOTIFICATION_MINUTE_KEY_NAME)
 private val THEME_MODE = stringPreferencesKey(THEME_MODE_KEY_NAME)
 private val TYPOGRAPHY_MODE = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
+private val LANGUAGE = stringPreferencesKey(LANGUAGE_KEY_NAME)
 private val DYNAMIC_COLOR = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
 private val CREDIT_QUICK_TOGGLE_FEATURE_ENABLED =
     booleanPreferencesKey(CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME)
@@ -107,6 +109,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 themeMode = preferences[THEME_MODE]?.toThemeMode() ?: ThemeMode.SYSTEM,
                 typographyMode = preferences[TYPOGRAPHY_MODE]?.toTypographyMode()
                     ?: TypographyMode.EXPRESSIVE,
+                language = preferences[LANGUAGE] ?: "en",
                 dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false,
                 isCreditQuickToggleEnabled = preferences[CREDIT_QUICK_TOGGLE_FEATURE_ENABLED] ?: false,
                 recurrentPaymentsViewMode = RecurrentPaymentsViewMode.fromName(
@@ -230,6 +233,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setTypographyMode(mode: TypographyMode) {
         context.settingsDataStore.edit { preferences ->
             preferences[TYPOGRAPHY_MODE] = mode.name
+        }
+    }
+
+    override suspend fun setLanguage(language: String) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[LANGUAGE] = language
         }
     }
 

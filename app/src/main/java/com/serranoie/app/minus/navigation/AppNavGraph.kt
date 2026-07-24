@@ -11,7 +11,10 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -25,13 +28,12 @@ import com.serranoie.app.minus.presentation.ui.changelog.ChangelogHistoryViewMod
 import com.serranoie.app.minus.presentation.ui.home.MainScreen
 import com.serranoie.app.minus.presentation.ui.onboarding.OnboardingScreen
 import com.serranoie.app.minus.presentation.ui.settings.SettingsScreen
+import com.serranoie.app.minus.presentation.ui.settings.SettingsViewModel
+import com.serranoie.app.minus.presentation.ui.settings.appearance.AppearanceOptionsScreen
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportScreen
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.wallet.Wallet
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.getValue
 import logcat.logcat
 
 private const val TAG = "ISAAC:AppNavGraph"
@@ -187,9 +189,27 @@ fun AppNavGraph(
                 onNavigateToChangelog = {
                     navController.navigate(Screen.Changelog.route)
                 },
+                onNavigateToAppearance = {
+                    navController.navigate(Screen.Appearance.route)
+                },
                 onNavigateBack = {
                     navController.popBackStack()
                 },
+            )
+        }
+
+        composable(Screen.Appearance.route) {
+            val viewModel: SettingsViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            AppearanceOptionsScreen(
+                state = uiState,
+                onThemeChange = viewModel::onThemeChange,
+                onTypographyChange = viewModel::onTypographyChange,
+                onContrastChange = viewModel::onContrastChange,
+                onLanguageChange = viewModel::onLanguageChange,
+                onMaterialYouToggle = viewModel::onMaterialYouToggle,
+                onBack = { navController.popBackStack() }
             )
         }
 

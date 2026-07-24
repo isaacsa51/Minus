@@ -212,6 +212,10 @@
     <!-- Settings -->
     <string name="settings_title">設定</string>
     <string name="settings_section_appearance">外觀</string>
+    <string name="settings_section_language">語言</string>
+    <string name="settings_language_header">應用語言</string>
+    <string name="settings_language_currently_format">當前: %1$s</string>
+    <string name="settings_language_disclaimer">語言翻譯可能不準確。</string>
     <string name="settings_section_notifications">通知</string>
     <string name="settings_section_features">功能</string>
     <string name="settings_section_app_info">App 資訊</string>

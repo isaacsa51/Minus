@@ -211,8 +211,12 @@
     <string name="onboarding_finish_date_selector_budget_view_question">How do you want to view your budget?</string>
     <!-- Settings -->
     <string name="settings_title">Settings</string>
-    <string name="settings_section_appearance">Appearance</string>
-    <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_section_appearance">外観</string>
+    <string name="settings_section_language">言語</string>
+    <string name="settings_language_header">アプリの言語</string>
+    <string name="settings_language_currently_format">現在: %1$s</string>
+    <string name="settings_language_disclaimer">翻訳が不正確な場合があります。</string>
+    <string name="settings_section_notifications">通知</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>
     <string name="settings_section_data_backup">Data backup</string>

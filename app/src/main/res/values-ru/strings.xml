@@ -220,8 +220,12 @@
     <string name="onboarding_finish_date_selector_budget_view_question">How do you want to view your budget?</string>
     <!-- Settings -->
     <string name="settings_title">Settings</string>
-    <string name="settings_section_appearance">Appearance</string>
-    <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_section_appearance">Оформление</string>
+    <string name="settings_section_language">Язык</string>
+    <string name="settings_language_header">Язык приложения</string>
+    <string name="settings_language_currently_format">Текущий: %1$s</string>
+    <string name="settings_language_disclaimer">Переводы могут быть неточными.</string>
+    <string name="settings_section_notifications">Уведомления</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>
     <string name="settings_section_data_backup">Data backup</string>

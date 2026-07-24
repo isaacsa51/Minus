@@ -214,8 +214,12 @@
     <string name="onboarding_finish_date_selector_budget_view_question">How do you want to view your budget?</string>
     <!-- Settings -->
     <string name="settings_title">Settings</string>
-    <string name="settings_section_appearance">Appearance</string>
-    <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_section_appearance">दिखावट</string>
+    <string name="settings_section_language">भाषा</string>
+    <string name="settings_language_header">एप्लिकेशन की भाषा</string>
+    <string name="settings_language_currently_format">वर्तमान में: %1$s</string>
+    <string name="settings_language_disclaimer">भाषा अनुवाद गलत हो सकते हैं।</string>
+    <string name="settings_section_notifications">सूचनाएं</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>
     <string name="settings_section_data_backup">Data backup</string>

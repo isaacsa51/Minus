@@ -29,6 +29,7 @@ class ThemeManager @Inject constructor() {
 
     private fun DomainTypographyMode.toPresentationTypographyMode(): TypographyMode {
         return when (this) {
+            DomainTypographyMode.SYSTEM -> TypographyMode.SYSTEM
             DomainTypographyMode.DEFAULT -> TypographyMode.DEFAULT
             DomainTypographyMode.CONDENSED -> TypographyMode.CONDENSED
             DomainTypographyMode.EXPRESSIVE -> TypographyMode.EXPRESSIVE

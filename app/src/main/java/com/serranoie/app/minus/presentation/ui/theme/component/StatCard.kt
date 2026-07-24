@@ -111,6 +111,7 @@ fun StatCard(
                                 text = crossedValue,
                                 style = valueFontStyle.copy(fontWeight = FontWeight.Light),
                                 fontSize = valueFontSize * 0.8f,
+                                lineHeight = valueFontSize * 0.8f,
                                 color = crossColor,
                                 overflow = TextOverflow.Ellipsis,
                                 softWrap = false,
@@ -128,7 +129,9 @@ fun StatCard(
                             )
                             .censor(),
                         style = valueFontStyle,
+                        fontWeight = FontWeight.Medium,
                         fontSize = valueFontSize,
+                        lineHeight = valueFontSize,
                         overflow = TextOverflow.Ellipsis,
                         softWrap = false,
                         textAlign = when (horizontalAlignment) {
