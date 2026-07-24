@@ -60,6 +60,14 @@ private val pinkLightScheme = lightColorScheme(
     onError = PinkOnErrorLight,
     errorContainer = PinkErrorContainerLight,
     onErrorContainer = PinkOnErrorContainerLight,
+    surfaceDim = PinkSurfaceDimLight,
+    surfaceBright = PinkSurfaceBrightLight,
+    surfaceContainerLowest = PinkSurfaceContainerLowestLight,
+    surfaceContainerLow = PinkSurfaceContainerLowLight,
+    surfaceContainer = PinkSurfaceContainerLight,
+    surfaceContainerHigh = PinkSurfaceContainerHighLight,
+    surfaceContainerHighest = PinkSurfaceContainerHighestLight,
+    surfaceTint = PinkSurfaceTintLight,
 )
 
 private val pinkDarkScheme = darkColorScheme(
@@ -91,6 +99,14 @@ private val pinkDarkScheme = darkColorScheme(
     onError = PinkOnErrorDark,
     errorContainer = PinkErrorContainerDark,
     onErrorContainer = PinkOnErrorContainerDark,
+    surfaceDim = PinkSurfaceDimDark,
+    surfaceBright = PinkSurfaceBrightDark,
+    surfaceContainerLowest = PinkSurfaceContainerLowestDark,
+    surfaceContainerLow = PinkSurfaceContainerLowDark,
+    surfaceContainer = PinkSurfaceContainerDark,
+    surfaceContainerHigh = PinkSurfaceContainerHighDark,
+    surfaceContainerHighest = PinkSurfaceContainerHighestDark,
+    surfaceTint = PinkSurfaceTintDark,
 )
 
 private val pinkNeutralLightScheme = lightColorScheme(
@@ -122,6 +138,14 @@ private val pinkNeutralLightScheme = lightColorScheme(
     onError = PinkNeutralOnErrorLight,
     errorContainer = PinkNeutralErrorContainerLight,
     onErrorContainer = PinkNeutralOnErrorContainerLight,
+    surfaceDim = PinkNeutralSurfaceDimLight,
+    surfaceBright = PinkNeutralSurfaceBrightLight,
+    surfaceContainerLowest = PinkNeutralSurfaceContainerLowestLight,
+    surfaceContainerLow = PinkNeutralSurfaceContainerLowLight,
+    surfaceContainer = PinkNeutralSurfaceContainerLight,
+    surfaceContainerHigh = PinkNeutralSurfaceContainerHighLight,
+    surfaceContainerHighest = PinkNeutralSurfaceContainerHighestLight,
+    surfaceTint = PinkNeutralSurfaceTintLight,
 )
 
 private val pinkNeutralDarkScheme = darkColorScheme(
@@ -153,6 +177,14 @@ private val pinkNeutralDarkScheme = darkColorScheme(
     onError = PinkNeutralOnErrorDark,
     errorContainer = PinkNeutralErrorContainerDark,
     onErrorContainer = PinkNeutralOnErrorContainerDark,
+    surfaceDim = PinkNeutralSurfaceDimDark,
+    surfaceBright = PinkNeutralSurfaceBrightDark,
+    surfaceContainerLowest = PinkNeutralSurfaceContainerLowestDark,
+    surfaceContainerLow = PinkNeutralSurfaceContainerLowDark,
+    surfaceContainer = PinkNeutralSurfaceContainerDark,
+    surfaceContainerHigh = PinkNeutralSurfaceContainerHighDark,
+    surfaceContainerHighest = PinkNeutralSurfaceContainerHighestDark,
+    surfaceTint = PinkNeutralSurfaceTintDark,
 )
 
 private val orangeLightScheme = lightColorScheme(
@@ -184,6 +216,14 @@ private val orangeLightScheme = lightColorScheme(
     onError = OrangeOnErrorLight,
     errorContainer = OrangeErrorContainerLight,
     onErrorContainer = OrangeOnErrorContainerLight,
+    surfaceDim = OrangeSurfaceDimLight,
+    surfaceBright = OrangeSurfaceBrightLight,
+    surfaceContainerLowest = OrangeSurfaceContainerLowestLight,
+    surfaceContainerLow = OrangeSurfaceContainerLowLight,
+    surfaceContainer = OrangeSurfaceContainerLight,
+    surfaceContainerHigh = OrangeSurfaceContainerHighLight,
+    surfaceContainerHighest = OrangeSurfaceContainerHighestLight,
+    surfaceTint = OrangeSurfaceTintLight,
 )
 
 private val orangeDarkScheme = darkColorScheme(
@@ -215,6 +255,14 @@ private val orangeDarkScheme = darkColorScheme(
     onError = OrangeOnErrorDark,
     errorContainer = OrangeErrorContainerDark,
     onErrorContainer = OrangeOnErrorContainerDark,
+    surfaceDim = OrangeSurfaceDimDark,
+    surfaceBright = OrangeSurfaceBrightDark,
+    surfaceContainerLowest = OrangeSurfaceContainerLowestDark,
+    surfaceContainerLow = OrangeSurfaceContainerLowDark,
+    surfaceContainer = OrangeSurfaceContainerDark,
+    surfaceContainerHigh = OrangeSurfaceContainerHighDark,
+    surfaceContainerHighest = OrangeSurfaceContainerHighestDark,
+    surfaceTint = OrangeSurfaceTintDark,
 )
 
 private val orangeNeutralLightScheme = lightColorScheme(
@@ -246,6 +294,14 @@ private val orangeNeutralLightScheme = lightColorScheme(
     onError = OrangeNeutralOnErrorLight,
     errorContainer = OrangeNeutralErrorContainerLight,
     onErrorContainer = OrangeNeutralOnErrorContainerLight,
+    surfaceDim = OrangeNeutralSurfaceDimLight,
+    surfaceBright = OrangeNeutralSurfaceBrightLight,
+    surfaceContainerLowest = OrangeNeutralSurfaceContainerLowestLight,
+    surfaceContainerLow = OrangeNeutralSurfaceContainerLowLight,
+    surfaceContainer = OrangeNeutralSurfaceContainerLight,
+    surfaceContainerHigh = OrangeNeutralSurfaceContainerHighLight,
+    surfaceContainerHighest = OrangeNeutralSurfaceContainerHighestLight,
+    surfaceTint = OrangeNeutralSurfaceTintLight,
 )
 
 private val orangeNeutralDarkScheme = darkColorScheme(
@@ -277,6 +333,14 @@ private val orangeNeutralDarkScheme = darkColorScheme(
     onError = OrangeNeutralOnErrorDark,
     errorContainer = OrangeNeutralErrorContainerDark,
     onErrorContainer = OrangeNeutralOnErrorContainerDark,
+    surfaceDim = OrangeNeutralSurfaceDimDark,
+    surfaceBright = OrangeNeutralSurfaceBrightDark,
+    surfaceContainerLowest = OrangeNeutralSurfaceContainerLowestDark,
+    surfaceContainerLow = OrangeNeutralSurfaceContainerLowDark,
+    surfaceContainer = OrangeNeutralSurfaceContainerDark,
+    surfaceContainerHigh = OrangeNeutralSurfaceContainerHighDark,
+    surfaceContainerHighest = OrangeNeutralSurfaceContainerHighestDark,
+    surfaceTint = OrangeNeutralSurfaceTintDark,
 )
 
 private val yellowLightScheme = lightColorScheme(
@@ -308,6 +372,14 @@ private val yellowLightScheme = lightColorScheme(
     onError = YellowOnErrorLight,
     errorContainer = YellowErrorContainerLight,
     onErrorContainer = YellowOnErrorContainerLight,
+    surfaceDim = YellowSurfaceDimLight,
+    surfaceBright = YellowSurfaceBrightLight,
+    surfaceContainerLowest = YellowSurfaceContainerLowestLight,
+    surfaceContainerLow = YellowSurfaceContainerLowLight,
+    surfaceContainer = YellowSurfaceContainerLight,
+    surfaceContainerHigh = YellowSurfaceContainerHighLight,
+    surfaceContainerHighest = YellowSurfaceContainerHighestLight,
+    surfaceTint = YellowSurfaceTintLight,
 )
 
 private val yellowDarkScheme = darkColorScheme(
@@ -339,6 +411,14 @@ private val yellowDarkScheme = darkColorScheme(
     onError = YellowOnErrorDark,
     errorContainer = YellowErrorContainerDark,
     onErrorContainer = YellowOnErrorContainerDark,
+    surfaceDim = YellowSurfaceDimDark,
+    surfaceBright = YellowSurfaceBrightDark,
+    surfaceContainerLowest = YellowSurfaceContainerLowestDark,
+    surfaceContainerLow = YellowSurfaceContainerLowDark,
+    surfaceContainer = YellowSurfaceContainerDark,
+    surfaceContainerHigh = YellowSurfaceContainerHighDark,
+    surfaceContainerHighest = YellowSurfaceContainerHighestDark,
+    surfaceTint = YellowSurfaceTintDark,
 )
 
 private val yellowNeutralLightScheme = lightColorScheme(
@@ -370,6 +450,14 @@ private val yellowNeutralLightScheme = lightColorScheme(
     onError = YellowNeutralOnErrorLight,
     errorContainer = YellowNeutralErrorContainerLight,
     onErrorContainer = YellowNeutralOnErrorContainerLight,
+    surfaceDim = YellowNeutralSurfaceDimLight,
+    surfaceBright = YellowNeutralSurfaceBrightLight,
+    surfaceContainerLowest = YellowNeutralSurfaceContainerLowestLight,
+    surfaceContainerLow = YellowNeutralSurfaceContainerLowLight,
+    surfaceContainer = YellowNeutralSurfaceContainerLight,
+    surfaceContainerHigh = YellowNeutralSurfaceContainerHighLight,
+    surfaceContainerHighest = YellowNeutralSurfaceContainerHighestLight,
+    surfaceTint = YellowNeutralSurfaceTintLight,
 )
 
 private val yellowNeutralDarkScheme = darkColorScheme(
@@ -401,6 +489,14 @@ private val yellowNeutralDarkScheme = darkColorScheme(
     onError = YellowNeutralOnErrorDark,
     errorContainer = YellowNeutralErrorContainerDark,
     onErrorContainer = YellowNeutralOnErrorContainerDark,
+    surfaceDim = YellowNeutralSurfaceDimDark,
+    surfaceBright = YellowNeutralSurfaceBrightDark,
+    surfaceContainerLowest = YellowNeutralSurfaceContainerLowestDark,
+    surfaceContainerLow = YellowNeutralSurfaceContainerLowDark,
+    surfaceContainer = YellowNeutralSurfaceContainerDark,
+    surfaceContainerHigh = YellowNeutralSurfaceContainerHighDark,
+    surfaceContainerHighest = YellowNeutralSurfaceContainerHighestDark,
+    surfaceTint = YellowNeutralSurfaceTintDark,
 )
 
 private val aquaLightScheme = lightColorScheme(
@@ -432,6 +528,14 @@ private val aquaLightScheme = lightColorScheme(
     onError = AquaOnErrorLight,
     errorContainer = AquaErrorContainerLight,
     onErrorContainer = AquaOnErrorContainerLight,
+    surfaceDim = AquaSurfaceDimLight,
+    surfaceBright = AquaSurfaceBrightLight,
+    surfaceContainerLowest = AquaSurfaceContainerLowestLight,
+    surfaceContainerLow = AquaSurfaceContainerLowLight,
+    surfaceContainer = AquaSurfaceContainerLight,
+    surfaceContainerHigh = AquaSurfaceContainerHighLight,
+    surfaceContainerHighest = AquaSurfaceContainerHighestLight,
+    surfaceTint = AquaSurfaceTintLight,
 )
 
 private val aquaDarkScheme = darkColorScheme(
@@ -463,6 +567,14 @@ private val aquaDarkScheme = darkColorScheme(
     onError = AquaOnErrorDark,
     errorContainer = AquaErrorContainerDark,
     onErrorContainer = AquaOnErrorContainerDark,
+    surfaceDim = AquaSurfaceDimDark,
+    surfaceBright = AquaSurfaceBrightDark,
+    surfaceContainerLowest = AquaSurfaceContainerLowestDark,
+    surfaceContainerLow = AquaSurfaceContainerLowDark,
+    surfaceContainer = AquaSurfaceContainerDark,
+    surfaceContainerHigh = AquaSurfaceContainerHighDark,
+    surfaceContainerHighest = AquaSurfaceContainerHighestDark,
+    surfaceTint = AquaSurfaceTintDark,
 )
 
 private val aquaNeutralLightScheme = lightColorScheme(
@@ -494,6 +606,14 @@ private val aquaNeutralLightScheme = lightColorScheme(
     onError = AquaNeutralOnErrorLight,
     errorContainer = AquaNeutralErrorContainerLight,
     onErrorContainer = AquaNeutralOnErrorContainerLight,
+    surfaceDim = AquaNeutralSurfaceDimLight,
+    surfaceBright = AquaNeutralSurfaceBrightLight,
+    surfaceContainerLowest = AquaNeutralSurfaceContainerLowestLight,
+    surfaceContainerLow = AquaNeutralSurfaceContainerLowLight,
+    surfaceContainer = AquaNeutralSurfaceContainerLight,
+    surfaceContainerHigh = AquaNeutralSurfaceContainerHighLight,
+    surfaceContainerHighest = AquaNeutralSurfaceContainerHighestLight,
+    surfaceTint = AquaNeutralSurfaceTintLight,
 )
 
 private val aquaNeutralDarkScheme = darkColorScheme(
@@ -525,6 +645,14 @@ private val aquaNeutralDarkScheme = darkColorScheme(
     onError = AquaNeutralOnErrorDark,
     errorContainer = AquaNeutralErrorContainerDark,
     onErrorContainer = AquaNeutralOnErrorContainerDark,
+    surfaceDim = AquaNeutralSurfaceDimDark,
+    surfaceBright = AquaNeutralSurfaceBrightDark,
+    surfaceContainerLowest = AquaNeutralSurfaceContainerLowestDark,
+    surfaceContainerLow = AquaNeutralSurfaceContainerLowDark,
+    surfaceContainer = AquaNeutralSurfaceContainerDark,
+    surfaceContainerHigh = AquaNeutralSurfaceContainerHighDark,
+    surfaceContainerHighest = AquaNeutralSurfaceContainerHighestDark,
+    surfaceTint = AquaNeutralSurfaceTintDark,
 )
 
 private val cyanLightScheme = lightColorScheme(
@@ -556,6 +684,14 @@ private val cyanLightScheme = lightColorScheme(
     onError = CyanOnErrorLight,
     errorContainer = CyanErrorContainerLight,
     onErrorContainer = CyanOnErrorContainerLight,
+    surfaceDim = CyanSurfaceDimLight,
+    surfaceBright = CyanSurfaceBrightLight,
+    surfaceContainerLowest = CyanSurfaceContainerLowestLight,
+    surfaceContainerLow = CyanSurfaceContainerLowLight,
+    surfaceContainer = CyanSurfaceContainerLight,
+    surfaceContainerHigh = CyanSurfaceContainerHighLight,
+    surfaceContainerHighest = CyanSurfaceContainerHighestLight,
+    surfaceTint = CyanSurfaceTintLight,
 )
 
 private val cyanDarkScheme = darkColorScheme(
@@ -587,6 +723,14 @@ private val cyanDarkScheme = darkColorScheme(
     onError = CyanOnErrorDark,
     errorContainer = CyanErrorContainerDark,
     onErrorContainer = CyanOnErrorContainerDark,
+    surfaceDim = CyanSurfaceDimDark,
+    surfaceBright = CyanSurfaceBrightDark,
+    surfaceContainerLowest = CyanSurfaceContainerLowestDark,
+    surfaceContainerLow = CyanSurfaceContainerLowDark,
+    surfaceContainer = CyanSurfaceDark,
+    surfaceContainerHigh = CyanSurfaceContainerHighDark,
+    surfaceContainerHighest = CyanSurfaceContainerHighestDark,
+    surfaceTint = CyanSurfaceTintDark,
 )
 
 private val cyanNeutralLightScheme = lightColorScheme(
@@ -618,6 +762,14 @@ private val cyanNeutralLightScheme = lightColorScheme(
     onError = CyanNeutralOnErrorLight,
     errorContainer = CyanNeutralErrorContainerLight,
     onErrorContainer = CyanNeutralOnErrorContainerLight,
+    surfaceDim = CyanNeutralSurfaceDimLight,
+    surfaceBright = CyanNeutralSurfaceBrightLight,
+    surfaceContainerLowest = CyanNeutralSurfaceContainerLowestLight,
+    surfaceContainerLow = CyanNeutralSurfaceContainerLowLight,
+    surfaceContainer = CyanNeutralSurfaceContainerLight,
+    surfaceContainerHigh = CyanNeutralSurfaceContainerHighLight,
+    surfaceContainerHighest = CyanNeutralSurfaceContainerHighestLight,
+    surfaceTint = CyanNeutralSurfaceTintLight,
 )
 
 private val cyanNeutralDarkScheme = darkColorScheme(
@@ -649,6 +801,14 @@ private val cyanNeutralDarkScheme = darkColorScheme(
     onError = CyanNeutralOnErrorDark,
     errorContainer = CyanNeutralErrorContainerDark,
     onErrorContainer = CyanNeutralOnErrorContainerDark,
+    surfaceDim = CyanNeutralSurfaceDimDark,
+    surfaceBright = CyanNeutralSurfaceBrightDark,
+    surfaceContainerLowest = CyanNeutralSurfaceContainerLowestDark,
+    surfaceContainerLow = CyanNeutralSurfaceContainerLowDark,
+    surfaceContainer = CyanNeutralSurfaceContainerDark,
+    surfaceContainerHigh = CyanNeutralSurfaceContainerHighDark,
+    surfaceContainerHighest = CyanNeutralSurfaceContainerHighestDark,
+    surfaceTint = CyanNeutralSurfaceTintDark,
 )
 
 private val blueLightScheme = lightColorScheme(
@@ -680,6 +840,14 @@ private val blueLightScheme = lightColorScheme(
     onError = BlueOnErrorLight,
     errorContainer = BlueErrorContainerLight,
     onErrorContainer = BlueOnErrorContainerLight,
+    surfaceDim = BlueSurfaceDimLight,
+    surfaceBright = BlueSurfaceBrightLight,
+    surfaceContainerLowest = BlueSurfaceContainerLowestLight,
+    surfaceContainerLow = BlueSurfaceContainerLowLight,
+    surfaceContainer = BlueSurfaceContainerLight,
+    surfaceContainerHigh = BlueSurfaceContainerHighLight,
+    surfaceContainerHighest = BlueSurfaceContainerHighestLight,
+    surfaceTint = BlueSurfaceTintLight,
 )
 
 private val blueDarkScheme = darkColorScheme(
@@ -711,6 +879,14 @@ private val blueDarkScheme = darkColorScheme(
     onError = BlueOnErrorDark,
     errorContainer = BlueErrorContainerDark,
     onErrorContainer = BlueOnErrorContainerDark,
+    surfaceDim = BlueSurfaceDimDark,
+    surfaceBright = BlueSurfaceBrightDark,
+    surfaceContainerLowest = BlueSurfaceContainerLowestDark,
+    surfaceContainerLow = BlueSurfaceContainerLowDark,
+    surfaceContainer = BlueSurfaceContainerDark,
+    surfaceContainerHigh = BlueSurfaceContainerHighDark,
+    surfaceContainerHighest = BlueSurfaceContainerHighestDark,
+    surfaceTint = BlueSurfaceTintDark,
 )
 
 private val blueNeutralLightScheme = lightColorScheme(
@@ -742,6 +918,14 @@ private val blueNeutralLightScheme = lightColorScheme(
     onError = BlueNeutralOnErrorLight,
     errorContainer = BlueNeutralErrorContainerLight,
     onErrorContainer = BlueNeutralOnErrorContainerLight,
+    surfaceDim = BlueNeutralSurfaceDimLight,
+    surfaceBright = BlueNeutralSurfaceBrightLight,
+    surfaceContainerLowest = BlueNeutralSurfaceContainerLowestLight,
+    surfaceContainerLow = BlueNeutralSurfaceContainerLowLight,
+    surfaceContainer = BlueNeutralSurfaceContainerLight,
+    surfaceContainerHigh = BlueNeutralSurfaceContainerHighLight,
+    surfaceContainerHighest = BlueNeutralSurfaceContainerHighestLight,
+    surfaceTint = BlueNeutralSurfaceTintLight,
 )
 
 private val blueNeutralDarkScheme = darkColorScheme(
@@ -773,13 +957,21 @@ private val blueNeutralDarkScheme = darkColorScheme(
     onError = BlueNeutralOnErrorDark,
     errorContainer = BlueNeutralErrorContainerDark,
     onErrorContainer = BlueNeutralOnErrorContainerDark,
+    surfaceDim = BlueNeutralSurfaceDimDark,
+    surfaceBright = BlueNeutralSurfaceBrightDark,
+    surfaceContainerLowest = BlueNeutralSurfaceContainerLowestDark,
+    surfaceContainerLow = BlueNeutralSurfaceContainerLowDark,
+    surfaceContainer = BlueNeutralSurfaceContainerDark,
+    surfaceContainerHigh = BlueNeutralSurfaceContainerHighDark,
+    surfaceContainerHighest = BlueNeutralSurfaceContainerHighestDark,
+    surfaceTint = BlueNeutralSurfaceTintDark,
 )
 
 private val purpleLightScheme = lightColorScheme(
     primary = PurplePrimaryLight,
     onPrimary = PurpleOnPrimaryLight,
     primaryContainer = PurplePrimaryContainerLight,
-    onPrimaryContainer = PurplePrimaryContainerLight,
+    onPrimaryContainer = PurpleOnPrimaryContainerLight,
     inversePrimary = PurpleInversePrimaryLight,
     secondary = PurpleSecondaryLight,
     onSecondary = PurpleOnSecondaryLight,
@@ -804,13 +996,21 @@ private val purpleLightScheme = lightColorScheme(
     onError = PurpleOnErrorLight,
     errorContainer = PurpleErrorContainerLight,
     onErrorContainer = PurpleOnErrorContainerLight,
+    surfaceDim = PurpleSurfaceDimLight,
+    surfaceBright = PurpleSurfaceBrightLight,
+    surfaceContainerLowest = PurpleSurfaceContainerLowestLight,
+    surfaceContainerLow = PurpleSurfaceContainerLowLight,
+    surfaceContainer = PurpleSurfaceContainerLight,
+    surfaceContainerHigh = PurpleSurfaceContainerHighLight,
+    surfaceContainerHighest = PurpleSurfaceContainerHighestLight,
+    surfaceTint = PurpleSurfaceTintLight,
 )
 
 private val purpleDarkScheme = darkColorScheme(
     primary = PurplePrimaryDark,
     onPrimary = PurpleOnPrimaryDark,
     primaryContainer = PurplePrimaryContainerDark,
-    onPrimaryContainer = PurplePrimaryContainerDark,
+    onPrimaryContainer = PurpleOnPrimaryContainerDark,
     inversePrimary = PurpleInversePrimaryDark,
     secondary = PurpleSecondaryDark,
     onSecondary = PurpleOnSecondaryDark,
@@ -834,7 +1034,15 @@ private val purpleDarkScheme = darkColorScheme(
     error = PurpleErrorDark,
     onError = PurpleOnErrorDark,
     errorContainer = PurpleErrorContainerDark,
-    onErrorContainer = PurpleErrorContainerDark,
+    onErrorContainer = PurpleOnErrorContainerDark,
+    surfaceDim = PurpleSurfaceDimDark,
+    surfaceBright = PurpleSurfaceBrightDark,
+    surfaceContainerLowest = PurpleSurfaceContainerLowestDark,
+    surfaceContainerLow = PurpleSurfaceContainerLowDark,
+    surfaceContainer = PurpleSurfaceContainerDark,
+    surfaceContainerHigh = PurpleSurfaceContainerHighDark,
+    surfaceContainerHighest = PurpleSurfaceContainerHighestDark,
+    surfaceTint = PurpleSurfaceTintDark,
 )
 
 private val purpleNeutralLightScheme = lightColorScheme(
@@ -866,6 +1074,14 @@ private val purpleNeutralLightScheme = lightColorScheme(
     onError = PurpleNeutralOnErrorLight,
     errorContainer = PurpleNeutralErrorContainerLight,
     onErrorContainer = PurpleNeutralOnErrorContainerLight,
+    surfaceDim = PurpleNeutralSurfaceDimLight,
+    surfaceBright = PurpleNeutralSurfaceBrightLight,
+    surfaceContainerLowest = PurpleNeutralSurfaceContainerLowestLight,
+    surfaceContainerLow = PurpleNeutralSurfaceContainerLowLight,
+    surfaceContainer = PurpleNeutralSurfaceContainerLight,
+    surfaceContainerHigh = PurpleNeutralSurfaceContainerHighLight,
+    surfaceContainerHighest = PurpleNeutralSurfaceContainerHighestLight,
+    surfaceTint = PurpleNeutralSurfaceTintLight,
 )
 
 private val purpleNeutralDarkScheme = darkColorScheme(
@@ -897,6 +1113,14 @@ private val purpleNeutralDarkScheme = darkColorScheme(
     onError = PurpleNeutralOnErrorDark,
     errorContainer = PurpleNeutralErrorContainerDark,
     onErrorContainer = PurpleNeutralOnErrorContainerDark,
+    surfaceDim = PurpleNeutralSurfaceDimDark,
+    surfaceBright = PurpleNeutralSurfaceBrightDark,
+    surfaceContainerLowest = PurpleNeutralSurfaceContainerLowestDark,
+    surfaceContainerLow = PurpleNeutralSurfaceContainerLowDark,
+    surfaceContainer = PurpleNeutralSurfaceContainerDark,
+    surfaceContainerHigh = PurpleNeutralSurfaceContainerHighDark,
+    surfaceContainerHighest = PurpleNeutralSurfaceContainerHighestDark,
+    surfaceTint = PurpleNeutralSurfaceTintDark,
 )
 
 private val redLightScheme = lightColorScheme(
@@ -928,6 +1152,14 @@ private val redLightScheme = lightColorScheme(
     onError = RedOnErrorLight,
     errorContainer = RedErrorContainerLight,
     onErrorContainer = RedOnErrorContainerLight,
+    surfaceDim = RedSurfaceDimLight,
+    surfaceBright = RedSurfaceBrightLight,
+    surfaceContainerLowest = RedSurfaceContainerLowestLight,
+    surfaceContainerLow = RedSurfaceContainerLowLight,
+    surfaceContainer = RedSurfaceContainerLight,
+    surfaceContainerHigh = RedSurfaceContainerHighLight,
+    surfaceContainerHighest = RedSurfaceContainerHighestLight,
+    surfaceTint = RedSurfaceTintLight,
 )
 
 private val redDarkScheme = darkColorScheme(
@@ -959,6 +1191,14 @@ private val redDarkScheme = darkColorScheme(
     onError = RedOnErrorDark,
     errorContainer = RedErrorContainerDark,
     onErrorContainer = RedOnErrorContainerDark,
+    surfaceDim = RedSurfaceDimDark,
+    surfaceBright = RedSurfaceBrightDark,
+    surfaceContainerLowest = RedSurfaceContainerLowestDark,
+    surfaceContainerLow = RedSurfaceContainerLowDark,
+    surfaceContainer = RedSurfaceContainerDark,
+    surfaceContainerHigh = RedSurfaceContainerHighDark,
+    surfaceContainerHighest = RedSurfaceContainerHighestDark,
+    surfaceTint = RedSurfaceTintDark,
 )
 
 private val redNeutralLightScheme = lightColorScheme(
@@ -990,6 +1230,14 @@ private val redNeutralLightScheme = lightColorScheme(
     onError = RedNeutralOnErrorLight,
     errorContainer = RedNeutralErrorContainerLight,
     onErrorContainer = RedNeutralOnErrorContainerLight,
+    surfaceDim = RedNeutralSurfaceDimLight,
+    surfaceBright = RedNeutralSurfaceBrightLight,
+    surfaceContainerLowest = RedNeutralSurfaceContainerLowestLight,
+    surfaceContainerLow = RedNeutralSurfaceContainerLowLight,
+    surfaceContainer = RedNeutralSurfaceContainerLight,
+    surfaceContainerHigh = RedNeutralSurfaceContainerHighLight,
+    surfaceContainerHighest = RedNeutralSurfaceContainerHighestLight,
+    surfaceTint = RedNeutralSurfaceTintLight,
 )
 
 private val redNeutralDarkScheme = darkColorScheme(
@@ -1021,6 +1269,14 @@ private val redNeutralDarkScheme = darkColorScheme(
     onError = RedNeutralOnErrorDark,
     errorContainer = RedNeutralErrorContainerDark,
     onErrorContainer = RedNeutralOnErrorContainerDark,
+    surfaceDim = RedNeutralSurfaceDimDark,
+    surfaceBright = RedNeutralSurfaceBrightDark,
+    surfaceContainerLowest = RedNeutralSurfaceContainerLowestDark,
+    surfaceContainerLow = RedNeutralSurfaceContainerLowDark,
+    surfaceContainer = RedNeutralSurfaceContainerDark,
+    surfaceContainerHigh = RedNeutralSurfaceContainerHighDark,
+    surfaceContainerHighest = RedNeutralSurfaceContainerHighestDark,
+    surfaceTint = RedNeutralSurfaceTintDark,
 )
 
 private val greenLightScheme = lightColorScheme(
@@ -1051,7 +1307,15 @@ private val greenLightScheme = lightColorScheme(
     error = GreenErrorLight,
     onError = GreenOnErrorLight,
     errorContainer = GreenErrorContainerLight,
-    onErrorContainer = GreenErrorContainerLight,
+    onErrorContainer = GreenOnErrorContainerLight,
+    surfaceDim = GreenSurfaceDimLight,
+    surfaceBright = GreenSurfaceBrightLight,
+    surfaceContainerLowest = GreenSurfaceContainerLowestLight,
+    surfaceContainerLow = GreenSurfaceContainerLowLight,
+    surfaceContainer = GreenSurfaceContainerLight,
+    surfaceContainerHigh = GreenSurfaceContainerHighLight,
+    surfaceContainerHighest = GreenSurfaceContainerHighestLight,
+    surfaceTint = GreenSurfaceTintLight,
 )
 
 private val greenDarkScheme = darkColorScheme(
@@ -1082,5 +1346,13 @@ private val greenDarkScheme = darkColorScheme(
     error = GreenErrorDark,
     onError = GreenOnErrorDark,
     errorContainer = GreenErrorContainerDark,
-    onErrorContainer = GreenErrorContainerDark,
+    onErrorContainer = GreenOnErrorContainerDark,
+    surfaceDim = GreenSurfaceDimDark,
+    surfaceBright = GreenSurfaceBrightDark,
+    surfaceContainerLowest = GreenSurfaceContainerLowestDark,
+    surfaceContainerLow = GreenSurfaceContainerLowDark,
+    surfaceContainer = GreenSurfaceContainerDark,
+    surfaceContainerHigh = GreenSurfaceContainerHighDark,
+    surfaceContainerHighest = GreenSurfaceContainerHighestDark,
+    surfaceTint = GreenSurfaceTintDark,
 )
