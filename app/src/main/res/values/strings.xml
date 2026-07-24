@@ -269,6 +269,19 @@
     <string name="settings_contrast_high">High</string>
     <string name="settings_typography_condensed">Condensed</string>
     <string name="settings_typography_expressive">Expressive</string>
+    <string name="settings_language_en" translatable="false">English</string>
+    <string name="settings_language_de" translatable="false">Deutsch</string>
+    <string name="settings_language_el" translatable="false">Ελληνικά</string>
+    <string name="settings_language_es" translatable="false">Español</string>
+    <string name="settings_language_fr" translatable="false">Français</string>
+    <string name="settings_language_hi" translatable="false">हिन्दी</string>
+    <string name="settings_language_it" translatable="false">Italiano</string>
+    <string name="settings_language_ja" translatable="false">日本語</string>
+    <string name="settings_language_ko" translatable="false">한국어</string>
+    <string name="settings_language_pt" translatable="false">Português</string>
+    <string name="settings_language_ru" translatable="false">Русский</string>
+    <string name="settings_language_zh" translatable="false">中文</string>
+    <string name="settings_color_scheme_title">App Color Scheme</string>
     <string name="settings_section_notifications">Notifications</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>

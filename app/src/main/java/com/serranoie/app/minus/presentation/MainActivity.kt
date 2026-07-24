@@ -63,6 +63,7 @@ import com.serranoie.app.minus.data.repository.SETTINGS_DATASTORE_NAME
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.data.repository.THEME_MODE_KEY_NAME
 import com.serranoie.app.minus.data.repository.TYPOGRAPHY_MODE_KEY_NAME
+import com.serranoie.app.minus.data.repository.COLOR_SCHEME_KEY_NAME
 import com.serranoie.app.minus.data.repository.LANGUAGE_KEY_NAME
 import com.serranoie.app.minus.data.repository.ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME
 import com.serranoie.app.minus.data.repository.ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME
@@ -93,6 +94,7 @@ import javax.inject.Inject
 val Context.settingsDataStore by preferencesDataStore(SETTINGS_DATASTORE_NAME)
 var Context.appTheme by mutableStateOf(ThemeMode.SYSTEM)
 var Context.appTypography by mutableStateOf(TypographyMode.EXPRESSIVE)
+var Context.appColorScheme by mutableStateOf(com.serranoie.app.minus.domain.model.AppColorScheme.BRAND)
 var Context.appContrast by mutableStateOf(ContrastMode.NORMAL)
 var Context.dynamicColorEnabled by mutableStateOf(false)
 
@@ -107,6 +109,7 @@ val RECURRENT_NOTIFICATION_HOUR_KEY = intPreferencesKey(RECURRENT_NOTIFICATION_H
 val RECURRENT_NOTIFICATION_MINUTE_KEY = intPreferencesKey(RECURRENT_NOTIFICATION_MINUTE_KEY_NAME)
 val THEME_MODE_KEY = stringPreferencesKey(THEME_MODE_KEY_NAME)
 val TYPOGRAPHY_MODE_KEY = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
+val COLOR_SCHEME_KEY = stringPreferencesKey(COLOR_SCHEME_KEY_NAME)
 val LANGUAGE_KEY = stringPreferencesKey(LANGUAGE_KEY_NAME)
 val CONTRAST_MODE_KEY = stringPreferencesKey("contrast_mode")
 val DYNAMIC_COLOR_KEY = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)

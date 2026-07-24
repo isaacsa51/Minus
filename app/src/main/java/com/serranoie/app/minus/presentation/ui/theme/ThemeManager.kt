@@ -4,6 +4,7 @@ import android.content.Context
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.dynamicColorEnabled
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,6 +17,7 @@ class ThemeManager @Inject constructor() {
     fun applyUserSettings(context: Context, settings: UserSettings) {
         context.appTheme = settings.themeMode.toPresentationThemeMode()
         context.appTypography = settings.typographyMode.toPresentationTypographyMode()
+        context.appColorScheme = settings.colorScheme
         context.dynamicColorEnabled = settings.dynamicColorEnabled
     }
 

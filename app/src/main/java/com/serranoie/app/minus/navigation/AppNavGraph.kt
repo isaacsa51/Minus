@@ -207,6 +207,7 @@ fun AppNavGraph(
                 onThemeChange = viewModel::onThemeChange,
                 onTypographyChange = viewModel::onTypographyChange,
                 onContrastChange = viewModel::onContrastChange,
+                onColorSchemeChange = viewModel::onColorSchemeChange,
                 onLanguageChange = viewModel::onLanguageChange,
                 onMaterialYouToggle = viewModel::onMaterialYouToggle,
                 onBack = { navController.popBackStack() }

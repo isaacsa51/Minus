@@ -31,6 +31,7 @@ import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
 import com.serranoie.app.minus.presentation.appContrast
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.dynamicColorEnabled
 import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
@@ -59,6 +60,7 @@ data class SettingsUiState(
     val currentTheme: String = "System",
     val currentTypography: String = "Expressive",
     val currentContrast: String = "Normal",
+    val currentColorScheme: com.serranoie.app.minus.domain.model.AppColorScheme = com.serranoie.app.minus.domain.model.AppColorScheme.BRAND,
     val currentLanguage: String = "English",
     val isMaterialYouEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,
@@ -163,6 +165,7 @@ class SettingsViewModel @Inject constructor(
                             ContrastMode.HIGH -> "High"
                             else -> "Normal"
                         },
+                        currentColorScheme = settings.colorScheme,
                         isMaterialYouEnabled = settings.dynamicColorEnabled,
                         currentLanguage = settings.language,
                         recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
@@ -245,6 +248,14 @@ class SettingsViewModel @Inject constructor(
             context.settingsDataStore.edit { prefs ->
                 prefs[CONTRAST_MODE_KEY] = newMode.toString()
             }
+        }
+    }
+
+    fun onColorSchemeChange(colorScheme: com.serranoie.app.minus.domain.model.AppColorScheme) {
+        context.appColorScheme = colorScheme
+        _uiState.update { it.copy(currentColorScheme = colorScheme) }
+        viewModelScope.launch {
+            settingsRepository.setAppColorScheme(colorScheme)
         }
     }
 

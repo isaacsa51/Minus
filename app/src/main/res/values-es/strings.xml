@@ -228,6 +228,7 @@
     <string name="settings_contrast_high">Alto</string>
     <string name="settings_typography_condensed">Condensada</string>
     <string name="settings_typography_expressive">Expresiva</string>
+    <string name="settings_color_scheme_title">Esquema de color</string>
     <string name="settings_section_notifications">Notificaciones</string>
     <string name="settings_section_features">Funciones</string>
     <string name="settings_section_app_info">Información de la aplicación</string>
