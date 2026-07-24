@@ -67,6 +67,7 @@ private val lightScheme = lightColorScheme(
     surfaceContainer = surfaceContainerLight,
     surfaceContainerHigh = surfaceContainerHighLight,
     surfaceContainerHighest = surfaceContainerHighestLight,
+    surfaceTint = primaryLight,
 )
 
 private val darkScheme = darkColorScheme(
@@ -105,6 +106,7 @@ private val darkScheme = darkColorScheme(
     surfaceContainer = surfaceContainerDark,
     surfaceContainerHigh = surfaceContainerHighDark,
     surfaceContainerHighest = surfaceContainerHighestDark,
+    surfaceTint = primaryDark,
 )
 
 private val mediumContrastLightColorScheme = lightColorScheme(
@@ -143,6 +145,7 @@ private val mediumContrastLightColorScheme = lightColorScheme(
     surfaceContainer = surfaceContainerLightMediumContrast,
     surfaceContainerHigh = surfaceContainerHighLightMediumContrast,
     surfaceContainerHighest = surfaceContainerHighestLightMediumContrast,
+    surfaceTint = primaryLightMediumContrast,
 )
 
 private val highContrastLightColorScheme = lightColorScheme(
@@ -181,6 +184,7 @@ private val highContrastLightColorScheme = lightColorScheme(
     surfaceContainer = surfaceContainerLightHighContrast,
     surfaceContainerHigh = surfaceContainerHighLightHighContrast,
     surfaceContainerHighest = surfaceContainerHighestLightHighContrast,
+    surfaceTint = primaryLightHighContrast,
 )
 
 private val mediumContrastDarkColorScheme = darkColorScheme(
@@ -219,6 +223,7 @@ private val mediumContrastDarkColorScheme = darkColorScheme(
     surfaceContainer = surfaceContainerDarkMediumContrast,
     surfaceContainerHigh = surfaceContainerHighDarkMediumContrast,
     surfaceContainerHighest = surfaceContainerHighestDarkMediumContrast,
+    surfaceTint = primaryDarkMediumContrast,
 )
 
 private val highContrastDarkColorScheme = darkColorScheme(
@@ -257,6 +262,7 @@ private val highContrastDarkColorScheme = darkColorScheme(
     surfaceContainer = surfaceContainerDarkHighContrast,
     surfaceContainerHigh = surfaceContainerHighDarkHighContrast,
     surfaceContainerHighest = surfaceContainerHighestDarkHighContrast,
+    surfaceTint = primaryDarkHighContrast,
 )
 
 @Composable
@@ -312,29 +318,4 @@ fun MinusTheme(
         typography = typography,
         content = content
     )
-}
-
-suspend fun switchTheme(context: Context, mode: ThemeMode) {
-    context.settingsDataStore.edit {
-        it[THEME_MODE_KEY] = mode.toString()
-    }
-    context.appTheme = mode
-}
-
-fun syncTheme(context: Context) {
-    val currentValue = runBlocking { context.settingsDataStore.data.first() }
-
-    val mode = ThemeMode.valueOf(
-        currentValue[THEME_MODE_KEY] ?: ThemeMode.SYSTEM.toString()
-    )
-    val typographyMode = TypographyMode.valueOf(
-        currentValue[TYPOGRAPHY_MODE_KEY] ?: TypographyMode.EXPRESSIVE.toString()
-    )
-    val contrastMode = ContrastMode.valueOf(
-        currentValue[CONTRAST_MODE_KEY] ?: ContrastMode.NORMAL.toString()
-    )
-
-    context.appTheme = mode
-    context.appTypography = typographyMode
-    context.appContrast = contrastMode
 }

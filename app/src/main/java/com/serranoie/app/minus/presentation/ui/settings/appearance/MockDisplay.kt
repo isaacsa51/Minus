@@ -52,7 +52,6 @@ import com.serranoie.app.minus.presentation.ui.theme.ContrastMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
-import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 
@@ -106,7 +105,6 @@ private fun MockDashboardScreen(state: SettingsUiState) {
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            MockHeader()
             MockBudgetDisplay(targetState.currentTypography)
             MockBody()
         }
@@ -427,15 +425,15 @@ private fun MockPillScreen(state: SettingsUiState) {
                             },
                             fontWeight = FontWeight.Bold
                         )
-                        Text(
-                            "Days\nremaining",
-                            style = when (targetState.currentTypography) {
-                                "Condensed" -> MaterialTheme.typography.labelSmallCondensed
-                                else -> MaterialTheme.typography.labelSmall
-                            },
-                            textAlign = TextAlign.Center,
-                            lineHeight = 8.sp,
-                            fontSize = 8.sp
+                        Spacer(Modifier.height(2.dp))
+                        Box(
+                            modifier = Modifier
+                                .width(24.dp)
+                                .height(6.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                    RoundedCornerShape(2.dp)
+                                )
                         )
                     }
                 }
@@ -545,29 +543,6 @@ private fun AppearanceMockupContainer(
             ) { targetState ->
                 content(targetState)
             }
-        }
-    }
-}
-
-@Composable
-private fun MockHeader() {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(28.dp)
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape)
-            )
-            Spacer(Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .width(60.dp)
-                    .height(10.dp)
-                    .background(MaterialTheme.colorScheme.onSurface, RoundedCornerShape(4.dp))
-            )
         }
     }
 }
