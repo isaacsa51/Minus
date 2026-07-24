@@ -21,7 +21,9 @@ import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
 import com.serranoie.app.minus.presentation.appContrast
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.settingsDataStore
+import com.serranoie.app.minus.presentation.ui.theme.schemes.getAppColorScheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
@@ -269,6 +271,7 @@ fun MinusTheme(
     darkTheme: Boolean = isNightMode(),
     dynamicColor: Boolean = false,
     typographyMode: TypographyMode = LocalContext.current.appTypography,
+    appColorScheme: com.serranoie.app.minus.domain.model.AppColorScheme = LocalContext.current.appColorScheme,
     contrastMode: ContrastMode = LocalContext.current.appContrast,
     content: @Composable () -> Unit
 ) {
@@ -276,6 +279,10 @@ fun MinusTheme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+
+        appColorScheme != com.serranoie.app.minus.domain.model.AppColorScheme.BRAND -> {
+            getAppColorScheme(appColorScheme, darkTheme) ?: if (darkTheme) darkScheme else lightScheme
         }
 
         darkTheme -> when (contrastMode) {

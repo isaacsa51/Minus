@@ -14,6 +14,7 @@ data class UserSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val typographyMode: TypographyMode = TypographyMode.EXPRESSIVE,
     val language: String = "en",
+    val colorScheme: AppColorScheme = AppColorScheme.BRAND,
     val dynamicColorEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
@@ -39,4 +40,25 @@ enum class TypographyMode {
     DEFAULT,
     CONDENSED,
     EXPRESSIVE,
+}
+
+enum class AppColorScheme {
+    BRAND,
+    PINK,
+    PINK_NEUTRAL,
+    RED,
+    RED_NEUTRAL,
+    BLUE,
+    BLUE_NEUTRAL,
+    ORANGE,
+    ORANGE_NEUTRAL,
+    YELLOW,
+    YELLOW_NEUTRAL,
+    AQUA,
+    AQUA_NEUTRAL,
+    CYAN,
+    CYAN_NEUTRAL,
+    PURPLE,
+    PURPLE_NEUTRAL,
+    GREEN,
 }

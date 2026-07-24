@@ -35,6 +35,7 @@ const val RECURRENT_NOTIFICATION_HOUR_KEY_NAME = "recurrent_notification_hour"
 const val RECURRENT_NOTIFICATION_MINUTE_KEY_NAME = "recurrent_notification_minute"
 const val THEME_MODE_KEY_NAME = "theme_mode"
 const val TYPOGRAPHY_MODE_KEY_NAME = "typography_mode"
+const val COLOR_SCHEME_KEY_NAME = "app_color_scheme"
 const val LANGUAGE_KEY_NAME = "language"
 const val DYNAMIC_COLOR_KEY_NAME = "dynamic_color_enabled"
 const val CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME = "credit_quick_toggle_feature_enabled"
@@ -68,6 +69,7 @@ private val NOTIFICATION_HOUR = intPreferencesKey(NOTIFICATION_HOUR_KEY_NAME)
 private val NOTIFICATION_MINUTE = intPreferencesKey(NOTIFICATION_MINUTE_KEY_NAME)
 private val THEME_MODE = stringPreferencesKey(THEME_MODE_KEY_NAME)
 private val TYPOGRAPHY_MODE = stringPreferencesKey(TYPOGRAPHY_MODE_KEY_NAME)
+private val COLOR_SCHEME = stringPreferencesKey(COLOR_SCHEME_KEY_NAME)
 private val LANGUAGE = stringPreferencesKey(LANGUAGE_KEY_NAME)
 private val DYNAMIC_COLOR = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
 private val CREDIT_QUICK_TOGGLE_FEATURE_ENABLED =
@@ -109,6 +111,8 @@ class SettingsRepositoryImpl @Inject constructor(
                 themeMode = preferences[THEME_MODE]?.toThemeMode() ?: ThemeMode.SYSTEM,
                 typographyMode = preferences[TYPOGRAPHY_MODE]?.toTypographyMode()
                     ?: TypographyMode.EXPRESSIVE,
+                colorScheme = preferences[COLOR_SCHEME]?.toAppColorScheme()
+                    ?: com.serranoie.app.minus.domain.model.AppColorScheme.BRAND,
                 language = preferences[LANGUAGE] ?: "en",
                 dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false,
                 isCreditQuickToggleEnabled = preferences[CREDIT_QUICK_TOGGLE_FEATURE_ENABLED] ?: false,
@@ -236,6 +240,12 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setAppColorScheme(colorScheme: com.serranoie.app.minus.domain.model.AppColorScheme) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[COLOR_SCHEME] = colorScheme.name
+        }
+    }
+
     override suspend fun setLanguage(language: String) {
         context.settingsDataStore.edit { preferences ->
             preferences[LANGUAGE] = language
@@ -302,6 +312,14 @@ class SettingsRepositoryImpl @Inject constructor(
             TypographyMode.valueOf(this)
         } catch (_: Exception) {
             TypographyMode.EXPRESSIVE
+        }
+    }
+
+    private fun String.toAppColorScheme(): com.serranoie.app.minus.domain.model.AppColorScheme {
+        return try {
+            com.serranoie.app.minus.domain.model.AppColorScheme.valueOf(this)
+        } catch (_: Exception) {
+            com.serranoie.app.minus.domain.model.AppColorScheme.BRAND
         }
     }
 }
