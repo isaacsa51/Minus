@@ -37,20 +37,6 @@ import java.math.RoundingMode
 import java.text.NumberFormat
 import java.time.LocalDate
 
-/**
- * End-to-end coverage for the per-budget dynamic split mode feature.
- *
- * Anchored to the spec example: 16,644.45 budget, 200 spent, 30 days, with
- * 28 days remaining should yield a DAILY amount of 587.30 in DYNAMIC mode
- * and 554.82 in STATIC mode.
- *
- * The sheet is driven both standalone (via [renderSheet]) and through
- * [Editor] (via [renderEditorWithSheet]) which is the actual parent that
- * renders the [BudgetPeriodSheet] inside a `ModalBottomSheet`. We mount
- * [Editor] rather than [com.serranoie.app.minus.presentation.ui.home.MainScreenContent]
- * because the latter only emits the show-sheet intent — it never renders
- * the sheet itself.
- */
 class SplitModeE2ETest {
 
     @get:Rule
@@ -59,11 +45,6 @@ class SplitModeE2ETest {
     private val totalBudget = BigDecimal("16644.45")
     private val totalSpent = BigDecimal("200.00")
 
-    /**
-     * 30-day window ending 27 days from "today", so `daysRemaining`
-     * (computed in the sheet as `ChronoUnit.DAYS.between(today, endDate) + 1`)
-     * resolves to 28 — matching the spec anchor case.
-     */
     private fun dynamicWindow(): Pair<LocalDate, LocalDate> {
         val end = LocalDate.now().plusDays(27)
         val start = end.minusDays(29)
@@ -83,20 +64,16 @@ class SplitModeE2ETest {
             )
         }
 
-    /**
-     * Builds the shared BudgetState fixture. The four allocation fields are
-     * computed mode-aware: STATIC uses [splitBudget] with `mode=STATIC`
-     * (the formula the production calculator now uses for STATIC), DYNAMIC
-     * uses [computeDynamicAllocations]. This mirrors the production
-     * BudgetStateCalculator which branches on `settings.splitMode`.
-     */
     private fun dynamicState(splitMode: BudgetSplitMode = BudgetSplitMode.DYNAMIC): BudgetState {
         val base = BudgetState(
             remainingToday = BigDecimal("554.82"),
             totalSpentToday = BigDecimal("0.00"),
             dailyBudget = BigDecimal("554.82"),
             daysRemaining = 28,
-            progress = (totalSpent.divide(totalBudget, 2, RoundingMode.HALF_UP).toFloat()).coerceIn(0f, 1f),
+            progress = (totalSpent.divide(totalBudget, 2, RoundingMode.HALF_UP).toFloat()).coerceIn(
+                0f,
+                1f
+            ),
             isOverBudget = false,
             totalBudget = totalBudget,
             totalSpentInPeriod = totalSpent,
@@ -116,10 +93,38 @@ class SplitModeE2ETest {
         } else {
             // STATIC: totalBudget / (30 / periodBlockDays) for each period.
             Quintuple(
-                daily = splitBudget(totalBudget, totalSpent, 30, 28, BudgetPeriod.DAILY, BudgetSplitMode.STATIC),
-                weekly = splitBudget(totalBudget, totalSpent, 30, 28, BudgetPeriod.WEEKLY, BudgetSplitMode.STATIC),
-                biweekly = splitBudget(totalBudget, totalSpent, 30, 28, BudgetPeriod.BIWEEKLY, BudgetSplitMode.STATIC),
-                monthly = splitBudget(totalBudget, totalSpent, 30, 28, BudgetPeriod.MONTHLY, BudgetSplitMode.STATIC),
+                daily = splitBudget(
+                    totalBudget,
+                    totalSpent,
+                    30,
+                    28,
+                    BudgetPeriod.DAILY,
+                    BudgetSplitMode.STATIC
+                ),
+                weekly = splitBudget(
+                    totalBudget,
+                    totalSpent,
+                    30,
+                    28,
+                    BudgetPeriod.WEEKLY,
+                    BudgetSplitMode.STATIC
+                ),
+                biweekly = splitBudget(
+                    totalBudget,
+                    totalSpent,
+                    30,
+                    28,
+                    BudgetPeriod.BIWEEKLY,
+                    BudgetSplitMode.STATIC
+                ),
+                monthly = splitBudget(
+                    totalBudget,
+                    totalSpent,
+                    30,
+                    28,
+                    BudgetPeriod.MONTHLY,
+                    BudgetSplitMode.STATIC
+                ),
                 isOverDaily = false,
             )
         }
@@ -292,7 +297,8 @@ class SplitModeE2ETest {
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG)
             .assertIsDisplayed()
         val staticLabel = composeTestRule.activity.getString(R.string.split_mode_static)
-        composeTestRule.onAllNodesWithText(staticLabel, substring = true).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(staticLabel, substring = true).onLast()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -305,7 +311,8 @@ class SplitModeE2ETest {
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG)
             .assertIsDisplayed()
         val dynamicLabel = composeTestRule.activity.getString(R.string.split_mode_dynamic)
-        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -314,8 +321,10 @@ class SplitModeE2ETest {
 
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG).performClick()
         composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(500)
 
-        composeTestRule.onAllNodesWithText("How should we split your budget?")
+        val title = composeTestRule.activity.getString(R.string.split_mode_dialog_title)
+        composeTestRule.onAllNodesWithText(title, substring = true)
             .onLast()
             .assertIsDisplayed()
     }
@@ -334,10 +343,12 @@ class SplitModeE2ETest {
         composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast().performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithText("How should we split your budget?", substring = true)
+        val title = composeTestRule.activity.getString(R.string.split_mode_dialog_title)
+        composeTestRule.onAllNodesWithText(title, substring = true)
             .onLast()
             .assertIsNotDisplayed()
-        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -526,7 +537,6 @@ class SplitModeE2ETest {
 
         renderSheet(budgetSettings = settings, budgetState = state)
 
-        // Switch the period chip from DAILY (the default) to WEEKLY
         composeTestRule.onNodeWithTag(budgetPeriodToggleTag(BudgetPeriod.WEEKLY))
             .performClick()
         composeTestRule.waitForIdle()
