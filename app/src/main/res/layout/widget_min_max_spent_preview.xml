@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#111318"
+    android:background="?android:attr/colorBackground"
     android:orientation="horizontal"
     android:padding="8dp">
 
@@ -10,7 +10,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="#E5EFFD">
+        android:background="@color/widget_min_spent_container">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,9 +35,9 @@
             android:gravity="center_vertical"
             android:orientation="vertical"
             android:padding="14dp">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/widget_min_max_spent_preview_min_amount" android:textColor="#1B1B21" android:textSize="26sp" android:textStyle="bold" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/minimum_spent" android:textColor="#5F6673" android:textSize="12sp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/widget_min_max_spent_preview_min_date" android:textColor="#5F6673" android:textSize="12sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/widget_min_max_spent_preview_min_amount" android:textColor="?android:attr/textColorPrimary" android:textSize="26sp" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/minimum_spent" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/widget_min_max_spent_preview_min_date" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
         </LinearLayout>
     </FrameLayout>
 
@@ -49,7 +49,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="#FDE5E8">
+        android:background="@color/widget_max_spent_container">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -74,9 +74,9 @@
             android:gravity="center_vertical"
             android:orientation="vertical"
             android:padding="14dp">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/widget_min_max_spent_preview_max_amount" android:textColor="#1B1B21" android:textSize="26sp" android:textStyle="bold" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/maximum_spent" android:textColor="#5F6673" android:textSize="12sp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/widget_min_max_spent_preview_max_date" android:textColor="#5F6673" android:textSize="12sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/widget_min_max_spent_preview_max_amount" android:textColor="?android:attr/textColorPrimary" android:textSize="26sp" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/maximum_spent" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/widget_min_max_spent_preview_max_date" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>
