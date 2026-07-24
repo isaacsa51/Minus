@@ -4,15 +4,13 @@ package com.serranoie.app.minus.presentation.widget
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.glance.Button
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -20,27 +18,20 @@ import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
 import androidx.glance.currentState
-import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
-import androidx.glance.layout.Column
-import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.height
-import androidx.glance.layout.padding
-import androidx.glance.layout.size
+import androidx.glance.layout.*
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
@@ -52,9 +43,9 @@ class ExpenseWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ExpenseWidget()
 }
 
-@Preview(widthDp = 180, heightDp = 110)
+@Preview(widthDp = 180, heightDp = 180)
 @Composable
-fun ExpenseWidgetPreviewLowSpend() {
+fun ExpenseWidgetNormalPreview() {
     GlanceTheme {
         ExpenseWidget().ExpenseWidgetContent(
             spend = 3740,
@@ -64,36 +55,12 @@ fun ExpenseWidgetPreviewLowSpend() {
     }
 }
 
-@Preview(widthDp = 180, heightDp = 110)
+@Preview(widthDp = 180, heightDp = 80)
 @Composable
-fun ExpenseWidgetPreviewMediumSpend() {
+fun ExpenseWidgetCompactPreview() {
     GlanceTheme {
         ExpenseWidget().ExpenseWidgetContent(
-            spend = 30740,
-            budget = 60000,
-            currency = "USD"
-        )
-    }
-}
-
-@Preview(widthDp = 180, heightDp = 110)
-@Composable
-fun ExpenseWidgetPreviewHighSpend() {
-    GlanceTheme {
-        ExpenseWidget().ExpenseWidgetContent(
-            spend = 45740,
-            budget = 60000,
-            currency = "USD"
-        )
-    }
-}
-
-@Preview(widthDp = 180, heightDp = 110)
-@Composable
-fun ExpenseWidgetPreviewEmpty() {
-    GlanceTheme {
-        ExpenseWidget().ExpenseWidgetContent(
-            spend = 0,
+            spend = 3740,
             budget = 60000,
             currency = "USD"
         )
@@ -101,6 +68,13 @@ fun ExpenseWidgetPreviewEmpty() {
 }
 
 class ExpenseWidget : GlanceAppWidget() {
+
+    override val sizeMode: SizeMode = SizeMode.Responsive(
+        setOf(
+            DpSize(100.dp, 50.dp),
+            DpSize(100.dp, 100.dp)
+        )
+    )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
@@ -131,12 +105,10 @@ class ExpenseWidget : GlanceAppWidget() {
         currency: String,
         context: Context = LocalContext.current,
         totalSpentLabel: String = context.getString(R.string.total_spent),
-        addExpenseContentDescription: String = context.getString(R.string.widget_add_expense_label),
-        plusSymbol: String = context.getString(R.string.widget_add_expense_plus)
+        addExpenseContentDescription: String = context.getString(R.string.widget_add_expense_label)
     ) {
-        val percentSpent = if (budget > 0) {
-            spend.toFloat() / budget.toFloat()
-        } else 0f
+        val size = LocalSize.current
+        val isHorizontal = size.height < 100.dp
 
         Box(
             modifier = GlanceModifier
@@ -145,63 +117,82 @@ class ExpenseWidget : GlanceAppWidget() {
                 .clickable(actionRunCallback<OpenAppAction>())
                 .padding(16.dp)
         ) {
-            Column(
-                modifier = GlanceModifier.fillMaxSize()
-            ) {
+            if (isHorizontal) {
                 Row(
-                    modifier = GlanceModifier.fillMaxWidth(),
+                    modifier = GlanceModifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Column(modifier = GlanceModifier.defaultWeight()) {
                         Text(
                             text = totalSpentLabel,
                             style = TextStyle(
                                 color = GlanceTheme.colors.onSurfaceVariant,
-                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                fontSize = 14.sp
                             )
                         )
-                        Spacer(modifier = GlanceModifier.height(4.dp))
                         Text(
                             text = formatWidgetCurrency(currency, spend),
                             style = TextStyle(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                                color = GlanceTheme.colors.onSurface
-                            )
-                        )
-                    }
-
-                    Spacer(modifier = GlanceModifier.fillMaxWidth())
-
-                    Box(
-                        modifier = GlanceModifier
-                            .size(32.dp)
-                            .clickable(actionRunCallback<OpenAppAction>()),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = plusSymbol,
-                            style = TextStyle(
                                 color = GlanceTheme.colors.onSurface,
-                                fontSize = 24.sp,
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         )
                     }
+                    PlusButton(addExpenseContentDescription)
+                }
+            } else {
+                Column(
+                    modifier = GlanceModifier.fillMaxSize()
+                ) {
+                    Text(
+                        text = totalSpentLabel,
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onSurfaceVariant,
+                            fontSize = 16.sp
+                        )
+                    )
+                    Spacer(modifier = GlanceModifier.height(4.dp))
+                    Text(
+                        text = formatWidgetCurrency(currency, spend),
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onSurface,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Spacer(modifier = GlanceModifier.defaultWeight())
+                    Row(
+                        modifier = GlanceModifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        PlusButton(addExpenseContentDescription)
+                    }
                 }
             }
+        }
+    }
 
-            Box(
+    @Composable
+    private fun PlusButton(contentDescription: String) {
+        Box(
+            modifier = GlanceModifier
+                .size(48.dp)
+                .clickable(actionRunCallback<OpenAppAction>()),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                provider = ImageProvider(R.drawable.shape_soft_star_1),
+                contentDescription = null,
                 modifier = GlanceModifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                Image(
-                    provider = ImageProvider(R.drawable.ic_plus),
-                    contentDescription = addExpenseContentDescription,
-                    modifier = GlanceModifier.size(20.dp),
-                    colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface)
-                )
-            }
+                colorFilter = ColorFilter.tint(GlanceTheme.colors.primary)
+            )
+            Image(
+                provider = ImageProvider(R.drawable.ic_plus),
+                contentDescription = contentDescription,
+                modifier = GlanceModifier.size(24.dp),
+                colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary)
+            )
         }
     }
 
