@@ -64,22 +64,22 @@ fun FlexibleListGroup(
 ) {
     Column(
         modifier = modifier
-            .padding(16.dp)
-            .padding(vertical = 8.dp)
+            .padding(horizontal = 16.dp)
+            .padding(vertical = 2.dp)
     ) {
         title?.let {
             Text(
                 text = it,
-                color = MaterialTheme.colorScheme.outline,
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(bottom = 10.dp)
+                style = MaterialTheme.typography.labelLargeEmphasized,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 10.dp, start = 4.dp)
             )
         }
 
         Surface(
-            shape = RoundedCornerShape(16.dp),
-            tonalElevation = 4.dp,
-            color = MaterialTheme.colorScheme.surfaceContainer,
+            shape = RoundedCornerShape(24.dp),
+            tonalElevation = 2.dp,
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
             modifier = Modifier.fillMaxWidth()
         ) {
             Column {
@@ -199,6 +199,7 @@ fun PaddedExpandableList(
     headerLabel: String,
     containerPosition: PaddedListItemPosition = PaddedListItemPosition.First,
     headerSubtitle: String? = null,
+    headerSubtitleContent: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     headerVerticalPadding: Dp? = null,
     expandedContent: @Composable ColumnScope.() -> Unit,
@@ -211,6 +212,7 @@ fun PaddedExpandableList(
             position = containerPosition,
             verticalPadding = headerVerticalPadding ?: 12.dp,
             subtitle = headerSubtitle,
+            subtitleContent = headerSubtitleContent,
             leadingIcon = leadingIcon,
             trailingContent = {
                 Icon(
@@ -263,6 +265,7 @@ fun SelectablePaddedItem(
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
     verticalPadding: Dp = 12.dp,
     subtitle: String? = null,
+    subtitleContent: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
 ) {
@@ -315,6 +318,7 @@ fun SelectablePaddedItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+                subtitleContent?.invoke()
             }
             trailingContent?.invoke()
         }

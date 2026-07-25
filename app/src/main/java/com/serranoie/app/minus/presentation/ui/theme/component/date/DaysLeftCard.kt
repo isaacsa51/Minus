@@ -87,7 +87,8 @@ fun DaysLeftCard(
 			Text(
 				text = restDays.toString(),
 				style = MaterialTheme.typography.displayLargeEmphasized.copy(
-					fontSize = MaterialTheme.typography.titleLarge.fontSize
+					fontSize = MaterialTheme.typography.titleLarge.fontSize,
+					lineHeight = MaterialTheme.typography.titleLarge.fontSize
 				)
 			)
 			Text(

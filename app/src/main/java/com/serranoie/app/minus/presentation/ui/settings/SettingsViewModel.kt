@@ -20,6 +20,7 @@ import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUse
 import com.serranoie.app.minus.presentation.ANALYTICS_TUTORIAL_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
 import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
+import com.serranoie.app.minus.presentation.CONTRAST_MODE_KEY
 import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
 import com.serranoie.app.minus.presentation.DYNAMIC_COLOR_KEY
 import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
@@ -27,12 +28,15 @@ import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_MINUTE_KEY
 import com.serranoie.app.minus.presentation.THEME_MODE_KEY
 import com.serranoie.app.minus.presentation.TUTORIAL_BOX_COMPLETED_KEY
 import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
+import com.serranoie.app.minus.presentation.appContrast
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.dynamicColorEnabled
 import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferManager
+import com.serranoie.app.minus.presentation.ui.theme.ContrastMode
 import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
 import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
@@ -49,10 +53,15 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 import android.provider.Settings as AndroidSettings
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 
 data class SettingsUiState(
     val currentTheme: String = "System",
     val currentTypography: String = "Expressive",
+    val currentContrast: String = "Normal",
+    val currentColorScheme: com.serranoie.app.minus.domain.model.AppColorScheme = com.serranoie.app.minus.domain.model.AppColorScheme.BRAND,
+    val currentLanguage: String = "English",
     val isMaterialYouEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,
     val isCategoryPickerDirectPopupEnabled: Boolean = false,
@@ -147,11 +156,18 @@ class SettingsViewModel @Inject constructor(
                             else -> "System"
                         },
                         currentTypography = when (settings.typographyMode) {
-                            com.serranoie.app.minus.domain.model.TypographyMode.DEFAULT -> "Default"
                             com.serranoie.app.minus.domain.model.TypographyMode.CONDENSED -> "Condensed"
+                            com.serranoie.app.minus.domain.model.TypographyMode.SYSTEM -> "System"
                             else -> "Expressive"
                         },
+                        currentContrast = when (context.appContrast) {
+                            ContrastMode.MEDIUM -> "Medium"
+                            ContrastMode.HIGH -> "High"
+                            else -> "Normal"
+                        },
+                        currentColorScheme = settings.colorScheme,
                         isMaterialYouEnabled = settings.dynamicColorEnabled,
+                        currentLanguage = settings.language,
                         recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
                         notificationHour = settings.notificationHour,
                         notificationMinute = settings.notificationMinute,
@@ -206,6 +222,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onTypographyChange(typographyMode: String) {
         val newMode = when (typographyMode) {
+            "System" -> TypographyMode.SYSTEM
             "Default" -> TypographyMode.DEFAULT
             "Condensed" -> TypographyMode.CONDENSED
             else -> TypographyMode.EXPRESSIVE
@@ -216,6 +233,38 @@ class SettingsViewModel @Inject constructor(
             context.settingsDataStore.edit { prefs ->
                 prefs[TYPOGRAPHY_MODE_KEY] = newMode.toString()
             }
+        }
+    }
+
+    fun onContrastChange(contrastMode: String) {
+        val newMode = when (contrastMode) {
+            "Medium" -> ContrastMode.MEDIUM
+            "High" -> ContrastMode.HIGH
+            else -> ContrastMode.NORMAL
+        }
+        context.appContrast = newMode
+        _uiState.update { it.copy(currentContrast = contrastMode) }
+        viewModelScope.launch {
+            context.settingsDataStore.edit { prefs ->
+                prefs[CONTRAST_MODE_KEY] = newMode.toString()
+            }
+        }
+    }
+
+    fun onColorSchemeChange(colorScheme: com.serranoie.app.minus.domain.model.AppColorScheme) {
+        context.appColorScheme = colorScheme
+        _uiState.update { it.copy(currentColorScheme = colorScheme) }
+        viewModelScope.launch {
+            settingsRepository.setAppColorScheme(colorScheme)
+        }
+    }
+
+    fun onLanguageChange(language: String) {
+        _uiState.update { it.copy(currentLanguage = language) }
+        viewModelScope.launch {
+            settingsRepository.setLanguage(language)
+            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(language)
+            AppCompatDelegate.setApplicationLocales(appLocale)
         }
     }
 

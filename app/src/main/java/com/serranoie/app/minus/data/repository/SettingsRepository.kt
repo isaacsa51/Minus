@@ -39,6 +39,10 @@ interface SettingsRepository {
 
     suspend fun setTypographyMode(mode: TypographyMode)
 
+    suspend fun setAppColorScheme(colorScheme: com.serranoie.app.minus.domain.model.AppColorScheme)
+
+    suspend fun setLanguage(language: String)
+
     suspend fun setDynamicColorEnabled(enabled: Boolean)
 
     suspend fun setRecurrentPaymentsViewMode(mode: com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode)

@@ -256,6 +256,32 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_language">Language</string>
+    <string name="settings_language_header">App Language</string>
+    <string name="settings_language_currently_format">Currently: %1$s</string>
+    <string name="settings_language_disclaimer">Language translations might be incorrect.</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_contrast_title">Contrast</string>
+    <string name="settings_contrast_normal">Normal</string>
+    <string name="settings_contrast_medium">Medium</string>
+    <string name="settings_contrast_high">High</string>
+    <string name="settings_typography_condensed">Condensed</string>
+    <string name="settings_typography_expressive">Expressive</string>
+    <string name="settings_language_en" translatable="false">English</string>
+    <string name="settings_language_de" translatable="false">Deutsch</string>
+    <string name="settings_language_el" translatable="false">Ελληνικά</string>
+    <string name="settings_language_es" translatable="false">Español</string>
+    <string name="settings_language_fr" translatable="false">Français</string>
+    <string name="settings_language_hi" translatable="false">हिन्दी</string>
+    <string name="settings_language_it" translatable="false">Italiano</string>
+    <string name="settings_language_ja" translatable="false">日本語</string>
+    <string name="settings_language_ko" translatable="false">한국어</string>
+    <string name="settings_language_pt" translatable="false">Português</string>
+    <string name="settings_language_ru" translatable="false">Русский</string>
+    <string name="settings_language_zh" translatable="false">中文</string>
+    <string name="settings_color_scheme_title">App Color Scheme</string>
     <string name="settings_section_notifications">Notifications</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>
@@ -265,6 +291,8 @@
 
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_subtitle">Change the app theme style</string>
+    <string name="settings_appearance_title">Theming and color</string>
+    <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
     <string name="settings_typography_title">Typography</string>
     <string name="settings_typography_subtitle">Change the app typography style</string>
     <string name="settings_material_you_title">Material You</string>

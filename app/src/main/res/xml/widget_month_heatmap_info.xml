@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/widget_heatmap_preview"
+    android:initialLayout="@layout/widget_month_heatmap_preview"
     android:minWidth="120dp"
     android:minHeight="120dp"
     android:maxResizeWidth="320dp"

@@ -540,4 +540,5 @@
     <string name="analytics_tutorial_credit_desc">Pulsa sobre la estrella para ver todas las transacciones realizadas con ella, marcarlas como pagadas o ajusta la fecha límite de facturación para evitar intereses.</string>
     <string name="analytics_tutorial_history_title">Historial de Transacciones</string>
     <string name="analytics_tutorial_history_desc">Haz tap aquí para ver la lista completa de gastos en este periodo.</string>
+    <string name="settings_appearance_title">Tema y color</string>
 </resources>
