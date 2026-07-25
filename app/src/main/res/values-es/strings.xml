@@ -237,6 +237,7 @@
     <string name="settings_section_savings">Ahorros</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_subtitle">Cambiar el estilo del tema de la aplicación</string>
+    <string name="settings_appearance_title">Tema y color</string>
     <string name="settings_appearance_subtitle">Cambia el color y apariencia de la app</string>
     <string name="settings_typography_title">Tipografía</string>
     <string name="settings_typography_subtitle">Cambiar el estilo de tipografía de la aplicación</string>
@@ -539,5 +540,4 @@
     <string name="analytics_tutorial_credit_desc">Pulsa sobre la estrella para ver todas las transacciones realizadas con ella, marcarlas como pagadas o ajusta la fecha límite de facturación para evitar intereses.</string>
     <string name="analytics_tutorial_history_title">Historial de Transacciones</string>
     <string name="analytics_tutorial_history_desc">Haz tap aquí para ver la lista completa de gastos en este periodo.</string>
-    <string name="settings_appearance_title">Tema y color</string>
 </resources>

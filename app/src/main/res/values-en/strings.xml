@@ -228,6 +228,7 @@
     <string name="settings_contrast_high">High</string>
     <string name="settings_typography_condensed">Condensed</string>
     <string name="settings_typography_expressive">Expressive</string>
+    <string name="settings_color_scheme_title">App Color Scheme</string>
     <string name="settings_section_notifications">Notifications</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>
@@ -236,6 +237,8 @@
     <string name="settings_section_savings">Savings</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_subtitle">Change the app theme style</string>
+    <string name="settings_appearance_title">Theming and color</string>
+    <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
     <string name="settings_typography_title">Typography</string>
     <string name="settings_typography_subtitle">Change the app typography style</string>
     <string name="settings_material_you_title">Material You</string>

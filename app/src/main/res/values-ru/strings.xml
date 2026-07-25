@@ -225,6 +225,16 @@
     <string name="settings_language_header">Язык приложения</string>
     <string name="settings_language_currently_format">Текущий: %1$s</string>
     <string name="settings_language_disclaimer">Переводы могут быть неточными.</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_contrast_title">Contrast</string>
+    <string name="settings_contrast_normal">Normal</string>
+    <string name="settings_contrast_medium">Medium</string>
+    <string name="settings_contrast_high">High</string>
+    <string name="settings_typography_condensed">Condensed</string>
+    <string name="settings_typography_expressive">Expressive</string>
+    <string name="settings_color_scheme_title">App Color Scheme</string>
     <string name="settings_section_notifications">Уведомления</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>
@@ -233,6 +243,8 @@
     <string name="settings_section_savings">Savings</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_subtitle">Change the app theme style</string>
+    <string name="settings_appearance_title">Theming and color</string>
+    <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
     <string name="settings_typography_title">Typography</string>
     <string name="settings_typography_subtitle">Change the app typography style</string>
     <string name="settings_material_you_title">Material You</string>
