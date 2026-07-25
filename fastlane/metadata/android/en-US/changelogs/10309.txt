@@ -1,0 +1,5 @@
+- feat(i10n): update translations
+- feat: implement compact expense widget & fixed inconsistencies
+- fix: use proper surface colors for external colorschemes
+- feat: implement custom color schemes
+- feat: implement advanced appearance settings and per-app language support
