@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
-    <string name="tutorial_numpad_title">Numpad</string>
-    <string name="tutorial_numpad_description">Digite a quantidade que você gastou e toque na marca verde para salvar. Deslize para cima no numpad para calcular.</string>
+    <string name="tutorial_numpad_title">Empada</string>
+    <string name="tutorial_numpad_description">Digite a quantidade que gastou e toque na marca verde para salvar. Deslize para cima no empada para calcular.</string>
     <string name="tutorial_comment_title">Adicionar uma categoria</string>
     <string name="tutorial_comment_description">Adicione uma categoria ou nota curta para lembrar para que era o gasto.</string>
     <string name="tutorial_budget_pill_title">Progresso do orçamento</string>
     <string name="tutorial_budget_pill_description">Toque para alternar entre visualizações de orçamento diárias, semanais e mensais, ou para editar a configuração de período.</string>
-    <string name="tutorial_settings_title">Confirgurações</string>
+    <string name="tutorial_settings_title">Configurações</string>
     <string name="tutorial_settings_description">Abra as configurações para habilitar os recursos, configurar widgets na tela inicial ou redefinir este tutorial.</string>
     <string name="tutorial_recurrent_title">Pagamentos recorrentes</string>
     <string name="tutorial_recurrent_description">Toque aqui para marcar este gasto como um pagamento recorrente (semanal, semanal ou mensal). O aplicativo irá lembrá-lo de registrá-lo no cronograma.</string>
-    <string name="tutorial_analytics_title">Veja suas análises</string>
-    <string name="tutorial_analytics_description">Abra Analytics para ver como seus gastos se dividem ao longo do tempo, por categoria e contra seus objetivos orçamentais.</string>
+    <string name="tutorial_analytics_title">Veja as suas análises</string>
+    <string name="tutorial_analytics_description">Abra Analytics para ver como os seus gastos se dividem temporal, por categoria e contra os seus objetivos orçamentais.</string>
     <string name="tutorial_privacy_title">Modo de privacidade</string>
     <string name="tutorial_privacy_description">Cubra o topo do telefone (onde a câmera frontal fica com a sua mão, por cerca de um segundo, para desfocar todas as quantidades na tela. Cubra novamente para desativá-lo.</string>
-    <string name="today">hoje</string>
-    <string name="yesterday">ontem</string>
+    <string name="today">Hoje</string>
+    <string name="yesterday">Ontem</string>
     <string name="tomorrow">Amanhã</string>
     <string name="apply">Aplicar</string>
     <string name="accept">Aceitar</string>
-    <string name="cancel">cancelar</string>
+    <string name="cancel">Cancelar</string>
     <string name="ok">Certo</string>
     <string name="save">Guardar</string>
-    <string name="delete">excluir</string>
+    <string name="delete">Excluir</string>
     <string name="edit">Alterar</string>
-    <string name="close">FECHAR</string>
+    <string name="close">Fechar</string>
     <string name="done">Concluído</string>
     <string name="add">Adicionar</string>
     <string name="remove">Excluir</string>
@@ -40,7 +40,7 @@
     <string name="recurrent_expense_frequency_subtitle">Com que frequência você quer pagar esta despesa?</string>
     <string name="recurrent_frequency_weekly">Semanalmente</string>
     <string name="recurrent_frequency_biweekly">Bienal</string>
-    <string name="recurrent_frequency_monthly">Mensual</string>
+    <string name="recurrent_frequency_monthly">Mensal</string>
     <string name="previous_day">Dia anterior</string>
     <string name="next_day">Próximo dia</string>
     <string name="monthly_on_day_format">Dia %1$d de cada mês</string>
@@ -126,11 +126,11 @@
     <string name="analytics_title">Análises</string>
     <plurals name="days">
         <item quantity="one">%d dia</item>
-        <item quantity="other">%d days</item>
+        <item quantity="other">%d dias</item>
     </plurals>
     <plurals name="analytics_days_left">
         <item quantity="one">%d dia</item>
-        <item quantity="other">%d days</item>
+        <item quantity="other">%d dias</item>
     </plurals>
     <string name="total_budget">Orçamento total</string>
     <string name="minimum_spent">Gasto mínimo</string>
@@ -247,7 +247,7 @@
     <string name="settings_censor_mode_subtitle">Ocultar e desfocar todos os valores financeiros no app</string>
     <string name="settings_feature_credit_toggle_title">Usar Cartão de Crédito como pagamento</string>
     <string name="settings_feature_credit_toggle_subtitle">Toque para ver mais detalhes</string>
-    <string name="settings_feature_credit_toggle_details">When activated, you can now mark payments made with a credit card. \nBy declaring a billing date, you\'ll know how much to pay your bank before you have to pay interest, through a notification separate from the billing period.</string>
+    <string name="settings_feature_credit_toggle_details">Após a ativação, poderá marcar os pagamentos efetuados com cartão de crédito. Ao definir uma data de vencimento, saberá quanto pagar ao seu banco antes de incidirem juros, através de uma notificação separada do período de faturação.</string>
     <string name="settings_feature_credit_toggle_switch_label">Ativar o uso da CC</string>
     <string name="settings_category_behavior_title">Comportamento da categoria</string>
     <string name="settings_category_behavior_subtitle">Configure como o seletor de categorias se comporta ao marcar uma transação.</string>
@@ -456,7 +456,7 @@
     <string name="currency_selected">Selecionado</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">Excesso de orçamento</string>
-    <string name="strategy_dialog_description" formatted="false">You can choose how to distribute your budget balance at the end of each day.\n\nFor example, you have a budget of 500 per day, and yesterday you spent 400: you can spread the 100 across the remaining days, or spend 600 today (daily budget + surplus from previous period).</string>
+    <string name="strategy_dialog_description" formatted="false">Pode escolher como distribuir o seu saldo de orçamento ao final de cada dia.\n\nPor exemplo, tem um orçamento de 500 por dia, e ontem gastou 400: pode espalhar os 100 pelos dias restantes, ou gastar 600 hoje (orçamento diário + excedente do período anterior).</string>
     <string name="strategy_ask_always">Perguntar-me sempre</string>
     <string name="strategy_ask_always_desc">No final do período, vamos perguntar o que fazer com o excedente</string>
     <string name="strategy_split_equally">Espalhe por todos os dias</string>
@@ -525,7 +525,7 @@
     <string name="past_periods_status_saved">%1$s Salvo</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendências de gastos</string>
-    <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>
+    <string name="analytics_tutorial_minmax_desc">Estes cartões mostram as suas despesas mínimas e máximas. À medida que adiciona mais transações, estas serão atualizadas para ajudar a identificar valores discrepantes.</string>
     <string name="analytics_tutorial_header_title">Períodos históricos</string>
     <string name="analytics_tutorial_header_desc">Toque no ícone para ver seus últimos períodos de orçamento e revisar seu desempenho.</string>
     <string name="analytics_tutorial_budget_title">Situação do orçamento</string>
