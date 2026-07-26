@@ -99,6 +99,7 @@ fun BudgetPill(
     bigVariant: Boolean = false,
     centerRemainingAmount: Boolean = false,
     splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
+    calculationPreview: String? = null,
     modifier: Modifier = Modifier,
 ) {
     val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
@@ -145,8 +146,8 @@ fun BudgetPill(
     }
 
     val shouldCenterRemainingAmount =
-        remember(centerRemainingAmount, metrics.isCurrentPeriodOverBudget, bigVariant, isNoBudget) {
-            (centerRemainingAmount && !metrics.isCurrentPeriodOverBudget && !bigVariant) || isNoBudget
+        remember(centerRemainingAmount, metrics.isCurrentPeriodOverBudget, bigVariant, isNoBudget, calculationPreview) {
+            (centerRemainingAmount && !metrics.isCurrentPeriodOverBudget && !bigVariant) || isNoBudget || calculationPreview != null
         }
 
     val isDarkTheme = isSystemInDarkTheme()
@@ -227,17 +228,18 @@ fun BudgetPill(
                             contentAlignment = Alignment.Center,
                         ) {
                             AdaptiveSingleLineText(
-                                text = amountText,
-                                annotatedText = annotatedAmount,
+                                text = if (isNoBudget) stringResource(R.string.budget_pill_no_budget_action) else currencyFormat.format(
+                                    metrics.periodRemaining
+                                ),
                                 style = MaterialTheme.typography.titleMediumCondensed,
                                 color = textColor,
                                 minFontSize = 16.sp,
                                 modifier = Modifier.fillMaxWidth().graphicsLayer {
-                                    if (!isNoBudget) {
+                                    if (!isNoBudget && calculationPreview == null) {
                                         scaleX = centeredAmountScale
                                         scaleY = centeredAmountScale
                                     }
-                                }.let { if (!isNoBudget) it else it.censor() },
+                                }.let { if (!isNoBudget || calculationPreview != null) it else it.censor() },
                                 textAlign = TextAlign.Center,
                             )
                         }

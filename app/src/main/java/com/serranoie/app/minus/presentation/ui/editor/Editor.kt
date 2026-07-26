@@ -209,6 +209,7 @@ fun Editor(
                 currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
                 centerRemainingAmount = animState == AnimState.EDITING,
                 splitMode = uiState.budgetSettings?.splitMode ?: BudgetSplitMode.STATIC,
+                calculationPreview = uiState.calculationPreview,
                 onOpenBudgetSheet = {
                     view.weakHapticFeedback()
                     onShowBudgetPeriodSheet()

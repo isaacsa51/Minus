@@ -165,13 +165,37 @@ class NumpadControllerTest {
     }
 
     @Test
-    fun `when_operator_tapped_on_empty_input_then_input_is_unchanged`() {
+    fun `when_operator_tapped_on_empty_input_and_is_unary_then_operator_is_appended_and_calculation_mode_is_set`() {
         val controller = newController()
 
-        val changes = controller.process(NumpadIntent.OperatorTapped('+'), currentIsCalculation = false)
+        val changesPlus = controller.process(NumpadIntent.OperatorTapped('+'), currentIsCalculation = false)
+        assertThat(controller.input.value).isEqualTo("+")
+        assertThat(changesPlus).containsExactly(
+            NumpadChange.InputChanged("+"),
+            NumpadChange.CalculationModeChanged(true),
+        )
 
+        controller.process(NumpadIntent.ResetInputTapped, currentIsCalculation = true)
+
+        val changesMinus = controller.process(NumpadIntent.OperatorTapped('-'), currentIsCalculation = false)
+        assertThat(controller.input.value).isEqualTo("-")
+        assertThat(changesMinus).containsExactly(
+            NumpadChange.InputChanged("-"),
+            NumpadChange.CalculationModeChanged(true),
+        )
+    }
+
+    @Test
+    fun `when_non_unary_operator_tapped_on_empty_input_then_input_is_unchanged`() {
+        val controller = newController()
+
+        val changesMultiply = controller.process(NumpadIntent.OperatorTapped('×'), currentIsCalculation = false)
         assertThat(controller.input.value).isEqualTo("")
-        assertThat(changes).isEmpty()
+        assertThat(changesMultiply).isEmpty()
+
+        val changesDivide = controller.process(NumpadIntent.OperatorTapped('÷'), currentIsCalculation = false)
+        assertThat(controller.input.value).isEqualTo("")
+        assertThat(changesDivide).isEmpty()
     }
 
     @Test

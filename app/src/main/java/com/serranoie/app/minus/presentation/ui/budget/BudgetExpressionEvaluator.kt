@@ -14,23 +14,36 @@ class BudgetExpressionEvaluator @Inject constructor() {
                 .replace("×", "*")
                 .replace("÷", "/")
 
-            normalized.lastOrNull()?.let { if (it in "+-*/") return null }
+            // Handle unary leading operators
+            val leadingOperator = if (normalized.startsWith("+") || normalized.startsWith("-")) {
+                normalized[0]
+            } else null
+            
+            val expressionToParse = if (leadingOperator != null) {
+                normalized.substring(1).trim()
+            } else {
+                normalized
+            }
 
-            val hasOperator = normalized.any { it in "+-*/" }
+            expressionToParse.lastOrNull()?.let { if (it in "+-*/") return null }
+
+            val hasOperator = expressionToParse.any { it in "+-*/" }
 
             if (!hasOperator) {
-                val num = normalized.toBigDecimalOrNull() ?: return null
-                return formatResult(num)
+                val num = expressionToParse.toBigDecimalOrNull() ?: return null
+                val finalNum = if (leadingOperator == '-') num.negate() else num
+                return formatResult(finalNum)
             }
 
             val tokenPattern = Regex("([+\\-*/])")
-            val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
-            val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
+            val parts = tokenPattern.split(expressionToParse).filter { it.isNotEmpty() }
+            val operators = tokenPattern.findAll(expressionToParse).map { it.value }.toList()
 
             if (parts.isEmpty() || parts[0].isEmpty()) return null
             if (operators.size > parts.size - 1) return null
 
             var result = parts[0].toBigDecimalOrNull() ?: return null
+            if (leadingOperator == '-') result = result.negate()
 
             for (i in operators.indices) {
                 if (i + 1 >= parts.size) break
