@@ -12,7 +12,7 @@ import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
-import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
+import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import com.serranoie.app.minus.presentation.ui.history.calculateNextChargeDate
 import com.serranoie.app.minus.presentation.ui.history.getRecurringChargesInPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,6 +55,7 @@ sealed interface AnalyticsUiEffect {
 class AnalyticsViewModel @Inject constructor(
     private val budgetRepository: BudgetRepository,
     private val settingsRepository: SettingsRepository,
+    private val budgetStateCalculator: BudgetStateCalculator,
     private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase,
     private val clearEarlyFinishStateUseCase: ClearEarlyFinishStateUseCase,
     private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
@@ -141,7 +142,6 @@ class AnalyticsViewModel @Inject constructor(
         )
 
         val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
-        val totalSpent = actualSpends.sumOf { it.amount }
 
         val budgetSettings = BudgetSettings(
             totalBudget = archive.totalBudget,
@@ -151,23 +151,10 @@ class AnalyticsViewModel @Inject constructor(
             currencyCode = archive.currencyCode
         )
 
-        val budgetState = BudgetState(
-            remainingToday = archive.totalBudget.subtract(totalSpent)
-                .coerceAtLeast(BigDecimal.ZERO),
-            totalSpentToday = BigDecimal.ZERO,
-            dailyBudget = archive.totalBudget.divide(
-                BigDecimal(
-                    ChronoUnit.DAYS.between(
-                        archive.startDate, archive.endDate
-                    ).toInt() + 1
-                ), 2, RoundingMode.HALF_UP
-            ),
-            daysRemaining = 0,
-            progress = (totalSpent.divide(archive.totalBudget, 4, RoundingMode.HALF_UP)
-                .toFloat()).coerceIn(0f, 1f),
-            isOverBudget = totalSpent > archive.totalBudget,
-            totalBudget = archive.totalBudget,
-            totalSpentInPeriod = totalSpent
+        val budgetState = budgetStateCalculator.calculateBudgetState(
+            settings = budgetSettings,
+            transactions = transactions,
+            currentDate = archive.endDate
         )
 
         return AnalyticsState(
@@ -223,7 +210,11 @@ class AnalyticsViewModel @Inject constructor(
             today = today,
         )
 
-        val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
+        val displayBudgetState = budgetStateCalculator.calculateBudgetState(
+            settings = settings,
+            transactions = transactions,
+            currentDate = today
+        )
 
         val startDate = settings.startDate.atStartOfDay().atZone(ZoneId.systemDefault())
             .let { Date.from(it.toInstant()) }
@@ -245,55 +236,19 @@ class AnalyticsViewModel @Inject constructor(
                 .isEqual(today)
         val periodFinished = periodFinishedNaturally || earlyFinishActive
 
-        val wholeBudget = settings.totalBudget
+        val displayBudget = displayBudgetState.totalBudget
 
-        val totalSpent = actualSpends.sumOf { it.amount }
-        val remainingBudget = wholeBudget.subtract(totalSpent)
+        val totalSpent = displayBudgetState.totalSpentInPeriod
+        val remainingBudget = displayBudgetState.remainingToday
 
-        val plannedPeriodDays =
-            ChronoUnit.DAYS.between(settings.startDate, settings.getPeriodEndDate()).toInt() + 1
-
-        val dailyBudget = if (wholeBudget > BigDecimal.ZERO && plannedPeriodDays > 0) {
-            wholeBudget.divide(BigDecimal(plannedPeriodDays), 2, RoundingMode.HALF_UP)
-        } else BigDecimal.ZERO
+        val dailyBudget = displayBudgetState.dailyBudget
 
         val extraAffordableDays =
             if (earlyFinishActive && remainingBudget > BigDecimal.ZERO && dailyBudget > BigDecimal.ZERO) {
                 remainingBudget.divide(dailyBudget, 0, RoundingMode.DOWN).toInt().coerceAtLeast(0)
             } else 0
 
-        val daysRemaining = ChronoUnit.DAYS.between(today, endDate).coerceAtLeast(0).toInt()
-        val progress = if (wholeBudget > BigDecimal.ZERO) {
-            totalSpent.divide(wholeBudget, 4, RoundingMode.HALF_UP).toFloat()
-        } else 0f
-        val isOverBudget = totalSpent > wholeBudget
-        val totalSpentToday = actualSpends.filter { tx -> tx.date?.toLocalDate() == today }
-            .fold(BigDecimal.ZERO) { acc, tx -> acc.add(tx.amount) }
-
-        val allocations = computeDynamicAllocations(
-            totalBudget = wholeBudget,
-            totalSpentInPeriod = totalSpent,
-            totalSpentToday = totalSpentToday,
-            daysRemaining = daysRemaining,
-        )
-
-        val displayBudgetState = BudgetState(
-            remainingToday = remainingBudget.coerceAtLeast(BigDecimal.ZERO),
-            totalSpentToday = totalSpentToday,
-            dailyBudget = dailyBudget,
-            daysRemaining = daysRemaining,
-            progress = progress,
-            isOverBudget = isOverBudget,
-            totalBudget = wholeBudget,
-            totalSpentInPeriod = totalSpent,
-            dailyAllocation = allocations.dailyAllocation,
-            weeklyAllocation = allocations.weeklyAllocation,
-            biweeklyAllocation = allocations.biweeklyAllocation,
-            monthlyAllocation = allocations.monthlyAllocation,
-            isTodayOverDailyAllocation = allocations.isTodayOverDailyAllocation,
-        )
-
-        val shouldShowRolloverStyle = settings.rollOverLimit?.let { it > BigDecimal.ZERO } == true
+        val shouldShowRolloverStyle = displayBudget > settings.totalBudget
 
         val creditOwed = allTransactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
             .sumOf { it.amount }
@@ -304,11 +259,11 @@ class AnalyticsViewModel @Inject constructor(
 
         return AnalyticsState(
             periodFinished = periodFinished,
-            transactions = actualSpends,
-            spends = actualSpends,
+            transactions = transactions,
+            spends = transactions,
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
-            wholeBudget = wholeBudget,
+            wholeBudget = displayBudget,
             currencyCode = settings.currencyCode,
             finishPeriodActualDate = if (earlyFinishActive) earlyFinishActualDate else null,
             startPeriodDate = startDate,

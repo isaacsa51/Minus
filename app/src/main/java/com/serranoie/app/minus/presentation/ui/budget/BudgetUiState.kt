@@ -37,6 +37,7 @@ data class BudgetUiState(
 	val pendingExpensesForNextPeriod: List<Transaction> = emptyList(),
 	val creditOwed: BigDecimal = BigDecimal.ZERO,
 	val debtAdjustedBalance: BigDecimal = BigDecimal.ZERO,
+	val calculationPreview: String? = null,
 ) {
 	companion object {
 		val INITIAL = BudgetUiState()

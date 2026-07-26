@@ -27,11 +27,19 @@ fun DayTotalItem(
 			.fillMaxWidth(),
 		horizontalArrangement = Arrangement.End
 	) {
+		val isIncome = total < BigDecimal.ZERO
+		val absoluteTotal = total.abs()
+		val formattedValue = if (isIncome) {
+			"+${currencyFormat.format(absoluteTotal)}"
+		} else {
+			currencyFormat.format(total)
+		}
+
 		Text(
 			text = if (showLabel) {
-				stringResource(R.string.day_total_format, currencyFormat.format(total))
+				stringResource(R.string.day_total_format, formattedValue)
 			} else {
-				currencyFormat.format(total)
+				formattedValue
 			},
 			style = MaterialTheme.typography.labelMediumCondensed,
 			color = MaterialTheme.colorScheme.onSurfaceVariant

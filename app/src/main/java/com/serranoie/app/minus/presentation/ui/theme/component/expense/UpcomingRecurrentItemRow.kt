@@ -140,10 +140,13 @@ fun UpcomingRecurrentItemRow(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val isIncome = transaction.amount < java.math.BigDecimal.ZERO
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = transaction.comment.ifEmpty { stringResource(R.string.expense_item_unnamed_expense) },
+                                    text = transaction.comment.ifEmpty {
+                                        stringResource(if (isIncome) R.string.expense_item_unnamed_income else R.string.expense_item_unnamed_expense)
+                                    },
                                     style = MaterialTheme.typography.titleMediumCondensed.copy(
                                         fontStyle = if (transaction.isCredit) FontStyle.Italic else FontStyle.Normal
                                     ),
@@ -189,7 +192,11 @@ fun UpcomingRecurrentItemRow(
                         }
 
                         Text(
-                            text = currencyFormat.format(transaction.amount),
+                            text = if (isIncome) {
+                                "+${currencyFormat.format(transaction.amount.abs())}"
+                            } else {
+                                currencyFormat.format(transaction.amount)
+                            },
                             style = MaterialTheme.typography.titleSmallEmphasized,
                             color = if (isOutOfPeriod) {
                                 MaterialTheme.colorScheme.onSurfaceVariant

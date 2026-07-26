@@ -1,7 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -35,7 +37,9 @@ import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadInt
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetSystemIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
+import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -59,13 +63,14 @@ private const val TAG = "BudgetViewModel - ISAAC"
 
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val budgetRepository: BudgetRepository,
     private val notificationHelper: NotificationHelper,
     private val notificationScheduler: NotificationScheduler,
     private val transactionHandler: BudgetTransactionHandler,
     private val budgetStateCalculator: BudgetStateCalculator,
     private val budgetWidgetUpdater: BudgetWidgetUpdater,
-    budgetExpressionEvaluator: BudgetExpressionEvaluator,
+    private val budgetExpressionEvaluator: BudgetExpressionEvaluator,
     private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase,
     private val observeCurrentPeriodRolloverUseCase: ObserveCurrentPeriodRolloverUseCase,
     private val getCurrentPeriodIdUseCase: GetCurrentPeriodIdUseCase,
@@ -155,6 +160,8 @@ class BudgetViewModel @Inject constructor(
             ) { numpadInput, editorState ->
                 numpadInput to editorState
             }.collect { (numpadInput, editorState) ->
+                val currencyCode = _uiState.value.budgetSettings?.currencyCode ?: "USD"
+                val preview = calculateCalculationPreview(numpadInput, currencyCode)
                 _uiState.update {
                     it.copy(
                         numpadInput = numpadInput,
@@ -171,6 +178,7 @@ class BudgetViewModel @Inject constructor(
                         pendingRecurrentAmount = editorState.pendingRecurrentAmount,
                         pendingRecurrentComment = editorState.pendingRecurrentComment,
                         selectedDate = editorState.selectedDate,
+                        calculationPreview = preview,
                     )
                 }
             }
@@ -260,6 +268,10 @@ class BudgetViewModel @Inject constructor(
     }
 
     private suspend fun applyBaseState(baseState: BudgetUiState) {
+        val preview = calculateCalculationPreview(
+            numpadController.input.value,
+            baseState.budgetSettings?.currencyCode ?: "USD"
+        )
         _uiState.update { current ->
             baseState.copy(
                 numpadInput = numpadController.input.value,
@@ -278,6 +290,7 @@ class BudgetViewModel @Inject constructor(
                 isCalculation = current.isCalculation,
                 dragProgress = current.dragProgress,
                 pendingExpensesForNextPeriod = baseState.pendingExpensesForNextPeriod,
+                calculationPreview = preview,
             )
         }
 
@@ -753,12 +766,34 @@ class BudgetViewModel @Inject constructor(
         return _uiState.value.currentPeriodId
     }
 
+    private fun calculateCalculationPreview(input: String, currencyCode: String): String? {
+        if (input.isEmpty()) return null
+        val startsWithPlus = input.startsWith("+")
+        val startsWithMinus = input.startsWith("-")
+        if (!startsWithPlus && !startsWithMinus) return null
+
+        val result = budgetExpressionEvaluator.evaluate(input) ?: return null
+
+        val amount = try {
+            BigDecimal(result).abs()
+        } catch (_: Exception) {
+            return null
+        }
+        val formattedAmount = symbolOnlyCurrencyFormat(currencyCode).format(amount)
+
+        return if (startsWithPlus) {
+            context.getString(R.string.budget_pill_calc_added, formattedAmount)
+        } else {
+            context.getString(R.string.budget_pill_calc_subtracted, formattedAmount)
+        }
+    }
+
     private fun validateNumpadInput(input: String): Boolean {
         if (input.isEmpty()) return false
         if (input == ".") return false
         return try {
             val value = BigDecimal(input)
-            value > BigDecimal.ZERO
+            value.compareTo(BigDecimal.ZERO) != 0
         } catch (_: NumberFormatException) {
             false
         }

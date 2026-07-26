@@ -203,7 +203,7 @@ fun CategoryAnalytics(
                         }
                     }
 
-                    val dayTotal = transactions.sumOf { it.amount }
+                    val dayTotal = transactions.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
                     DayTotalItem(
                         total = dayTotal,
                         currencyFormat = currencyFormat,

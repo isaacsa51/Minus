@@ -118,6 +118,7 @@
     <string name="expense_modified_format">%1$s has been modified</string>
     <string name="generic_expense">Expense</string>
     <string name="expense_item_unnamed_expense">Unnamed expense</string>
+    <string name="expense_item_unnamed_income" translatable="false">Unnamed income</string>
     <string name="expense_item_recurrent_subtitle_format">Recurrent expense — %1$s</string>
     <string name="hide_subscriptions_outside_period">Hide subscriptions outside of the period</string>
     <string name="show_subscriptions_outside_period">Show subscriptions outside of the period</string>
@@ -417,6 +418,8 @@
     <string name="budget_pill_over_budget">Budget amount exceeded</string>
     <string name="budget_pill_no_budget">No budget</string>
     <string name="budget_pill_no_budget_action">Set up your budget</string>
+    <string name="budget_pill_calc_added" translatable="false">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted" translatable="false">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Weekly</string>
     <string name="budget_pill_exhausted_biweekly_label">Biweekly</string>
@@ -559,6 +562,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>
     <string name="no_name">No name</string>
+    <string name="no_name_income" translatable="false">Unnamed income</string>
     <string name="description">Purchase Reason</string>
     <string name="date">Date</string>
     <string name="frequency">Frequency</string>

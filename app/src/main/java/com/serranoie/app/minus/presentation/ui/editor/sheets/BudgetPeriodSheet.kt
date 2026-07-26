@@ -381,7 +381,7 @@ private fun ViewBudgetContent(
                     .fillMaxWidth()
                     .height(IntrinsicSize.Min)
                     .padding(bottom = 8.dp),
-            budget = totalBudget,
+            budget = budgetState?.totalBudget ?: totalBudget,
             spend = totalSpent,
             currency = currencyCode,
         )

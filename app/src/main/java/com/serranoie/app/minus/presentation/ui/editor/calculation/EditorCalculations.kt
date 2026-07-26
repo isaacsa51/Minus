@@ -27,29 +27,42 @@ internal fun evaluateCalculation(input: String): String? {
     return try {
         val normalized = input.trim().replace("×", "*").replace("÷", "/")
 
-        // Reject expressions ending in an operator (incomplete expression)
-        normalized.lastOrNull()?.let { if (it in "+-*/") return null }
+        // Handle unary leading operators
+        val leadingOperator = if (normalized.startsWith("+") || normalized.startsWith("-")) {
+            normalized[0]
+        } else null
 
-        val hasOperator = normalized.any { it in "+-*/" }
+        val expressionToParse = if (leadingOperator != null) {
+            normalized.substring(1).trim()
+        } else {
+            normalized
+        }
+
+        // Reject expressions ending in an operator (incomplete expression)
+        expressionToParse.lastOrNull()?.let { if (it in "+-*/") return null }
+
+        val hasOperator = expressionToParse.any { it in "+-*/" }
 
         if (!hasOperator) {
-            val num = normalized.toBigDecimalOrNull() ?: return null
-            return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
-                num.toBigInteger().toString()
+            val num = expressionToParse.toBigDecimalOrNull() ?: return null
+            val finalNum = if (leadingOperator == '-') num.negate() else num
+            return if (finalNum.scale() <= 0 || finalNum.stripTrailingZeros().scale() <= 0) {
+                finalNum.toBigInteger().toString()
             } else {
-                num.setScale(2, RoundingMode.HALF_UP).toPlainString()
+                finalNum.setScale(2, RoundingMode.HALF_UP).toPlainString()
             }
         }
 
         val tokenPattern = Regex("([+\\-*/])")
-        val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
-        val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
+        val parts = tokenPattern.split(expressionToParse).filter { it.isNotEmpty() }
+        val operators = tokenPattern.findAll(expressionToParse).map { it.value }.toList()
 
         if (parts.isEmpty() || parts[0].isEmpty()) return null
 
         if (operators.size > parts.size - 1) return null
 
         var result = parts[0].toBigDecimalOrNull() ?: return null
+        if (leadingOperator == '-') result = result.negate()
 
         for (i in operators.indices) {
             if (i + 1 >= parts.size) break

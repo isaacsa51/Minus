@@ -99,10 +99,6 @@ fun BudgetDisplay(
             settingsTotalBudget.subtract(rolloverFromSettings)
         }
 
-        settingsTotalBudget != null && stateTotalBudget != null && stateTotalBudget > settingsTotalBudget -> {
-            settingsTotalBudget
-        }
-
         settingsTotalBudget != null -> settingsTotalBudget
         else -> budget
     }
