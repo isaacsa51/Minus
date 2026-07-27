@@ -46,11 +46,7 @@ internal fun evaluateCalculation(input: String): String? {
         if (!hasOperator) {
             val num = expressionToParse.toBigDecimalOrNull() ?: return null
             val finalNum = if (leadingOperator == '-') num.negate() else num
-            return if (finalNum.scale() <= 0 || finalNum.stripTrailingZeros().scale() <= 0) {
-                finalNum.toBigInteger().toString()
-            } else {
-                finalNum.setScale(2, RoundingMode.HALF_UP).toPlainString()
-            }
+            return formatResult(finalNum)
         }
 
         val tokenPattern = Regex("([+\\-*/])")
@@ -82,12 +78,17 @@ internal fun evaluateCalculation(input: String): String? {
             }
         }
 
-        if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
-            result.toBigInteger().toString()
-        } else {
-            result.setScale(2, RoundingMode.HALF_UP).toPlainString()
-        }
+        formatResult(result)
     } catch (_: Exception) {
         null
+    }
+}
+
+private fun formatResult(value: BigDecimal): String {
+    val stripped = value.stripTrailingZeros()
+    return if (stripped.scale() <= 0) {
+        stripped.toPlainString()
+    } else {
+        value.setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
     }
 }
