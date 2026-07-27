@@ -22,7 +22,7 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
         ArchivedBudgetEntity::class
     ],
     version = 13,
-    exportSchema = false
+    exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
 

@@ -13,6 +13,10 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 detekt {
     buildUponDefaultConfig = true
     config.setFrom(files("$rootDir/config/detekt/detekt.yml"))

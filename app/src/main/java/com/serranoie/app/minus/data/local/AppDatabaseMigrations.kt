@@ -55,4 +55,24 @@ object AppDatabaseMigrations {
             )
         }
     }
+
+    val MIGRATION_12_13: Migration = object : Migration(12, 13) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `archived_budgets` (
+                    `periodId` INTEGER NOT NULL, 
+                    `totalBudget` TEXT NOT NULL, 
+                    `spentAmount` TEXT NOT NULL, 
+                    `startDate` INTEGER NOT NULL, 
+                    `endDate` INTEGER NOT NULL, 
+                    `currencyCode` TEXT NOT NULL, 
+                    `periodType` TEXT NOT NULL, 
+                    `createdAt` INTEGER NOT NULL, 
+                    PRIMARY KEY(`periodId`)
+                )
+                """.trimIndent()
+            )
+        }
+    }
 }
