@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
@@ -48,18 +50,20 @@ fun AutoResizeBasicTextField(
 		innerTextField()
 	},
 	containerSize: IntSize = IntSize.Zero,
+	annotatedValue: AnnotatedString? = null,
 ) {
-	val transformedValue = remember(value, visualTransformation) {
-		visualTransformation.filter(AnnotatedString(value)).text.text
+	val transformedValue = remember(value, visualTransformation, annotatedValue) {
+		val base = annotatedValue ?: AnnotatedString(value)
+		visualTransformation.filter(base).text
 	}
 
-	val adaptiveFontSize = if (containerSize.width > 0 && transformedValue.isNotEmpty()) {
+	val adaptiveFontSize = if (containerSize.width > 0 && transformedValue.text.isNotEmpty()) {
 		calcAdaptiveFont(
 			height = containerSize.height.toFloat(),
 			width = containerSize.width.toFloat(),
 			minFontSize = minFontSize,
 			maxFontSize = maxFontSize,
-			text = transformedValue,
+			text = transformedValue.text,
 			style = textStyle,
 		)
 	} else {
@@ -81,7 +85,24 @@ fun AutoResizeBasicTextField(
 		singleLine = singleLine,
 		enabled = enabled,
 		readOnly = readOnly,
-		visualTransformation = visualTransformation,
+		visualTransformation = if (annotatedValue != null) {
+			VisualTransformation { original ->
+				val offsetMapping = object : OffsetMapping {
+					override fun originalToTransformed(offset: Int): Int {
+						val prefixLen = annotatedValue.length - original.length
+						return (offset + prefixLen).coerceIn(0, annotatedValue.length)
+					}
+
+					override fun transformedToOriginal(offset: Int): Int {
+						val prefixLen = annotatedValue.length - original.length
+						return (offset - prefixLen).coerceIn(0, original.length)
+					}
+				}
+				TransformedText(annotatedValue, offsetMapping)
+			}
+		} else {
+			visualTransformation
+		},
 		keyboardOptions = keyboardOptions,
 		keyboardActions = keyboardActions,
 		decorationBox = decorationBox,

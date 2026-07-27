@@ -44,6 +44,7 @@ import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.harmonizeWithColor
@@ -198,28 +199,41 @@ fun SpendBudgetCard(
                     .padding(vertical = 16.dp, horizontal = 24.dp),
             ) {
                 val valueFontSize = MaterialTheme.typography.titleLargeEmphasized.fontSize
-                val formattedAmount = numberFormat(context, spend, currency)
-                val annotatedSpend = remember(formattedAmount, currency) {
+                val symbolStyle = MaterialTheme.typography.titleSmallCondensed.toSpanStyle()
+                val formattedAmountValue = numberFormat(context, spend, currency)
+                val annotatedSpend = remember(formattedAmountValue, currency, valueFontSize, symbolStyle) {
                     val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: ""
-                    if (currencySymbol.length > 2 && formattedAmount.startsWith(currencySymbol)) {
+                    if (currencySymbol.length > 2 && formattedAmountValue.startsWith(currencySymbol)) {
+                        val amount = formattedAmountValue.removePrefix(currencySymbol).trim()
                         AnnotatedString.Builder().apply {
-                            pushStyle(SpanStyle(fontSize = valueFontSize * 0.5f, baselineShift = BaselineShift(0.25f)))
+                            pushStyle(
+                                symbolStyle.copy(
+                                    fontSize = valueFontSize * 0.65f,
+                                    fontWeight = FontWeight.Bold,
+                                    baselineShift = BaselineShift(0f)
+                                )
+                            )
                             append(currencySymbol)
                             pop()
-                            append(formattedAmount.removePrefix(currencySymbol))
+                            pushStyle(
+                                SpanStyle(
+                                    fontSize = valueFontSize,
+                                    fontWeight = FontWeight.Light
+                                )
+                            )
+                            append(amount)
+                            pop()
                         }.toAnnotatedString()
                     } else {
-                        AnnotatedString(formattedAmount)
+                        AnnotatedString(formattedAmountValue)
                     }
                 }
                 Text(
                     text = annotatedSpend,
                     style = MaterialTheme.typography.displaySmallEmphasized,
                     fontSize = valueFontSize,
-                    fontWeight = FontWeight.Bold,
                     overflow = TextOverflow.Ellipsis,
                     softWrap = false,
-                    lineHeight = TextUnit(0.2f, TextUnitType.Em),
                     modifier = Modifier.censor()
                 )
 
@@ -285,7 +299,7 @@ private fun PreviewSpendBudgetCard() {
                 modifier = Modifier.height(IntrinsicSize.Min),
                 spend = BigDecimal(45740),
                 budget = BigDecimal(60000),
-                currency = "BKT"
+                currency = "QAR"
             )
 
             Spacer(modifier = Modifier.height(16.dp))

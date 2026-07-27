@@ -68,7 +68,10 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -83,8 +86,6 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
-import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
-import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalculation
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.EditableCategoryTag
@@ -98,6 +99,9 @@ import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTe
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
+import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
@@ -296,7 +300,10 @@ fun Editor(
                                         modifier = Modifier
                                             .semantics { role = Role.RadioButton }
                                             .let { m ->
-                                                if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 4) else m
+                                                if (tutorialBoxState != null) m.markForTutorial(
+                                                    tutorialBoxState,
+                                                    index = 4
+                                                ) else m
                                             },
                                         colors = ToggleButtonDefaults.toggleButtonColors(
                                             containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
@@ -337,7 +344,10 @@ fun Editor(
                                     modifier = Modifier
                                         .semantics { role = Role.RadioButton }
                                         .let { m ->
-                                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 4) else m
+                                            if (tutorialBoxState != null) m.markForTutorial(
+                                                tutorialBoxState,
+                                                index = 4
+                                            ) else m
                                         },
                                     colors = ToggleButtonDefaults.toggleButtonColors(
                                         containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
@@ -388,7 +398,10 @@ fun Editor(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .let { m ->
-                                        if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 2) else m
+                                        if (tutorialBoxState != null) m.markForTutorial(
+                                            tutorialBoxState,
+                                            index = 2
+                                        ) else m
                                     }
                             ) {
                                 BadgedBox(
@@ -543,14 +556,75 @@ private fun EditingContent(
         }
     }
 
-    val displayContent = if (hasExpressionOperators) {
-        "$currencySymbol $input"
-    } else {
-        try {
-            val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
-            currencyFormat.format(value)
-        } catch (_: Exception) {
-            input.ifEmpty { currencyFormat.format(BigDecimal.ZERO) }
+    val symbolStyle = MaterialTheme.typography.titleSmallCondensed.toSpanStyle()
+    val annotatedDisplayContent =
+        remember(input, currencyCode, hasExpressionOperators, symbolStyle) {
+            if (hasExpressionOperators) {
+                val content = "$currencySymbol$input"
+                if (currencySymbol.length > 2) {
+                    AnnotatedString.Builder().apply {
+                        pushStyle(
+                            symbolStyle.copy(
+                                fontSize = 86.sp * 0.6f,
+                                fontWeight = FontWeight.Bold,
+                                baselineShift = BaselineShift(0f)
+                            )
+                        )
+                        append(currencySymbol)
+                        pop()
+                        pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                        append(input)
+                        pop()
+                    }.toAnnotatedString()
+                } else {
+                    AnnotatedString(content)
+                }
+            } else {
+                val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
+                val formatted = currencyFormat.format(value)
+                if (currencySymbol.length > 2 && formatted.startsWith(currencySymbol)) {
+                    val amount = formatted.removePrefix(currencySymbol).trim()
+                    AnnotatedString.Builder().apply {
+                        pushStyle(
+                            symbolStyle.copy(
+                                fontSize = 86.sp * 0.6f,
+                                fontWeight = FontWeight.Bold,
+                                baselineShift = BaselineShift(0f)
+                            )
+                        )
+                        append(currencySymbol)
+                        pop()
+                        pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                        append(amount)
+                        pop()
+                    }.toAnnotatedString()
+                } else {
+                    AnnotatedString(formatted)
+                }
+            }
+        }
+
+    val annotatedCalculationResult = remember(calculationResult, currencyCode, symbolStyle) {
+        if (calculationResult == null) return@remember null
+        val content = "= $currencySymbol$calculationResult"
+        if (currencySymbol.length > 2) {
+            AnnotatedString.Builder().apply {
+                append("= ")
+                pushStyle(
+                    symbolStyle.copy(
+                        fontSize = 36.sp * 0.6f,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(0f)
+                    )
+                )
+                append(currencySymbol)
+                pop()
+                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                append(calculationResult)
+                pop()
+            }.toAnnotatedString()
+        } else {
+            AnnotatedString(content)
         }
     }
 
@@ -607,7 +681,8 @@ private fun EditingContent(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             AutoResizeBasicTextField(
-                                value = displayContent,
+                                value = input,
+                                annotatedValue = annotatedDisplayContent,
                                 onValueChange = {},
                                 readOnly = true,
                                 modifier = Modifier.wrapContentWidth(Alignment.End),
@@ -621,7 +696,8 @@ private fun EditingContent(
                                 containerSize = containerSizePx
                             )
                             AutoResizeBasicTextField(
-                                value = "= ${currencySymbol}$calculationResult",
+                                value = calculationResult ?: "",
+                                annotatedValue = annotatedCalculationResult,
                                 onValueChange = {},
                                 readOnly = true,
                                 modifier = Modifier
@@ -639,7 +715,8 @@ private fun EditingContent(
                         }
                     } else {
                         AutoResizeBasicTextField(
-                            value = displayContent,
+                            value = input,
+                            annotatedValue = annotatedDisplayContent,
                             onValueChange = {},
                             readOnly = true,
                             modifier = Modifier.wrapContentWidth(Alignment.End),
@@ -672,7 +749,10 @@ private fun EditingContent(
                         onCommentUpdate = onCommentUpdate,
                         editorFocusController = editorFocusController,
                         modifier = Modifier.let { m ->
-                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 3) else m
+                            if (tutorialBoxState != null) m.markForTutorial(
+                                tutorialBoxState,
+                                index = 3
+                            ) else m
                         },
                         extendWidth = toolbarWidth,
                         onlyIcon = false,
@@ -707,7 +787,10 @@ private fun EditingContent(
                         .fillMaxWidth()
                         .padding(bottom = 26.dp)
                         .let { m ->
-                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, index = 3) else m
+                            if (tutorialBoxState != null) m.markForTutorial(
+                                tutorialBoxState,
+                                index = 3
+                            ) else m
                         },
                 )
             }
@@ -837,7 +920,7 @@ private fun EditorPreview_Editing_WithCredit() {
                     totalBudget = BigDecimal("500.00"),
                     period = BudgetPeriod.DAILY,
                     startDate = LocalDate.now(),
-                    currencyCode = "USD"
+                    currencyCode = "QAR"
                 ),
                 budgetState = BudgetState(
                     remainingToday = BigDecimal("110.00"),

@@ -45,7 +45,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -58,6 +62,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
@@ -65,6 +70,7 @@ import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.calcAdaptiveFont
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.combineColors
@@ -106,6 +112,38 @@ fun BudgetPill(
     val exhaustedMessage = resolveExhaustedMessage(budgetState, viewPeriod, splitMode)
 
     val isNoBudget = budgetState == null
+    val amountText =
+        if (isNoBudget) stringResource(R.string.budget_pill_no_budget_action) else currencyFormat.format(
+            metrics.periodRemaining
+        )
+    val symbolStyle = MaterialTheme.typography.titleSmallCondensed.toSpanStyle()
+    val annotatedAmount = remember(amountText, currencyCode, symbolStyle, isNoBudget) {
+        val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: ""
+        if (!isNoBudget && currencySymbol.length > 2 && amountText.startsWith(currencySymbol)) {
+            val amount = amountText.removePrefix(currencySymbol).trim()
+            AnnotatedString.Builder().apply {
+                pushStyle(
+                    symbolStyle.copy(
+                        fontSize = 16.sp * 0.65f,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(0f)
+                    )
+                )
+                append(currencySymbol)
+                pop()
+                pushStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Light
+                    )
+                )
+                append(amount)
+                pop()
+            }.toAnnotatedString()
+        } else {
+            AnnotatedString(amountText)
+        }
+    }
+
     val shouldCenterRemainingAmount =
         remember(centerRemainingAmount, metrics.isCurrentPeriodOverBudget, bigVariant, isNoBudget) {
             (centerRemainingAmount && !metrics.isCurrentPeriodOverBudget && !bigVariant) || isNoBudget
@@ -189,9 +227,8 @@ fun BudgetPill(
                             contentAlignment = Alignment.Center,
                         ) {
                             AdaptiveSingleLineText(
-                                text = if (isNoBudget) stringResource(R.string.budget_pill_no_budget_action) else currencyFormat.format(
-                                    metrics.periodRemaining
-                                ),
+                                text = amountText,
+                                annotatedText = annotatedAmount,
                                 style = MaterialTheme.typography.titleMediumCondensed,
                                 color = textColor,
                                 minFontSize = 16.sp,
@@ -230,7 +267,8 @@ fun BudgetPill(
 
                             if (!metrics.isCurrentPeriodOverBudget && !metrics.isOverCurrentSubPeriod && !bigVariant) {
                                 AdaptiveSingleLineText(
-                                    text = currencyFormat.format(metrics.periodRemaining),
+                                    text = amountText,
+                                    annotatedText = annotatedAmount,
                                     style = MaterialTheme.typography.titleMediumCondensed,
                                     color = textColor,
                                     minFontSize = 16.sp,
@@ -488,6 +526,7 @@ private fun AdaptiveSingleLineText(
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start,
     fillWidth: Boolean = true,
+    annotatedText: AnnotatedString? = null,
 ) {
     BoxWithConstraints(modifier = modifier) {
         val density = LocalDensity.current
@@ -505,7 +544,7 @@ private fun AdaptiveSingleLineText(
         )
 
         Text(
-            text = text,
+            text = annotatedText ?: AnnotatedString(text),
             style = style.copy(fontSize = adaptiveFontSize),
             color = color,
             maxLines = 1,
@@ -671,11 +710,11 @@ private fun PreviewBudgetPillDynamic() {
                     totalBudget = BigDecimal("500.00"),
                     period = BudgetPeriod.DAILY,
                     startDate = LocalDate.now(),
-                    currencyCode = "MXN",
+                    currencyCode = "QAR",
                     splitMode = BudgetSplitMode.DYNAMIC,
                 ),
                 viewPeriod = BudgetPeriod.DAILY,
-                currencyCode = "MXN",
+                currencyCode = "QAR",
                 splitMode = BudgetSplitMode.DYNAMIC,
                 onOpenBudgetSheet = { },
             )
@@ -700,11 +739,11 @@ private fun PreviewBudgetPillDynamic() {
                     totalBudget = BigDecimal("1500.00"),
                     period = BudgetPeriod.DAILY,
                     startDate = LocalDate.now(),
-                    currencyCode = "MXN",
+                    currencyCode = "QAR",
                     splitMode = BudgetSplitMode.DYNAMIC,
                 ),
                 viewPeriod = BudgetPeriod.DAILY,
-                currencyCode = "MXN",
+                currencyCode = "QAR",
                 centerRemainingAmount = true,
                 modifier = Modifier.fillMaxWidth(),
                 splitMode = BudgetSplitMode.DYNAMIC,
