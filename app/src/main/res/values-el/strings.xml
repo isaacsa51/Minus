@@ -208,6 +208,8 @@
     <string name="changelog_release_date">Κυκλοφόρησε %1$s</string>
     <string name="changelog_close">Κλείσιμο</string>
     <string name="changelog_previous_versions">Προηγούμενη έκδοση</string>
+    <string name="changelog_updated_to">Updated to: %1$s</string>
+    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Επιλέξτε την περίοδο</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d days · %2$s - %3$s</string>
