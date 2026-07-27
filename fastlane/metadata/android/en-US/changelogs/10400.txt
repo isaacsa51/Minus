@@ -1,0 +1,5 @@
+- feat: implement income support
+- feat: add qatari riyal currency
+- fix: add migration to v13
+- feat: enhance changelog UI with information header
+- feat: implement sub-period spending tracking and refine BudgetPill logic
