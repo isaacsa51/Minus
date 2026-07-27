@@ -205,6 +205,8 @@
     <string name="changelog_release_date">發布於 %1$s</string>
     <string name="changelog_close">關閉</string>
     <string name="changelog_previous_versions">先前版本</string>
+    <string name="changelog_updated_to">Updated to: %1$s</string>
+    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">選擇週期</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d 天 · %2$s - %3$s</string>

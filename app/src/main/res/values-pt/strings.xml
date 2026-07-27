@@ -208,6 +208,8 @@
     <string name="changelog_release_date">%1$s liberados</string>
     <string name="changelog_close">FECHAR</string>
     <string name="changelog_previous_versions">Versão anterior</string>
+    <string name="changelog_updated_to">Updated to: %1$s</string>
+    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Selecione o período</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d dias · %2$s - %3$s</string>

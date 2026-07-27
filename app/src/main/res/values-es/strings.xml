@@ -208,6 +208,8 @@
     <string name="changelog_release_date">Publicada el %1$s</string>
     <string name="changelog_close">Cerrar</string>
     <string name="changelog_previous_versions">Versión anterior</string>
+    <string name="changelog_updated_to">Actualizado a: %1$s</string>
+    <string name="changelog_see_changes">Revisa todos los cambios para no perderte ninguna novedad</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Selecciona el periodo</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d días · %2$s - %3$s</string>

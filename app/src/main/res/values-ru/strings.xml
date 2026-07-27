@@ -214,6 +214,8 @@
     <string name="changelog_release_date">Released %1$s</string>
     <string name="changelog_close">Close</string>
     <string name="changelog_previous_versions">Previous version</string>
+    <string name="changelog_updated_to">Updated to: %1$s</string>
+    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Select the period</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d days · %2$s - %3$s</string>
