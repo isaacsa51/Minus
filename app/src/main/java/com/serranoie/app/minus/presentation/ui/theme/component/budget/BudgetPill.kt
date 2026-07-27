@@ -263,7 +263,12 @@ private fun calculateBudgetMetrics(
         BudgetPeriod.MONTHLY -> BigDecimal(30)
     }
     val periodBudget = dailyBudget.multiply(multiplier)
-    val periodSpent = if (period == BudgetPeriod.DAILY) spentToday else spentInPeriod
+    val periodSpent = when (period) {
+        BudgetPeriod.DAILY -> spentToday
+        BudgetPeriod.WEEKLY -> state.totalSpentThisWeek
+        BudgetPeriod.BIWEEKLY -> state.totalSpentThisBiweek
+        BudgetPeriod.MONTHLY -> state.totalSpentThisMonth
+    }
     val staticRemaining = periodBudget.subtract(periodSpent)
 
     val periodRemaining = when (splitMode) {
@@ -275,16 +280,17 @@ private fun calculateBudgetMetrics(
         BudgetSplitMode.STATIC -> staticRemaining
     }
 
-    val isOverBudget = when (splitMode) {
-        BudgetSplitMode.DYNAMIC -> state.isOverBudget
-        BudgetSplitMode.STATIC -> staticRemaining.signum() == -1
-    }
+    val isOverBudget = state.isOverBudget
 
-    val isOverSubPeriod = when (period) {
-        BudgetPeriod.DAILY -> state.isTodayOverDailyAllocation
-        BudgetPeriod.WEEKLY -> spentInPeriod > state.weeklyAllocation && state.weeklyAllocation > BigDecimal.ZERO
-        BudgetPeriod.BIWEEKLY -> spentInPeriod > state.biweeklyAllocation && state.biweeklyAllocation > BigDecimal.ZERO
-        BudgetPeriod.MONTHLY -> spentInPeriod > state.monthlyAllocation && state.monthlyAllocation > BigDecimal.ZERO
+    val isOverSubPeriod = when (splitMode) {
+        BudgetSplitMode.DYNAMIC -> when (period) {
+            BudgetPeriod.DAILY -> state.isTodayOverDailyAllocation
+            BudgetPeriod.WEEKLY -> spentInPeriod > state.weeklyAllocation && state.weeklyAllocation > BigDecimal.ZERO
+            BudgetPeriod.BIWEEKLY -> spentInPeriod > state.biweeklyAllocation && state.biweeklyAllocation > BigDecimal.ZERO
+            BudgetPeriod.MONTHLY -> spentInPeriod > state.monthlyAllocation && state.monthlyAllocation > BigDecimal.ZERO
+        }
+
+        BudgetSplitMode.STATIC -> staticRemaining.signum() == -1
     }
 
     val progress = if (periodBudget.signum() == 1) {

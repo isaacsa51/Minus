@@ -100,6 +100,17 @@ class BudgetStateCalculator @Inject constructor(
 
         val recurringDueToday = recurringExpenseCalculator.calculateRecurringDueToday(transactions, currentDate)
         val spentToday = regularSpentToday.add(recurringDueToday)
+
+        val totalSpentThisWeek = calculateSpentInSubPeriod(
+            transactions, settings.startDate, currentDate, 7
+        )
+        val totalSpentThisBiweek = calculateSpentInSubPeriod(
+            transactions, settings.startDate, currentDate, 14
+        )
+        val totalSpentThisMonth = calculateSpentInSubPeriod(
+            transactions, settings.startDate, currentDate, 30
+        )
+
         val remainingToday = originalDailyBudget.add(carryForFirstDay).subtract(spentToday)
 
         val progress = if (effectiveTotalBudget > BigDecimal.ZERO) {
@@ -165,12 +176,36 @@ class BudgetStateCalculator @Inject constructor(
             isOverBudget = remainingBudget < BigDecimal.ZERO,
             totalBudget = effectiveTotalBudget,
             totalSpentInPeriod = totalSpentInPeriod.add(recurringDueToday),
+            totalSpentThisWeek = totalSpentThisWeek,
+            totalSpentThisBiweek = totalSpentThisBiweek,
+            totalSpentThisMonth = totalSpentThisMonth,
             dailyAllocation = allocations.daily,
             weeklyAllocation = allocations.weekly,
             biweeklyAllocation = allocations.biweekly,
             monthlyAllocation = allocations.monthly,
             isTodayOverDailyAllocation = allocations.isOverDaily,
         )
+    }
+
+    private fun calculateSpentInSubPeriod(
+        transactions: List<Transaction>,
+        budgetStart: LocalDate,
+        currentDate: LocalDate,
+        blockDays: Int,
+    ): BigDecimal {
+        val daysFromStart = ChronoUnit.DAYS.between(budgetStart, currentDate)
+        if (daysFromStart < 0) return BigDecimal.ZERO
+
+        val currentBlockIndex = daysFromStart / blockDays
+        val blockStart = budgetStart.plusDays(currentBlockIndex * blockDays)
+        val blockEnd = blockStart.plusDays(blockDays.toLong() - 1)
+
+        return transactions.filter { !it.isDeleted }
+            .filter {
+                val txDate = it.date?.toLocalDate()
+                txDate != null && !txDate.isBefore(blockStart) && !txDate.isAfter(blockEnd)
+            }
+            .sumOf { it.amount }
     }
 }
 
