@@ -347,7 +347,7 @@
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">Budget amount Exceeded</string>
+    <string name="budget_pill_over_budget">Budget amount exceeded</string>
     <string name="budget_pill_no_budget">No budget</string>
     <string name="budget_pill_no_budget_action">Set up your budget</string>
     <string name="budget_pill_exhausted_daily_label">Daily</string>
