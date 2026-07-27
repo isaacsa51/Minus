@@ -69,10 +69,11 @@ class BudgetExpressionEvaluator @Inject constructor() {
     }
 
     private fun formatResult(value: BigDecimal): String {
-        return if (value.scale() <= 0 || value.stripTrailingZeros().scale() <= 0) {
-            value.toBigInteger().toString()
+        val stripped = value.stripTrailingZeros()
+        return if (stripped.scale() <= 0) {
+            stripped.toPlainString()
         } else {
-            value.setScale(2, RoundingMode.HALF_UP).toPlainString()
+            value.setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
         }
     }
 }

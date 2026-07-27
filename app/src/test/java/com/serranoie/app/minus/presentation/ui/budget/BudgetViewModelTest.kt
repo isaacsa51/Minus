@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
+import android.content.Context
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.repository.BudgetRepository
@@ -44,6 +45,7 @@ import java.time.LocalDateTime
 @OptIn(ExperimentalCoroutinesApi::class)
 class BudgetViewModelTest {
 
+    private val context: Context = mockk(relaxed = true)
     private val budgetRepository: BudgetRepository = mockk(relaxed = true)
     private val notificationHelper: NotificationHelper = mockk(relaxed = true)
     private val notificationScheduler: NotificationScheduler = mockk(relaxed = true)
@@ -79,6 +81,7 @@ class BudgetViewModelTest {
     }
 
     private fun newViewModel() = BudgetViewModel(
+        context = context,
         budgetRepository = budgetRepository,
         notificationHelper = notificationHelper,
         notificationScheduler = notificationScheduler,
