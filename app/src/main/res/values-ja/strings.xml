@@ -15,6 +15,10 @@
     <string name="tutorial_analytics_description">Analytics を開くと、時間の経過とカテゴリ別、予算目標に対する支出がどのように分割されるかを確認できます。</string>
     <string name="tutorial_privacy_title">プライバシーモード</string>
     <string name="tutorial_privacy_description">画面上のすべての金額をぼかすために、携帯電話の上部(フロントカメラが座っている場所)を手で約1秒間覆います。 電源を切るには、もう一度カバーしてください。</string>
+    <string name="tutorial_calc_title">Ongoing budget</string>
+    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
+    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
     <string name="today">今日</string>
     <string name="yesterday">昨日</string>
     <string name="tomorrow">明日</string>
