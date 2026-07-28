@@ -15,6 +15,10 @@
     <string name="tutorial_analytics_description">Öffne deine Analytics, um zu sehen, wie sich deine Ausgaben im Verlauf der Zeit nach Kategorien und im Vergleich zu deinen Budgetzielen verteilen.</string>
     <string name="tutorial_privacy_title">Privatsphäre-Modus</string>
     <string name="tutorial_privacy_description">Halte deine Hand für etwa eine Sekunde über den oberen Bereich des Smartphones (wo sich die Frontkamera befindet), um alle Beträge auf dem Bildschirm unkenntlich zu machen. Halte sie erneut darüber, um die Funktion auszuschalten.</string>
+    <string name="tutorial_calc_title">Ongoing budget</string>
+    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
+    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
     <string name="today">Heute</string>
     <string name="yesterday">Gestern</string>
     <string name="tomorrow">Morgen</string>
