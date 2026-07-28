@@ -681,7 +681,6 @@ private fun PhoneLayout(
                             ),
                         )
                     },
-                    rowHeight = with(localDensity) { rowHeightPx.toDp() },
                     enableCalculationMode = true,
                     enableCalcModeSwipe = !showCategoryGrid,
                     leftContent = categoryGridLeftContent,
@@ -1297,7 +1296,6 @@ private fun TabletLayout(
                                 ),
                             )
                         },
-                        rowHeight = with(localDensity) { rowHeightPx.toDp() },
                         enableCalculationMode = true,
                         enableCalcModeSwipe = !showCategoryGrid,
                         leftContent = tabletGridLeftContent,

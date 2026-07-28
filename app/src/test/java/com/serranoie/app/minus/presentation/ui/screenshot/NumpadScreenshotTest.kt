@@ -38,7 +38,6 @@ class NumpadScreenshotTest {
                         editedTransaction = null,
                     ),
                     isCalculation = false,
-                    rowHeight = 55.dp,
                 )
             }
         }
@@ -60,7 +59,6 @@ class NumpadScreenshotTest {
                         editedTransaction = null,
                     ),
                     isCalculation = true,
-                    rowHeight = 55.dp,
                 )
             }
         }
