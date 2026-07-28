@@ -125,7 +125,7 @@ fun BudgetPill(
             AnnotatedString.Builder().apply {
                 pushStyle(
                     symbolStyle.copy(
-                        fontSize = 16.sp * 0.65f,
+                        fontSize = 16.sp * 0.75f,
                         fontWeight = FontWeight.Bold,
                         baselineShift = BaselineShift(0f)
                     )
@@ -142,6 +142,34 @@ fun BudgetPill(
             }.toAnnotatedString()
         } else {
             AnnotatedString(amountText)
+        }
+    }
+
+    val annotatedCalculationPreview = remember(calculationPreview, currencyCode, symbolStyle) {
+        if (calculationPreview == null) return@remember null
+        val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: ""
+        if (currencySymbol.length > 2 && calculationPreview.startsWith(currencySymbol)) {
+            val rest = calculationPreview.removePrefix(currencySymbol)
+            AnnotatedString.Builder().apply {
+                pushStyle(
+                    symbolStyle.copy(
+                        fontSize = 16.sp * 0.75f,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(0f)
+                    )
+                )
+                append(currencySymbol)
+                pop()
+                pushStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Light
+                    )
+                )
+                append(rest)
+                pop()
+            }.toAnnotatedString()
+        } else {
+            AnnotatedString(calculationPreview)
         }
     }
 
@@ -228,18 +256,30 @@ fun BudgetPill(
                             contentAlignment = Alignment.Center,
                         ) {
                             AdaptiveSingleLineText(
-                                text = if (isNoBudget) stringResource(R.string.budget_pill_no_budget_action) else currencyFormat.format(
-                                    metrics.periodRemaining
-                                ),
+                                text = when {
+                                    calculationPreview != null -> calculationPreview
+                                    isNoBudget -> stringResource(R.string.budget_pill_no_budget_action)
+                                    else -> currencyFormat.format(metrics.periodRemaining)
+                                },
+                                annotatedText = when {
+                                    calculationPreview != null -> annotatedCalculationPreview
+                                    isNoBudget -> null
+                                    else -> annotatedAmount
+                                },
                                 style = MaterialTheme.typography.titleMediumCondensed,
                                 color = textColor,
                                 minFontSize = 16.sp,
-                                modifier = Modifier.fillMaxWidth().graphicsLayer {
-                                    if (!isNoBudget && calculationPreview == null) {
-                                        scaleX = centeredAmountScale
-                                        scaleY = centeredAmountScale
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .graphicsLayer {
+                                        if (!isNoBudget && calculationPreview == null) {
+                                            scaleX = centeredAmountScale
+                                            scaleY = centeredAmountScale
+                                        }
                                     }
-                                }.let { if (!isNoBudget || calculationPreview != null) it else it.censor() },
+                                    .let {
+                                        if (!isNoBudget || calculationPreview != null) it else it.censor()
+                                    },
                                 textAlign = TextAlign.Center,
                             )
                         }
