@@ -15,6 +15,10 @@
     <string name="tutorial_analytics_description">Ανοίξτε Analytics για να δείτε πώς οι δαπάνες σας διασπώνται με την πάροδο του χρόνου, ανά κατηγορία και ενάντια στους στόχους του προϋπολογισμού σας.</string>
     <string name="tutorial_privacy_title">Λειτουργία απορρήτου</string>
     <string name="tutorial_privacy_description">Καλύψτε την κορυφή του τηλεφώνου (όπου κάθεται η μπροστινή φωτογραφική μηχανή) με το χέρι σας για περίπου ένα δευτερόλεπτο για να θολώσει κάθε ποσό στην οθόνη. Καλύψτε το ξανά για να το απενεργοποιήσετε.</string>
+    <string name="tutorial_calc_title">Ongoing budget</string>
+    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
+    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
     <string name="today">Σήμερα</string>
     <string name="yesterday">Χθες</string>
     <string name="tomorrow">Αύριο</string>
