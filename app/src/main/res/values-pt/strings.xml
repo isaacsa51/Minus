@@ -15,6 +15,10 @@
     <string name="tutorial_analytics_description">Abra Analytics para ver como os seus gastos se dividem temporal, por categoria e contra os seus objetivos orçamentais.</string>
     <string name="tutorial_privacy_title">Modo de privacidade</string>
     <string name="tutorial_privacy_description">Cubra o topo do telefone (onde a câmera frontal fica com a sua mão, por cerca de um segundo, para desfocar todas as quantidades na tela. Cubra novamente para desativá-lo.</string>
+    <string name="tutorial_calc_title">Ongoing budget</string>
+    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
+    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
     <string name="today">Hoje</string>
     <string name="yesterday">Ontem</string>
     <string name="tomorrow">Amanhã</string>
