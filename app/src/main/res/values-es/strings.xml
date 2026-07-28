@@ -15,6 +15,10 @@
     <string name="tutorial_analytics_description">Abre Análisis para ver como tus gastos se comportan con el tiempo por su categoría, y sobre tus metas de ahorro.</string>
     <string name="tutorial_privacy_title">Modo de privacidad</string>
     <string name="tutorial_privacy_description">Tapa la parte inferior del teléfono (donde la cámara está) con tu mano por al menos un segundo para esconder todo monto en la pantalla. Cúbrelo de nuevo para apagarlo.</string>
+    <string name="tutorial_calc_title">Presupuesto en curso</string>
+    <string name="tutorial_calc_description">Usa + o - al principio para aumentar o disminuir el presupuesto restante de este período.</string>
+    <string name="tutorial_credit_toggle_title">Pago con Tarjeta</string>
+    <string name="tutorial_credit_toggle_description">Toca aquí para marcar que este gasto fue hecho con una tarjeta de crédito. Se rastreará por separado en tus análisis.</string>
     <string name="today">Hoy</string>
     <string name="yesterday">Ayer</string>
     <string name="tomorrow">Mañana</string>

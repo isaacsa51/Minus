@@ -169,17 +169,33 @@ fun Analytics(
             it[tutorialCompletedKey] ?: false
         }
     }
-    val tutorialCompleted by tutorialCompletedFlow.collectAsStateWithLifecycle(initialValue = true)
+    val tutorialCompleted by tutorialCompletedFlow.collectAsStateWithLifecycle(initialValue = false)
 
     val effectiveTutorialCompleted = showTutorialOverride?.let { !it } ?: tutorialCompleted
 
-    val tutorialOrder = remember(hasSpends) {
-        if (hasSpends) listOf(3, 0, 2) else listOf(1, 2, 5)
+    val tutorialOrder = remember(hasSpends, state.creditOwed, state.periodFinished) {
+        buildList {
+            if (hasSpends) {
+                add(3) // Heatmap
+                add(0) // MinMax
+                add(2) // Budget
+                add(4) // Charts
+            } else {
+                if (!state.periodFinished) {
+                    add(1) // Header
+                }
+                add(2) // Budget
+                add(5) // Savings
+            }
+            if (state.creditOwed > BigDecimal.ZERO) {
+                add(6) // Credit Card
+            }
+        }
     }
 
     val tutorialBoxState = rememberTutorialBoxState(
         order = tutorialOrder,
-        virtual = setOf(6),
+        virtual = emptySet(),
     )
 
     var scrollableContainerCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
@@ -208,6 +224,7 @@ fun Analytics(
             3 to BringIntoViewRequester(),
             4 to BringIntoViewRequester(),
             5 to BringIntoViewRequester(),
+            6 to BringIntoViewRequester(),
         )
     }
 
@@ -280,8 +297,9 @@ fun Analytics(
                     description = stringResource(R.string.analytics_tutorial_savings_desc)
                 )
 
-                else -> TutorialTooltip(
-                    title = "Tutorial Step $index", description = "Description for step $index"
+                6 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_credit_title),
+                    description = stringResource(R.string.analytics_tutorial_credit_desc)
                 )
             }
         }) {
@@ -664,7 +682,8 @@ private fun AnalyticsCompactLayout(
                     modifier = Modifier
                         .fillMaxHeight()
                         .aspectRatio(1f)
-                        .markForTutorial(tutorialBoxState, 6),
+                        .bringIntoViewRequester(bringIntoViewRequesters[6]!!)
+                        .markIfInOrder(6, tutorialBoxState, tutorialOrder),
                 )
             }
         }
@@ -772,7 +791,8 @@ private fun AnalyticsTabletLayout(
                     modifier = Modifier
                         .fillMaxHeight()
                         .aspectRatio(1f)
-                        .markForTutorial(tutorialBoxState, 6),
+                        .bringIntoViewRequester(bringIntoViewRequesters[6]!!)
+                        .markIfInOrder(6, tutorialBoxState, tutorialOrder),
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))

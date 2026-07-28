@@ -40,9 +40,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
+import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.Utils.abortFeedback
 import com.serranoie.app.minus.presentation.util.getFloatDivider
 import com.serranoie.app.minus.presentation.util.join
@@ -93,10 +94,10 @@ fun Numpad(
     onApplyPressedForTutorial: (() -> Unit)? = null,
     onDragProgressChanged: (Float) -> Unit = {},
     dragProgress: Float = 0f,
-    rowHeight: Dp = 55.dp, // Still kept for backward compatibility but internal logic now uses weights
     enableCalculationMode: Boolean = true,
     enableCalcModeSwipe: Boolean = enableCalculationMode,
     leftContent: (@Composable ColumnScope.() -> Unit)? = null,
+    tutorialBoxState: TutorialBoxState? = null,
 ) {
     val view = LocalView.current
     val haptic = LocalHapticFeedback.current
@@ -198,6 +199,9 @@ fun Numpad(
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .graphicsLayer(alpha = effectiveDragProgress)
+                        .let { m ->
+                            if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, 7) else m
+                        }
                 ) {
                     val operators = listOf('÷', '×', '+', '-')
                     for (operator in operators) {

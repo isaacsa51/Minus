@@ -194,6 +194,14 @@ fun MainScreen(
                         title = stringResource(R.string.tutorial_privacy_title),
                         description = stringResource(R.string.tutorial_privacy_description),
                     )
+                    7 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_calc_title),
+                        description = stringResource(R.string.tutorial_calc_description),
+                    )
+                    8 -> TutorialTooltip(
+                        title = stringResource(R.string.tutorial_credit_toggle_title),
+                        description = stringResource(R.string.tutorial_credit_toggle_description),
+                    )
                     else -> Text(text = "")
                 }
             },

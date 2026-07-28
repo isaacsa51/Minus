@@ -685,6 +685,7 @@ private fun PhoneLayout(
                     enableCalculationMode = true,
                     enableCalcModeSwipe = !showCategoryGrid,
                     leftContent = categoryGridLeftContent,
+                    tutorialBoxState = tutorialBoxState,
                 )
             }
         }
@@ -725,14 +726,22 @@ private fun PhoneLayout(
                     onOpenHistory = {},
                     onOpenSettings = onNavigateToSettings,
                     onOpenAnalytics = onNavigateToAnalytics,
-                    onOpenWallet = { onProcessIntent(MainScreenUiIntent.ShowBudgetPeriodSheet()) },
+                    onOpenWallet = {
+                        val noBudget = budgetUiState.budgetSettings == null || budgetUiState.budgetSettings?.endDate == null
+                        onProcessIntent(
+                            MainScreenUiIntent.ShowBudgetPeriodSheet(forceSetup = noBudget)
+                        )
+                    },
                     openWalletOnStart = openWalletOnStart,
                     showBudgetPeriodSheet = showBudgetPeriodSheet,
                     forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
                     selectedViewPeriod = selectedViewPeriod,
                     onPeriodSelected = onPeriodSelected,
                     onShowBudgetPeriodSheet = {
-                        onProcessIntent(MainScreenUiIntent.ShowBudgetPeriodSheet())
+                        val noBudget = budgetUiState.budgetSettings == null || budgetUiState.budgetSettings?.endDate == null
+                        onProcessIntent(
+                            MainScreenUiIntent.ShowBudgetPeriodSheet(forceSetup = noBudget)
+                        )
                     },
                     onHideBudgetPeriodSheet = {
                         onProcessIntent(MainScreenUiIntent.HideBudgetPeriodSheet)
@@ -1026,14 +1035,22 @@ private fun TabletLayout(
                     onOpenHistory = {},
                     onOpenSettings = {},
                     onOpenAnalytics = {},
-                    onOpenWallet = { onProcessIntent(MainScreenUiIntent.ShowBudgetPeriodSheet()) },
+                    onOpenWallet = {
+                        val noBudget = budgetUiState.budgetSettings == null || budgetUiState.budgetSettings?.endDate == null
+                        onProcessIntent(
+                            MainScreenUiIntent.ShowBudgetPeriodSheet(forceSetup = noBudget)
+                        )
+                    },
                     openWalletOnStart = openWalletOnStart,
                     showBudgetPeriodSheet = showBudgetPeriodSheet,
                     forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
                     selectedViewPeriod = selectedViewPeriod,
                     onPeriodSelected = onPeriodSelected,
                     onShowBudgetPeriodSheet = {
-                        onProcessIntent(MainScreenUiIntent.ShowBudgetPeriodSheet())
+                        val noBudget = budgetUiState.budgetSettings == null || budgetUiState.budgetSettings?.endDate == null
+                        onProcessIntent(
+                            MainScreenUiIntent.ShowBudgetPeriodSheet(forceSetup = noBudget)
+                        )
                     },
                     onHideBudgetPeriodSheet = {
                         onProcessIntent(MainScreenUiIntent.HideBudgetPeriodSheet)
@@ -1284,6 +1301,7 @@ private fun TabletLayout(
                         enableCalculationMode = true,
                         enableCalcModeSwipe = !showCategoryGrid,
                         leftContent = tabletGridLeftContent,
+                        tutorialBoxState = tutorialBoxState,
                     )
                 }
             }

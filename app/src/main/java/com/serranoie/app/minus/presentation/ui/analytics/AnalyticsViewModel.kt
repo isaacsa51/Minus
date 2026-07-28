@@ -28,7 +28,6 @@ import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 import java.util.Date
 import javax.inject.Inject
 
@@ -184,14 +183,10 @@ class AnalyticsViewModel @Inject constructor(
         userSettings: UserSettings,
         rolloverAmountFromPref: BigDecimal,
     ): AnalyticsState {
-        if (settings == null) return AnalyticsState()
+        if (settings == null) return AnalyticsState(isLoading = false)
 
         val today = LocalDate.now()
         val endDate = settings.getPeriodEndDate()
-
-        // We use rolloverAmountFromPref instead of manually reading from preferences
-        val remainingFromLastPeriod = rolloverAmountFromPref
-        val shouldShowEndedSnapshot = false // Logic for snapshot can be added if needed
 
         val transactions = filterTransactions(
             allTransactions = allTransactions,

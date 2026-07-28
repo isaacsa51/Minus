@@ -39,6 +39,8 @@ class TutorialBoxState {
 
     internal val pendingRewindCandidates: SnapshotStateSet<Int> = mutableStateSetOf()
 
+    internal val gatedJumpedIndices: SnapshotStateSet<Int> = mutableStateSetOf()
+
     val currentBounds: Rect?
         get() = targetBounds[currentIndexState.value]
 
@@ -89,20 +91,21 @@ class TutorialBoxState {
         visitedIndices.clear()
         measuredIndices.clear()
         pendingRewindCandidates.clear()
+        gatedJumpedIndices.clear()
     }
 }
 
-private val DefaultWalkOrder: List<Int> = listOf(0, 1, 2, 3, 4, 5, 6)
+private val DefaultWalkOrder: List<Int> = listOf(0, 1, 2, 3, 4, 8, 5, 6, 7)
 
 internal val VirtualIndices: Set<Int> = setOf(6)
 
-internal val GatedIndices: Set<Int> = setOf(3, 4)
+internal val GatedIndices: Set<Int> = setOf(3, 4, 7, 8)
 
 @Composable
 fun rememberTutorialBoxState(
     order: List<Int> = DefaultWalkOrder,
     virtual: Set<Int> = VirtualIndices,
-): TutorialBoxState = remember {
+): TutorialBoxState = remember(order) {
     TutorialBoxState().also {
         it.registrationOrder.addAll(order)
         virtual.forEach { idx -> it.targetBounds[idx] = Rect.Zero }
@@ -130,23 +133,29 @@ fun Modifier.markForTutorial(
                 state.registrationOrder.add(index)
             }
 
-            val isFirstMeasurement = index !in state.measuredIndices
+            val isBecomingVisible = index !in state.targetBounds || state.targetBounds[index]?.isEmpty == true
             state.measuredIndices.add(index)
             state.targetBounds[index] = bounds
 
             if (state.currentIndexState.value == -1) {
-                state.currentIndexState.value = state.registrationOrder.first()
+                state.currentIndexState.value = state.registrationOrder.firstOrNull() ?: -1
             }
 
-            if (isFirstMeasurement && index !in state.visitedIndices) {
+            if (isBecomingVisible && index !in state.visitedIndices && index !in state.gatedJumpedIndices) {
                 val targetPos = state.registrationOrder.indexOf(index)
                 val currentPos =
                     state.registrationOrder.indexOf(state.currentIndexState.value).coerceAtLeast(0)
+                
+                logcat(TUTORIAL_LOG_TAG) { "markForTutorial: index=$index became visible at $bounds. currentIdx=${state.currentIndexState.value} (pos=$currentPos), targetPos=$targetPos, isCompleted=${state.isCompleted}" }
+                
                 if (state.isCompleted) {
+                    if (index in GatedIndices) state.gatedJumpedIndices.add(index)
                     state.pendingRewindCandidates.add(index)
                 } else if (currentPos > targetPos) {
+                    if (index in GatedIndices) state.gatedJumpedIndices.add(index)
                     state.pendingRewindCandidates.add(index)
                 } else if (index in GatedIndices && currentPos < targetPos && state.registrationOrder[currentPos] !in GatedIndices) {
+                    state.gatedJumpedIndices.add(index)
                     state.pendingRewindCandidates.add(index)
                 }
             }

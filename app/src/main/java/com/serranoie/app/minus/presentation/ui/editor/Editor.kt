@@ -262,7 +262,14 @@ fun Editor(
                                         checked = uiState.isCreditEnabled,
                                         onCheckedChange = onCreditToggle,
                                         shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-                                        modifier = Modifier.semantics { role = Role.RadioButton },
+                                        modifier = Modifier
+                                            .semantics { role = Role.RadioButton }
+                                            .let { m ->
+                                                if (tutorialBoxState != null) m.markForTutorial(
+                                                    tutorialBoxState,
+                                                    index = 8
+                                                ) else m
+                                            },
                                         colors = ToggleButtonDefaults.toggleButtonColors(
                                             containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
                                                 alpha = 0.5f
