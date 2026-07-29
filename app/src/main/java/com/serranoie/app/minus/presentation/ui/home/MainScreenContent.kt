@@ -953,8 +953,7 @@ private fun TabletLayout(
     val defaultInternalKeyboardHeightBase =
         (contentWidth / 2f)
             .coerceAtMost(with(localDensity) { 500.dp.toPx() })
-            .coerceAtMost(contentHeight / 2)
-            .coerceAtLeast(contentHeight)
+            .coerceAtMost(contentHeight / 2.5f)
     val rowHeightPx = defaultInternalKeyboardHeightBase / 4
     val defaultInternalKeyboardHeight = rowHeightPx * 4
     val calcModeKeyboardHeight = rowHeightPx * 5
@@ -1002,7 +1001,6 @@ private fun TabletLayout(
                 onCancelPendingDelete = { cancelPendingDelete() },
                 onShowInfoSnackbar = { msg -> showInfoSnackbar(msg) },
             )
-            StatusBarPadding()
         }
 
         VerticalDivider(
@@ -1174,8 +1172,8 @@ private fun TabletLayout(
                         .height(with(localDensity) { (keyboardHeightAnimated + navBarHeightPx).toDp() }),
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier.fillMaxSize().navigationBarsPadding(),
+                    contentAlignment = Alignment.TopCenter,
                 ) {
                     val editorState =
                         remember(budgetUiState) {
