@@ -188,6 +188,17 @@ class BudgetRepositoryImpl @Inject constructor(
         createdAt = this.createdAt
     )
 
+    private fun ArchivedBudget.toEntity(): ArchivedBudgetEntity = ArchivedBudgetEntity(
+        periodId = periodId,
+        totalBudget = totalBudget.toPlainString(),
+        spentAmount = spentAmount.toPlainString(),
+        startDate = startDate.toEpochDay() * 86400000,
+        endDate = endDate.toEpochDay() * 86400000,
+        currencyCode = currencyCode,
+        periodType = periodType.name,
+        createdAt = createdAt
+    )
+
     override fun getTransactions(): Flow<List<Transaction>> {
         return transactionDao.getAllTransactions()
             .map { entities -> entities.map { it.toDomain() } }
@@ -368,6 +379,11 @@ class BudgetRepositoryImpl @Inject constructor(
         return archivedBudgetDao.getAllArchivedBudgets().map { entities ->
             entities.map { it.toDomain() }
         }
+    }
+
+    override suspend fun upsertArchivedBudgets(archivedBudgets: List<ArchivedBudget>) {
+        val entities = archivedBudgets.map { it.toEntity() }
+        archivedBudgetDao.insertAll(entities)
     }
 
     override suspend fun archiveCurrentPeriod(

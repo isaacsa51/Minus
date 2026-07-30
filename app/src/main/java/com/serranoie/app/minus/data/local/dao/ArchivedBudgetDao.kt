@@ -13,6 +13,9 @@ interface ArchivedBudgetDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(archivedBudget: ArchivedBudgetEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(archivedBudgets: List<ArchivedBudgetEntity>)
+
     @Query("SELECT * FROM archived_budgets ORDER BY startDate DESC")
     fun getAllArchivedBudgets(): Flow<List<ArchivedBudgetEntity>>
 
