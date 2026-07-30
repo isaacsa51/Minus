@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.data.csv
 
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -22,6 +23,7 @@ class MinusCsvParser {
     fun parse(inputStream: InputStream): CsvImportPayload {
         val errors = mutableListOf<String>()
         val rows = mutableListOf<CsvTransactionRow>()
+        val archivedBudgets = mutableListOf<ArchivedBudget>()
         var metadata: CsvBackupMetadata? = null
 
         val format = CSVFormat.DEFAULT.builder()
@@ -44,6 +46,13 @@ class MinusCsvParser {
                     return@forEachIndexed
                 }
 
+                if (dateRaw == MinusCsvContract.MARKER_ARCHIVED) {
+                    runCatching { parseArchivedBudget(raw) }
+                        .onSuccess { archivedBudgets.add(it) }
+                        .onFailure { throwable -> errors.add("Line $lineNo archived budget discarded: ${throwable.message}") }
+                    return@forEachIndexed
+                }
+
                 runCatching {
                     val row = parseRecord(raw)
                     if (row.amount <= BigDecimal.ZERO) {
@@ -63,6 +72,7 @@ class MinusCsvParser {
         return CsvImportPayload(
             rows = rows,
             metadata = metadata,
+            archivedBudgets = archivedBudgets,
             errors = errors
         )
     }
@@ -111,6 +121,29 @@ class MinusCsvParser {
             isCredit = isCredit,
             isCreditPaid = isCreditPaid,
             periodId = periodId,
+        )
+    }
+
+    private fun parseArchivedBudget(raw: Map<String, String>): ArchivedBudget {
+        val spentAmount = raw.valueOf(MinusCsvContract.COL_AMOUNT).toBigDecimal()
+        val periodId = raw.valueOf(MinusCsvContract.COL_PERIOD_ID).toLong()
+        val createdAt = raw.valueOf(MinusCsvContract.COL_CREATED_AT)
+            .toLongOrNull() ?: System.currentTimeMillis()
+        val totalBudget = raw.valueOf(MinusCsvContract.COL_BUDGET_TOTAL).toBigDecimal()
+        val periodType = BudgetPeriod.valueOf(raw.valueOf(MinusCsvContract.COL_BUDGET_PERIOD))
+        val startDate = LocalDate.parse(raw.valueOf(MinusCsvContract.COL_BUDGET_START_DATE), dateFormatter)
+        val endDate = LocalDate.parse(raw.valueOf(MinusCsvContract.COL_BUDGET_END_DATE), dateFormatter)
+        val currencyCode = raw.valueOf(MinusCsvContract.COL_CURRENCY_CODE).ifBlank { "USD" }
+
+        return ArchivedBudget(
+            periodId = periodId,
+            totalBudget = totalBudget,
+            spentAmount = spentAmount,
+            startDate = startDate,
+            endDate = endDate,
+            currencyCode = currencyCode,
+            periodType = periodType,
+            createdAt = createdAt
         )
     }
 

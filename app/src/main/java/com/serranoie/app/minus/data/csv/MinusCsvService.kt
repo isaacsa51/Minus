@@ -36,6 +36,7 @@ class MinusCsvService @Inject constructor(
 
     suspend fun exportAllTransactions(outputStream: OutputStream) {
         val transactions = repository.getTransactions().first()
+        val archivedBudgets = repository.getArchivedBudgets().first()
         val settings = repository.getBudgetSettingsSync()
         val userSettings = settingsRepository.getSettings()
         val metadata = settings?.let {
@@ -45,7 +46,7 @@ class MinusCsvService @Inject constructor(
                 currentPeriodId = userSettings.currentPeriodId,
             )
         }
-        exporter.export(transactions, metadata, outputStream)
+        exporter.export(transactions, archivedBudgets, metadata, outputStream)
     }
 
     suspend fun importTransactions(inputStream: InputStream): CsvImportResult {
@@ -60,6 +61,10 @@ class MinusCsvService @Inject constructor(
         }
 
         fresh.forEach { repository.addTransaction(it.copy(id = 0L)) }
+
+        if (payload.archivedBudgets.isNotEmpty()) {
+            repository.upsertArchivedBudgets(payload.archivedBudgets)
+        }
 
         payload.metadata?.let { metadata ->
             repository.saveBudgetSettings(metadata.budgetSettings)
