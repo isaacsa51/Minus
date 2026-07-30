@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.data.csv
 
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.Transaction
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
@@ -15,6 +16,7 @@ class MinusCsvExporter {
 
     fun export(
         transactions: List<Transaction>,
+        archivedBudgets: List<ArchivedBudget>,
         metadata: CsvBackupMetadata?,
         outputStream: OutputStream,
     ) {
@@ -28,6 +30,8 @@ class MinusCsvExporter {
                     val s = meta.budgetSettings
                     printer.printRecord(
                         MinusCsvContract.MARKER_META,
+                        "",
+                        "",
                         "",
                         "",
                         "",
@@ -53,6 +57,36 @@ class MinusCsvExporter {
                     )
                 }
 
+                archivedBudgets.forEach { archive ->
+                    printer.printRecord(
+                        MinusCsvContract.MARKER_ARCHIVED,
+                        archive.spentAmount.toPlainString(),
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        archive.periodId.toString(),
+                        archive.createdAt.toString(),
+                        archive.totalBudget.toPlainString(),
+                        archive.periodType.name,
+                        archive.startDate.format(dateFormatter),
+                        archive.endDate.format(dateFormatter),
+                        archive.currencyCode,
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                    )
+                }
+
                 transactions.forEach { tx ->
                     val txDate = tx.date ?: return@forEach
                     val frequency = tx.recurrentFrequency?.name.orEmpty()
@@ -71,7 +105,7 @@ class MinusCsvExporter {
                         if (tx.isCredit) "1" else "0",
                         if (tx.isCreditPaid) "1" else "0",
                         tx.periodId.toString(),
-                        "",
+                        tx.createdAt.toString(),
                         "",
                         "",
                         "",
