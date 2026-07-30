@@ -28,6 +28,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
@@ -52,7 +53,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
@@ -149,7 +149,6 @@ class MainScreenE2ETest {
                         forceBudgetPeriodSheetSetup = false,
                         selectedViewPeriod = selectedViewPeriod,
                         onPeriodSelected = {},
-                        settingsDataStore = null,
                         undoSnackbarActionLabel = "Undo",
                     )
                 }

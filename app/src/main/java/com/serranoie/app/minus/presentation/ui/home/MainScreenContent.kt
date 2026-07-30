@@ -66,15 +66,13 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.SwipeableState
 import androidx.wear.compose.material.rememberSwipeableState
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
@@ -95,8 +93,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorStat
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.SavedCategoriesGrid
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
-import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
@@ -130,7 +126,6 @@ fun MainScreenContent(
     forceBudgetPeriodSheetSetup: Boolean,
     selectedViewPeriod: BudgetPeriod?,
     onPeriodSelected: (BudgetPeriod) -> Unit,
-    settingsDataStore: DataStore<Preferences>?,
     undoSnackbarActionLabel: String,
     tutorialBoxState: TutorialBoxState? = null,
 ) {
@@ -198,12 +193,7 @@ fun MainScreenContent(
     }
 
     fun advanceTutorial(expected: FirstLaunchTutorialStage) {
-        if (tutorialStage != expected) return
-        coroutineScope.launch {
-            settingsDataStore?.edit { prefs ->
-                prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] = expected.next().name
-            }
-        }
+        onProcessIntent(MainScreenUiIntent.AdvanceTutorial(expected))
     }
 
     val quickLogSwipeModifier =
@@ -1358,7 +1348,6 @@ private fun MainScreenPreview() {
                 forceBudgetPeriodSheetSetup = false,
                 selectedViewPeriod = BudgetPeriod.DAILY,
                 onPeriodSelected = {},
-                settingsDataStore = null,
                 undoSnackbarActionLabel = "Undo",
             )
         }

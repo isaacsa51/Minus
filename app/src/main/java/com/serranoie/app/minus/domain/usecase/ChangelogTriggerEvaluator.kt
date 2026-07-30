@@ -1,14 +1,9 @@
 package com.serranoie.app.minus.domain.usecase
 
-import android.content.Context
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.longPreferencesKey
 import com.serranoie.app.minus.data.repository.ChangelogRepository
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.changelog.ChangelogDecision
 import com.serranoie.app.minus.domain.model.changelog.VersionRelease
-import com.serranoie.app.minus.presentation.settingsDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.first
 import logcat.logcat
 import javax.inject.Inject
 
@@ -39,8 +34,8 @@ fun decideChangelog(
 }
 
 class ChangelogTriggerEvaluator @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val changelogRepository: ChangelogRepository,
+    private val settingsRepository: SettingsRepository,
 ) {
     suspend operator fun invoke(currentVersionCode: Int): ChangelogDecision {
         if (currentVersionCode <= 0) {
@@ -82,21 +77,13 @@ class ChangelogTriggerEvaluator @Inject constructor(
     }
 
     private suspend fun readLastSeen(): Long? =
-        context.settingsDataStore.data.first()[LAST_SEEN_VERSION_CODE]
+        settingsRepository.getLastSeenVersionCode()
 
     private suspend fun writeLastSeen(code: Int) {
-        context.settingsDataStore.edit { prefs ->
-            prefs[LAST_SEEN_VERSION_CODE] = code.toLong()
-        }
+        settingsRepository.setLastSeenVersionCode(code.toLong())
     }
 
     suspend fun resetLastSeen() {
-        context.settingsDataStore.edit { prefs ->
-            prefs.remove(LAST_SEEN_VERSION_CODE)
-        }
-    }
-
-    companion object {
-        val LAST_SEEN_VERSION_CODE = longPreferencesKey("changelog_last_seen_version_code")
+        settingsRepository.resetLastSeenVersionCode()
     }
 }

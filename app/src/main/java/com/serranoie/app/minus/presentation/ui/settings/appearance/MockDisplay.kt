@@ -47,10 +47,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.serranoie.app.minus.domain.model.ContrastMode
+import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.presentation.ui.settings.SettingsUiState
-import com.serranoie.app.minus.presentation.ui.theme.ContrastMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed

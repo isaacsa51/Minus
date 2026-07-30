@@ -4,13 +4,13 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers

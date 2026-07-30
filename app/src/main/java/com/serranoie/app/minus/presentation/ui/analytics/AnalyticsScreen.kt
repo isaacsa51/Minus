@@ -5,11 +5,8 @@ import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.preferences.core.Preferences
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.serranoie.app.minus.presentation.settingsDataStore
 
 @Composable
 fun AnalyticsScreen(
@@ -19,7 +16,6 @@ fun AnalyticsScreen(
     viewModel: AnalyticsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     BackHandler {
         viewModel.onClose()
@@ -62,6 +58,9 @@ fun AnalyticsScreen(
             },
             onHistoricalPeriodSelected = { periodId ->
                 viewModel.onPeriodSelected(periodId)
+            },
+            onTutorialCompleted = { hasSpends ->
+                viewModel.onTutorialCompleted(hasSpends)
             }
         ),
         activityResultRegistryOwner = activityResultRegistryOwner,

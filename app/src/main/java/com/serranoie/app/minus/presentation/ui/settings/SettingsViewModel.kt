@@ -8,40 +8,27 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.datastore.preferences.core.edit
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.model.AppColorScheme
+import com.serranoie.app.minus.domain.model.ContrastMode
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.model.SavingsPreferences
+import com.serranoie.app.minus.domain.model.ThemeMode
+import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
-import com.serranoie.app.minus.presentation.ANALYTICS_TUTORIAL_COMPLETED_KEY
-import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
-import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
-import com.serranoie.app.minus.presentation.CONTRAST_MODE_KEY
-import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
-import com.serranoie.app.minus.presentation.DYNAMIC_COLOR_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.presentation.THEME_MODE_KEY
-import com.serranoie.app.minus.presentation.TUTORIAL_BOX_COMPLETED_KEY
-import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
+import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.appContrast
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
-import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.dynamicColorEnabled
-import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferManager
-import com.serranoie.app.minus.presentation.ui.theme.ContrastMode
-import com.serranoie.app.minus.presentation.ui.theme.ThemeMode
-import com.serranoie.app.minus.presentation.ui.theme.TypographyMode
-import com.serranoie.app.minus.presentation.ui.tutorial.FIRST_LAUNCH_TUTORIAL_STAGE_KEY
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
-import com.serranoie.app.minus.presentation.ui.tutorial.PERIOD_MAPPING_MODE_KEY
 import com.serranoie.app.minus.presentation.util.CensorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -53,14 +40,12 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 import android.provider.Settings as AndroidSettings
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 
 data class SettingsUiState(
     val currentTheme: String = "System",
     val currentTypography: String = "Expressive",
     val currentContrast: String = "Normal",
-    val currentColorScheme: com.serranoie.app.minus.domain.model.AppColorScheme = com.serranoie.app.minus.domain.model.AppColorScheme.BRAND,
+    val currentColorScheme: AppColorScheme = AppColorScheme.BRAND,
     val currentLanguage: String = "English",
     val isMaterialYouEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,
@@ -121,7 +106,6 @@ class SettingsViewModel @Inject constructor(
                 Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
         } else {
-            // Pre-Tiramisu devices grant by default.
             true
         }
         logcat("ISAAC:Settings") { "refreshNotificationPermission -> granted=$granted" }
@@ -151,54 +135,38 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update { current ->
                     current.copy(
                         currentTheme = when (settings.themeMode) {
-                            com.serranoie.app.minus.domain.model.ThemeMode.LIGHT -> "Light"
-                            com.serranoie.app.minus.domain.model.ThemeMode.NIGHT -> "Dark"
+                            ThemeMode.LIGHT -> "Light"
+                            ThemeMode.NIGHT -> "Dark"
                             else -> "System"
                         },
                         currentTypography = when (settings.typographyMode) {
-                            com.serranoie.app.minus.domain.model.TypographyMode.CONDENSED -> "Condensed"
-                            com.serranoie.app.minus.domain.model.TypographyMode.SYSTEM -> "System"
+                            TypographyMode.CONDENSED -> "Condensed"
+                            TypographyMode.SYSTEM -> "System"
                             else -> "Expressive"
                         },
-                        currentContrast = when (context.appContrast) {
+                        currentContrast = when (settings.contrastMode) {
                             ContrastMode.MEDIUM -> "Medium"
                             ContrastMode.HIGH -> "High"
                             else -> "Normal"
                         },
                         currentColorScheme = settings.colorScheme,
                         isMaterialYouEnabled = settings.dynamicColorEnabled,
+                        isCreditQuickToggleEnabled = settings.isCreditQuickToggleEnabled,
+                        isCategoryPickerDirectPopupEnabled = settings.categoryPickerDirectPopupEnabled,
+                        isCategoryGridModeEnabled = settings.categoryGridModeEnabled,
                         currentLanguage = settings.language,
                         recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
                         notificationHour = settings.notificationHour,
                         notificationMinute = settings.notificationMinute,
-                        recurrentNotificationHour = settings.notificationHour, // Fixed to match repo if needed, but repo has separate? No, repo only has one.
-                        recurrentNotificationMinute = settings.notificationMinute,
+                        recurrentNotificationHour = settings.recurrentNotificationHour,
+                        recurrentNotificationMinute = settings.recurrentNotificationMinute,
                         exactAlarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                             val alarmManager =
                                 context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                             alarmManager.canScheduleExactAlarms()
                         } else true,
+                        periodMappingMode = settings.periodMappingMode,
                         savingsPreferences = settings.savingsPreferences,
-                    )
-                }
-            }
-        }
-        viewModelScope.launch {
-            context.settingsDataStore.data.collect { prefs ->
-                _uiState.update {
-                    it.copy(
-                        isCreditQuickToggleEnabled = prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY]
-                            ?: false,
-                        isCategoryPickerDirectPopupEnabled = prefs[CATEGORY_PICKER_DIRECT_POPUP_KEY]
-                            ?: false,
-                        isCategoryGridModeEnabled = prefs[CATEGORY_GRID_MODE_KEY] ?: false,
-                        periodMappingMode = try {
-                            PeriodMappingMode.valueOf(
-                                prefs[PERIOD_MAPPING_MODE_KEY] ?: ""
-                            )
-                        } catch (_: Exception) {
-                            PeriodMappingMode.ACTIVE_BUDGET
-                        },
                     )
                 }
             }
@@ -214,9 +182,7 @@ class SettingsViewModel @Inject constructor(
         context.appTheme = newMode
         _uiState.update { it.copy(currentTheme = themeMode) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[THEME_MODE_KEY] = newMode.toString()
-            }
+            settingsRepository.setThemeMode(newMode)
         }
     }
 
@@ -230,9 +196,7 @@ class SettingsViewModel @Inject constructor(
         context.appTypography = newMode
         _uiState.update { it.copy(currentTypography = typographyMode) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[TYPOGRAPHY_MODE_KEY] = newMode.toString()
-            }
+            settingsRepository.setTypographyMode(newMode)
         }
     }
 
@@ -245,13 +209,11 @@ class SettingsViewModel @Inject constructor(
         context.appContrast = newMode
         _uiState.update { it.copy(currentContrast = contrastMode) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[CONTRAST_MODE_KEY] = newMode.toString()
-            }
+            settingsRepository.setContrastMode(newMode)
         }
     }
 
-    fun onColorSchemeChange(colorScheme: com.serranoie.app.minus.domain.model.AppColorScheme) {
+    fun onColorSchemeChange(colorScheme: AppColorScheme) {
         context.appColorScheme = colorScheme
         _uiState.update { it.copy(currentColorScheme = colorScheme) }
         viewModelScope.launch {
@@ -273,9 +235,7 @@ class SettingsViewModel @Inject constructor(
         context.dynamicColorEnabled = newValue
         _uiState.update { it.copy(isMaterialYouEnabled = newValue) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[DYNAMIC_COLOR_KEY] = newValue
-            }
+            settingsRepository.setDynamicColorEnabled(newValue)
         }
     }
 
@@ -287,9 +247,7 @@ class SettingsViewModel @Inject constructor(
         val newValue = !_uiState.value.isCreditQuickToggleEnabled
         _uiState.update { it.copy(isCreditQuickToggleEnabled = newValue) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[CREDIT_QUICK_TOGGLE_FEATURE_KEY] = newValue
-            }
+            settingsRepository.setCreditQuickToggleEnabled(newValue)
         }
     }
 
@@ -297,9 +255,7 @@ class SettingsViewModel @Inject constructor(
         val newValue = !_uiState.value.isCategoryPickerDirectPopupEnabled
         _uiState.update { it.copy(isCategoryPickerDirectPopupEnabled = newValue) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[CATEGORY_PICKER_DIRECT_POPUP_KEY] = newValue
-            }
+            settingsRepository.setCategoryPickerDirectPopupEnabled(newValue)
         }
     }
 
@@ -307,9 +263,7 @@ class SettingsViewModel @Inject constructor(
         val newValue = !_uiState.value.isCategoryGridModeEnabled
         _uiState.update { it.copy(isCategoryGridModeEnabled = newValue) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[CATEGORY_GRID_MODE_KEY] = newValue
-            }
+            settingsRepository.setCategoryGridModeEnabled(newValue)
         }
     }
 
@@ -323,10 +277,7 @@ class SettingsViewModel @Inject constructor(
     fun onNotificationTimeChange(hour: Int, minute: Int) {
         _uiState.update { it.copy(notificationHour = hour, notificationMinute = minute) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[RECURRENT_NOTIFICATION_HOUR_KEY] = hour
-                prefs[RECURRENT_NOTIFICATION_MINUTE_KEY] = minute
-            }
+            settingsRepository.setNotificationTime(hour, minute)
             updateNotificationTimeUseCase(hour, minute)
         }
     }
@@ -338,10 +289,7 @@ class SettingsViewModel @Inject constructor(
             )
         }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[RECURRENT_NOTIFICATION_HOUR_KEY] = hour
-                prefs[RECURRENT_NOTIFICATION_MINUTE_KEY] = minute
-            }
+            settingsRepository.setRecurrentNotificationTime(hour, minute)
             updateNotificationTimeUseCase.updateRecurrentNotificationTime(hour, minute)
         }
     }
@@ -349,9 +297,7 @@ class SettingsViewModel @Inject constructor(
     fun onPeriodMappingModeChange(mode: PeriodMappingMode) {
         _uiState.update { it.copy(periodMappingMode = mode) }
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[PERIOD_MAPPING_MODE_KEY] = mode.name
-            }
+            settingsRepository.setPeriodMappingMode(mode)
         }
     }
 
@@ -400,12 +346,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onResetTutorial() {
         viewModelScope.launch {
-            context.settingsDataStore.edit { prefs ->
-                prefs[TUTORIAL_BOX_COMPLETED_KEY] = false
-                prefs[ANALYTICS_TUTORIAL_COMPLETED_KEY] = false
-                prefs[FIRST_LAUNCH_TUTORIAL_STAGE_KEY] =
-                    FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
-            }
+            settingsRepository.resetTutorials()
         }
     }
 

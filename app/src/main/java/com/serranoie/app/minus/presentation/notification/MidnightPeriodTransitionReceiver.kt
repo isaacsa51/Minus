@@ -3,12 +3,8 @@
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.datastore.preferences.core.edit
 import com.serranoie.app.minus.data.repository.BudgetRepository
-import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
-import com.serranoie.app.minus.domain.time.MIDNIGHT_TRANSITION_OCCURRED_KEY
-import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
-import com.serranoie.app.minus.presentation.settingsDataStore
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -33,6 +29,7 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
     @InstallIn(SingletonComponent::class)
     interface MidnightPeriodTransitionReceiverEntryPoint {
         fun budgetRepository(): BudgetRepository
+        fun settingsRepository(): SettingsRepository
         fun notificationHelper(): NotificationHelper
     }
 
@@ -49,6 +46,7 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
                     MidnightPeriodTransitionReceiverEntryPoint::class.java
                 )
                 val budgetRepository = entryPoint.budgetRepository()
+                val settingsRepository = entryPoint.settingsRepository()
                 val notificationHelper = entryPoint.notificationHelper()
 
                 val settings = budgetRepository.getBudgetSettingsSync() ?: run {
@@ -81,7 +79,7 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
                     currency = settings.currencyCode
                 )
 
-                updateMidnightTransitionState(context, periodEnd, remaining)
+                updateMidnightTransitionState(settingsRepository, periodEnd, remaining)
 
                 logcat { "Midnight transition completed successfully" }
 
@@ -94,15 +92,12 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
     }
 
     private suspend fun updateMidnightTransitionState(
-        context: Context,
+        settingsRepository: SettingsRepository,
         periodEnd: LocalDate,
         remaining: java.math.BigDecimal
     ) {
-        // Store transition data for foreground detection
-        context.settingsDataStore.edit { prefs ->
-            prefs[LAST_PERIOD_END_KEY] = periodEnd.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            prefs[REMAINING_FROM_LAST_PERIOD_KEY] = remaining.toPlainString()
-            prefs[MIDNIGHT_TRANSITION_OCCURRED_KEY] = true
-        }
+        val millis = periodEnd.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        settingsRepository.persistLastPeriodSnapshot(millis, remaining)
+        settingsRepository.setMidnightTransitionOccurred(true)
     }
 }

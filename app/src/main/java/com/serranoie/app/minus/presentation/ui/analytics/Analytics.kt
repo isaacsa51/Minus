@@ -56,18 +56,14 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.datastore.preferences.core.edit
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY
-import com.serranoie.app.minus.presentation.ANALYTICS_TUTORIAL_COMPLETED_KEY
+import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.presentation.LocalWindowInsets
-import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalytics
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalyticsState
 import com.serranoie.app.minus.presentation.ui.analytics.util.previewAnalyticsState
@@ -95,7 +91,6 @@ import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.math.BigDecimal
@@ -128,6 +123,7 @@ data class AnalyticsState(
     val debtAdjustedBalance: BigDecimal = BigDecimal.ZERO,
     val creditTransactions: List<Transaction> = emptyList(),
     val isHistoricalView: Boolean = false,
+    val userSettings: UserSettings = UserSettings.DEFAULT,
 )
 
 data class AnalyticsActions(
@@ -138,6 +134,7 @@ data class AnalyticsActions(
     val onPayTransactionClick: (Long) -> Unit = {},
     val onCutoffDayChanged: (Int) -> Unit = {},
     val onHistoricalPeriodSelected: (Long) -> Unit = {},
+    val onTutorialCompleted: (Boolean) -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -161,15 +158,11 @@ fun Analytics(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val hasSpends = state.spends.isNotEmpty()
-    val tutorialCompletedKey =
-        if (hasSpends) ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY else ANALYTICS_TUTORIAL_COMPLETED_KEY
-
-    val tutorialCompletedFlow = remember(context, tutorialCompletedKey) {
-        context.settingsDataStore.data.map {
-            it[tutorialCompletedKey] ?: false
-        }
+    val tutorialCompleted = if (hasSpends) {
+        state.userSettings.analyticsSpendsTutorialCompleted
+    } else {
+        state.userSettings.analyticsTutorialCompleted
     }
-    val tutorialCompleted by tutorialCompletedFlow.collectAsStateWithLifecycle(initialValue = false)
 
     val effectiveTutorialCompleted = showTutorialOverride?.let { !it } ?: tutorialCompleted
 
@@ -259,11 +252,7 @@ fun Analytics(
         showTutorial = !effectiveTutorialCompleted && !state.isLoading,
         state = tutorialBoxState,
         onTutorialCompleted = {
-            scope.launch {
-                context.settingsDataStore.edit { prefs ->
-                    prefs[tutorialCompletedKey] = true
-                }
-            }
+            actions.onTutorialCompleted(hasSpends)
         },
         tutorialTarget = { index ->
             when (index) {

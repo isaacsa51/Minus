@@ -1,35 +1,11 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
-import android.content.Context
-import androidx.datastore.preferences.core.edit
 import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
-import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY
-import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY
-import com.serranoie.app.minus.domain.time.LAST_PERIOD_END_KEY
-import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_AMOUNT_KEY
-import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_STRATEGY_KEY
-import com.serranoie.app.minus.domain.time.REMAINING_FROM_LAST_PERIOD_KEY
 import com.serranoie.app.minus.domain.time.TimeProvider
-import com.serranoie.app.minus.presentation.BUDGET_END_DATE_KEY
-import com.serranoie.app.minus.presentation.CURRENT_PERIOD_ID_KEY
-import com.serranoie.app.minus.presentation.CURRENT_PERIOD_STARTED_AT_KEY
-import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_HOUR
-import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_MINUTE
-import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_HOUR
-import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_MINUTE
-import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTIVE_KEY
-import com.serranoie.app.minus.presentation.EARLY_FINISH_ACTUAL_DATE_KEY
-import com.serranoie.app.minus.presentation.EARLY_FINISH_ORIGINAL_END_DATE_KEY
-import com.serranoie.app.minus.presentation.NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.presentation.NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_MINUTE_KEY
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
-import com.serranoie.app.minus.presentation.settingsDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -42,27 +18,21 @@ data class PeriodBoundaryResult(
 )
 
 class BudgetPeriodManager @Inject constructor(
-	@ApplicationContext private val context: Context,
 	private val budgetRepository: BudgetRepository,
+	private val settingsRepository: SettingsRepository,
 	private val timeProvider: TimeProvider,
 	private val notificationScheduler: NotificationScheduler,
 ) {
 
 	suspend fun updatePeriodEndNotificationTime(hour: Int, minute: Int) {
-		context.settingsDataStore.edit { prefs ->
-			prefs[NOTIFICATION_HOUR_KEY] = hour
-			prefs[NOTIFICATION_MINUTE_KEY] = minute
-		}
+		settingsRepository.setNotificationTime(hour, minute)
 		budgetRepository.getBudgetSettingsSync()?.let { settings ->
 			notificationScheduler.schedulePeriodEndNotification(settings.getPeriodEndDate())
 		}
 	}
 
 	suspend fun updateRecurrentNotificationTime(hour: Int, minute: Int) {
-		context.settingsDataStore.edit { prefs ->
-			prefs[RECURRENT_NOTIFICATION_HOUR_KEY] = hour
-			prefs[RECURRENT_NOTIFICATION_MINUTE_KEY] = minute
-		}
+		settingsRepository.setRecurrentNotificationTime(hour, minute)
 		notificationScheduler.rescheduleRecurrentExpenseNotifications()
 	}
 
@@ -71,34 +41,27 @@ class BudgetPeriodManager @Inject constructor(
 		val originalEndDate = settings.getPeriodEndDate()
 		val now = LocalDate.now()
 
-		context.settingsDataStore.edit { prefs ->
-			prefs[EARLY_FINISH_ACTIVE_KEY] = true
-			prefs[EARLY_FINISH_ACTUAL_DATE_KEY] =
-				now.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-			prefs[EARLY_FINISH_ORIGINAL_END_DATE_KEY] =
-				originalEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-		}
+		settingsRepository.setEarlyFinishActive(
+			active = true,
+			actualDate = now.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+			originalEndDate = originalEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+				.toEpochMilli()
+		)
 	}
 
 	suspend fun clearEarlyFinishState() {
-		context.settingsDataStore.edit { prefs ->
-			prefs[EARLY_FINISH_ACTIVE_KEY] = false
-			prefs.remove(EARLY_FINISH_ACTUAL_DATE_KEY)
-			prefs.remove(EARLY_FINISH_ORIGINAL_END_DATE_KEY)
-		}
+		settingsRepository.clearEarlyFinish()
 	}
 
 	suspend fun persistBudgetSettings(
 		settings: BudgetSettings,
 		forceNewPeriodBoundary: Boolean,
 	): PeriodBoundaryResult {
-		val previousPrefs = context.settingsDataStore.data.first()
-		val pendingRolloverAmount = previousPrefs[PENDING_ROLLOVER_AMOUNT_KEY]?.toBigDecimalOrNull()
-		val pendingRolloverStrategy = previousPrefs[PENDING_ROLLOVER_STRATEGY_KEY]?.let {
-			runCatching { RemainingBudgetStrategy.valueOf(it) }.getOrNull()
-		}
+		val userSettings = settingsRepository.getSettings()
+		val (pendingRolloverAmount, pendingRolloverStrategy) = settingsRepository.getPendingRollover()
+
 		val shouldApplyPendingRollover =
-			forceNewPeriodBoundary && pendingRolloverAmount != null && pendingRolloverAmount > BigDecimal.ZERO
+			forceNewPeriodBoundary && pendingRolloverAmount > BigDecimal.ZERO
 		val appliedRolloverAmount =
 			if (shouldApplyPendingRollover) pendingRolloverAmount else BigDecimal.ZERO
 		val appliedCarryForward =
@@ -125,9 +88,9 @@ class BudgetPeriodManager @Inject constructor(
 
 		clearEarlyFinishState()
 		val previousSettings = budgetRepository.getBudgetSettingsSync()
-		val previousPeriodId = previousPrefs[CURRENT_PERIOD_ID_KEY]
+		val previousPeriodId = userSettings.currentPeriodId
 
-		if (forceNewPeriodBoundary && previousSettings != null && previousPeriodId != null) {
+		if (forceNewPeriodBoundary && previousSettings != null && previousPeriodId != 0L) {
 			archivePeriod(previousPeriodId, previousSettings)
 		}
 
@@ -139,45 +102,30 @@ class BudgetPeriodManager @Inject constructor(
 		val periodStartMillis = if (shouldCreateNewPeriodBoundary) {
 			timeProvider.nowEpochMillis()
 		} else {
-			previousPrefs[CURRENT_PERIOD_STARTED_AT_KEY]
-				?: effectiveSettings.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
-					.toEpochMilli()
+			val existingStart = userSettings.currentPeriodStartedAt
+			if (existingStart != 0L) existingStart
+			else effectiveSettings.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+				.toEpochMilli()
 		}
 		val periodId = if (shouldCreateNewPeriodBoundary) {
 			periodStartMillis
 		} else {
-			previousPrefs[CURRENT_PERIOD_ID_KEY] ?: periodStartMillis
+			val existingId = userSettings.currentPeriodId
+			if (existingId != 0L) existingId else periodStartMillis
 		}
 
 		val periodEndDate = effectiveSettings.getPeriodEndDate()
 		val millis = periodEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-		context.settingsDataStore.edit { prefs ->
-			prefs[BUDGET_END_DATE_KEY] = millis
-			prefs[CURRENT_PERIOD_STARTED_AT_KEY] = periodStartMillis
-			prefs[CURRENT_PERIOD_ID_KEY] = periodId
-			prefs[CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY] = appliedRolloverAmount.toPlainString()
-			prefs[CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY] = appliedCarryForward
-			if (shouldApplyPendingRollover) {
-				prefs.remove(PENDING_ROLLOVER_AMOUNT_KEY)
-				prefs.remove(PENDING_ROLLOVER_STRATEGY_KEY)
-			}
-			if (shouldCreateNewPeriodBoundary) {
-				prefs.remove(LAST_PERIOD_END_KEY)
-				prefs.remove(REMAINING_FROM_LAST_PERIOD_KEY)
-			}
-			if (!prefs.contains(NOTIFICATION_HOUR_KEY)) {
-				prefs[NOTIFICATION_HOUR_KEY] = DEFAULT_NOTIFICATION_HOUR
-			}
-			if (!prefs.contains(NOTIFICATION_MINUTE_KEY)) {
-				prefs[NOTIFICATION_MINUTE_KEY] = DEFAULT_NOTIFICATION_MINUTE
-			}
-			if (!prefs.contains(RECURRENT_NOTIFICATION_HOUR_KEY)) {
-				prefs[RECURRENT_NOTIFICATION_HOUR_KEY] = DEFAULT_RECURRENT_NOTIFICATION_HOUR
-			}
-			if (!prefs.contains(RECURRENT_NOTIFICATION_MINUTE_KEY)) {
-				prefs[RECURRENT_NOTIFICATION_MINUTE_KEY] = DEFAULT_RECURRENT_NOTIFICATION_MINUTE
-			}
+		settingsRepository.setBudgetEndDate(millis)
+		settingsRepository.setCurrentPeriod(periodId, periodStartMillis)
+		settingsRepository.setCurrentPeriodRollover(appliedRolloverAmount, appliedCarryForward)
+
+		if (shouldApplyPendingRollover) {
+			settingsRepository.clearPendingRollover()
+		}
+		if (shouldCreateNewPeriodBoundary) {
+			settingsRepository.clearLastPeriodSnapshot()
 		}
 
 		if (shouldCreateNewPeriodBoundary) {
