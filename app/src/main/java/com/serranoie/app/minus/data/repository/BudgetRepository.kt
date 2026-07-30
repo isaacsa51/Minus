@@ -67,6 +67,8 @@ interface BudgetRepository {
 
     fun getArchivedBudgets(): Flow<List<ArchivedBudget>>
 
+    suspend fun upsertArchivedBudgets(archivedBudgets: List<ArchivedBudget>)
+
     suspend fun archiveCurrentPeriod(
         periodId: Long,
         settings: BudgetSettings,
