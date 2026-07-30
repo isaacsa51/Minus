@@ -1,11 +1,11 @@
 package com.serranoie.app.minus.presentation.ui.home
 
 import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 
 sealed interface MainScreenUiIntent {
     data class QueueDeleteWithUndo(
@@ -28,6 +28,8 @@ sealed interface MainScreenUiIntent {
     data class SetSelectedPeriod(val period: BudgetPeriod) : MainScreenUiIntent
 
     data object MarkWalletSheetOpened : MainScreenUiIntent
+
+    data class SetTutorialBoxCompleted(val completed: Boolean) : MainScreenUiIntent
 
     data class ProcessBudgetTransactionIntent(val intent: BudgetTransactionIntent) : MainScreenUiIntent
     data class ProcessBudgetEditorIntent(val intent: BudgetEditorIntent) : MainScreenUiIntent
@@ -62,4 +64,11 @@ data class MainScreenUiState(
     val forceBudgetPeriodSheetSetup: Boolean = false,
     val selectedViewPeriod: BudgetPeriod? = null,
     val walletSheetOpened: Boolean = false,
+
+    val onboardingCompleted: Boolean = false,
+    val tutorialStage: FirstLaunchTutorialStage = FirstLaunchTutorialStage.COMPLETED,
+    val tutorialBoxCompleted: Boolean = false,
+    val showCreditQuickToggleFeature: Boolean = false,
+    val directCategoryPopupEnabled: Boolean = false,
+    val categoryGridModeEnabled: Boolean = false,
 )

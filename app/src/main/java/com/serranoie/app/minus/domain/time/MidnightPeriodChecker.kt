@@ -1,12 +1,8 @@
 package com.serranoie.app.minus.domain.time
 
-import android.content.Context
-import androidx.datastore.preferences.core.edit
 import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
-import com.serranoie.app.minus.presentation.BUDGET_END_DATE_KEY
-import com.serranoie.app.minus.presentation.settingsDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,8 +28,8 @@ data class MidnightTransitionData(
 
 @Singleton
 class MidnightPeriodChecker @Inject constructor(
-    @param:ApplicationContext private val context: Context,
-    private val budgetRepository: BudgetRepository
+    private val budgetRepository: BudgetRepository,
+    private val settingsRepository: SettingsRepository,
 ) {
     data class EndingPeriodState(
         val shouldHandleEndingPeriod: Boolean,
@@ -65,7 +61,7 @@ class MidnightPeriodChecker @Inject constructor(
             return
         }
 
-        context.settingsDataStore.edit { it[MIDNIGHT_TRANSITION_OCCURRED_KEY] = false }
+        settingsRepository.setMidnightTransitionOccurred(false)
 
         val lastPeriodEndDate = endingPeriodState.periodEndDate ?: run {
             logcat { "No period end date found" }
@@ -145,14 +141,13 @@ class MidnightPeriodChecker @Inject constructor(
     }
 
     suspend fun resolveEndingPeriodState(): EndingPeriodState {
-        val prefs = context.settingsDataStore.data.first()
-        val transitionOccurred = prefs[MIDNIGHT_TRANSITION_OCCURRED_KEY] ?: false
+        val transitionOccurred = settingsRepository.observeMidnightTransitionOccurred().first()
         val today = LocalDate.now()
 
         val settings = budgetRepository.getBudgetSettingsSync()
         val settingsEndDate = settings?.getPeriodEndDate()
 
-        val endDateMillis = prefs[BUDGET_END_DATE_KEY]
+        val endDateMillis = settingsRepository.observeBudgetEndDate().first()
         val dataStoreEndDate = endDateMillis?.let { millis ->
             Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
         }
@@ -167,8 +162,7 @@ class MidnightPeriodChecker @Inject constructor(
         val periodEndedBasedOnDate = effectiveEndDate?.let { today.isAfter(it) } ?: false
 
         val periodEndDate = if (transitionOccurred) {
-            val lastPeriodEndMillis = prefs[LAST_PERIOD_END_KEY] ?: endDateMillis
-            lastPeriodEndMillis?.let {
+            settingsRepository.getLastPeriodEnd()?.let {
                 Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
             } ?: effectiveEndDate
         } else {
@@ -176,7 +170,7 @@ class MidnightPeriodChecker @Inject constructor(
         }
 
         val remaining = if (transitionOccurred) {
-            BigDecimal(prefs[REMAINING_FROM_LAST_PERIOD_KEY] ?: "0")
+            settingsRepository.getRemainingFromLastPeriod()
         } else {
             computeRemainingFromCurrentPeriod()
         }
@@ -239,22 +233,17 @@ class MidnightPeriodChecker @Inject constructor(
         periodEndDate: LocalDate,
         remainingAmount: BigDecimal,
     ) {
-        context.settingsDataStore.edit { prefs ->
-            prefs[LAST_PERIOD_END_KEY] = periodEndDate
-                .atStartOfDay(ZoneId.systemDefault())
-                .toInstant()
-                .toEpochMilli()
-            prefs[REMAINING_FROM_LAST_PERIOD_KEY] = remainingAmount.toPlainString()
-        }
+        val millis = periodEndDate
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+        settingsRepository.persistLastPeriodSnapshot(millis, remainingAmount)
     }
 
     private suspend fun enqueuePendingRollover(
         strategy: RemainingBudgetStrategy,
         remainingAmount: BigDecimal,
     ) {
-        context.settingsDataStore.edit { prefs ->
-            prefs[PENDING_ROLLOVER_STRATEGY_KEY] = strategy.name
-            prefs[PENDING_ROLLOVER_AMOUNT_KEY] = remainingAmount.toPlainString()
-        }
+        settingsRepository.setPendingRollover(remainingAmount, strategy)
     }
 }

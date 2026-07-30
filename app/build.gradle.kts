@@ -302,7 +302,6 @@ dependencies {
     implementation(libs.androidx.glance.preview)
     implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.core.splashscreen)
-    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.dagger)
     implementation(libs.hilt.android)
     implementation(libs.commons.csv)

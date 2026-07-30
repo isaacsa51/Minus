@@ -12,17 +12,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_HOUR
-import com.serranoie.app.minus.presentation.DEFAULT_NOTIFICATION_MINUTE
-import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_HOUR
-import com.serranoie.app.minus.presentation.DEFAULT_RECURRENT_NOTIFICATION_MINUTE
-import com.serranoie.app.minus.presentation.NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.presentation.NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_HOUR_KEY
-import com.serranoie.app.minus.presentation.RECURRENT_NOTIFICATION_MINUTE_KEY
-import com.serranoie.app.minus.presentation.settingsDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +40,8 @@ import javax.inject.Singleton
 @Singleton
 class NotificationScheduler @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val budgetRepository: BudgetRepository
+    private val budgetRepository: BudgetRepository,
+    private val settingsRepository: SettingsRepository,
 ) {
     companion object {
         const val ACTION_SHOW_PERIOD_END_NOTIFICATION =
@@ -406,18 +399,12 @@ class NotificationScheduler @Inject constructor(
     }
 
     private suspend fun getPeriodEndNotificationTime(): Pair<Int, Int> {
-        val preferences = context.settingsDataStore.data.first()
-        val hour = preferences[NOTIFICATION_HOUR_KEY] ?: DEFAULT_NOTIFICATION_HOUR
-        val minute = preferences[NOTIFICATION_MINUTE_KEY] ?: DEFAULT_NOTIFICATION_MINUTE
-        return hour to minute
+        val settings = settingsRepository.getSettings()
+        return settings.notificationHour to settings.notificationMinute
     }
 
     private suspend fun getRecurrentNotificationTime(): Pair<Int, Int> {
-        val preferences = context.settingsDataStore.data.first()
-        val hour =
-            preferences[RECURRENT_NOTIFICATION_HOUR_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_HOUR
-        val minute =
-            preferences[RECURRENT_NOTIFICATION_MINUTE_KEY] ?: DEFAULT_RECURRENT_NOTIFICATION_MINUTE
-        return hour to minute
+        val settings = settingsRepository.getSettings()
+        return settings.recurrentNotificationHour to settings.recurrentNotificationMinute
     }
 }

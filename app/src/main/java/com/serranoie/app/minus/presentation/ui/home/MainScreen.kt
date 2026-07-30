@@ -6,32 +6,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
-import com.serranoie.app.minus.presentation.CATEGORY_GRID_MODE_KEY
-import com.serranoie.app.minus.presentation.CATEGORY_PICKER_DIRECT_POPUP_KEY
-import com.serranoie.app.minus.presentation.CREDIT_QUICK_TOGGLE_FEATURE_KEY
-import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
-import com.serranoie.app.minus.presentation.TUTORIAL_BOX_COMPLETED_KEY
-import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.changelog.ChangelogGate
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
-import com.serranoie.app.minus.presentation.ui.tutorial.firstLaunchTutorialStageFlow
 import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
-import com.serranoie.app.minus.presentation.ui.tutorial.tutorialBoxCompletedFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import logcat.logcat
 
 private const val TAG = "ISAAC:MainScreen"
@@ -51,28 +38,16 @@ fun MainScreen(
     val mainScreenState by mainScreenViewModel.uiState.collectAsStateWithLifecycle()
     val budgetUiState by budgetViewModel.uiState.collectAsStateWithLifecycle()
 
-    val onboardingCompleted by context.settingsDataStore.data.map {
-        it[ONBOARDING_COMPLETED_KEY] ?: false
-    }.collectAsStateWithLifecycle(initialValue = false)
-
-    val tutorialStage by context.firstLaunchTutorialStageFlow()
-        .collectAsStateWithLifecycle(initialValue = FirstLaunchTutorialStage.COMPLETED)
-
-    val showCreditQuickToggleFeature by context.settingsDataStore.data.map {
-        it[CREDIT_QUICK_TOGGLE_FEATURE_KEY] ?: false
-    }.collectAsStateWithLifecycle(initialValue = false)
+    val onboardingCompleted = mainScreenState.onboardingCompleted
+    val tutorialStage = mainScreenState.tutorialStage
+    val showCreditQuickToggleFeature = mainScreenState.showCreditQuickToggleFeature
+    val tutorialBoxCompleted = mainScreenState.tutorialBoxCompleted
+    val directCategoryPopupEnabled = mainScreenState.directCategoryPopupEnabled
+    val categoryGridModeEnabled = mainScreenState.categoryGridModeEnabled
 
     val effectiveSelectedPeriod =
         mainScreenState.selectedViewPeriod ?: budgetUiState.budgetSettings?.period
         ?: BudgetPeriod.DAILY
-
-    val directCategoryPopupEnabled by context.settingsDataStore.data
-        .map { it[CATEGORY_PICKER_DIRECT_POPUP_KEY] ?: false }
-        .collectAsStateWithLifecycle(initialValue = false)
-
-    val categoryGridModeEnabled by context.settingsDataStore.data
-        .map { it[CATEGORY_GRID_MODE_KEY] ?: false }
-        .collectAsStateWithLifecycle(initialValue = false)
 
     val undoSnackbarActionLabel = stringResource(R.string.undo)
 
@@ -124,11 +99,8 @@ fun MainScreen(
         }
     }
 
-    val tutorialBoxCompleted by context.tutorialBoxCompletedFlow()
-        .collectAsStateWithLifecycle(initialValue = false)
     val showNumpadTutorial = !tutorialBoxCompleted
     val tutorialBoxState = rememberTutorialBoxState()
-    val tutorialScope = rememberCoroutineScope()
 
     LaunchedEffect(tutorialBoxCompleted) {
         if (!tutorialBoxCompleted && tutorialBoxState.isCompleted) {
@@ -149,19 +121,17 @@ fun MainScreen(
             showTutorial = showNumpadTutorial,
             onTutorialCompleted = {
                 logcat(TAG) { "TutorialBox completed → persisting tutorialBoxCompleted=true" }
-                tutorialScope.launch {
-                    context.settingsDataStore.edit { prefs ->
-                        prefs[TUTORIAL_BOX_COMPLETED_KEY] = true
-                    }
-                }
+                mainScreenViewModel.processIntent(
+                    MainScreenUiIntent.SetTutorialBoxCompleted(true),
+                    tutorialStage,
+                )
             },
             onTutorialReopened = {
                 logcat(TAG) { "TutorialBox reopened (gated target became measurable) → persisting tutorialBoxCompleted=false" }
-                tutorialScope.launch {
-                    context.settingsDataStore.edit { prefs ->
-                        prefs[TUTORIAL_BOX_COMPLETED_KEY] = false
-                    }
-                }
+                mainScreenViewModel.processIntent(
+                    MainScreenUiIntent.SetTutorialBoxCompleted(false),
+                    tutorialStage,
+                )
             },
             state = tutorialBoxState,
             tutorialTarget = { index ->
@@ -245,7 +215,6 @@ fun MainScreen(
                         MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
                     )
                 },
-                settingsDataStore = context.settingsDataStore,
                 undoSnackbarActionLabel = undoSnackbarActionLabel,
                 tutorialBoxState = tutorialBoxState,
             )

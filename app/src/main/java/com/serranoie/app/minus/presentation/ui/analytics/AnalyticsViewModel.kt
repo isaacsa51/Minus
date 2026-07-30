@@ -272,6 +272,7 @@ class AnalyticsViewModel @Inject constructor(
             creditOwed = creditOwed,
             debtAdjustedBalance = debtAdjustedBalance,
             creditTransactions = creditTransactions,
+            userSettings = userSettings,
         )
     }
 
@@ -383,6 +384,16 @@ class AnalyticsViewModel @Inject constructor(
                 settings = currentSettings.copy(creditCardCutoffDay = day),
                 forceNewPeriodBoundary = false,
             )
+        }
+    }
+
+    fun onTutorialCompleted(hasSpends: Boolean) {
+        viewModelScope.launch {
+            if (hasSpends) {
+                settingsRepository.setAnalyticsSpendsTutorialCompleted(true)
+            } else {
+                settingsRepository.setAnalyticsTutorialCompleted(true)
+            }
         }
     }
 
