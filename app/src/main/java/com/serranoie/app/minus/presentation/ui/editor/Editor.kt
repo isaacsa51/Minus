@@ -85,6 +85,7 @@ import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.SupportedCurrency
+import com.serranoie.app.minus.domain.model.SymbolPosition
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalculation
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
@@ -549,7 +550,6 @@ private fun EditingContent(
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
-    val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
 
     val hasExpressionOperators = remember(input) { input.any { it in "+-×÷" } }
 
@@ -567,44 +567,130 @@ private fun EditingContent(
     val symbolStyle = MaterialTheme.typography.titleSmallCondensed.toSpanStyle()
     val annotatedDisplayContent =
         remember(input, currencyCode, hasExpressionOperators, symbolStyle) {
+            val supportedCurrency = SupportedCurrency.findByCode(currencyCode)
+            val currencySymbol = supportedCurrency?.symbol ?: "$"
+            val isSymbolAtEnd = supportedCurrency?.symbolPosition == SymbolPosition.END
+
             if (hasExpressionOperators) {
-                val content = "$currencySymbol$input"
+                val leadingSign =
+                    if (input.startsWith("+") || input.startsWith("-")) input[0].toString() else ""
+                val remaining = if (leadingSign.isNotEmpty()) input.substring(1) else input
+                val hasInnerOperators = remaining.any { it in "+-×÷" }
+
+                val useLeadingSignOrder = leadingSign.isNotEmpty() && !hasInnerOperators
+
+                val formattedRemaining = if (useLeadingSignOrder) {
+                    val value = remaining.toBigDecimalOrNull() ?: BigDecimal.ZERO
+                    val formatted = currencyFormat.format(value)
+                    formatted.replace(currencySymbol, "").trim()
+                } else {
+                    remaining
+                }
+
                 if (currencySymbol.length > 2) {
                     AnnotatedString.Builder().apply {
-                        pushStyle(
-                            symbolStyle.copy(
-                                fontSize = 86.sp * 0.6f,
-                                fontWeight = FontWeight.Bold,
-                                baselineShift = BaselineShift(0f)
-                            )
-                        )
-                        append(currencySymbol)
-                        pop()
-                        pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                        append(input)
-                        pop()
+                        if (useLeadingSignOrder) {
+                            append(leadingSign)
+                            if (isSymbolAtEnd) {
+                                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                                append(formattedRemaining)
+                                pop()
+                                pushStyle(
+                                    symbolStyle.copy(
+                                        fontSize = 86.sp * 0.6f,
+                                        fontWeight = FontWeight.Bold,
+                                        baselineShift = BaselineShift(0f)
+                                    )
+                                )
+                                append(currencySymbol)
+                                pop()
+                            } else {
+                                pushStyle(
+                                    symbolStyle.copy(
+                                        fontSize = 86.sp * 0.6f,
+                                        fontWeight = FontWeight.Bold,
+                                        baselineShift = BaselineShift(0f)
+                                    )
+                                )
+                                append(currencySymbol)
+                                pop()
+                                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                                append(formattedRemaining)
+                                pop()
+                            }
+                        } else {
+                            if (isSymbolAtEnd) {
+                                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                                append(input)
+                                pop()
+                                pushStyle(
+                                    symbolStyle.copy(
+                                        fontSize = 86.sp * 0.6f,
+                                        fontWeight = FontWeight.Bold,
+                                        baselineShift = BaselineShift(0f)
+                                    )
+                                )
+                                append(currencySymbol)
+                                pop()
+                            } else {
+                                pushStyle(
+                                    symbolStyle.copy(
+                                        fontSize = 86.sp * 0.6f,
+                                        fontWeight = FontWeight.Bold,
+                                        baselineShift = BaselineShift(0f)
+                                    )
+                                )
+                                append(currencySymbol)
+                                pop()
+                                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                                append(input)
+                                pop()
+                            }
+                        }
                     }.toAnnotatedString()
                 } else {
+                    val content = if (useLeadingSignOrder) {
+                        if (isSymbolAtEnd) "$leadingSign$formattedRemaining$currencySymbol"
+                        else "$leadingSign$currencySymbol$formattedRemaining"
+                    } else {
+                        if (isSymbolAtEnd) "$input$currencySymbol"
+                        else "$currencySymbol$input"
+                    }
                     AnnotatedString(content)
                 }
             } else {
                 val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
                 val formatted = currencyFormat.format(value)
-                if (currencySymbol.length > 2 && formatted.startsWith(currencySymbol)) {
-                    val amount = formatted.removePrefix(currencySymbol).trim()
+                if (currencySymbol.length > 2 && formatted.contains(currencySymbol)) {
+                    val amount = formatted.replace(currencySymbol, "").trim()
                     AnnotatedString.Builder().apply {
-                        pushStyle(
-                            symbolStyle.copy(
-                                fontSize = 86.sp * 0.6f,
-                                fontWeight = FontWeight.Bold,
-                                baselineShift = BaselineShift(0f)
+                        if (formatted.startsWith(currencySymbol)) {
+                            pushStyle(
+                                symbolStyle.copy(
+                                    fontSize = 86.sp * 0.6f,
+                                    fontWeight = FontWeight.Bold,
+                                    baselineShift = BaselineShift(0f)
+                                )
                             )
-                        )
-                        append(currencySymbol)
-                        pop()
-                        pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                        append(amount)
-                        pop()
+                            append(currencySymbol)
+                            pop()
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                            append(amount)
+                            pop()
+                        } else {
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                            append(amount)
+                            pop()
+                            pushStyle(
+                                symbolStyle.copy(
+                                    fontSize = 86.sp * 0.6f,
+                                    fontWeight = FontWeight.Bold,
+                                    baselineShift = BaselineShift(0f)
+                                )
+                            )
+                            append(currencySymbol)
+                            pop()
+                        }
                     }.toAnnotatedString()
                 } else {
                     AnnotatedString(formatted)
@@ -612,26 +698,54 @@ private fun EditingContent(
             }
         }
 
-    val annotatedCalculationResult = remember(calculationResult, currencyCode, symbolStyle) {
-        if (calculationResult == null) return@remember null
-        val content = "= $currencySymbol$calculationResult"
+    val annotatedCalculationResult = remember(calculationResult, currencyCode, symbolStyle, input) {
+        val isSimpleSignEntry = (input.startsWith("+") || input.startsWith("-")) &&
+                input.substring(1).none { it in "+-×÷" }
+
+        if (calculationResult == null || isSimpleSignEntry) return@remember null
+        val supportedCurrency = SupportedCurrency.findByCode(currencyCode)
+        val currencySymbol = supportedCurrency?.symbol ?: "$"
+        val isSymbolAtEnd = supportedCurrency?.symbolPosition == SymbolPosition.END
+
+        val isNegative = calculationResult.startsWith("-")
+        val sign = if (isNegative) "-" else ""
+        val absValue = if (isNegative) calculationResult.substring(1) else calculationResult
+
         if (currencySymbol.length > 2) {
             AnnotatedString.Builder().apply {
                 append("= ")
-                pushStyle(
-                    symbolStyle.copy(
-                        fontSize = 36.sp * 0.6f,
-                        fontWeight = FontWeight.Bold,
-                        baselineShift = BaselineShift(0f)
+                append(sign)
+                if (isSymbolAtEnd) {
+                    pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                    append(absValue)
+                    pop()
+                    pushStyle(
+                        symbolStyle.copy(
+                            fontSize = 36.sp * 0.6f,
+                            fontWeight = FontWeight.Bold,
+                            baselineShift = BaselineShift(0f)
+                        )
                     )
-                )
-                append(currencySymbol)
-                pop()
-                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                append(calculationResult)
-                pop()
+                    append(currencySymbol)
+                    pop()
+                } else {
+                    pushStyle(
+                        symbolStyle.copy(
+                            fontSize = 36.sp * 0.6f,
+                            fontWeight = FontWeight.Bold,
+                            baselineShift = BaselineShift(0f)
+                        )
+                    )
+                    append(currencySymbol)
+                    pop()
+                    pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                    append(absValue)
+                    pop()
+                }
             }.toAnnotatedString()
         } else {
+            val content = if (isSymbolAtEnd) "= $sign$absValue$currencySymbol"
+            else "= $sign$currencySymbol$absValue"
             AnnotatedString(content)
         }
     }

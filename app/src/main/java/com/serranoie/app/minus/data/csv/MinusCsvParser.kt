@@ -2,6 +2,7 @@ package com.serranoie.app.minus.data.csv
 
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import org.apache.commons.csv.CSVFormat
@@ -36,7 +37,7 @@ class MinusCsvParser {
                 val raw = record.toMap()
 
                 val dateRaw = raw.valueOf(MinusCsvContract.COL_DATE)
-                if (dateRaw == "__META__") {
+                if (dateRaw == MinusCsvContract.MARKER_META) {
                     runCatching { parseMetadata(raw) }
                         .onSuccess { parsedMeta -> metadata = parsedMeta }
                         .onFailure { throwable -> errors.add("Line $lineNo metadata discarded: ${throwable.message}") }
@@ -59,7 +60,11 @@ class MinusCsvParser {
             }
         }
 
-        return CsvImportPayload(rows = rows, metadata = metadata, errors = errors)
+        return CsvImportPayload(
+            rows = rows,
+            metadata = metadata,
+            errors = errors
+        )
     }
 
     private fun parseRecord(raw: Map<String, String>): CsvTransactionRow {
@@ -89,6 +94,11 @@ class MinusCsvParser {
         val isCredit = raw.valueOf(MinusCsvContract.COL_IS_CREDIT).trim() == "1"
         val isCreditPaid = raw.valueOf(MinusCsvContract.COL_IS_CREDIT_PAID).trim() == "1"
 
+        val periodId = raw.valueOf(MinusCsvContract.COL_PERIOD_ID)
+            .toLongOrNull()
+            ?.coerceAtLeast(0L)
+            ?: 0L
+
         return CsvTransactionRow(
             id = id,
             date = date,
@@ -100,6 +110,7 @@ class MinusCsvParser {
             subscriptionDay = subDay,
             isCredit = isCredit,
             isCreditPaid = isCreditPaid,
+            periodId = periodId,
         )
     }
 
@@ -133,6 +144,16 @@ class MinusCsvParser {
             ?.coerceAtLeast(0L)
             ?: 0L
 
+        val splitMode = raw.valueOf(MinusCsvContract.COL_SPLIT_MODE)
+            .takeIf { it.isNotBlank() }
+            ?.let {
+                try {
+                    BudgetSplitMode.valueOf(it)
+                } catch (_: Exception) {
+                    BudgetSplitMode.STATIC
+                }
+            } ?: BudgetSplitMode.STATIC
+
         return CsvBackupMetadata(
             budgetSettings = BudgetSettings(
                 totalBudget = totalBudget,
@@ -147,6 +168,7 @@ class MinusCsvParser {
                 creditCardCutoffDay = raw.valueOf(MinusCsvContract.COL_CREDIT_CARD_CUTOFF_DAY)
                     .toIntOrNull()
                     ?.takeIf { it in 1..31 },
+                splitMode = splitMode,
             ),
             currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             currentPeriodId = currentPeriodId,

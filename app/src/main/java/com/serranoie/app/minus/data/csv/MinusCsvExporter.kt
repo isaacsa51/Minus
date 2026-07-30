@@ -27,7 +27,7 @@ class MinusCsvExporter {
                 metadata?.let { meta ->
                     val s = meta.budgetSettings
                     printer.printRecord(
-                        "__META__",
+                        MinusCsvContract.MARKER_META,
                         "",
                         "",
                         "",
@@ -49,6 +49,7 @@ class MinusCsvExporter {
                         meta.currentPeriodStartedAtMillis.toString(),
                         meta.currentPeriodId.toString(),
                         s.creditCardCutoffDay?.toString().orEmpty(),
+                        s.splitMode.name,
                     )
                 }
 
@@ -69,6 +70,7 @@ class MinusCsvExporter {
                         tx.id.toString(),
                         if (tx.isCredit) "1" else "0",
                         if (tx.isCreditPaid) "1" else "0",
+                        tx.periodId.toString(),
                         "",
                         "",
                         "",
