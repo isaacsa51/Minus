@@ -49,6 +49,7 @@ data class SettingsUiState(
     val currentLanguage: String = "English",
     val isMaterialYouEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,
+    val showPastTransactions: Boolean = true,
     val isCategoryPickerDirectPopupEnabled: Boolean = false,
     val isCategoryGridModeEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
@@ -152,6 +153,7 @@ class SettingsViewModel @Inject constructor(
                         currentColorScheme = settings.colorScheme,
                         isMaterialYouEnabled = settings.dynamicColorEnabled,
                         isCreditQuickToggleEnabled = settings.isCreditQuickToggleEnabled,
+                        showPastTransactions = settings.showPastTransactions,
                         isCategoryPickerDirectPopupEnabled = settings.categoryPickerDirectPopupEnabled,
                         isCategoryGridModeEnabled = settings.categoryGridModeEnabled,
                         currentLanguage = settings.language,
@@ -248,6 +250,14 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(isCreditQuickToggleEnabled = newValue) }
         viewModelScope.launch {
             settingsRepository.setCreditQuickToggleEnabled(newValue)
+        }
+    }
+
+    fun onShowPastTransactionsToggle() {
+        val newValue = !_uiState.value.showPastTransactions
+        _uiState.update { it.copy(showPastTransactions = newValue) }
+        viewModelScope.launch {
+            settingsRepository.setShowPastTransactions(newValue)
         }
     }
 

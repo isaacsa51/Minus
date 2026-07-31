@@ -41,6 +41,7 @@ const val COLOR_SCHEME_KEY_NAME = "app_color_scheme"
 const val LANGUAGE_KEY_NAME = "language"
 const val DYNAMIC_COLOR_KEY_NAME = "dynamic_color_enabled"
 const val CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME = "credit_quick_toggle_feature_enabled"
+const val SHOW_PAST_TRANSACTIONS_KEY_NAME = "show_past_transactions"
 const val CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME = "category_picker_direct_popup_enabled"
 const val CATEGORY_GRID_MODE_KEY_NAME = "category_grid_mode_enabled"
 const val RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME = "recurrent_payments_view_mode"
@@ -79,6 +80,8 @@ private val LANGUAGE = stringPreferencesKey(LANGUAGE_KEY_NAME)
 private val DYNAMIC_COLOR = booleanPreferencesKey(DYNAMIC_COLOR_KEY_NAME)
 private val CREDIT_QUICK_TOGGLE_FEATURE_ENABLED =
     booleanPreferencesKey(CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME)
+private val SHOW_PAST_TRANSACTIONS =
+    booleanPreferencesKey(SHOW_PAST_TRANSACTIONS_KEY_NAME)
 private val CATEGORY_PICKER_DIRECT_POPUP_ENABLED =
     booleanPreferencesKey(CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME)
 private val CATEGORY_GRID_MODE_ENABLED =
@@ -146,6 +149,7 @@ class SettingsRepositoryImpl @Inject constructor(
                     ?: com.serranoie.app.minus.domain.model.AppColorScheme.BRAND,
                 language = preferences[LANGUAGE] ?: "en",
                 dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false,
+                showPastTransactions = preferences[SHOW_PAST_TRANSACTIONS] ?: true,
                 isCreditQuickToggleEnabled = preferences[CREDIT_QUICK_TOGGLE_FEATURE_ENABLED] ?: false,
                 categoryPickerDirectPopupEnabled = preferences[CATEGORY_PICKER_DIRECT_POPUP_ENABLED] ?: false,
                 categoryGridModeEnabled = preferences[CATEGORY_GRID_MODE_ENABLED] ?: false,
@@ -316,6 +320,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setCreditQuickToggleEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[CREDIT_QUICK_TOGGLE_FEATURE_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun setShowPastTransactions(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[SHOW_PAST_TRANSACTIONS] = enabled
         }
     }
 

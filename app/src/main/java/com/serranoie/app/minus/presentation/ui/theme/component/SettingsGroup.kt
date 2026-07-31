@@ -275,9 +275,11 @@ fun SelectablePaddedItem(
         position == PaddedListItemPosition.First -> RoundedCornerShape(
             topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
         )
+
         position == PaddedListItemPosition.Last -> RoundedCornerShape(
             bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
         )
+
         else -> RoundedCornerShape(4.dp)
     }
 
@@ -299,7 +301,10 @@ fun SelectablePaddedItem(
         },
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = verticalPadding),
+            modifier = Modifier.padding(
+                horizontal = 16.dp,
+                vertical = verticalPadding
+            ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             leadingIcon?.invoke()
@@ -310,6 +315,7 @@ fun SelectablePaddedItem(
                 Text(
                     text = label,
                     style = MaterialTheme.typography.bodyMediumEmphasized,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 if (subtitle != null) {
                     Text(
@@ -355,9 +361,11 @@ fun SelectableInfoPaddedItem(
         position == PaddedListItemPosition.First -> RoundedCornerShape(
             topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
         )
+
         position == PaddedListItemPosition.Last -> RoundedCornerShape(
             bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
         )
+
         else -> RoundedCornerShape(4.dp)
     }
 
@@ -853,7 +861,8 @@ fun PaddedExpandableListPreview() {
                             )
                         },
                         expandedContent = {
-                            val items = listOf("Food", "Transport", "Shopping", "Entertainment", "Bills")
+                            val items =
+                                listOf("Food", "Transport", "Shopping", "Entertainment", "Bills")
 
                             items.forEachIndexed { index, item ->
                                 val position = when {

@@ -74,7 +74,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -116,6 +115,7 @@ fun Settings(
     modifier: Modifier = Modifier,
     isCensored: Boolean = false,
     isCreditQuickToggleFeatureEnabled: Boolean,
+    showPastTransactions: Boolean = true,
     recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
     notificationHour: Int,
     notificationMinute: Int,
@@ -125,6 +125,7 @@ fun Settings(
     notificationPermissionGranted: Boolean,
     onCensorModeToggle: () -> Unit = {},
     onCreditQuickToggleFeatureToggle: () -> Unit,
+    onShowPastTransactionsToggle: () -> Unit = {},
     isCategoryPickerDirectPopupEnabled: Boolean = false,
     isCategoryGridModeEnabled: Boolean = false,
     onCategoryPickerDirectPopupFeatureToggle: () -> Unit = {},
@@ -367,6 +368,34 @@ fun Settings(
                                 }
                             }
                         })
+
+                    CustomPaddedListItem(
+                        onClick = onShowPastTransactionsToggle,
+                        position = PaddedListItemPosition.Middle,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_feature_show_past_transactions_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_feature_show_past_transactions_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = showPastTransactions,
+                            onCheckedChange = { onShowPastTransactionsToggle() },
+                        )
+                    }
 
                     PaddedExpandableList(
                         isExpanded = isCategoryFeatureExpanded,
@@ -970,11 +999,14 @@ fun RecurrentPaymentsViewModePickerDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Repeat, contentDescription = null, tint = if (currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST) {
+                        imageVector = Icons.Default.Repeat,
+                        contentDescription = null,
+                        tint = if (currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST) {
                             MaterialTheme.colorScheme.onPrimaryContainer
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
-                        }, modifier = Modifier.size(24.dp)
+                        },
+                        modifier = Modifier.size(24.dp)
                     )
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -1031,11 +1063,14 @@ fun RecurrentPaymentsViewModePickerDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Repeat, contentDescription = null, tint = if (currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
+                        imageVector = Icons.Default.Repeat,
+                        contentDescription = null,
+                        tint = if (currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
                             MaterialTheme.colorScheme.onPrimaryContainer
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
-                        }, modifier = Modifier.size(24.dp)
+                        },
+                        modifier = Modifier.size(24.dp)
                     )
 
                     Spacer(modifier = Modifier.width(16.dp))
