@@ -546,4 +546,5 @@
     <string name="analytics_tutorial_credit_desc">Toque no cartão de crédito para ver todas as transações CC, marcá-las como pagas ou ajustar a data do cubo de cobrança para evitar juros.</string>
     <string name="analytics_tutorial_history_title">Histórico de transações</string>
     <string name="analytics_tutorial_history_desc">Toque aqui para ver uma lista de todas as suas despesas para este período.</string>
+    <string name="skip_tutorial">Skip</string>
 </resources>
