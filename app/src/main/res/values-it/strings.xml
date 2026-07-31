@@ -261,6 +261,8 @@
     <string name="settings_category_picker_direct_popup_description">Aprire il popup dei suggerimenti con tutte le categorie salvate non appena si tocca il campo categoria. Quando è spento, i suggerimenti appaiono solo dopo aver iniziato a digitare.</string>
     <string name="settings_category_grid_mode_switch_label">Mostra come elenco (sperimentale)</string>
     <string name="settings_category_grid_mode_description">Toccare il tag categoria per aprire una griglia delle categorie salvate, invece di entrare in modalità di modifica in linea. Disattiva anche la modalità di calcolo del numpad mentre è acceso.</string>
+    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">Modalità visualizzazione pagamenti ricorrenti</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Cambia il tipo di display per mostrare i tuoi pagamenti ricorrenti</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Modalità visualizzazione pagamenti ricorrenti</string>
