@@ -134,7 +134,7 @@ class NotificationScheduler @Inject constructor(
     ) {
         scope.launch {
             val (hour, minute) = getPeriodEndNotificationTime()
-            schedulePeriodEndNotification(periodEndDate, hour, minute, currentDate)
+            schedulePeriodEndNotification(periodEndDate.plusDays(1), hour, minute, currentDate)
         }
     }
 
