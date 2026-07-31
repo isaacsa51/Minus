@@ -38,6 +38,7 @@ import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.Editor
 import com.serranoie.app.minus.presentation.ui.history.History
 import com.serranoie.app.minus.presentation.ui.history.HistoryUiState
+import com.serranoie.app.minus.presentation.ui.home.MainScreenActions
 import com.serranoie.app.minus.presentation.ui.home.MainScreenContent
 import com.serranoie.app.minus.presentation.ui.home.MainScreenUiIntent
 import com.serranoie.app.minus.presentation.ui.home.MainScreenUiState
@@ -157,23 +158,24 @@ class MainScreenCoverageTest {
             ) {
                 MinusTheme {
                     MainScreenContent(
-                        mainScreenState = mainScreenState,
+                        mainScreenState =
+                            mainScreenState.copy(
+                                onboardingCompleted = onboardingCompleted,
+                                tutorialStage = FirstLaunchTutorialStage.COMPLETED,
+                                showCreditQuickToggleFeature = true,
+                                directCategoryPopupEnabled = false,
+                                categoryGridModeEnabled = false,
+                                showBudgetPeriodSheet = showBudgetPeriodSheet,
+                                forceBudgetPeriodSheetSetup = false,
+                                selectedViewPeriod = selectedViewPeriod,
+                            ),
                         budgetUiState = budgetUiState,
-                        onboardingCompleted = onboardingCompleted,
-                        tutorialStage = FirstLaunchTutorialStage.COMPLETED,
-                        showCreditQuickToggleFeature = true,
-                        directCategoryPopupEnabled = false,
-                        categoryGridModeEnabled = false,
-                        onProcessIntent = { intent -> capturedIntents += intent },
-                        onNavigateToAnalytics = {},
-                        onNavigateToSettings = {},
-                        onNavigateToWallet = {},
+                        actions =
+                            MainScreenActions(
+                                onProcessIntent = { intent -> capturedIntents += intent },
+                                onAdvanceTutorial = {},
+                            ),
                         openWalletOnStart = false,
-                        showBudgetPeriodSheet = showBudgetPeriodSheet,
-                        forceBudgetPeriodSheetSetup = false,
-                        selectedViewPeriod = selectedViewPeriod,
-                        onPeriodSelected = {},
-                        undoSnackbarActionLabel = "Undo",
                     )
                 }
             }

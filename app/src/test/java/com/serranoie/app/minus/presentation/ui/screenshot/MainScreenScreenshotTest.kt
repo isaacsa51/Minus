@@ -17,6 +17,7 @@ import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
+import com.serranoie.app.minus.presentation.ui.home.MainScreenActions
 import com.serranoie.app.minus.presentation.ui.home.MainScreenContent
 import com.serranoie.app.minus.presentation.ui.home.MainScreenUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -76,23 +77,24 @@ private fun MainScreenPreviewContent(
     ) {
         MinusTheme {
             MainScreenContent(
-                mainScreenState = MainScreenUiState(),
+                mainScreenState =
+                    MainScreenUiState(
+                        onboardingCompleted = true,
+                        tutorialStage = FirstLaunchTutorialStage.COMPLETED,
+                        showCreditQuickToggleFeature = true,
+                        directCategoryPopupEnabled = false,
+                        categoryGridModeEnabled = false,
+                        showBudgetPeriodSheet = false,
+                        forceBudgetPeriodSheetSetup = false,
+                        selectedViewPeriod = BudgetPeriod.DAILY,
+                    ),
                 budgetUiState = budgetUiState,
-                onboardingCompleted = true,
-                tutorialStage = FirstLaunchTutorialStage.COMPLETED,
-                showCreditQuickToggleFeature = true,
-                directCategoryPopupEnabled = false,
-                categoryGridModeEnabled = false,
-                onProcessIntent = {},
-                onNavigateToAnalytics = {},
-                onNavigateToSettings = {},
-                onNavigateToWallet = {},
+                actions =
+                    MainScreenActions(
+                        onProcessIntent = {},
+                        onAdvanceTutorial = {},
+                    ),
                 openWalletOnStart = false,
-                showBudgetPeriodSheet = false,
-                forceBudgetPeriodSheetSetup = false,
-                selectedViewPeriod = BudgetPeriod.DAILY,
-                onPeriodSelected = {},
-                undoSnackbarActionLabel = "Undo",
             )
         }
     }

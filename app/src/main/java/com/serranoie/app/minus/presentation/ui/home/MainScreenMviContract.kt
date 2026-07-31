@@ -72,3 +72,26 @@ data class MainScreenUiState(
     val directCategoryPopupEnabled: Boolean = false,
     val categoryGridModeEnabled: Boolean = false,
 )
+
+data class MainScreenActions(
+    val onProcessIntent: (MainScreenUiIntent) -> Unit,
+    val onAdvanceTutorial: (FirstLaunchTutorialStage) -> Unit,
+    val onNavigateToAnalytics: () -> Unit = {},
+    val onNavigateToSettings: () -> Unit = {},
+    val onNavigateToWallet: () -> Unit = {},
+    val onPeriodSelected: (BudgetPeriod) -> Unit = {},
+    val onShowSnackbar: (String) -> Unit = {},
+)
+
+data class MainScreenFeatureFlags(
+    val showCreditQuickToggleFeature: Boolean,
+    val directCategoryPopupEnabled: Boolean,
+    val categoryGridModeEnabled: Boolean,
+)
+
+data class MainScreenBudgetPeriodState(
+    val showBudgetPeriodSheet: Boolean,
+    val forceBudgetPeriodSheetSetup: Boolean,
+    val selectedViewPeriod: BudgetPeriod?,
+    val onPeriodSelected: (BudgetPeriod) -> Unit,
+)

@@ -6,6 +6,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.serranoie.app.minus.R
+import logcat.logcat
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -17,200 +18,224 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.math.ceil
-import logcat.logcat
 
 const val DAY = 24 * 60 * 60 * 1000
 
-fun LocalDate.toDate(): Date = Date(this.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000)
+fun LocalDate.toDate(): Date =
+    Date(this.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000)
 
-fun LocalDateTime.toDate(): Date = Date(this.toEpochSecond(
-	ZoneId.systemDefault().rules.getOffset(this)
-) * 1000)
+fun LocalDateTime.toDate(): Date = Date(
+    this.toEpochSecond(
+        ZoneId.systemDefault().rules.getOffset(this)
+    ) * 1000
+)
 
 fun Date.toLocalDate(): LocalDate = this.toInstant()
-	.atZone(ZoneId.systemDefault())
-	.toLocalDate()
+    .atZone(ZoneId.systemDefault())
+    .toLocalDate()
 
 fun Date.toLocalDateTime(): LocalDateTime = this.toInstant()
-	.atZone(ZoneId.systemDefault())
-	.toLocalDateTime()
+    .atZone(ZoneId.systemDefault())
+    .toLocalDateTime()
 
-fun countDaysToToday(fromDate: Date): Int {
-	val today = Date()
-	if (fromDate <= today) {
-		return 0
-	}
-	val result = countDays(fromDate, today)
-	logcat("DateFormatting - ISAAC") { "countDaysToToday: fromDate=$fromDate, today=${Date()}, result=$result" }
-	return result
+fun countDaysToToday(finishDate: Date): Int {
+    val today = LocalDate.now()
+    val end = finishDate.toLocalDate()
+    if (!today.isBefore(end)) {
+        return 0
+    }
+    val result = java.time.temporal.ChronoUnit.DAYS.between(today, end).toInt()
+    logcat("DateFormatting") { "countDaysToToday: finishDate=$finishDate, today=$today, result=$result" }
+    return result
 }
 
 fun countDays(toDate: Date, fromDate: Date): Int {
-	val fromDateRound = roundToDay(fromDate)
-	val toDateRound = roundToDay(toDate)
+    val fromDateRound = roundToDay(fromDate)
+    val toDateRound = roundToDay(toDate)
 
-	val daysFrom = ceil(fromDateRound.time / DAY.toDouble()).toInt()
-	val daysTo = ceil(toDateRound.time / DAY.toDouble()).toInt()
+    val daysFrom = ceil(fromDateRound.time / DAY.toDouble()).toInt()
+    val daysTo = ceil(toDateRound.time / DAY.toDouble()).toInt()
 
-	val result = daysTo - daysFrom + 1
-	logcat("DateFormatting - ISAAC") { "countDays: fromDate=$fromDate (rounded=$fromDateRound, daysFrom=$daysFrom), toDate=$toDate (rounded=$toDateRound, daysTo=$daysTo), result=$result" }
-	return result
+    val result = daysTo - daysFrom + 1
+    logcat("DateFormatting - ISAAC") { "countDays: fromDate=$fromDate (rounded=$fromDateRound, daysFrom=$daysFrom), toDate=$toDate (rounded=$toDateRound, daysTo=$daysTo), result=$result" }
+    return result
 }
 
 fun isToday(date: Date): Boolean {
-	return isSameDay(date.time, Date().time)
+    return isSameDay(date.time, Date().time)
 }
 
 fun isSameDay(timestampA: Long, timestampB: Long): Boolean {
-	return isSameDay(Date(timestampA), Date(timestampB))
+    return isSameDay(Date(timestampA), Date(timestampB))
 }
 
 fun isSameDay(dateA: Date, dateB: Date): Boolean {
-	return roundToDay(dateA) == roundToDay(dateB)
+    return roundToDay(dateA) == roundToDay(dateB)
 }
+
 @Composable
 fun getWeek(): Array<DayOfWeek> {
-	val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales[0]
 
-	return getWeek(locale)
+    return getWeek(locale)
 }
 
 fun getWeek(locale: Locale): Array<DayOfWeek> {
-	val firstDayOfWeek = WeekFields.of(locale).firstDayOfWeek
+    val firstDayOfWeek = WeekFields.of(locale).firstDayOfWeek
 
-	return if (firstDayOfWeek == DayOfWeek.MONDAY) {
-		arrayOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
-	} else {
-		arrayOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
-	}
+    return if (firstDayOfWeek == DayOfWeek.MONDAY) {
+        arrayOf(
+            DayOfWeek.MONDAY,
+            DayOfWeek.TUESDAY,
+            DayOfWeek.WEDNESDAY,
+            DayOfWeek.THURSDAY,
+            DayOfWeek.FRIDAY,
+            DayOfWeek.SATURDAY,
+            DayOfWeek.SUNDAY
+        )
+    } else {
+        arrayOf(
+            DayOfWeek.SUNDAY,
+            DayOfWeek.MONDAY,
+            DayOfWeek.TUESDAY,
+            DayOfWeek.WEDNESDAY,
+            DayOfWeek.THURSDAY,
+            DayOfWeek.FRIDAY,
+            DayOfWeek.SATURDAY
+        )
+    }
 }
 
 @Composable
 fun prettyDate(
-	date: Date,
-	pattern: String,
-	simplifyIfToday: Boolean = true,
+    date: Date,
+    pattern: String,
+    simplifyIfToday: Boolean = true,
 ): String {
-	val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales[0]
 
-	val dateWithMonthAndYearFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", locale)
-	val currentFullDate = dateWithMonthAndYearFormatter.format(LocalDate.now())
-	val convertedFullDate = dateWithMonthAndYearFormatter.format(date.toLocalDateTime())
+    val dateWithMonthAndYearFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", locale)
+    val currentFullDate = dateWithMonthAndYearFormatter.format(LocalDate.now())
+    val convertedFullDate = dateWithMonthAndYearFormatter.format(date.toLocalDateTime())
 
-	var final = ""
+    var final = ""
 
-	final += if (simplifyIfToday && convertedFullDate == currentFullDate) {
-		stringResource(R.string.today)
-	} else {
-		DateTimeFormatter.ofPattern(pattern, locale).format(date.toLocalDateTime())
-	}
+    final += if (simplifyIfToday && convertedFullDate == currentFullDate) {
+        stringResource(R.string.today)
+    } else {
+        DateTimeFormatter.ofPattern(pattern, locale).format(date.toLocalDateTime())
+    }
 
-	return final.trim()
+    return final.trim()
 }
 
 @Composable
 fun prettyDate(
-	date: LocalDateTime?,
-	showTime: Boolean = true,
-	forceShowDate: Boolean = false,
-	forceHideDate: Boolean = false,
-	forceShowYear: Boolean = false,
-	human: Boolean = false,
-	shortMonth: Boolean = false,
+    date: LocalDateTime?,
+    showTime: Boolean = true,
+    forceShowDate: Boolean = false,
+    forceHideDate: Boolean = false,
+    forceShowYear: Boolean = false,
+    human: Boolean = false,
+    shortMonth: Boolean = false,
 ): String {
-	val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales[0]
 
-	val yearOnlyFormatter = DateTimeFormatter.ofPattern("yyyy", locale)
-	val dateWithMonthAndYearFormatter = if (shortMonth) {
-		DateTimeFormatter.ofPattern("dd MMM yyyy", locale)
-	} else {
-		DateTimeFormatter.ofPattern("dd MMMM yyyy", locale)
-	}
-	val dateWithMonthFormatter = if (shortMonth) {
-		DateTimeFormatter.ofPattern("dd MMM", locale)
-	} else {
-		DateTimeFormatter.ofPattern("dd MMMM", locale)
-	}
-	val timeFormatter = if (DateFormat.is24HourFormat(LocalContext.current)) {
-		DateTimeFormatter.ofPattern("HH:mm", locale)
-	} else {
-		DateTimeFormatter.ofPattern("hh:mm a", locale)
-	}
+    val yearOnlyFormatter = DateTimeFormatter.ofPattern("yyyy", locale)
+    val dateWithMonthAndYearFormatter = if (shortMonth) {
+        DateTimeFormatter.ofPattern("dd MMM yyyy", locale)
+    } else {
+        DateTimeFormatter.ofPattern("dd MMMM yyyy", locale)
+    }
+    val dateWithMonthFormatter = if (shortMonth) {
+        DateTimeFormatter.ofPattern("dd MMM", locale)
+    } else {
+        DateTimeFormatter.ofPattern("dd MMMM", locale)
+    }
+    val timeFormatter = if (DateFormat.is24HourFormat(LocalContext.current)) {
+        DateTimeFormatter.ofPattern("HH:mm", locale)
+    } else {
+        DateTimeFormatter.ofPattern("hh:mm a", locale)
+    }
 
 
-	val currentFullDate = dateWithMonthAndYearFormatter.format(LocalDate.now())
-	val currentYear = yearOnlyFormatter.format(LocalDate.now())
+    val currentFullDate = dateWithMonthAndYearFormatter.format(LocalDate.now())
+    val currentYear = yearOnlyFormatter.format(LocalDate.now())
 
-	val convertedFullDate = dateWithMonthAndYearFormatter.format(date?.toLocalDate())
-	val convertedYear = yearOnlyFormatter.format(date?.toLocalDate())
-	val convertedDate = dateWithMonthFormatter.format(date?.toLocalDate())
-	val convertedTime = if (date != null) timeFormatter.format(date) else ""
+    val convertedFullDate = dateWithMonthAndYearFormatter.format(date?.toLocalDate())
+    val convertedYear = yearOnlyFormatter.format(date?.toLocalDate())
+    val convertedDate = dateWithMonthFormatter.format(date?.toLocalDate())
+    val convertedTime = if (date != null) timeFormatter.format(date) else ""
 
-	var final = ""
+    var final = ""
 
-	if (human && convertedFullDate == currentFullDate) {
-		final += stringResource(R.string.today)
-	}
+    if (human && convertedFullDate == currentFullDate) {
+        final += stringResource(R.string.today)
+    }
 
-	if (!human || convertedFullDate != currentFullDate) {
-		if ((convertedFullDate != currentFullDate || !showTime || forceShowDate) && !forceHideDate) {
-			final += convertedDate
-		}
+    if (!human || convertedFullDate != currentFullDate) {
+        if ((convertedFullDate != currentFullDate || !showTime || forceShowDate) && !forceHideDate) {
+            final += convertedDate
+        }
 
-		if (convertedYear != currentYear || forceShowYear) {
-			final += " $convertedYear"
-		}
-	}
+        if (convertedYear != currentYear || forceShowYear) {
+            final += " $convertedYear"
+        }
+    }
 
-	if (showTime) {
-		final += " $convertedTime"
-	}
+    if (showTime) {
+        final += " $convertedTime"
+    }
 
-	return final.trim()
+    return final.trim()
 }
 
 @Composable
 fun prettyYearMonth(yearMonth: YearMonth): String {
-	val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales[0]
 
-	val yearOnlyFormatter = DateTimeFormatter.ofPattern("yyyy", locale)
-	val monthFormatter = DateTimeFormatter.ofPattern("LLLL", locale)
-	val monthWithYearFormatter = DateTimeFormatter.ofPattern("LLLL yyyy", locale)
+    val yearOnlyFormatter = DateTimeFormatter.ofPattern("yyyy", locale)
+    val monthFormatter = DateTimeFormatter.ofPattern("LLLL", locale)
+    val monthWithYearFormatter = DateTimeFormatter.ofPattern("LLLL yyyy", locale)
 
-	return if (yearMonth.year.toString() == yearOnlyFormatter.format(LocalDate.now())) {
-		yearMonth.format(monthFormatter)
-	} else {
-		yearMonth.format(monthWithYearFormatter)
-	}.replaceFirstChar {
-		if (it.isLowerCase()) it.titlecase(
-			locale
-		) else it.toString()
-	}
+    return if (yearMonth.year.toString() == yearOnlyFormatter.format(LocalDate.now())) {
+        yearMonth.format(monthFormatter)
+    } else {
+        yearMonth.format(monthWithYearFormatter)
+    }.replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(
+            locale
+        ) else it.toString()
+    }
 }
 
 @Composable
 fun prettyWeekDay(dayOfWeek: DayOfWeek): String {
-	val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales[0]
 
-	val dayOfWeekFormatter = if (locale.language == "ru") {
-		DateTimeFormatter.ofPattern("ccc", locale)
-	} else {
-		DateTimeFormatter.ofPattern("ccccc", locale)
-	}
+    val dayOfWeekFormatter = if (locale.language == "ru") {
+        DateTimeFormatter.ofPattern("ccc", locale)
+    } else {
+        DateTimeFormatter.ofPattern("ccccc", locale)
+    }
 
-	return dayOfWeekFormatter.format(dayOfWeek).uppercase(locale)
+    return dayOfWeekFormatter.format(dayOfWeek).uppercase(locale)
 }
 
 fun roundToDay(date: Date): Date {
-	val calendar = Calendar.getInstance()
-	calendar.time = date
+    val calendar = Calendar.getInstance()
+    calendar.time = date
 
-	return Calendar
-		.Builder()
-		.setTimeZone(calendar.timeZone)
-		.setDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-		.build()
-		.time
+    return Calendar
+        .Builder()
+        .setTimeZone(calendar.timeZone)
+        .setDate(
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        .build()
+        .time
 }
 
 fun calculateDaysToCutoff(cutoffDay: Int, fromDate: LocalDate = LocalDate.now()): Int {

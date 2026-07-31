@@ -38,18 +38,12 @@ fun MainScreen(
     val mainScreenState by mainScreenViewModel.uiState.collectAsStateWithLifecycle()
     val budgetUiState by budgetViewModel.uiState.collectAsStateWithLifecycle()
 
-    val onboardingCompleted = mainScreenState.onboardingCompleted
     val tutorialStage = mainScreenState.tutorialStage
-    val showCreditQuickToggleFeature = mainScreenState.showCreditQuickToggleFeature
     val tutorialBoxCompleted = mainScreenState.tutorialBoxCompleted
-    val directCategoryPopupEnabled = mainScreenState.directCategoryPopupEnabled
-    val categoryGridModeEnabled = mainScreenState.categoryGridModeEnabled
 
     val effectiveSelectedPeriod =
         mainScreenState.selectedViewPeriod ?: budgetUiState.budgetSettings?.period
         ?: BudgetPeriod.DAILY
-
-    val undoSnackbarActionLabel = stringResource(R.string.undo)
 
     logcat(TAG) { "MainScreen composed (openWalletOnStart=$openWalletOnStart, effectivePeriod=$effectiveSelectedPeriod)" }
 
@@ -179,43 +173,43 @@ fun MainScreen(
             MainScreenContent(
                 mainScreenState = mainScreenState,
                 budgetUiState = budgetUiState,
-                onboardingCompleted = onboardingCompleted,
-                tutorialStage = tutorialStage,
-                showCreditQuickToggleFeature = showCreditQuickToggleFeature,
-                directCategoryPopupEnabled = directCategoryPopupEnabled,
-                categoryGridModeEnabled = categoryGridModeEnabled,
-                onProcessIntent = { intent ->
-                    when (intent) {
-                        is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
-                            budgetViewModel.processIntent(intent.intent)
-                        }
+                actions =
+                    MainScreenActions(
+                        onProcessIntent = { intent ->
+                            when (intent) {
+                                is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
+                                    budgetViewModel.processIntent(intent.intent)
+                                }
 
-                        is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
-                            budgetViewModel.processIntent(intent.intent)
-                        }
+                                is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
+                                    budgetViewModel.processIntent(intent.intent)
+                                }
 
-                        is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
-                            budgetViewModel.processIntent(intent.intent)
-                        }
+                                is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
+                                    budgetViewModel.processIntent(intent.intent)
+                                }
 
-                        else -> {
-                            mainScreenViewModel.processIntent(intent, tutorialStage)
-                        }
-                    }
-                },
-                onNavigateToAnalytics = onNavigateToAnalytics,
-                onNavigateToSettings = onNavigateToSettings,
-                onNavigateToWallet = onNavigateToWallet,
+                                else -> {
+                                    mainScreenViewModel.processIntent(intent, tutorialStage)
+                                }
+                            }
+                        },
+                        onAdvanceTutorial = { expected ->
+                            mainScreenViewModel.processIntent(
+                                MainScreenUiIntent.AdvanceTutorial(expected),
+                                tutorialStage
+                            )
+                        },
+                        onNavigateToAnalytics = onNavigateToAnalytics,
+                        onNavigateToSettings = onNavigateToSettings,
+                        onNavigateToWallet = onNavigateToWallet,
+                        onPeriodSelected = { period ->
+                            mainScreenViewModel.processIntent(
+                                MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
+                            )
+                        },
+                    ),
                 openWalletOnStart = openWalletOnStart,
-                showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet,
-                forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup,
-                selectedViewPeriod = effectiveSelectedPeriod,
-                onPeriodSelected = { period ->
-                    mainScreenViewModel.processIntent(
-                        MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
-                    )
-                },
-                undoSnackbarActionLabel = undoSnackbarActionLabel,
                 tutorialBoxState = tutorialBoxState,
             )
         }
