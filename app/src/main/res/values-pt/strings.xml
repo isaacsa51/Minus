@@ -261,6 +261,8 @@
     <string name="settings_category_picker_direct_popup_description">Abra a janela de sugestões com todas as suas categorias salvas assim que você tocar no campo da categoria. Quando desativado, as sugestões só aparecem depois de você começar a digitar.</string>
     <string name="settings_category_grid_mode_switch_label">Exibir como uma lista (Experimental)</string>
     <string name="settings_category_grid_mode_description">Toque na tag da categoria para abrir uma grade de suas categorias salvas, em vez de entrar no modo de edição. Também desativa o modo de cálculo do número enquanto isto estiver ativado.</string>
+    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">Modo de visualização de pagamentos recorrentes</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Altere o tipo de exibição para mostrar seus pagamentos recorrentes</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Modo de visualização de pagamentos recorrentes</string>
