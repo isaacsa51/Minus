@@ -1,0 +1,11 @@
+- feat: add setting to toggle visibility of past transactions
+- refactor: consolidate MainScreen parameters into dedicated state classes and extract UI sections
+- fix: show period completion logic after ends date
+- fix: refine period end notification scheduling
+- feat: reconstruct historical periods and enhance analytics visualization
+- feat: include archived budgets and creation timestamps in CSV exports and imports
+- feat: include budget split mode in CSV exports
+- refactor: centralize settings management and clean up DataStore usage
+- fix: refine internal keyboard height constraints and layout alignment
+- feat: enhance tutorial hints with smoother animations
+- fix: show incoming label in budget pill

@@ -162,4 +162,27 @@ platform :android do
       "--generate-notes"
     )
   end
+
+  desc "Builds and uploads the AAB to Google Play"
+  lane :deploy_play_store do |options|
+    track = options[:track] || "internal"
+
+    # Ensure changelogs exist
+    version_tag = ENV["VERSION_TAG"] || `git describe --tags --abbrev=0`.to_s.strip
+    expected_txt = changelog_path_for(version_tag)
+    unless File.exist?(expected_txt)
+      UI.user_error!("Missing #{expected_txt}. Run prep_release or generate_changelog first.")
+    end
+
+    # Build the App Bundle
+    gradle(task: ":app:bundleWearRelease")
+
+    # Upload to Play Store
+    upload_to_play_store(
+      track: track,
+      aab: "app/build/outputs/bundle/wearRelease/app-wear-release.aab",
+      skip_upload_screenshots: true,
+      metadata_path: "fastlane/metadata/android"
+    )
+  end
 end
