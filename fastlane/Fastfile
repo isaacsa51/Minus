@@ -186,14 +186,30 @@ platform :android do
     # Build the App Bundle
     gradle(task: ":app:bundleWearRelease")
 
-    # Upload to Play Store
-    upload_to_play_store(
-      track: track,
-      aab: "app/build/outputs/bundle/wearRelease/app-wear-release.aab",
-      skip_upload_apk: true,
-      skip_upload_screenshots: true,
-      skip_upload_images: true,
-      metadata_path: "fastlane/metadata/android"
-    )
+    # Upload to Play Store with idempotency check
+    begin
+      upload_to_play_store(
+        track: track,
+        aab: "app/build/outputs/bundle/wearRelease/app-wear-release.aab",
+        skip_upload_apk: true,
+        skip_upload_screenshots: true,
+        skip_upload_images: true,
+        metadata_path: "fastlane/metadata/android"
+      )
+    rescue => e
+      if e.to_s.include?("already been used")
+        UI.important("Version code already exists on Play Store. Skipping AAB upload and updating metadata only.")
+        upload_to_play_store(
+          track: track,
+          skip_upload_aab: true,
+          skip_upload_apk: true,
+          skip_upload_screenshots: true,
+          skip_upload_images: true,
+          metadata_path: "fastlane/metadata/android"
+        )
+      else
+        raise e
+      end
+    end
   end
 end
