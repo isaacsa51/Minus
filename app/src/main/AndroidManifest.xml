@@ -43,6 +43,10 @@
             android:exported="false" />
 
         <receiver
+            android:name=".presentation.notification.MidnightPeriodTransitionReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".presentation.notification.NotificationRescheduleReceiver"
             android:enabled="true"
             android:exported="true">
