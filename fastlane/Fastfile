@@ -155,12 +155,19 @@ platform :android do
     ].select { |path| File.exist?(path) }
     UI.user_error!("No se encontraron APKs generados por Gradle") if apk_paths.empty?
 
-    sh(
-      "gh", "release", "create", version_tag, *apk_paths,
-      "--repo", ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
-      "--title", "Minus #{version_tag}",
-      "--generate-notes"
-    )
+    # Check if release already exists to allow CI re-runs
+    release_exists = system("gh release view #{version_tag} --repo #{ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus")} > /dev/null 2>&1")
+
+    if release_exists
+      UI.important("Release #{version_tag} already exists on GitHub. Skipping creation.")
+    else
+      sh(
+        "gh", "release", "create", version_tag, *apk_paths,
+        "--repo", ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
+        "--title", "Minus #{version_tag}",
+        "--generate-notes"
+      )
+    end
   end
 
   desc "Builds and uploads the AAB to Google Play"
