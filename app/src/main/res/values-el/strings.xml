@@ -261,6 +261,8 @@
     <string name="settings_category_picker_direct_popup_description">Ανοίξτε τις προτάσεις με όλες τις αποθηκευμένες κατηγορίες μόλις πατήσετε το πεδίο κατηγορίας. Όταν είναι απενεργοποιημένο, οι προτάσεις εμφανίζονται μόνο αφού αρχίσετε να πληκτρολογείτε.</string>
     <string name="settings_category_grid_mode_switch_label">Εμφάνιση ως λίστα (Πειραματικό)</string>
     <string name="settings_category_grid_mode_description">Αγγίξτε την ετικέτα κατηγορίας για να ανοίξετε ένα πλέγμα των αποθηκευμένων κατηγοριών σας, αντί να εισάγετε μια εσωτερική λειτουργία επεξεργασίας. Επίσης απενεργοποιεί τη λειτουργία υπολογισμού του numpad ενώ αυτό είναι ενεργό.</string>
+    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">Λειτουργία επαναλαμβανόμενης προβολής πληρωμών</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Αλλάξτε τον τύπο εμφάνισης για να εμφανίσετε τις επαναλαμβανόμενες πληρωμές σας</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Λειτουργία επαναλαμβανόμενης προβολής πληρωμών</string>
