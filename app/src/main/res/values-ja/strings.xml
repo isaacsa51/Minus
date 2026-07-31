@@ -543,4 +543,5 @@
     <string name="analytics_tutorial_credit_desc">クレジットカードをタップして、すべてのCC取引を表示したり、支払い済みとしてマークしたり、関心を避けるために請求のカットオフ日を調整したりします。</string>
     <string name="analytics_tutorial_history_title">取引履歴</string>
     <string name="analytics_tutorial_history_desc">この期間のすべての経費のリストを表示するには、ここをタップしてください。</string>
+    <string name="skip_tutorial">Skip</string>
 </resources>
