@@ -258,6 +258,8 @@
     <string name="settings_category_picker_direct_popup_description">カテゴリフィールドをタップするとすぐに、保存されているすべてのカテゴリの候補ポップアップを開きます。 オフの場合、入力を開始した後にのみ候補が表示されます。</string>
     <string name="settings_category_grid_mode_switch_label">リストとして表示 (実験的)</string>
     <string name="settings_category_grid_mode_description">カテゴリ タグをタップすると、インライン編集モードではなく、保存したカテゴリのグリッドが開きます。 また、これがオンの間、numpadの計算モードをオフにします。</string>
+    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">反復支払い表示モード</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">定期支払いを表示するようにディスプレイの種類を変更します</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">反復支払い表示モード</string>
