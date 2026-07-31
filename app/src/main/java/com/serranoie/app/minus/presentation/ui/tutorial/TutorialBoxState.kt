@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.tutorial
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -85,6 +86,12 @@ class TutorialBoxState {
         }
     }
 
+    fun skipAll() {
+        isCompleted = true
+        visitedIndices.addAll(registrationOrder)
+        logcat(TUTORIAL_LOG_TAG) { "skipAll: tutorial marked as completed" }
+    }
+
     fun resetForReplay() {
         isCompleted = false
         currentIndexState.value = if (registrationOrder.isEmpty()) -1 else registrationOrder.first()
@@ -105,11 +112,31 @@ internal val GatedIndices: Set<Int> = setOf(3, 4, 7, 8)
 fun rememberTutorialBoxState(
     order: List<Int> = DefaultWalkOrder,
     virtual: Set<Int> = VirtualIndices,
-): TutorialBoxState = remember(order) {
-    TutorialBoxState().also {
-        it.registrationOrder.addAll(order)
-        virtual.forEach { idx -> it.targetBounds[idx] = Rect.Zero }
+): TutorialBoxState {
+    val state = remember { TutorialBoxState() }
+
+    LaunchedEffect(order) {
+        val currentOrder = state.registrationOrder.toList()
+        if (currentOrder != order) {
+            state.registrationOrder.clear()
+            state.registrationOrder.addAll(order)
+
+            // If we were at -1 or our current index is no longer in the order, reset to first
+            if (state.currentIndexState.value == -1 || state.currentIndexState.value !in order) {
+                state.currentIndexState.value = order.firstOrNull() ?: -1
+            }
+        }
     }
+
+    LaunchedEffect(virtual) {
+        virtual.forEach { idx ->
+            if (idx !in state.targetBounds) {
+                state.targetBounds[idx] = Rect.Zero
+            }
+        }
+    }
+
+    return state
 }
 
 fun Modifier.markForTutorial(

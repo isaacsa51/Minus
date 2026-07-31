@@ -105,6 +105,7 @@ private val STABLE_DEFAULT_DATE = Date(0)
 data class AnalyticsState(
     val periodFinished: Boolean = false,
     val transactions: List<Transaction> = emptyList(),
+    val allTransactions: List<Transaction> = emptyList(),
     val spends: List<Transaction> = emptyList(),
     val recurringInPeriod: List<Transaction> = emptyList(),
     val oneTimeSpends: List<Transaction> = emptyList(),
@@ -490,6 +491,7 @@ fun Analytics(
         ) {
             com.serranoie.app.minus.presentation.ui.analytics.dialogs.PastPeriodsBottomSheet(
                 periods = archivedBudgets,
+                allTransactions = state.allTransactions,
                 onPeriodClick = { archivedBudget ->
                     scope.launch {
                         sheetState.hide()
