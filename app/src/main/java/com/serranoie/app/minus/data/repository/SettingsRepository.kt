@@ -52,6 +52,8 @@ interface SettingsRepository {
 
     suspend fun setCreditQuickToggleEnabled(enabled: Boolean)
 
+    suspend fun setShowPastTransactions(enabled: Boolean)
+
     suspend fun setCategoryPickerDirectPopupEnabled(enabled: Boolean)
 
     suspend fun setCategoryGridModeEnabled(enabled: Boolean)

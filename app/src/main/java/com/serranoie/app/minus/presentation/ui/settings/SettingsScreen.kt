@@ -60,11 +60,14 @@ fun SettingsScreen(
                     viewModel.consumeEffect()
                     onNavigateToBugReport()
                 }
+
                 is SettingsUiEffect.NavigateBack -> {
                     viewModel.consumeEffect()
                     onNavigateBack()
                 }
-                null -> { /* no-op */ }
+
+                null -> { /* no-op */
+                }
             }
         }
     }
@@ -72,10 +75,12 @@ fun SettingsScreen(
     Settings(
         isCensored = uiState.isCensored,
         isCreditQuickToggleFeatureEnabled = uiState.isCreditQuickToggleEnabled,
+        showPastTransactions = uiState.showPastTransactions,
         isCategoryPickerDirectPopupEnabled = uiState.isCategoryPickerDirectPopupEnabled,
         isCategoryGridModeEnabled = uiState.isCategoryGridModeEnabled,
         onCategoryPickerDirectPopupFeatureToggle = viewModel::onCategoryPickerDirectPopupFeatureToggle,
         onCategoryGridModeToggle = viewModel::onCategoryGridModeToggle,
+        onShowPastTransactionsToggle = viewModel::onShowPastTransactionsToggle,
         recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
         notificationHour = uiState.notificationHour,
         notificationMinute = uiState.notificationMinute,

@@ -38,6 +38,7 @@ data class HistoryUiState(
     val currentPeriodStartedAtMillis: Long = 0L,
 
     val isCreditQuickToggleEnabled: Boolean = false,
+    val showPastTransactionsSetting: Boolean = true,
 
     val tags: List<String> = emptyList(),
 

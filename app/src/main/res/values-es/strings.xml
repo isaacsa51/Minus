@@ -262,6 +262,8 @@
     <string name="settings_category_picker_direct_popup_description">Abrir sugerencias de categorías al momento de dar tap en el campo de categorías. Si está apagado, las sugerencias solo aparecerán al momento que empieces a escribir.</string>
     <string name="settings_category_grid_mode_switch_label">Mostrar como una lista (Experimental)</string>
     <string name="settings_category_grid_mode_description">Al dar tap en la categoría se abrirá una lista con todas las categorías guardadas, en vez de escribirlos directamente. Este ajuste apaga el Numpad al escribir la categoría.</string>
+    <string name="settings_feature_show_past_transactions_title">Mostrar transacciones pasadas</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Cargar transacciones de periodos pasados</string>
     <string name="settings_recurrent_payments_view_mode_title">Modo de visualización de pagos recurrentes</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Cambia el tipo de visualización para mostrar tus pagos recurrentes</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Modo de visualización de pagos recurrentes</string>

@@ -223,9 +223,14 @@ class HistoryViewModel @Inject constructor(
             today = today,
         )
 
-        val groupedPast = groupTransactionsByDate(pastPeriodTx)
+        val groupedPast = if (userSettings?.showPastTransactions == false) {
+            emptyMap()
+        } else {
+            groupTransactionsByDate(pastPeriodTx)
+        }
 
-        val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }.sumOf { it.amount }
+        val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
+            .sumOf { it.amount }
         val remainingBudget = budgetState?.remainingToday ?: BigDecimal.ZERO
         val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
 
@@ -250,6 +255,7 @@ class HistoryViewModel @Inject constructor(
             creditOwed = creditOwed,
             debtAdjustedBalance = debtAdjustedBalance,
             isCreditQuickToggleEnabled = userSettings?.isCreditQuickToggleEnabled ?: false,
+            showPastTransactionsSetting = userSettings?.showPastTransactions ?: true,
             recurrentPaymentsViewMode = userSettings?.recurrentPaymentsViewMode
                 ?: RecurrentPaymentsViewMode.VERTICAL_LIST,
         )

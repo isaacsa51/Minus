@@ -26,6 +26,7 @@ data class UserSettings(
     val firstLaunchTutorialStage: FirstLaunchTutorialStage = FirstLaunchTutorialStage.COMPLETED,
     val analyticsTutorialCompleted: Boolean = false,
     val analyticsSpendsTutorialCompleted: Boolean = false,
+    val showPastTransactions: Boolean = false,
     val periodMappingMode: PeriodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val budgetSplitViewPeriod: BudgetPeriod? = null,
