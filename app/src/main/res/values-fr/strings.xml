@@ -546,4 +546,5 @@
     <string name="analytics_tutorial_credit_desc">Appuyez sur la carte de crédit pour afficher toutes les transactions en CC, les marquer comme payées ou ajuster votre date limite de facturation pour éviter les intérêts.</string>
     <string name="analytics_tutorial_history_title">Historique des transactions</string>
     <string name="analytics_tutorial_history_desc">Cliquez ici pour voir la liste de toutes vos dépenses pour cette période.</string>
+    <string name="skip_tutorial">Skip</string>
 </resources>
