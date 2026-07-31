@@ -543,4 +543,5 @@
     <string name="analytics_tutorial_credit_desc">Tap the credit card to view all CC transactions, mark them as paid, or adjust your billing cutoff date to avoid interest.</string>
     <string name="analytics_tutorial_history_title">Transaction History</string>
     <string name="analytics_tutorial_history_desc">Tap here to see a list of all your expenses for this period.</string>
+    <string name="skip_tutorial">Skip</string>
 </resources>
