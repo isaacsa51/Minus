@@ -46,116 +46,116 @@ import java.util.Date
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DaysLeftCard(
-	modifier: Modifier = Modifier,
-	startDate: Date,
-	finishDate: Date?,
+    modifier: Modifier = Modifier,
+    startDate: Date,
+    finishDate: Date?,
 ) {
-	if (finishDate == null) {
-		Box { }
-		return
-	}
+    if (finishDate == null) {
+        Box { }
+        return
+    }
 
-	val days = countDays(finishDate, startDate)
-	val restDays = countDaysToToday(finishDate)
+    val days = countDays(finishDate, startDate)
+    val restDays = countDaysToToday(finishDate)
 
-	val density = LocalDensity.current
-	val strokeWidthPx = with(density) { 6.dp.toPx() }
+    val density = LocalDensity.current
+    val strokeWidthPx = with(density) { 6.dp.toPx() }
 
-	Box(
-		Modifier
+    Box(
+        Modifier
 			.widthIn(max = 120.dp)
 			.aspectRatio(1f),
-		contentAlignment = Alignment.Center
-	) {
-		CircularWavyProgressIndicator(
-			// Subtract a tiny amount to show animation when completed
-			progress = { 1f - (restDays / days.toFloat()) - 0.01f },
-			modifier = modifier.fillMaxSize(),
-			color = MaterialTheme.colorScheme.primary,
-			trackColor = MaterialTheme.colorScheme.surfaceVariant,
-			amplitude = { 2f },
-			wavelength = 46.dp,
-			stroke = Stroke(width = strokeWidthPx, cap = StrokeCap.Round),
-			trackStroke = Stroke(width = strokeWidthPx, cap = StrokeCap.Round),
-		)
+        contentAlignment = Alignment.Center
+    ) {
+        CircularWavyProgressIndicator(
+            // Subtract a tiny amount to show animation when completed
+            progress = { 1f - (restDays / days.toFloat()) - 0.01f },
+            modifier = modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            amplitude = { 2f },
+            wavelength = 46.dp,
+            stroke = Stroke(width = strokeWidthPx, cap = StrokeCap.Round),
+            trackStroke = Stroke(width = strokeWidthPx, cap = StrokeCap.Round),
+        )
 
-		Column(
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.Center,
-			modifier = Modifier.padding(16.dp)
-		) {
-			Text(
-				text = restDays.toString(),
-				style = MaterialTheme.typography.displayLargeEmphasized.copy(
-					fontSize = MaterialTheme.typography.titleLarge.fontSize,
-					lineHeight = MaterialTheme.typography.titleLarge.fontSize
-				)
-			)
-			Text(
-				text = stringResource(R.string.days_remaining_label),
-				style = MaterialTheme.typography.labelMediumCondensed.copy(lineHeight = 12.sp),
-				textAlign = TextAlign.Center,
-				color = LocalContentColor.current.copy(alpha = 0.6f),
-			)
-			Spacer(modifier = Modifier.height(4.dp))
-		}
-	}
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = restDays.toString(),
+                style = MaterialTheme.typography.displayLargeEmphasized.copy(
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                    lineHeight = MaterialTheme.typography.titleLarge.fontSize
+                )
+            )
+            Text(
+                text = stringResource(R.string.days_remaining_label),
+                style = MaterialTheme.typography.labelMediumCondensed.copy(lineHeight = 12.sp),
+                textAlign = TextAlign.Center,
+                color = LocalContentColor.current.copy(alpha = 0.6f),
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+    }
 }
 
 @Deprecated("No longer used, using CircularWavyProgressIndicator instead")
 class ArcShape(
-	private val thickness: Dp,
-	private val progress: Float,
+    private val thickness: Dp,
+    private val progress: Float,
 ) : Shape {
-	override fun createOutline(
-		size: Size,
-		layoutDirection: LayoutDirection,
-		density: Density,
-	) = Outline.Generic(Path().apply {
-		val fixedProgress = progress - 0.000001f
-		val thicknessPx = with(density) { thickness.toPx() }
-		val shift = -90f
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density,
+    ) = Outline.Generic(Path().apply {
+        val fixedProgress = progress - 0.000001f
+        val thicknessPx = with(density) { thickness.toPx() }
+        val shift = -90f
 
-		val wavyPath = Path().apply {
-			arcTo(
-				Rect(offset = Offset.Zero, size = size),
-				shift,
-				-360 * fixedProgress,
-				forceMoveTo = true,
-			)
-			arcTo(
-				Rect(
-					offset = Offset(thicknessPx, thicknessPx),
-					size = Size(
-						width = size.width - thicknessPx * 2,
-						height = size.height - thicknessPx * 2
-					),
-				),
-				-360 * fixedProgress + shift,
-				360 * fixedProgress,
-				forceMoveTo = false,
-			)
-		}
-		val boundsPath = Path().apply {
-			addRect(Rect(offset = Offset.Zero, size = size))
-		}
-		op(wavyPath, boundsPath, PathOperation.Intersect)
-	})
+        val wavyPath = Path().apply {
+            arcTo(
+                Rect(offset = Offset.Zero, size = size),
+                shift,
+                -360 * fixedProgress,
+                forceMoveTo = true,
+            )
+            arcTo(
+                Rect(
+                    offset = Offset(thicknessPx, thicknessPx),
+                    size = Size(
+                        width = size.width - thicknessPx * 2,
+                        height = size.height - thicknessPx * 2
+                    ),
+                ),
+                -360 * fixedProgress + shift,
+                360 * fixedProgress,
+                forceMoveTo = false,
+            )
+        }
+        val boundsPath = Path().apply {
+            addRect(Rect(offset = Offset.Zero, size = size))
+        }
+        op(wavyPath, boundsPath, PathOperation.Intersect)
+    })
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun PreviewDaysLeftCard() {
-	val calendar = Calendar.getInstance()
-	calendar.add(Calendar.DAY_OF_YEAR, -3)
-	val startDate = calendar.time
-	calendar.add(Calendar.DAY_OF_YEAR, 6)
-	val finishDate = calendar.time
+    val calendar = Calendar.getInstance()
+    calendar.add(Calendar.DAY_OF_YEAR, -3)
+    val startDate = calendar.time
+    calendar.add(Calendar.DAY_OF_YEAR, 6)
+    val finishDate = calendar.time
 
-	MinusTheme {
-		DaysLeftCard(
-			startDate = startDate,
-			finishDate = finishDate,
-		)
-	}
+    MinusTheme {
+        DaysLeftCard(
+            startDate = startDate,
+            finishDate = finishDate,
+        )
+    }
 }

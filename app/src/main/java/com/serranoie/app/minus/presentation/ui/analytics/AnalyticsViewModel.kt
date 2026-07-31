@@ -167,7 +167,10 @@ class AnalyticsViewModel @Inject constructor(
                 if (hasOverlap) return@mapNotNull null
 
                 val virtualId = -(year.toLong() * 100 + month.toLong())
-                val daysInMonth = java.time.temporal.ChronoUnit.DAYS.between(actualStartDate, actualEndDate.plusDays(1))
+                val daysInMonth = java.time.temporal.ChronoUnit.DAYS.between(
+                    actualStartDate,
+                    actualEndDate.plusDays(1)
+                )
 
                 ArchivedBudget(
                     periodId = virtualId,
@@ -298,8 +301,7 @@ class AnalyticsViewModel @Inject constructor(
         val savingsPreferences = userSettings.savingsPreferences
 
         val periodFinishedNaturally =
-            settings.getPeriodEndDate().isBefore(today) || settings.getPeriodEndDate()
-                .isEqual(today)
+            settings.getPeriodEndDate().isBefore(today)
         val periodFinished = periodFinishedNaturally || earlyFinishActive
 
         val displayBudget = displayBudgetState.totalBudget
