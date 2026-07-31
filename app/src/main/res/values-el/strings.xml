@@ -546,4 +546,5 @@
     <string name="analytics_tutorial_credit_desc">Πατήστε την πιστωτική κάρτα για να δείτε όλες τις συναλλαγές CC, να τις επισημάνετε ως πληρωμένες ή να προσαρμόσετε την ημερομηνία περικοπής χρέωσής σας για να αποφύγετε τους τόκους.</string>
     <string name="analytics_tutorial_history_title">Ιστορικό Συναλλαγών</string>
     <string name="analytics_tutorial_history_desc">Πατήστε εδώ για να δείτε μια λίστα με όλα τα έξοδά σας για αυτή την περίοδο.</string>
+    <string name="skip_tutorial">Skip</string>
 </resources>
