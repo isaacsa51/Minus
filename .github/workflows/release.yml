@@ -71,6 +71,12 @@ jobs:
         run: |
           echo "$MINUS_RELEASE_KEYSTORE_BASE64" | base64 --decode > release-keystore.jks
 
+      - name: Write Google Play Service Account Key
+        env:
+          GOOGLE_PLAY_KEY_JSON: ${{ secrets.GOOGLE_PLAY_KEY_JSON }}
+        run: |
+          echo "$GOOGLE_PLAY_KEY_JSON" > fastlane/minus-app-504107-53ece865faf4.json
+
       - name: Write keystore.properties for CI build
         env:
           MINUS_RELEASE_STORE_PASSWORD: ${{ secrets.MINUS_RELEASE_STORE_PASSWORD }}
@@ -108,3 +114,8 @@ jobs:
           MINUS_RELEASE_KEY_ALIAS: ${{ secrets.MINUS_RELEASE_KEY_ALIAS }}
           MINUS_RELEASE_KEY_PASSWORD: ${{ secrets.MINUS_RELEASE_KEY_PASSWORD }}
         run: bundle exec fastlane android publish_github
+
+      - name: Deploy to Google Play (Production)
+        env:
+          VERSION_TAG: ${{ github.ref_name }}
+        run: bundle exec fastlane android deploy_play_store track:production
