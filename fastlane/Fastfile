@@ -181,7 +181,9 @@ platform :android do
     upload_to_play_store(
       track: track,
       aab: "app/build/outputs/bundle/wearRelease/app-wear-release.aab",
+      skip_upload_apk: true,
       skip_upload_screenshots: true,
+      skip_upload_images: true,
       metadata_path: "fastlane/metadata/android"
     )
   end
