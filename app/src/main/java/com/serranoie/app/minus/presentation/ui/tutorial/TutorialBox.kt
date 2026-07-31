@@ -18,16 +18,20 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -48,10 +52,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import kotlinx.coroutines.delay
@@ -105,6 +111,7 @@ fun TutorialBox(
                 isVirtual = isVirtual,
                 tutorialTarget = tutorialTarget,
                 onTap = { state.advance() },
+                onSkip = { state.skipAll() }
             )
         }
     }
@@ -116,7 +123,7 @@ fun TutorialBox(
             !isVirtual &&
             state.currentBounds == null
         ) {
-            delay(1000.milliseconds)
+            delay(400.milliseconds)
             if (state.currentBounds == null) {
                 logcat(TUTORIAL_LOG_TAG) {
                     "TutorialBox: current target $currentIndex " +
@@ -194,6 +201,7 @@ private fun TutorialOverlay(
     isVirtual: Boolean,
     tutorialTarget: @Composable (Int) -> Unit,
     onTap: () -> Unit,
+    onSkip: () -> Unit,
 ) {
     if (!isVirtual && bounds.isEmpty) return
 
@@ -205,9 +213,9 @@ private fun TutorialOverlay(
     val paddingPx = with(density) { 4.dp.toPx() }
     val cornerRadiusPx = with(density) { 12.dp.toPx() }
     val tooltipGapPx = with(density) { 20.dp.toPx() }
-    val tooltipMaxWidthPx = with(density) { 260.dp.toPx() }
+    val tooltipMaxWidthPx = with(density) { 280.dp.toPx() }
     val tooltipMaxWidth = with(density) { tooltipMaxWidthPx.toDp() }
-    val tooltipMinHeightEstimate = with(density) { 160.dp.toPx() }
+    val tooltipMinHeightEstimate = with(density) { 180.dp.toPx() }
 
     val infiniteTransition = rememberInfiniteTransition(label = "TutorialPulse")
     val pulseScale by infiniteTransition.animateFloat(
@@ -345,8 +353,21 @@ private fun TutorialOverlay(
                 .widthIn(max = tooltipMaxWidth)
                 .padding(horizontal = 16.dp),
         ) {
-            Box(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 tutorialTarget(index)
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onSkip) {
+                        Text(
+                            text = stringResource(R.string.skip_tutorial),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
         }
     }

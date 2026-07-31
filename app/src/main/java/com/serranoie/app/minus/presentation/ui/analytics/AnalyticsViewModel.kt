@@ -92,18 +92,22 @@ class AnalyticsViewModel @Inject constructor(
                 val rollover = args[5] as Pair<BigDecimal, Boolean>
 
                 val currentPeriodId = periodBoundary.second
+                val reconstructedArchives = reconstructHistory(transactions, archives, settings)
+                val allArchives = (archives + reconstructedArchives).distinctBy { it.periodId }
+                    .sortedByDescending { it.startDate }
+
                 val updatedState = _uiState.value.copy(
                     isLoading = false,
                     budgetSettings = settings,
                     allTransactions = transactions,
-                    archivedBudgets = archives,
+                    archivedBudgets = allArchives,
                     currentPeriodId = currentPeriodId,
                     userSettings = userSettings,
                     rolloverAmount = rollover.first,
                     rolloverCarryForward = rollover.second,
                     displayState = if (_uiState.value.selectedPeriodId != null && _uiState.value.selectedPeriodId != currentPeriodId) {
                         buildHistoricalDisplayState(
-                            _uiState.value.selectedPeriodId!!, transactions, archives
+                            _uiState.value.selectedPeriodId!!, transactions, allArchives
                         )
                     } else {
                         buildDisplayState(
@@ -120,6 +124,64 @@ class AnalyticsViewModel @Inject constructor(
         }
     }
 
+    private fun reconstructHistory(
+        allTransactions: List<Transaction>,
+        existingArchives: List<ArchivedBudget>,
+        currentSettings: BudgetSettings?
+    ): List<ArchivedBudget> {
+        if (currentSettings == null) return emptyList()
+
+        val orphaned = allTransactions.filter { it.periodId <= 0L && !it.isDeleted }
+        if (orphaned.isEmpty()) return emptyList()
+
+        val currentPeriodStart = currentSettings.startDate
+        val currentPeriodEnd = currentSettings.getPeriodEndDate()
+        val dailyBudget = currentSettings.calculateDailyBudget()
+
+        return orphaned
+            .filter { tx ->
+                val date = tx.date?.toLocalDate() ?: return@filter false
+                date.isBefore(currentPeriodStart) || date.isAfter(currentPeriodEnd)
+            }
+            .groupBy { tx ->
+                val date = tx.date?.toLocalDate() ?: return@groupBy "0-0"
+                "${date.year}-${date.monthValue}"
+            }
+            .mapNotNull { (key, txs) ->
+                val parts = key.split("-")
+                if (parts.size < 2) return@mapNotNull null
+                val year = parts[0].toInt()
+                val month = parts[1].toInt()
+
+                val actualStartDate = txs.mapNotNull { it.date?.toLocalDate() }.minOrNull()
+                    ?: LocalDate.of(year, month, 1)
+                val actualEndDate = txs.mapNotNull { it.date?.toLocalDate() }.maxOrNull()
+                    ?: actualStartDate.plusMonths(1).minusDays(1)
+
+                val hasOverlap = existingArchives.any { existing ->
+                    val eStart = existing.startDate
+                    val eEnd = existing.endDate
+                    actualStartDate <= eEnd && actualEndDate >= eStart
+                }
+
+                if (hasOverlap) return@mapNotNull null
+
+                val virtualId = -(year.toLong() * 100 + month.toLong())
+                val daysInMonth = java.time.temporal.ChronoUnit.DAYS.between(actualStartDate, actualEndDate.plusDays(1))
+
+                ArchivedBudget(
+                    periodId = virtualId,
+                    totalBudget = dailyBudget.multiply(BigDecimal(daysInMonth)),
+                    spentAmount = txs.sumOf { it.amount },
+                    startDate = actualStartDate,
+                    endDate = actualEndDate,
+                    currencyCode = currentSettings.currencyCode,
+                    periodType = com.serranoie.app.minus.domain.model.BudgetPeriod.MONTHLY,
+                    createdAt = System.currentTimeMillis()
+                )
+            }
+    }
+
     private fun buildHistoricalDisplayState(
         periodId: Long, allTransactions: List<Transaction>, archives: List<ArchivedBudget>
     ): AnalyticsState {
@@ -131,7 +193,15 @@ class AnalyticsViewModel @Inject constructor(
             rolloverAmountFromPref = _uiState.value.rolloverAmount
         )
 
-        val transactions = allTransactions.filter { it.periodId == periodId && !it.isDeleted }
+        val isVirtual = periodId < 0L
+        val transactions = if (isVirtual) {
+            allTransactions.filter { tx ->
+                val date = tx.date?.toLocalDate() ?: return@filter false
+                !date.isBefore(archive.startDate) && !date.isAfter(archive.endDate) && !tx.isDeleted
+            }
+        } else {
+            allTransactions.filter { it.periodId == periodId && !it.isDeleted }
+        }
         val (paidRecurring, upcomingRecurring, oneTimeSpends) = splitRecurringAndOneTime(
             allTransactions = allTransactions,
             filteredTransactions = transactions,
@@ -159,6 +229,7 @@ class AnalyticsViewModel @Inject constructor(
         return AnalyticsState(
             periodFinished = true,
             transactions = actualSpends,
+            allTransactions = allTransactions,
             spends = actualSpends,
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
@@ -255,6 +326,7 @@ class AnalyticsViewModel @Inject constructor(
         return AnalyticsState(
             periodFinished = periodFinished,
             transactions = transactions,
+            allTransactions = allTransactions,
             spends = transactions,
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
