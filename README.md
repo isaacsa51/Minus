@@ -32,6 +32,11 @@
         <img src="assets/badge_github.png" height="80" alt="Get it at GitHub">
       </a>
     </td>
+    <td align="center">
+      <a href="[https://github.com/isaacsa51/Minus/releases](https://play.google.com/store/apps/details?id=com.serranoie.app.minus)">
+        <img src="assets/badge_playstore.png" height="80" alt="Get it at Google Play Store">
+      </a>
+    </td>
   </tr>
 </table>
 
@@ -59,10 +64,11 @@
 ---
 
 ## Appearing on:
-
 ### [HowToMen](https://www.youtube.com/@howtomen)
-
 [![YouTube](http://i.ytimg.com/vi/2QBFRcqee7I/hqdefault.jpg)](https://www.youtube.com/watch?v=2QBFRcqee7I&t=694s)
+
+### [Enoch Boateng](https://www.youtube.com/@EnochBoateng)
+[![YouTube](http://i.ytimg.com/vi/7DAGDm9esQE/hqdefault.jpg)]([https://www.youtube.com/watch?v=2QBFRcqee7I&t=694s](https://youtu.be/7DAGDm9esQE?t=194))
 
 ---
 
@@ -84,15 +90,11 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 information.
 
 ## Translations
-
 [![Crowdin](https://badges.crowdin.net/minus-budget-tracker-app/localized.svg)](https://crowdin.com/project/minus-budget-tracker-app)
 
-**NEW CROWDING PLATFORM TO CREATE AND FIX ANY EXISTING TRANSLATIONS WITHOUT NEEDED TO FORK THE
-PROJECT!**
-
-Feel free to see, check and fix current translation, any help will be appretiated.
+Feel free to see, check and fix current translation, any help will be appreciated.
 Access to
-Crowdin [here](https://crwd.in/minus-budget-tracker-app/75d145a97ecee054c41b758477be3d542825683)
+Crowdin [here](https://crowdin.com/project/minus-budget-tracker-app/invite?h=5f5fae4aac7d90e9a050c4e45996bc222825687)
 
 ---
 
