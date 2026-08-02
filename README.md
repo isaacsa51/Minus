@@ -33,7 +33,7 @@
       </a>
     </td>
     <td align="center">
-      <a href="[https://github.com/isaacsa51/Minus/releases](https://play.google.com/store/apps/details?id=com.serranoie.app.minus)">
+      <a href="https://play.google.com/store/apps/details?id=com.serranoie.app.minus">
         <img src="assets/badge_playstore.png" height="80" alt="Get it at Google Play Store">
       </a>
     </td>
