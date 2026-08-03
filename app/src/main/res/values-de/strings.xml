@@ -120,8 +120,8 @@
     <string name="show_subscriptions_outside_period">Show subscriptions outside of the period</string>
     <string name="hide_past_period_expenses">Hide past period expenses</string>
     <string name="show_past_period_expenses">Show past period expenses</string>
-    <string name="add_new_category">Category</string>
-    <string name="add_new_category_action">Add New Category</string>
+    <string name="add_new_category">Kategorie</string>
+    <string name="add_new_category_action">Füge neue Kategorie hinzu</string>
     <string name="budget_validation_major_zero">Budget must be greater than 0</string>
     <string name="budget_no_date_defined">No end date defined</string>
     <string name="budget_no_days_defined">No days defined</string>
@@ -129,8 +129,8 @@
     <!--  Analytics  -->
     <string name="analytics_title">Analytics</string>
     <plurals name="days">
-        <item quantity="one">%d day</item>
-        <item quantity="other">%d days</item>
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tage</item>
     </plurals>
     <plurals name="analytics_days_left">
         <item quantity="one">%d Tag</item>
