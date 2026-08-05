@@ -100,13 +100,19 @@ platform :android do
     version_tag = options[:version_tag] || ENV["VERSION_TAG"]
     UI.user_error!("Pasá version_tag como argumento (ej: version_tag:v1.3.4) o seteá VERSION_TAG") if version_tag.nil?
 
+    # Update version.properties
+    version_name = version_tag.gsub(/^v/, "")
+    version_code = version_code_from(version_tag)
+    File.write("../version.properties", "VERSION_NAME=#{version_name}\nVERSION_CODE=#{version_code}\n")
+    UI.success("Actualizado version.properties (Name: #{version_name}, Code: #{version_code})")
+
     generate_changelog(version_tag: version_tag)
     txt_path = changelog_path_for(version_tag)
 
     UI.important(
       "Próximos pasos manuales (CRUCIAL: commit ANTES del tag):\n" \
       "  1. Editá #{txt_path} si querés curar entradas para el usuario.\n" \
-      "  2. git add fastlane/metadata\n" \
+      "  2. git add version.properties fastlane/metadata\n" \
       "  3. git commit -m \"docs(changelog): preparar #{version_tag}\"\n" \
       "  4. git tag -a #{version_tag} -m \"Release #{version_tag.gsub(/^v/, '')}\"\n" \
       "  5. git push origin #{version_tag}   # dispara el workflow Release Minus\n" \
@@ -201,6 +207,7 @@ platform :android do
         UI.important("Version code already exists on Play Store. Skipping AAB upload and updating metadata only.")
         upload_to_play_store(
           track: track,
+          version_code: version_code_from(version_tag),
           skip_upload_aab: true,
           skip_upload_apk: true,
           skip_upload_screenshots: true,

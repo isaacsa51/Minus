@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import java.util.Properties
 
 plugins {
 	alias(libs.plugins.android.application)
@@ -19,35 +20,15 @@ fun gitOutput(vararg args: String): String? {
 	}.getOrNull()
 }
 
-fun normalizedVersionTag(tag: String?): String? {
-	val normalizedTag = tag?.removePrefix("refs/tags/") ?: return null
-	return normalizedTag.takeIf { it.matches(Regex("^v?\\d+\\.\\d+\\.\\d+(-[A-Za-z0-9.-]+)?$")) }
+val versionPropsFile = rootProject.file("version.properties")
+val versionProps = Properties().apply {
+	if (versionPropsFile.exists()) {
+		versionPropsFile.inputStream().use { load(it) }
+	}
 }
 
-fun releaseVersionName(): String {
-	val tag = normalizedVersionTag(System.getenv("VERSION_TAG"))
-		?: normalizedVersionTag(System.getenv("GITHUB_REF_NAME"))
-		?: normalizedVersionTag(gitOutput("describe", "--tags", "--exact-match"))
-		?: normalizedVersionTag(gitOutput("describe", "--tags", "--abbrev=0"))
-		?: "v0.0.0-dev"
-
-	return tag.removePrefix("v")
-}
-
-fun versionCodeFrom(versionName: String): Int {
-	val parts = versionName.split("-", limit = 2).first()
-		.split(".")
-		.map { it.toIntOrNull() ?: 0 }
-	val major = parts.getOrElse(0) { 0 }
-	val minor = parts.getOrElse(1) { 0 }
-	val patch = parts.getOrElse(2) { 0 }
-
-	val code = major * 10_000 + minor * 100 + patch
-	return if (code > 0) code else 1
-}
-
-val appVersionName = releaseVersionName()
-val appVersionCode = versionCodeFrom(appVersionName)
+val appVersionName = versionProps.getProperty("VERSION_NAME") ?: "0.0.0-dev"
+val appVersionCode = versionProps.getProperty("VERSION_CODE")?.toIntOrNull() ?: 1
 
 android {
 	namespace = "com.serranoie.app.wear.minus"
