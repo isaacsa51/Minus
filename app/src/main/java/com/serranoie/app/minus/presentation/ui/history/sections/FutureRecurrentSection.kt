@@ -12,9 +12,12 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +30,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
+import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableUpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import androidx.compose.foundation.lazy.LazyColumn
@@ -56,6 +60,8 @@ internal fun LazyListScope.futureRecurrentSection(
     creditCardCutoffDay: Int? = null,
 ) {
     if (futureRecurrentOutOfPeriod.isEmpty()) return
+
+    val futureTotal = futureRecurrentOutOfPeriod.sumOf { it.transaction.amount }
 
     item("future-recurrent-toggle") {
         val interactionSource = remember { MutableInteractionSource() }
@@ -92,28 +98,41 @@ internal fun LazyListScope.futureRecurrentSection(
                 shrinkTowards = Alignment.Top,
             ) + fadeOut(animationSpec = tween(300)),
         ) {
-            RecurrentItemsContent(
-                items = futureRecurrentOutOfPeriod,
-                recurrentPaymentsViewMode = recurrentPaymentsViewMode,
-                currencyFormat = currencyFormat,
-                verticalItem = { _, item, position ->
-                    SwipeableUpcomingRecurrentItem(
-                        item = item,
+            Column {
+                RecurrentItemsContent(
+                    items = futureRecurrentOutOfPeriod,
+                    recurrentPaymentsViewMode = recurrentPaymentsViewMode,
+                    currencyFormat = currencyFormat,
+                    verticalItem = { _, item, position ->
+                        SwipeableUpcomingRecurrentItem(
+                            item = item,
+                            currencyFormat = currencyFormat,
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            position = position,
+                            isExpanded = expandedTransactionId == item.transaction.id,
+                            onDelete = { onDelete(item.transaction) },
+                            onEdit = { onEdit(item.transaction) },
+                            onMarkAsPaid = { onMarkAsPaid(item.transaction) },
+                            onClick = { onClick(item.transaction) },
+                            creditCardCutoffDay = creditCardCutoffDay,
+                        )
+                    },
+                    horizontalKeyPrefix = "future",
+                    onClick = onClick,
+                )
+
+                if (recurrentPaymentsViewMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    DayTotalItem(
+                        total = futureTotal,
                         currencyFormat = currencyFormat,
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        position = position,
-                        isExpanded = expandedTransactionId == item.transaction.id,
-                        onDelete = { onDelete(item.transaction) },
-                        onEdit = { onEdit(item.transaction) },
-                        onMarkAsPaid = { onMarkAsPaid(item.transaction) },
-                        onClick = { onClick(item.transaction) },
-                        creditCardCutoffDay = creditCardCutoffDay,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                     )
-                },
-                horizontalKeyPrefix = "future",
-                onClick = onClick,
-            )
+                }
+            }
         }
     }
 }

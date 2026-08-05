@@ -37,93 +37,93 @@ private fun budgetForPeriod(
 }
 
 fun splitBudget(
-	totalBudget: BigDecimal,
-	totalSpent: BigDecimal,
-	totalDays: Int,
-	daysRemaining: Int,
-	period: BudgetPeriod,
-	mode: BudgetSplitMode,
+    totalBudget: BigDecimal,
+    totalSpent: BigDecimal,
+    totalDays: Int,
+    daysRemaining: Int,
+    period: BudgetPeriod,
+    mode: BudgetSplitMode,
 ): BigDecimal {
-	if (totalBudget == BigDecimal.ZERO || totalDays <= 0) return BigDecimal.ZERO
-	return when (mode) {
-		BudgetSplitMode.STATIC ->
-			budgetForPeriod(totalBudget, totalDays, period)
+    if (totalBudget == BigDecimal.ZERO || totalDays <= 0) return BigDecimal.ZERO
+    return when (mode) {
+        BudgetSplitMode.STATIC ->
+            budgetForPeriod(totalBudget, totalDays, period)
 
-		BudgetSplitMode.DYNAMIC -> {
-			if (daysRemaining <= 0) return BigDecimal.ZERO
-			val remaining = totalBudget.subtract(totalSpent)
-			if (remaining <= BigDecimal.ZERO) return BigDecimal.ZERO
-			val daily = remaining.divide(BigDecimal(daysRemaining), 2, RoundingMode.HALF_UP)
-			daily.multiply(BigDecimal(period.toDays()))
-		}
-	}
+        BudgetSplitMode.DYNAMIC -> {
+            if (daysRemaining <= 0) return BigDecimal.ZERO
+            val remaining = totalBudget.subtract(totalSpent)
+            if (remaining <= BigDecimal.ZERO) return BigDecimal.ZERO
+            val daily = remaining.divide(BigDecimal(daysRemaining), 2, RoundingMode.HALF_UP)
+            daily.multiply(BigDecimal(period.toDays()))
+        }
+    }
 }
 
 data class DynamicAllocations(
-	val dailyAllocation: BigDecimal,
-	val weeklyAllocation: BigDecimal,
-	val biweeklyAllocation: BigDecimal,
-	val monthlyAllocation: BigDecimal,
-	val isTodayOverDailyAllocation: Boolean,
+    val dailyAllocation: BigDecimal,
+    val weeklyAllocation: BigDecimal,
+    val biweeklyAllocation: BigDecimal,
+    val monthlyAllocation: BigDecimal,
+    val isTodayOverDailyAllocation: Boolean,
 ) {
-	fun forPeriod(period: BudgetPeriod): BigDecimal = when (period) {
-		BudgetPeriod.DAILY -> dailyAllocation
-		BudgetPeriod.WEEKLY -> weeklyAllocation
-		BudgetPeriod.BIWEEKLY -> biweeklyAllocation
-		BudgetPeriod.MONTHLY -> monthlyAllocation
-	}
+    fun forPeriod(period: BudgetPeriod): BigDecimal = when (period) {
+        BudgetPeriod.DAILY -> dailyAllocation
+        BudgetPeriod.WEEKLY -> weeklyAllocation
+        BudgetPeriod.BIWEEKLY -> biweeklyAllocation
+        BudgetPeriod.MONTHLY -> monthlyAllocation
+    }
 }
 
 fun computeDynamicAllocations(
-	totalBudget: BigDecimal,
-	totalSpentInPeriod: BigDecimal,
-	totalSpentToday: BigDecimal,
-	daysRemaining: Int,
+    totalBudget: BigDecimal,
+    totalSpentInPeriod: BigDecimal,
+    totalSpentToday: BigDecimal,
+    daysRemaining: Int,
 ): DynamicAllocations {
-	if (totalBudget <= BigDecimal.ZERO || daysRemaining <= 0) {
-		return DynamicAllocations(
-			dailyAllocation = BigDecimal.ZERO,
-			weeklyAllocation = BigDecimal.ZERO,
-			biweeklyAllocation = BigDecimal.ZERO,
-			monthlyAllocation = BigDecimal.ZERO,
-			isTodayOverDailyAllocation = totalSpentToday > BigDecimal.ZERO,
-		)
-	}
-	val remaining = totalBudget.subtract(totalSpentInPeriod)
-	if (remaining <= BigDecimal.ZERO) {
-		return DynamicAllocations(
-			dailyAllocation = BigDecimal.ZERO,
-			weeklyAllocation = BigDecimal.ZERO,
-			biweeklyAllocation = BigDecimal.ZERO,
-			monthlyAllocation = BigDecimal.ZERO,
-			isTodayOverDailyAllocation = true,
-		)
-	}
+    if (totalBudget <= BigDecimal.ZERO || daysRemaining <= 0) {
+        return DynamicAllocations(
+            dailyAllocation = BigDecimal.ZERO,
+            weeklyAllocation = BigDecimal.ZERO,
+            biweeklyAllocation = BigDecimal.ZERO,
+            monthlyAllocation = BigDecimal.ZERO,
+            isTodayOverDailyAllocation = totalSpentToday > BigDecimal.ZERO,
+        )
+    }
+    val remaining = totalBudget.subtract(totalSpentInPeriod)
+    if (remaining <= BigDecimal.ZERO) {
+        return DynamicAllocations(
+            dailyAllocation = BigDecimal.ZERO,
+            weeklyAllocation = BigDecimal.ZERO,
+            biweeklyAllocation = BigDecimal.ZERO,
+            monthlyAllocation = BigDecimal.ZERO,
+            isTodayOverDailyAllocation = true,
+        )
+    }
 
-	val daily = remaining.divide(BigDecimal(daysRemaining), 2, RoundingMode.HALF_UP)
-	val weekly = remaining.divide(
-		BigDecimal(blocksRemaining(daysRemaining, 7)),
-		2,
-		RoundingMode.HALF_UP,
-	)
-	val biweekly = remaining.divide(
-		BigDecimal(blocksRemaining(daysRemaining, 14)),
-		2,
-		RoundingMode.HALF_UP,
-	)
-	val monthly = remaining.divide(
-		BigDecimal(blocksRemaining(daysRemaining, 30)),
-		2,
-		RoundingMode.HALF_UP,
-	)
+    val daily = remaining.divide(BigDecimal(daysRemaining), 2, RoundingMode.HALF_UP)
+    val weekly = remaining.divide(
+        BigDecimal(blocksRemaining(daysRemaining, 7)),
+        2,
+        RoundingMode.HALF_UP,
+    )
+    val biweekly = remaining.divide(
+        BigDecimal(blocksRemaining(daysRemaining, 14)),
+        2,
+        RoundingMode.HALF_UP,
+    )
+    val monthly = remaining.divide(
+        BigDecimal(blocksRemaining(daysRemaining, 30)),
+        2,
+        RoundingMode.HALF_UP,
+    )
 
-	return DynamicAllocations(
-		dailyAllocation = daily,
-		weeklyAllocation = weekly,
-		biweeklyAllocation = biweekly,
-		monthlyAllocation = monthly,
-		isTodayOverDailyAllocation = totalSpentToday > daily,
-	)
+    return DynamicAllocations(
+        dailyAllocation = daily,
+        weeklyAllocation = weekly,
+        biweeklyAllocation = biweekly,
+        monthlyAllocation = monthly,
+        isTodayOverDailyAllocation = totalSpentToday > daily,
+    )
 }
 
 internal fun blocksRemaining(daysRemaining: Int, blockDays: Int): Int {

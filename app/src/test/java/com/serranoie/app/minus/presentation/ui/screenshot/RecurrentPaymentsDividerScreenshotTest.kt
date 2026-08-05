@@ -11,6 +11,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.RecurrentPaymentsDivider
 import org.junit.Rule
 import org.junit.Test
+import java.math.BigDecimal
 import java.util.Locale
 
 class RecurrentPaymentsDividerScreenshotTest {
@@ -47,6 +48,8 @@ class RecurrentPaymentsDividerScreenshotTest {
                     isExpanded = false,
                     onToggleClick = {},
                     itemCount = 3,
+                    totalAmount = BigDecimal("4152.00"),
+                    currencyCode = "USD",
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 )
             }

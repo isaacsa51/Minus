@@ -38,7 +38,6 @@ internal fun evaluateCalculation(input: String): String? {
             normalized
         }
 
-        // Reject expressions ending in an operator (incomplete expression)
         expressionToParse.lastOrNull()?.let { if (it in "+-*/") return null }
 
         val hasOperator = expressionToParse.any { it in "+-*/" }

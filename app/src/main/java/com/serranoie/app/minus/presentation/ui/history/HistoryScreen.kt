@@ -184,6 +184,7 @@ fun History(
                     )
                 },
                 recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
+                currencyCode = currencyCode,
                 currencyFormat = currencyFormat,
                 onDelete = { expense ->
                     if (expense.isRecurrent) {

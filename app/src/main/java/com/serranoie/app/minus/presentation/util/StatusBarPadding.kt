@@ -9,11 +9,11 @@ import com.serranoie.app.minus.presentation.LocalWindowInsets
 
 @Composable
 fun StatusBarPadding() {
-	Box(
-		modifier = Modifier
-			.fillMaxWidth()
-			.requiredHeight(
-				LocalWindowInsets.current.calculateTopPadding()
-			)
-	)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .requiredHeight(
+                LocalWindowInsets.current.calculateTopPadding()
+            )
+    )
 }
