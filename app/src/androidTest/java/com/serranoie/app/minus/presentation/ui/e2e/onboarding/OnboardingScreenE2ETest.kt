@@ -33,8 +33,6 @@ class OnboardingScreenE2ETest {
     private fun setOnboardingContent(
         onOnboardingCompleted: () -> Unit = {},
         viewModel: OnboardingViewModel = OnboardingViewModel(
-            budgetRepository = mockk(relaxed = true),
-            notificationScheduler = mockk(relaxed = true),
             settingsRepository = mockk(relaxed = true),
         ),
     ) {
@@ -167,8 +165,6 @@ class OnboardingScreenE2ETest {
     @Test
     fun when_on_welcome_dismissed_intent_is_dispatched_then_on_onboarding_completed_fires() {
         val vm = OnboardingViewModel(
-            budgetRepository = mockk(relaxed = true),
-            notificationScheduler = mockk(relaxed = true),
             settingsRepository = mockk(relaxed = true),
         )
         var invoked = 0
