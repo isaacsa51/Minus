@@ -474,7 +474,7 @@ private fun PhoneLayout(
     val defaultInternalKeyboardHeightBase =
         contentWidth
             .coerceAtMost(with(localDensity) { 500.dp.toPx() })
-            .coerceAtMost(contentHeight / 2)
+            .coerceAtMost(contentHeight * 0.45f)
     val rowHeightPx = defaultInternalKeyboardHeightBase / 4
     val defaultInternalKeyboardHeight = rowHeightPx * 4
     val calcModeKeyboardHeight = rowHeightPx * 5
@@ -525,13 +525,13 @@ private fun PhoneLayout(
     ) {
         derivedStateOf {
             val additionalOffset =
-                with(localDensity) { if (isShowSystemKeyboard || keepImeLayout) 16.dp.toPx() else 16.dp.toPx() }
+                with(localDensity) { if (isShowSystemKeyboard || keepImeLayout) 18.dp.toPx() else 18.dp.toPx() }
             contentHeight
                 .minus(
                     currentKeyboardHeight.plus(navBarHeightPx).plus(additionalOffset)
                         .coerceAtLeast(0f),
                 )
-                .coerceAtMost(contentHeight - (navBarHeightPx + with(localDensity) { 96.dp.toPx() }))
+                .coerceAtMost(contentHeight - (navBarHeightPx + with(localDensity) { 98.dp.toPx() }))
         }
     }
 
@@ -559,7 +559,7 @@ private fun PhoneLayout(
     val currentEditorHeight =
         with(localDensity) {
             val halfExpanedOffset =
-                (-contentHeight + navBarHeightPx + with(localDensity) { 16.dp.toPx() } + editorHeightAnimated).coerceAtMost(
+                (-contentHeight + navBarHeightPx + with(localDensity) { 18.dp.toPx() } + editorHeightAnimated).coerceAtMost(
                     0f,
                 )
 
@@ -567,7 +567,7 @@ private fun PhoneLayout(
                 topSheetState.offset.value.coerceIn(
                     halfExpanedOffset,
                     0f,
-                ) + contentHeight - navBarHeightPx - with(localDensity) { 16.dp.toPx() }
+                ) + contentHeight - navBarHeightPx - with(localDensity) { 18.dp.toPx() }
 
             minOf(computed, editorHeightAnimated).toDp()
         }
@@ -578,7 +578,7 @@ private fun PhoneLayout(
     ) {
         val halfExpandedOffsetPx =
             with(localDensity) {
-                (-contentHeight + navBarHeightPx + 16.dp.toPx() + editorHeightAnimated).coerceAtMost(
+                (-contentHeight + navBarHeightPx + 18.dp.toPx() + editorHeightAnimated).coerceAtMost(
                     0f
                 )
             }
@@ -617,7 +617,7 @@ private fun PhoneLayout(
             }
         }
 
-        val expandHeightPx = contentHeight - navBarHeightPx - with(localDensity) { 16.dp.toPx() }
+        val expandHeightPx = contentHeight - navBarHeightPx - with(localDensity) { 18.dp.toPx() }
         TopSheetLayout(
             swipeableState = topSheetState,
             customHalfHeight = editorHeightAnimated,

@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.CreditCard
@@ -112,6 +113,15 @@ import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.milliseconds
+
+private val EditorFontSize = 96.sp
+private const val EditorSymbolScale = 0.45f
+private val EditorMinFontSize = 24.sp
+
+private val CalcInputMinFontSize = 20.sp
+private val CalcInputMaxFontSize = 57.sp
+private val CalcResultMinFontSize = 16.sp
+private val CalcResultMaxFontSize = 36.sp
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -200,7 +210,8 @@ fun Editor(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .height(66.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             BudgetPill(
@@ -217,13 +228,15 @@ fun Editor(
                 },
                 modifier = Modifier
                     .weight(1f)
+                    .fillMaxHeight()
                     .animateContentSize(animationSpec = tween(200))
-                    .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                    .padding(end = 8.dp)
                     .then(budgetPillHintAnchorModifier)
             )
 
             AnimatedContent(
                 targetState = animState == AnimState.EDITING,
+                modifier = Modifier.fillMaxHeight(),
                 transitionSpec = {
                     slideInHorizontally(animationSpec = tween(200)) { it } + fadeIn(tween(200)) togetherWith slideOutHorizontally(
                         animationSpec = tween(200)
@@ -236,9 +249,13 @@ fun Editor(
                 label = "topBarTrailingSwitch"
             ) { isEditing ->
                 if (isEditing) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         if (showCreditQuickToggleFeature) {
                             FlowRow(
+                                modifier = Modifier.fillMaxHeight(),
                                 horizontalArrangement = Arrangement.spacedBy(
                                     ButtonGroupDefaults.ConnectedSpaceBetween
                                 ),
@@ -264,6 +281,7 @@ fun Editor(
                                         onCheckedChange = onCreditToggle,
                                         shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
                                         modifier = Modifier
+                                            .fillMaxHeight()
                                             .semantics { role = Role.RadioButton }
                                             .let { m ->
                                                 if (tutorialBoxState != null) m.markForTutorial(
@@ -272,12 +290,10 @@ fun Editor(
                                                 ) else m
                                             },
                                         colors = ToggleButtonDefaults.toggleButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
-                                                alpha = 0.5f
-                                            ),
-                                            checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                            checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
+                                            checkedContainerColor = MaterialTheme.colorScheme.tertiary,
+                                            contentColor = MaterialTheme.colorScheme.tertiary,
+                                            checkedContentColor = MaterialTheme.colorScheme.onTertiary
                                         )
                                     ) {
                                         Icon(
@@ -307,6 +323,7 @@ fun Editor(
                                         onCheckedChange = onRecurrentToggle,
                                         shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
                                         modifier = Modifier
+                                            .fillMaxHeight()
                                             .semantics { role = Role.RadioButton }
                                             .let { m ->
                                                 if (tutorialBoxState != null) m.markForTutorial(
@@ -315,12 +332,10 @@ fun Editor(
                                                 ) else m
                                             },
                                         colors = ToggleButtonDefaults.toggleButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
-                                                alpha = 0.5f
-                                            ),
-                                            checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                            checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
+                                            checkedContainerColor = MaterialTheme.colorScheme.tertiary,
+                                            contentColor = MaterialTheme.colorScheme.tertiary,
+                                            checkedContentColor = MaterialTheme.colorScheme.onTertiary
                                         )
                                     ) {
                                         Icon(
@@ -351,6 +366,7 @@ fun Editor(
                                     onCheckedChange = onRecurrentToggle,
                                     shapes = ToggleButtonDefaults.shapes(),
                                     modifier = Modifier
+                                        .fillMaxHeight()
                                         .semantics { role = Role.RadioButton }
                                         .let { m ->
                                             if (tutorialBoxState != null) m.markForTutorial(
@@ -359,12 +375,10 @@ fun Editor(
                                             ) else m
                                         },
                                     colors = ToggleButtonDefaults.toggleButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
-                                            alpha = 0.5f
-                                        ),
-                                        checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                        checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
+                                        checkedContainerColor = MaterialTheme.colorScheme.tertiary,
+                                        contentColor = MaterialTheme.colorScheme.tertiary,
+                                        checkedContentColor = MaterialTheme.colorScheme.onTertiary
                                     )
                                 ) {
                                     Icon(
@@ -432,6 +446,9 @@ fun Editor(
 
         AnimatedContent(
             targetState = animState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             transitionSpec = {
                 when (targetState) {
                     AnimState.EDITING -> fadeIn(tween(200)) togetherWith fadeOut(tween(200))
@@ -468,7 +485,9 @@ fun Editor(
 
                 AnimState.IDLE, AnimState.RESET -> {
                     IdleContent(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
                     )
                 }
 
@@ -587,114 +606,99 @@ private fun EditingContent(
                     remaining
                 }
 
-                if (currencySymbol.length > 2) {
-                    AnnotatedString.Builder().apply {
-                        if (useLeadingSignOrder) {
-                            append(leadingSign)
-                            if (isSymbolAtEnd) {
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                                append(formattedRemaining)
-                                pop()
-                                pushStyle(
-                                    symbolStyle.copy(
-                                        fontSize = 86.sp * 0.6f,
-                                        fontWeight = FontWeight.Bold,
-                                        baselineShift = BaselineShift(0f)
-                                    )
+                AnnotatedString.Builder().apply {
+                    if (useLeadingSignOrder) {
+                        append(leadingSign)
+                        if (isSymbolAtEnd) {
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                            append(formattedRemaining)
+                            pop()
+                            pushStyle(
+                                symbolStyle.copy(
+                                    fontSize = EditorFontSize * EditorSymbolScale,
+                                    fontWeight = FontWeight.Bold,
+                                    baselineShift = BaselineShift(0f)
                                 )
-                                append(currencySymbol)
-                                pop()
-                            } else {
-                                pushStyle(
-                                    symbolStyle.copy(
-                                        fontSize = 86.sp * 0.6f,
-                                        fontWeight = FontWeight.Bold,
-                                        baselineShift = BaselineShift(0f)
-                                    )
-                                )
-                                append(currencySymbol)
-                                pop()
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                                append(formattedRemaining)
-                                pop()
-                            }
+                            )
+                            append(currencySymbol)
+                            pop()
                         } else {
-                            if (isSymbolAtEnd) {
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                                append(input)
-                                pop()
-                                pushStyle(
-                                    symbolStyle.copy(
-                                        fontSize = 86.sp * 0.6f,
-                                        fontWeight = FontWeight.Bold,
-                                        baselineShift = BaselineShift(0f)
-                                    )
+                            pushStyle(
+                                symbolStyle.copy(
+                                    fontSize = EditorFontSize * EditorSymbolScale,
+                                    fontWeight = FontWeight.Bold,
+                                    baselineShift = BaselineShift(0f)
                                 )
-                                append(currencySymbol)
-                                pop()
-                            } else {
-                                pushStyle(
-                                    symbolStyle.copy(
-                                        fontSize = 86.sp * 0.6f,
-                                        fontWeight = FontWeight.Bold,
-                                        baselineShift = BaselineShift(0f)
-                                    )
-                                )
-                                append(currencySymbol)
-                                pop()
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                                append(input)
-                                pop()
-                            }
+                            )
+                            append(currencySymbol)
+                            pop()
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                            append(formattedRemaining)
+                            pop()
                         }
-                    }.toAnnotatedString()
-                } else {
-                    val content = if (useLeadingSignOrder) {
-                        if (isSymbolAtEnd) "$leadingSign$formattedRemaining$currencySymbol"
-                        else "$leadingSign$currencySymbol$formattedRemaining"
                     } else {
-                        if (isSymbolAtEnd) "$input$currencySymbol"
-                        else "$currencySymbol$input"
+                        if (isSymbolAtEnd) {
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                            append(input)
+                            pop()
+                            pushStyle(
+                                symbolStyle.copy(
+                                    fontSize = EditorFontSize * EditorSymbolScale,
+                                    fontWeight = FontWeight.Bold,
+                                    baselineShift = BaselineShift(0f)
+                                )
+                            )
+                            append(currencySymbol)
+                            pop()
+                        } else {
+                            pushStyle(
+                                symbolStyle.copy(
+                                    fontSize = EditorFontSize * EditorSymbolScale,
+                                    fontWeight = FontWeight.Bold,
+                                    baselineShift = BaselineShift(0f)
+                                )
+                            )
+                            append(currencySymbol)
+                            pop()
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                            append(input)
+                            pop()
+                        }
                     }
-                    AnnotatedString(content)
-                }
+                }.toAnnotatedString()
             } else {
                 val value = input.toBigDecimalOrNull() ?: BigDecimal.ZERO
                 val formatted = currencyFormat.format(value)
-                if (currencySymbol.length > 2 && formatted.contains(currencySymbol)) {
-                    val amount = formatted.replace(currencySymbol, "").trim()
-                    AnnotatedString.Builder().apply {
-                        if (formatted.startsWith(currencySymbol)) {
-                            pushStyle(
-                                symbolStyle.copy(
-                                    fontSize = 86.sp * 0.6f,
-                                    fontWeight = FontWeight.Bold,
-                                    baselineShift = BaselineShift(0f)
-                                )
+                val amount = formatted.replace(currencySymbol, "").trim()
+                AnnotatedString.Builder().apply {
+                    if (formatted.startsWith(currencySymbol)) {
+                        pushStyle(
+                            symbolStyle.copy(
+                                fontSize = EditorFontSize * EditorSymbolScale,
+                                fontWeight = FontWeight.Bold,
+                                baselineShift = BaselineShift(0f)
                             )
-                            append(currencySymbol)
-                            pop()
-                            pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                            append(amount)
-                            pop()
-                        } else {
-                            pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                            append(amount)
-                            pop()
-                            pushStyle(
-                                symbolStyle.copy(
-                                    fontSize = 86.sp * 0.6f,
-                                    fontWeight = FontWeight.Bold,
-                                    baselineShift = BaselineShift(0f)
-                                )
+                        )
+                        append(currencySymbol)
+                        pop()
+                        pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                        append(amount)
+                        pop()
+                    } else {
+                        pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                        append(amount)
+                        pop()
+                        pushStyle(
+                            symbolStyle.copy(
+                                fontSize = EditorFontSize * EditorSymbolScale,
+                                fontWeight = FontWeight.Bold,
+                                baselineShift = BaselineShift(0f)
                             )
-                            append(currencySymbol)
-                            pop()
-                        }
-                    }.toAnnotatedString()
-                } else {
-                    AnnotatedString(formatted)
-                }
+                        )
+                        append(currencySymbol)
+                        pop()
+                    }
+                }.toAnnotatedString()
             }
         }
 
@@ -711,48 +715,42 @@ private fun EditingContent(
         val sign = if (isNegative) "-" else ""
         val absValue = if (isNegative) calculationResult.substring(1) else calculationResult
 
-        if (currencySymbol.length > 2) {
-            AnnotatedString.Builder().apply {
-                append("= ")
-                append(sign)
-                if (isSymbolAtEnd) {
-                    pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                    append(absValue)
-                    pop()
-                    pushStyle(
-                        symbolStyle.copy(
-                            fontSize = 36.sp * 0.6f,
-                            fontWeight = FontWeight.Bold,
-                            baselineShift = BaselineShift(0f)
-                        )
+        AnnotatedString.Builder().apply {
+            append("= ")
+            append(sign)
+            if (isSymbolAtEnd) {
+                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                append(absValue)
+                pop()
+                pushStyle(
+                    symbolStyle.copy(
+                        fontSize = CalcResultMaxFontSize * EditorSymbolScale,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(0f)
                     )
-                    append(currencySymbol)
-                    pop()
-                } else {
-                    pushStyle(
-                        symbolStyle.copy(
-                            fontSize = 36.sp * 0.6f,
-                            fontWeight = FontWeight.Bold,
-                            baselineShift = BaselineShift(0f)
-                        )
+                )
+                append(currencySymbol)
+                pop()
+            } else {
+                pushStyle(
+                    symbolStyle.copy(
+                        fontSize = CalcResultMaxFontSize * EditorSymbolScale,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(0f)
                     )
-                    append(currencySymbol)
-                    pop()
-                    pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                    append(absValue)
-                    pop()
-                }
-            }.toAnnotatedString()
-        } else {
-            val content = if (isSymbolAtEnd) "= $sign$absValue$currencySymbol"
-            else "= $sign$currencySymbol$absValue"
-            AnnotatedString(content)
-        }
+                )
+                append(currencySymbol)
+                pop()
+                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                append(absValue)
+                pop()
+            }
+        }.toAnnotatedString()
     }
 
     val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
         fontWeight = FontWeight.W500,
-        fontSize = 86.sp,
+        fontSize = EditorFontSize,
     )
 
     BoxWithConstraints(
@@ -761,12 +759,11 @@ private fun EditingContent(
         val density = LocalDensity.current
         val availableWidth = maxWidth - 32.dp
         val toolbarWidth = maxWidth - 48.dp
-        val amountSlotHeight = 124.dp
-        val containerSizePx = remember(availableWidth, amountSlotHeight, density) {
+        val containerSizePx = remember(availableWidth, maxHeight, density) {
             with(density) {
                 IntSize(
                     width = availableWidth.toPx().toInt(),
-                    height = amountSlotHeight.toPx().toInt()
+                    height = maxHeight.toPx().toInt()
                 )
             }
         }
@@ -777,9 +774,9 @@ private fun EditingContent(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(amountSlotHeight)
+                    .weight(1f)
                     .padding(start = 16.dp, end = 16.dp),
-                contentAlignment = Alignment.TopEnd
+                contentAlignment = Alignment.CenterEnd
             ) {
                 AnimatedContent(
                     targetState = if (hasExpressionOperators && calculationResult != null) "result" else "input",
@@ -813,8 +810,8 @@ private fun EditingContent(
                                     textAlign = TextAlign.End
                                 ),
                                 singleLine = true,
-                                minFontSize = 20.sp,
-                                maxFontSize = 57.sp,
+                                minFontSize = CalcInputMinFontSize,
+                                maxFontSize = CalcInputMaxFontSize,
                                 containerSize = containerSizePx
                             )
                             AutoResizeBasicTextField(
@@ -830,8 +827,8 @@ private fun EditingContent(
                                     textAlign = TextAlign.End
                                 ),
                                 singleLine = true,
-                                minFontSize = 16.sp,
-                                maxFontSize = 36.sp,
+                                minFontSize = CalcResultMinFontSize,
+                                maxFontSize = CalcResultMaxFontSize,
                                 containerSize = containerSizePx
                             )
                         }
@@ -847,6 +844,8 @@ private fun EditingContent(
                                 textAlign = TextAlign.End
                             ),
                             singleLine = true,
+                            minFontSize = EditorMinFontSize,
+                            maxFontSize = EditorFontSize,
                             containerSize = containerSizePx,
                             decorationBox = { innerTextField ->
                                 Box { innerTextField() }
@@ -855,8 +854,6 @@ private fun EditingContent(
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.weight(1f))
 
             if (categoryGridModeEnabled) {
                 Row(
@@ -938,11 +935,18 @@ private fun IdleContent(
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterEnd
     ) {
-        Text(
-            text = if (cursorVisible.value) "|" else "",
-            style = MaterialTheme.typography.displayLarge,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-        )
+        val dashWidth = 4.dp
+        val dashHeight = 96.dp
+        if (cursorVisible.value) {
+            Box(
+                modifier = Modifier
+                    .size(width = dashWidth, height = dashHeight)
+                    .background(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
+                        shape = CircleShape
+                    )
+            )
+        }
     }
 }
 

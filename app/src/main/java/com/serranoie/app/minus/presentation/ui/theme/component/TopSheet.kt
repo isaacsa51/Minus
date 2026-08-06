@@ -102,7 +102,7 @@ fun TopSheetLayout(
         val fullHeight = constraints.maxHeight.toFloat()
         val halfHeight = customHalfHeight ?: (fullHeight / 2)
         val expandHeight =
-            with(localDensity) { (fullHeight - navigationBarHeight.toPx() - 16.dp.toPx()) }
+            with(localDensity) { (fullHeight - navigationBarHeight.toPx() - 18.dp.toPx()) }
         val currOffset = swipeableState.offset.value + externalDragOffset()
         val maxOffset = (-(expandHeight - halfHeight)).coerceAtMost(0f)
 
@@ -174,7 +174,7 @@ fun TopSheetLayout(
                 .fillMaxWidth()
                 .height(with(localDensity) {
                     (customCardHeight()
-                        ?: (fullHeight - navigationBarHeight.toPx() - 16.dp.toPx()))
+                        ?: (fullHeight - navigationBarHeight.toPx() - 18.dp.toPx()))
                         .toDp()
                 })
                 .offset {

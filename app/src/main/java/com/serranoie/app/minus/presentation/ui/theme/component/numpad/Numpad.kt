@@ -50,7 +50,7 @@ import com.serranoie.app.minus.presentation.util.join
 import com.serranoie.app.minus.presentation.util.tryConvertStringToNumber
 import java.util.Date
 
-val BUTTON_GAP = 4.dp
+val BUTTON_GAP = 3.dp
 private const val TEST_NOTIFICATION_TAP_COUNT = 5
 
 enum class EditMode { ADD, EDIT }
