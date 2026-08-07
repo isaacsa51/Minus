@@ -1,0 +1,5 @@
+- chore: update locale translations (#156)
+- feat: implement interactive budget graph with adjustable granularity
+- feat: redefine typed value and fixed contrast toggle buttons on editor
+- refactor: simplify onboarding flow logic
+- feat: display section totals for recurrent payments
