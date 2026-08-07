@@ -549,4 +549,17 @@
     <string name="analytics_tutorial_history_title">Historique des transactions</string>
     <string name="analytics_tutorial_history_desc">Cliquez ici pour voir la liste de toutes vos dépenses pour cette période.</string>
     <string name="skip_tutorial">Skip</string>
+    <string name="budget_graph_header_spending">Spending</string>
+    <string name="budget_graph_legend_current">Current</string>
+    <string name="budget_graph_legend_previous">Previous</string>
+    <string name="budget_graph_nav_prev">Previous</string>
+    <string name="budget_graph_nav_next">Suivant</string>
+    <string name="graph_granularity_days">Days</string>
+    <string name="graph_granularity_week">Week</string>
+    <string name="graph_granularity_biweek">Biweek</string>
+    <string name="graph_granularity_month">Month</string>
+    <string name="graph_granularity_total">Total</string>
+    <string name="budget_graph_page_indicator">%1$d / %2$d</string>
+    <string name="unit_thousands">K</string>
+    <string name="unit_millions">M</string>
 </resources>
