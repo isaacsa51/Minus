@@ -218,10 +218,10 @@
     <!-- Settings -->
     <string name="settings_title">设置</string>
     <string name="settings_section_appearance">外观</string>
-    <string name="settings_section_language">Language</string>
-    <string name="settings_language_header">App Language</string>
-    <string name="settings_language_currently_format">Currently: %1$s</string>
-    <string name="settings_language_disclaimer">Language translations might be incorrect.</string>
+    <string name="settings_section_language">語言</string>
+    <string name="settings_language_header">應用語言</string>
+    <string name="settings_language_currently_format">當前: %1$s</string>
+    <string name="settings_language_disclaimer">語言翻譯可能不準確。</string>
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
@@ -352,7 +352,7 @@
     <string name="expand">展开</string>
     <string name="collapse">折叠</string>
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">Budget amount exceeded</string>
+    <string name="budget_pill_over_budget">已超出預算金額</string>
     <string name="budget_pill_no_budget">没有预算</string>
     <string name="budget_pill_no_budget_action">设置预算</string>
     <string name="budget_pill_exhausted_daily_label">每天</string>
