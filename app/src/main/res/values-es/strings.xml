@@ -115,7 +115,6 @@
     <string name="expense_modified_format">%1$s ha sido modificado</string>
     <string name="generic_expense">Gasto</string>
     <string name="expense_item_unnamed_expense">Gasto sin nombre</string>
-    <string name="expense_item_unnamed_income">Ingreso sin nombre</string>
     <string name="expense_item_recurrent_subtitle_format">Gasto recurrente — %1$s</string>
     <string name="hide_subscriptions_outside_period">Ocultar suscripciones fuera del período</string>
     <string name="show_subscriptions_outside_period">Mostrar suscripciones fuera del periodo</string>
@@ -359,8 +358,6 @@
     <string name="budget_pill_over_budget">Monto del presupuesto excedido</string>
     <string name="budget_pill_no_budget">Sin presupuesto</string>
     <string name="budget_pill_no_budget_action">Establece tu presupuesto</string>
-    <string name="budget_pill_calc_added">Se sumarán %1$s</string>
-    <string name="budget_pill_calc_subtracted">Se restarán %1$s</string>
     <string name="budget_pill_exhausted_daily_label">diario</string>
     <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
@@ -485,7 +482,6 @@
     <!-- Transaction Detail -->
     <string name="without_date">Sin fecha</string>
     <string name="no_name">Sin nombre</string>
-    <string name="no_name_income">Ingreso sin nombre</string>
     <string name="description">Razón de Compra</string>
     <string name="date">Fecha</string>
     <string name="frequency">Frecuencia</string>
@@ -553,4 +549,17 @@
     <string name="analytics_tutorial_history_title">Historial de Transacciones</string>
     <string name="analytics_tutorial_history_desc">Haz tap aquí para ver la lista completa de gastos en este periodo.</string>
     <string name="skip_tutorial">Omitir</string>
+    <string name="budget_graph_header_spending">Spending</string>
+    <string name="budget_graph_legend_current">Current</string>
+    <string name="budget_graph_legend_previous">Previous</string>
+    <string name="budget_graph_nav_prev">Previous</string>
+    <string name="budget_graph_nav_next">Siguiente</string>
+    <string name="graph_granularity_days">Days</string>
+    <string name="graph_granularity_week">Week</string>
+    <string name="graph_granularity_biweek">Biweek</string>
+    <string name="graph_granularity_month">Month</string>
+    <string name="graph_granularity_total">Total</string>
+    <string name="budget_graph_page_indicator">%1$d / %2$d</string>
+    <string name="unit_thousands">K</string>
+    <string name="unit_millions">M</string>
 </resources>
