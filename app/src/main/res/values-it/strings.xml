@@ -15,6 +15,10 @@
     <string name="tutorial_analytics_description">Open Analytics to see how your spending breaks down over time, by category, and against your budget goals.</string>
     <string name="tutorial_privacy_title">Privacy mode</string>
     <string name="tutorial_privacy_description">Cover the top of the phone (where the front camera sits) with your hand for about a second to blur every amount on screen. Cover it again to turn it off.</string>
+    <string name="tutorial_calc_title">Ongoing budget</string>
+    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
+    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
     <string name="today">Oggi</string>
     <string name="yesterday">Ieri</string>
     <string name="tomorrow">Domani</string>
@@ -257,6 +261,8 @@
     <string name="settings_category_picker_direct_popup_description">Aprire il popup dei suggerimenti con tutte le categorie salvate non appena si tocca il campo categoria. Quando è spento, i suggerimenti appaiono solo dopo aver iniziato a digitare.</string>
     <string name="settings_category_grid_mode_switch_label">Mostra come elenco (sperimentale)</string>
     <string name="settings_category_grid_mode_description">Toccare il tag categoria per aprire una griglia delle categorie salvate, invece di entrare in modalità di modifica in linea. Disattiva anche la modalità di calcolo del numpad mentre è acceso.</string>
+    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">Modalità visualizzazione pagamenti ricorrenti</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Cambia il tipo di display per mostrare i tuoi pagamenti ricorrenti</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Modalità visualizzazione pagamenti ricorrenti</string>
@@ -542,4 +548,5 @@
     <string name="analytics_tutorial_credit_desc">Tap the credit card to view all CC transactions, mark them as paid, or adjust your billing cutoff date to avoid interest.</string>
     <string name="analytics_tutorial_history_title">Transaction History</string>
     <string name="analytics_tutorial_history_desc">Tap here to see a list of all your expenses for this period.</string>
+    <string name="skip_tutorial">Skip</string>
 </resources>

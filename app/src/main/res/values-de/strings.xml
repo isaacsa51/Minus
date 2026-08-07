@@ -15,6 +15,10 @@
     <string name="tutorial_analytics_description">Öffne deine Analytics, um zu sehen, wie sich deine Ausgaben im Verlauf der Zeit nach Kategorien und im Vergleich zu deinen Budgetzielen verteilen.</string>
     <string name="tutorial_privacy_title">Privatsphäre-Modus</string>
     <string name="tutorial_privacy_description">Halte deine Hand für etwa eine Sekunde über den oberen Bereich des Smartphones (wo sich die Frontkamera befindet), um alle Beträge auf dem Bildschirm unkenntlich zu machen. Halte sie erneut darüber, um die Funktion auszuschalten.</string>
+    <string name="tutorial_calc_title">Ongoing budget</string>
+    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
+    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
     <string name="today">Heute</string>
     <string name="yesterday">Gestern</string>
     <string name="tomorrow">Morgen</string>
@@ -116,8 +120,8 @@
     <string name="show_subscriptions_outside_period">Show subscriptions outside of the period</string>
     <string name="hide_past_period_expenses">Hide past period expenses</string>
     <string name="show_past_period_expenses">Show past period expenses</string>
-    <string name="add_new_category">Category</string>
-    <string name="add_new_category_action">Add New Category</string>
+    <string name="add_new_category">Kategorie</string>
+    <string name="add_new_category_action">Füge neue Kategorie hinzu</string>
     <string name="budget_validation_major_zero">Budget must be greater than 0</string>
     <string name="budget_no_date_defined">No end date defined</string>
     <string name="budget_no_days_defined">No days defined</string>
@@ -125,8 +129,8 @@
     <!--  Analytics  -->
     <string name="analytics_title">Analytics</string>
     <plurals name="days">
-        <item quantity="one">%d day</item>
-        <item quantity="other">%d days</item>
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tage</item>
     </plurals>
     <plurals name="analytics_days_left">
         <item quantity="one">%d Tag</item>
@@ -257,6 +261,8 @@
     <string name="settings_category_picker_direct_popup_description">Open the suggestions popup with all your saved categories as soon as you tap the category field. When off, suggestions only appear after you start typing.</string>
     <string name="settings_category_grid_mode_switch_label">Show as a list (Experimental)</string>
     <string name="settings_category_grid_mode_description">Tap the category tag to open a grid of your saved categories, instead of entering inline edit mode. Also turns off the numpad\'s calculation mode while this is on.</string>
+    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">Recurrent payments view mode</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Change the type of display to show your recurrent payments</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Recurrent payments view mode</string>
@@ -542,4 +548,5 @@
     <string name="analytics_tutorial_credit_desc">Tap the credit card to view all CC transactions, mark them as paid, or adjust your billing cutoff date to avoid interest.</string>
     <string name="analytics_tutorial_history_title">Transaction History</string>
     <string name="analytics_tutorial_history_desc">Tap here to see a list of all your expenses for this period.</string>
+    <string name="skip_tutorial">Skip</string>
 </resources>

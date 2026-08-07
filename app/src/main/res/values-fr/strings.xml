@@ -15,6 +15,10 @@
     <string name="tutorial_analytics_description">Ouvrez Analytics pour voir comment vos dépenses se répartissent au fil du temps, par catégorie et par rapport à vos objectifs budgétaires.</string>
     <string name="tutorial_privacy_title">Mode privé</string>
     <string name="tutorial_privacy_description">Couvrez le haut du téléphone (où la caméra avant est installée) de votre main pendant environ une seconde pour flouter chaque quantité à l\'écran. Couvrez-le à nouveau pour le désactiver.</string>
+    <string name="tutorial_calc_title">Ongoing budget</string>
+    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
+    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
     <string name="today">Aujourd\'hui</string>
     <string name="yesterday">Hier</string>
     <string name="tomorrow">Demain</string>
@@ -257,6 +261,8 @@
     <string name="settings_category_picker_direct_popup_description">Dès que vous appuyez sur le champ de catégorie, une fenêtre contextuelle de suggestions s\'ouvre avec toutes vos catégories enregistrées. Si cette option est désactivée, les suggestions n\'apparaissent qu\'après avoir commencé à saisir du texte.</string>
     <string name="settings_category_grid_mode_switch_label">Afficher sous forme de liste</string>
     <string name="settings_category_grid_mode_description">Touchez l\'étiquette de catégorie pour ouvrir une grille de vos catégories enregistrées, au lieu d\'accéder au mode d\'édition en ligne. Désactive également le mode de calcul du pavé numérique lorsque cette option est activée.</string>
+    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">Mode d\'affichage des paiements récurrents</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Modifiez le type d\'affichage pour afficher vos paiements récurrents.</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Mode d\'affichage des paiements récurrents</string>
@@ -542,4 +548,5 @@
     <string name="analytics_tutorial_credit_desc">Appuyez sur la carte de crédit pour afficher toutes les transactions en CC, les marquer comme payées ou ajuster votre date limite de facturation pour éviter les intérêts.</string>
     <string name="analytics_tutorial_history_title">Historique des transactions</string>
     <string name="analytics_tutorial_history_desc">Cliquez ici pour voir la liste de toutes vos dépenses pour cette période.</string>
+    <string name="skip_tutorial">Skip</string>
 </resources>
