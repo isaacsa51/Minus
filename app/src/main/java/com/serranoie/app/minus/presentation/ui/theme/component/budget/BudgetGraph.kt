@@ -73,7 +73,7 @@ import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsState
 import com.serranoie.app.minus.presentation.ui.analytics.GraphGranularity
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
-import com.serranoie.app.minus.presentation.ui.theme.labelSmallEmphasized
+import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import java.math.BigDecimal
@@ -90,9 +90,6 @@ const val BUDGET_GRAPH_NEXT_PAGE_TAG = "BUDGET_GRAPH_NEXT_PAGE_TAG"
 const val BUDGET_GRAPH_WINDOW_LABEL_TAG = "BUDGET_GRAPH_WINDOW_LABEL_TAG"
 fun budgetGraphGranularityToggleTag(granularity: GraphGranularity) = "BUDGET_GRAPH_TOGGLE_${granularity.name}"
 
-/**
- * State holder for BudgetGraph interaction and animation logic.
- */
 @Stable
 class BudgetGraphState(
     private val allCurrentPoints: List<BigDecimal>,
@@ -118,7 +115,6 @@ class BudgetGraphState(
 
     val animProgress = Animatable(1f)
 
-    // Synchronized interpolated points
     val interpolatedCurrent by derivedStateOf {
         interpolatePoints(_oldCurrentPoints, _renderCurrentPoints, animProgress.value)
     }
@@ -154,7 +150,6 @@ class BudgetGraphState(
 
     suspend fun reconcile(animDuration: Int = 600) {
         if (_renderCurrentPoints != targetCurrentPoints || _renderWindowIndex != currentWindowIndex) {
-            // Capture current visual state as the new "Old" state
             _oldCurrentPoints = interpolatedCurrent
             _oldPreviousPoints = interpolatedPrevious
 
@@ -177,7 +172,6 @@ class BudgetGraphState(
         val start = index * step
         val end = (start + size).coerceAtMost(points.size)
         val sub = if (start < points.size) points.subList(start, end) else listOf(BigDecimal.ZERO)
-        // Ensure minimum size for interpolation stability
         return if (sub.size < 2) sub + sub else sub
     }
 }
@@ -214,7 +208,6 @@ fun rememberBudgetGraphState(
         )
     }
 
-    // Debounce rapid interaction updates
     LaunchedEffect(state.currentWindowIndex, granularity) {
         delay(150)
         state.reconcile()
@@ -290,10 +283,14 @@ fun BudgetGraph(
             .fillMaxWidth()
             .testTag(BUDGET_GRAPH_TAG),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = combineColors(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.surfaceVariant,
+                t = 0.3f,
+            ),
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(22.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -302,11 +299,7 @@ fun BudgetGraph(
                 currencyFormat = currencyFormat,
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
             BudgetGraphLegend(showPrevious = state.graphGranularity != GraphGranularity.TOTAL)
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             Box(
                 modifier = Modifier
@@ -440,7 +433,7 @@ private fun BudgetGraphHeader(
     Column(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = stringResource(R.string.budget_graph_header_spending),
+                text = stringResource(R.string.total_spent),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -716,8 +709,6 @@ private fun DrawScope.drawGraphContent(
         val isEnd = index == currentPoints.size - 1
         val isFirst = index == 0
 
-        // In TOTAL mode, we mostly care about unique month labels.
-        // In other modes, we care about physical space.
         val shouldAttemptLabel = isFirst || isEnd || dateText != lastLabelText
 
         if (shouldAttemptLabel) {
@@ -730,7 +721,6 @@ private fun DrawScope.drawGraphContent(
                 lastLabelEndX = x + labelWidth / 2
                 lastLabelText = dateText
             } else if (isEnd && labelsToDraw.isNotEmpty()) {
-                // Prioritize the end label: remove previous if it overlaps
                 labelsToDraw.removeAt(labelsToDraw.size - 1)
                 labelsToDraw.add(Triple(x, dateText, index))
             }

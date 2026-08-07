@@ -121,7 +121,6 @@ class AnalyticsViewModel @Inject constructor(
                             allTransactions = transactions,
                             currentPeriodId = currentPeriodId,
                             userSettings = userSettings,
-                            rolloverAmountFromPref = rollover.first,
                             granularity = granularity,
                             archives = allArchives
                         )
@@ -204,37 +203,21 @@ class AnalyticsViewModel @Inject constructor(
             allTransactions = allTransactions,
             currentPeriodId = _uiState.value.currentPeriodId,
             userSettings = _uiState.value.userSettings,
-            rolloverAmountFromPref = _uiState.value.rolloverAmount,
             granularity = granularity,
             archives = archives
         )
 
-        val isVirtual = periodId < 0L
-        val transactions = if (isVirtual) {
-            allTransactions.filter { tx ->
-                val date = tx.date?.toLocalDate() ?: return@filter false
-                !date.isBefore(archive.startDate) && !date.isAfter(archive.endDate) && !tx.isDeleted
-            }
-        } else {
-            allTransactions.filter { it.periodId == periodId && !it.isDeleted }
-        }
+        val transactions = findTransactionsForArchive(archive, allTransactions, periodId)
         val (paidRecurring, upcomingRecurring, oneTimeSpends) = splitRecurringAndOneTime(
             allTransactions = allTransactions,
             filteredTransactions = transactions,
             periodStart = archive.startDate,
             periodEnd = archive.endDate,
-            today = archive.endDate, // For archives, today is end date
+            today = archive.endDate,
         )
 
         val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
-
-        val budgetSettings = BudgetSettings(
-            totalBudget = archive.totalBudget,
-            period = archive.periodType,
-            startDate = archive.startDate,
-            endDate = archive.endDate,
-            currencyCode = archive.currencyCode
-        )
+        val budgetSettings = archive.toBudgetSettings()
 
         val budgetState = budgetStateCalculator.calculateBudgetState(
             settings = budgetSettings,
@@ -242,13 +225,11 @@ class AnalyticsViewModel @Inject constructor(
             currentDate = archive.endDate
         )
 
-        val previousArchive = archives.firstOrNull { it.startDate.isBefore(archive.startDate) }
-        val previousTransactions = if (previousArchive != null) {
-            allTransactions.filter { tx ->
-                val date = tx.date?.toLocalDate() ?: return@filter false
-                !date.isBefore(previousArchive.startDate) && !date.isAfter(previousArchive.endDate) && !tx.isDeleted
-            }
-        } else emptyList()
+        val previousTransactions = findPreviousPeriodTransactions(
+            allTransactions = allTransactions,
+            archives = archives,
+            currentStartDate = archive.startDate
+        )
 
         return AnalyticsState(
             periodFinished = true,
@@ -259,12 +240,8 @@ class AnalyticsViewModel @Inject constructor(
             oneTimeSpends = oneTimeSpends,
             wholeBudget = archive.totalBudget,
             currencyCode = archive.currencyCode,
-            startPeriodDate = Date.from(
-                archive.startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
-            ),
-            finishPeriodDate = Date.from(
-                archive.endDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
-            ),
+            startPeriodDate = archive.startDate.toDate(),
+            finishPeriodDate = archive.endDate.toDate(),
             budgetSettingsForDisplay = budgetSettings,
             budgetStateForDisplay = budgetState,
             isHistoricalView = true,
@@ -273,19 +250,42 @@ class AnalyticsViewModel @Inject constructor(
         )
     }
 
+    private fun findTransactionsForArchive(
+        archive: ArchivedBudget,
+        allTransactions: List<Transaction>,
+        periodId: Long
+    ): List<Transaction> {
+        return if (periodId < 0L) {
+            allTransactions.filter { tx ->
+                val date = tx.date?.toLocalDate() ?: return@filter false
+                !date.isBefore(archive.startDate) && !date.isAfter(archive.endDate) && !tx.isDeleted
+            }
+        } else {
+            allTransactions.filter { it.periodId == periodId && !it.isDeleted }
+        }
+    }
+
+    private fun ArchivedBudget.toBudgetSettings(): BudgetSettings {
+        return BudgetSettings(
+            totalBudget = totalBudget,
+            period = periodType,
+            startDate = startDate,
+            endDate = endDate,
+            currencyCode = currencyCode
+        )
+    }
+
     private fun buildDisplayState(
         settings: BudgetSettings?,
         allTransactions: List<Transaction>,
         currentPeriodId: Long,
         userSettings: UserSettings,
-        rolloverAmountFromPref: BigDecimal,
         granularity: GraphGranularity,
         archives: List<ArchivedBudget>,
     ): AnalyticsState {
         if (settings == null) return AnalyticsState(isLoading = false, graphGranularity = granularity)
 
         val today = LocalDate.now()
-        val endDate = settings.getPeriodEndDate()
 
         val transactions = filterTransactions(
             allTransactions = allTransactions,
@@ -296,13 +296,11 @@ class AnalyticsViewModel @Inject constructor(
             lastPeriodEnd = null,
         )
 
-        val previousArchive = archives.firstOrNull { it.startDate.isBefore(settings.startDate) }
-        val previousTransactions = if (previousArchive != null) {
-            allTransactions.filter { tx ->
-                val date = tx.date?.toLocalDate() ?: return@filter false
-                !date.isBefore(previousArchive.startDate) && !date.isAfter(previousArchive.endDate) && !tx.isDeleted
-            }
-        } else emptyList()
+        val previousTransactions = findPreviousPeriodTransactions(
+            allTransactions = allTransactions,
+            archives = archives,
+            currentStartDate = settings.startDate
+        )
 
         val (paidRecurring, upcomingRecurring, oneTimeSpends) = splitRecurringAndOneTime(
             allTransactions = allTransactions,
@@ -318,72 +316,102 @@ class AnalyticsViewModel @Inject constructor(
             currentDate = today
         )
 
-        val startDate = settings.startDate.atStartOfDay().atZone(ZoneId.systemDefault())
-            .let { Date.from(it.toInstant()) }
-
-        val plannedFinishDate =
-            settings.getPeriodEndDate().atStartOfDay().atZone(ZoneId.systemDefault())
-                .let { Date.from(it.toInstant()) }
-
         val earlyFinishActive = userSettings.earlyFinishActive
-        val earlyFinishActualDate =
-            if (userSettings.earlyFinishActualDate > 0) Date(userSettings.earlyFinishActualDate) else null
-        val earlyFinishOriginalEndDate =
-            if (userSettings.earlyFinishOriginalEndDate > 0) Date(userSettings.earlyFinishOriginalEndDate) else null
+        val earlyFinishInfo = calculateEarlyFinishStats(
+            userSettings = userSettings,
+            remainingBudget = displayBudgetState.remainingToday,
+            dailyBudget = displayBudgetState.dailyBudget
+        )
 
-        val savingsPreferences = userSettings.savingsPreferences
-
-        val periodFinishedNaturally =
-            settings.getPeriodEndDate().isBefore(today)
-        val periodFinished = periodFinishedNaturally || earlyFinishActive
-
-        val displayBudget = displayBudgetState.totalBudget
-
-        val totalSpent = displayBudgetState.totalSpentInPeriod
-        val remainingBudget = displayBudgetState.remainingToday
-
-        val dailyBudget = displayBudgetState.dailyBudget
-
-        val extraAffordableDays =
-            if (earlyFinishActive && remainingBudget > BigDecimal.ZERO && dailyBudget > BigDecimal.ZERO) {
-                remainingBudget.divide(dailyBudget, 0, RoundingMode.DOWN).toInt().coerceAtLeast(0)
-            } else 0
-
-        val shouldShowRolloverStyle = displayBudget > settings.totalBudget
-
-        val creditOwed = allTransactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
-            .sumOf { it.amount }
-        val creditTransactions =
-            allTransactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
-                .sortedByDescending { it.date }
-        val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
+        val creditInfo = calculateCreditAnalytics(allTransactions, displayBudgetState.remainingToday)
 
         return AnalyticsState(
-            periodFinished = periodFinished,
+            periodFinished = settings.getPeriodEndDate().isBefore(today) || earlyFinishActive,
             transactions = transactions,
             allTransactions = allTransactions,
             spends = transactions,
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
-            wholeBudget = displayBudget,
+            wholeBudget = displayBudgetState.totalBudget,
             currencyCode = settings.currencyCode,
-            finishPeriodActualDate = if (earlyFinishActive) earlyFinishActualDate else null,
-            startPeriodDate = startDate,
-            finishPeriodDate = if (earlyFinishActive) earlyFinishOriginalEndDate else plannedFinishDate,
-            extraAffordableDaysFromRemaining = extraAffordableDays,
+            finishPeriodActualDate = earlyFinishInfo.actualDate,
+            startPeriodDate = settings.startDate.toDate(),
+            finishPeriodDate = if (earlyFinishActive) earlyFinishInfo.originalEndDate else settings.getPeriodEndDate().toDate(),
+            extraAffordableDaysFromRemaining = earlyFinishInfo.extraAffordableDays,
             budgetSettingsForDisplay = settings,
             budgetStateForDisplay = displayBudgetState,
-            showRolloverStyleInBudgetDisplay = shouldShowRolloverStyle,
+            showRolloverStyleInBudgetDisplay = displayBudgetState.totalBudget > settings.totalBudget,
             isLoading = false,
-            savingsPreferences = savingsPreferences,
-            creditOwed = creditOwed,
-            debtAdjustedBalance = debtAdjustedBalance,
-            creditTransactions = creditTransactions,
+            savingsPreferences = userSettings.savingsPreferences,
+            creditOwed = creditInfo.owed,
+            debtAdjustedBalance = creditInfo.debtAdjustedBalance,
+            creditTransactions = creditInfo.transactions,
             userSettings = userSettings,
             previousPeriodTransactions = previousTransactions,
             graphGranularity = granularity,
         )
     }
+
+    private fun findPreviousPeriodTransactions(
+        allTransactions: List<Transaction>,
+        archives: List<ArchivedBudget>,
+        currentStartDate: LocalDate
+    ): List<Transaction> {
+        val previousArchive = archives.firstOrNull { it.startDate.isBefore(currentStartDate) }
+        return if (previousArchive != null) {
+            allTransactions.filter { tx ->
+                val date = tx.date?.toLocalDate() ?: return@filter false
+                !date.isBefore(previousArchive.startDate) && !date.isAfter(previousArchive.endDate) && !tx.isDeleted
+            }
+        } else emptyList()
+    }
+
+    private data class EarlyFinishStats(
+        val actualDate: Date?,
+        val originalEndDate: Date?,
+        val extraAffordableDays: Int
+    )
+
+    private fun calculateEarlyFinishStats(
+        userSettings: UserSettings,
+        remainingBudget: BigDecimal,
+        dailyBudget: BigDecimal
+    ): EarlyFinishStats {
+        val earlyFinishActive = userSettings.earlyFinishActive
+        val extraAffordableDays = if (earlyFinishActive && remainingBudget > BigDecimal.ZERO && dailyBudget > BigDecimal.ZERO) {
+            remainingBudget.divide(dailyBudget, 0, RoundingMode.DOWN).toInt().coerceAtLeast(0)
+        } else 0
+
+        return EarlyFinishStats(
+            actualDate = if (userSettings.earlyFinishActualDate > 0) Date(userSettings.earlyFinishActualDate) else null,
+            originalEndDate = if (userSettings.earlyFinishOriginalEndDate > 0) Date(userSettings.earlyFinishOriginalEndDate) else null,
+            extraAffordableDays = extraAffordableDays
+        )
+    }
+
+    private data class CreditAnalytics(
+        val owed: BigDecimal,
+        val transactions: List<Transaction>,
+        val debtAdjustedBalance: BigDecimal
+    )
+
+    private fun calculateCreditAnalytics(
+        allTransactions: List<Transaction>,
+        remainingBudget: BigDecimal
+    ): CreditAnalytics {
+        val unpaidCredit = allTransactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
+        val creditOwed = unpaidCredit.sumOf { it.amount }
+        val creditTransactions = unpaidCredit.sortedByDescending { it.date }
+        val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
+
+        return CreditAnalytics(
+            owed = creditOwed,
+            transactions = creditTransactions,
+            debtAdjustedBalance = debtAdjustedBalance
+        )
+    }
+
+    private fun LocalDate.toDate(): Date = Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant())
 
     private fun splitRecurringAndOneTime(
         allTransactions: List<Transaction>,
@@ -512,9 +540,5 @@ class AnalyticsViewModel @Inject constructor(
 
     fun consumeEffect() {
         _effects.value = null
-    }
-
-    companion object {
-        private const val RECURRING_TAG = "Analytics/Recurring"
     }
 }
