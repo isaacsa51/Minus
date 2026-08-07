@@ -19,6 +19,7 @@ class NotificationRescheduleReceiver : BroadcastReceiver() {
     @InstallIn(SingletonComponent::class)
     interface NotificationRescheduleReceiverEntryPoint {
         fun budgetRepository(): BudgetRepository
+        fun notificationScheduler(): NotificationScheduler
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -30,10 +31,7 @@ class NotificationRescheduleReceiver : BroadcastReceiver() {
                     context.applicationContext,
                     NotificationRescheduleReceiverEntryPoint::class.java
                 )
-                val scheduler = NotificationScheduler(
-                    context.applicationContext,
-                    entryPoint.budgetRepository()
-                )
+                val scheduler = entryPoint.notificationScheduler()
                 scheduler.initializeNotifications()
             } catch (e: Exception) {
                 logcat { "Error rescheduling notifications\n${e.asLog()}" }

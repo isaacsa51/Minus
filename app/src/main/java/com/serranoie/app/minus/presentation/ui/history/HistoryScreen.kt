@@ -51,7 +51,7 @@ enum class RecurrentPaymentsViewMode {
     companion object {
         fun fromName(value: String?): RecurrentPaymentsViewMode = runCatching {
             value?.let(::valueOf)
-        }.getOrNull() ?: HORIZONTAL_LIST
+        }.getOrNull() ?: VERTICAL_LIST
     }
 }
 
@@ -184,6 +184,7 @@ fun History(
                     )
                 },
                 recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
+                currencyCode = currencyCode,
                 currencyFormat = currencyFormat,
                 onDelete = { expense ->
                     if (expense.isRecurrent) {
@@ -203,7 +204,13 @@ fun History(
                 onMarkAsPaid = { expense ->
                     onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
                 },
-                onClick = { expense -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(expense.id)) },
+                onClick = { expense ->
+                    onProcessIntent(
+                        HistoryUiIntent.ToggleExpandedTransaction(
+                            expense.id
+                        )
+                    )
+                },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
@@ -236,7 +243,13 @@ fun History(
                 onMarkAsPaid = { expense ->
                     onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
                 },
-                onClick = { expense -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(expense.id)) },
+                onClick = { expense ->
+                    onProcessIntent(
+                        HistoryUiIntent.ToggleExpandedTransaction(
+                            expense.id
+                        )
+                    )
+                },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
@@ -258,52 +271,71 @@ fun History(
                 onMarkAsPaid = { expense ->
                     onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
                 },
-                onClick = { expense -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(expense.id)) },
+                onClick = { expense ->
+                    onProcessIntent(
+                        HistoryUiIntent.ToggleExpandedTransaction(
+                            expense.id
+                        )
+                    )
+                },
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
             )
 
-            pastPeriodToggleSection(
-                groupedPastTransactions = uiState.groupedPastTransactions,
-                showPastPeriod = uiState.showPastPeriod,
-                onToggleShowPastPeriod = {
-                    onProcessIntent(HistoryUiIntent.TogglePastPeriod(!uiState.showPastPeriod))
-                },
-            )
+            if (uiState.showPastTransactionsSetting) {
+                pastPeriodToggleSection(
+                    groupedPastTransactions = uiState.groupedPastTransactions,
+                    showPastPeriod = uiState.showPastPeriod,
+                    onToggleShowPastPeriod = {
+                        onProcessIntent(HistoryUiIntent.TogglePastPeriod(!uiState.showPastPeriod))
+                    },
+                )
 
-            pastTransactionDateSections(
-                showPastPeriod = uiState.showPastPeriod,
-                groupedPastTransactions = uiState.groupedPastTransactions,
-                expandedDates = uiState.expandedDates,
-                expandedTransactionId = uiState.expandedTransactionId,
-                deletingTransactionIds = uiState.pendingRemovedTransactions.keys,
-                currencyCode = currencyCode,
-                currencyFormat = currencyFormat,
-                readOnly = readOnly,
-                onToggleDate = { date -> onProcessIntent(HistoryUiIntent.ToggleExpandedDate(date)) },
-                onDelete = { expense ->
-                    onQueueDeleteWithUndo(
-                        expense,
-                        resources.getString(
-                            R.string.expense_deleted_format,
-                            expense.comment.ifEmpty { resources.getString(R.string.generic_expense) }
-                        ),
-                    ) {
-                        onCancelPendingDelete()
-                    }
-                    onProcessIntent(HistoryUiIntent.DeleteTransaction(expense))
-                },
-                onEdit = { expense -> onProcessIntent(HistoryUiIntent.SetEditingTransaction(expense)) },
-                onMarkAsPaid = { expense ->
-                    onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
-                },
-                onClick = { expense -> onProcessIntent(HistoryUiIntent.ToggleExpandedTransaction(expense.id)) },
-                sharedTransitionScope = sharedTransitionScope,
-                animatedVisibilityScope = animatedVisibilityScope,
-                creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
-            )
-
+                pastTransactionDateSections(
+                    showPastPeriod = uiState.showPastPeriod,
+                    groupedPastTransactions = uiState.groupedPastTransactions,
+                    expandedDates = uiState.expandedDates,
+                    expandedTransactionId = uiState.expandedTransactionId,
+                    deletingTransactionIds = uiState.pendingRemovedTransactions.keys,
+                    currencyCode = currencyCode,
+                    currencyFormat = currencyFormat,
+                    readOnly = readOnly,
+                    onToggleDate = { date -> onProcessIntent(HistoryUiIntent.ToggleExpandedDate(date)) },
+                    onDelete = { expense ->
+                        onQueueDeleteWithUndo(
+                            expense,
+                            resources.getString(
+                                R.string.expense_deleted_format,
+                                expense.comment.ifEmpty { resources.getString(R.string.generic_expense) }
+                            ),
+                        ) {
+                            onCancelPendingDelete()
+                        }
+                        onProcessIntent(HistoryUiIntent.DeleteTransaction(expense))
+                    },
+                    onEdit = { expense ->
+                        onProcessIntent(
+                            HistoryUiIntent.SetEditingTransaction(
+                                expense
+                            )
+                        )
+                    },
+                    onMarkAsPaid = { expense ->
+                        onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
+                    },
+                    onClick = { expense ->
+                        onProcessIntent(
+                            HistoryUiIntent.ToggleExpandedTransaction(
+                                expense.id
+                            )
+                        )
+                    },
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
+                )
+            }
 
             item("spacer-bottom") {
                 Spacer(modifier = Modifier.height(32.dp))

@@ -9,15 +9,21 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
+import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.RecurrentPaymentsDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableUpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
@@ -39,6 +45,7 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
     expandedTransactionId: Long?,
     onToggleShowUpcomingRecurrentInPeriod: () -> Unit,
     recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
+    currencyCode: String,
     currencyFormat: NumberFormat,
     onDelete: (Transaction) -> Unit,
     onEdit: (Transaction) -> Unit,
@@ -50,12 +57,16 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
 ) {
     if (upcomingRecurrentInPeriod.isEmpty()) return
 
+    val recurrentTotal = upcomingRecurrentInPeriod.sumOf { it.transaction.amount }
+
     item("upcoming-recurrent-toggle") {
         RecurrentPaymentsDivider(
             title = stringResource(R.string.recurrent_payments_divider_title_current_period),
             isExpanded = showUpcomingRecurrentInPeriod,
             onToggleClick = onToggleShowUpcomingRecurrentInPeriod,
             itemCount = upcomingRecurrentInPeriod.size,
+            totalAmount = recurrentTotal,
+            currencyCode = currencyCode,
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -72,28 +83,41 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
                 shrinkTowards = Alignment.Top,
             ) + fadeOut(animationSpec = tween(300)),
         ) {
-            RecurrentItemsContent(
-                items = upcomingRecurrentInPeriod,
-                recurrentPaymentsViewMode = recurrentPaymentsViewMode,
-                currencyFormat = currencyFormat,
-                verticalItem = { _, item, position ->
-                    SwipeableUpcomingRecurrentItem(
-                        item = item,
+            Column {
+                RecurrentItemsContent(
+                    items = upcomingRecurrentInPeriod,
+                    recurrentPaymentsViewMode = recurrentPaymentsViewMode,
+                    currencyFormat = currencyFormat,
+                    verticalItem = { _, item, position ->
+                        SwipeableUpcomingRecurrentItem(
+                            item = item,
+                            currencyFormat = currencyFormat,
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            position = position,
+                            isExpanded = expandedTransactionId == item.transaction.id,
+                            onDelete = { onDelete(item.transaction) },
+                            onEdit = { onEdit(item.transaction) },
+                            onMarkAsPaid = { onMarkAsPaid(item.transaction) },
+                            onClick = { onClick(item.transaction) },
+                            creditCardCutoffDay = creditCardCutoffDay,
+                        )
+                    },
+                    horizontalKeyPrefix = "upcoming",
+                    onClick = onClick,
+                )
+
+                if (recurrentPaymentsViewMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    DayTotalItem(
+                        total = recurrentTotal,
                         currencyFormat = currencyFormat,
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        position = position,
-                        isExpanded = expandedTransactionId == item.transaction.id,
-                        onDelete = { onDelete(item.transaction) },
-                        onEdit = { onEdit(item.transaction) },
-                        onMarkAsPaid = { onMarkAsPaid(item.transaction) },
-                        onClick = { onClick(item.transaction) },
-                        creditCardCutoffDay = creditCardCutoffDay,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                     )
-                },
-                horizontalKeyPrefix = "upcoming",
-                onClick = onClick,
-            )
+                }
+            }
         }
     }
 }
@@ -125,6 +149,7 @@ private fun CurrentPeriodRecurrentSectionPreview() {
                 expandedTransactionId = null,
                 onToggleShowUpcomingRecurrentInPeriod = {},
                 recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
+                currencyCode = "USD",
                 currencyFormat = NumberFormat.getCurrencyInstance(),
                 onDelete = {},
                 onEdit = {},

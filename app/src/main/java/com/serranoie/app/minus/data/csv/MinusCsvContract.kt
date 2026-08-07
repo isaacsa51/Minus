@@ -13,6 +13,11 @@ object MinusCsvContract {
     const val COL_ID = "id"
     const val COL_IS_CREDIT = "is_credit"
     const val COL_IS_CREDIT_PAID = "is_credit_paid"
+    const val COL_PERIOD_ID = "period_id"
+    const val COL_CREATED_AT = "created_at"
+
+    const val MARKER_META = "__META__"
+    const val MARKER_ARCHIVED = "__ARCHIVED__"
 
     const val COL_BUDGET_TOTAL = "budget_total"
     const val COL_BUDGET_PERIOD = "budget_period"
@@ -26,6 +31,7 @@ object MinusCsvContract {
     const val COL_CURRENT_PERIOD_STARTED_AT = "current_period_started_at_millis"
     const val COL_CURRENT_PERIOD_ID = "current_period_id"
     const val COL_CREDIT_CARD_CUTOFF_DAY = "credit_card_cutoff_day"
+    const val COL_SPLIT_MODE = "split_mode"
 
     val HEADERS = arrayOf(
         COL_DATE,
@@ -38,6 +44,8 @@ object MinusCsvContract {
         COL_ID,
         COL_IS_CREDIT,
         COL_IS_CREDIT_PAID,
+        COL_PERIOD_ID,
+        COL_CREATED_AT,
         COL_BUDGET_TOTAL,
         COL_BUDGET_PERIOD,
         COL_BUDGET_START_DATE,
@@ -50,5 +58,6 @@ object MinusCsvContract {
         COL_CURRENT_PERIOD_STARTED_AT,
         COL_CURRENT_PERIOD_ID,
         COL_CREDIT_CARD_CUTOFF_DAY,
+        COL_SPLIT_MODE,
     )
 }

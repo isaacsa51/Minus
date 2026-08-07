@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.presentation.ui.changelog
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,16 +25,15 @@ import com.serranoie.app.minus.presentation.ui.changelog.components.ChangelogIte
 import com.serranoie.app.minus.presentation.ui.changelog.components.ChangelogSectionHeader
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
-import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 
 // !INFO: Population of real data and how it's being rendered, check: [CHANGELOG_GENERATION.md]
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ChangelogHistoryContent(
     releases: List<VersionRelease>,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier,
+    header: (LazyListScope.() -> Unit)? = null,
 ) {
     if (releases.isEmpty()) {
         Column(
@@ -58,14 +55,14 @@ internal fun ChangelogHistoryContent(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
     ) {
+        header?.invoke(this)
         changelogReleaseItems(releases)
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) {
     releases.forEachIndexed { index, release ->
-        stickyHeader(key = "meta-${release.versionCode}") {
+        item(key = "meta-${release.versionCode}") {
             ChangelogReleaseMeta(release = release)
         }
 
@@ -114,20 +111,16 @@ private fun LazyListScope.changelogReleaseItems(releases: List<VersionRelease>) 
 
 @Composable
 private fun ChangelogReleaseMeta(release: VersionRelease) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = stringResource(
-                R.string.changelog_release_header,
-                release.versionName,
-                release.releaseDate,
-            ),
-            style = MaterialTheme.typography.titleLargeEmphasized,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-        )
-    }
+    Text(
+        text = stringResource(
+            R.string.changelog_release_header,
+            release.versionName,
+            release.releaseDate,
+        ),
+        style = MaterialTheme.typography.titleMediumEmphasized,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+    )
 }
 
 @Preview(showBackground = true)

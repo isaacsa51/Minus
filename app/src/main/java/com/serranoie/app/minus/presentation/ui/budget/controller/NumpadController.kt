@@ -100,9 +100,12 @@ class NumpadController(
 
     private fun handleOperator(operator: Char, currentIsCalculation: Boolean): List<NumpadChange> {
         val current = _input.value
-        if (current.isEmpty()) return emptyList()
-        val lastChar = current.lastOrNull() ?: return emptyList()
-        if (lastChar in "+-×÷" || lastChar == '.') return emptyList()
+        val isUnaryPossible = operator == '+' || operator == '-'
+        
+        if (current.isEmpty() && !isUnaryPossible) return emptyList()
+        
+        val lastChar = current.lastOrNull()
+        if (lastChar != null && (lastChar in "+-×÷" || lastChar == '.')) return emptyList()
 
         val updated = "$current$operator"
         _input.value = updated

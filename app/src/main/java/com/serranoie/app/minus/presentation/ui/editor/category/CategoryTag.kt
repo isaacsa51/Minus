@@ -40,77 +40,77 @@ import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CategoryTag(
-	value: String, onClick: () -> Unit, onDelete: () -> Unit, modifier: Modifier = Modifier
+    value: String, onClick: () -> Unit, onDelete: () -> Unit, modifier: Modifier = Modifier
 ) {
-	var showDeleteButton by remember { mutableStateOf(false) }
+    var showDeleteButton by remember { mutableStateOf(false) }
 
-	Surface(
-		shape = CircleShape,
-		color = MaterialTheme.colorScheme.surface,
-		contentColor = MaterialTheme.colorScheme.onSurface,
-		modifier = modifier
-			.clip(CircleShape)
-			.combinedClickable(onClick = {
-				if (showDeleteButton) {
-					showDeleteButton = false
-				} else {
-					onClick()
-				}
-			}, onLongClick = {
-				showDeleteButton = true
-			})
-	) {
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			Text(
-				text = value,
-				style = MaterialTheme.typography.bodyMediumCondensed,
-				modifier = Modifier
-					.padding(horizontal = 12.dp, vertical = 8.dp)
-					.heightIn(min = 28.dp)
-					.wrapContentHeight(align = Alignment.CenterVertically),
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis,
-			)
+    Surface(
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+            .clip(CircleShape)
+            .combinedClickable(onClick = {
+                if (showDeleteButton) {
+                    showDeleteButton = false
+                } else {
+                    onClick()
+                }
+            }, onLongClick = {
+                showDeleteButton = true
+            })
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMediumCondensed,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .heightIn(min = 28.dp)
+                    .wrapContentHeight(align = Alignment.CenterVertically),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
 
-			AnimatedVisibility(
-				visible = showDeleteButton,
-				enter = scaleIn(tween(durationMillis = 150)) + fadeIn(tween(durationMillis = 150)),
-				exit = scaleOut(tween(durationMillis = 150)) + fadeOut(tween(durationMillis = 150)),
-			) {
-				IconButton(
-					onClick = {
-						onDelete()
-						showDeleteButton = false
-					},
-					modifier = Modifier.size(32.dp),
-					colors = IconButtonDefaults.iconButtonColors(
-						contentColor = MaterialTheme.colorScheme.error,
-					),
-				) {
-					Icon(
-						imageVector = Icons.Default.Close,
-						contentDescription = "Delete category",
-						modifier = Modifier.size(16.dp),
-					)
-				}
-			}
+            AnimatedVisibility(
+                visible = showDeleteButton,
+                enter = scaleIn(tween(durationMillis = 150)) + fadeIn(tween(durationMillis = 150)),
+                exit = scaleOut(tween(durationMillis = 150)) + fadeOut(tween(durationMillis = 150)),
+            ) {
+                IconButton(
+                    onClick = {
+                        onDelete()
+                        showDeleteButton = false
+                    },
+                    modifier = Modifier.size(32.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Delete category",
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
+            }
 
-			if (!showDeleteButton) {
-				Spacer(modifier = Modifier.width(4.dp))
-			}
-		}
-	}
+            if (!showDeleteButton) {
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+        }
+    }
 }
 
 
 @Preview(name = "Tag")
 @Composable
 private fun PreviewCategoryTag() {
-	CategoryTag(
-		value = "Mock Category",
-		onClick = {},
-		onDelete = {},
-	)
+    CategoryTag(
+        value = "Mock Category",
+        onClick = {},
+        onDelete = {},
+    )
 }

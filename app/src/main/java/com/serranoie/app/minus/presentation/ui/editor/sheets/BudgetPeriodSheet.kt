@@ -381,7 +381,7 @@ private fun ViewBudgetContent(
                     .fillMaxWidth()
                     .height(IntrinsicSize.Min)
                     .padding(bottom = 8.dp),
-            budget = totalBudget,
+            budget = budgetState?.totalBudget ?: totalBudget,
             spend = totalSpent,
             currency = currencyCode,
         )
@@ -510,7 +510,7 @@ private fun ViewBudgetContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             CalculatedSplitCard(
                 periodCache = periodCache,

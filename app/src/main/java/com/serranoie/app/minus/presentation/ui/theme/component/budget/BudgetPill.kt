@@ -20,9 +20,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -45,7 +47,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -58,6 +64,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
@@ -65,6 +72,7 @@ import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.calcAdaptiveFont
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.combineColors
@@ -93,6 +101,7 @@ fun BudgetPill(
     bigVariant: Boolean = false,
     centerRemainingAmount: Boolean = false,
     splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
+    calculationPreview: String? = null,
     modifier: Modifier = Modifier,
 ) {
     val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
@@ -106,9 +115,69 @@ fun BudgetPill(
     val exhaustedMessage = resolveExhaustedMessage(budgetState, viewPeriod, splitMode)
 
     val isNoBudget = budgetState == null
+    val amountText =
+        if (isNoBudget) stringResource(R.string.budget_pill_no_budget_action) else currencyFormat.format(
+            metrics.periodRemaining
+        )
+    val symbolStyle = MaterialTheme.typography.titleSmallCondensed.toSpanStyle()
+    val annotatedAmount = remember(amountText, currencyCode, symbolStyle, isNoBudget) {
+        val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: ""
+        if (!isNoBudget && currencySymbol.length > 2 && amountText.startsWith(currencySymbol)) {
+            val amount = amountText.removePrefix(currencySymbol).trim()
+            AnnotatedString.Builder().apply {
+                pushStyle(
+                    symbolStyle.copy(
+                        fontSize = 16.sp * 0.75f,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(0f)
+                    )
+                )
+                append(currencySymbol)
+                pop()
+                pushStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Light
+                    )
+                )
+                append(amount)
+                pop()
+            }.toAnnotatedString()
+        } else {
+            AnnotatedString(amountText)
+        }
+    }
+
+    val annotatedCalculationPreview = remember(calculationPreview, currencyCode, symbolStyle) {
+        if (calculationPreview == null) return@remember null
+        val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: ""
+        if (currencySymbol.length > 2 && calculationPreview.startsWith(currencySymbol)) {
+            val rest = calculationPreview.removePrefix(currencySymbol)
+            AnnotatedString.Builder().apply {
+                pushStyle(
+                    symbolStyle.copy(
+                        fontSize = 16.sp * 0.75f,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(0f)
+                    )
+                )
+                append(currencySymbol)
+                pop()
+                pushStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Light
+                    )
+                )
+                append(rest)
+                pop()
+            }.toAnnotatedString()
+        } else {
+            AnnotatedString(calculationPreview)
+        }
+    }
+
     val shouldCenterRemainingAmount =
-        remember(centerRemainingAmount, metrics.isCurrentPeriodOverBudget, bigVariant, isNoBudget) {
-            (centerRemainingAmount && !metrics.isCurrentPeriodOverBudget && !bigVariant) || isNoBudget
+        remember(centerRemainingAmount, metrics.isCurrentPeriodOverBudget, bigVariant, isNoBudget, calculationPreview) {
+            (centerRemainingAmount && !metrics.isCurrentPeriodOverBudget && !bigVariant) || isNoBudget || calculationPreview != null
         }
 
     val isDarkTheme = isSystemInDarkTheme()
@@ -139,7 +208,9 @@ fun BudgetPill(
         modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
-            modifier = Modifier.height(50.dp), // Fixed height as both states were 50.dp
+            modifier = Modifier
+                .fillMaxHeight()
+                .heightIn(min = 50.dp),
             shape = CircleShape, colors = CardDefaults.cardColors(
                 containerColor = harmonizedColor.container.copy(alpha = 0.6f),
                 contentColor = harmonizedColor.onContainer,
@@ -189,18 +260,30 @@ fun BudgetPill(
                             contentAlignment = Alignment.Center,
                         ) {
                             AdaptiveSingleLineText(
-                                text = if (isNoBudget) stringResource(R.string.budget_pill_no_budget_action) else currencyFormat.format(
-                                    metrics.periodRemaining
-                                ),
+                                text = when {
+                                    calculationPreview != null -> calculationPreview
+                                    isNoBudget -> stringResource(R.string.budget_pill_no_budget_action)
+                                    else -> currencyFormat.format(metrics.periodRemaining)
+                                },
+                                annotatedText = when {
+                                    calculationPreview != null -> annotatedCalculationPreview
+                                    isNoBudget -> null
+                                    else -> annotatedAmount
+                                },
                                 style = MaterialTheme.typography.titleMediumCondensed,
                                 color = textColor,
                                 minFontSize = 16.sp,
-                                modifier = Modifier.fillMaxWidth().graphicsLayer {
-                                    if (!isNoBudget) {
-                                        scaleX = centeredAmountScale
-                                        scaleY = centeredAmountScale
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .graphicsLayer {
+                                        if (!isNoBudget && calculationPreview == null) {
+                                            scaleX = centeredAmountScale
+                                            scaleY = centeredAmountScale
+                                        }
                                     }
-                                }.let { if (!isNoBudget) it else it.censor() },
+                                    .let {
+                                        if (!isNoBudget || calculationPreview != null) it else it.censor()
+                                    },
                                 textAlign = TextAlign.Center,
                             )
                         }
@@ -230,7 +313,8 @@ fun BudgetPill(
 
                             if (!metrics.isCurrentPeriodOverBudget && !metrics.isOverCurrentSubPeriod && !bigVariant) {
                                 AdaptiveSingleLineText(
-                                    text = currencyFormat.format(metrics.periodRemaining),
+                                    text = amountText,
+                                    annotatedText = annotatedAmount,
                                     style = MaterialTheme.typography.titleMediumCondensed,
                                     color = textColor,
                                     minFontSize = 16.sp,
@@ -263,7 +347,12 @@ private fun calculateBudgetMetrics(
         BudgetPeriod.MONTHLY -> BigDecimal(30)
     }
     val periodBudget = dailyBudget.multiply(multiplier)
-    val periodSpent = if (period == BudgetPeriod.DAILY) spentToday else spentInPeriod
+    val periodSpent = when (period) {
+        BudgetPeriod.DAILY -> spentToday
+        BudgetPeriod.WEEKLY -> state.totalSpentThisWeek
+        BudgetPeriod.BIWEEKLY -> state.totalSpentThisBiweek
+        BudgetPeriod.MONTHLY -> state.totalSpentThisMonth
+    }
     val staticRemaining = periodBudget.subtract(periodSpent)
 
     val periodRemaining = when (splitMode) {
@@ -275,16 +364,17 @@ private fun calculateBudgetMetrics(
         BudgetSplitMode.STATIC -> staticRemaining
     }
 
-    val isOverBudget = when (splitMode) {
-        BudgetSplitMode.DYNAMIC -> state.isOverBudget
-        BudgetSplitMode.STATIC -> staticRemaining.signum() == -1
-    }
+    val isOverBudget = state.isOverBudget
 
-    val isOverSubPeriod = when (period) {
-        BudgetPeriod.DAILY -> state.isTodayOverDailyAllocation
-        BudgetPeriod.WEEKLY -> spentInPeriod > state.weeklyAllocation && state.weeklyAllocation > BigDecimal.ZERO
-        BudgetPeriod.BIWEEKLY -> spentInPeriod > state.biweeklyAllocation && state.biweeklyAllocation > BigDecimal.ZERO
-        BudgetPeriod.MONTHLY -> spentInPeriod > state.monthlyAllocation && state.monthlyAllocation > BigDecimal.ZERO
+    val isOverSubPeriod = when (splitMode) {
+        BudgetSplitMode.DYNAMIC -> when (period) {
+            BudgetPeriod.DAILY -> state.isTodayOverDailyAllocation
+            BudgetPeriod.WEEKLY -> spentInPeriod > state.weeklyAllocation && state.weeklyAllocation > BigDecimal.ZERO
+            BudgetPeriod.BIWEEKLY -> spentInPeriod > state.biweeklyAllocation && state.biweeklyAllocation > BigDecimal.ZERO
+            BudgetPeriod.MONTHLY -> spentInPeriod > state.monthlyAllocation && state.monthlyAllocation > BigDecimal.ZERO
+        }
+
+        BudgetSplitMode.STATIC -> staticRemaining.signum() == -1
     }
 
     val progress = if (periodBudget.signum() == 1) {
@@ -482,6 +572,7 @@ private fun AdaptiveSingleLineText(
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start,
     fillWidth: Boolean = true,
+    annotatedText: AnnotatedString? = null,
 ) {
     BoxWithConstraints(modifier = modifier) {
         val density = LocalDensity.current
@@ -499,7 +590,7 @@ private fun AdaptiveSingleLineText(
         )
 
         Text(
-            text = text,
+            text = annotatedText ?: AnnotatedString(text),
             style = style.copy(fontSize = adaptiveFontSize),
             color = color,
             maxLines = 1,
@@ -665,11 +756,11 @@ private fun PreviewBudgetPillDynamic() {
                     totalBudget = BigDecimal("500.00"),
                     period = BudgetPeriod.DAILY,
                     startDate = LocalDate.now(),
-                    currencyCode = "MXN",
+                    currencyCode = "QAR",
                     splitMode = BudgetSplitMode.DYNAMIC,
                 ),
                 viewPeriod = BudgetPeriod.DAILY,
-                currencyCode = "MXN",
+                currencyCode = "QAR",
                 splitMode = BudgetSplitMode.DYNAMIC,
                 onOpenBudgetSheet = { },
             )
@@ -694,11 +785,11 @@ private fun PreviewBudgetPillDynamic() {
                     totalBudget = BigDecimal("1500.00"),
                     period = BudgetPeriod.DAILY,
                     startDate = LocalDate.now(),
-                    currencyCode = "MXN",
+                    currencyCode = "QAR",
                     splitMode = BudgetSplitMode.DYNAMIC,
                 ),
                 viewPeriod = BudgetPeriod.DAILY,
-                currencyCode = "MXN",
+                currencyCode = "QAR",
                 centerRemainingAmount = true,
                 modifier = Modifier.fillMaxWidth(),
                 splitMode = BudgetSplitMode.DYNAMIC,

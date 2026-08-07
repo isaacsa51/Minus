@@ -2,7 +2,6 @@
 
 package com.serranoie.app.minus.presentation.ui.theme
 
-import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -14,22 +13,14 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.preferences.core.edit
-import com.serranoie.app.minus.presentation.CONTRAST_MODE_KEY
-import com.serranoie.app.minus.presentation.THEME_MODE_KEY
-import com.serranoie.app.minus.presentation.TYPOGRAPHY_MODE_KEY
+import com.serranoie.app.minus.domain.model.ContrastMode
+import com.serranoie.app.minus.domain.model.ThemeMode
+import com.serranoie.app.minus.domain.model.TypographyMode
+import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.appContrast
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
-import com.serranoie.app.minus.presentation.appColorScheme
-import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.theme.schemes.getAppColorScheme
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
-
-enum class ThemeMode { LIGHT, NIGHT, SYSTEM }
-enum class TypographyMode { SYSTEM, DEFAULT, CONDENSED, EXPRESSIVE }
-enum class ContrastMode { NORMAL, MEDIUM, HIGH }
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,

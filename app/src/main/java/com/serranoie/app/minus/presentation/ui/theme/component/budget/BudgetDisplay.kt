@@ -99,10 +99,6 @@ fun BudgetDisplay(
             settingsTotalBudget.subtract(rolloverFromSettings)
         }
 
-        settingsTotalBudget != null && stateTotalBudget != null && stateTotalBudget > settingsTotalBudget -> {
-            settingsTotalBudget
-        }
-
         settingsTotalBudget != null -> settingsTotalBudget
         else -> budget
     }
@@ -132,12 +128,11 @@ fun BudgetDisplay(
                 MaterialTheme.typography.titleSmallCondensed.toSpanStyle().copy(
                     fontSize = valueFontSize * 0.65f,
                     fontWeight = FontWeight.Bold,
-                    baselineShift = BaselineShift(0.1f)
+                    baselineShift = BaselineShift(0f)
                 )
             )
             append(currencySymbol)
             pop()
-            append(" ")
             pushStyle(
                 SpanStyle(
                     fontSize = valueFontSize,
@@ -547,6 +542,24 @@ private fun BudgetDisplayPreview_DebtAdjusted() {
             startDate = startDate,
             finishDate = finishDate,
             creditOwed = BigDecimal("35.25")
+        )
+    }
+}
+
+@Preview(device = "spec:width=800px,height=500px")
+@Composable
+private fun BudgetDisplayPreview_LongCurrency() {
+    MinusTheme {
+        val startDate = Date()
+        val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 7) }.time
+
+        BudgetDisplay(
+            budget = BigDecimal("10830.65"),
+            budgetState = null,
+            budgetSettings = null,
+            currencyCode = "QAR",
+            startDate = startDate,
+            finishDate = finishDate
         )
     }
 }

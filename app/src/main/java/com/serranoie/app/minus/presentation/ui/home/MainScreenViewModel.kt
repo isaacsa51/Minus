@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -40,6 +40,12 @@ class MainScreenViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         selectedViewPeriod = settings.budgetSplitViewPeriod ?: BudgetPeriod.DAILY,
+                        onboardingCompleted = settings.onboardingCompleted,
+                        tutorialBoxCompleted = settings.tutorialBoxCompleted,
+                        showCreditQuickToggleFeature = settings.isCreditQuickToggleEnabled,
+                        directCategoryPopupEnabled = settings.categoryPickerDirectPopupEnabled,
+                        categoryGridModeEnabled = settings.categoryGridModeEnabled,
+                        tutorialStage = settings.firstLaunchTutorialStage,
                     )
                 }
             }
@@ -59,6 +65,7 @@ class MainScreenViewModel @Inject constructor(
             is MainScreenUiIntent.HideBudgetPeriodSheet -> hideBudgetPeriodSheet()
             is MainScreenUiIntent.SetSelectedPeriod -> setSelectedPeriod(intent.period)
             is MainScreenUiIntent.MarkWalletSheetOpened -> markWalletSheetOpened()
+            is MainScreenUiIntent.SetTutorialBoxCompleted -> setTutorialBoxCompleted(intent.completed)
 
             is MainScreenUiIntent.ProcessBudgetTransactionIntent -> { /* caller */ }
             is MainScreenUiIntent.ProcessBudgetEditorIntent -> { /* caller */ }
@@ -140,7 +147,9 @@ class MainScreenViewModel @Inject constructor(
 
     private fun advanceTutorial(intent: MainScreenUiIntent.AdvanceTutorial, currentStage: FirstLaunchTutorialStage) {
         if (currentStage != intent.expected) return
-        // Actual DataStore write is handled by the composable (needs Context)
+        viewModelScope.launch {
+            settingsRepository.setFirstLaunchTutorialStage(currentStage.next())
+        }
     }
 
     private fun setShownStage(stage: FirstLaunchTutorialStage?) {
@@ -180,6 +189,12 @@ class MainScreenViewModel @Inject constructor(
 
     private fun markWalletSheetOpened() {
         _uiState.update { it.copy(walletSheetOpened = true) }
+    }
+
+    private fun setTutorialBoxCompleted(completed: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setTutorialBoxCompleted(completed)
+        }
     }
 
     override fun onCleared() {

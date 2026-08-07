@@ -58,7 +58,7 @@ internal fun LazyListScope.transactionDateSections(
 ) {
     groupedTransactions.forEach { (date, transactions) ->
         val isExpanded = date?.let { expandedDates.contains(it) } ?: false
-        val dayTotal = transactions.sumOf { it.amount }
+        val dayTotal = transactions.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
 
         item("$keyPrefix-date-$date") {
             HistoryDateDivider(

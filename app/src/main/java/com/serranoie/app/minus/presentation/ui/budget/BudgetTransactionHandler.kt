@@ -61,13 +61,18 @@ class BudgetTransactionHandler @Inject constructor(
 
         if (!validateNumpadInput(normalizedInput)) return ApplyTransactionResult.InvalidInput
 
-        val amount = try {
+        var amount = try {
             BigDecimal(normalizedInput)
         } catch (_: NumberFormatException) {
             return ApplyTransactionResult.InvalidInput
         }
 
-        if (amount < BigDecimal.ZERO) return ApplyTransactionResult.InvalidInput
+        // Logic for unary leading operators
+        amount = when {
+            input.startsWith("+") -> amount.negate()
+            input.startsWith("-") -> amount.abs()
+            else -> amount
+        }
 
         if (isRecurrentEnabled) {
             return ApplyTransactionResult.ShowRecurrentDialog(
@@ -223,7 +228,7 @@ class BudgetTransactionHandler @Inject constructor(
         if (input == ".") return false
         return try {
             val value = BigDecimal(input)
-            value > BigDecimal.ZERO
+            value.compareTo(BigDecimal.ZERO) != 0
         } catch (_: NumberFormatException) {
             false
         }

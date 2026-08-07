@@ -49,7 +49,9 @@ class BudgetStateCalculator @Inject constructor(
         val daysRemaining = ChronoUnit.DAYS.between(currentDate, periodEnd).toInt() + 1
         val originalTotalDays = ChronoUnit.DAYS.between(settings.startDate, periodEnd).toInt() + 1
 
-        val totalSpentInPeriod = transactions.filter { !it.isDeleted }.sumOf { it.amount }
+        val activeTransactions = transactions.filter { !it.isDeleted }
+        val totalExpensesInPeriod = activeTransactions.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
+        val totalIncomeInPeriod = activeTransactions.filter { it.amount < BigDecimal.ZERO }.sumOf { it.amount }.abs()
 
         val carryForFirstDay = if (
             settings.rollOverCarryForward && currentDate.isEqual(settings.startDate)
@@ -65,14 +67,14 @@ class BudgetStateCalculator @Inject constructor(
             BigDecimal.ZERO
         }
 
-        val effectiveTotalBudget = settings.totalBudget.add(rolloverAmount)
-        val remainingBudget = effectiveTotalBudget.subtract(totalSpentInPeriod)
+        val effectiveTotalBudget = settings.totalBudget.add(rolloverAmount).add(totalIncomeInPeriod)
+        val remainingBudget = effectiveTotalBudget.subtract(totalExpensesInPeriod)
         val originalDailyBudget = when (settings.splitMode) {
             BudgetSplitMode.DYNAMIC -> {
                 if (daysRemaining <= 0) {
                     BigDecimal.ZERO
                 } else {
-                    val remaining = effectiveTotalBudget.subtract(totalSpentInPeriod)
+                    val remaining = effectiveTotalBudget.subtract(totalExpensesInPeriod)
                     if (remaining <= BigDecimal.ZERO) {
                         BigDecimal.ZERO
                     } else {
@@ -94,16 +96,27 @@ class BudgetStateCalculator @Inject constructor(
             }
         }
 
-        val regularSpentToday =
-            transactions.filter { !it.isDeleted && it.date?.toLocalDate() == currentDate }
-                .sumOf { it.amount }
+        val todayTransactions = activeTransactions.filter { it.date?.toLocalDate() == currentDate }
+        val regularSpentToday = todayTransactions.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
+        val incomeToday = todayTransactions.filter { it.amount < BigDecimal.ZERO }.sumOf { it.amount }.abs()
 
         val recurringDueToday = recurringExpenseCalculator.calculateRecurringDueToday(transactions, currentDate)
         val spentToday = regularSpentToday.add(recurringDueToday)
-        val remainingToday = originalDailyBudget.add(carryForFirstDay).subtract(spentToday)
+
+        val totalSpentThisWeek = calculateSpentInSubPeriod(
+            transactions, settings.startDate, currentDate, 7
+        )
+        val totalSpentThisBiweek = calculateSpentInSubPeriod(
+            transactions, settings.startDate, currentDate, 14
+        )
+        val totalSpentThisMonth = calculateSpentInSubPeriod(
+            transactions, settings.startDate, currentDate, 30
+        )
+
+        val remainingToday = originalDailyBudget.add(carryForFirstDay).add(incomeToday).subtract(spentToday)
 
         val progress = if (effectiveTotalBudget > BigDecimal.ZERO) {
-            totalSpentInPeriod.divide(effectiveTotalBudget, 4, RoundingMode.HALF_UP)
+            totalExpensesInPeriod.divide(effectiveTotalBudget, 4, RoundingMode.HALF_UP)
                 .toFloat()
                 .coerceIn(0f, 1f)
         } else {
@@ -112,10 +125,9 @@ class BudgetStateCalculator @Inject constructor(
 
         val allocations = if (settings.splitMode == BudgetSplitMode.DYNAMIC) {
             // DYNAMIC: (remaining) / blocksRemaining(daysRemaining, period)
-            // See computeDynamicAllocations for the full spec.
             val a = computeDynamicAllocations(
                 totalBudget = effectiveTotalBudget,
-                totalSpentInPeriod = totalSpentInPeriod.add(recurringDueToday),
+                totalSpentInPeriod = totalExpensesInPeriod.add(recurringDueToday),
                 totalSpentToday = spentToday,
                 daysRemaining = daysRemaining.coerceAtLeast(0),
             )
@@ -126,11 +138,8 @@ class BudgetStateCalculator @Inject constructor(
             )
         } else {
             // STATIC: totalBudget / (totalDays / periodBlockDays) for each
-            // period. Uses the existing splitBudget helper for the formula.
-            // (Static mode has no "today over" sub-period signal — the
-            // state just has the static allocation per period.)
             val totalDaysClamped = originalTotalDays.coerceAtLeast(1)
-            val totalSpent = totalSpentInPeriod.add(recurringDueToday)
+            val totalSpent = totalExpensesInPeriod.add(recurringDueToday)
             Quintuple(
                 daily = splitBudget(
                     totalBudget = effectiveTotalBudget, totalSpent = totalSpent,
@@ -164,7 +173,10 @@ class BudgetStateCalculator @Inject constructor(
             progress = progress,
             isOverBudget = remainingBudget < BigDecimal.ZERO,
             totalBudget = effectiveTotalBudget,
-            totalSpentInPeriod = totalSpentInPeriod.add(recurringDueToday),
+            totalSpentInPeriod = totalExpensesInPeriod.add(recurringDueToday),
+            totalSpentThisWeek = totalSpentThisWeek,
+            totalSpentThisBiweek = totalSpentThisBiweek,
+            totalSpentThisMonth = totalSpentThisMonth,
             dailyAllocation = allocations.daily,
             weeklyAllocation = allocations.weekly,
             biweeklyAllocation = allocations.biweekly,
@@ -172,13 +184,29 @@ class BudgetStateCalculator @Inject constructor(
             isTodayOverDailyAllocation = allocations.isOverDaily,
         )
     }
+
+    private fun calculateSpentInSubPeriod(
+        transactions: List<Transaction>,
+        budgetStart: LocalDate,
+        currentDate: LocalDate,
+        blockDays: Int,
+    ): BigDecimal {
+        val daysFromStart = ChronoUnit.DAYS.between(budgetStart, currentDate)
+        if (daysFromStart < 0) return BigDecimal.ZERO
+
+        val currentBlockIndex = daysFromStart / blockDays
+        val blockStart = budgetStart.plusDays(currentBlockIndex * blockDays)
+        val blockEnd = blockStart.plusDays(blockDays.toLong() - 1)
+
+        return transactions.filter { !it.isDeleted }
+            .filter {
+                val txDate = it.date?.toLocalDate()
+                txDate != null && !txDate.isBefore(blockStart) && !txDate.isAfter(blockEnd)
+            }
+            .sumOf { it.amount }
+    }
 }
 
-/**
- * Local 5-tuple for the four per-mode allocations + the today-over flag.
- * Lets the DYNAMIC and STATIC branches share a single copy-site in the
- * BudgetState constructor without dragging an interface across packages.
- */
 private data class Quintuple(
     val daily: BigDecimal,
     val weekly: BigDecimal,

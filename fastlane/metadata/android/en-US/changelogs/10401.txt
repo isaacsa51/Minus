@@ -1,0 +1,7 @@
+- feat: toggle visibility of past transactions
+- feat: historical periods & analytics visualization
+- feat: include archived budgets in CSV exports
+- feat: smoother tutorial animations
+- fix: period logic & notification scheduling
+- fix: keyboard height & layout alignment
+- fix: show incoming label in budget pill

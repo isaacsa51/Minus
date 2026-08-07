@@ -1,50 +1,44 @@
 package com.serranoie.app.minus.presentation.ui.e2e.home
 
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.SemanticsNodeInteraction
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.longClick
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
-import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.Editor
 import com.serranoie.app.minus.presentation.ui.history.History
 import com.serranoie.app.minus.presentation.ui.history.HistoryUiState
+import com.serranoie.app.minus.presentation.ui.home.MainScreenActions
 import com.serranoie.app.minus.presentation.ui.home.MainScreenContent
 import com.serranoie.app.minus.presentation.ui.home.MainScreenUiIntent
 import com.serranoie.app.minus.presentation.ui.home.MainScreenUiState
@@ -56,11 +50,9 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
-import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -166,24 +158,24 @@ class MainScreenCoverageTest {
             ) {
                 MinusTheme {
                     MainScreenContent(
-                        mainScreenState = mainScreenState,
+                        mainScreenState =
+                            mainScreenState.copy(
+                                onboardingCompleted = onboardingCompleted,
+                                tutorialStage = FirstLaunchTutorialStage.COMPLETED,
+                                showCreditQuickToggleFeature = true,
+                                directCategoryPopupEnabled = false,
+                                categoryGridModeEnabled = false,
+                                showBudgetPeriodSheet = showBudgetPeriodSheet,
+                                forceBudgetPeriodSheetSetup = false,
+                                selectedViewPeriod = selectedViewPeriod,
+                            ),
                         budgetUiState = budgetUiState,
-                        onboardingCompleted = onboardingCompleted,
-                        tutorialStage = FirstLaunchTutorialStage.COMPLETED,
-                        showCreditQuickToggleFeature = true,
-                        directCategoryPopupEnabled = false,
-                        categoryGridModeEnabled = false,
-                        onProcessIntent = { intent -> capturedIntents += intent },
-                        onNavigateToAnalytics = {},
-                        onNavigateToSettings = {},
-                        onNavigateToWallet = {},
+                        actions =
+                            MainScreenActions(
+                                onProcessIntent = { intent -> capturedIntents += intent },
+                                onAdvanceTutorial = {},
+                            ),
                         openWalletOnStart = false,
-                        showBudgetPeriodSheet = showBudgetPeriodSheet,
-                        forceBudgetPeriodSheetSetup = false,
-                        selectedViewPeriod = selectedViewPeriod,
-                        onPeriodSelected = {},
-                        settingsDataStore = null,
-                        undoSnackbarActionLabel = "Undo",
                     )
                 }
             }

@@ -27,29 +27,37 @@ internal fun evaluateCalculation(input: String): String? {
     return try {
         val normalized = input.trim().replace("×", "*").replace("÷", "/")
 
-        // Reject expressions ending in an operator (incomplete expression)
-        normalized.lastOrNull()?.let { if (it in "+-*/") return null }
+        // Handle unary leading operators
+        val leadingOperator = if (normalized.startsWith("+") || normalized.startsWith("-")) {
+            normalized[0]
+        } else null
 
-        val hasOperator = normalized.any { it in "+-*/" }
+        val expressionToParse = if (leadingOperator != null) {
+            normalized.substring(1).trim()
+        } else {
+            normalized
+        }
+
+        expressionToParse.lastOrNull()?.let { if (it in "+-*/") return null }
+
+        val hasOperator = expressionToParse.any { it in "+-*/" }
 
         if (!hasOperator) {
-            val num = normalized.toBigDecimalOrNull() ?: return null
-            return if (num.scale() <= 0 || num.stripTrailingZeros().scale() <= 0) {
-                num.toBigInteger().toString()
-            } else {
-                num.setScale(2, RoundingMode.HALF_UP).toPlainString()
-            }
+            val num = expressionToParse.toBigDecimalOrNull() ?: return null
+            val finalNum = if (leadingOperator == '-') num.negate() else num
+            return formatResult(finalNum)
         }
 
         val tokenPattern = Regex("([+\\-*/])")
-        val parts = tokenPattern.split(normalized).filter { it.isNotEmpty() }
-        val operators = tokenPattern.findAll(normalized).map { it.value }.toList()
+        val parts = tokenPattern.split(expressionToParse).filter { it.isNotEmpty() }
+        val operators = tokenPattern.findAll(expressionToParse).map { it.value }.toList()
 
         if (parts.isEmpty() || parts[0].isEmpty()) return null
 
         if (operators.size > parts.size - 1) return null
 
         var result = parts[0].toBigDecimalOrNull() ?: return null
+        if (leadingOperator == '-') result = result.negate()
 
         for (i in operators.indices) {
             if (i + 1 >= parts.size) break
@@ -69,12 +77,17 @@ internal fun evaluateCalculation(input: String): String? {
             }
         }
 
-        if (result.scale() <= 0 || result.stripTrailingZeros().scale() <= 0) {
-            result.toBigInteger().toString()
-        } else {
-            result.setScale(2, RoundingMode.HALF_UP).toPlainString()
-        }
+        formatResult(result)
     } catch (_: Exception) {
         null
+    }
+}
+
+private fun formatResult(value: BigDecimal): String {
+    val stripped = value.stripTrailingZeros()
+    return if (stripped.scale() <= 0) {
+        stripped.toPlainString()
+    } else {
+        value.setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
     }
 }

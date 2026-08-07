@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
-import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
+import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import com.serranoie.app.minus.presentation.ui.budget.BudgetTransactionHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -28,6 +29,8 @@ import javax.inject.Inject
 class HistoryViewModel @Inject constructor(
     private val budgetTransactionHandler: BudgetTransactionHandler,
     private val settingsRepository: SettingsRepository,
+    private val budgetStateCalculator: BudgetStateCalculator,
+    private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase,
     private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
 ) : ViewModel() {
 
@@ -57,17 +60,17 @@ class HistoryViewModel @Inject constructor(
             combine(
                 budgetTransactionHandler.budgetRepository.getTransactions(),
                 budgetTransactionHandler.budgetRepository.getBudgetSettings(),
+                observeCurrentPeriodBoundaryUseCase(),
                 settingsRepository.observeSettings(),
-            ) { transactions, settings, userSettings ->
-                Triple(transactions, settings, userSettings)
-            }.collect { (transactions, settings, userSettings) ->
+            ) { transactions, settings, periodBoundary, userSettings ->
                 recomputeDerivedState(
                     transactions = transactions,
                     budgetSettings = settings,
-                    budgetState = null,
+                    currentPeriodStartedAtMillis = periodBoundary.first,
+                    currentPeriodId = periodBoundary.second,
                     userSettings = userSettings,
                 )
-            }
+            }.collect {}
         }
     }
 
@@ -173,7 +176,8 @@ class HistoryViewModel @Inject constructor(
     private fun recomputeDerivedState(
         transactions: List<Transaction>,
         budgetSettings: BudgetSettings?,
-        budgetState: BudgetState?,
+        currentPeriodStartedAtMillis: Long,
+        currentPeriodId: Long,
         userSettings: com.serranoie.app.minus.domain.model.UserSettings?,
     ) {
         val current = _uiState.value
@@ -183,17 +187,26 @@ class HistoryViewModel @Inject constructor(
         val startDate = budgetSettings?.startDate ?: LocalDate.now().minusDays(30)
         val endDate = budgetSettings?.getPeriodEndDate() ?: LocalDate.now()
         val today = LocalDate.now()
-        val currentPeriodId = budgetSettings?.let { computeCurrentPeriodId(transactions) } ?: 0L
         val previousPeriodId = currentPeriodId - 1
 
         val (currentPeriodTx, pastPeriodTx) = splitPeriodTransactions(
             transactions = displayTx,
             budgetStartDate = startDate,
             budgetEndDate = endDate,
-            currentPeriodStartedAtMillis = current.currentPeriodStartedAtMillis,
+            currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             currentPeriodId = currentPeriodId,
             previousPeriodId = previousPeriodId,
         )
+
+        val budgetState = budgetSettings?.let { s ->
+            val periodTransactions = budgetStateCalculator.filterPeriodTransactions(
+                transactions = transactions,
+                settings = s,
+                currentPeriodId = currentPeriodId,
+                currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
+            )
+            budgetStateCalculator.calculateBudgetState(s, periodTransactions, today)
+        }
 
         val (upcomingInPeriod, futureOutOfPeriod) = buildUpcomingRecurrentItems(
             transactions = displayTx,
@@ -210,9 +223,14 @@ class HistoryViewModel @Inject constructor(
             today = today,
         )
 
-        val groupedPast = groupTransactionsByDate(pastPeriodTx)
+        val groupedPast = if (userSettings?.showPastTransactions == false) {
+            emptyMap()
+        } else {
+            groupTransactionsByDate(pastPeriodTx)
+        }
 
-        val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }.sumOf { it.amount }
+        val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
+            .sumOf { it.amount }
         val remainingBudget = budgetState?.remainingToday ?: BigDecimal.ZERO
         val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
 
@@ -237,15 +255,11 @@ class HistoryViewModel @Inject constructor(
             creditOwed = creditOwed,
             debtAdjustedBalance = debtAdjustedBalance,
             isCreditQuickToggleEnabled = userSettings?.isCreditQuickToggleEnabled ?: false,
+            showPastTransactionsSetting = userSettings?.showPastTransactions ?: true,
             recurrentPaymentsViewMode = userSettings?.recurrentPaymentsViewMode
                 ?: RecurrentPaymentsViewMode.VERTICAL_LIST,
         )
     }
-
-    private fun computeCurrentPeriodId(transactions: List<Transaction>): Long {
-        return transactions.filter { it.periodId > 0L }.maxByOrNull { it.periodId }?.periodId ?: 0L
-    }
-
 
     companion object {
         private const val EXIT_ANIMATION_DURATION_MS = 600L

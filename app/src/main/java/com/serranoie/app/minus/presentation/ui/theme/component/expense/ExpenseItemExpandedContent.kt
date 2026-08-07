@@ -34,6 +34,7 @@ import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.calculateDaysToCutoff
+import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDateTime
@@ -56,10 +57,11 @@ fun ExpenseItemExpandedContent(
     creditCardCutoffDay: Int? = null,
 ) {
     val withoutDate = stringResource(R.string.without_date)
-    val noName = stringResource(R.string.no_name)
     val dateLabel = stringResource(R.string.date)
     val frequencyLabel = stringResource(R.string.frequency)
     val chargeDayLabel = stringResource(R.string.charge_day)
+
+    val isIncome = transaction.amount < BigDecimal.ZERO
 
     val transactionDateText = transaction.date?.let { date ->
         prettyDate(date, showTime = true, forceHideDate = false, human = true)
@@ -72,7 +74,7 @@ fun ExpenseItemExpandedContent(
     }
 
     val details = buildList {
-        add(stringResource(R.string.description) to transaction.comment.ifEmpty { noName })
+        add(stringResource(R.string.description) to transaction.comment.ifEmpty { stringResource(if (isIncome) R.string.no_name_income else R.string.no_name) })
         add(dateLabel to transactionDateText)
 
         if (transaction.isCredit && creditCardCutoffDay != null) {
@@ -124,9 +126,13 @@ fun ExpenseItemExpandedContent(
         )
 
         Text(
-            text = currencyFormat.format(transaction.amount),
+            text = if (isIncome) {
+                "+${currencyFormat.format(transaction.amount.abs())}"
+            } else {
+                currencyFormat.format(transaction.amount)
+            },
             style = MaterialTheme.typography.headlineSmallEmphasized,
-            color = MaterialTheme.colorScheme.error,
+            color = if (isIncome) colorGood else MaterialTheme.colorScheme.error,
             fontWeight = FontWeight.Black,
             textAlign = TextAlign.Center,
             modifier = Modifier

@@ -34,7 +34,7 @@ internal fun LazyListScope.budgetDisplaySection(
             Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
         }
 
-        val budget = budgetState?.totalBudget ?: BigDecimal.ZERO
+        val budget = budgetSettings?.totalBudget ?: BigDecimal.ZERO
         logcat("History") {
             "BudgetDisplay input budget=$budget budgetStateTotal=${budgetState?.totalBudget} budgetSettingsTotal=${budgetSettings?.totalBudget} rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward}"
         }

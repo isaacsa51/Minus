@@ -13,6 +13,10 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 detekt {
     buildUponDefaultConfig = true
     config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
@@ -55,39 +59,15 @@ fun gitOutput(vararg args: String): String? {
     }.getOrNull()
 }
 
-fun normalizedVersionTag(tag: String?): String? {
-    val normalizedTag = tag?.removePrefix("refs/tags/") ?: return null
-    return normalizedTag.takeIf { it.matches(Regex("^v?\\d+\\.\\d+\\.\\d+(-[A-Za-z0-9.-]+)?$")) }
+val versionPropsFile = rootProject.file("version.properties")
+val versionProps = Properties().apply {
+    if (versionPropsFile.exists()) {
+        versionPropsFile.inputStream().use { load(it) }
+    }
 }
 
-fun versionTagFromEnvOrProperty(): String? =
-    System.getProperty("VERSION_TAG")
-        ?: System.getenv("VERSION_TAG")
-        ?: System.getenv("GITHUB_REF_NAME")
-
-fun releaseVersionName(): String {
-    val tag = normalizedVersionTag(versionTagFromEnvOrProperty())
-        ?: normalizedVersionTag(
-            gitOutput(
-                "describe", "--tags", "--exact-match"
-            )
-        ) ?: normalizedVersionTag(gitOutput("describe", "--tags", "--abbrev=0")) ?: "v0.0.0-dev"
-
-    return tag.removePrefix("v")
-}
-
-fun versionCodeFrom(versionName: String): Int {
-    val parts = versionName.split("-", limit = 2).first().split(".").map { it.toIntOrNull() ?: 0 }
-    val major = parts.getOrElse(0) { 0 }
-    val minor = parts.getOrElse(1) { 0 }
-    val patch = parts.getOrElse(2) { 0 }
-
-    val code = major * 10_000 + minor * 100 + patch
-    return if (code > 0) code else 1
-}
-
-val appVersionName = releaseVersionName()
-val appVersionCode = versionCodeFrom(appVersionName)
+val appVersionName = versionProps.getProperty("VERSION_NAME") ?: "0.0.0-dev"
+val appVersionCode = versionProps.getProperty("VERSION_CODE")?.toIntOrNull() ?: 1
 
 android {
     namespace = "com.serranoie.app.minus"
@@ -298,7 +278,6 @@ dependencies {
     implementation(libs.androidx.glance.preview)
     implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.core.splashscreen)
-    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.dagger)
     implementation(libs.hilt.android)
     implementation(libs.commons.csv)
@@ -596,4 +575,24 @@ fun kotlinStringLiteral(s: String): String {
         .replace("\t", "\\t")
         .replace("$", "\\$")
     return "\"$escaped\""
+}
+
+fun normalizedVersionTag(tag: String?): String? {
+    val normalizedTag = tag?.removePrefix("refs/tags/") ?: return null
+    return normalizedTag.takeIf { it.matches(Regex("^v?\\d+\\.\\d+\\.\\d+(-[A-Za-z0-9.-]+)?$")) }
+}
+
+fun versionTagFromEnvOrProperty(): String? =
+    System.getProperty("VERSION_TAG")
+        ?: System.getenv("VERSION_TAG")
+        ?: System.getenv("GITHUB_REF_NAME")
+
+fun versionCodeFrom(versionName: String): Int {
+    val parts = versionName.split("-", limit = 2).first().split(".").map { it.toIntOrNull() ?: 0 }
+    val major = parts.getOrElse(0) { 0 }
+    val minor = parts.getOrElse(1) { 0 }
+    val patch = parts.getOrElse(2) { 0 }
+
+    val code = major * 10_000 + minor * 100 + patch
+    return if (code > 0) code else 1
 }

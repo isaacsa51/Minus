@@ -44,7 +44,6 @@ import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.availablePeriodsFor
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.splitBudget
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.PeriodOptionChip
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -54,194 +53,190 @@ import java.util.Date
 @Composable
 @ReadOnlyComposable
 fun BudgetPeriod.label(): String = when (this) {
-	BudgetPeriod.DAILY -> stringResource(R.string.budget_period_daily)
-	BudgetPeriod.WEEKLY -> stringResource(R.string.budget_period_weekly)
-	BudgetPeriod.BIWEEKLY -> stringResource(R.string.budget_period_biweekly)
-	BudgetPeriod.MONTHLY -> stringResource(R.string.budget_period_monthly)
+    BudgetPeriod.DAILY -> stringResource(R.string.budget_period_daily)
+    BudgetPeriod.WEEKLY -> stringResource(R.string.budget_period_weekly)
+    BudgetPeriod.BIWEEKLY -> stringResource(R.string.budget_period_biweekly)
+    BudgetPeriod.MONTHLY -> stringResource(R.string.budget_period_monthly)
 }
 
 @Composable
 @ReadOnlyComposable
 fun BudgetPeriod.periodLabel(): String = when (this) {
-	BudgetPeriod.DAILY -> stringResource(R.string.budget_period_label_today)
-	BudgetPeriod.WEEKLY -> stringResource(R.string.budget_period_label_this_week)
-	BudgetPeriod.BIWEEKLY -> stringResource(R.string.budget_period_label_this_biweek)
-	BudgetPeriod.MONTHLY -> stringResource(R.string.budget_period_label_this_month)
+    BudgetPeriod.DAILY -> stringResource(R.string.budget_period_label_today)
+    BudgetPeriod.WEEKLY -> stringResource(R.string.budget_period_label_this_week)
+    BudgetPeriod.BIWEEKLY -> stringResource(R.string.budget_period_label_this_biweek)
+    BudgetPeriod.MONTHLY -> stringResource(R.string.budget_period_label_this_month)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinishDateSelector(
-	selectDate: Date? = null,
-	totalBudget: BigDecimal = BigDecimal.ZERO,
-	currencyCode: String = "USD",
-	onBackPressed: () -> Unit,
-	onApply: (startDate: LocalDate, endDate: LocalDate, period: BudgetPeriod) -> Unit,
+    selectDate: Date? = null,
+    totalBudget: BigDecimal = BigDecimal.ZERO,
+    currencyCode: String = "USD",
+    onBackPressed: () -> Unit,
+    onApply: (startDate: LocalDate, endDate: LocalDate, period: BudgetPeriod) -> Unit,
 ) {
-	val dateFormatter = remember { DateTimeFormatter.ofPattern("dd MMM") }
+    val dateFormatter = remember { DateTimeFormatter.ofPattern("dd MMM") }
 
-	val dateRangePickerState = rememberDateRangePickerState()
+    val dateRangePickerState = rememberDateRangePickerState()
 
-	val startDate: LocalDate? = remember(dateRangePickerState.selectedStartDateMillis) {
-		dateRangePickerState.selectedStartDateMillis?.let { LocalDate.ofEpochDay(it / 86_400_000) }
-	}
-	val endDate: LocalDate? = remember(dateRangePickerState.selectedEndDateMillis) {
-		dateRangePickerState.selectedEndDateMillis?.let { LocalDate.ofEpochDay(it / 86_400_000) }
-	}
-	val hasRange = startDate != null && endDate != null
-	val totalDays = if (hasRange) ChronoUnit.DAYS.between(startDate, endDate).toInt() + 1 else 0
-	val available = if (totalDays > 0) availablePeriodsFor(totalDays) else emptyList()
+    val startDate: LocalDate? = remember(dateRangePickerState.selectedStartDateMillis) {
+        dateRangePickerState.selectedStartDateMillis?.let { LocalDate.ofEpochDay(it / 86_400_000) }
+    }
+    val endDate: LocalDate? = remember(dateRangePickerState.selectedEndDateMillis) {
+        dateRangePickerState.selectedEndDateMillis?.let { LocalDate.ofEpochDay(it / 86_400_000) }
+    }
+    val hasRange = startDate != null && endDate != null
+    val totalDays = if (hasRange) ChronoUnit.DAYS.between(startDate, endDate).toInt() + 1 else 0
+    val available = if (totalDays > 0) availablePeriodsFor(totalDays) else emptyList()
 
-	var selectedPeriod by remember { mutableStateOf<BudgetPeriod?>(null) }
+    var selectedPeriod by remember { mutableStateOf<BudgetPeriod?>(null) }
 
-	LaunchedEffect(startDate, endDate, available) {
-		if (selectedPeriod == null && available.isNotEmpty()) {
-			selectedPeriod = available.first()
-		} else if (selectedPeriod !in available) {
-			selectedPeriod = available.firstOrNull()
-		}
-	}
+    LaunchedEffect(startDate, endDate, available) {
+        if (selectedPeriod == null && available.isNotEmpty()) {
+            selectedPeriod = available.first()
+        } else if (selectedPeriod !in available) {
+            selectedPeriod = available.firstOrNull()
+        }
+    }
 
-	var pickerVisible by remember { mutableStateOf(false) }
-	LaunchedEffect(Unit) {
-		pickerVisible = true
-	}
+    var pickerVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        pickerVisible = true
+    }
 
-	Surface(
-		modifier = Modifier
-			.fillMaxSize()
-			.systemBarsPadding(),
-	) {
-		Column(modifier = Modifier.fillMaxSize()) {
-			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(horizontal = 8.dp, vertical = 4.dp),
-				verticalAlignment = Alignment.CenterVertically,
-			) {
-				IconButton(onClick = onBackPressed) {
-					Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close))
-				}
-				Spacer(Modifier.weight(1f))
-				Column(horizontalAlignment = Alignment.CenterHorizontally) {
-					Text(
-						text = stringResource(R.string.onboarding_finish_date_selector_title),
-						style = MaterialTheme.typography.titleSmallEmphasized,
-					)
-					if (totalDays > 0) {
-						Text(
-							text = stringResource(
-								R.string.onboarding_finish_date_selector_days_range,
-								totalDays,
-								startDate?.format(dateFormatter).orEmpty(),
-								endDate?.format(dateFormatter).orEmpty(),
-							),
-							style = MaterialTheme.typography.bodySmall,
-							color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-						)
-					}
-				}
-				Spacer(Modifier.weight(1f))
-				Button(
-					onClick = {
-						if (selectedPeriod != null && startDate != null && endDate != null) {
-							onApply(startDate, endDate, selectedPeriod!!)
-						}
-					},
-					enabled = hasRange && selectedPeriod != null,
-				) { Text(stringResource(R.string.apply), style = MaterialTheme.typography.labelMediumEmphasized) }
-			}
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = onBackPressed) {
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close))
+                }
+                Spacer(Modifier.weight(1f))
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.onboarding_finish_date_selector_title),
+                        style = MaterialTheme.typography.titleSmallEmphasized,
+                    )
+                    if (totalDays > 0) {
+                        Text(
+                            text = stringResource(
+                                R.string.onboarding_finish_date_selector_days_range,
+                                totalDays,
+                                startDate?.format(dateFormatter).orEmpty(),
+                                endDate?.format(dateFormatter).orEmpty(),
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        )
+                    }
+                }
+                Spacer(Modifier.weight(1f))
+                Button(
+                    onClick = {
+                        if (selectedPeriod != null && startDate != null && endDate != null) {
+                            onApply(startDate, endDate, selectedPeriod!!)
+                        }
+                    },
+                    enabled = hasRange && selectedPeriod != null,
+                ) {
+                    Text(
+                        stringResource(R.string.apply),
+                        style = MaterialTheme.typography.labelMediumEmphasized
+                    )
+                }
+            }
 
-			AnimatedVisibility(
-				visible = pickerVisible,
-				enter = fadeIn(animationSpec = tween(300, delayMillis = 50)) +
-					scaleIn(initialScale = 0.95f, animationSpec = tween(300, delayMillis = 50)),
-			) {
-				DateRangePicker(
-					state = dateRangePickerState,
-					colors = DatePickerDefaults.colors(
-						titleContentColor = MaterialTheme.colorScheme.onSurface,
-						headlineContentColor = MaterialTheme.colorScheme.onSurface,
-						containerColor = MaterialTheme.colorScheme.surface,
-					),
-					modifier = Modifier
-						.fillMaxWidth()
-						.weight(1f),
-					title = null,
-					headline = null,
-					showModeToggle = false,
-				)
-			}
+            AnimatedVisibility(
+                visible = pickerVisible,
+                enter = fadeIn(animationSpec = tween(300, delayMillis = 50)) +
+                        scaleIn(initialScale = 0.95f, animationSpec = tween(300, delayMillis = 50)),
+            ) {
+                DateRangePicker(
+                    state = dateRangePickerState,
+                    colors = DatePickerDefaults.colors(
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        headlineContentColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    title = null,
+                    headline = null,
+                    showModeToggle = false,
+                )
+            }
 
-			if (hasRange && available.isNotEmpty()) {
-				HorizontalDivider()
-				Column(
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(horizontal = 16.dp, vertical = 12.dp),
-				) {
-					Text(
-						text = stringResource(R.string.onboarding_finish_date_selector_budget_view_question),
-						style = MaterialTheme.typography.titleSmall,
-						modifier = Modifier.padding(bottom = 10.dp),
-					)
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.spacedBy(8.dp),
-					) {
-						available.forEach { period ->
-							val preview = if (totalBudget > BigDecimal.ZERO) {
-								// Onboarding is pre-period, so the only meaningful view
-								// is the static split. Dynamic degenerates to the same
-								// number once the period starts, so we hard-code STATIC
-								// here to avoid showing misleading previews.
-								splitBudget(
-									totalBudget = totalBudget,
-									totalSpent = BigDecimal.ZERO,
-									totalDays = totalDays,
-									daysRemaining = totalDays,
-									period = period,
-									mode = BudgetSplitMode.STATIC,
-								)
-							} else null
-
-							PeriodOptionChip(
-								period = period,
-								budgetPreview = preview,
-								currencyCode = currencyCode,
-								isSelected = selectedPeriod == period,
-								onClick = { selectedPeriod = period },
-								modifier = Modifier.weight(1f),
-							)
-						}
-					}
-				}
-			}
-		}
-	}
+            if (hasRange && available.isNotEmpty()) {
+                HorizontalDivider()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.onboarding_finish_date_selector_budget_view_question),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(bottom = 10.dp),
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        available.forEach { period ->
+                            val preview = if (totalBudget > BigDecimal.ZERO) {
+                                // Onboarding is pre-period, so the only meaningful view
+                                // is the static split. Dynamic degenerates to the same
+                                // number once the period starts, so we hard-code STATIC
+                                // here to avoid showing misleading previews.
+                                splitBudget(
+                                    totalBudget = totalBudget,
+                                    totalSpent = BigDecimal.ZERO,
+                                    totalDays = totalDays,
+                                    daysRemaining = totalDays,
+                                    period = period,
+                                    mode = BudgetSplitMode.STATIC,
+                                )
+                            } else null
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Preview(
-	showBackground = true,
-	device = Devices.NEXUS_5X,
-	widthDp = 412,
-	heightDp = 860,
+    showBackground = true,
+    device = Devices.NEXUS_5X,
+    widthDp = 412,
+    heightDp = 860,
 )
 @Composable
 private fun FinishDateSelectorPreview() {
-	MinusTheme {
-		Surface(
-			modifier = Modifier.fillMaxSize(),
-			color = MaterialTheme.colorScheme.background,
-		) {
-			FinishDateSelector(
-				totalBudget = BigDecimal("5000"),
-				currencyCode = "USD",
-				onBackPressed = {},
-				onApply = { start, end, period ->
-					println("Apply: start=$start, end=$end, period=$period")
-				},
-			)
-		}
-	}
+    MinusTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background,
+        ) {
+            FinishDateSelector(
+                totalBudget = BigDecimal("5000"),
+                currencyCode = "USD",
+                onBackPressed = {},
+                onApply = { start, end, period ->
+                    println("Apply: start=$start, end=$end, period=$period")
+                },
+            )
+        }
+    }
 }

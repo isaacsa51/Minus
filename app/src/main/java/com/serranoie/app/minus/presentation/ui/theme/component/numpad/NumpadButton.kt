@@ -53,145 +53,146 @@ enum class NumpadButtonType { DEFAULT, PRIMARY, SECONDARY, TERTIARY, DELETE, OPE
 
 @Composable
 fun NumpadButton(
-	modifier: Modifier = Modifier,
-	type: NumpadButtonType = NumpadButtonType.DEFAULT,
-	text: String? = null,
-	icon: ImageVector? = null,
-	onClick: () -> Unit = {},
-	onLongClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    type: NumpadButtonType = NumpadButtonType.DEFAULT,
+    text: String? = null,
+    icon: ImageVector? = null,
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
 ) {
-	val interactionSource = remember { MutableInteractionSource() }
-	val isPressed by interactionSource.collectIsPressedAsState()
-	val baseTextStyle = MaterialTheme.typography.displaySmallCondensed.copy(fontWeight = FontWeight.W600)
-	val emphasizedTextStyle = MaterialTheme.typography.displayMediumEmphasized
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val baseTextStyle =
+        MaterialTheme.typography.displaySmallCondensed.copy(fontWeight = FontWeight.W600)
+    val emphasizedTextStyle = MaterialTheme.typography.displayMediumEmphasized
 
-	val radius by animateDpAsState(
-		targetValue = if (isPressed) 18.dp else 100.dp, animationSpec = if (isPressed) {
-			tween(durationMillis = 60, easing = LinearOutSlowInEasing)
-		} else {
-			tween(durationMillis = 620, easing = LinearEasing)
-		}, label = "ButtonRadius"
-	)
-	val pressProgress by animateFloatAsState(
-		targetValue = if (isPressed) 1f else 0f, animationSpec = if (isPressed) {
-			tween(durationMillis = 60, easing = LinearOutSlowInEasing)
-		} else {
-			tween(durationMillis = 400, easing = LinearOutSlowInEasing)
-		}, label = "ButtonPressProgress"
-	)
+    val radius by animateDpAsState(
+        targetValue = if (isPressed) 18.dp else 100.dp, animationSpec = if (isPressed) {
+            tween(durationMillis = 60, easing = LinearOutSlowInEasing)
+        } else {
+            tween(durationMillis = 620, easing = LinearEasing)
+        }, label = "ButtonRadius"
+    )
+    val pressProgress by animateFloatAsState(
+        targetValue = if (isPressed) 1f else 0f, animationSpec = if (isPressed) {
+            tween(durationMillis = 60, easing = LinearOutSlowInEasing)
+        } else {
+            tween(durationMillis = 400, easing = LinearOutSlowInEasing)
+        }, label = "ButtonPressProgress"
+    )
 
-	val color = when (type) {
-		NumpadButtonType.DEFAULT -> colorButton
-		NumpadButtonType.PRIMARY -> MaterialTheme.colorScheme.primaryContainer
-		NumpadButtonType.SECONDARY -> MaterialTheme.colorScheme.secondaryContainer
-		NumpadButtonType.TERTIARY -> MaterialTheme.colorScheme.tertiaryContainer
-		NumpadButtonType.DELETE -> MaterialTheme.colorScheme.errorContainer
-		NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondaryContainer
-	}
+    val color = when (type) {
+        NumpadButtonType.DEFAULT -> colorButton
+        NumpadButtonType.PRIMARY -> MaterialTheme.colorScheme.primaryContainer
+        NumpadButtonType.SECONDARY -> MaterialTheme.colorScheme.secondaryContainer
+        NumpadButtonType.TERTIARY -> MaterialTheme.colorScheme.tertiaryContainer
+        NumpadButtonType.DELETE -> MaterialTheme.colorScheme.errorContainer
+        NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondaryContainer
+    }
 
-	val contentColor = when (type) {
-		NumpadButtonType.DEFAULT -> colorOnButton
-		NumpadButtonType.PRIMARY -> MaterialTheme.colorScheme.onPrimaryContainer
-		NumpadButtonType.SECONDARY -> MaterialTheme.colorScheme.onSecondaryContainer
-		NumpadButtonType.TERTIARY -> MaterialTheme.colorScheme.onTertiaryContainer
-		NumpadButtonType.DELETE -> MaterialTheme.colorScheme.onErrorContainer
-		NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondary
-	}
+    val contentColor = when (type) {
+        NumpadButtonType.DEFAULT -> colorOnButton
+        NumpadButtonType.PRIMARY -> MaterialTheme.colorScheme.onPrimaryContainer
+        NumpadButtonType.SECONDARY -> MaterialTheme.colorScheme.onSecondaryContainer
+        NumpadButtonType.TERTIARY -> MaterialTheme.colorScheme.onTertiaryContainer
+        NumpadButtonType.DELETE -> MaterialTheme.colorScheme.onErrorContainer
+        NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondary
+    }
 
-	Surface(
-		tonalElevation = 10.dp, modifier = modifier
-			.fillMaxSize()
-			.clip(RoundedCornerShape(radius))
-	) {
-		Box(
-			modifier = Modifier
-				.background(color = color)
-				.fillMaxSize()
-				.combinedClickable(
-					interactionSource = interactionSource,
-					indication = ripple(),
-					onClick = onClick,
-					onLongClick = onLongClick,
-				), contentAlignment = Alignment.Center
-		) {
-			if (text != null) {
-				Text(
-					text = text,
-					color = contentColor,
-					style = baseTextStyle.interpolateToEmphasized(
-						emphasizedStyle = emphasizedTextStyle, progress = pressProgress
-					),
-					maxLines = 1,
-				)
-			}
-			if (icon != null) {
-				Icon(
-					imageVector = icon,
-					tint = contentColor,
-					modifier = Modifier.size(32.dp),
-					contentDescription = "Editor action",
-				)
-			}
-		}
-	}
+    Surface(
+        tonalElevation = 10.dp, modifier = modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(radius))
+    ) {
+        Box(
+            modifier = Modifier
+                .background(color = color)
+                .fillMaxSize()
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(),
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                ), contentAlignment = Alignment.Center
+        ) {
+            if (text != null) {
+                Text(
+                    text = text,
+                    color = contentColor,
+                    style = baseTextStyle.interpolateToEmphasized(
+                        emphasizedStyle = emphasizedTextStyle, progress = pressProgress
+                    ),
+                    maxLines = 1,
+                )
+            }
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    tint = contentColor,
+                    modifier = Modifier.size(32.dp),
+                    contentDescription = "Editor action",
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalTextApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TextStyle.interpolateToEmphasized(
-	emphasizedStyle: TextStyle, progress: Float
+    emphasizedStyle: TextStyle, progress: Float
 ): TextStyle {
-	val clampedProgress = progress.coerceIn(0f, 1f)
-	val animatedWeight = lerp(400f, 600f, clampedProgress)
-	val animatedWidth = lerp(100f, 125f, clampedProgress)
-	val animatedFontSize = lerp(fontSize.value, emphasizedStyle.fontSize.value, clampedProgress).sp
-	val animatedLineHeight =
-		lerp(lineHeight.value, emphasizedStyle.lineHeight.value, clampedProgress).sp
-	val animatedLetterSpacing = lerp(
-		letterSpacing.value, emphasizedStyle.letterSpacing.value, clampedProgress
-	).sp
+    val clampedProgress = progress.coerceIn(0f, 1f)
+    val animatedWeight = lerp(400f, 600f, clampedProgress)
+    val animatedWidth = lerp(100f, 125f, clampedProgress)
+    val animatedFontSize = lerp(fontSize.value, emphasizedStyle.fontSize.value, clampedProgress).sp
+    val animatedLineHeight =
+        lerp(lineHeight.value, emphasizedStyle.lineHeight.value, clampedProgress).sp
+    val animatedLetterSpacing = lerp(
+        letterSpacing.value, emphasizedStyle.letterSpacing.value, clampedProgress
+    ).sp
 
-	val animatedFontFamily = remember(animatedWeight, animatedWidth) {
-		FontFamily(
-			Font(
-				R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-					FontVariation.weight(animatedWeight.toInt()), FontVariation.width(animatedWidth)
-				)
-			)
-		)
-	}
+    val animatedFontFamily = remember(animatedWeight, animatedWidth) {
+        FontFamily(
+            Font(
+                R.font.google_sans_flex, variationSettings = FontVariation.Settings(
+                    FontVariation.weight(animatedWeight.toInt()), FontVariation.width(animatedWidth)
+                )
+            )
+        )
+    }
 
-	return copy(
-		fontFamily = animatedFontFamily,
-		fontSize = animatedFontSize,
-		lineHeight = animatedLineHeight,
-		letterSpacing = animatedLetterSpacing
-	)
+    return copy(
+        fontFamily = animatedFontFamily,
+        fontSize = animatedFontSize,
+        lineHeight = animatedLineHeight,
+        letterSpacing = animatedLetterSpacing
+    )
 }
 
 private fun lerp(start: Float, stop: Float, fraction: Float): Float {
-	return start + (stop - start) * fraction
+    return start + (stop - start) * fraction
 }
 
 @Preview(device = "spec:width=500px,height=550px,dpi=440")
 @Composable
 private fun NumpadButtonPreviews() {
-	MinusTheme {
-		Column {
-			Row {
-				NumpadButton(type = NumpadButtonType.DEFAULT, text = "1")
-				NumpadButton(type = NumpadButtonType.SECONDARY, text = "2")
-				NumpadButton(type = NumpadButtonType.TERTIARY, text = "3")
-			}
-			Spacer(Modifier.height(8.dp))
+    MinusTheme {
+        Column {
+            Row {
+                NumpadButton(type = NumpadButtonType.DEFAULT, text = "1")
+                NumpadButton(type = NumpadButtonType.SECONDARY, text = "2")
+                NumpadButton(type = NumpadButtonType.TERTIARY, text = "3")
+            }
+            Spacer(Modifier.height(8.dp))
 
-			Row {
-				NumpadButton(type = NumpadButtonType.DEFAULT, icon = Icons.Default.Check)
-				NumpadButton(
-					type = NumpadButtonType.SECONDARY, icon = Icons.AutoMirrored.Filled.ArrowBack
-				)
-				NumpadButton(type = NumpadButtonType.TERTIARY, icon = Icons.Default.Close)
-			}
-		}
-	}
+            Row {
+                NumpadButton(type = NumpadButtonType.DEFAULT, icon = Icons.Default.Check)
+                NumpadButton(
+                    type = NumpadButtonType.SECONDARY, icon = Icons.AutoMirrored.Filled.ArrowBack
+                )
+                NumpadButton(type = NumpadButtonType.TERTIARY, icon = Icons.Default.Close)
+            }
+        }
+    }
 }

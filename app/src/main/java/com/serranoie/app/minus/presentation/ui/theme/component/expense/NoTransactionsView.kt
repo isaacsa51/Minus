@@ -22,38 +22,38 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 
 @Composable
 fun NoTransactionsView(modifier: Modifier = Modifier) {
-	Column(
-		modifier = modifier,
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.Center
-	) {
-		Icon(
-			imageVector = Icons.Rounded.MoneyOffCsred,
-			contentDescription = null,
-			modifier = Modifier.size(64.dp),
-			tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-		)
-		Spacer(modifier = Modifier.height(16.dp))
-		Text(
-			text = stringResource(R.string.no_transactions_title),
-			style = MaterialTheme.typography.titleMediumEmphasized,
-			color = MaterialTheme.colorScheme.onSurfaceVariant
-		)
-		Spacer(modifier = Modifier.height(8.dp))
-		Text(
-			text = stringResource(R.string.no_transactions_subtitle),
-			style = MaterialTheme.typography.bodyMedium,
-			color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-		)
-	}
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.MoneyOffCsred,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.no_transactions_title),
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.no_transactions_subtitle),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun NoTransactionsViewPreview() {
-	MinusTheme {
-		NoTransactionsView(
-			modifier = Modifier.fillMaxSize()
-		)
-	}
+    MinusTheme {
+        NoTransactionsView(
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }

@@ -100,13 +100,19 @@ platform :android do
     version_tag = options[:version_tag] || ENV["VERSION_TAG"]
     UI.user_error!("Pasá version_tag como argumento (ej: version_tag:v1.3.4) o seteá VERSION_TAG") if version_tag.nil?
 
+    # Update version.properties
+    version_name = version_tag.gsub(/^v/, "")
+    version_code = version_code_from(version_tag)
+    File.write("../version.properties", "VERSION_NAME=#{version_name}\nVERSION_CODE=#{version_code}\n")
+    UI.success("Actualizado version.properties (Name: #{version_name}, Code: #{version_code})")
+
     generate_changelog(version_tag: version_tag)
     txt_path = changelog_path_for(version_tag)
 
     UI.important(
       "Próximos pasos manuales (CRUCIAL: commit ANTES del tag):\n" \
       "  1. Editá #{txt_path} si querés curar entradas para el usuario.\n" \
-      "  2. git add fastlane/metadata\n" \
+      "  2. git add version.properties fastlane/metadata\n" \
       "  3. git commit -m \"docs(changelog): preparar #{version_tag}\"\n" \
       "  4. git tag -a #{version_tag} -m \"Release #{version_tag.gsub(/^v/, '')}\"\n" \
       "  5. git push origin #{version_tag}   # dispara el workflow Release Minus\n" \
@@ -155,11 +161,62 @@ platform :android do
     ].select { |path| File.exist?(path) }
     UI.user_error!("No se encontraron APKs generados por Gradle") if apk_paths.empty?
 
-    sh(
-      "gh", "release", "create", version_tag, *apk_paths,
-      "--repo", ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
-      "--title", "Minus #{version_tag}",
-      "--generate-notes"
-    )
+    # Check if release already exists to allow CI re-runs
+    begin
+      sh(
+        "gh", "release", "create", version_tag, *apk_paths,
+        "--repo", ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
+        "--title", "Minus #{version_tag}",
+        "--generate-notes"
+      )
+    rescue => e
+      if e.to_s.include?("already exists")
+        UI.important("Release #{version_tag} already exists on GitHub. Skipping creation.")
+      else
+        raise e
+      end
+    end
+  end
+
+  desc "Builds and uploads the AAB to Google Play"
+  lane :deploy_play_store do |options|
+    track = options[:track] || "internal"
+
+    # Ensure changelogs exist
+    version_tag = ENV["VERSION_TAG"] || `git describe --tags --abbrev=0`.to_s.strip
+    expected_txt = changelog_path_for(version_tag)
+    unless File.exist?(expected_txt)
+      UI.user_error!("Missing #{expected_txt}. Run prep_release or generate_changelog first.")
+    end
+
+    # Build the App Bundle
+    gradle(task: ":app:bundleWearRelease")
+
+    # Upload to Play Store with idempotency check
+    begin
+      upload_to_play_store(
+        track: track,
+        aab: "app/build/outputs/bundle/wearRelease/app-wear-release.aab",
+        skip_upload_apk: true,
+        skip_upload_screenshots: true,
+        skip_upload_images: true,
+        metadata_path: "fastlane/metadata/android"
+      )
+    rescue => e
+      if e.to_s.include?("already been used")
+        UI.important("Version code already exists on Play Store. Skipping AAB upload and updating metadata only.")
+        upload_to_play_store(
+          track: track,
+          version_code: version_code_from(version_tag),
+          skip_upload_aab: true,
+          skip_upload_apk: true,
+          skip_upload_screenshots: true,
+          skip_upload_images: true,
+          metadata_path: "fastlane/metadata/android"
+        )
+      else
+        raise e
+      end
+    end
   end
 end

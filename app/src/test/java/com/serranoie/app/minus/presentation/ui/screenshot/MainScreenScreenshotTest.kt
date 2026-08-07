@@ -11,15 +11,16 @@ import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
+import com.serranoie.app.minus.presentation.ui.home.MainScreenActions
 import com.serranoie.app.minus.presentation.ui.home.MainScreenContent
 import com.serranoie.app.minus.presentation.ui.home.MainScreenUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.tutorial.FirstLaunchTutorialStage
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
@@ -76,24 +77,24 @@ private fun MainScreenPreviewContent(
     ) {
         MinusTheme {
             MainScreenContent(
-                mainScreenState = MainScreenUiState(),
+                mainScreenState =
+                    MainScreenUiState(
+                        onboardingCompleted = true,
+                        tutorialStage = FirstLaunchTutorialStage.COMPLETED,
+                        showCreditQuickToggleFeature = true,
+                        directCategoryPopupEnabled = false,
+                        categoryGridModeEnabled = false,
+                        showBudgetPeriodSheet = false,
+                        forceBudgetPeriodSheetSetup = false,
+                        selectedViewPeriod = BudgetPeriod.DAILY,
+                    ),
                 budgetUiState = budgetUiState,
-                onboardingCompleted = true,
-                tutorialStage = FirstLaunchTutorialStage.COMPLETED,
-                showCreditQuickToggleFeature = true,
-                directCategoryPopupEnabled = false,
-                categoryGridModeEnabled = false,
-                onProcessIntent = {},
-                onNavigateToAnalytics = {},
-                onNavigateToSettings = {},
-                onNavigateToWallet = {},
+                actions =
+                    MainScreenActions(
+                        onProcessIntent = {},
+                        onAdvanceTutorial = {},
+                    ),
                 openWalletOnStart = false,
-                showBudgetPeriodSheet = false,
-                forceBudgetPeriodSheetSetup = false,
-                selectedViewPeriod = BudgetPeriod.DAILY,
-                onPeriodSelected = {},
-                settingsDataStore = null,
-                undoSnackbarActionLabel = "Undo",
             )
         }
     }

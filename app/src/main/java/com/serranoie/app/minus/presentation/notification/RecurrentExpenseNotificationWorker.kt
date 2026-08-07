@@ -1,15 +1,13 @@
 package com.serranoie.app.minus.presentation.notification
 
 import android.content.Context
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.settingsDataStore
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -46,6 +44,7 @@ class RecurrentExpenseNotificationWorker(
     @InstallIn(SingletonComponent::class)
     interface RecurrentExpenseWorkerEntryPoint {
         fun budgetRepository(): BudgetRepository
+        fun settingsRepository(): SettingsRepository
         fun notificationHelper(): NotificationHelper
         fun notificationScheduler(): NotificationScheduler
     }
@@ -58,6 +57,7 @@ class RecurrentExpenseNotificationWorker(
             RecurrentExpenseWorkerEntryPoint::class.java
         )
         val budgetRepository = entryPoint.budgetRepository()
+        val settingsRepository = entryPoint.settingsRepository()
         val notificationHelper = entryPoint.notificationHelper()
         val notificationScheduler = entryPoint.notificationScheduler()
 
@@ -83,6 +83,7 @@ class RecurrentExpenseNotificationWorker(
                     settings = settings,
                     today = today,
                     notificationHelper = notificationHelper,
+                    settingsRepository = settingsRepository,
                 )
                 notificationScheduler.scheduleRecurrentExpenseNotification(transaction)
                 return Result.success()
@@ -145,6 +146,7 @@ class RecurrentExpenseNotificationWorker(
         settings: BudgetSettings,
         today: LocalDate,
         notificationHelper: NotificationHelper,
+        settingsRepository: SettingsRepository,
     ) {
         val frequency = transaction.recurrentFrequency ?: return
         if (!isDueToday(transaction, today, frequency)) {
@@ -153,8 +155,8 @@ class RecurrentExpenseNotificationWorker(
         }
 
         val dedupeKey = recurrentNotificationDedupeKey(transaction, today)
-        val preferences = applicationContext.settingsDataStore.data.first()
-        if (preferences[dedupeKey] == today.toString()) {
+        val lastNotified = settingsRepository.getString(dedupeKey)
+        if (lastNotified == today.toString()) {
             logcat { "Skipping duplicate recurrent notification: transactionId=${transaction.id} date=$today" }
             return
         }
@@ -164,14 +166,12 @@ class RecurrentExpenseNotificationWorker(
             comment = transaction.comment,
             currency = settings.currencyCode
         )
-        applicationContext.settingsDataStore.edit { prefs ->
-            prefs[dedupeKey] = today.toString()
-        }
+        settingsRepository.setString(dedupeKey, today.toString())
         logcat { "Recurrent expense notification shown for transactionId=${transaction.id} date=$today" }
     }
 
     private fun recurrentNotificationDedupeKey(transaction: Transaction, date: LocalDate) =
-        stringPreferencesKey("$LAST_RECURRENT_NOTIFICATION_PREFIX${transaction.id}_${date}")
+        "$LAST_RECURRENT_NOTIFICATION_PREFIX${transaction.id}_${date}"
 
     private fun isDueToday(transaction: Transaction, today: LocalDate, frequency: RecurrentFrequency): Boolean {
         val startDate = transaction.date?.toLocalDate() ?: return false

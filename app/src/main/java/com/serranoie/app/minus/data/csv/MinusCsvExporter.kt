@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.data.csv
 
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.Transaction
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
@@ -15,6 +16,7 @@ class MinusCsvExporter {
 
     fun export(
         transactions: List<Transaction>,
+        archivedBudgets: List<ArchivedBudget>,
         metadata: CsvBackupMetadata?,
         outputStream: OutputStream,
     ) {
@@ -27,7 +29,9 @@ class MinusCsvExporter {
                 metadata?.let { meta ->
                     val s = meta.budgetSettings
                     printer.printRecord(
-                        "__META__",
+                        MinusCsvContract.MARKER_META,
+                        "",
+                        "",
                         "",
                         "",
                         "",
@@ -49,6 +53,37 @@ class MinusCsvExporter {
                         meta.currentPeriodStartedAtMillis.toString(),
                         meta.currentPeriodId.toString(),
                         s.creditCardCutoffDay?.toString().orEmpty(),
+                        s.splitMode.name,
+                    )
+                }
+
+                archivedBudgets.forEach { archive ->
+                    printer.printRecord(
+                        MinusCsvContract.MARKER_ARCHIVED,
+                        archive.spentAmount.toPlainString(),
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        archive.periodId.toString(),
+                        archive.createdAt.toString(),
+                        archive.totalBudget.toPlainString(),
+                        archive.periodType.name,
+                        archive.startDate.format(dateFormatter),
+                        archive.endDate.format(dateFormatter),
+                        archive.currencyCode,
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
                     )
                 }
 
@@ -69,7 +104,8 @@ class MinusCsvExporter {
                         tx.id.toString(),
                         if (tx.isCredit) "1" else "0",
                         if (tx.isCreditPaid) "1" else "0",
-                        "",
+                        tx.periodId.toString(),
+                        tx.createdAt.toString(),
                         "",
                         "",
                         "",

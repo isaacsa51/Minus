@@ -56,18 +56,14 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.datastore.preferences.core.edit
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY
-import com.serranoie.app.minus.presentation.ANALYTICS_TUTORIAL_COMPLETED_KEY
+import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.presentation.LocalWindowInsets
-import com.serranoie.app.minus.presentation.settingsDataStore
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalytics
 import com.serranoie.app.minus.presentation.ui.analytics.dialogs.CategoryAnalyticsState
 import com.serranoie.app.minus.presentation.ui.analytics.util.previewAnalyticsState
@@ -79,7 +75,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHea
 import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeader
 import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetGraph
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditOwedCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.MinMaxSpentCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
@@ -95,7 +91,6 @@ import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.math.BigDecimal
@@ -106,10 +101,12 @@ import kotlin.time.Duration.Companion.milliseconds
 
 private val STABLE_DEFAULT_DATE = Date(0)
 
+
 @Immutable
 data class AnalyticsState(
     val periodFinished: Boolean = false,
     val transactions: List<Transaction> = emptyList(),
+    val allTransactions: List<Transaction> = emptyList(),
     val spends: List<Transaction> = emptyList(),
     val recurringInPeriod: List<Transaction> = emptyList(),
     val oneTimeSpends: List<Transaction> = emptyList(),
@@ -128,6 +125,9 @@ data class AnalyticsState(
     val debtAdjustedBalance: BigDecimal = BigDecimal.ZERO,
     val creditTransactions: List<Transaction> = emptyList(),
     val isHistoricalView: Boolean = false,
+    val userSettings: UserSettings = UserSettings.DEFAULT,
+    val previousPeriodTransactions: List<Transaction> = emptyList(),
+    val graphGranularity: GraphGranularity = GraphGranularity.DAYS,
 )
 
 data class AnalyticsActions(
@@ -138,6 +138,8 @@ data class AnalyticsActions(
     val onPayTransactionClick: (Long) -> Unit = {},
     val onCutoffDayChanged: (Int) -> Unit = {},
     val onHistoricalPeriodSelected: (Long) -> Unit = {},
+    val onTutorialCompleted: (Boolean) -> Unit = {},
+    val onGranularityChanged: (GraphGranularity) -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -161,25 +163,37 @@ fun Analytics(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val hasSpends = state.spends.isNotEmpty()
-    val tutorialCompletedKey =
-        if (hasSpends) ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY else ANALYTICS_TUTORIAL_COMPLETED_KEY
-
-    val tutorialCompletedFlow = remember(context, tutorialCompletedKey) {
-        context.settingsDataStore.data.map {
-            it[tutorialCompletedKey] ?: false
-        }
+    val tutorialCompleted = if (hasSpends) {
+        state.userSettings.analyticsSpendsTutorialCompleted
+    } else {
+        state.userSettings.analyticsTutorialCompleted
     }
-    val tutorialCompleted by tutorialCompletedFlow.collectAsStateWithLifecycle(initialValue = true)
 
     val effectiveTutorialCompleted = showTutorialOverride?.let { !it } ?: tutorialCompleted
 
-    val tutorialOrder = remember(hasSpends) {
-        if (hasSpends) listOf(3, 0, 2) else listOf(1, 2, 5)
+    val tutorialOrder = remember(hasSpends, state.creditOwed, state.periodFinished) {
+        buildList {
+            if (hasSpends) {
+                add(3) // Heatmap
+                add(0) // MinMax
+                add(2) // Budget
+                add(4) // Charts
+            } else {
+                if (!state.periodFinished) {
+                    add(1) // Header
+                }
+                add(2) // Budget
+                add(5) // Savings
+            }
+            if (state.creditOwed > BigDecimal.ZERO) {
+                add(6) // Credit Card
+            }
+        }
     }
 
     val tutorialBoxState = rememberTutorialBoxState(
         order = tutorialOrder,
-        virtual = setOf(6),
+        virtual = emptySet(),
     )
 
     var scrollableContainerCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
@@ -208,6 +222,7 @@ fun Analytics(
             3 to BringIntoViewRequester(),
             4 to BringIntoViewRequester(),
             5 to BringIntoViewRequester(),
+            6 to BringIntoViewRequester(),
         )
     }
 
@@ -242,11 +257,7 @@ fun Analytics(
         showTutorial = !effectiveTutorialCompleted && !state.isLoading,
         state = tutorialBoxState,
         onTutorialCompleted = {
-            scope.launch {
-                context.settingsDataStore.edit { prefs ->
-                    prefs[tutorialCompletedKey] = true
-                }
-            }
+            actions.onTutorialCompleted(hasSpends)
         },
         tutorialTarget = { index ->
             when (index) {
@@ -280,8 +291,9 @@ fun Analytics(
                     description = stringResource(R.string.analytics_tutorial_savings_desc)
                 )
 
-                else -> TutorialTooltip(
-                    title = "Tutorial Step $index", description = "Description for step $index"
+                6 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_credit_title),
+                    description = stringResource(R.string.analytics_tutorial_credit_desc)
                 )
             }
         }) {
@@ -333,17 +345,9 @@ fun Analytics(
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
-                        BudgetDisplay(
-                            budget = state.wholeBudget,
-                            budgetState = state.budgetStateForDisplay,
-                            budgetSettings = state.budgetSettingsForDisplay,
-                            currencyCode = state.currencyCode,
-                            startDate = state.startPeriodDate,
-                            finishDate = state.finishPeriodDate,
-                            actualFinishDate = state.finishPeriodActualDate,
-                            extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
-                            showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
-                            creditOwed = state.creditOwed,
+                        BudgetGraph(
+                            state = state,
+                            onGranularityChanged = actions.onGranularityChanged,
                             modifier = Modifier.padding(horizontal = 16.dp)
                                 .bringIntoViewRequester(bringIntoViewRequesters[2]!!)
                                 .markIfInOrder(2),
@@ -483,6 +487,7 @@ fun Analytics(
         ) {
             com.serranoie.app.minus.presentation.ui.analytics.dialogs.PastPeriodsBottomSheet(
                 periods = archivedBudgets,
+                allTransactions = state.allTransactions,
                 onPeriodClick = { archivedBudget ->
                     scope.launch {
                         sheetState.hide()
@@ -664,7 +669,8 @@ private fun AnalyticsCompactLayout(
                     modifier = Modifier
                         .fillMaxHeight()
                         .aspectRatio(1f)
-                        .markForTutorial(tutorialBoxState, 6),
+                        .bringIntoViewRequester(bringIntoViewRequesters[6]!!)
+                        .markIfInOrder(6, tutorialBoxState, tutorialOrder),
                 )
             }
         }
@@ -772,7 +778,8 @@ private fun AnalyticsTabletLayout(
                     modifier = Modifier
                         .fillMaxHeight()
                         .aspectRatio(1f)
-                        .markForTutorial(tutorialBoxState, 6),
+                        .bringIntoViewRequester(bringIntoViewRequesters[6]!!)
+                        .markIfInOrder(6, tutorialBoxState, tutorialOrder),
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -835,7 +842,7 @@ private fun AnalyticsState.toCategoryAnalyticsState(
 
 @Preview
 @Composable
-private fun PreviewAnalytics() {
+fun AnalyticsMainPreview() {
     MinusTheme {
         Surface {
             Analytics(
@@ -847,7 +854,7 @@ private fun PreviewAnalytics() {
 
 @PreviewScreenSizes
 @Composable
-private fun PreviewAnalyticsNotFinished() {
+fun PreviewAnalyticsNotFinished() {
     MinusTheme {
         Surface {
             Analytics(
@@ -859,7 +866,7 @@ private fun PreviewAnalyticsNotFinished() {
 
 @PreviewScreenSizes
 @Composable
-private fun PreviewAnalyticsFinished() {
+fun PreviewAnalyticsFinished() {
     MinusTheme {
         Surface {
             Analytics(

@@ -9,10 +9,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
@@ -31,9 +29,6 @@ import com.serranoie.app.minus.presentation.ui.settings.SettingsScreen
 import com.serranoie.app.minus.presentation.ui.settings.SettingsViewModel
 import com.serranoie.app.minus.presentation.ui.settings.appearance.AppearanceOptionsScreen
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportScreen
-import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
-import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
-import com.serranoie.app.minus.presentation.ui.wallet.Wallet
 import logcat.logcat
 
 private const val TAG = "ISAAC:AppNavGraph"
@@ -87,40 +82,6 @@ fun AppNavGraph(
             )
         }
 
-        composable(
-            route = Screen.Wallet.route,
-            arguments = listOf(
-                navArgument(Screen.Wallet.ARG_FORCE_CHANGE) {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-            ),
-        ) { backStackEntry ->
-            val forceChange =
-                backStackEntry.arguments?.getBoolean(Screen.Wallet.ARG_FORCE_CHANGE) ?: false
-
-            CompositionLocalProvider(
-                LocalBottomSheetScrollState provides BottomSheetScrollState(
-                    topPadding = 0.dp
-                )
-            ) {
-                Wallet(
-                    forceChange = forceChange,
-                    activityResultRegistryOwner = activityResultRegistryOwner,
-                    onClose = {
-                        logcat(tag) { "Wallet onClose → Main" }
-                        navController.navigate(Screen.Main.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    },
-                    onOnboardingComplete = {
-                        logcat(tag) { "Wallet onOnboardingComplete" }
-                        onOnboardingComplete()
-                    },
-                )
-            }
-        }
-
         composable(Screen.Analytics.route) {
             AnalyticsScreen(
                 activityResultRegistryOwner = activityResultRegistryOwner,
@@ -171,9 +132,6 @@ fun AppNavGraph(
                 },
                 onNavigateToSettings = {
                     navController.navigate(Screen.Settings.route)
-                },
-                onNavigateToWallet = {
-                    navController.navigate(Screen.Wallet.createRoute(false))
                 },
                 onRequestNotificationPermission = onRequestNotificationPermission,
             )

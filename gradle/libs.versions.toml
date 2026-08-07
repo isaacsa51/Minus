@@ -39,7 +39,6 @@ hilt = "1.2.0"
 navigationCompose = "2.7.7"
 lifecycleViewmodelCompose = "2.9.2"
 glance = "1.1.1"
-accompanist = "0.36.0"
 dagger = "2.58"
 commonsCsv = "1.14.0"
 coil = "2.7.0"
@@ -108,7 +107,6 @@ androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidge
 androidx-glance-appwidget-preview = { group = "androidx.glance", name = "glance-appwidget-preview", version.ref = "glance" }
 androidx-glance-preview = { group = "androidx.glance", name = "glance-preview", version.ref = "glance" }
 androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
-accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
 dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "dagger" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }

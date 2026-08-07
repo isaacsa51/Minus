@@ -1,13 +1,7 @@
 package com.serranoie.app.minus.data.csv
 
-import android.content.Context
-import androidx.datastore.preferences.core.edit
 import com.serranoie.app.minus.data.repository.BudgetRepository
-import com.serranoie.app.minus.presentation.CURRENT_PERIOD_ID_KEY
-import com.serranoie.app.minus.presentation.CURRENT_PERIOD_STARTED_AT_KEY
-import com.serranoie.app.minus.presentation.ONBOARDING_COMPLETED_KEY
-import com.serranoie.app.minus.presentation.settingsDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import kotlinx.coroutines.flow.first
 import java.io.InputStream
 import java.io.OutputStream
@@ -18,7 +12,7 @@ import javax.inject.Singleton
 @Singleton
 class MinusCsvService @Inject constructor(
     private val repository: BudgetRepository,
-    @param:ApplicationContext private val context: Context,
+    private val settingsRepository: SettingsRepository,
 ) {
 
     private val parser = MinusCsvParser()
@@ -42,16 +36,17 @@ class MinusCsvService @Inject constructor(
 
     suspend fun exportAllTransactions(outputStream: OutputStream) {
         val transactions = repository.getTransactions().first()
+        val archivedBudgets = repository.getArchivedBudgets().first()
         val settings = repository.getBudgetSettingsSync()
-        val prefs = context.settingsDataStore.data.first()
+        val userSettings = settingsRepository.getSettings()
         val metadata = settings?.let {
             CsvBackupMetadata(
                 budgetSettings = it,
-                currentPeriodStartedAtMillis = prefs[CURRENT_PERIOD_STARTED_AT_KEY] ?: 0L,
-                currentPeriodId = prefs[CURRENT_PERIOD_ID_KEY] ?: 0L,
+                currentPeriodStartedAtMillis = userSettings.currentPeriodStartedAt,
+                currentPeriodId = userSettings.currentPeriodId,
             )
         }
-        exporter.export(transactions, metadata, outputStream)
+        exporter.export(transactions, archivedBudgets, metadata, outputStream)
     }
 
     suspend fun importTransactions(inputStream: InputStream): CsvImportResult {
@@ -67,13 +62,17 @@ class MinusCsvService @Inject constructor(
 
         fresh.forEach { repository.addTransaction(it.copy(id = 0L)) }
 
+        if (payload.archivedBudgets.isNotEmpty()) {
+            repository.upsertArchivedBudgets(payload.archivedBudgets)
+        }
+
         payload.metadata?.let { metadata ->
             repository.saveBudgetSettings(metadata.budgetSettings)
-            context.settingsDataStore.edit { prefs ->
-                prefs[CURRENT_PERIOD_STARTED_AT_KEY] = metadata.currentPeriodStartedAtMillis
-                prefs[CURRENT_PERIOD_ID_KEY] = metadata.currentPeriodId
-                prefs[ONBOARDING_COMPLETED_KEY] = true
-            }
+            settingsRepository.setCurrentPeriod(
+                metadata.currentPeriodId,
+                metadata.currentPeriodStartedAtMillis
+            )
+            settingsRepository.setOnboardingCompleted(true)
         }
 
         return CsvImportResult(

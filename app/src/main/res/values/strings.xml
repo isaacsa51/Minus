@@ -15,6 +15,10 @@
     <string name="tutorial_analytics_description">Open Analytics to see how your spending breaks down over time, by category, and against your budget goals.</string>
     <string name="tutorial_privacy_title">Privacy mode</string>
     <string name="tutorial_privacy_description">Cover the top of the phone (where the front camera sits) with your hand for about a second to blur every amount on screen. Cover it again to turn it off.</string>
+    <string name="tutorial_calc_title">Ongoing budget</string>
+    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
+    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
 
     <string name="empty" translatable="false">—</string>
 
@@ -118,6 +122,7 @@
     <string name="expense_modified_format">%1$s has been modified</string>
     <string name="generic_expense">Expense</string>
     <string name="expense_item_unnamed_expense">Unnamed expense</string>
+    <string name="expense_item_unnamed_income" translatable="false">Unnamed income</string>
     <string name="expense_item_recurrent_subtitle_format">Recurrent expense — %1$s</string>
     <string name="hide_subscriptions_outside_period">Hide subscriptions outside of the period</string>
     <string name="show_subscriptions_outside_period">Show subscriptions outside of the period</string>
@@ -247,6 +252,8 @@
     <string name="changelog_release_date">Released %1$s</string>
     <string name="changelog_close">Close</string>
     <string name="changelog_previous_versions">Previous version</string>
+    <string name="changelog_updated_to">Updated to: %1$s</string>
+    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Select the period</string>
@@ -309,6 +316,8 @@
     <string name="settings_category_picker_direct_popup_description">Open the suggestions popup with all your saved categories as soon as you tap the category field. When off, suggestions only appear after you start typing.</string>
     <string name="settings_category_grid_mode_switch_label">Show as a list (Experimental)</string>
     <string name="settings_category_grid_mode_description">Tap the category tag to open a grid of your saved categories, instead of entering inline edit mode. Also turns off the numpad\'s calculation mode while this is on.</string>
+    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">Recurrent payments view mode</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Change the type of display to show your recurrent payments</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Recurrent payments view mode</string>
@@ -412,9 +421,11 @@
     <string name="collapse">Collapse</string>
 
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">Budget amount Exceeded</string>
+    <string name="budget_pill_over_budget">Budget amount exceeded</string>
     <string name="budget_pill_no_budget">No budget</string>
     <string name="budget_pill_no_budget_action">Set up your budget</string>
+    <string name="budget_pill_calc_added" translatable="false">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted" translatable="false">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Weekly</string>
     <string name="budget_pill_exhausted_biweekly_label">Biweekly</string>
@@ -557,6 +568,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>
     <string name="no_name">No name</string>
+    <string name="no_name_income" translatable="false">Unnamed income</string>
     <string name="description">Purchase Reason</string>
     <string name="date">Date</string>
     <string name="frequency">Frequency</string>
@@ -633,4 +645,19 @@
     <string name="analytics_tutorial_credit_desc">Tap the credit card to view all CC transactions, mark them as paid, or adjust your billing cutoff date to avoid interest.</string>
     <string name="analytics_tutorial_history_title">Transaction History</string>
     <string name="analytics_tutorial_history_desc">Tap here to see a list of all your expenses for this period.</string>
+    <string name="skip_tutorial">Skip</string>
+
+    <string name="budget_graph_header_spending">Spending</string>
+    <string name="budget_graph_legend_current">Current</string>
+    <string name="budget_graph_legend_previous">Previous</string>
+    <string name="budget_graph_nav_prev">Previous</string>
+    <string name="budget_graph_nav_next">Next</string>
+    <string name="graph_granularity_days">Days</string>
+    <string name="graph_granularity_week">Week</string>
+    <string name="graph_granularity_biweek">Biweek</string>
+    <string name="graph_granularity_month">Month</string>
+    <string name="graph_granularity_total">Total</string>
+    <string name="budget_graph_page_indicator">%1$d / %2$d</string>
+    <string name="unit_thousands">K</string>
+    <string name="unit_millions">M</string>
 </resources>

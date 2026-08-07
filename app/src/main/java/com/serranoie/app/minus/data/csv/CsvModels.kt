@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.data.csv
 
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
@@ -17,7 +18,8 @@ data class CsvTransactionRow(
     val endDate: LocalDate?,
     val subscriptionDay: Int?,
     val isCredit: Boolean,
-    val isCreditPaid: Boolean
+    val isCreditPaid: Boolean,
+    val periodId: Long
 )
 
 data class CsvBackupMetadata(
@@ -29,6 +31,7 @@ data class CsvBackupMetadata(
 data class CsvImportPayload(
     val rows: List<CsvTransactionRow>,
     val metadata: CsvBackupMetadata?,
+    val archivedBudgets: List<ArchivedBudget>,
     val errors: List<String>,
 )
 
@@ -44,6 +47,7 @@ fun CsvTransactionRow.toDomainTransaction(): Transaction {
         amount = amount,
         comment = comment,
         date = date,
+        periodId = periodId,
         isDeleted = false,
         isRecurrent = isRecurrent,
         recurrentFrequency = frequency,

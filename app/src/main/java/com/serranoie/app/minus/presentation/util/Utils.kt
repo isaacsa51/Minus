@@ -144,7 +144,6 @@ object Utils {
                 it.vibrate(effect)
             }
         } catch (e: Exception) {
-            // Fallback to basic haptic feedback if custom vibration fails
             this.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
             logcat("Utils") { e.asLog() }
         }

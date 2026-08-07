@@ -1,7 +1,9 @@
 package com.serranoie.app.minus.data.csv
 
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import org.apache.commons.csv.CSVFormat
@@ -21,6 +23,7 @@ class MinusCsvParser {
     fun parse(inputStream: InputStream): CsvImportPayload {
         val errors = mutableListOf<String>()
         val rows = mutableListOf<CsvTransactionRow>()
+        val archivedBudgets = mutableListOf<ArchivedBudget>()
         var metadata: CsvBackupMetadata? = null
 
         val format = CSVFormat.DEFAULT.builder()
@@ -36,10 +39,17 @@ class MinusCsvParser {
                 val raw = record.toMap()
 
                 val dateRaw = raw.valueOf(MinusCsvContract.COL_DATE)
-                if (dateRaw == "__META__") {
+                if (dateRaw == MinusCsvContract.MARKER_META) {
                     runCatching { parseMetadata(raw) }
                         .onSuccess { parsedMeta -> metadata = parsedMeta }
                         .onFailure { throwable -> errors.add("Line $lineNo metadata discarded: ${throwable.message}") }
+                    return@forEachIndexed
+                }
+
+                if (dateRaw == MinusCsvContract.MARKER_ARCHIVED) {
+                    runCatching { parseArchivedBudget(raw) }
+                        .onSuccess { archivedBudgets.add(it) }
+                        .onFailure { throwable -> errors.add("Line $lineNo archived budget discarded: ${throwable.message}") }
                     return@forEachIndexed
                 }
 
@@ -59,7 +69,12 @@ class MinusCsvParser {
             }
         }
 
-        return CsvImportPayload(rows = rows, metadata = metadata, errors = errors)
+        return CsvImportPayload(
+            rows = rows,
+            metadata = metadata,
+            archivedBudgets = archivedBudgets,
+            errors = errors
+        )
     }
 
     private fun parseRecord(raw: Map<String, String>): CsvTransactionRow {
@@ -89,6 +104,11 @@ class MinusCsvParser {
         val isCredit = raw.valueOf(MinusCsvContract.COL_IS_CREDIT).trim() == "1"
         val isCreditPaid = raw.valueOf(MinusCsvContract.COL_IS_CREDIT_PAID).trim() == "1"
 
+        val periodId = raw.valueOf(MinusCsvContract.COL_PERIOD_ID)
+            .toLongOrNull()
+            ?.coerceAtLeast(0L)
+            ?: 0L
+
         return CsvTransactionRow(
             id = id,
             date = date,
@@ -100,6 +120,30 @@ class MinusCsvParser {
             subscriptionDay = subDay,
             isCredit = isCredit,
             isCreditPaid = isCreditPaid,
+            periodId = periodId,
+        )
+    }
+
+    private fun parseArchivedBudget(raw: Map<String, String>): ArchivedBudget {
+        val spentAmount = raw.valueOf(MinusCsvContract.COL_AMOUNT).toBigDecimal()
+        val periodId = raw.valueOf(MinusCsvContract.COL_PERIOD_ID).toLong()
+        val createdAt = raw.valueOf(MinusCsvContract.COL_CREATED_AT)
+            .toLongOrNull() ?: System.currentTimeMillis()
+        val totalBudget = raw.valueOf(MinusCsvContract.COL_BUDGET_TOTAL).toBigDecimal()
+        val periodType = BudgetPeriod.valueOf(raw.valueOf(MinusCsvContract.COL_BUDGET_PERIOD))
+        val startDate = LocalDate.parse(raw.valueOf(MinusCsvContract.COL_BUDGET_START_DATE), dateFormatter)
+        val endDate = LocalDate.parse(raw.valueOf(MinusCsvContract.COL_BUDGET_END_DATE), dateFormatter)
+        val currencyCode = raw.valueOf(MinusCsvContract.COL_CURRENCY_CODE).ifBlank { "USD" }
+
+        return ArchivedBudget(
+            periodId = periodId,
+            totalBudget = totalBudget,
+            spentAmount = spentAmount,
+            startDate = startDate,
+            endDate = endDate,
+            currencyCode = currencyCode,
+            periodType = periodType,
+            createdAt = createdAt
         )
     }
 
@@ -133,6 +177,16 @@ class MinusCsvParser {
             ?.coerceAtLeast(0L)
             ?: 0L
 
+        val splitMode = raw.valueOf(MinusCsvContract.COL_SPLIT_MODE)
+            .takeIf { it.isNotBlank() }
+            ?.let {
+                try {
+                    BudgetSplitMode.valueOf(it)
+                } catch (_: Exception) {
+                    BudgetSplitMode.STATIC
+                }
+            } ?: BudgetSplitMode.STATIC
+
         return CsvBackupMetadata(
             budgetSettings = BudgetSettings(
                 totalBudget = totalBudget,
@@ -147,6 +201,7 @@ class MinusCsvParser {
                 creditCardCutoffDay = raw.valueOf(MinusCsvContract.COL_CREDIT_CARD_CUTOFF_DAY)
                     .toIntOrNull()
                     ?.takeIf { it in 1..31 },
+                splitMode = splitMode,
             ),
             currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             currentPeriodId = currentPeriodId,
