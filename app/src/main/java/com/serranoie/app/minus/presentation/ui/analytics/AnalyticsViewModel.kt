@@ -43,6 +43,7 @@ data class AnalyticsUiState(
     val userSettings: UserSettings = UserSettings.DEFAULT,
     val rolloverAmount: BigDecimal = BigDecimal.ZERO,
     val rolloverCarryForward: Boolean = false,
+    val graphGranularity: GraphGranularity = GraphGranularity.DAYS,
 )
 
 sealed interface AnalyticsUiEffect {
@@ -62,6 +63,8 @@ class AnalyticsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(AnalyticsUiState())
     val uiState: StateFlow<AnalyticsUiState> = _uiState.asStateFlow()
+
+    private val _granularity = MutableStateFlow(GraphGranularity.DAYS)
 
     private val _effects = MutableStateFlow<AnalyticsUiEffect?>(null)
     val effects: StateFlow<AnalyticsUiEffect?> = _effects.asStateFlow()
@@ -83,6 +86,7 @@ class AnalyticsViewModel @Inject constructor(
                 observeCurrentPeriodBoundaryUseCase().distinctUntilChanged(),
                 settingsRepository.observeSettings().distinctUntilChanged(),
                 settingsRepository.observeCurrentPeriodRollover().distinctUntilChanged(),
+                _granularity,
             ) { args: Array<Any?> ->
                 val settings = args[0] as BudgetSettings?
                 val transactions = args[1] as List<Transaction>
@@ -90,6 +94,7 @@ class AnalyticsViewModel @Inject constructor(
                 val periodBoundary = args[3] as Pair<Long, Long>
                 val userSettings = args[4] as UserSettings
                 val rollover = args[5] as Pair<BigDecimal, Boolean>
+                val granularity = args[6] as GraphGranularity
 
                 val currentPeriodId = periodBoundary.second
                 val reconstructedArchives = reconstructHistory(transactions, archives, settings)
@@ -105,9 +110,10 @@ class AnalyticsViewModel @Inject constructor(
                     userSettings = userSettings,
                     rolloverAmount = rollover.first,
                     rolloverCarryForward = rollover.second,
+                    graphGranularity = granularity,
                     displayState = if (_uiState.value.selectedPeriodId != null && _uiState.value.selectedPeriodId != currentPeriodId) {
                         buildHistoricalDisplayState(
-                            _uiState.value.selectedPeriodId!!, transactions, allArchives
+                            _uiState.value.selectedPeriodId!!, transactions, allArchives, granularity
                         )
                     } else {
                         buildDisplayState(
@@ -116,6 +122,8 @@ class AnalyticsViewModel @Inject constructor(
                             currentPeriodId = currentPeriodId,
                             userSettings = userSettings,
                             rolloverAmountFromPref = rollover.first,
+                            granularity = granularity,
+                            archives = allArchives
                         )
                     },
                 )
@@ -186,14 +194,19 @@ class AnalyticsViewModel @Inject constructor(
     }
 
     private fun buildHistoricalDisplayState(
-        periodId: Long, allTransactions: List<Transaction>, archives: List<ArchivedBudget>
+        periodId: Long,
+        allTransactions: List<Transaction>,
+        archives: List<ArchivedBudget>,
+        granularity: GraphGranularity,
     ): AnalyticsState {
         val archive = archives.find { it.periodId == periodId } ?: return buildDisplayState(
             settings = _uiState.value.budgetSettings,
             allTransactions = allTransactions,
             currentPeriodId = _uiState.value.currentPeriodId,
             userSettings = _uiState.value.userSettings,
-            rolloverAmountFromPref = _uiState.value.rolloverAmount
+            rolloverAmountFromPref = _uiState.value.rolloverAmount,
+            granularity = granularity,
+            archives = archives
         )
 
         val isVirtual = periodId < 0L
@@ -229,6 +242,14 @@ class AnalyticsViewModel @Inject constructor(
             currentDate = archive.endDate
         )
 
+        val previousArchive = archives.firstOrNull { it.startDate.isBefore(archive.startDate) }
+        val previousTransactions = if (previousArchive != null) {
+            allTransactions.filter { tx ->
+                val date = tx.date?.toLocalDate() ?: return@filter false
+                !date.isBefore(previousArchive.startDate) && !date.isAfter(previousArchive.endDate) && !tx.isDeleted
+            }
+        } else emptyList()
+
         return AnalyticsState(
             periodFinished = true,
             transactions = actualSpends,
@@ -246,7 +267,9 @@ class AnalyticsViewModel @Inject constructor(
             ),
             budgetSettingsForDisplay = budgetSettings,
             budgetStateForDisplay = budgetState,
-            isHistoricalView = true
+            isHistoricalView = true,
+            previousPeriodTransactions = previousTransactions,
+            graphGranularity = granularity
         )
     }
 
@@ -256,8 +279,10 @@ class AnalyticsViewModel @Inject constructor(
         currentPeriodId: Long,
         userSettings: UserSettings,
         rolloverAmountFromPref: BigDecimal,
+        granularity: GraphGranularity,
+        archives: List<ArchivedBudget>,
     ): AnalyticsState {
-        if (settings == null) return AnalyticsState(isLoading = false)
+        if (settings == null) return AnalyticsState(isLoading = false, graphGranularity = granularity)
 
         val today = LocalDate.now()
         val endDate = settings.getPeriodEndDate()
@@ -270,6 +295,14 @@ class AnalyticsViewModel @Inject constructor(
             endedPeriodStartDate = null,
             lastPeriodEnd = null,
         )
+
+        val previousArchive = archives.firstOrNull { it.startDate.isBefore(settings.startDate) }
+        val previousTransactions = if (previousArchive != null) {
+            allTransactions.filter { tx ->
+                val date = tx.date?.toLocalDate() ?: return@filter false
+                !date.isBefore(previousArchive.startDate) && !date.isAfter(previousArchive.endDate) && !tx.isDeleted
+            }
+        } else emptyList()
 
         val (paidRecurring, upcomingRecurring, oneTimeSpends) = splitRecurringAndOneTime(
             allTransactions = allTransactions,
@@ -347,6 +380,8 @@ class AnalyticsViewModel @Inject constructor(
             debtAdjustedBalance = debtAdjustedBalance,
             creditTransactions = creditTransactions,
             userSettings = userSettings,
+            previousPeriodTransactions = previousTransactions,
+            graphGranularity = granularity,
         )
     }
 
@@ -469,6 +504,10 @@ class AnalyticsViewModel @Inject constructor(
                 settingsRepository.setAnalyticsTutorialCompleted(true)
             }
         }
+    }
+
+    fun onGranularityChanged(granularity: GraphGranularity) {
+        _granularity.value = granularity
     }
 
     fun consumeEffect() {
