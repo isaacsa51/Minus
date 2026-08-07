@@ -1,9 +1,10 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.expense
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -77,25 +78,31 @@ fun RecurrentPaymentsDivider(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            AnimatedVisibility(
-                visible = totalAmount != null && !isExpanded,
-                enter = fadeIn(animationSpec = tween(durationMillis = 150)),
-                exit = fadeOut(animationSpec = tween(durationMillis = 150))
-            ) {
-                val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
-                DayTotalItem(
-                    total = totalAmount!!,
-                    currencyFormat = currencyFormat,
-                    modifier = Modifier,
-                    showLabel = false,
-                )
+            AnimatedContent(
+                targetState = totalAmount != null && !isExpanded,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(150)) togetherWith fadeOut(
+                        animationSpec = tween(150)
+                    )
+                },
+                label = "RecurrentDividerAmountCountSwap"
+            ) { showAmount ->
+                if (showAmount) {
+                    val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
+                    DayTotalItem(
+                        total = totalAmount!!,
+                        currencyFormat = currencyFormat,
+                        modifier = Modifier,
+                        showLabel = false,
+                    )
+                } else {
+                    Text(
+                        text = "$itemCount",
+                        style = MaterialTheme.typography.labelMediumCondensed,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
             }
-
-            Text(
-                text = "$itemCount",
-                style = MaterialTheme.typography.labelMediumCondensed,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
         }
     }
 }
