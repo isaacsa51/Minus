@@ -75,7 +75,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHea
 import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeader
 import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetGraph
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditOwedCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.MinMaxSpentCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
@@ -101,6 +101,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 private val STABLE_DEFAULT_DATE = Date(0)
 
+
 @Immutable
 data class AnalyticsState(
     val periodFinished: Boolean = false,
@@ -125,6 +126,8 @@ data class AnalyticsState(
     val creditTransactions: List<Transaction> = emptyList(),
     val isHistoricalView: Boolean = false,
     val userSettings: UserSettings = UserSettings.DEFAULT,
+    val previousPeriodTransactions: List<Transaction> = emptyList(),
+    val graphGranularity: GraphGranularity = GraphGranularity.DAYS,
 )
 
 data class AnalyticsActions(
@@ -136,6 +139,7 @@ data class AnalyticsActions(
     val onCutoffDayChanged: (Int) -> Unit = {},
     val onHistoricalPeriodSelected: (Long) -> Unit = {},
     val onTutorialCompleted: (Boolean) -> Unit = {},
+    val onGranularityChanged: (GraphGranularity) -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -341,17 +345,9 @@ fun Analytics(
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
-                        BudgetDisplay(
-                            budget = state.wholeBudget,
-                            budgetState = state.budgetStateForDisplay,
-                            budgetSettings = state.budgetSettingsForDisplay,
-                            currencyCode = state.currencyCode,
-                            startDate = state.startPeriodDate,
-                            finishDate = state.finishPeriodDate,
-                            actualFinishDate = state.finishPeriodActualDate,
-                            extraDaysFromRemaining = state.extraAffordableDaysFromRemaining,
-                            showRolloverStyle = state.showRolloverStyleInBudgetDisplay,
-                            creditOwed = state.creditOwed,
+                        BudgetGraph(
+                            state = state,
+                            onGranularityChanged = actions.onGranularityChanged,
                             modifier = Modifier.padding(horizontal = 16.dp)
                                 .bringIntoViewRequester(bringIntoViewRequesters[2]!!)
                                 .markIfInOrder(2),
@@ -846,7 +842,7 @@ private fun AnalyticsState.toCategoryAnalyticsState(
 
 @Preview
 @Composable
-private fun PreviewAnalytics() {
+fun AnalyticsMainPreview() {
     MinusTheme {
         Surface {
             Analytics(
@@ -858,7 +854,7 @@ private fun PreviewAnalytics() {
 
 @PreviewScreenSizes
 @Composable
-private fun PreviewAnalyticsNotFinished() {
+fun PreviewAnalyticsNotFinished() {
     MinusTheme {
         Surface {
             Analytics(
@@ -870,7 +866,7 @@ private fun PreviewAnalyticsNotFinished() {
 
 @PreviewScreenSizes
 @Composable
-private fun PreviewAnalyticsFinished() {
+fun PreviewAnalyticsFinished() {
     MinusTheme {
         Surface {
             Analytics(

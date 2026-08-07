@@ -61,6 +61,9 @@ fun AnalyticsScreen(
             },
             onTutorialCompleted = { hasSpends ->
                 viewModel.onTutorialCompleted(hasSpends)
+            },
+            onGranularityChanged = { granularity ->
+                viewModel.onGranularityChanged(granularity)
             }
         ),
         activityResultRegistryOwner = activityResultRegistryOwner,

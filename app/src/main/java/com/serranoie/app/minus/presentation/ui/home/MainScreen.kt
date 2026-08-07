@@ -28,7 +28,6 @@ private const val TAG = "ISAAC:MainScreen"
 fun MainScreen(
     onNavigateToAnalytics: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
-    onNavigateToWallet: () -> Unit = {},
     openWalletOnStart: Boolean = false,
     onRequestNotificationPermission: () -> Unit = {},
     budgetViewModel: BudgetViewModel = hiltViewModel(),
@@ -78,10 +77,6 @@ fun MainScreen(
                     budgetViewModel.processIntent(
                         BudgetNumpadIntent.SetDragProgress(effect.progress),
                     )
-                }
-
-                is MainScreenUiEffect.OpenWallet -> {
-                    onNavigateToWallet()
                 }
 
                 is MainScreenUiEffect.OpenAnalytics -> {
@@ -202,7 +197,6 @@ fun MainScreen(
                         },
                         onNavigateToAnalytics = onNavigateToAnalytics,
                         onNavigateToSettings = onNavigateToSettings,
-                        onNavigateToWallet = onNavigateToWallet,
                         onPeriodSelected = { period ->
                             mainScreenViewModel.processIntent(
                                 MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage

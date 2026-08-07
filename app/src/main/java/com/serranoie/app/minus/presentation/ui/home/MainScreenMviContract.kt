@@ -46,7 +46,6 @@ sealed interface MainScreenUiEffect {
 
     data class UpdateDragProgress(val progress: Float) : MainScreenUiEffect
 
-    data object OpenWallet : MainScreenUiEffect
 
     data object OpenAnalytics : MainScreenUiEffect
 }

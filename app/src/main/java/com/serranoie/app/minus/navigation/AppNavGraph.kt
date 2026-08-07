@@ -133,9 +133,6 @@ fun AppNavGraph(
                 onNavigateToSettings = {
                     navController.navigate(Screen.Settings.route)
                 },
-                onNavigateToWallet = {
-                    navController.navigate(Screen.Wallet.createRoute(false))
-                },
                 onRequestNotificationPermission = onRequestNotificationPermission,
             )
         }
