@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
-    <string name="tutorial_numpad_title">Numpad</string>
+    <string name="tutorial_numpad_title">Цифрова клавиатура</string>
     <string name="tutorial_numpad_description">Enter the amount you spent and tap the green checkmark to save. Swipe up on the numpad to calculate.</string>
-    <string name="tutorial_comment_title">Add a category</string>
-    <string name="tutorial_comment_description">Add a category or short note to remember what the spend was for.</string>
+    <string name="tutorial_comment_title">Добави категория</string>
+    <string name="tutorial_comment_description">Добавете категория или кратка бележка, за да запомните за какво е бил разходът.</string>
     <string name="tutorial_budget_pill_title">Budget progress</string>
     <string name="tutorial_budget_pill_description">Tap to switch between daily, weekly, and monthly budget views, or to edit the period setup.</string>
-    <string name="tutorial_settings_title">Settings</string>
+    <string name="tutorial_settings_title">Настройки</string>
     <string name="tutorial_settings_description">Open Settings to enable features, set up home-screen widgets, or reset this tutorial.</string>
     <string name="tutorial_recurrent_title">Recurrent payments</string>
     <string name="tutorial_recurrent_description">Tap here to mark this spend as a recurring payment (weekly, biweekly, or monthly). The app will remind you to log it on schedule.</string>
@@ -16,22 +16,22 @@
     <string name="tutorial_privacy_title">Privacy mode</string>
     <string name="tutorial_privacy_description">Cover the top of the phone (where the front camera sits) with your hand for about a second to blur every amount on screen. Cover it again to turn it off.</string>
     <string name="tutorial_calc_title">Ongoing budget</string>
-    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
-    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
+    <string name="tutorial_calc_description">Използвай + или - в началото, за да увеличиш или намалиш оставащия ти бюджет за този период.</string>
+    <string name="tutorial_credit_toggle_title">Плащане с кредитна карта</string>
     <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
-    <string name="today">Today</string>
-    <string name="yesterday">Yesterday</string>
-    <string name="tomorrow">Tomorrow</string>
+    <string name="today">Днес</string>
+    <string name="yesterday">Вчера</string>
+    <string name="tomorrow">Утре</string>
     <string name="apply">Apply</string>
     <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
-    <string name="save">Save</string>
-    <string name="delete">Delete</string>
+    <string name="save">Запази</string>
+    <string name="delete">Изтрий</string>
     <string name="edit">Edit</string>
-    <string name="close">Close</string>
+    <string name="close">Затвори</string>
     <string name="done">Done</string>
-    <string name="add">Add</string>
+    <string name="add">Добави</string>
     <string name="remove">Remove</string>
     <string name="undo">UNDO</string>
     <string name="back">Back</string>
@@ -162,7 +162,7 @@
     <string name="budget_period_weekly">Weekly</string>
     <string name="budget_period_biweekly">Biweekly</string>
     <string name="budget_period_monthly">Monthly</string>
-    <string name="budget_period_label_today">Today</string>
+    <string name="budget_period_label_today">Днес</string>
     <string name="budget_period_label_this_week">This week</string>
     <string name="budget_period_label_this_biweek">This biweekly</string>
     <string name="budget_period_label_this_month">This month</string>
@@ -210,7 +210,7 @@
     <string name="changelog_release_header">Version %1$s — %2$s</string>
     <string name="changelog_release_version">Version %1$s</string>
     <string name="changelog_release_date">Released %1$s</string>
-    <string name="changelog_close">Close</string>
+    <string name="changelog_close">Затвори</string>
     <string name="changelog_previous_versions">Previous version</string>
     <string name="changelog_updated_to">Updated to: %1$s</string>
     <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
@@ -219,7 +219,7 @@
     <string name="onboarding_finish_date_selector_days_range">%1$d days · %2$s - %3$s</string>
     <string name="onboarding_finish_date_selector_budget_view_question">How do you want to view your budget?</string>
     <!-- Settings -->
-    <string name="settings_title">Settings</string>
+    <string name="settings_title">Настройки</string>
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_language">Language</string>
     <string name="settings_language_header">App Language</string>
@@ -385,8 +385,8 @@
     <string name="recurrent_payments_divider_title_upcoming">Upcoming recurrent payments</string>
     <string name="recurrent_payments_divider_title_current_period">Recurrent Payments on this period</string>
     <!-- Upcoming Recurrent Item -->
-    <string name="upcoming_recurrent_today">Today</string>
-    <string name="upcoming_recurrent_tomorrow">Tomorrow</string>
+    <string name="upcoming_recurrent_today">Днес</string>
+    <string name="upcoming_recurrent_tomorrow">Утре</string>
     <string name="upcoming_recurrent_in_days">In %1$d days</string>
     <string name="upcoming_recurrent_in_weeks">In %1$d weeks</string>
     <string name="upcoming_recurrent_unnamed_expense">Unnamed recurrent expense</string>
