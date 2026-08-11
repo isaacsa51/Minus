@@ -37,7 +37,7 @@ import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadInt
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetSystemIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow

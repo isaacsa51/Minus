@@ -49,8 +49,8 @@ import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDia
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
-import com.serranoie.app.minus.presentation.util.prettyDate
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.prettyDate
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime

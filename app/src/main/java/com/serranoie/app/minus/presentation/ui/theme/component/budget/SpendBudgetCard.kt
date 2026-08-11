@@ -36,8 +36,6 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.SupportedCurrency
@@ -48,7 +46,7 @@ import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.harmonizeWithColor
-import com.serranoie.app.minus.presentation.util.numberFormat
+import com.serranoie.app.minus.presentation.util.font.format.numberFormat
 import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
 import java.math.BigDecimal
 import java.math.RoundingMode

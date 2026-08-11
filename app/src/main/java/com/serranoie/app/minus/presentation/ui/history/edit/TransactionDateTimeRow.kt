@@ -12,7 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.serranoie.app.minus.presentation.util.prettyDate
+import com.serranoie.app.minus.presentation.util.font.format.prettyDate
 import java.time.LocalDate
 import java.time.LocalTime
 import androidx.compose.foundation.layout.fillMaxWidth

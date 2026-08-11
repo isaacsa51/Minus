@@ -46,11 +46,11 @@ import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.harmonize
-import com.serranoie.app.minus.presentation.util.isZero
-import com.serranoie.app.minus.presentation.util.numberFormat
-import com.serranoie.app.minus.presentation.util.prettyDate
-import com.serranoie.app.minus.presentation.util.toDate
-import com.serranoie.app.minus.presentation.util.toLocalDateTime
+import com.serranoie.app.minus.presentation.util.font.format.isZero
+import com.serranoie.app.minus.presentation.util.font.format.numberFormat
+import com.serranoie.app.minus.presentation.util.font.format.prettyDate
+import com.serranoie.app.minus.presentation.util.font.format.toDate
+import com.serranoie.app.minus.presentation.util.font.format.toLocalDateTime
 import com.serranoie.app.minus.presentation.util.toPalette
 import java.math.BigDecimal
 import java.time.LocalDate

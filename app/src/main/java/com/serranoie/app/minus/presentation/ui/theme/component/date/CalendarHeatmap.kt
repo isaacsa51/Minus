@@ -55,11 +55,11 @@ import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.combineColors
-import com.serranoie.app.minus.presentation.util.getWeek
-import com.serranoie.app.minus.presentation.util.prettyWeekDay
-import com.serranoie.app.minus.presentation.util.prettyYearMonth
-import com.serranoie.app.minus.presentation.util.toDate
-import com.serranoie.app.minus.presentation.util.toLocalDate
+import com.serranoie.app.minus.presentation.util.font.format.getWeek
+import com.serranoie.app.minus.presentation.util.font.format.prettyWeekDay
+import com.serranoie.app.minus.presentation.util.font.format.prettyYearMonth
+import com.serranoie.app.minus.presentation.util.font.format.toDate
+import com.serranoie.app.minus.presentation.util.font.format.toLocalDate
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth

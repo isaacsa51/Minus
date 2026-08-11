@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.util.HarmonizedColorPalette
-import com.serranoie.app.minus.presentation.util.numberFormat
+import com.serranoie.app.minus.presentation.util.font.format.numberFormat
 import java.math.BigDecimal
 
 @Composable

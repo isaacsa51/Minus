@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.editor.category
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutQuad
 import androidx.compose.animation.core.tween
@@ -41,7 +42,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -262,12 +265,18 @@ fun CommentEditor(
 ) {
     var focusIsTracking by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val configuration = LocalConfiguration.current
+    val hasHardKeyboard = configuration.keyboard == Configuration.KEYBOARD_QWERTY
 
     TextField(
         modifier = modifier
             .fillMaxWidth()
             .focusRequester(focusRequester)
             .onFocusChanged { focusState ->
+                if (focusState.isFocused && hasHardKeyboard) {
+                    keyboardController?.hide()
+                }
                 if (!focusState.hasFocus && focusIsTracking) {
                     onApply()
                 }
@@ -293,6 +302,13 @@ fun CommentEditor(
         },
         textStyle = MaterialTheme.typography.bodyLarge,
         singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { onApply() }
+        ),
         shape = RoundedCornerShape(24.dp),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -302,13 +318,6 @@ fun CommentEditor(
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
             errorIndicatorColor = Color.Transparent,
-        ),
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Sentences,
-            imeAction = ImeAction.Done,
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = { onApply() }
         ),
     )
 

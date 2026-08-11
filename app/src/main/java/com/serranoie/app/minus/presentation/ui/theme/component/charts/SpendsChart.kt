@@ -30,7 +30,7 @@ import com.serranoie.app.minus.presentation.ui.theme.colorMin
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.harmonize
-import com.serranoie.app.minus.presentation.util.isZero
+import com.serranoie.app.minus.presentation.util.font.format.isZero
 import com.serranoie.app.minus.presentation.util.toPalette
 import java.math.BigDecimal
 import java.math.RoundingMode

@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
-import com.serranoie.app.minus.presentation.util.countDays
-import com.serranoie.app.minus.presentation.util.countDaysToToday
+import com.serranoie.app.minus.presentation.util.font.format.countDays
+import com.serranoie.app.minus.presentation.util.font.format.countDaysToToday
 import java.util.Calendar
 import java.util.Date
 

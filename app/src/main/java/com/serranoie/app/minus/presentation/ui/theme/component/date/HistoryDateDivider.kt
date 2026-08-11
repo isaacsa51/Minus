@@ -26,11 +26,10 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
-import com.serranoie.app.minus.presentation.util.prettyDate
+import com.serranoie.app.minus.presentation.util.font.format.prettyDate
 import java.math.BigDecimal
-import java.text.NumberFormat
 import java.time.LocalDate
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 
 @Composable
 fun HistoryDateDivider(

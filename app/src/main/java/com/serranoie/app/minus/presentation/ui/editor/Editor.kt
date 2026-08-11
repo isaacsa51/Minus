@@ -60,6 +60,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -106,7 +107,7 @@ import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -163,6 +164,7 @@ fun Editor(
     onDismissCreditCutoffDialog: () -> Unit = {},
     onRecurrentExpenseConfirm: (RecurrentFrequency, LocalDate, Int?, String) -> Unit = { _, _, _, _ -> },
     onCreditCutoffConfirm: (Int) -> Unit = {},
+    onApply: () -> Unit = {},
     showAnalyticsButton: Boolean = true,
     showSettingsButton: Boolean = true,
     budgetPillHintAnchorModifier: Modifier = Modifier,
@@ -172,7 +174,12 @@ fun Editor(
 ) {
     val view = LocalView.current
     val scope = rememberCoroutineScope()
+    val configuration = LocalConfiguration.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val isSquareScreen =
+        configuration.screenWidthDp.toFloat() / configuration.screenHeightDp.toFloat() > 0.8f
+    val topBarHeight = if (isSquareScreen) 54.dp else 66.dp
 
     val editorFocusController = remember { FocusController() }
 
@@ -210,7 +217,7 @@ fun Editor(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(66.dp)
+                .height(topBarHeight)
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -476,6 +483,7 @@ fun Editor(
                         onShowCategoryGrid = onShowCategoryGrid,
                         onHideCategoryGrid = onHideCategoryGrid,
                         onDisableCalculationMode = onDisableCalculationMode,
+                        onApply = onApply,
                         tutorialBoxState = tutorialBoxState,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -565,6 +573,7 @@ private fun EditingContent(
     onShowCategoryGrid: () -> Unit = {},
     onHideCategoryGrid: () -> Unit = {},
     onDisableCalculationMode: () -> Unit = {},
+    onApply: () -> Unit = {},
     tutorialBoxState: TutorialBoxState? = null,
     modifier: Modifier = Modifier
 ) {
@@ -876,7 +885,7 @@ private fun EditingContent(
                         extendWidth = toolbarWidth,
                         onlyIcon = false,
                         onEdit = {},
-                        onSaveExpense = {},
+                        onSaveExpense = onApply,
                         onDeleteTag = onDeleteTag,
                         directCategoryPopupEnabled = directCategoryPopupEnabled,
                         categoryGridModeEnabled = categoryGridModeEnabled,
@@ -902,6 +911,7 @@ private fun EditingContent(
                     onShowCategoryGrid = onShowCategoryGrid,
                     onHideCategoryGrid = onHideCategoryGrid,
                     onDisableCalculationMode = onDisableCalculationMode,
+                    onSaveExpense = onApply,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 26.dp)

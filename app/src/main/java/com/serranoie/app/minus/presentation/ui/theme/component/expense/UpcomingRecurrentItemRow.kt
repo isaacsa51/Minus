@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.expense
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -10,7 +9,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,8 +38,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPos
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.censor
-import com.serranoie.app.minus.presentation.util.calculateDaysToCutoff
-import com.serranoie.app.minus.presentation.util.prettyDate
+import com.serranoie.app.minus.presentation.util.font.format.calculateDaysToCutoff
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.LocalDateTime

@@ -42,7 +42,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.Date

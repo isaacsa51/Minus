@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.util
+package com.serranoie.app.minus.presentation.util.font.format
 
 import android.content.Context
 import com.serranoie.app.minus.domain.model.SupportedCurrency
@@ -6,6 +6,7 @@ import com.serranoie.app.minus.domain.model.SymbolPosition
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.util.Currency
 import java.util.Locale
 
 fun getFloatDivider(): String {
@@ -51,7 +52,7 @@ fun formatCurrencySymbolOnly(
     }
     return try {
         val formatter = NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
-            currency = java.util.Currency.getInstance(currencyCode)
+            currency = Currency.getInstance(currencyCode)
             this.maximumFractionDigits = resolvedMaxDigits
             this.minimumFractionDigits = minimumFractionDigits
         }
@@ -93,7 +94,7 @@ fun symbolOnlyCurrencyFormat(
             negativePrefix = "-$currencySymbol"
         }
         try {
-            currency = java.util.Currency.getInstance(currencyCode)
+            currency = Currency.getInstance(currencyCode)
         } catch (e: Exception) {
             // Keep the prefix/suffix set above
         }

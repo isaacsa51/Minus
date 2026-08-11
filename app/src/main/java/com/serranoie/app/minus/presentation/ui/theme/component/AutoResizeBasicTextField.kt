@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.util.calcAdaptiveFont
+import com.serranoie.app.minus.presentation.util.font.calcAdaptiveFont
 
 /**
  * Auto-resizing text field that scales font size based on content and available space.

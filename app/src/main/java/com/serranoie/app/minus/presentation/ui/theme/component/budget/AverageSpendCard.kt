@@ -11,7 +11,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -22,7 +21,7 @@ import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.combineColors
-import com.serranoie.app.minus.presentation.util.numberFormat
+import com.serranoie.app.minus.presentation.util.font.format.numberFormat
 import java.math.RoundingMode
 import java.time.LocalDateTime
 import java.util.Date

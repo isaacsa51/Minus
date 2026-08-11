@@ -1,4 +1,4 @@
-﻿package com.serranoie.app.minus.presentation.util
+﻿package com.serranoie.app.minus.presentation.util.font.format
 
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
@@ -13,6 +13,7 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.time.temporal.WeekFields
 import java.util.Calendar
 import java.util.Date
@@ -44,7 +45,7 @@ fun countDaysToToday(finishDate: Date): Int {
     if (!today.isBefore(end)) {
         return 0
     }
-    val result = java.time.temporal.ChronoUnit.DAYS.between(today, end).toInt()
+    val result = ChronoUnit.DAYS.between(today, end).toInt()
     logcat("DateFormatting") { "countDaysToToday: finishDate=$finishDate, today=$today, result=$result" }
     return result
 }
@@ -246,7 +247,7 @@ fun calculateDaysToCutoff(cutoffDay: Int, fromDate: LocalDate = LocalDate.now())
     }
 
     return if (!fromDate.isAfter(cutoffThisMonth)) {
-        java.time.temporal.ChronoUnit.DAYS.between(fromDate, cutoffThisMonth).toInt()
+        ChronoUnit.DAYS.between(fromDate, cutoffThisMonth).toInt()
     } else {
         val nextMonth = fromDate.plusMonths(1)
         val cutoffNextMonth = try {
@@ -254,7 +255,7 @@ fun calculateDaysToCutoff(cutoffDay: Int, fromDate: LocalDate = LocalDate.now())
         } catch (e: Exception) {
             nextMonth.withDayOfMonth(nextMonth.lengthOfMonth())
         }
-        java.time.temporal.ChronoUnit.DAYS.between(fromDate, cutoffNextMonth).toInt()
+        ChronoUnit.DAYS.between(fromDate, cutoffNextMonth).toInt()
     }
 }
 

@@ -73,11 +73,11 @@ import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
-import com.serranoie.app.minus.presentation.util.calcAdaptiveFont
+import com.serranoie.app.minus.presentation.util.font.calcAdaptiveFont
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.harmonizeWithColor
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
 import java.math.BigDecimal
 import java.math.RoundingMode

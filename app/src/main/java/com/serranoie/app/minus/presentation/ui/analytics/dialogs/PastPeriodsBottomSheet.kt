@@ -54,9 +54,9 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
-import com.serranoie.app.minus.presentation.util.calcAdaptiveFont
+import com.serranoie.app.minus.presentation.util.font.calcAdaptiveFont
 import com.serranoie.app.minus.presentation.util.combineColors
-import com.serranoie.app.minus.presentation.util.formatCurrencySymbolOnly
+import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

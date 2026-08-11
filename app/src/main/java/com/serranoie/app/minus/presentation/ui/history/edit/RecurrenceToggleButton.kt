@@ -13,13 +13,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButtonColors
+import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -34,13 +37,11 @@ internal fun RecurrenceToggleButton(
         checked = isRecurrent,
         onCheckedChange = onToggle,
         modifier = modifier.height(40.dp),
-        colors = ToggleButtonColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.25f),
-            contentColor = tertiary,
-            checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            checkedContentColor = tertiary,
-            disabledContentColor = MaterialTheme.colorScheme.outline,
-            disabledContainerColor = MaterialTheme.colorScheme.outlineVariant
+        colors = ToggleButtonDefaults.toggleButtonColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
+            checkedContainerColor = MaterialTheme.colorScheme.tertiary,
+            contentColor = MaterialTheme.colorScheme.tertiary,
+            checkedContentColor = MaterialTheme.colorScheme.onTertiary
         ),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
     ) {
@@ -50,7 +51,12 @@ internal fun RecurrenceToggleButton(
             modifier = Modifier.size(ButtonDefaults.IconSize),
         )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        Text(stringResource(R.string.recurrent_toggle_label), style = MaterialTheme.typography.titleSmallEmphasized)
+        Text(
+            text = stringResource(R.string.recurrent_toggle_label),
+            style = MaterialTheme.typography.labelSmallEmphasized,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 

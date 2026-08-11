@@ -1,5 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.history.edit
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +40,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.util.handleHardwareNumpadKeyEvent
+import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
+import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalculation
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.runtime.LaunchedEffect
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
@@ -48,7 +58,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -114,12 +124,15 @@ fun TransactionEditScreen(
     var showCreditCutoffDialog by remember { mutableStateOf(false) }
 
     val focusController = remember { FocusController() }
+    val focusRequester = remember { FocusRequester() }
 
     var isCalculation by remember { mutableStateOf(false) }
 
     val configuration = LocalConfiguration.current
+    val hasHardKeyboard =
+        configuration.keyboard == android.content.res.Configuration.KEYBOARD_QWERTY
     val screenHeight = configuration.screenHeightDp.dp
-    val targetNumpadHeight = screenHeight * 0.48f
+    val targetNumpadHeight = if (hasHardKeyboard) 200.dp else screenHeight * 0.48f
 
     val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
         fontWeight = FontWeight.W500
@@ -148,7 +161,58 @@ fun TransactionEditScreen(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .focusRequester(focusRequester)
+            .focusable()
+            .onKeyEvent { keyEvent ->
+                handleHardwareNumpadKeyEvent(keyEvent) { intent ->
+                    when (intent) {
+                        is BudgetNumpadIntent.NumberTapped -> {
+                            editedAmount = if (editedAmount == "0") intent.digit else editedAmount + intent.digit
+                        }
+                        BudgetNumpadIntent.DotTapped -> {
+                            val lastChar = editedAmount.lastOrNull()
+                            if (editedAmount.isEmpty() || (lastChar != null && lastChar in "+-×÷")) {
+                                editedAmount += "0."
+                            } else {
+                                val lastOperatorIndex = editedAmount.indexOfLast { it in "+-×÷" }
+                                val currentSegment = editedAmount.substring(lastOperatorIndex + 1)
+                                if (!currentSegment.contains(".")) {
+                                    editedAmount += "."
+                                }
+                            }
+                        }
+                        BudgetNumpadIntent.BackspaceTapped -> {
+                            editedAmount = editedAmount.dropLast(1).ifEmpty { "0" }
+                        }
+                        BudgetNumpadIntent.ResetInputTapped -> {
+                            editedAmount = "0"
+                        }
+                        is BudgetNumpadIntent.OperatorTapped -> {
+                            val lastChar = editedAmount.lastOrNull()
+                            if (editedAmount.isNotEmpty() && lastChar != null && lastChar !in "+-×÷" && lastChar != '.') {
+                                editedAmount += intent.operator.toString()
+                            }
+                        }
+                        BudgetNumpadIntent.EqualsTapped -> {
+                            val result = evaluateCalculation(editedAmount)
+                            if (result != null) editedAmount = result
+                        }
+                        BudgetNumpadIntent.ApplyTapped -> {
+                            val newAmount = editedAmount.toBigDecimalOrNull() ?: transaction.amount
+                            onSave(newAmount, editedComment, editedDate.atTime(editedTime), isRecurrent, if (isRecurrent) selectedFrequency else null, if (isRecurrent) recurrentEndDate else null, if (isRecurrent && selectedFrequency == RecurrentFrequency.MONTHLY) subscriptionDay else null, isCredit)
+                        }
+                        else -> {}
+                    }
+                }
+            }
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { focusRequester.requestFocus() }
     ) {
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
         TransactionEditTopBar(
             isRecurrent = transaction.isRecurrent,
             onCancel = onCancel,
@@ -296,6 +360,7 @@ fun TransactionEditScreen(
             },
             isCalculation = isCalculation,
             onCalculationModeChanged = { isCalculation = it },
+            hasHardKeyboard = hasHardKeyboard,
             onOperatorInput = { operator ->
                 val lastChar = editedAmount.lastOrNull()
                 if (editedAmount.isNotEmpty() && lastChar != null && lastChar !in "+-×÷" && lastChar != '.') {

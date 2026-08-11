@@ -42,7 +42,7 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.util.formatCurrencySymbolOnly
+import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Date

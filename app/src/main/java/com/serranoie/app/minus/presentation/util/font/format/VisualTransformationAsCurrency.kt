@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.util
+package com.serranoie.app.minus.presentation.util.font.format
 
 import android.content.Context
 import androidx.compose.foundation.layout.Column
@@ -23,7 +23,8 @@ fun formatCurrency(
     currencyCode: String = "USD",
 ): String = formatCurrencySymbolOnly(amount, currencyCode)
 
-fun getCurrencySymbol(currencyCode: String = "USD"): String = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
+fun getCurrencySymbol(currencyCode: String = "USD"): String =
+    SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
 
 fun getAnnotatedString(
     value: String,
@@ -41,7 +42,8 @@ fun getAnnotatedString(
     value: String,
     hintParts: List<Pair<Int, Int>>,
     hintColor: Color,
-): AnnotatedString = getAnnotatedString(value, hintParts, hintParts.map { SpanStyle(color = hintColor) })
+): AnnotatedString =
+    getAnnotatedString(value, hintParts, hintParts.map { SpanStyle(color = hintColor) })
 
 fun getAnnotatedString(
     value: String,
@@ -279,7 +281,8 @@ fun isNumber(char: Char): Boolean =
         false
     }
 
-fun Triple<String, String, String>.join(third: Boolean = true): String = this.first + this.second + if (third) this.third else ""
+fun Triple<String, String, String>.join(third: Boolean = true): String =
+    this.first + this.second + if (third) this.third else ""
 
 fun fixedNumberString(input: String): String {
     val dotExist = input.contains(".")

@@ -13,7 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.MainActivity
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import logcat.logcat
 import java.math.BigDecimal

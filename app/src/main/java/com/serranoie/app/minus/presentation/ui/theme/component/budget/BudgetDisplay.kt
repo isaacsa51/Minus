@@ -24,7 +24,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,16 +51,14 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
-import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
-import com.serranoie.app.minus.presentation.util.countDays
-import com.serranoie.app.minus.presentation.util.prettyDate
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.countDays
+import com.serranoie.app.minus.presentation.util.font.format.prettyDate
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 

@@ -33,8 +33,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransac
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.RecurrentPaymentsDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.RecurrentTicketCard
-import com.serranoie.app.minus.presentation.util.prettyDate
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.prettyDate
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
