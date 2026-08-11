@@ -51,7 +51,6 @@ class CsvTransferManager @Inject constructor(
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         } else {
-            // Fallback to cache if MediaStore failed or API < 29
             val exportDir = File(context.cacheDir, "exports").apply { mkdirs() }
             val csvFile = File(exportDir, fileName)
 

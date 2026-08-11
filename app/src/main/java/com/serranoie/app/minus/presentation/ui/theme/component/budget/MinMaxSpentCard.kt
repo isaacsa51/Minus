@@ -100,7 +100,7 @@ fun MinMaxSpentCard(
             val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: ""
             if (currencySymbol.length > 2 && formattedSpent.startsWith(currencySymbol)) {
                 AnnotatedString.Builder().apply {
-                    pushStyle(SpanStyle(fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f, baselineShift = BaselineShift(0.25f)))
+                    pushStyle(SpanStyle(fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f, baselineShift = BaselineShift(0f)))
                     append(currencySymbol)
                     pop()
                     append(formattedSpent.removePrefix(currencySymbol))
