@@ -1,0 +1,3 @@
+- fix: handle physical keyboard and 1:1 aspect ratio inside app
+- fix: load proper hints with new components on analytics
+- fix: load currencyCode correctly on MinMax card and Average Card components
