@@ -169,24 +169,30 @@ fun Analytics(
         state.userSettings.analyticsTutorialCompleted
     }
 
-    val effectiveTutorialCompleted = showTutorialOverride?.let { !it } ?: tutorialCompleted
+    val effectiveTutorialCompleted = showTutorialOverride?.let { !it } ?: (tutorialCompleted || state.isHistoricalView)
 
-    val tutorialOrder = remember(hasSpends, state.creditOwed, state.periodFinished) {
+    val tutorialOrder = remember(hasSpends, state.creditOwed, state.periodFinished, state.isHistoricalView) {
         buildList {
+            // 1. Header (if visible)
+            if (!state.periodFinished || state.isHistoricalView) {
+                add(1)
+            }
+
+            // 2. Budget Summary (Graph)
+            add(2)
+
             if (hasSpends) {
                 add(3) // Heatmap
                 add(0) // MinMax
-                add(2) // Budget
-                add(4) // Charts
-            } else {
-                if (!state.periodFinished) {
-                    add(1) // Header
+                if (state.creditOwed > BigDecimal.ZERO) {
+                    add(6) // Credit Owed
                 }
-                add(2) // Budget
+                add(4) // Categories
+            } else {
                 add(5) // Savings
-            }
-            if (state.creditOwed > BigDecimal.ZERO) {
-                add(6) // Credit Card
+                if (state.creditOwed > BigDecimal.ZERO) {
+                    add(6) // Credit Owed
+                }
             }
         }
     }
@@ -379,9 +385,8 @@ fun Analytics(
                                 ).copy(isDayView = true)
                                 view.weakHapticFeedback()
                             },
-                            tutorialBoxState = tutorialBoxState,
                             bringIntoViewRequesters = bringIntoViewRequesters,
-                            tutorialOrder = tutorialOrder,
+                            markIfInOrder = markIfInOrder,
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         SavingsRecommendationCard(
@@ -528,9 +533,8 @@ private fun AnalyticsResponsiveLayout(
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
     onDayClick: (LocalDate) -> Unit,
-    tutorialBoxState: TutorialBoxState,
     bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
-    tutorialOrder: List<Int>,
+    markIfInOrder: Modifier.(Int) -> Modifier,
 ) {
     if (useTabletLayout) {
         AnalyticsTabletLayout(
@@ -539,9 +543,8 @@ private fun AnalyticsResponsiveLayout(
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
             onDayClick = onDayClick,
-            tutorialBoxState = tutorialBoxState,
             bringIntoViewRequesters = bringIntoViewRequesters,
-            tutorialOrder = tutorialOrder,
+            markIfInOrder = markIfInOrder,
         )
     } else {
         AnalyticsCompactLayout(
@@ -550,9 +553,8 @@ private fun AnalyticsResponsiveLayout(
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
             onDayClick = onDayClick,
-            tutorialBoxState = tutorialBoxState,
             bringIntoViewRequesters = bringIntoViewRequesters,
-            tutorialOrder = tutorialOrder,
+            markIfInOrder = markIfInOrder,
         )
     }
 }
@@ -564,9 +566,8 @@ private fun AnalyticsCompactLayout(
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
     onDayClick: (LocalDate) -> Unit,
-    tutorialBoxState: TutorialBoxState,
     bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
-    tutorialOrder: List<Int>,
+    markIfInOrder: Modifier.(Int) -> Modifier,
 ) {
     Column {
         Row(
@@ -585,7 +586,7 @@ private fun AnalyticsCompactLayout(
                         .weight(1f)
                         .wrapContentHeight()
                         .bringIntoViewRequester(bringIntoViewRequesters[3]!!)
-                        .markIfInOrder(3, tutorialBoxState, tutorialOrder),
+                        .markIfInOrder(3),
                 )
             }
         }
@@ -603,7 +604,7 @@ private fun AnalyticsCompactLayout(
                 .padding(horizontal = 16.dp)
                 .height(IntrinsicSize.Min)
                 .bringIntoViewRequester(bringIntoViewRequesters[0]!!)
-                .markIfInOrder(0, tutorialBoxState, tutorialOrder)
+                .markIfInOrder(0)
         ) {
             MinMaxSpentCard(
                 isMin = true,
@@ -670,7 +671,7 @@ private fun AnalyticsCompactLayout(
                         .fillMaxHeight()
                         .aspectRatio(1f)
                         .bringIntoViewRequester(bringIntoViewRequesters[6]!!)
-                        .markIfInOrder(6, tutorialBoxState, tutorialOrder),
+                        .markIfInOrder(6),
                 )
             }
         }
@@ -682,7 +683,7 @@ private fun AnalyticsCompactLayout(
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
                 .bringIntoViewRequester(bringIntoViewRequesters[4]!!)
-                .markIfInOrder(4, tutorialBoxState, tutorialOrder),
+                .markIfInOrder(4),
             onCategoryClick = onCategoryClick,
         )
     }
@@ -695,9 +696,8 @@ private fun AnalyticsTabletLayout(
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
     onDayClick: (LocalDate) -> Unit,
-    tutorialBoxState: TutorialBoxState,
     bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
-    tutorialOrder: List<Int>,
+    markIfInOrder: Modifier.(Int) -> Modifier,
 ) {
     Column(
         modifier = Modifier
@@ -726,7 +726,7 @@ private fun AnalyticsTabletLayout(
                             .fillMaxWidth()
                             .fillMaxHeight()
                             .bringIntoViewRequester(bringIntoViewRequesters[3]!!)
-                            .markIfInOrder(3, tutorialBoxState, tutorialOrder),
+                            .markIfInOrder(3),
                     )
                 }
             }
@@ -736,7 +736,7 @@ private fun AnalyticsTabletLayout(
                     .weight(1f)
                     .fillMaxHeight()
                     .bringIntoViewRequester(bringIntoViewRequesters[0]!!)
-                    .markIfInOrder(0, tutorialBoxState, tutorialOrder)
+                    .markIfInOrder(0)
             ) {
                 MinMaxSpentCard(
                     isMin = true,
@@ -779,7 +779,7 @@ private fun AnalyticsTabletLayout(
                         .fillMaxHeight()
                         .aspectRatio(1f)
                         .bringIntoViewRequester(bringIntoViewRequesters[6]!!)
-                        .markIfInOrder(6, tutorialBoxState, tutorialOrder),
+                        .markIfInOrder(6),
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -812,15 +812,11 @@ private fun AnalyticsTabletLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .bringIntoViewRequester(bringIntoViewRequesters[4]!!)
-                .markIfInOrder(4, tutorialBoxState, tutorialOrder),
+                .markIfInOrder(4),
             onCategoryClick = onCategoryClick,
         )
     }
 }
-
-private fun Modifier.markIfInOrder(
-    index: Int, state: TutorialBoxState, order: List<Int>
-): Modifier = if (index in order) this.markForTutorial(state, index) else this
 
 private fun AnalyticsState.toCategoryAnalyticsState(
     categoryName: String,
