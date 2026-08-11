@@ -53,7 +53,7 @@ internal fun RecurrenceToggleButton(
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         Text(
             text = stringResource(R.string.recurrent_toggle_label),
-            style = MaterialTheme.typography.labelSmallEmphasized,
+            style = MaterialTheme.typography.labelSmallCondensed,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

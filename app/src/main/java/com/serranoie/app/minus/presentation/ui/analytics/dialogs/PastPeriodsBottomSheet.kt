@@ -343,6 +343,7 @@ private fun CategoryDistributionBar(
         ) {
             Row(
                 modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 data.segments.forEachIndexed { index, segment ->
                     val weight = (segment.amount.toFloat() / data.totalWeight).coerceAtLeast(0.01f)
@@ -353,19 +354,8 @@ private fun CategoryDistributionBar(
                         modifier = Modifier
                             .weight(weight)
                             .fillMaxHeight()
-                            .clip(CircleShape)
+                            .clip(RoundedCornerShape(4.dp))
                             .background(color)
-                            .then(
-                                if (segment.isRecurrent) {
-                                    Modifier.border(
-                                        1.dp,
-                                        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
-                                        CircleShape
-                                    )
-                                } else {
-                                    Modifier
-                                }
-                            )
                     )
                 }
 
@@ -376,7 +366,7 @@ private fun CategoryDistributionBar(
                             modifier = Modifier
                                 .weight(remaining / data.totalWeight)
                                 .fillMaxHeight()
-                                .clip(CircleShape)
+                                .clip(RoundedCornerShape(4.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                         )
                     }

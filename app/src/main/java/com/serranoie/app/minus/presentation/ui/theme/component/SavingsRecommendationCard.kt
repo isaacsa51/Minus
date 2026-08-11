@@ -252,7 +252,6 @@ fun LinearSavingsBar(
     modifier: Modifier = Modifier,
 ) {
     val totalSpentPct = recurrentPct + variablePct
-    val roundedCorner = RoundedCornerShape(12.dp)
     val ceiling = spendingCeilingPct.coerceIn(0, 100)
 
     Box(
@@ -260,7 +259,10 @@ fun LinearSavingsBar(
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
     ) {
-        Row(modifier = Modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
             val recSafe = recurrentPct.coerceAtMost(ceiling).toFloat()
             val varSafe = if (recurrentPct < ceiling) {
                 variablePct.coerceAtMost(ceiling - recurrentPct).toFloat()
@@ -276,7 +278,7 @@ fun LinearSavingsBar(
                     Modifier
                         .weight(recSafe)
                         .fillMaxHeight()
-                        .clip(roundedCorner)
+                        .clip(RoundedCornerShape(4.dp))
                         .background(MaterialTheme.colorScheme.outlineVariant)
                 )
             }
@@ -285,7 +287,7 @@ fun LinearSavingsBar(
                     Modifier
                         .weight(varSafe)
                         .fillMaxHeight()
-                        .clip(roundedCorner)
+                        .clip(RoundedCornerShape(4.dp))
                         .background(MaterialTheme.colorScheme.primary)
                 )
             }
@@ -305,7 +307,7 @@ fun LinearSavingsBar(
                     Modifier
                         .weight(totalInvasion)
                         .fillMaxHeight()
-                        .clip(roundedCorner)
+                        .clip(RoundedCornerShape(4.dp))
                         .background(MaterialTheme.colorScheme.error)
                 )
             }
@@ -314,7 +316,7 @@ fun LinearSavingsBar(
                     Modifier
                         .weight(safeSavings)
                         .fillMaxHeight()
-                        .clip(roundedCorner)
+                        .clip(RoundedCornerShape(4.dp))
                         .background(MaterialTheme.colorScheme.error.copy(alpha = 0.15f))
                 )
             }

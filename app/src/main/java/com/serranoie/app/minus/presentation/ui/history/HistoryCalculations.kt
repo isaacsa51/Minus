@@ -82,7 +82,8 @@ internal fun buildUpcomingRecurrentItems(
                 null
             }
         }
-    }.sortedBy { it.nextChargeDate }
+    }.filter { item -> !upcomingInPeriod.any { it.transaction.id == item.transaction.id } }
+        .sortedBy { it.nextChargeDate }
 
     return upcomingInPeriod to futureOutOfPeriod
 }

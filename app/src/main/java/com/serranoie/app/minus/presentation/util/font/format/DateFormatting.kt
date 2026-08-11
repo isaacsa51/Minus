@@ -143,11 +143,6 @@ fun prettyDate(
     val locale = LocalConfiguration.current.locales[0]
 
     val yearOnlyFormatter = DateTimeFormatter.ofPattern("yyyy", locale)
-    val dateWithMonthAndYearFormatter = if (shortMonth) {
-        DateTimeFormatter.ofPattern("dd MMM yyyy", locale)
-    } else {
-        DateTimeFormatter.ofPattern("dd MMMM yyyy", locale)
-    }
     val dateWithMonthFormatter = if (shortMonth) {
         DateTimeFormatter.ofPattern("dd MMM", locale)
     } else {
@@ -160,35 +155,25 @@ fun prettyDate(
     }
 
 
-    val currentFullDate = dateWithMonthAndYearFormatter.format(LocalDate.now())
-    val currentYear = yearOnlyFormatter.format(LocalDate.now())
+    val currentLocalDate = LocalDate.now()
+    val isToday = date?.toLocalDate() == currentLocalDate
 
-    val convertedFullDate = dateWithMonthAndYearFormatter.format(date?.toLocalDate())
+    val currentYear = yearOnlyFormatter.format(currentLocalDate)
     val convertedYear = yearOnlyFormatter.format(date?.toLocalDate())
-    val convertedDate = dateWithMonthFormatter.format(date?.toLocalDate())
-    val convertedTime = if (date != null) timeFormatter.format(date) else ""
 
-    var final = ""
-
-    if (human && convertedFullDate == currentFullDate) {
-        final += stringResource(R.string.today)
-    }
-
-    if (!human || convertedFullDate != currentFullDate) {
-        if ((convertedFullDate != currentFullDate || !showTime || forceShowDate) && !forceHideDate) {
-            final += convertedDate
-        }
-
+    val datePart = if (human && isToday) {
+        stringResource(R.string.today)
+    } else if (!forceHideDate && (!isToday || !showTime || forceShowDate)) {
+        var dp = dateWithMonthFormatter.format(date?.toLocalDate())
         if (convertedYear != currentYear || forceShowYear) {
-            final += " $convertedYear"
+            dp += " $convertedYear"
         }
-    }
+        dp
+    } else ""
 
-    if (showTime) {
-        final += " $convertedTime"
-    }
+    val timePart = if (showTime && date != null) " ${timeFormatter.format(date)}" else ""
 
-    return final.trim()
+    return "$datePart$timePart".trim()
 }
 
 @Composable

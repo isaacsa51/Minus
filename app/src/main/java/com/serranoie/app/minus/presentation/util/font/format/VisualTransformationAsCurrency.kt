@@ -59,7 +59,7 @@ private fun calcShift(
     var shift = 0
 
     for (i in 0 until position) {
-        while (i < before.length && i + shift < after.length && (before[i] != after[i + shift])) {
+        while (i < before.length && i + shift < after.length && before[i] != after[i + shift]) {
             shift += 1
         }
     }
@@ -128,8 +128,8 @@ private fun visualTransformationAsCurrency(
                 output,
                 listOf(
                     Pair(
-                        before.length + (if (fixed.third.isNotEmpty()) 1 else 0),
-                        before.length + (if (fixed.third.isNotEmpty()) 2 else 0),
+                        before.length + if (fixed.third.isNotEmpty()) 1 else 0,
+                        before.length + if (fixed.third.isNotEmpty()) 2 else 0,
                     ),
                 ),
                 listOf(
@@ -328,7 +328,7 @@ fun tryConvertStringToNumber(input: String): Triple<String, String, String> {
         hintEnd = "0"
     }
     val middle =
-        if (end.isNotEmpty() || (input.lastOrNull() == '.')) {
+        if (end.isNotEmpty() || input.lastOrNull() == '.') {
             "."
         } else {
             ""

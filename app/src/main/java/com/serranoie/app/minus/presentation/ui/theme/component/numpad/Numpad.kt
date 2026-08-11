@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +50,7 @@ import com.serranoie.app.minus.presentation.util.font.format.getFloatDivider
 import com.serranoie.app.minus.presentation.util.font.format.join
 import com.serranoie.app.minus.presentation.util.font.format.tryConvertStringToNumber
 import java.util.Date
+import kotlin.math.abs
 
 val BUTTON_GAP = 3.dp
 private const val TEST_NOTIFICATION_TAP_COUNT = 5
@@ -103,16 +105,6 @@ fun Numpad(
     val view = LocalView.current
     val haptic = LocalHapticFeedback.current
     var debugProgress by remember { mutableIntStateOf(0) }
-    val shouldTriggerTestNotifications: () -> Boolean = {
-        if (debugProgress >= TEST_NOTIFICATION_TAP_COUNT) {
-            onTestNotifications?.invoke()
-            onShowSnackbar?.invoke("Test notifications triggered!")
-            debugProgress = 0
-            true
-        } else {
-            false
-        }
-    }
 
     val effectiveDragProgress by animateFloatAsState(
         targetValue = if (dragProgress > 0f && dragProgress < 1f) dragProgress else if (isCalculation) 1f else 0f,
@@ -122,6 +114,15 @@ fun Numpad(
 
     val hasOperators by remember(editorState.rawSpentValue) {
         derivedStateOf { editorState.rawSpentValue.any { it in "+-×÷" } }
+    }
+
+    val shouldTriggerTestNotifications: () -> Boolean = {
+        if (debugProgress >= TEST_NOTIFICATION_TAP_COUNT) {
+            onTestNotifications?.invoke()
+            onShowSnackbar?.invoke("Test notifications triggered!")
+            debugProgress = 0
+            true
+        } else false
     }
 
     Column(
@@ -149,29 +150,22 @@ fun Numpad(
                             accumulatedDrag < 0f && !isCalculation -> {
                                 (-accumulatedDrag / 110f).coerceIn(0f, 1f)
                             }
-
                             accumulatedDrag > 0f && isCalculation && !hasOperators -> {
                                 (accumulatedDrag / 110f).coerceIn(0f, 1f)
                             }
-
                             else -> 0f
                         }
 
-                        // Progress haptics (ticks every ~15% of the gesture)
-                        if (progress > lastTickProgress + 0.15f) {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            lastTickProgress = progress
-                        } else if (progress < lastTickProgress - 0.15f) {
+                        if (abs(progress - lastTickProgress) > 0.15f) {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             lastTickProgress = progress
                         }
 
-                        if (kotlin.math.abs(progress - lastReportedProgress) >= 0.05f) {
+                        if (abs(progress - lastReportedProgress) >= 0.05f) {
                             onDragProgressChanged(progress)
                             lastReportedProgress = progress
                         }
 
-                        // Trigger at 100% displacement
                         if (progress >= 1f && !hasTriggered) {
                             onCalculationModeChanged(!isCalculation)
                             onDragProgressChanged(0f)
@@ -184,373 +178,322 @@ fun Numpad(
                         }
                         onDragProgressChanged(0f)
                     },
-                    onDragCancel = { onDragProgressChanged(0f) })
+                    onDragCancel = { onDragProgressChanged(0f) }
+                )
             }
     ) {
         if (hasHardKeyboard) {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ) {
-                // Row 1: Arithmetic symbols
-                Row(Modifier.fillMaxWidth().weight(1f)) {
-                    val operators = listOf('÷', '×', '+', '-')
-                    for (operator in operators) {
-                        NumpadButton(
-                            modifier = Modifier
-                                .weight(1F)
-                                .padding(BUTTON_GAP),
-                            type = NumpadButtonType.OPERATOR,
-                            text = operator.toString(),
-                            onClick = {
-                                onOperatorInput(operator)
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            })
-                    }
-                }
-
-                // Row 2: Dot and Equals
-                Row(Modifier.fillMaxWidth().weight(1f)) {
-                    NumpadButton(
-                        modifier = Modifier
-                            .weight(2F)
-                            .padding(BUTTON_GAP),
-                        type = NumpadButtonType.OPERATOR,
-                        text = getFloatDivider(),
-                        onClick = {
-                            onDotInput()
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        })
-                    NumpadButton(
-                        modifier = Modifier
-                            .weight(2F)
-                            .padding(BUTTON_GAP),
-                        type = NumpadButtonType.OPERATOR,
-                        text = "=",
-                        onClick = {
-                            onEqualsInput()
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        })
-                }
-
-                // Row 3: Backspace and Save/DeleteTransaction
-                Row(Modifier.fillMaxWidth().weight(1f)) {
-                    NumpadButton(
-                        modifier = Modifier
-                            .weight(2F)
-                            .padding(BUTTON_GAP),
-                        type = NumpadButtonType.TERTIARY,
-                        icon = Icons.AutoMirrored.Rounded.Backspace,
-                        onClick = {
-                            onBackspace()
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        },
-                        onLongClick = {
-                            onBackspaceLongPress()
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        })
-
-                    val fixedSpent by remember(editorState.rawSpentValue) {
-                        derivedStateOf {
-                            tryConvertStringToNumber(editorState.rawSpentValue).join(third = false)
-                        }
-                    }
-
-                    val targetIsDelete =
-                        !isCalculation && (fixedSpent == "0" || fixedSpent == "0." || fixedSpent == "0.0") && editorState.mode == EditMode.EDIT
-
-                    NumpadButton(
-                        modifier = Modifier
-                            .weight(2F)
-                            .padding(BUTTON_GAP),
-                        type = if (targetIsDelete) NumpadButtonType.DELETE else NumpadButtonType.PRIMARY,
-                        icon = if (targetIsDelete) Icons.Default.Delete else (if (isCalculation) Icons.Default.Done else Icons.Default.Check),
-                        onClick = {
-                            if (targetIsDelete) onDelete() else onApply()
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        })
-                }
-            }
+            CompactHardwareLayout(
+                editorState = editorState,
+                isCalculation = isCalculation,
+                onOperatorInput = onOperatorInput,
+                onDotInput = onDotInput,
+                onEqualsInput = onEqualsInput,
+                onBackspace = onBackspace,
+                onBackspaceLongPress = onBackspaceLongPress,
+                onDelete = onDelete,
+                onApply = onApply
+            )
         } else {
             if (effectiveDragProgress > 0.01f || isCalculation) {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(effectiveDragProgress.coerceAtLeast(0.01f))
-                        .clipToBounds(),
-                    contentAlignment = androidx.compose.ui.Alignment.BottomCenter
-                ) {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .graphicsLayer(alpha = effectiveDragProgress)
-                            .let { m ->
-                                if (tutorialBoxState != null) m.markForTutorial(tutorialBoxState, 7) else m
-                            }
-                    ) {
-                        val operators = listOf('÷', '×', '+', '-')
-                        for (operator in operators) {
-                            NumpadButton(
-                                modifier = Modifier
-                                    .weight(1F)
-                                    .padding(BUTTON_GAP),
-                                type = NumpadButtonType.OPERATOR,
-                                text = operator.toString(),
-                                onClick = {
-                                    onOperatorInput(operator)
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                })
-                        }
-                    }
-                }
+                OperatorRow(
+                    effectiveDragProgress = effectiveDragProgress,
+                    tutorialBoxState = tutorialBoxState,
+                    onOperatorInput = onOperatorInput
+                )
             }
 
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(4f)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(3F)
-                ) {
-                    val leftColumnScope = this
+            Row(Modifier.fillMaxWidth().weight(4f)) {
+                Box(Modifier.fillMaxHeight().weight(3f)) {
                     AnimatedContent(
-                        modifier = Modifier.fillMaxSize(),
                         targetState = leftContent != null,
                         label = "NumpadLeftContentSwap",
                         transitionSpec = {
-                            (fadeIn(animationSpec = tween(durationMillis = 250)) +
-                                    scaleIn(
-                                        initialScale = 0.96f,
-                                        animationSpec = tween(durationMillis = 250)
-                                    )) togetherWith
-                                    (fadeOut(animationSpec = tween(durationMillis = 200)) +
-                                            scaleOut(
-                                                targetScale = 0.96f,
-                                                animationSpec = tween(durationMillis = 200)
-                                            )) using
-                                    SizeTransform(clip = false)
-                        },
+                            (fadeIn(tween(250)) + scaleIn(initialScale = 0.96f, animationSpec = tween(250))) togetherWith
+                            (fadeOut(tween(200)) + scaleOut(targetScale = 0.96f, animationSpec = tween(200))) using
+                            SizeTransform(clip = false)
+                        }
                     ) { hasLeftContent ->
                         if (hasLeftContent) {
-                            leftContent?.invoke(leftColumnScope)
+                            Column(Modifier.fillMaxSize()) { leftContent?.invoke(this) }
                         } else {
-                            Column(modifier = Modifier.fillMaxHeight()) {
-                                Row(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .weight(1F)
-                                ) {
-                                    for (i in 7..9) {
-                                        NumpadButton(
-                                            modifier = Modifier
-                                                .weight(1F)
-                                                .padding(BUTTON_GAP),
-                                            type = NumpadButtonType.DEFAULT,
-                                            text = i.toString(),
-                                            onClick = {
-                                                onNumberInput(i)
-                                                debugProgress = 0
-                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            })
-                                    }
-                                }
-
-                                Row(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .weight(1F)
-                                ) {
-                                    for (i in 4..6) {
-                                        NumpadButton(
-                                            modifier = Modifier
-                                                .weight(1F)
-                                                .padding(BUTTON_GAP)
-                                                .then(if (i == 5) numberHintAnchorModifier else Modifier as Modifier),
-                                            type = NumpadButtonType.DEFAULT,
-                                            text = i.toString(),
-                                            onClick = {
-                                                onNumberInput(i)
-                                                onNumberPressedForTutorial?.invoke()
-                                                debugProgress = 0
-                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            })
-                                    }
-                                }
-
-                                Row(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .weight(1F)
-                                ) {
-                                    for (i in 1..3) {
-                                        NumpadButton(
-                                            modifier = Modifier
-                                                .weight(1F)
-                                                .padding(BUTTON_GAP),
-                                            type = NumpadButtonType.DEFAULT,
-                                            text = i.toString(),
-                                            onClick = {
-                                                onNumberInput(i)
-                                                debugProgress = 0
-                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            })
-                                    }
-                                }
-
-                                Row(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .weight(1F)
-                                ) {
-                                    if (effectiveDragProgress > 0.01f || isCalculation) {
-                                        NumpadButton(
-                                            modifier = Modifier
-                                                .weight(effectiveDragProgress.coerceAtLeast(0.01f))
-                                                .padding(BUTTON_GAP)
-                                                .graphicsLayer(alpha = effectiveDragProgress),
-                                            type = NumpadButtonType.OPERATOR,
-                                            text = getFloatDivider(),
-                                            onClick = {
-                                                onDotInput()
-                                                debugProgress =
-                                                    (debugProgress + 1).coerceAtMost(
-                                                        TEST_NOTIFICATION_TAP_COUNT
-                                                    )
-                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            })
-                                    }
-                                    NumpadButton(
-                                        modifier = Modifier
-                                            .weight(3f - (2f * effectiveDragProgress))
-                                            .padding(BUTTON_GAP),
-                                        type = NumpadButtonType.DEFAULT,
-                                        text = "0",
-                                        onClick = {
-                                            onNumberInput(0)
-                                            onNumberPressedForTutorial?.invoke()
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        })
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1.5f - (0.5f * effectiveDragProgress))
-                                            .fillMaxHeight()
-                                    ) {
-                                        AnimatedContent(
-                                            targetState = isCalculation || effectiveDragProgress > 0.5f,
-                                            label = "LastButtonSwap",
-                                            transitionSpec = {
-                                                fadeIn(tween(150)) togetherWith fadeOut(tween(150))
-                                            }
-                                        ) { showEquals ->
-                                            if (showEquals) {
-                                                NumpadButton(
-                                                    modifier = Modifier
-                                                        .fillMaxSize()
-                                                        .padding(BUTTON_GAP),
-                                                    type = NumpadButtonType.OPERATOR,
-                                                    text = "=",
-                                                    onClick = {
-                                                        onEqualsInput()
-                                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                    })
-                                            } else {
-                                                NumpadButton(
-                                                    modifier = Modifier
-                                                        .fillMaxSize()
-                                                        .padding(BUTTON_GAP),
-                                                    type = NumpadButtonType.OPERATOR,
-                                                    text = getFloatDivider(),
-                                                    onClick = {
-                                                        onDotInput()
-                                                        debugProgress =
-                                                            (debugProgress + 1).coerceAtMost(
-                                                                TEST_NOTIFICATION_TAP_COUNT
-                                                            )
-                                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                    })
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            NumberGrid(
+                                effectiveDragProgress = effectiveDragProgress,
+                                isCalculation = isCalculation,
+                                onNumberInput = {
+                                    onNumberInput(it)
+                                    debugProgress = 0
+                                },
+                                onDotInput = {
+                                    onDotInput()
+                                    debugProgress = (debugProgress + 1).coerceAtMost(TEST_NOTIFICATION_TAP_COUNT)
+                                },
+                                onEqualsInput = onEqualsInput,
+                                numberHintAnchorModifier = numberHintAnchorModifier,
+                                onNumberPressedForTutorial = onNumberPressedForTutorial
+                            )
                         }
                     }
                 }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1F)
-                ) {
+                ActionButtonsColumn(
+                    editorState = editorState,
+                    isCalculation = isCalculation,
+                    onBackspace = {
+                        onBackspace()
+                        debugProgress = 0
+                    },
+                    onBackspaceLongPress = {
+                        onBackspaceLongPress()
+                        debugProgress = 0
+                    },
+                    onDelete = onDelete,
+                    onApply = {
+                        if (!shouldTriggerTestNotifications()) {
+                            debugProgress = 0
+                            onApplyPressedForTutorial?.invoke()
+                            onApply()
+                        }
+                    },
+                    applyHintAnchorModifier = applyHintAnchorModifier
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CompactHardwareLayout(
+    editorState: EditorState,
+    isCalculation: Boolean,
+    onOperatorInput: (Char) -> Unit,
+    onDotInput: () -> Unit,
+    onEqualsInput: () -> Unit,
+    onBackspace: () -> Unit,
+    onBackspaceLongPress: () -> Unit,
+    onDelete: () -> Unit,
+    onApply: () -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
+    Column(Modifier.fillMaxWidth().fillMaxHeight()) {
+        Row(Modifier.fillMaxWidth().weight(1f)) {
+            listOf('÷', '×', '+', '-').forEach { operator ->
+                NumpadButton(
+                    modifier = Modifier.weight(1f).padding(BUTTON_GAP),
+                    type = NumpadButtonType.OPERATOR,
+                    text = operator.toString(),
+                    onClick = {
+                        onOperatorInput(operator)
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                )
+            }
+        }
+
+        Row(Modifier.fillMaxWidth().weight(1f)) {
+            NumpadButton(
+                modifier = Modifier.weight(2f).padding(BUTTON_GAP),
+                type = NumpadButtonType.OPERATOR,
+                text = getFloatDivider(),
+                onClick = {
+                    onDotInput()
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                }
+            )
+            NumpadButton(
+                modifier = Modifier.weight(2f).padding(BUTTON_GAP),
+                type = NumpadButtonType.OPERATOR,
+                text = "=",
+                onClick = {
+                    onEqualsInput()
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                }
+            )
+        }
+
+        Row(Modifier.fillMaxWidth().weight(1f)) {
+            NumpadButton(
+                modifier = Modifier.weight(2f).padding(BUTTON_GAP),
+                type = NumpadButtonType.TERTIARY,
+                icon = Icons.AutoMirrored.Rounded.Backspace,
+                onClick = {
+                    onBackspace()
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                },
+                onLongClick = {
+                    onBackspaceLongPress()
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+            )
+
+            val targetIsDelete = remember(editorState.rawSpentValue, editorState.mode, isCalculation) {
+                !isCalculation && editorState.mode == EditMode.EDIT &&
+                        tryConvertStringToNumber(editorState.rawSpentValue).join(third = false).let {
+                            it == "0" || it == "0." || it == "0.0"
+                        }
+            }
+
+            NumpadButton(
+                modifier = Modifier.weight(2f).padding(BUTTON_GAP),
+                type = if (targetIsDelete) NumpadButtonType.DELETE else NumpadButtonType.PRIMARY,
+                icon = if (targetIsDelete) Icons.Default.Delete else if (isCalculation) Icons.Default.Done else Icons.Default.Check,
+                onClick = {
+                    if (targetIsDelete) onDelete() else onApply()
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ColumnScope.OperatorRow(
+    effectiveDragProgress: Float,
+    tutorialBoxState: TutorialBoxState?,
+    onOperatorInput: (Char) -> Unit
+) {
+    val haptic = LocalHapticFeedback.current
+    Box(
+        Modifier.fillMaxWidth().weight(effectiveDragProgress.coerceAtLeast(0.01f)).clipToBounds(),
+        contentAlignment = androidx.compose.ui.Alignment.BottomCenter
+    ) {
+        Row(
+            Modifier.fillMaxWidth().fillMaxHeight().graphicsLayer(alpha = effectiveDragProgress)
+                .let { if (tutorialBoxState != null) it.markForTutorial(tutorialBoxState, 7) else it }
+        ) {
+            listOf('÷', '×', '+', '-').forEach { operator ->
+                NumpadButton(
+                    modifier = Modifier.weight(1f).padding(BUTTON_GAP),
+                    type = NumpadButtonType.OPERATOR,
+                    text = operator.toString(),
+                    onClick = {
+                        onOperatorInput(operator)
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NumberGrid(
+    effectiveDragProgress: Float,
+    isCalculation: Boolean,
+    onNumberInput: (Int) -> Unit,
+    onDotInput: () -> Unit,
+    onEqualsInput: () -> Unit,
+    numberHintAnchorModifier: Modifier,
+    onNumberPressedForTutorial: (() -> Unit)?
+) {
+    val haptic = LocalHapticFeedback.current
+    Column(Modifier.fillMaxHeight()) {
+        val rows = listOf(7..9, 4..6, 1..3)
+        for (row in rows) {
+            Row(Modifier.fillMaxWidth().weight(1f)) {
+                for (i in row) {
                     NumpadButton(
-                        modifier = Modifier
-                            .weight(1F)
-                            .padding(BUTTON_GAP),
-                        type = NumpadButtonType.TERTIARY,
-                        icon = Icons.AutoMirrored.Rounded.Backspace,
+                        modifier = Modifier.weight(1f).padding(BUTTON_GAP)
+                            .then(if (i == 5) numberHintAnchorModifier else Modifier),
+                        type = NumpadButtonType.DEFAULT,
+                        text = i.toString(),
                         onClick = {
-                            onBackspace()
-                            debugProgress = 0
+                            onNumberInput(i)
+                            if (i in 4..6) onNumberPressedForTutorial?.invoke()
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        },
-                        onLongClick = {
-                            debugProgress = 0
-                            onBackspaceLongPress()
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        })
-
-                    val fixedSpent by remember(editorState.rawSpentValue) {
-                        derivedStateOf {
-                            tryConvertStringToNumber(editorState.rawSpentValue).join(third = false)
                         }
-                    }
-
-                    AnimatedContent(
-                        modifier = Modifier.weight(3f),
-                        label = "Delete or Apply",
-                        targetState = if (isCalculation) false else (fixedSpent == "0" || fixedSpent == "0." || fixedSpent == "0.0") && editorState.mode == EditMode.EDIT,
-                        transitionSpec = {
-                            fadeIn(tween(durationMillis = 150)) togetherWith fadeOut(
-                                tween(
-                                    durationMillis = 150
-                                )
-                            )
-                        }) { targetIsDelete ->
-                        if (targetIsDelete) {
-                            NumpadButton(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(BUTTON_GAP),
-                                type = NumpadButtonType.DELETE,
-                                icon = Icons.Default.Delete,
-                                onClick = {
-                                    onDelete()
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                })
-                        } else {
-                            NumpadButton(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(BUTTON_GAP)
-                                    .then(applyHintAnchorModifier),
-                                type = if (isCalculation) NumpadButtonType.PRIMARY else NumpadButtonType.PRIMARY,
-                                icon = if (isCalculation) Icons.Default.Done else Icons.Default.Check,
-                                onClick = {
-                                    if (shouldTriggerTestNotifications()) return@NumpadButton
-                                    debugProgress = 0
-                                    onApplyPressedForTutorial?.invoke()
-                                    onApply()
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                })
-                        }
-                    }
+                    )
                 }
             }
+        }
+
+        Row(Modifier.fillMaxWidth().weight(1f)) {
+            if (effectiveDragProgress > 0.01f || isCalculation) {
+                NumpadButton(
+                    modifier = Modifier.weight(effectiveDragProgress.coerceAtLeast(0.01f)).padding(BUTTON_GAP).graphicsLayer(alpha = effectiveDragProgress),
+                    type = NumpadButtonType.OPERATOR,
+                    text = getFloatDivider(),
+                    onClick = {
+                        onDotInput()
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                )
+            }
+            NumpadButton(
+                modifier = Modifier.weight(3f - (2f * effectiveDragProgress)).padding(BUTTON_GAP),
+                type = NumpadButtonType.DEFAULT,
+                text = "0",
+                onClick = {
+                    onNumberInput(0)
+                    onNumberPressedForTutorial?.invoke()
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                }
+            )
+            Box(Modifier.weight(1.5f - (0.5f * effectiveDragProgress)).fillMaxHeight()) {
+                val showEquals = isCalculation || effectiveDragProgress > 0.5f
+                AnimatedContent(targetState = showEquals, label = "LastButtonSwap") { equals ->
+                    NumpadButton(
+                        modifier = Modifier.fillMaxSize().padding(BUTTON_GAP),
+                        type = NumpadButtonType.OPERATOR,
+                        text = if (equals) "=" else getFloatDivider(),
+                        onClick = {
+                            if (equals) onEqualsInput() else onDotInput()
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.ActionButtonsColumn(
+    editorState: EditorState,
+    isCalculation: Boolean,
+    onBackspace: () -> Unit,
+    onBackspaceLongPress: () -> Unit,
+    onDelete: () -> Unit,
+    onApply: () -> Unit,
+    applyHintAnchorModifier: Modifier
+) {
+    val haptic = LocalHapticFeedback.current
+    Column(Modifier.fillMaxHeight().weight(1f)) {
+        NumpadButton(
+            modifier = Modifier.weight(1f).padding(BUTTON_GAP),
+            type = NumpadButtonType.TERTIARY,
+            icon = Icons.AutoMirrored.Rounded.Backspace,
+            onClick = {
+                onBackspace()
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            },
+            onLongClick = {
+                onBackspaceLongPress()
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            }
+        )
+
+        val targetIsDelete = remember(editorState.rawSpentValue, editorState.mode, isCalculation) {
+            !isCalculation && editorState.mode == EditMode.EDIT &&
+                    tryConvertStringToNumber(editorState.rawSpentValue).join(third = false).let {
+                        it == "0" || it == "0." || it == "0.0"
+                    }
+        }
+
+        AnimatedContent(
+            modifier = Modifier.weight(3f),
+            targetState = targetIsDelete,
+            label = "Delete or Apply"
+        ) { isDelete ->
+            NumpadButton(
+                modifier = Modifier.fillMaxSize().padding(BUTTON_GAP).then(if (!isDelete) applyHintAnchorModifier else Modifier),
+                type = if (isDelete) NumpadButtonType.DELETE else NumpadButtonType.PRIMARY,
+                icon = if (isDelete) Icons.Default.Delete else (if (isCalculation) Icons.Default.Done else Icons.Default.Check),
+                onClick = {
+                    if (isDelete) onDelete() else onApply()
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+            )
         }
     }
 }
@@ -568,13 +511,7 @@ fun NumpadPreview() {
                 currentComment = "",
                 editedTransaction = null
             ),
-            isCalculation = false,
-            onNumberInput = { },
-            onDotInput = { },
-            onBackspace = { },
-            onBackspaceLongPress = { },
-            onDelete = { },
-            onApply = { },
+            isCalculation = false
         )
     }
 }
@@ -592,13 +529,7 @@ fun NumpadPreviewCalculationMode() {
                 currentComment = "",
                 editedTransaction = null
             ),
-            isCalculation = true,
-            onNumberInput = { },
-            onDotInput = { },
-            onBackspace = { },
-            onBackspaceLongPress = { },
-            onDelete = { },
-            onApply = { },
+            isCalculation = true
         )
     }
 }
