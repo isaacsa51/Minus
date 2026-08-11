@@ -40,7 +40,7 @@ fun calcMaxFont(
     )
 
     return with(LocalDensity.current) {
-        ((measureFontSize.toPx() / paragraph.firstBaseline) * height).toSp()
+        (measureFontSize.toPx() / paragraph.firstBaseline * height).toSp()
     }
 }
 
