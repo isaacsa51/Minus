@@ -39,7 +39,7 @@ import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorPrimary
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 
 /**

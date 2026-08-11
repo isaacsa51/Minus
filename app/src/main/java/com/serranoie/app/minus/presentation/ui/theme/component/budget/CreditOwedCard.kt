@@ -43,7 +43,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.censor
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)

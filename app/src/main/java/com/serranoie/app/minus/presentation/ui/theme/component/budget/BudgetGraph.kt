@@ -74,7 +74,7 @@ import com.serranoie.app.minus.presentation.ui.analytics.GraphGranularity
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.combineColors
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import java.math.BigDecimal
 import java.math.RoundingMode

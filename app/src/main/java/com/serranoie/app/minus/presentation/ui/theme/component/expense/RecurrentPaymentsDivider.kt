@@ -28,7 +28,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 
 @Composable

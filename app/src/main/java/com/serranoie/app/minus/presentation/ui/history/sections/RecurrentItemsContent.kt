@@ -18,7 +18,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.ticket.RecurrentTicketCard
-import com.serranoie.app.minus.presentation.util.prettyDate
+import com.serranoie.app.minus.presentation.util.font.format.prettyDate
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDate

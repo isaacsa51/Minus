@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.util
+package com.serranoie.app.minus.presentation.util.font
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable

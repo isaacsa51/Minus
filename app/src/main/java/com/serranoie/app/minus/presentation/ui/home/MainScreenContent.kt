@@ -1,5 +1,6 @@
 ﻿package com.serranoie.app.minus.presentation.ui.home
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -58,9 +59,27 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Density
@@ -468,16 +487,31 @@ private fun PhoneLayout(
     tutorialBoxState: TutorialBoxState? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val configuration = LocalConfiguration.current
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
     val navigationBarOffset = windowInsets.calculateBottomPadding()
     val navBarHeightPx = with(localDensity) { navigationBarOffset.toPx() }
 
+    val hasHardKeyboard =
+        configuration.keyboard == Configuration.KEYBOARD_QWERTY
+    val isSquareScreen =
+        configuration.screenWidthDp.toFloat() / configuration.screenHeightDp.toFloat() > 0.8f
+
+    var isNumpadExpandedManually by remember { mutableStateOf<Boolean?>(null) }
+    val isNumpadCollapsed =
+        isNumpadExpandedManually?.let { !it } ?: (hasHardKeyboard && isSquareScreen)
+
+    val heightFactor = if (isSquareScreen) 0.35f else 0.45f
     val defaultInternalKeyboardHeightBase =
         contentWidth
             .coerceAtMost(with(localDensity) { 500.dp.toPx() })
-            .coerceAtMost(contentHeight * 0.45f)
+            .coerceAtMost(contentHeight * heightFactor)
     val rowHeightPx = defaultInternalKeyboardHeightBase / 4
-    val defaultInternalKeyboardHeight = rowHeightPx * 4
-    val calcModeKeyboardHeight = rowHeightPx * 5
+    val defaultInternalKeyboardHeight =
+        if (isNumpadCollapsed) with(localDensity) { 64.dp.toPx() } else rowHeightPx * 4
+    val calcModeKeyboardHeight =
+        if (isNumpadCollapsed || hasHardKeyboard) defaultInternalKeyboardHeight else rowHeightPx * 5
 
     var localDragProgress by remember { mutableFloatStateOf(0f) }
 
@@ -573,9 +607,195 @@ private fun PhoneLayout(
         }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .focusRequester(focusRequester)
+            .focusable()
+            .onKeyEvent { keyEvent ->
+                if (keyEvent.type == KeyEventType.KeyUp) {
+                    when (keyEvent.key) {
+                        Key.Zero, Key.NumPad0 -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped("0")
+                                )
+                            ); true
+                        }
+
+                        Key.One, Key.NumPad1 -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped("1")
+                                )
+                            ); true
+                        }
+
+                        Key.Two, Key.NumPad2 -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped("2")
+                                )
+                            ); true
+                        }
+
+                        Key.Three, Key.NumPad3 -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped("3")
+                                )
+                            ); true
+                        }
+
+                        Key.Four, Key.NumPad4 -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped("4")
+                                )
+                            ); true
+                        }
+
+                        Key.Five, Key.NumPad5 -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped("5")
+                                )
+                            ); true
+                        }
+
+                        Key.Six, Key.NumPad6 -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped("6")
+                                )
+                            ); true
+                        }
+
+                        Key.Seven, Key.NumPad7 -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped("7")
+                                )
+                            ); true
+                        }
+
+                        Key.Eight -> {
+                            if (keyEvent.isShiftPressed) {
+                                actions.onProcessIntent(
+                                    MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                        BudgetNumpadIntent.OperatorTapped('×')
+                                    )
+                                ); true
+                            } else {
+                                actions.onProcessIntent(
+                                    MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                        BudgetNumpadIntent.NumberTapped("8")
+                                    )
+                                ); true
+                            }
+                        }
+
+                        Key.Nine, Key.NumPad9 -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.NumberTapped("9")
+                                )
+                            ); true
+                        }
+
+                        Key.Period, Key.NumPadDot -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.DotTapped
+                                )
+                            ); true
+                        }
+
+                        Key.Backspace -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.BackspaceTapped
+                                )
+                            ); true
+                        }
+
+                        Key.Enter, Key.NumPadEnter -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.ApplyTapped
+                                )
+                            ); true
+                        }
+
+                        Key.Plus, Key.NumPadAdd -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.OperatorTapped('+')
+                                )
+                            ); true
+                        }
+
+                        Key.Minus, Key.NumPadSubtract -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.OperatorTapped('-')
+                                )
+                            ); true
+                        }
+
+                        Key.Multiply, Key.NumPadMultiply -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.OperatorTapped('×')
+                                )
+                            ); true
+                        }
+
+                        Key.Slash, Key.NumPadDivide -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.OperatorTapped('÷')
+                                )
+                            ); true
+                        }
+
+                        Key.Equals, Key.NumPadEquals -> {
+                            if (keyEvent.isShiftPressed) {
+                                actions.onProcessIntent(
+                                    MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                        BudgetNumpadIntent.OperatorTapped('+')
+                                    )
+                                ); true
+                            } else {
+                                actions.onProcessIntent(
+                                    MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                        BudgetNumpadIntent.EqualsTapped
+                                    )
+                                ); true
+                            }
+                        }
+
+                        Key.Escape -> {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                    BudgetNumpadIntent.ResetInputTapped
+                                )
+                            ); true
+                        }
+
+                        else -> false
+                    }
+                } else false
+            },
         contentAlignment = Alignment.BottomCenter,
     ) {
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
+        LaunchedEffect(budgetUiState.animState) {
+            if (budgetUiState.animState == AnimState.EDITING) {
+                focusRequester.requestFocus()
+            }
+        }
         val halfExpandedOffsetPx =
             with(localDensity) {
                 (-contentHeight + navBarHeightPx + 18.dp.toPx() + editorHeightAnimated).coerceAtMost(
@@ -602,18 +822,56 @@ private fun PhoneLayout(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp),
+                    .padding(top = 16.dp)
+                    .pointerInput(isNumpadCollapsed) {
+                        detectVerticalDragGestures { change, dragAmount ->
+                            if (dragAmount < -20f && isNumpadCollapsed) {
+                                isNumpadExpandedManually = true
+                                focusManager.clearFocus()
+                            } else if (dragAmount > 20f && !isNumpadCollapsed && (hasHardKeyboard || isSquareScreen)) {
+                                isNumpadExpandedManually = false
+                            }
+                        }
+                    }
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        if (hasHardKeyboard || isSquareScreen) {
+                            isNumpadExpandedManually = !isNumpadCollapsed
+                            focusManager.clearFocus()
+                            focusRequester.requestFocus()
+                        }
+                    },
                 contentAlignment = Alignment.BottomCenter,
             ) {
-                MainScreenNumpadSection(
-                    budgetUiState = budgetUiState,
-                    showCategoryGrid = showCategoryGrid,
-                    actions = actions,
-                    featureFlags = featureFlags,
-                    effectiveProgress = effectiveProgress,
-                    onDragProgressChanged = { progress -> localDragProgress = progress },
-                    tutorialBoxState = tutorialBoxState,
-                )
+                if (isNumpadCollapsed) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .navigationBarsPadding()
+                            .padding(bottom = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.ExpandLess,
+                            contentDescription = "Expand Numpad",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                } else {
+                    MainScreenNumpadSection(
+                        budgetUiState = budgetUiState,
+                        showCategoryGrid = showCategoryGrid,
+                        actions = actions,
+                        featureFlags = featureFlags,
+                        effectiveProgress = effectiveProgress,
+                        onDragProgressChanged = { progress -> localDragProgress = progress },
+                        hasHardKeyboard = hasHardKeyboard,
+                        tutorialBoxState = tutorialBoxState,
+                    )
+                }
             }
         }
 
@@ -659,6 +917,23 @@ private fun PhoneLayout(
                     onNavigateToAnalytics = actions.onNavigateToAnalytics,
                     openWalletOnStart = openWalletOnStart,
                     tutorialBoxState = tutorialBoxState,
+                    onFocus = {
+                        focusRequester.requestFocus()
+                        if (budgetUiState.numpadInput.isNotEmpty() && budgetUiState.animState != AnimState.EDITING) {
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetEditorIntent(
+                                    BudgetEditorIntent.SetAnimState(AnimState.EDITING),
+                                ),
+                            )
+                        }
+                    },
+                    onApply = {
+                        actions.onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.ApplyTapped,
+                            ),
+                        )
+                    }
                 )
             },
             sheetContentExpand = {
@@ -751,6 +1026,9 @@ private fun TabletLayout(
     snackbarHostState: SnackbarHostState,
     tutorialBoxState: TutorialBoxState? = null,
 ) {
+    val configuration = LocalConfiguration.current
+    val hasHardKeyboard =
+        configuration.keyboard == Configuration.KEYBOARD_QWERTY
     val navigationBarOffset = windowInsets.calculateBottomPadding()
     val navBarHeightPx = with(localDensity) { navigationBarOffset.toPx() }
 
@@ -760,7 +1038,7 @@ private fun TabletLayout(
             .coerceAtMost(contentHeight / 2.5f)
     val rowHeightPx = defaultInternalKeyboardHeightBase / 4
     val defaultInternalKeyboardHeight = rowHeightPx * 4
-    val calcModeKeyboardHeight = rowHeightPx * 5
+    val calcModeKeyboardHeight = if (hasHardKeyboard) defaultInternalKeyboardHeight else rowHeightPx * 5
 
     var localDragProgress by remember { mutableFloatStateOf(0f) }
 
@@ -842,6 +1120,13 @@ private fun TabletLayout(
                     tutorialBoxState = tutorialBoxState,
                     showAnalyticsButton = false,
                     showSettingsButton = false,
+                    onApply = {
+                        actions.onProcessIntent(
+                            MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                                BudgetNumpadIntent.ApplyTapped,
+                            ),
+                        )
+                    }
                 )
             }
 
@@ -870,6 +1155,7 @@ private fun TabletLayout(
                         featureFlags = featureFlags,
                         effectiveProgress = effectiveProgress,
                         onDragProgressChanged = { progress -> localDragProgress = progress },
+                        hasHardKeyboard = hasHardKeyboard,
                         tutorialBoxState = tutorialBoxState,
                     )
                 }
@@ -886,6 +1172,7 @@ private fun MainScreenNumpadSection(
     featureFlags: MainScreenFeatureFlags,
     effectiveProgress: Float,
     onDragProgressChanged: (Float) -> Unit,
+    hasHardKeyboard: Boolean = false,
     modifier: Modifier = Modifier,
     tutorialBoxState: TutorialBoxState? = null,
 ) {
@@ -932,6 +1219,7 @@ private fun MainScreenNumpadSection(
                 } ?: Modifier,
             ),
         editorState = editorState,
+        hasHardKeyboard = hasHardKeyboard,
         numberHintAnchorModifier = Modifier,
         applyHintAnchorModifier = Modifier,
         onNumberInput = { digit ->
@@ -1027,11 +1315,14 @@ private fun MainScreenEditorSection(
     tutorialBoxState: TutorialBoxState? = null,
     showAnalyticsButton: Boolean = true,
     showSettingsButton: Boolean = true,
+    onFocus: () -> Unit = {},
+    onApply: () -> Unit = {},
 ) {
     Editor(
         uiState = budgetUiState,
         animState = budgetUiState.animState,
         modifier = modifier,
+        onApply = onApply,
         onOpenHistory = {},
         onOpenSettings = onNavigateToSettings,
         onOpenAnalytics = onNavigateToAnalytics,
@@ -1060,15 +1351,7 @@ private fun MainScreenEditorSection(
         onAnalyticsClickForTutorial = {
             actions.onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANALYTICS)
         },
-        onFocus = {
-            if (budgetUiState.numpadInput.isNotEmpty() && budgetUiState.animState != AnimState.EDITING) {
-                actions.onProcessIntent(
-                    MainScreenUiIntent.ProcessBudgetEditorIntent(
-                        BudgetEditorIntent.SetAnimState(AnimState.EDITING),
-                    ),
-                )
-            }
-        },
+        onFocus = onFocus,
         onCommentClick = {},
         onCommentUpdate = { comment ->
             actions.onProcessIntent(

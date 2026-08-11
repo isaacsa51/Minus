@@ -33,13 +33,13 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.censor
-import com.serranoie.app.minus.presentation.util.calculateDaysToCutoff
+import com.serranoie.app.minus.presentation.util.font.format.calculateDaysToCutoff
 import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.util.Locale
-import com.serranoie.app.minus.presentation.util.prettyDate
+import com.serranoie.app.minus.presentation.util.font.format.prettyDate
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
 @Composable

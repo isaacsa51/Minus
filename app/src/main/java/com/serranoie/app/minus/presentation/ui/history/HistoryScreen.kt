@@ -42,7 +42,7 @@ import com.serranoie.app.minus.presentation.ui.history.sections.pastPeriodToggle
 import com.serranoie.app.minus.presentation.ui.history.sections.pastTransactionDateSections
 import com.serranoie.app.minus.presentation.ui.history.sections.transactionDateSections
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransactionsView
-import com.serranoie.app.minus.presentation.util.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.time.LocalDate
 
 enum class RecurrentPaymentsViewMode {

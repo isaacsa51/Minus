@@ -40,7 +40,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
-import com.serranoie.app.minus.presentation.util.formatCurrencySymbolOnly
+import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
