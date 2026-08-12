@@ -288,7 +288,8 @@
     <string name="settings_language_pt" translatable="false">Português</string>
     <string name="settings_language_ru" translatable="false">Русский</string>
     <string name="settings_language_zh" translatable="false">中文</string>
-    <string name="settings_color_scheme_title">App Color Scheme</string>
+    <string name="settings_language_br" translatable="false">Bulgarian</string>
+    <string name="settings_color_scheme_title">Colorscheme</string>
     <string name="settings_section_notifications">Notifications</string>
     <string name="settings_section_features">Features</string>
     <string name="settings_section_app_info">App information</string>
@@ -302,6 +303,7 @@
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
     <string name="settings_typography_title">Typography</string>
     <string name="settings_typography_subtitle">Change the app typography style</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Use wallpaper colors to apply a dynamic app theme</string>
     <string name="settings_censor_mode_title">Privacy mode</string>

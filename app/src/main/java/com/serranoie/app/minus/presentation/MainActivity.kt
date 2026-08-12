@@ -58,6 +58,7 @@ import javax.inject.Inject
 
 var Context.appTheme by mutableStateOf(ThemeMode.SYSTEM)
 var Context.appTypography by mutableStateOf(TypographyMode.EXPRESSIVE)
+var Context.isRoundedFontEnabled by mutableStateOf(true)
 var Context.appColorScheme by mutableStateOf(AppColorScheme.BRAND)
 var Context.appContrast by mutableStateOf(ContrastMode.NORMAL)
 var Context.dynamicColorEnabled by mutableStateOf(false)

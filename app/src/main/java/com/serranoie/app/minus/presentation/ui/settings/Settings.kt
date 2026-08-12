@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ViewList
+import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -34,6 +35,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material.icons.filled.QuestionMark
@@ -41,7 +43,25 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Sell
+import androidx.compose.material.icons.filled.TipsAndUpdates
 import androidx.compose.material.icons.outlined.RemoveRedEye
+import androidx.compose.material.icons.rounded.AccessTime
+import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Backup
+import androidx.compose.material.icons.rounded.BugReport
+import androidx.compose.material.icons.rounded.CreditCard
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.HelpOutline
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Publish
+import androidx.compose.material.icons.rounded.QuestionMark
+import androidx.compose.material.icons.rounded.Repeat
+import androidx.compose.material.icons.rounded.Savings
+import androidx.compose.material.icons.rounded.Sell
+import androidx.compose.material.icons.rounded.TipsAndUpdates
+import androidx.compose.material.icons.rounded.YoutubeSearchedFor
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -323,7 +343,7 @@ fun Settings(
                         headerVerticalPadding = 20.dp,
                         leadingIcon = {
                             Icon(
-                                imageVector = Icons.Default.CreditCard,
+                                imageVector = Icons.Rounded.CreditCard,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary
                             )
@@ -334,23 +354,16 @@ fun Settings(
                                 onClick = onCreditQuickToggleFeatureToggle,
                                 position = PaddedListItemPosition.Middle,
                             ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
                                     Icon(
-                                        imageVector = Icons.Default.HelpOutline,
+                                        imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(18.dp)
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = stringResource(R.string.settings_feature_credit_toggle_details),
                                         style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.weight(1f)
                                     )
-                                }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
@@ -374,7 +387,7 @@ fun Settings(
                         position = PaddedListItemPosition.Middle,
                     ) {
                         Icon(
-                            imageVector = Icons.Default.AutoAwesome,
+                            imageVector = Icons.Rounded.YoutubeSearchedFor,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -408,7 +421,7 @@ fun Settings(
                         headerVerticalPadding = 20.dp,
                         leadingIcon = {
                             Icon(
-                                imageVector = Icons.Default.Sell,
+                                imageVector = Icons.Rounded.Sell,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary
                             )
@@ -419,23 +432,18 @@ fun Settings(
                                 onClick = onCategoryPickerDirectPopupFeatureToggle,
                                 position = PaddedListItemPosition.Middle,
                             ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
                                     Icon(
-                                        imageVector = Icons.Default.HelpOutline,
+                                        imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(18.dp)
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = stringResource(R.string.settings_category_picker_direct_popup_description),
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.weight(1f)
                                     )
-                                }
+
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
@@ -456,23 +464,18 @@ fun Settings(
                                 onClick = onCategoryGridModeToggle,
                                 position = PaddedListItemPosition.Middle,
                             ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
                                     Icon(
-                                        imageVector = Icons.Default.HelpOutline,
+                                        imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(18.dp)
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
+
                                     Text(
                                         text = stringResource(R.string.settings_category_grid_mode_description),
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.weight(1f)
                                     )
-                                }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
@@ -532,7 +535,7 @@ fun Settings(
                         modifier = Modifier.testTag("SettingsResetTutorialItem")
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Refresh,
+                            imageVector = Icons.Rounded.TipsAndUpdates,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -564,7 +567,7 @@ fun Settings(
                         modifier = Modifier.testTag("SettingsSavingsPreferencesItem"),
                         defaultContent = {
                             Icon(
-                                imageVector = Icons.Default.Savings,
+                                imageVector = Icons.Rounded.Savings,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary
                             )
@@ -583,9 +586,9 @@ fun Settings(
                             }
                             Icon(
                                 imageVector = if (isSavingsExpanded) {
-                                    Icons.Default.ExpandLess
+                                    Icons.Rounded.ExpandLess
                                 } else {
-                                    Icons.Default.ExpandMore
+                                    Icons.Rounded.ExpandMore
                                 },
                                 contentDescription = if (isSavingsExpanded) {
                                     "Collapse"
@@ -623,7 +626,7 @@ fun Settings(
                         position = PaddedListItemPosition.Middle,
                     ) {
                         Icon(
-                            imageVector = Icons.Default.AccessTime,
+                            imageVector = Icons.Rounded.AccessTime,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -657,7 +660,7 @@ fun Settings(
                         position = PaddedListItemPosition.Middle,
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Repeat,
+                            imageVector = Icons.Rounded.Repeat,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -696,7 +699,7 @@ fun Settings(
                         },
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Alarm,
+                            imageVector = Icons.Rounded.Alarm,
                             contentDescription = null,
                             tint = if (exactAlarmEnabled) {
                                 MaterialTheme.colorScheme.primary
@@ -744,7 +747,7 @@ fun Settings(
                         }, position = PaddedListItemPosition.First
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Backup,
+                            imageVector = Icons.Rounded.Backup,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -770,7 +773,7 @@ fun Settings(
                         }, position = PaddedListItemPosition.Last
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Publish,
+                            imageVector = Icons.Rounded.Publish,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -803,7 +806,7 @@ fun Settings(
                         position = PaddedListItemPosition.First,
                     ) {
                         Icon(
-                            imageVector = Icons.Default.AutoAwesome,
+                            imageVector = Icons.Rounded.AutoAwesome,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -837,7 +840,7 @@ fun Settings(
                         }, position = PaddedListItemPosition.Middle
                     ) {
                         Icon(
-                            imageVector = Icons.Default.QuestionMark,
+                            imageVector = Icons.Rounded.QuestionMark,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -863,7 +866,7 @@ fun Settings(
                         }, position = PaddedListItemPosition.Middle
                     ) {
                         Icon(
-                            imageVector = Icons.Default.BugReport,
+                            imageVector = Icons.Rounded.BugReport,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -899,7 +902,7 @@ fun Settings(
                         },
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Info,
+                            imageVector = Icons.Rounded.Info,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -999,7 +1002,7 @@ fun RecurrentPaymentsViewModePickerDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Repeat,
+                        imageVector = Icons.Rounded.Repeat,
                         contentDescription = null,
                         tint = if (currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST) {
                             MaterialTheme.colorScheme.onPrimaryContainer
@@ -1063,7 +1066,7 @@ fun RecurrentPaymentsViewModePickerDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Repeat,
+                        imageVector = Icons.Rounded.Repeat,
                         contentDescription = null,
                         tint = if (currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
                             MaterialTheme.colorScheme.onPrimaryContainer

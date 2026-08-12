@@ -48,6 +48,7 @@ data class SettingsUiState(
     val currentColorScheme: AppColorScheme = AppColorScheme.BRAND,
     val currentLanguage: String = "English",
     val isMaterialYouEnabled: Boolean = false,
+    val isRoundedFontEnabled: Boolean = true,
     val isCreditQuickToggleEnabled: Boolean = false,
     val showPastTransactions: Boolean = true,
     val isCategoryPickerDirectPopupEnabled: Boolean = false,
@@ -152,6 +153,7 @@ class SettingsViewModel @Inject constructor(
                         },
                         currentColorScheme = settings.colorScheme,
                         isMaterialYouEnabled = settings.dynamicColorEnabled,
+                        isRoundedFontEnabled = settings.isRoundedFontEnabled,
                         isCreditQuickToggleEnabled = settings.isCreditQuickToggleEnabled,
                         showPastTransactions = settings.showPastTransactions,
                         isCategoryPickerDirectPopupEnabled = settings.categoryPickerDirectPopupEnabled,
@@ -238,6 +240,14 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(isMaterialYouEnabled = newValue) }
         viewModelScope.launch {
             settingsRepository.setDynamicColorEnabled(newValue)
+        }
+    }
+
+    fun onRoundedFontToggle() {
+        val newValue = !_uiState.value.isRoundedFontEnabled
+        _uiState.update { it.copy(isRoundedFontEnabled = newValue) }
+        viewModelScope.launch {
+            settingsRepository.setRoundedFontEnabled(newValue)
         }
     }
 

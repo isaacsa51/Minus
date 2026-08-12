@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -44,10 +45,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.presentation.isRoundedFontEnabled
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.colorOnButton
 import com.serranoie.app.minus.presentation.ui.theme.displaySmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.roundness
 
 enum class NumpadButtonType { DEFAULT, PRIMARY, SECONDARY, TERTIARY, DELETE, OPERATOR }
 
@@ -152,11 +155,15 @@ private fun TextStyle.interpolateToEmphasized(
         letterSpacing.value, emphasizedStyle.letterSpacing.value, clampedProgress
     ).sp
 
-    val animatedFontFamily = remember(animatedWeight, animatedWidth) {
+    val isRounded = LocalContext.current.isRoundedFontEnabled
+    val animatedFontFamily = remember(animatedWeight, animatedWidth, isRounded) {
         FontFamily(
             Font(
-                R.font.google_sans_flex, variationSettings = FontVariation.Settings(
-                    FontVariation.weight(animatedWeight.toInt()), FontVariation.width(animatedWidth)
+                resId = R.font.google_sans_flex,
+                variationSettings = FontVariation.Settings(
+                    FontVariation.weight(animatedWeight.toInt()),
+                    FontVariation.width(animatedWidth),
+                    roundness(if (isRounded) 100f else 0f)
                 )
             )
         )

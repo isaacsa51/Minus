@@ -20,6 +20,7 @@ import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.appContrast
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.isRoundedFontEnabled
 import com.serranoie.app.minus.presentation.ui.theme.schemes.getAppColorScheme
 
 private val lightScheme = lightColorScheme(
@@ -268,6 +269,7 @@ fun MinusTheme(
     darkTheme: Boolean = isNightMode(),
     dynamicColor: Boolean = false,
     typographyMode: TypographyMode = LocalContext.current.appTypography,
+    isRoundedFontEnabled: Boolean = LocalContext.current.isRoundedFontEnabled,
     appColorScheme: com.serranoie.app.minus.domain.model.AppColorScheme = LocalContext.current.appColorScheme,
     contrastMode: ContrastMode = LocalContext.current.appContrast,
     content: @Composable () -> Unit
@@ -297,10 +299,10 @@ fun MinusTheme(
 
     val typography = when (typographyMode) {
         TypographyMode.SYSTEM -> androidx.compose.material3.Typography()
-        TypographyMode.DEFAULT -> Typography
-        TypographyMode.CONDENSED -> Typography.withCondensedStyles()
-        TypographyMode.EXPRESSIVE -> Typography.withEmphasizedStyles()
-    }.withEmphasizedStyles()
+        TypographyMode.DEFAULT -> getTypography(isRoundedFontEnabled)
+        TypographyMode.CONDENSED -> getTypography(isRoundedFontEnabled).withCondensedStyles(isRoundedFontEnabled)
+        TypographyMode.EXPRESSIVE -> getTypography(isRoundedFontEnabled).withEmphasizedStyles(isRoundedFontEnabled)
+    }
 
     MaterialExpressiveTheme(
         colorScheme = colorScheme,

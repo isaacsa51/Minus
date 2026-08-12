@@ -50,6 +50,8 @@ interface SettingsRepository {
 
     suspend fun setDynamicColorEnabled(enabled: Boolean)
 
+    suspend fun setRoundedFontEnabled(enabled: Boolean)
+
     suspend fun setCreditQuickToggleEnabled(enabled: Boolean)
 
     suspend fun setShowPastTransactions(enabled: Boolean)

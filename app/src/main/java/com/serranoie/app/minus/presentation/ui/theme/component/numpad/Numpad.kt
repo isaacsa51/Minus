@@ -131,7 +131,7 @@ fun Numpad(
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(horizontal = 14.dp)
             .pointerInput(isCalculation, hasOperators, enableCalculationMode, enableCalcModeSwipe, hasHardKeyboard) {
-                if (!enableCalculationMode || !enableCalcModeSwipe || hasHardKeyboard) return@pointerInput
+                if (!enableCalculationMode || !enableCalcModeSwipe) return@pointerInput
                 var accumulatedDrag = 0f
                 var lastReportedProgress = 0f
                 var lastTickProgress = 0f
@@ -182,7 +182,7 @@ fun Numpad(
                 )
             }
     ) {
-        if (hasHardKeyboard) {
+        if (hasHardKeyboard && !isCalculation) {
             CompactHardwareLayout(
                 editorState = editorState,
                 isCalculation = isCalculation,

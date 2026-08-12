@@ -247,6 +247,7 @@
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
     <string name="settings_typography_title">Typography</string>
     <string name="settings_typography_subtitle">Change the app typography style</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Use wallpaper colors to apply a dynamic app theme</string>
     <string name="settings_censor_mode_title">Privacy mode</string>
