@@ -156,6 +156,8 @@
     <string name="widget_add_expense_description">Quick shortcut to add a new expense</string>
     <string name="widget_add_expense_label">Add new expense</string>
     <string name="widget_add_expense_compact_label">Add expense</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Новая транзакция</string>
     <!-- Widget Labels -->
     <string name="spent">Spent</string>
     <string name="left">Left</string>
@@ -253,6 +255,7 @@
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
     <string name="settings_typography_title">Typography</string>
     <string name="settings_typography_subtitle">Change the app typography style</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Use wallpaper colors to apply a dynamic app theme</string>
     <string name="settings_censor_mode_title">Privacy mode</string>
