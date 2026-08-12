@@ -150,6 +150,8 @@
     <string name="widget_add_expense_description">Atalho rápido para adicionar uma nova despesa</string>
     <string name="widget_add_expense_label">Adicionar nova despesa</string>
     <string name="widget_add_expense_compact_label">Adicionar despesa</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Nova transação</string>
     <!-- Widget Labels -->
     <string name="spent">Gasto</string>
     <string name="left">Esquerda</string>
@@ -247,6 +249,7 @@
     <string name="settings_appearance_subtitle">Alterar a cor e a aparência do aplicativo</string>
     <string name="settings_typography_title">Tipografia</string>
     <string name="settings_typography_subtitle">Alterar o estilo da tipografia do aplicativo</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">Material de que você</string>
     <string name="settings_material_you_subtitle">Usar cores de papel de parede para aplicar um tema dinâmico</string>
     <string name="settings_censor_mode_title">Modo de privacidade</string>
