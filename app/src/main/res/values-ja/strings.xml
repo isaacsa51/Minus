@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">負</string>
+    <string name="tile_new_transaction_label">新しい取引</string>
     <string name="tutorial_numpad_title">テンキー</string>
     <string name="tutorial_numpad_description">使用した金額を入力し、緑色のチェックマークをタップして保存します。数値パッドを上にスワイプして計算します。</string>
     <string name="tutorial_comment_title">カテゴリを追加</string>

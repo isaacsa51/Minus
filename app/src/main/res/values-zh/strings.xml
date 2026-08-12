@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">俭</string>
+    <string name="tile_new_transaction_label">新交易</string>
     <string name="tutorial_numpad_title">数字键盘</string>
     <string name="tutorial_numpad_description">输入你支出的金额并点击绿色勾号来保存。上滑打开数字键盘进行计算。</string>
     <string name="tutorial_comment_title">添加一个类别</string>

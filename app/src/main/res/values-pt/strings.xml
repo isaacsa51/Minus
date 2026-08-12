@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
+    <string name="tile_new_transaction_label">Nova transação</string>
     <string name="tutorial_numpad_title">Empada</string>
     <string name="tutorial_numpad_description">Digite a quantidade que gastou e toque na marca verde para salvar. Deslize para cima no empada para calcular.</string>
     <string name="tutorial_comment_title">Adicionar uma categoria</string>
