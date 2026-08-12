@@ -147,6 +147,8 @@
     <string name="widget_add_expense_description">新しい費用を追加するためのクイックショートカット</string>
     <string name="widget_add_expense_label">新しい費用を追加</string>
     <string name="widget_add_expense_compact_label">費用を追加</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">新しい取引</string>
     <!-- Widget Labels -->
     <string name="spent">使用済み：</string>
     <string name="left">左</string>
@@ -244,6 +246,7 @@
     <string name="settings_appearance_subtitle">アプリの色と外観を変更する</string>
     <string name="settings_typography_title">タイポグラフィー（文法）</string>
     <string name="settings_typography_subtitle">アプリの組版スタイルを変更する</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">自分の素材</string>
     <string name="settings_material_you_subtitle">壁紙の色を使用して動的なアプリのテーマを適用する</string>
     <string name="settings_censor_mode_title">プライバシーモード</string>
