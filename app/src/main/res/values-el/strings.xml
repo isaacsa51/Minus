@@ -150,6 +150,8 @@
     <string name="widget_add_expense_description">Γρήγορη συντόμευση για την προσθήκη νέας δαπάνης</string>
     <string name="widget_add_expense_label">Προσθήκη νέου κόστους</string>
     <string name="widget_add_expense_compact_label">Προσθήκη εξόδων</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Νέα συναλλαγή</string>
     <!-- Widget Labels -->
     <string name="spent">Δαπανήθηκε</string>
     <string name="left">Αριστερά</string>
@@ -247,6 +249,7 @@
     <string name="settings_appearance_subtitle">Αλλάξτε το χρώμα και την εμφάνιση της εφαρμογής</string>
     <string name="settings_typography_title">Τυπογραφία</string>
     <string name="settings_typography_subtitle">Αλλαγή του στυλ τυπογραφίας εφαρμογών</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">Υλικό Εσείς</string>
     <string name="settings_material_you_subtitle">Χρήση χρωμάτων ταπετσαρίας για την εφαρμογή ενός δυναμικού θέματος εφαρμογής</string>
     <string name="settings_censor_mode_title">Λειτουργία απορρήτου</string>
