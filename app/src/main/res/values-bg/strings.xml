@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Минус</string>
+    <string name="tile_new_transaction_label">Нова транзакция</string>
     <string name="tutorial_numpad_title">Цифрова клавиатура</string>
     <string name="tutorial_numpad_description">Въведете похарчената сума и докоснете зелената отметка, за да запазите. Плъзнете нагоре върху цифровата клавиатура, за да пресметнете.</string>
     <string name="tutorial_comment_title">Добави категория</string>

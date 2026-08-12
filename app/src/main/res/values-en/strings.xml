@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
+    <string name="tile_new_transaction_label">New Transaction</string>
     <string name="tutorial_numpad_title">Numpad</string>
     <string name="tutorial_numpad_description">Enter the amount you spent and tap the green checkmark to save. Swipe up on the numpad to calculate.</string>
     <string name="tutorial_comment_title">Add a category</string>

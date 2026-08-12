@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Πλην</string>
+    <string name="tile_new_transaction_label">Νέα συναλλαγή</string>
     <string name="tutorial_numpad_title">Καντράν</string>
     <string name="tutorial_numpad_description">Εισάγετε το ποσό που δαπανήσατε και πατήστε το πράσινο σημάδι ελέγχου για αποθήκευση. Σύρετε προς τα επάνω στο numpad για να υπολογίσετε.</string>
     <string name="tutorial_comment_title">Προσθήκη κατηγορίας</string>

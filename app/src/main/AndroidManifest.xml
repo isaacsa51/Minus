@@ -77,6 +77,18 @@
                 android:value="true" />
         </service>
 
+        <!-- Quick Settings Tile -->
+        <service
+            android:name=".presentation.tile.NewTransactionTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_new_transaction"
+            android:label="@string/tile_new_transaction_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- Glance App Widgets -->
         <receiver
             android:name=".presentation.widget.ExpenseWidgetReceiver"

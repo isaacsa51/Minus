@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Menos</string>
+    <string name="tile_new_transaction_label">Nueva transacción</string>
     <string name="tutorial_numpad_title">Teclado numérico</string>
     <string name="tutorial_numpad_description">Ingresa el monto que gastaste. Toca los dígitos, usa la flecha para corregir y toca el botón verde para guardar. Desliza hacia arriba en el teclado para ingresar al modo calculadora.</string>
     <string name="tutorial_comment_title">Añadir categoría</string>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
+    <string name="tile_new_transaction_label">Neue Transaktion</string>
     <string name="tutorial_numpad_title">Ziffernblock</string>
     <string name="tutorial_numpad_description">Gebe den Betrag ein, den du ausgegeben haben, und tippe auf das grüne Häkchen zum Speichern. Wische auf dem Ziffernblock nach oben, um zu rechnen.</string>
     <string name="tutorial_comment_title">Kategorie hinzufügen</string>
