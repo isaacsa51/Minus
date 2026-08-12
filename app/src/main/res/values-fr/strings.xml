@@ -150,6 +150,8 @@
     <string name="widget_add_expense_description">Raccourci rapide pour ajouter une nouvelle dépense</string>
     <string name="widget_add_expense_label">Ajouter une nouvelle dépense</string>
     <string name="widget_add_expense_compact_label">Nouvelle dépense</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Nouvelle transaction</string>
     <!-- Widget Labels -->
     <string name="spent">Dépensé</string>
     <string name="left">Restant</string>
@@ -247,6 +249,7 @@
     <string name="settings_appearance_subtitle">Changer la couleur et l\'apparence de l\'application</string>
     <string name="settings_typography_title">Typographie</string>
     <string name="settings_typography_subtitle">Changer le style de typographie de l\'application</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Utiliser les couleurs du fond d\'écran pour appliquer un thème dynamique</string>
     <string name="settings_censor_mode_title">Mode privé</string>
