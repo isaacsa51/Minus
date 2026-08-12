@@ -150,6 +150,8 @@
     <string name="widget_add_expense_description">Acceso directo rápido para agregar un nuevo gasto</string>
     <string name="widget_add_expense_label">Agregar nuevo gasto</string>
     <string name="widget_add_expense_compact_label">Gasto</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Nueva transacción</string>
     <!-- Widget Labels -->
     <string name="spent">Gastado</string>
     <string name="left">Faltante</string>
@@ -247,6 +249,7 @@
     <string name="settings_appearance_subtitle">Cambia el color y apariencia de la app</string>
     <string name="settings_typography_title">Tipografía</string>
     <string name="settings_typography_subtitle">Cambiar el estilo de tipografía de la aplicación</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Utilice colores de fondo de pantalla para aplicar un tema de aplicación dinámico</string>
     <string name="settings_censor_mode_title">Modo de privacidad</string>
