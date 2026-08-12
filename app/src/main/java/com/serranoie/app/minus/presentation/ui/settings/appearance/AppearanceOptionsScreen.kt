@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialShapes
@@ -95,6 +96,7 @@ fun AppearanceOptionsScreen(
     onColorSchemeChange: (AppColorScheme) -> Unit = {},
     onLanguageChange: (String) -> Unit = {},
     onMaterialYouToggle: () -> Unit,
+    onRoundedFontToggle: () -> Unit,
     onBack: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -139,9 +141,16 @@ fun AppearanceOptionsScreen(
                             ThemeSection(state.currentTheme, onThemeChange)
 
                             if (state.currentColorScheme == AppColorScheme.BRAND) {
-                                Text(stringResource(R.string.settings_contrast_title))
-                                ContrastSection(state.currentContrast, onContrastChange)
+                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Text(
+                                        stringResource(R.string.settings_contrast_title),
+                                        style = MaterialTheme.typography.titleSmallEmphasized
+                                    )
+                                    ContrastSection(state.currentContrast, onContrastChange)
+                                }
                             }
+
+                            HorizontalDivider()
 
                             MaterialYouSection(state.isMaterialYouEnabled, onMaterialYouToggle)
                         }
@@ -156,9 +165,15 @@ fun AppearanceOptionsScreen(
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        TypographySection(state.currentTypography, onTypographyChange)
+                        TypographySection(
+                            state.currentTypography,
+                            state.isRoundedFontEnabled,
+                            onTypographyChange,
+                            onRoundedFontToggle
+                        )
                     }
                 }
             }
@@ -305,29 +320,34 @@ private fun MaterialYouSection(
     isEnabled: Boolean,
     onToggle: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Icon(
-            Icons.Default.Palette,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp)
-        )
+    Column {
         Text(
-            stringResource(R.string.settings_material_you_subtitle),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
+            stringResource(R.string.settings_material_you_title),
+            style = MaterialTheme.typography.titleSmallEmphasized
         )
-        Switch(
-            checked = isEnabled,
-            onCheckedChange = { onToggle() }
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                Icons.Default.Palette,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp)
+            )
+            Text(
+                stringResource(R.string.settings_material_you_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f)
+            )
+            Switch(
+                checked = isEnabled,
+                onCheckedChange = { onToggle() }
+            )
+        }
     }
 }
 
@@ -338,7 +358,7 @@ private fun ColorSchemeSection(
     onColorSchemeChange: (AppColorScheme) -> Unit
 ) {
     val schemes = AppColorScheme.entries
-    
+
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(R.string.settings_color_scheme_title),
@@ -346,7 +366,7 @@ private fun ColorSchemeSection(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
-        
+
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 16.dp),
@@ -409,10 +429,10 @@ private fun ColorSchemeSwatch(
                 height = size.height - if (isSelected) 1.dp.toPx() else 0.dp.toPx()
             )
             val innerPath = MorphPolygonShape.createPath(morph, progress, innerSize, size)
-            
+
             clipPath(innerPath) {
                 drawRect(color = swatchColors.surface)
-                
+
                 drawRect(
                     color = swatchColors.primary,
                     size = size,
@@ -468,14 +488,16 @@ private class MorphPolygonShape(
 @Composable
 private fun TypographySection(
     currentTypography: String,
-    onTypographyChange: (String) -> Unit
+    isRoundedFontEnabled: Boolean,
+    onTypographyChange: (String) -> Unit,
+    onRoundedFontToggle: () -> Unit
 ) {
     val mainOptions = listOf(
         "Condensed" to stringResource(R.string.settings_typography_condensed),
         "Expressive" to stringResource(R.string.settings_typography_expressive)
     )
 
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
@@ -518,6 +540,30 @@ private fun TypographySection(
                 overflow = TextOverflow.Ellipsis
             )
         }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                stringResource(R.string.settings_rounded_font_title),
+                style = MaterialTheme.typography.titleSmallEmphasized,
+                color = if (currentTypography != "System") {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                },
+                modifier = Modifier.weight(1f)
+            )
+            Switch(
+                checked = isRoundedFontEnabled,
+                onCheckedChange = { onRoundedFontToggle() },
+                enabled = currentTypography != "System"
+            )
+        }
     }
 }
 
@@ -538,11 +584,13 @@ private fun LanguageSection(
         "ko" to stringResource(R.string.settings_language_ko),
         "pt" to stringResource(R.string.settings_language_pt),
         "ru" to stringResource(R.string.settings_language_ru),
-        "zh" to stringResource(R.string.settings_language_zh)
+        "zh" to stringResource(R.string.settings_language_zh),
+        "bg" to stringResource(R.string.settings_language_br),
     )
 
     var isExpanded by remember { mutableStateOf(false) }
-    val currentLabel = languages.find { it.first == currentLanguage }?.second ?: stringResource(R.string.settings_language_en)
+    val currentLabel = languages.find { it.first == currentLanguage }?.second
+        ?: stringResource(R.string.settings_language_en)
 
     PaddedExpandableList(
         isExpanded = isExpanded,
@@ -601,6 +649,7 @@ private fun AppearanceOptionsScreenPreview() {
             onTypographyChange = {},
             onContrastChange = {},
             onMaterialYouToggle = {},
+            onRoundedFontToggle = {},
             onBack = {}
         )
     }
@@ -621,6 +670,7 @@ private fun AppearanceOptionsScreenDarkPreview() {
             onTypographyChange = {},
             onContrastChange = {},
             onMaterialYouToggle = {},
+            onRoundedFontToggle = {},
             onBack = {}
         )
     }

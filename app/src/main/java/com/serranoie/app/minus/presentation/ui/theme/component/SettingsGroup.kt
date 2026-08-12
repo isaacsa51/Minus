@@ -78,8 +78,7 @@ fun FlexibleListGroup(
 
         Surface(
             shape = RoundedCornerShape(24.dp),
-            tonalElevation = 2.dp,
-            color = MaterialTheme.colorScheme.surfaceContainerLow,
+            color = MaterialTheme.colorScheme.surfaceContainer,
             modifier = Modifier.fillMaxWidth()
         ) {
             Column {
@@ -229,8 +228,8 @@ fun PaddedExpandableList(
             exit = shrinkVertically() + fadeOut()
         ) {
             Column(
-                modifier = Modifier.padding(top = 2.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.padding(top = 3.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
                 content = expandedContent
             )
         }
@@ -418,7 +417,7 @@ fun PaddedListGroup(
         }
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             content()
         }
@@ -457,8 +456,7 @@ fun PaddedListItem(
 
     Surface(
         shape = shape,
-        tonalElevation = 2.dp,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape)
@@ -574,7 +572,6 @@ fun CustomPaddedExpandableItem(
 
     Surface(
         shape = shape,
-        tonalElevation = 4.dp,
         color = MaterialTheme.colorScheme.surfaceContainer,
         modifier = modifier
             .fillMaxWidth()
