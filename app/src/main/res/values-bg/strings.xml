@@ -150,6 +150,8 @@
     <string name="widget_add_expense_description">Бърз пряк път за добавяне на нов разход</string>
     <string name="widget_add_expense_label">Добавяне на нов разход</string>
     <string name="widget_add_expense_compact_label">Добави разход</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Нова транзакция</string>
     <!-- Widget Labels -->
     <string name="spent">Изразходвано</string>
     <string name="left">Остатък</string>
@@ -247,6 +249,7 @@
     <string name="settings_appearance_subtitle">Промяна на цвета и външния вид на приложението</string>
     <string name="settings_typography_title">Типография</string>
     <string name="settings_typography_subtitle">Промяна на шрифтовия стил</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Използване на цветовете от тапета за динамична тема</string>
     <string name="settings_censor_mode_title">Режим за поверителност</string>
