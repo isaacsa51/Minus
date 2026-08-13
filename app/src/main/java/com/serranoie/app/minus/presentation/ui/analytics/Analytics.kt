@@ -60,6 +60,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
@@ -127,6 +128,7 @@ data class AnalyticsState(
     val isHistoricalView: Boolean = false,
     val userSettings: UserSettings = UserSettings.DEFAULT,
     val previousPeriodTransactions: List<Transaction> = emptyList(),
+    val categories: List<Category> = emptyList(),
     val graphGranularity: GraphGranularity = GraphGranularity.DAYS,
 )
 
@@ -149,6 +151,7 @@ data class Size(val width: Dp, val height: Dp)
 fun Analytics(
     state: AnalyticsState = AnalyticsState(),
     archivedBudgets: List<ArchivedBudget> = emptyList(),
+    categories: List<Category> = emptyList(),
     actions: AnalyticsActions = AnalyticsActions(),
     activityResultRegistryOwner: ActivityResultRegistryOwner? = null,
     showTutorialOverride: Boolean? = null,
@@ -362,6 +365,7 @@ fun Analytics(
                         AnalyticsResponsiveLayout(
                             useTabletLayout = useWideAnalyticsLayout,
                             state = state,
+                            categories = categories,
                             onShowHistory = {
                                 showHistorySheet = true
                                 view.weakHapticFeedback()
@@ -529,6 +533,7 @@ fun Analytics(
 private fun AnalyticsResponsiveLayout(
     useTabletLayout: Boolean,
     state: AnalyticsState,
+    categories: List<Category>,
     onShowHistory: () -> Unit,
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
@@ -539,6 +544,7 @@ private fun AnalyticsResponsiveLayout(
     if (useTabletLayout) {
         AnalyticsTabletLayout(
             state = state,
+            categories = categories,
             onShowHistory = onShowHistory,
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
@@ -549,6 +555,7 @@ private fun AnalyticsResponsiveLayout(
     } else {
         AnalyticsCompactLayout(
             state = state,
+            categories = categories,
             onShowHistory = onShowHistory,
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
@@ -562,6 +569,7 @@ private fun AnalyticsResponsiveLayout(
 @Composable
 private fun AnalyticsCompactLayout(
     state: AnalyticsState,
+    categories: List<Category>,
     onShowHistory: () -> Unit,
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
@@ -610,6 +618,7 @@ private fun AnalyticsCompactLayout(
                 isMin = true,
                 spends = state.spends,
                 currency = state.currencyCode,
+                categories = categories,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
@@ -619,6 +628,7 @@ private fun AnalyticsCompactLayout(
                 isMin = false,
                 spends = state.spends,
                 currency = state.currencyCode,
+                categories = categories,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
@@ -692,6 +702,7 @@ private fun AnalyticsCompactLayout(
 @Composable
 private fun AnalyticsTabletLayout(
     state: AnalyticsState,
+    categories: List<Category>,
     onShowHistory: () -> Unit,
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
@@ -742,6 +753,7 @@ private fun AnalyticsTabletLayout(
                     isMin = true,
                     spends = state.spends,
                     currency = state.currencyCode,
+                    categories = categories,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -751,6 +763,7 @@ private fun AnalyticsTabletLayout(
                     isMin = false,
                     spends = state.spends,
                     currency = state.currencyCode,
+                    categories = categories,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),

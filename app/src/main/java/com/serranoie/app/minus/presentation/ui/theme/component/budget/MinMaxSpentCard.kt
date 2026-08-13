@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Label
+import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material.icons.rounded.Sell
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,39 +32,47 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorMax
 import com.serranoie.app.minus.presentation.ui.theme.colorMin
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
+import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.combineColors
-import com.serranoie.app.minus.presentation.util.harmonize
 import com.serranoie.app.minus.presentation.util.font.format.isZero
 import com.serranoie.app.minus.presentation.util.font.format.numberFormat
 import com.serranoie.app.minus.presentation.util.font.format.prettyDate
 import com.serranoie.app.minus.presentation.util.font.format.toDate
 import com.serranoie.app.minus.presentation.util.font.format.toLocalDateTime
+import com.serranoie.app.minus.presentation.util.harmonize
 import com.serranoie.app.minus.presentation.util.toPalette
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.Date
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MinMaxSpentCard(
     modifier: Modifier = Modifier,
     isMin: Boolean,
     spends: List<Transaction>,
     currency: String = "MXN",
+    categories: List<Category> = emptyList(),
 ) {
     val context = LocalContext.current
 
@@ -99,12 +110,12 @@ fun MinMaxSpentCard(
         if (formattedSpent != null) {
             val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: ""
             if (currencySymbol.length > 2 && formattedSpent.startsWith(currencySymbol)) {
-                AnnotatedString.Builder().apply {
-                    pushStyle(SpanStyle(fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f, baselineShift = BaselineShift(0f)))
-                    append(currencySymbol)
-                    pop()
+                buildAnnotatedString {
+                    withStyle(SpanStyle(fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f, baselineShift = BaselineShift(0f))) {
+                        append(currencySymbol)
+                    }
                     append(formattedSpent.removePrefix(currencySymbol))
-                }.toAnnotatedString()
+                }
             } else {
                 AnnotatedString(formattedSpent)
             }
@@ -114,48 +125,73 @@ fun MinMaxSpentCard(
     }
     StatCard(
         modifier = modifier.heightIn(min = 140.dp),
-        value = formattedSpent ?: "-",
+        value = formattedSpent ?: stringResource(R.string.empty),
         annotatedValue = annotatedSpent,
         label = if (isMin) stringResource(R.string.minimum_spent) else stringResource(R.string.maximum_spent),
+        valueFontStyle = MaterialTheme.typography.headlineSmallEmphasized.copy(
+            fontWeight = FontWeight.Black,
+            letterSpacing = (-1).sp
+        ),
+        labelFontStyle = MaterialTheme.typography.labelLargeCondensed.copy(
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.9f)
+        ),
         colors = CardDefaults.cardColors(
             containerColor = harmonizedColor.container,
             contentColor = harmonizedColor.onContainer,
         ),
         content = {
-            Spacer(modifier = Modifier.height(6.dp))
-
             if (spent != null) {
-                Text(
-                    text = prettyDate(
-                        spent.date,
-                        showTime = true,
-                        forceShowDate = true,
-                        shortMonth = true,
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
+                val dateValue = prettyDate(
+                    spent.date,
+                    showTime = false,
+                    forceShowDate = true,
+                    shortMonth = true,
                 )
+                val contentColor = LocalContentColor.current
 
-                if (spent.comment.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier.padding(top = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .padding(top = 2.dp)
-                                .size(16.dp),
-                            imageVector = Icons.Rounded.Label,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = spent.comment,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.basicMarquee(),
-                            style = MaterialTheme.typography.bodyMediumCondensed,
-                        )
-                    }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.DateRange,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = contentColor.copy(alpha = 0.7f)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = dateValue,
+                        style = MaterialTheme.typography.bodySmallCondensed.copy(fontWeight = FontWeight.Bold),
+                    )
+                }
+
+                val category = remember(spent.categoryId, categories) {
+                    categories.find { it.id == spent.categoryId }
+                }
+
+                val infoText = category?.name
+                    ?: spent.comment.takeIf { it.isNotBlank() }
+                    ?: stringResource(R.string.expense_item_unnamed_expense)
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Sell,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = contentColor.copy(alpha = 0.7f)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = infoText,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.basicMarquee(),
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    )
                 }
             }
         },
@@ -189,7 +225,8 @@ private fun PreviewMinMaxSpentCard() {
                     spends = listOf(
                         Transaction(
                             amount = BigDecimal(42),
-                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
+                            date = LocalDate.now().minusDays(1).toDate().toLocalDateTime(),
+                            comment = "Category value"
                         ),
                         Transaction(
                             amount = BigDecimal(42),
@@ -227,7 +264,8 @@ private fun PreviewMinMaxSpentCardMobile() {
                     spends = listOf(
                         Transaction(
                             amount = BigDecimal(52),
-                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
+                            date = LocalDate.now().minusDays(2).toDate().toLocalDateTime(),
+                            comment = "Category placeholder"
                         ),
                         Transaction(
                             amount = BigDecimal(42),

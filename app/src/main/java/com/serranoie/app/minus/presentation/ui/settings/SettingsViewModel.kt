@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.AppColorScheme
 import com.serranoie.app.minus.domain.model.ContrastMode
@@ -35,6 +36,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -63,6 +65,7 @@ data class SettingsUiState(
     val isCensored: Boolean = false,
     val periodMappingMode: PeriodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
+    val creditCardCutoffDay: Int? = null,
 )
 
 sealed interface SettingsUiEffect {
@@ -74,6 +77,7 @@ sealed interface SettingsUiEffect {
 class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settingsRepository: SettingsRepository,
+    private val budgetRepository: BudgetRepository,
     private val updateNotificationTimeUseCase: UpdatePeriodEndNotificationTimeUseCase,
     private val censorManager: CensorManager,
 ) : ViewModel() {
@@ -133,7 +137,10 @@ class SettingsViewModel @Inject constructor(
 
     private fun loadPreferences() {
         viewModelScope.launch {
-            settingsRepository.observeSettings().collect { settings ->
+            combine(
+                settingsRepository.observeSettings(),
+                budgetRepository.getBudgetSettings()
+            ) { settings, budgetSettings ->
                 _uiState.update { current ->
                     current.copy(
                         currentTheme = when (settings.themeMode) {
@@ -171,9 +178,10 @@ class SettingsViewModel @Inject constructor(
                         } else true,
                         periodMappingMode = settings.periodMappingMode,
                         savingsPreferences = settings.savingsPreferences,
+                        creditCardCutoffDay = budgetSettings?.creditCardCutoffDay
                     )
                 }
-            }
+            }.collect {}
         }
     }
 
@@ -260,6 +268,15 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(isCreditQuickToggleEnabled = newValue) }
         viewModelScope.launch {
             settingsRepository.setCreditQuickToggleEnabled(newValue)
+        }
+    }
+
+    fun onCutoffDayChange(day: Int) {
+        viewModelScope.launch {
+            val currentSettings = budgetRepository.getBudgetSettingsSync()
+            if (currentSettings != null) {
+                budgetRepository.saveBudgetSettings(currentSettings.copy(creditCardCutoffDay = day))
+            }
         }
     }
 

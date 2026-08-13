@@ -7,6 +7,7 @@ import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
@@ -36,6 +37,7 @@ data class AnalyticsUiState(
     val budgetSettings: BudgetSettings? = null,
     val budgetState: BudgetState? = null,
     val allTransactions: List<Transaction> = emptyList(),
+    val categories: List<Category> = emptyList(),
     val currentPeriodId: Long = 0L,
     val selectedPeriodId: Long? = null,
     val archivedBudgets: List<ArchivedBudget> = emptyList(),
@@ -82,6 +84,7 @@ class AnalyticsViewModel @Inject constructor(
             combine(
                 budgetRepository.getBudgetSettings().distinctUntilChanged(),
                 budgetRepository.getTransactions().distinctUntilChanged(),
+                budgetRepository.getActiveCategories().distinctUntilChanged(),
                 budgetRepository.getArchivedBudgets().distinctUntilChanged(),
                 observeCurrentPeriodBoundaryUseCase().distinctUntilChanged(),
                 settingsRepository.observeSettings().distinctUntilChanged(),
@@ -90,11 +93,12 @@ class AnalyticsViewModel @Inject constructor(
             ) { args: Array<Any?> ->
                 val settings = args[0] as BudgetSettings?
                 val transactions = args[1] as List<Transaction>
-                val archives = args[2] as List<ArchivedBudget>
-                val periodBoundary = args[3] as Pair<Long, Long>
-                val userSettings = args[4] as UserSettings
-                val rollover = args[5] as Pair<BigDecimal, Boolean>
-                val granularity = args[6] as GraphGranularity
+                val categories = args[2] as List<Category>
+                val archives = args[3] as List<ArchivedBudget>
+                val periodBoundary = args[4] as Pair<Long, Long>
+                val userSettings = args[5] as UserSettings
+                val rollover = args[6] as Pair<BigDecimal, Boolean>
+                val granularity = args[7] as GraphGranularity
 
                 val currentPeriodId = periodBoundary.second
                 val reconstructedArchives = reconstructHistory(transactions, archives, settings)
@@ -105,6 +109,7 @@ class AnalyticsViewModel @Inject constructor(
                     isLoading = false,
                     budgetSettings = settings,
                     allTransactions = transactions,
+                    categories = categories,
                     archivedBudgets = allArchives,
                     currentPeriodId = currentPeriodId,
                     userSettings = userSettings,
@@ -113,7 +118,7 @@ class AnalyticsViewModel @Inject constructor(
                     graphGranularity = granularity,
                     displayState = if (_uiState.value.selectedPeriodId != null && _uiState.value.selectedPeriodId != currentPeriodId) {
                         buildHistoricalDisplayState(
-                            _uiState.value.selectedPeriodId!!, transactions, allArchives, granularity
+                            _uiState.value.selectedPeriodId!!, transactions, allArchives, granularity, categories
                         )
                     } else {
                         buildDisplayState(
@@ -122,7 +127,8 @@ class AnalyticsViewModel @Inject constructor(
                             currentPeriodId = currentPeriodId,
                             userSettings = userSettings,
                             granularity = granularity,
-                            archives = allArchives
+                            archives = allArchives,
+                            categories = categories
                         )
                     },
                 )
@@ -197,6 +203,7 @@ class AnalyticsViewModel @Inject constructor(
         allTransactions: List<Transaction>,
         archives: List<ArchivedBudget>,
         granularity: GraphGranularity,
+        categories: List<Category>,
     ): AnalyticsState {
         val archive = archives.find { it.periodId == periodId } ?: return buildDisplayState(
             settings = _uiState.value.budgetSettings,
@@ -204,7 +211,8 @@ class AnalyticsViewModel @Inject constructor(
             currentPeriodId = _uiState.value.currentPeriodId,
             userSettings = _uiState.value.userSettings,
             granularity = granularity,
-            archives = archives
+            archives = archives,
+            categories = categories
         )
 
         val transactions = findTransactionsForArchive(archive, allTransactions, periodId)
@@ -246,6 +254,7 @@ class AnalyticsViewModel @Inject constructor(
             budgetStateForDisplay = budgetState,
             isHistoricalView = true,
             previousPeriodTransactions = previousTransactions,
+            categories = categories,
             graphGranularity = granularity
         )
     }
@@ -282,8 +291,9 @@ class AnalyticsViewModel @Inject constructor(
         userSettings: UserSettings,
         granularity: GraphGranularity,
         archives: List<ArchivedBudget>,
+        categories: List<Category>,
     ): AnalyticsState {
-        if (settings == null) return AnalyticsState(isLoading = false, graphGranularity = granularity)
+        if (settings == null) return AnalyticsState(isLoading = false, graphGranularity = granularity, categories = categories)
 
         val today = LocalDate.now()
 
@@ -348,6 +358,7 @@ class AnalyticsViewModel @Inject constructor(
             creditTransactions = creditInfo.transactions,
             userSettings = userSettings,
             previousPeriodTransactions = previousTransactions,
+            categories = categories,
             graphGranularity = granularity,
         )
     }
