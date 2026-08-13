@@ -517,7 +517,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">Votre abonnement «%1$s» de «%2$s» sera facturé %3$s. Préparez-vous pour la charge.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Vous avez un abonnement \"%1$s\" qui sera facturé %2$s.</string>
     <string name="notification_credit_cutoff_title">Paiement à venir par carte de crédit</string>
-    <string name="notification_credit_cutoff_message">Votre date limite est %1$s. Il est recommandé de payer %2$s pour éviter tout intérêt.</string>
+    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
     <string name="credit_owed_label">Total dû</string>
     <string name="debt_adjusted_balance_label">Solde ajusté de la dette</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s Crédit</string>
