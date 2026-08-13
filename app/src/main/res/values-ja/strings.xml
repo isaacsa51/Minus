@@ -514,7 +514,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">サブスクリプション「%1$s」の「%2$s」は %3$sが課金されます。料金の準備をしてください。</string>
     <string name="notification_upcoming_subscription_message_without_comment">\"%1$s\" のサブスクリプションがあります。このサブスクリプションは %2$s となります。</string>
     <string name="notification_credit_cutoff_title">今後のクレジットカードでの支払い</string>
-    <string name="notification_credit_cutoff_message">あなたのカットオフ日は %1$sです。利息を避けるために %2$s を支払うことをお勧めします。</string>
+    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
     <string name="credit_owed_label">支払済合計</string>
     <string name="debt_adjusted_balance_label">借金調整残高</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s クレジット</string>
