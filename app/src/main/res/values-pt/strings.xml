@@ -517,7 +517,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">Sua assinatura \"%1$s\" de \"%2$s\" será cobrada %3$s. Prepare-se para a cobrança.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Você tem uma assinatura de \"%1$s\" que será cobrado em %2$s.</string>
     <string name="notification_credit_cutoff_title">Próximo pagamento com cartão de crédito</string>
-    <string name="notification_credit_cutoff_message">Sua data de câmbio é %1$s. Recomenda-se pagar %2$s para evitar quaisquer juros.</string>
+    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
     <string name="credit_owed_label">Total devedor</string>
     <string name="debt_adjusted_balance_label">Saldo Débt-Ajustado</string>
     <string name="debt_adjusted_label_format">Dívida %1$s - %2$s</string>
