@@ -517,7 +517,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">Вашият абонамент „%1$s“ за „%2$s“ ще бъде таксуван на %3$s. Подгответе се за плащането.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Имате абонамент за „%1$s“, който ще бъде таксуван на %2$s.</string>
     <string name="notification_credit_cutoff_title">Предстоящо плащане по кредитна карта</string>
-    <string name="notification_credit_cutoff_message">Датата ви на отчитане е %1$s. Препоръчително е да платите %2$s, за да избегнете лихви.</string>
+    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
     <string name="credit_owed_label">Общо дължима сума</string>
     <string name="debt_adjusted_balance_label">Баланс, коригиран с дълга</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s дълг по кредитна карта</string>
