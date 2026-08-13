@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
@@ -16,10 +17,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -35,96 +37,120 @@ class HistoryViewModel @Inject constructor(
     private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HistoryUiState())
-    val uiState: StateFlow<HistoryUiState> = _uiState.asStateFlow()
+    private val _expandedDates = MutableStateFlow(emptySet<LocalDate>())
+    private val _editingTransaction = MutableStateFlow<Transaction?>(null)
+    private val _recurrentToDelete = MutableStateFlow<Transaction?>(null)
+    private val _recurrentToEdit = MutableStateFlow<Transaction?>(null)
+    private val _showDeleteRecurrentDialog = MutableStateFlow(false)
+    private val _showPastPeriod = MutableStateFlow(false)
+    private val _showOutOfPeriodSubscriptions = MutableStateFlow(false)
+    private val _showUpcomingRecurrentInPeriod = MutableStateFlow(true)
+    private val _lockSwipeable = MutableStateFlow(true)
+    private val _expandedTransactionId = MutableStateFlow<Long?>(null)
+    private val _pendingRemovedTransactions = MutableStateFlow(emptyMap<Long, Transaction>())
 
     private val _effects = MutableSharedFlow<HistoryUiEffect>()
     val effects: SharedFlow<HistoryUiEffect> = _effects.asSharedFlow()
 
     private var autoDismissJob: Job? = null
 
-    init {
-        observeData()
-        observeCategories()
+    private val uiInputs = combine(
+        listOf(
+            _expandedDates,
+            _editingTransaction,
+            _recurrentToDelete,
+            _recurrentToEdit,
+            _showDeleteRecurrentDialog,
+            _showPastPeriod,
+            _showOutOfPeriodSubscriptions,
+            _showUpcomingRecurrentInPeriod,
+            _lockSwipeable,
+            _expandedTransactionId,
+            _pendingRemovedTransactions
+        )
+    ) { array ->
+        UIInputs(
+            expandedDates = array[0] as Set<LocalDate>,
+            editingTransaction = array[1] as Transaction?,
+            recurrentToDelete = array[2] as Transaction?,
+            recurrentToEdit = array[3] as Transaction?,
+            showDeleteRecurrentDialog = array[4] as Boolean,
+            showPastPeriod = array[5] as Boolean,
+            showOutOfPeriodSubscriptions = array[6] as Boolean,
+            showUpcomingRecurrentInPeriod = array[7] as Boolean,
+            lockSwipeable = array[8] as Boolean,
+            expandedTransactionId = array[9] as Long?,
+            pendingRemovedTransactions = array[10] as Map<Long, Transaction>
+        )
     }
 
-    private fun observeCategories() {
-        viewModelScope.launch {
-            budgetTransactionHandler.budgetRepository.getActiveCategories().collect { categories ->
-                _uiState.update { it.copy(tags = categories.map { c -> c.name }) }
-            }
-        }
-    }
+    val uiState: StateFlow<HistoryUiState> = combine(
+        budgetTransactionHandler.budgetRepository.getTransactions(),
+        budgetTransactionHandler.budgetRepository.getBudgetSettings(),
+        observeCurrentPeriodBoundaryUseCase(),
+        settingsRepository.observeSettings(),
+        budgetTransactionHandler.budgetRepository.getActiveCategories(),
+        uiInputs
+    ) { array ->
+        val transactions = array[0] as List<Transaction>
+        val budgetSettings = array[1] as BudgetSettings?
+        @Suppress("UNCHECKED_CAST")
+        val periodBoundary = array[2] as Pair<Long, Long>
+        val userSettings = array[3] as UserSettings?
+        @Suppress("UNCHECKED_CAST")
+        val categories = array[4] as List<Category>
+        val inputs = array[5] as UIInputs
 
-    private fun observeData() {
-        viewModelScope.launch {
-            combine(
-                budgetTransactionHandler.budgetRepository.getTransactions(),
-                budgetTransactionHandler.budgetRepository.getBudgetSettings(),
-                observeCurrentPeriodBoundaryUseCase(),
-                settingsRepository.observeSettings(),
-            ) { transactions, settings, periodBoundary, userSettings ->
-                recomputeDerivedState(
-                    transactions = transactions,
-                    budgetSettings = settings,
-                    currentPeriodStartedAtMillis = periodBoundary.first,
-                    currentPeriodId = periodBoundary.second,
-                    userSettings = userSettings,
-                )
-            }.collect {}
-        }
-    }
+        calculateHistoryUiState(
+            transactions = transactions,
+            budgetSettings = budgetSettings,
+            currentPeriodStartedAtMillis = periodBoundary.first,
+            currentPeriodId = periodBoundary.second,
+            userSettings = userSettings,
+            categories = categories,
+            inputs = inputs
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = HistoryUiState()
+    )
 
     fun processIntent(intent: HistoryUiIntent) {
         when (intent) {
             is HistoryUiIntent.ToggleExpandedDate -> toggleExpandedDate(intent.date)
-            is HistoryUiIntent.SetEditingTransaction -> _uiState.value =
-                _uiState.value.copy(editingTransaction = intent.transaction)
+            is HistoryUiIntent.SetEditingTransaction -> _editingTransaction.value = intent.transaction
+            is HistoryUiIntent.SetRecurrentToDelete -> {
+                _recurrentToDelete.value = intent.transaction
+                _showDeleteRecurrentDialog.value = intent.transaction != null
+            }
 
-            is HistoryUiIntent.SetRecurrentToDelete -> _uiState.value = _uiState.value.copy(
-                recurrentToDelete = intent.transaction,
-                showDeleteRecurrentDialog = intent.transaction != null,
-            )
+            is HistoryUiIntent.SetRecurrentToEdit -> _recurrentToEdit.value = intent.transaction
+            is HistoryUiIntent.DismissDeleteRecurrentDialog -> {
+                _recurrentToDelete.value = null
+                _showDeleteRecurrentDialog.value = false
+            }
 
-            is HistoryUiIntent.SetRecurrentToEdit -> _uiState.value =
-                _uiState.value.copy(recurrentToEdit = intent.transaction)
-
-            is HistoryUiIntent.DismissDeleteRecurrentDialog -> _uiState.value = _uiState.value.copy(
-                recurrentToDelete = null,
-                showDeleteRecurrentDialog = false,
-            )
-
-            is HistoryUiIntent.TogglePastPeriod -> _uiState.value =
-                _uiState.value.copy(showPastPeriod = intent.visible)
-
-            is HistoryUiIntent.ToggleOutOfPeriodSubscriptions -> _uiState.value =
-                _uiState.value.copy(showOutOfPeriodSubscriptions = intent.visible)
-
-            is HistoryUiIntent.ToggleUpcomingRecurrentInPeriod -> _uiState.value =
-                _uiState.value.copy(showUpcomingRecurrentInPeriod = intent.visible)
-
+            is HistoryUiIntent.TogglePastPeriod -> _showPastPeriod.value = intent.visible
+            is HistoryUiIntent.ToggleOutOfPeriodSubscriptions -> _showOutOfPeriodSubscriptions.value = intent.visible
+            is HistoryUiIntent.ToggleUpcomingRecurrentInPeriod -> _showUpcomingRecurrentInPeriod.value = intent.visible
             is HistoryUiIntent.DeleteTransaction -> deleteTransaction(intent.transaction)
             is HistoryUiIntent.SaveEditedTransaction -> saveEditedTransaction(intent.transaction)
             is HistoryUiIntent.ConfirmDeleteRecurrent -> confirmDeleteRecurrent(intent.transaction)
-            is HistoryUiIntent.SetLockSwipeable -> _uiState.value =
-                _uiState.value.copy(lockSwipeable = intent.locked)
-
+            is HistoryUiIntent.SetLockSwipeable -> _lockSwipeable.value = intent.locked
             is HistoryUiIntent.ToggleExpandedTransaction -> toggleExpandedTransaction(intent.transactionId)
-
             is HistoryUiIntent.UpdateCreditCutoffDay -> updateCreditCutoffDay(intent.day)
         }
     }
 
     private fun toggleExpandedTransaction(id: Long?) {
-        _uiState.update { state ->
-            state.copy(
-                expandedTransactionId = if (state.expandedTransactionId == id) null else id
-            )
+        _expandedTransactionId.update { currentId ->
+            if (currentId == id) null else id
         }
     }
 
     private fun updateCreditCutoffDay(day: Int) {
-        val currentSettings = _uiState.value.budgetSettings ?: return
+        val currentSettings = uiState.value.budgetSettings ?: return
         if (day !in 1..31) return
 
         viewModelScope.launch {
@@ -137,13 +163,11 @@ class HistoryViewModel @Inject constructor(
 
     private fun deleteTransaction(transaction: Transaction) {
         autoDismissJob?.cancel()
-        _uiState.value = _uiState.value.copy(
-            pendingRemovedTransactions = _uiState.value.pendingRemovedTransactions + (transaction.id to transaction),
-        )
+        _pendingRemovedTransactions.update { it + (transaction.id to transaction) }
         autoDismissJob = viewModelScope.launch {
             delay(EXIT_ANIMATION_DURATION_MS)
             budgetTransactionHandler.deleteTransaction(transaction)
-            _uiState.value = _uiState.value.copy(pendingRemovedTransactions = emptyMap())
+            _pendingRemovedTransactions.update { it - transaction.id }
         }
     }
 
@@ -151,7 +175,7 @@ class HistoryViewModel @Inject constructor(
         viewModelScope.launch {
             val success = budgetTransactionHandler.editTransaction(transaction)
             if (success) {
-                _uiState.value = _uiState.value.copy(editingTransaction = null)
+                _editingTransaction.value = null
             } else {
                 _effects.emit(HistoryUiEffect.ShowSnackbar("Could not save transaction"))
             }
@@ -160,30 +184,33 @@ class HistoryViewModel @Inject constructor(
 
     private fun confirmDeleteRecurrent(transaction: Transaction) {
         viewModelScope.launch {
-            _uiState.value =
-                _uiState.value.copy(recurrentToDelete = null, showDeleteRecurrentDialog = false)
+            _recurrentToDelete.value = null
+            _showDeleteRecurrentDialog.value = false
             budgetTransactionHandler.deleteTransaction(transaction)
         }
     }
 
     private fun toggleExpandedDate(date: LocalDate) {
-        _uiState.value = _uiState.value.copy(
-            expandedDates = _uiState.value.expandedDates.let { expanded ->
-                if (expanded.contains(date)) expanded - date else expanded + date
-            },
-        )
+        _expandedDates.update { expanded ->
+            val currentExpanded = if (expanded.isEmpty()) {
+                uiState.value.expandedDates
+            } else {
+                expanded
+            }
+            if (currentExpanded.contains(date)) currentExpanded - date else currentExpanded + date
+        }
     }
 
-    private fun recomputeDerivedState(
+    private fun calculateHistoryUiState(
         transactions: List<Transaction>,
         budgetSettings: BudgetSettings?,
         currentPeriodStartedAtMillis: Long,
         currentPeriodId: Long,
         userSettings: UserSettings?,
-    ) {
-        val current = _uiState.value
-        val pendingRemoved = current.pendingRemovedTransactions
-        val displayTx = buildDisplayTransactions(transactions, pendingRemoved)
+        categories: List<Category>,
+        inputs: UIInputs
+    ): HistoryUiState {
+        val displayTx = buildDisplayTransactions(transactions, inputs.pendingRemovedTransactions)
 
         val startDate = budgetSettings?.startDate ?: LocalDate.now().minusDays(30)
         val endDate = budgetSettings?.getPeriodEndDate() ?: LocalDate.now()
@@ -236,31 +263,57 @@ class HistoryViewModel @Inject constructor(
         val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
 
         // Auto-expand first date group on initial load
-        val autoExpanded = if (current.expandedDates.isEmpty()) {
+        val autoExpanded = if (inputs.expandedDates.isEmpty()) {
             groupedCurrent.keys.filterNotNull().sortedDescending().take(1).toSet()
         } else {
-            current.expandedDates
+            inputs.expandedDates
         }
 
-        _uiState.value = current.copy(
-            transactions = transactions,
+        return HistoryUiState(
             budgetSettings = budgetSettings,
             budgetState = budgetState,
             currentPeriodId = currentPeriodId,
+            currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
+            isCreditQuickToggleEnabled = userSettings?.isCreditQuickToggleEnabled ?: false,
+            showPastTransactionsSetting = userSettings?.showPastTransactions ?: true,
+            tags = categories.map { it.name },
+            transactions = transactions,
+            editingTransaction = inputs.editingTransaction,
+            pendingRemovedTransactions = inputs.pendingRemovedTransactions,
+            recurrentToDelete = inputs.recurrentToDelete,
+            recurrentToEdit = inputs.recurrentToEdit,
+            showDeleteRecurrentDialog = inputs.showDeleteRecurrentDialog,
+            expandedTransactionId = inputs.expandedTransactionId,
+            expandedDates = autoExpanded,
+            showPastPeriod = inputs.showPastPeriod,
+            showOutOfPeriodSubscriptions = inputs.showOutOfPeriodSubscriptions,
+            showUpcomingRecurrentInPeriod = inputs.showUpcomingRecurrentInPeriod,
+            lockSwipeable = inputs.lockSwipeable,
+            recurrentPaymentsViewMode = userSettings?.recurrentPaymentsViewMode
+                ?: RecurrentPaymentsViewMode.VERTICAL_LIST,
             displayTransactions = displayTx,
             groupedCurrentTransactions = groupedCurrent,
             groupedPastTransactions = groupedPast,
             upcomingRecurrentInPeriod = upcomingInPeriod,
             futureRecurrentOutOfPeriod = futureOutOfPeriod,
-            expandedDates = autoExpanded,
             creditOwed = creditOwed,
             debtAdjustedBalance = debtAdjustedBalance,
-            isCreditQuickToggleEnabled = userSettings?.isCreditQuickToggleEnabled ?: false,
-            showPastTransactionsSetting = userSettings?.showPastTransactions ?: true,
-            recurrentPaymentsViewMode = userSettings?.recurrentPaymentsViewMode
-                ?: RecurrentPaymentsViewMode.VERTICAL_LIST,
         )
     }
+
+    private data class UIInputs(
+        val expandedDates: Set<LocalDate>,
+        val editingTransaction: Transaction?,
+        val recurrentToDelete: Transaction?,
+        val recurrentToEdit: Transaction?,
+        val showDeleteRecurrentDialog: Boolean,
+        val showPastPeriod: Boolean,
+        val showOutOfPeriodSubscriptions: Boolean,
+        val showUpcomingRecurrentInPeriod: Boolean,
+        val lockSwipeable: Boolean,
+        val expandedTransactionId: Long?,
+        val pendingRemovedTransactions: Map<Long, Transaction>
+    )
 
     companion object {
         private const val EXIT_ANIMATION_DURATION_MS = 600L
