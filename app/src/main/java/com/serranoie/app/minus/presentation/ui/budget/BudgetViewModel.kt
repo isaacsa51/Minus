@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
-import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.CreditCard
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
@@ -23,6 +22,7 @@ import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUse
 import com.serranoie.app.minus.presentation.notification.NotificationHelper
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.ui.budget.controller.EditorIntent
+import com.serranoie.app.minus.presentation.ui.budget.controller.EditorLocalState
 import com.serranoie.app.minus.presentation.ui.budget.controller.EditorStateController
 import com.serranoie.app.minus.presentation.ui.budget.controller.NumpadController
 import com.serranoie.app.minus.presentation.ui.budget.controller.NumpadIntent
@@ -45,14 +45,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import logcat.asLog
 import logcat.logcat
 import java.math.BigDecimal
@@ -96,152 +97,54 @@ class BudgetViewModel @Inject constructor(
 
     private val periodActionsController = PeriodActionsController(NoopPeriodActions)
 
-    private val _uiState = MutableStateFlow(BudgetUiState.INITIAL)
-    val uiState: StateFlow<BudgetUiState> = _uiState.asStateFlow()
-
-    private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
-    val transactions: StateFlow<List<Transaction>> = _transactions.asStateFlow()
-
-    private val _budgetSettings = MutableStateFlow<BudgetSettings?>(null)
-    val budgetSettings: StateFlow<BudgetSettings?> = _budgetSettings.asStateFlow()
-
-    private val _budgetState = MutableStateFlow<BudgetState?>(null)
-    val budgetState: StateFlow<BudgetState?> = _budgetState.asStateFlow()
-
-    private val _categories =
-        MutableStateFlow<List<Category>>(emptyList())
-
     private val _effects = MutableSharedFlow<BudgetUiEffect>()
     val effects: SharedFlow<BudgetUiEffect> = _effects.asSharedFlow()
 
     private val _pendingPeriodBoundaryOverride = MutableStateFlow<Pair<Long, Long>?>(null)
 
-    init {
-        observeBudgetData()
-        observeEditorState()
-        observeInitialBudgetCheck()
-        observeCategories()
-    }
+    val uiState: StateFlow<BudgetUiState> = combine(
+        budgetRepository.getBudgetSettings(),
+        budgetRepository.getTransactions(),
+        buildPeriodBoundaryFlow(),
+        budgetRepository.getQueuedTransactions(),
+        observeCurrentPeriodRolloverUseCase(),
+        numpadController.input,
+        numpadController.isCalculation,
+        numpadController.dragProgress,
+        editorStateController.state,
+        budgetRepository.getActiveCategories()
+    ) { params ->
+        val settings = params[0] as BudgetSettings?
+        val transactions = params[1] as List<Transaction>
+        val (currentPeriodStartedAtMillis, currentPeriodId) = params[2] as Pair<Long, Long>
+        val queuedTransactions = params[3] as List<Transaction>
+        val (rolloverAmount, rolloverCarryForward) = params[4] as Pair<BigDecimal, Boolean>
+        val numpadInput = params[5] as String
+        val isCalculation = params[6] as Boolean
+        val dragProgress = params[7] as Float
+        val editorState = params[8] as EditorLocalState
+        val categories = params[9] as List<Category>
 
-    private fun observeBudgetData() {
-        viewModelScope.launch {
-            combine(
-                budgetRepository.getBudgetSettings(),
-                budgetRepository.getTransactions(),
-                buildPeriodBoundaryFlow(),
-                budgetRepository.getQueuedTransactions(),
-                observeCurrentPeriodRolloverUseCase()
-            ) { settings, transactions, periodBoundary, queuedTransactions, rolloverInfo ->
-                createBaseUiState(
-                    settings = settings,
-                    transactions = transactions,
-                    periodBoundary = periodBoundary,
-                    queuedTransactions = queuedTransactions,
-                    rolloverAmount = rolloverInfo.first,
-                    rolloverCarryForward = rolloverInfo.second,
-                )
-            }.catch { error ->
-                emit(
-                    BudgetUiState(
-                        isLoading = false,
-                        error = error.message ?: "Unknown error",
-                        isFirstLaunch = true
-                    )
-                )
-            }.collect { baseState ->
-                applyBaseState(baseState)
-            }
-        }
-    }
-
-    private fun observeEditorState() {
-        viewModelScope.launch {
-            combine(
-                numpadController.input,
-                editorStateController.state,
-            ) { numpadInput, editorState ->
-                numpadInput to editorState
-            }.collect { (numpadInput, editorState) ->
-                val currencyCode = _uiState.value.budgetSettings?.currencyCode ?: "USD"
-                val preview = calculateCalculationPreview(numpadInput, currencyCode)
-                _uiState.update {
-                    it.copy(
-                        numpadInput = numpadInput,
-                        isNumpadValid = validateNumpadInput(numpadInput),
-                        animState = if (numpadInput.isNotEmpty()) AnimState.EDITING else AnimState.IDLE,
-                        currentComment = editorState.currentComment,
-                        editMode = editorState.editMode,
-                        lockSwipeable = editorState.lockSwipeable,
-                        lockDraggable = editorState.lockDraggable,
-                        isRecurrentEnabled = editorState.isRecurrentEnabled,
-                        isCreditEnabled = editorState.isCreditEnabled,
-                        showRecurrentDialog = editorState.showRecurrentDialog,
-                        showCreditCutoffDialog = editorState.showCreditCutoffDialog,
-                        pendingRecurrentAmount = editorState.pendingRecurrentAmount,
-                        pendingRecurrentComment = editorState.pendingRecurrentComment,
-                        selectedDate = editorState.selectedDate,
-                        calculationPreview = preview,
-                    )
-                }
-            }
-        }
-    }
-
-    private fun observeInitialBudgetCheck() {
-        viewModelScope.launch {
-            val settings = budgetRepository.getBudgetSettingsSync()
-            if (settings == null) {
-                _uiState.update { it.copy(isFirstLaunch = true) }
-            }
-        }
-    }
-
-    private fun observeCategories() {
-        viewModelScope.launch {
-            budgetRepository.getActiveCategories().collect { categories ->
-                _categories.value = categories
-                _uiState.update { it.copy(tags = categories.map { c -> c.name }) }
-            }
-        }
-    }
-
-    private fun buildPeriodBoundaryFlow() = observeCurrentPeriodBoundaryUseCase().map { boundary ->
-        _pendingPeriodBoundaryOverride.value ?: boundary
-    }
-
-    private fun createBaseUiState(
-        settings: BudgetSettings?,
-        transactions: List<Transaction>,
-        periodBoundary: Pair<Long, Long>,
-        queuedTransactions: List<Transaction>,
-        rolloverAmount: BigDecimal,
-        rolloverCarryForward: Boolean,
-    ): BudgetUiState {
-        val currentPeriodStartedAtMillis = periodBoundary.first
-        val currentPeriodId = periodBoundary.second
         val settingsWithRollover = settings?.copy(
             rollOverLimit = if (rolloverAmount > BigDecimal.ZERO) rolloverAmount else null,
             rollOverCarryForward = rolloverCarryForward,
         )
+
         val budgetState = settingsWithRollover?.let { s ->
-            val today = LocalDate.now()
             val periodTransactions = budgetStateCalculator.filterPeriodTransactions(
                 transactions = transactions,
                 settings = s,
                 currentPeriodId = currentPeriodId,
                 currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             )
-            budgetStateCalculator.calculateBudgetState(s, periodTransactions, today)
+            budgetStateCalculator.calculateBudgetState(s, periodTransactions, LocalDate.now())
         }
-
-        val numpadInput = numpadController.input.value
-        val editorState = editorStateController.state.value
 
         val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }.sumOf { it.amount }
         val remainingBudget = budgetState?.remainingToday ?: BigDecimal.ZERO
         val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
 
-        return BudgetUiState(
+        BudgetUiState(
             isLoading = false,
             budgetSettings = settingsWithRollover,
             budgetState = budgetState,
@@ -253,54 +156,50 @@ class BudgetViewModel @Inject constructor(
             editMode = editorState.editMode,
             animState = if (numpadInput.isNotEmpty()) AnimState.EDITING else AnimState.IDLE,
             currentComment = editorState.currentComment,
-            tags = _categories.value.map { it.name },
+            tags = categories.map { it.name },
             isFirstLaunch = settings == null,
+            isRecurrentEnabled = editorState.isRecurrentEnabled,
             isCreditEnabled = editorState.isCreditEnabled,
+            showRecurrentDialog = editorState.showRecurrentDialog,
             showCreditCutoffDialog = editorState.showCreditCutoffDialog,
-            pendingExpensesForNextPeriod = queuedTransactions,
+            pendingRecurrentAmount = editorState.pendingRecurrentAmount,
+            pendingRecurrentComment = editorState.pendingRecurrentComment,
             currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             currentPeriodId = currentPeriodId,
-            isCalculation = numpadController.isCalculation.value,
-            dragProgress = numpadController.dragProgress.value,
+            isCalculation = isCalculation,
+            dragProgress = dragProgress,
             lockSwipeable = editorState.lockSwipeable,
             lockDraggable = editorState.lockDraggable,
+            pendingExpensesForNextPeriod = queuedTransactions,
             creditOwed = creditOwed,
             debtAdjustedBalance = debtAdjustedBalance,
+            calculationPreview = calculateCalculationPreview(numpadInput, settings?.currencyCode ?: "USD")
         )
+    }.catch { error ->
+        logcat(TAG) { "Error in uiState pipeline: ${error.asLog()}" }
+        emit(
+            BudgetUiState(
+                isLoading = false,
+                error = error.message ?: "Unknown error",
+                isFirstLaunch = true
+            )
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = BudgetUiState.INITIAL
+    )
+
+    init {
+        viewModelScope.launch {
+            uiState.collect { baseState ->
+                budgetWidgetUpdater.update(baseState)
+            }
+        }
     }
 
-    private suspend fun applyBaseState(baseState: BudgetUiState) {
-        val preview = calculateCalculationPreview(
-            numpadController.input.value,
-            baseState.budgetSettings?.currencyCode ?: "USD"
-        )
-        _uiState.update { current ->
-            baseState.copy(
-                numpadInput = numpadController.input.value,
-                isNumpadValid = validateNumpadInput(numpadController.input.value),
-                animState = if (numpadController.input.value.isNotEmpty()) AnimState.EDITING else AnimState.IDLE,
-                currentComment = editorStateController.state.value.currentComment,
-                editMode = editorStateController.state.value.editMode,
-                lockSwipeable = editorStateController.state.value.lockSwipeable,
-                lockDraggable = editorStateController.state.value.lockDraggable,
-                isRecurrentEnabled = editorStateController.state.value.isRecurrentEnabled,
-                isCreditEnabled = editorStateController.state.value.isCreditEnabled,
-                showRecurrentDialog = editorStateController.state.value.showRecurrentDialog,
-                showCreditCutoffDialog = editorStateController.state.value.showCreditCutoffDialog,
-                pendingRecurrentAmount = editorStateController.state.value.pendingRecurrentAmount,
-                pendingRecurrentComment = editorStateController.state.value.pendingRecurrentComment,
-                isCalculation = current.isCalculation,
-                dragProgress = current.dragProgress,
-                pendingExpensesForNextPeriod = baseState.pendingExpensesForNextPeriod,
-                calculationPreview = preview,
-            )
-        }
-
-        _transactions.value = baseState.transactions
-        _budgetSettings.value = baseState.budgetSettings
-        _budgetState.value = baseState.budgetState
-
-        budgetWidgetUpdater.update(baseState)
+    private fun buildPeriodBoundaryFlow() = observeCurrentPeriodBoundaryUseCase().map { boundary ->
+        _pendingPeriodBoundaryOverride.value ?: boundary
     }
 
     fun saveBudgetSettings(
@@ -380,7 +279,6 @@ class BudgetViewModel @Inject constructor(
     fun markFirstLaunchComplete() {
         for (action in periodActionsController.markFirstLaunchComplete()) {
             if (action is PeriodAction.MarkOnboardingCompleted) {
-                _uiState.update { it.copy(isFirstLaunch = false) }
                 viewModelScope.launch { markOnboardingCompletedUseCase() }
             }
         }
@@ -457,29 +355,10 @@ class BudgetViewModel @Inject constructor(
             is BudgetNumpadIntent.SetDragProgress -> NumpadIntent.SetDragProgress(intent.progress)
             BudgetNumpadIntent.TriggerTestNotifications -> NumpadIntent.TriggerTestNotifications
         }
-        val changes = numpadController.process(
+        numpadController.process(
             intent = controllerIntent,
-            currentIsCalculation = _uiState.value.isCalculation,
+            currentIsCalculation = uiState.value.isCalculation,
         )
-        for (change in changes) {
-            when (change) {
-                is NumpadController.NumpadChange.InputChanged -> _uiState.update {
-                    it.copy(
-                        numpadInput = change.newInput,
-                        isNumpadValid = validateNumpadInput(change.newInput),
-                        animState = if (change.newInput.isNotEmpty()) AnimState.EDITING else AnimState.IDLE,
-                    )
-                }
-
-                is NumpadController.NumpadChange.CalculationModeChanged -> _uiState.update {
-                    it.copy(isCalculation = change.enabled)
-                }
-
-                is NumpadController.NumpadChange.DragProgressChanged -> _uiState.update {
-                    it.copy(dragProgress = change.progress)
-                }
-            }
-        }
 
         if (intent is BudgetNumpadIntent.ApplyTapped) handleApply()
         if (intent is BudgetNumpadIntent.TriggerTestNotifications) triggerTestNotifications()
@@ -511,42 +390,42 @@ class BudgetViewModel @Inject constructor(
         when (intent) {
             is BudgetEditorIntent.SetEditMode -> editorStateController.process(
                 EditorIntent.SetEditMode(intent.mode),
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
             is BudgetEditorIntent.SetAnimState -> editorStateController.process(
                 EditorIntent.SetAnimState(intent.state),
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
             is BudgetEditorIntent.CommentUpdated -> editorStateController.process(
                 EditorIntent.CommentUpdated(intent.comment),
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
             is BudgetEditorIntent.SetRecurrentEnabled -> editorStateController.process(
                 EditorIntent.SetRecurrentEnabled(intent.enabled),
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
             is BudgetEditorIntent.SetCreditEnabled -> editorStateController.process(
                 EditorIntent.SetCreditEnabled(intent.enabled),
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
             is BudgetEditorIntent.DismissRecurrentDialog -> editorStateController.process(
                 EditorIntent.DismissRecurrentDialog,
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
             is BudgetEditorIntent.DismissCreditCutoffDialog -> editorStateController.process(
                 EditorIntent.DismissCreditCutoffDialog,
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
             is BudgetEditorIntent.DateSelected -> editorStateController.process(
                 EditorIntent.DateSelected(intent.date),
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
             is BudgetEditorIntent.UpdateSettings -> handleUpdateSettings(intent.settings)
@@ -568,12 +447,12 @@ class BudgetViewModel @Inject constructor(
             is BudgetSystemIntent.MarkFirstLaunchComplete -> markFirstLaunchComplete()
             is BudgetSystemIntent.SetLockSwipeable -> editorStateController.process(
                 EditorIntent.SetLockSwipeable(intent.locked),
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
             is BudgetSystemIntent.SetLockDraggable -> editorStateController.process(
                 EditorIntent.SetLockDraggable(intent.locked),
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
         }
     }
@@ -583,10 +462,10 @@ class BudgetViewModel @Inject constructor(
             val actions = transactionActionsController.apply(
                 input = numpadController.input.value,
                 isCalculation = numpadController.isCalculation.value,
-                isRecurrentEnabled = editorStateController.state.value.isRecurrentEnabled,
-                isCreditEnabled = editorStateController.state.value.isCreditEnabled,
-                comment = editorStateController.state.value.currentComment,
-                budgetSettings = _uiState.value.budgetSettings,
+                isRecurrentEnabled = uiState.value.isRecurrentEnabled,
+                isCreditEnabled = uiState.value.isCreditEnabled,
+                comment = uiState.value.currentComment,
+                budgetSettings = uiState.value.budgetSettings,
                 resolveActivePeriodId = ::resolveActivePeriodId,
             )
             applyTransactionActions(actions)
@@ -611,23 +490,19 @@ class BudgetViewModel @Inject constructor(
                 frequency = frequency,
                 endDate = endDate,
                 subscriptionDay = subscriptionDay,
-                pendingAmount = editorStateController.state.value.pendingRecurrentAmount,
-                pendingComment = editorStateController.state.value.pendingRecurrentComment,
+                pendingAmount = uiState.value.pendingRecurrentAmount,
+                pendingComment = uiState.value.pendingRecurrentComment,
                 resolveActivePeriodId = ::resolveActivePeriodId,
-                isCredit = editorStateController.state.value.isCreditEnabled,
+                isCredit = uiState.value.isCreditEnabled,
                 fallbackComment = fallbackComment,
             )
             if (actions.isNotEmpty()) {
                 editorStateController.applyRecurrentDialog()
-                _uiState.update {
-                    it.copy(
-                        numpadInput = "",
-                        currentComment = "",
-                        isCalculation = false,
-                        isRecurrentEnabled = false,
-                        isCreditEnabled = false,
-                    )
-                }
+                numpadController.setInput("")
+                numpadController.process(
+                    NumpadIntent.SetCalculationMode(false),
+                    uiState.value.isCalculation
+                )
             }
         }
     }
@@ -640,9 +515,8 @@ class BudgetViewModel @Inject constructor(
         }
 
         editorStateController.applyCreditCutoffDay()
-        _uiState.update { it.copy(showCreditCutoffDialog = false, isCreditEnabled = true) }
 
-        val currentSettings = _uiState.value.budgetSettings
+        val currentSettings = uiState.value.budgetSettings
         if (currentSettings == null) {
             logcat(TAG) { "handleCreditCutoffDayConfirmed: currentSettings is NULL, skipping persistence" }
             return
@@ -662,8 +536,6 @@ class BudgetViewModel @Inject constructor(
     }
 
     private fun handleDeleteTag(tag: String) {
-        _categories.update { categories -> categories.filterNot { it.name == tag } }
-        _uiState.update { state -> state.copy(tags = state.tags.filterNot { it == tag }) }
         viewModelScope.launch { budgetRepository.hideCategory(tag) }
     }
 
@@ -676,30 +548,25 @@ class BudgetViewModel @Inject constructor(
                 }
 
                 TransactionAction.ClearEditorFlags -> {
-                    _uiState.update { it.copy(isCalculation = false, isCreditEnabled = false) }
+                    numpadController.process(
+                        NumpadIntent.SetCalculationMode(false),
+                        uiState.value.isCalculation
+                    )
+                    editorStateController.process(
+                        EditorIntent.SetCreditEnabled(false),
+                        hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null
+                    )
                 }
 
-                TransactionAction.TransactionAdded -> {
-                    // The transaction list is refreshed by the observation
-                    // pipeline, so no explicit refresh is needed.
-                }
-
-                TransactionAction.TransactionQueuedForNextPeriod -> {
-                    // Same — refreshed by observation.
-                }
+                TransactionAction.TransactionAdded -> Unit
+                TransactionAction.TransactionQueuedForNextPeriod -> Unit
 
                 is TransactionAction.OpenRecurrentDialog -> {
                     editorStateController.showRecurrentDialog(
                         amount = action.amount,
                         comment = action.comment,
                     )
-                    numpadController.clearInput()
-                    _uiState.update {
-                        it.copy(
-                            numpadInput = action.normalizedInput,
-                            isNumpadValid = validateNumpadInput(action.normalizedInput),
-                        )
-                    }
+                    numpadController.setInput(action.normalizedInput)
                 }
 
                 is TransactionAction.ShowMessage -> {
@@ -716,19 +583,19 @@ class BudgetViewModel @Inject constructor(
             }
         }
         if (needClear) {
-            numpadController.clearInput()
+            numpadController.setInput("")
+            numpadController.process(
+                NumpadIntent.SetCalculationMode(false),
+                uiState.value.isCalculation
+            )
             editorStateController.process(
                 EditorIntent.CommentUpdated(""),
-                hasCreditCardCutoffDay = _uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
-            _uiState.update {
-                it.copy(
-                    numpadInput = "",
-                    currentComment = "",
-                    isCalculation = false,
-                    isCreditEnabled = false,
-                )
-            }
+            editorStateController.process(
+                EditorIntent.SetCreditEnabled(false),
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null
+            )
         }
     }
 
@@ -745,12 +612,9 @@ class BudgetViewModel @Inject constructor(
         )
         _pendingPeriodBoundaryOverride.value =
             periodBoundary.periodStartMillis to periodBoundary.periodId
-        _uiState.update {
-            it.copy(
-                currentPeriodStartedAtMillis = periodBoundary.periodStartMillis,
-                currentPeriodId = periodBoundary.periodId,
-            )
-        }
+
+        yield()
+
         _pendingPeriodBoundaryOverride.value = null
         logcat(TAG) {
             "persistBudgetSettings END periodStartMillis=${periodBoundary.periodStartMillis} periodId=${periodBoundary.periodId}"
@@ -765,7 +629,7 @@ class BudgetViewModel @Inject constructor(
         val dataStorePeriodId = getCurrentPeriodIdUseCase()
         if (dataStorePeriodId > 0L) return dataStorePeriodId
 
-        return _uiState.value.currentPeriodId
+        return uiState.value.currentPeriodId
     }
 
     private fun calculateCalculationPreview(input: String, currencyCode: String): String? {

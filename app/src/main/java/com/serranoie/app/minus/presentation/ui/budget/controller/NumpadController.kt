@@ -5,17 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/**
- * Owns the numpad input string and the calculation-mode toggle. Pure business
- * logic — no Android dependencies, no coroutine launches, no side effects
- * beyond its own [input] / [isCalculation] state.
- *
- * The controller's [process] method takes the current `isCalculation` flag
- * as a read-only input (so it can clear it on backspace) and returns a
- * [NumpadChange] describing the state diff for the parent ViewModel to
- * apply. This keeps the controller a pure state machine that can be
- * exhaustively unit-tested without any Android or coroutine scaffolding.
- */
 class NumpadController(
     private val expressionEvaluator: BudgetExpressionEvaluator = BudgetExpressionEvaluator(),
 ) {
@@ -28,25 +17,12 @@ class NumpadController(
     private val _dragProgress = MutableStateFlow(0f)
     val dragProgress: StateFlow<Float> = _dragProgress.asStateFlow()
 
-    /**
-     * The result of processing one numpad intent. The parent ViewModel
-     * applies these as patches to its own UI state.
-     */
     sealed interface NumpadChange {
-        /** The numpad input string changed. */
         data class InputChanged(val newInput: String) : NumpadChange
-        /** The calculation-mode flag changed. */
         data class CalculationModeChanged(val enabled: Boolean) : NumpadChange
-        /** The drag progress changed (e.g. for the editor sheet expand). */
         data class DragProgressChanged(val progress: Float) : NumpadChange
     }
 
-    /**
-     * Process one numpad intent. The `currentIsCalculation` is the parent's
-     * current value of the calculation flag (used to decide whether to clear
-     * it on backspace / reset). The returned [NumpadChange]s are the
-     * authoritative state diff for this call — the parent MUST apply them.
-     */
     fun process(
         intent: NumpadIntent,
         currentIsCalculation: Boolean,
@@ -101,9 +77,9 @@ class NumpadController(
     private fun handleOperator(operator: Char, currentIsCalculation: Boolean): List<NumpadChange> {
         val current = _input.value
         val isUnaryPossible = operator == '+' || operator == '-'
-        
+
         if (current.isEmpty() && !isUnaryPossible) return emptyList()
-        
+
         val lastChar = current.lastOrNull()
         if (lastChar != null && (lastChar in "+-×÷" || lastChar == '.')) return emptyList()
 
@@ -154,22 +130,17 @@ class NumpadController(
         return listOf(NumpadChange.DragProgressChanged(progress))
     }
 
-    /**
-     * Reset the input to an empty string. Called by the parent ViewModel
-     * after a successful apply / restore action.
-     */
     fun clearInput(): NumpadChange {
         _input.value = ""
         return NumpadChange.InputChanged("")
     }
+
+    fun setInput(newInput: String): NumpadChange {
+        _input.value = newInput
+        return NumpadChange.InputChanged(newInput)
+    }
 }
 
-/**
- * The set of numpad intents the controller understands. Mirrors the
- * production [com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent]
- * but kept as a controller-local sealed interface so the controller has no
- * dependency on the MVI intent types.
- */
 sealed interface NumpadIntent {
     data class NumberTapped(val digit: String) : NumpadIntent
     data object DotTapped : NumpadIntent
