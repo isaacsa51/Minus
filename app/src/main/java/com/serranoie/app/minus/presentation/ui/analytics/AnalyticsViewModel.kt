@@ -18,10 +18,12 @@ import com.serranoie.app.minus.presentation.ui.history.calculateNextChargeDate
 import com.serranoie.app.minus.presentation.ui.history.getRecurringChargesInPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.math.BigDecimal
@@ -63,77 +65,85 @@ class AnalyticsViewModel @Inject constructor(
     private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AnalyticsUiState())
-    val uiState: StateFlow<AnalyticsUiState> = _uiState.asStateFlow()
-
+    private val _selectedPeriodId = MutableStateFlow<Long?>(null)
     private val _granularity = MutableStateFlow(GraphGranularity.DAYS)
+
+    val uiState: StateFlow<AnalyticsUiState> = combine(
+        budgetRepository.getBudgetSettings().distinctUntilChanged(),
+        budgetRepository.getTransactions().distinctUntilChanged(),
+        budgetRepository.getActiveCategories().distinctUntilChanged(),
+        budgetRepository.getArchivedBudgets().distinctUntilChanged(),
+        observeCurrentPeriodBoundaryUseCase().distinctUntilChanged(),
+        settingsRepository.observeSettings().distinctUntilChanged(),
+        settingsRepository.observeCurrentPeriodRollover().distinctUntilChanged(),
+        _granularity,
+        _selectedPeriodId
+    ) { args: Array<Any?> ->
+        val settings = args[0] as BudgetSettings?
+        val transactions = args[1] as List<Transaction>
+        val categories = args[2] as List<Category>
+        val archives = args[3] as List<ArchivedBudget>
+        val periodBoundary = args[4] as Pair<Long, Long>
+        val userSettings = args[5] as UserSettings
+        val rollover = args[6] as Pair<BigDecimal, Boolean>
+        val granularity = args[7] as GraphGranularity
+        val selectedPeriodId = args[8] as Long?
+
+        val currentPeriodId = periodBoundary.second
+        val reconstructedArchives = reconstructHistory(transactions, archives, settings)
+        val allArchives = (archives + reconstructedArchives).distinctBy { it.periodId }
+            .sortedByDescending { it.startDate }
+
+        val displayState = if (selectedPeriodId != null && selectedPeriodId != currentPeriodId) {
+            buildHistoricalDisplayState(
+                periodId = selectedPeriodId,
+                allTransactions = transactions,
+                archives = allArchives,
+                granularity = granularity,
+                categories = categories,
+                currentSettings = settings,
+                currentPeriodId = currentPeriodId,
+                userSettings = userSettings
+            )
+        } else {
+            buildDisplayState(
+                settings = settings,
+                allTransactions = transactions,
+                currentPeriodId = currentPeriodId,
+                userSettings = userSettings,
+                granularity = granularity,
+                archives = allArchives,
+                categories = categories
+            )
+        }
+
+        AnalyticsUiState(
+            isLoading = false,
+            budgetSettings = settings,
+            allTransactions = transactions,
+            categories = categories,
+            archivedBudgets = allArchives,
+            currentPeriodId = currentPeriodId,
+            selectedPeriodId = selectedPeriodId,
+            userSettings = userSettings,
+            rolloverAmount = rollover.first,
+            rolloverCarryForward = rollover.second,
+            graphGranularity = granularity,
+            displayState = displayState
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = AnalyticsUiState()
+    )
 
     private val _effects = MutableStateFlow<AnalyticsUiEffect?>(null)
     val effects: StateFlow<AnalyticsUiEffect?> = _effects.asStateFlow()
 
     init {
-        observeBudgetData()
         viewModelScope.launch {
             val demoIds = listOf(20260501L, 20260601L, 20260708L, 20260615L)
             demoIds.forEach { budgetRepository.deleteArchivedBudget(it) }
-        }
-    }
-
-    private fun observeBudgetData() {
-        viewModelScope.launch {
-            combine(
-                budgetRepository.getBudgetSettings().distinctUntilChanged(),
-                budgetRepository.getTransactions().distinctUntilChanged(),
-                budgetRepository.getActiveCategories().distinctUntilChanged(),
-                budgetRepository.getArchivedBudgets().distinctUntilChanged(),
-                observeCurrentPeriodBoundaryUseCase().distinctUntilChanged(),
-                settingsRepository.observeSettings().distinctUntilChanged(),
-                settingsRepository.observeCurrentPeriodRollover().distinctUntilChanged(),
-                _granularity,
-            ) { args: Array<Any?> ->
-                val settings = args[0] as BudgetSettings?
-                val transactions = args[1] as List<Transaction>
-                val categories = args[2] as List<Category>
-                val archives = args[3] as List<ArchivedBudget>
-                val periodBoundary = args[4] as Pair<Long, Long>
-                val userSettings = args[5] as UserSettings
-                val rollover = args[6] as Pair<BigDecimal, Boolean>
-                val granularity = args[7] as GraphGranularity
-
-                val currentPeriodId = periodBoundary.second
-                val reconstructedArchives = reconstructHistory(transactions, archives, settings)
-                val allArchives = (archives + reconstructedArchives).distinctBy { it.periodId }
-                    .sortedByDescending { it.startDate }
-
-                val updatedState = _uiState.value.copy(
-                    isLoading = false,
-                    budgetSettings = settings,
-                    allTransactions = transactions,
-                    categories = categories,
-                    archivedBudgets = allArchives,
-                    currentPeriodId = currentPeriodId,
-                    userSettings = userSettings,
-                    rolloverAmount = rollover.first,
-                    rolloverCarryForward = rollover.second,
-                    graphGranularity = granularity,
-                    displayState = if (_uiState.value.selectedPeriodId != null && _uiState.value.selectedPeriodId != currentPeriodId) {
-                        buildHistoricalDisplayState(
-                            _uiState.value.selectedPeriodId!!, transactions, allArchives, granularity, categories
-                        )
-                    } else {
-                        buildDisplayState(
-                            settings = settings,
-                            allTransactions = transactions,
-                            currentPeriodId = currentPeriodId,
-                            userSettings = userSettings,
-                            granularity = granularity,
-                            archives = allArchives,
-                            categories = categories
-                        )
-                    },
-                )
-                _uiState.value = updatedState
-            }.distinctUntilChanged().collect {}
         }
     }
 
@@ -204,12 +214,15 @@ class AnalyticsViewModel @Inject constructor(
         archives: List<ArchivedBudget>,
         granularity: GraphGranularity,
         categories: List<Category>,
+        currentSettings: BudgetSettings?,
+        currentPeriodId: Long,
+        userSettings: UserSettings,
     ): AnalyticsState {
         val archive = archives.find { it.periodId == periodId } ?: return buildDisplayState(
-            settings = _uiState.value.budgetSettings,
+            settings = currentSettings,
             allTransactions = allTransactions,
-            currentPeriodId = _uiState.value.currentPeriodId,
-            userSettings = _uiState.value.userSettings,
+            currentPeriodId = currentPeriodId,
+            userSettings = userSettings,
             granularity = granularity,
             archives = archives,
             categories = categories
@@ -492,17 +505,15 @@ class AnalyticsViewModel @Inject constructor(
     }
 
     fun onClose() {
-        if (_uiState.value.selectedPeriodId != null) {
-            _uiState.value = _uiState.value.copy(selectedPeriodId = null)
-            observeBudgetData() // Refresh to current
+        if (_selectedPeriodId.value != null) {
+            _selectedPeriodId.value = null
         } else {
             _effects.value = AnalyticsUiEffect.NavigateToMain
         }
     }
 
     fun onPeriodSelected(periodId: Long) {
-        _uiState.value = _uiState.value.copy(selectedPeriodId = periodId)
-        observeBudgetData()
+        _selectedPeriodId.value = periodId
     }
 
     fun onMarkCreditPaid() {
@@ -519,7 +530,7 @@ class AnalyticsViewModel @Inject constructor(
 
     fun onCutoffDayChanged(day: Int) {
         logcat("AnalyticsViewModel") { "onCutoffDayChanged: day=$day" }
-        val currentSettings = _uiState.value.budgetSettings
+        val currentSettings = uiState.value.budgetSettings
         if (currentSettings == null) {
             logcat("AnalyticsViewModel") { "onCutoffDayChanged: currentSettings is NULL, skipping persistence" }
             return
