@@ -84,7 +84,6 @@ fun EditableCategoryTag(
     extendWidth: Dp = 0.dp,
     onlyIcon: Boolean = false,
     onEdit: (Boolean) -> Unit = {},
-    onSaveExpense: () -> Unit = {},
     onDeleteTag: (String) -> Unit = {},
     directCategoryPopupEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
@@ -93,12 +92,13 @@ fun EditableCategoryTag(
     onShowCategoryGrid: () -> Unit = {},
     onHideCategoryGrid: () -> Unit = {},
     onDisableCalculationMode: () -> Unit = {},
+    startInEditMode: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
     val localDensity = LocalDensity.current
     val scope = rememberCoroutineScope()
 
-    var isEdit by remember { mutableStateOf(false) }
+    var isEdit by remember { mutableStateOf(startInEditMode) }
     var value by remember(currentComment) {
         mutableStateOf(
             TextFieldValue(
@@ -129,10 +129,6 @@ fun EditableCategoryTag(
         focusManager.clearFocus()
     }
 
-    val saveAndClose = {
-        close()
-        onSaveExpense()
-    }
 
     ExposedDropdownMenuBox(expanded = isShowSuggestions, onExpandedChange = {}) {
         Surface(
@@ -227,7 +223,7 @@ fun EditableCategoryTag(
                         CommentEditor(
                             value = value,
                             onChange = { value = it },
-                            onApply = { saveAndClose() })
+                            onApply = { close() })
                     } else if (!onlyIcon || value.text.isNotEmpty()) {
                         Text(
                             modifier = Modifier
@@ -449,6 +445,23 @@ private fun EditableCategoryTagOnlyIconPreview() {
                 editorFocusController = remember { FocusController() },
                 extendWidth = 300.dp,
                 onlyIcon = true
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun EditableCategoryTagFocusedPreview() {
+    MinusTheme {
+        Box(modifier = Modifier.padding(8.dp)) {
+            EditableCategoryTag(
+                currentComment = "Groceries",
+                tags = listOf("Food", "Transport", "Shopping", "Entertainment"),
+                onCommentUpdate = {},
+                editorFocusController = remember { FocusController() },
+                extendWidth = 300.dp,
+                startInEditMode = true
             )
         }
     }

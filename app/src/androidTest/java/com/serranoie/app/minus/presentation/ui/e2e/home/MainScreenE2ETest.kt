@@ -289,7 +289,6 @@ class MainScreenE2ETest {
                         onCommentUpdate = { capturedIntents += "CommentUpdate:$it" },
                         editorFocusController = FocusController(),
                         onDeleteTag = { capturedIntents += "DeleteTag:$it" },
-                        onSaveExpense = { capturedIntents += "SaveExpense" },
                         modifier = Modifier
                             .fillMaxSize()
                             .height(200.dp),

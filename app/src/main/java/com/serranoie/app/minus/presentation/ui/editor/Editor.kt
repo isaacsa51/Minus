@@ -885,7 +885,6 @@ private fun EditingContent(
                         extendWidth = toolbarWidth,
                         onlyIcon = false,
                         onEdit = {},
-                        onSaveExpense = onApply,
                         onDeleteTag = onDeleteTag,
                         directCategoryPopupEnabled = directCategoryPopupEnabled,
                         categoryGridModeEnabled = categoryGridModeEnabled,
@@ -911,7 +910,6 @@ private fun EditingContent(
                     onShowCategoryGrid = onShowCategoryGrid,
                     onHideCategoryGrid = onHideCategoryGrid,
                     onDisableCalculationMode = onDisableCalculationMode,
-                    onSaveExpense = onApply,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 26.dp)
