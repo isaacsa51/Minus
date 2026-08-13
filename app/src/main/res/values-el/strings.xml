@@ -517,7 +517,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">Η συνδρομή σας \"%1$s\" του \"%2$s\" θα χρεωθεί με %3$s. Προετοιμαστείτε για τη χρέωση.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Έχετε μια συνδρομή του \"%1$s\" που θα χρεωθεί %2$s.</string>
     <string name="notification_credit_cutoff_title">Επερχόμενη πληρωμή με πιστωτική κάρτα</string>
-    <string name="notification_credit_cutoff_message">Η ημερομηνία περικοπής σας είναι %1$s. Συνιστάται να πληρώσετε %2$s για να αποφύγετε οποιοδήποτε ενδιαφέρον.</string>
+    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
     <string name="credit_owed_label">Σύνολο οφειλόμενων</string>
     <string name="debt_adjusted_balance_label">Υπόλοιπο Προσαρμοσμένου Χρέους</string>
     <string name="debt_adjusted_label_format">%1$s - Πιστωτικό χρέος %2$s</string>
