@@ -6,8 +6,10 @@ import androidx.work.WorkerParameters
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.CreditCard
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.model.calculatePaymentDueDate
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -105,19 +107,29 @@ class RecurrentExpenseNotificationWorker(
         }
     }
     private fun maybeSendCreditCutoffReminder(
-	    settings: BudgetSettings,
-	    transactions: List<Transaction>,
-	    today: LocalDate,
-	    notificationHelper: NotificationHelper
+        settings: BudgetSettings,
+        transactions: List<Transaction>,
+        today: LocalDate,
+        notificationHelper: NotificationHelper
     ) {
         val cutoffDay = settings.creditCardCutoffDay ?: return
+        val card = CreditCard(cutoffDay = cutoffDay)
+        val dueDate = calculatePaymentDueDate(card, today)
 
-        val cutoffThisMonth = runCatching { today.withDayOfMonth(cutoffDay) }.getOrElse {
+        val daysUntilDueDate = ChronoUnit.DAYS.between(today, dueDate)
+        
+        // Notify 3 days before the payment due date
+        if (daysUntilDueDate != 3L) return
+
+        // The billing period for this due date ended at the corresponding cutoff date.
+        val currentMonthCutoff = runCatching { today.withDayOfMonth(cutoffDay) }.getOrElse {
             today.withDayOfMonth(today.lengthOfMonth())
         }
-
-        val daysUntilCutoff = ChronoUnit.DAYS.between(today, cutoffThisMonth)
-        if (daysUntilCutoff != 3L) return
+        val actualCutoffDate = if (today.isAfter(currentMonthCutoff)) {
+            currentMonthCutoff
+        } else {
+            currentMonthCutoff.minusMonths(1)
+        }
 
         val creditTotal = transactions
             .filter { tx ->
@@ -125,9 +137,7 @@ class RecurrentExpenseNotificationWorker(
                     !tx.isDeleted &&
                     !tx.isCreditPaid &&
                     tx.date != null &&
-                    tx.date.toLocalDate().month == cutoffThisMonth.month &&
-                    tx.date.toLocalDate().year == cutoffThisMonth.year &&
-                    !tx.date.toLocalDate().isAfter(cutoffThisMonth)
+                    !tx.date.toLocalDate().isAfter(actualCutoffDate)
             }
             .sumOf { it.amount }
 
@@ -136,7 +146,7 @@ class RecurrentExpenseNotificationWorker(
         val formatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault())
         notificationHelper.showCreditCutoffNotification(
             totalAmount = creditTotal.toPlainString(),
-            cutoffDateText = cutoffThisMonth.format(formatter),
+            dueDateText = dueDate.format(formatter),
             currency = settings.currencyCode
         )
     }

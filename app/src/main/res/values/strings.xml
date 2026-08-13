@@ -612,7 +612,7 @@
     <string name="notification_upcoming_subscription_message_without_comment">You have a subscription of \"%1$s\" that will be charged %2$s.</string>
 
     <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
-    <string name="notification_credit_cutoff_message">Your cutoff date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
 
     <string name="credit_owed_label">Total owed</string>
     <string name="debt_adjusted_balance_label">Debt-Adjusted Balance</string>

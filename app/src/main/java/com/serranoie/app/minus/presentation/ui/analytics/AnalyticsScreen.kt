@@ -40,6 +40,7 @@ fun AnalyticsScreen(
     Analytics(
         state = uiState.displayState,
         archivedBudgets = uiState.archivedBudgets,
+        categories = uiState.categories,
         actions = AnalyticsActions(
             onCreateNewPeriod = {
                 viewModel.onCreateNewPeriod()

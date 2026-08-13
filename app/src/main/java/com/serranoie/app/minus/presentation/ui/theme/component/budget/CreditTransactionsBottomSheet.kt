@@ -44,7 +44,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.CreditCard
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.model.calculatePaymentDueDate
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
@@ -174,17 +176,20 @@ fun CreditCardVisualization(
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currency)
     val today = LocalDate.now()
-    val cutoffDate = runCatching { today.withDayOfMonth(cutoffDay ?: 1) }.getOrElse {
-        today.withDayOfMonth(today.lengthOfMonth())
+    val card = remember(cutoffDay) {
+        CreditCard(cutoffDay = cutoffDay ?: 15)
     }
-    val nextCutoff = if (today.isAfter(cutoffDate)) {
-        val nextMonth = today.plusMonths(1)
-        runCatching { nextMonth.withDayOfMonth(cutoffDay ?: 1) }.getOrElse {
-            nextMonth.withDayOfMonth(nextMonth.lengthOfMonth())
-        }
-    } else cutoffDate
+    val dueDate = calculatePaymentDueDate(card, today)
 
-    val cutoffDateText = nextCutoff.format(DateTimeFormatter.ofPattern("dd MMMM"))
+    // If today is after the calculated due date, show the one for the next month
+    val displayDueDate = if (today.isAfter(dueDate)) {
+        val nextMonthDate = today.plusMonths(1)
+        calculatePaymentDueDate(card, nextMonthDate)
+    } else {
+        dueDate
+    }
+
+    val dueDateText = displayDueDate.format(DateTimeFormatter.ofPattern("dd MMMM"))
 
     Box(
         modifier = modifier
@@ -245,7 +250,7 @@ fun CreditCardVisualization(
                 shape = CircleShape
             ) {
                 Text(
-                    text = "Cutoff: $cutoffDateText",
+                    text = "Due date: $dueDateText",
                     style = MaterialTheme.typography.bodySmallEmphasized,
                     color = MaterialTheme.colorScheme.onTertiaryContainer,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -267,7 +272,7 @@ fun CreditCardVisualization(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Cutoff Not Passed")
 @Composable
 private fun CreditTransactionsBottomSheetPreview() {
     MinusTheme {
@@ -279,19 +284,36 @@ private fun CreditTransactionsBottomSheetPreview() {
                     comment = "Gas",
                     date = LocalDateTime.now(),
                     isCredit = true
-                ), Transaction(
-                    id = 2,
-                    amount = BigDecimal("12.50"),
-                    comment = "Coffee",
-                    date = LocalDateTime.now().minusHours(2),
-                    isCredit = true
-                ), Transaction(
-                    id = 3,
+                )
+            ),
+            totalOwed = BigDecimal("45.00"),
+            currency = "USD",
+            onPayClick = {},
+            onPayTransactionClick = {},
+            creditCardCutoffDay = LocalDate.now().plusDays(2).dayOfMonth // Cutoff is in 2 days
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Cutoff Passed")
+@Composable
+private fun CreditTransactionsBottomSheetPreviewPassed() {
+    MinusTheme {
+        CreditTransactionsBottomSheet(
+            transactions = listOf(
+                Transaction(
+                    id = 1,
                     amount = BigDecimal("120.00"),
                     comment = "Groceries",
-                    date = LocalDateTime.now().minusDays(1),
+                    date = LocalDateTime.now().minusDays(5),
                     isCredit = true
                 )
-            ), totalOwed = BigDecimal("177.50"), currency = "USD", onPayClick = {}, onPayTransactionClick = {}, creditCardCutoffDay = 15)
+            ),
+            totalOwed = BigDecimal("120.00"),
+            currency = "USD",
+            onPayClick = {},
+            onPayTransactionClick = {},
+            creditCardCutoffDay = LocalDate.now().minusDays(2).dayOfMonth // Cutoff was 2 days ago
+        )
     }
 }

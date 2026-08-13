@@ -129,6 +129,10 @@
     <string name="budget_less_than_one_day_validation">El presupuesto debe ser para al menos un día</string>
     <!--  Analytics  -->
     <string name="analytics_title">Análisis</string>
+    <string name="spent_on">Sucedió el %1$s</string>
+    <string name="category_label">Etiquetado como %1$s</string>
+    <string name="comment_label">Nota: %1$s</string>
+
     <plurals name="days">
         <item quantity="one">%d día</item>
         <item quantity="other">%d días</item>
@@ -138,8 +142,8 @@
         <item quantity="other">%d días</item>
     </plurals>
     <string name="total_budget">Presupuesto total</string>
-    <string name="minimum_spent">Mínimo gastado</string>
-    <string name="maximum_spent">Máximo gastado</string>
+    <string name="minimum_spent">Mínimo Gustito</string>
+    <string name="maximum_spent">Gran Compra</string>
     <string name="average_spent">Promedio por día empleado</string>
     <string name="days_remaining_label">Días\nrestantes</string>
     <!-- Widget Descriptions -->
@@ -515,7 +519,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">Tu suscripción \"%1$s\" de \"%2$s\" se cobrará %3$s. Prepárate para el cargo.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Tienes una suscripción de \"%1$s\" que se cobrará %2$s.</string>
     <string name="notification_credit_cutoff_title">Pago de tarjeta próximo</string>
-    <string name="notification_credit_cutoff_message">Tu fecha de corte es el %1$s. Se recomienda saldar %2$s para evitar intereses.</string>
+    <string name="notification_credit_cutoff_message">Tu fecha de pago es el %1$s. Se recomienda saldar %2$s para evitar intereses.</string>
     <string name="credit_owed_label">Total adeudado</string>
     <string name="debt_adjusted_balance_label">Saldo ajustado por deuda</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s deuda de crédito</string>

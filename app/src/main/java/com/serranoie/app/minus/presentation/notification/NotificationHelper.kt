@@ -257,7 +257,7 @@ class NotificationHelper @Inject constructor(
 
     fun showCreditCutoffNotification(
         totalAmount: String,
-        cutoffDateText: String,
+        dueDateText: String,
         currency: String
     ) {
         val hasPermission = checkNotificationPermission()
@@ -280,7 +280,7 @@ class NotificationHelper @Inject constructor(
         val formattedAmount = formatAmount(totalAmount, currency)
         val message = context.getString(
             R.string.notification_credit_cutoff_message,
-            cutoffDateText,
+            dueDateText,
             formattedAmount
         )
 

@@ -7,6 +7,7 @@ import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
@@ -42,6 +43,7 @@ class AnalyticsViewModelTest {
 
     private val settingsFlow = MutableStateFlow<BudgetSettings?>(null)
     private val transactionsFlow = MutableStateFlow<List<Transaction>>(emptyList())
+    private val categoriesFlow = MutableStateFlow<List<Category>>(emptyList())
     private val archivedFlow = MutableStateFlow<List<ArchivedBudget>>(emptyList())
     private val boundaryFlow = flowOf(0L to 1L)
     private val userSettingsFlow = flowOf(UserSettings())
@@ -52,6 +54,7 @@ class AnalyticsViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
         every { budgetRepository.getBudgetSettings() } returns settingsFlow
         every { budgetRepository.getTransactions() } returns transactionsFlow
+        every { budgetRepository.getActiveCategories() } returns categoriesFlow
         every { budgetRepository.getArchivedBudgets() } returns archivedFlow
         every { observeCurrentPeriodBoundaryUseCase() } returns boundaryFlow
         every { settingsRepository.observeSettings() } returns userSettingsFlow

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
@@ -178,7 +179,7 @@ class HistoryViewModel @Inject constructor(
         budgetSettings: BudgetSettings?,
         currentPeriodStartedAtMillis: Long,
         currentPeriodId: Long,
-        userSettings: com.serranoie.app.minus.domain.model.UserSettings?,
+        userSettings: UserSettings?,
     ) {
         val current = _uiState.value
         val pendingRemoved = current.pendingRemovedTransactions

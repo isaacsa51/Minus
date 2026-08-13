@@ -8,8 +8,10 @@ import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
+import com.serranoie.app.minus.domain.model.CreditCard
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.model.calculatePaymentDueDate
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.FinishBudgetEarlyUseCase
 import com.serranoie.app.minus.domain.usecase.GetCurrentPeriodIdUseCase
@@ -412,12 +414,12 @@ class BudgetViewModel @Inject constructor(
                 val cutoffDay = settings?.creditCardCutoffDay
                 if (cutoffDay != null) {
                     val today = LocalDate.now()
-                    val cutoffDate = runCatching { today.withDayOfMonth(cutoffDay) }
-                        .getOrElse { today.withDayOfMonth(today.lengthOfMonth()) }
+                    val card = CreditCard(cutoffDay = cutoffDay)
+                    val dueDate = calculatePaymentDueDate(card, today)
                     val formatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault())
                     notificationHelper.showCreditCutoffNotification(
                         totalAmount = "123.45",
-                        cutoffDateText = cutoffDate.format(formatter),
+                        dueDateText = dueDate.format(formatter),
                         currency = currency
                     )
                 }
