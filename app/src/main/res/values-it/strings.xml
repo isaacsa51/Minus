@@ -249,7 +249,7 @@
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
     <string name="settings_typography_title">Tipografia</string>
     <string name="settings_typography_subtitle">Cambia lo stile tipografico dell\'app</string>
-    <string name="settings_rounded_font_title">Rounded font style</string>
+    <string name="settings_rounded_font_title">Stile di carattere arrotondato</string>
     <string name="settings_material_you_title">Materiale Tu</string>
     <string name="settings_material_you_subtitle">Usa i colori dello sfondo per applicare un tema dinamico</string>
     <string name="settings_censor_mode_title">Privacy mode</string>
@@ -290,6 +290,7 @@
     <string name="settings_about_subtitle">Scopri di più sull\'app e sul suo sviluppo</string>
     <string name="settings_bug_report_title">Trovato un bug?</string>
     <string name="settings_bug_report_subtitle">Crea una segnalazione di bug e lo risolveremo presto</string>
+    <string name="settings_what_is_this_for">A cosa serve?</string>
     <string name="settings_version_title">Versione</string>
     <string name="settings_version_metadata_copied">Metadati dell\'app e del dispositivo copiati negli appunti</string>
     <!-- Bug Report -->
@@ -517,7 +518,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">Your subscription \"%1$s\" of \"%2$s\" will be charged %3$s. Prepare for the charge.</string>
     <string name="notification_upcoming_subscription_message_without_comment">You have a subscription of \"%1$s\" that will be charged %2$s.</string>
     <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
-    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="notification_credit_cutoff_message">Your cutoff date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
     <string name="credit_owed_label">Total owed</string>
     <string name="debt_adjusted_balance_label">Debt-Adjusted Balance</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s credit debt</string>
