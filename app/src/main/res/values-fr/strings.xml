@@ -15,10 +15,10 @@
     <string name="tutorial_analytics_description">Ouvrez Analytics pour voir comment vos dépenses se répartissent au fil du temps, par catégorie et par rapport à vos objectifs budgétaires.</string>
     <string name="tutorial_privacy_title">Mode privé</string>
     <string name="tutorial_privacy_description">Couvrez le haut du téléphone (où la caméra avant est installée) de votre main pendant environ une seconde pour flouter chaque quantité à l\'écran. Couvrez-le à nouveau pour le désactiver.</string>
-    <string name="tutorial_calc_title">Ongoing budget</string>
-    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
-    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
-    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
+    <string name="tutorial_calc_title">Budget en cours</string>
+    <string name="tutorial_calc_description">Utilisez + ou - au début pour augmenter ou diminuer votre budget restant pour cette période.</string>
+    <string name="tutorial_credit_toggle_title">Paiement par carte bancaire</string>
+    <string name="tutorial_credit_toggle_description">Appuyez ici pour indiquer que cette dépense a été effectuée par carte bancaire. Elle sera suivie séparément dans vos statistiques.</string>
     <string name="today">Aujourd\'hui</string>
     <string name="yesterday">Hier</string>
     <string name="tomorrow">Demain</string>
@@ -214,8 +214,8 @@
     <string name="changelog_release_date">Publiée le %1$s</string>
     <string name="changelog_close">Fermer</string>
     <string name="changelog_previous_versions">Versions précédentes</string>
-    <string name="changelog_updated_to">Updated to: %1$s</string>
-    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
+    <string name="changelog_updated_to">Mis à jour vers : %1$s</string>
+    <string name="changelog_see_changes">Découvrez ci-dessous toutes les modifications pour ne manquer aucune nouvelle fonctionnalité</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Sélectionnez la période</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d jours · %2$s - %3$s</string>
@@ -264,8 +264,8 @@
     <string name="settings_category_picker_direct_popup_description">Dès que vous appuyez sur le champ de catégorie, une fenêtre contextuelle de suggestions s\'ouvre avec toutes vos catégories enregistrées. Si cette option est désactivée, les suggestions n\'apparaissent qu\'après avoir commencé à saisir du texte.</string>
     <string name="settings_category_grid_mode_switch_label">Afficher sous forme de liste</string>
     <string name="settings_category_grid_mode_description">Touchez l\'étiquette de catégorie pour ouvrir une grille de vos catégories enregistrées, au lieu d\'accéder au mode d\'édition en ligne. Désactive également le mode de calcul du pavé numérique lorsque cette option est activée.</string>
-    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
-    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
+    <string name="settings_feature_show_past_transactions_title">Afficher les transactions passées</string>
+    <string name="settings_feature_show_past_transactions_subtitle">Charger les transactions des périodes précédentes</string>
     <string name="settings_recurrent_payments_view_mode_title">Mode d\'affichage des paiements récurrents</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Modifiez le type d\'affichage pour afficher vos paiements récurrents.</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Mode d\'affichage des paiements récurrents</string>
@@ -319,11 +319,10 @@
     <string name="bug_report_attachments_label_bug">Captures d\'écran ou enregistrements</string>
     <string name="bug_report_submit">Envoyer le rapport</string>
     <string name="bug_report_share_title">Envoyer le rapport</string>
-    <string name="bug_report_email_subject">%1$s</string>
     <string name="bug_report_email_body">Bonjour, vous trouverez ci-joint mon rapport Minus généré.</string>
     <string name="bug_report_help_title">Aidez-nous à nous améliorer</string>
     <string name="bug_report_help_message_prefix">"Remplir ce formulaire générera un fichier .zip avec le contenu du rapport et les pièces jointes afin que vous puissiez l’envoyer par e-mail.\nSi vous avez un compte GitHub, vous pouvez aussi ouvrir "</string>
-    <string name="bug_report_help_github_issues">" GitHub Issues "</string>
+    <string name="bug_report_help_github_issues">"Problèmes GitHub"</string>
     <string name="bug_report_help_message_suffix"> pour ce dépôt.</string>
     <string name="bug_report_steps_to_reproduce_label">Étapes pour reproduire</string>
     <string name="bug_report_include_steps_label">Inclure les étapes de reproduction</string>
@@ -362,6 +361,8 @@
     <string name="budget_pill_over_budget">Montant du budget dépassé</string>
     <string name="budget_pill_no_budget">Aucun budget</string>
     <string name="budget_pill_no_budget_action">Configurez votre budget</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">quotidien</string>
     <string name="budget_pill_exhausted_weekly_label">hebdomadaire</string>
     <string name="budget_pill_exhausted_biweekly_label">bihebdomadaire</string>
@@ -486,6 +487,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Sans date</string>
     <string name="no_name">Sans nom</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">Raison de l\'achat</string>
     <string name="date">Date</string>
     <string name="frequency">Fréquence</string>
@@ -525,7 +527,7 @@
     <string name="credit_badge">CRÉDIT</string>
     <string name="credit_cutoff_subtitle">%1$s — Date limite dans %2$d jours</string>
     <string name="credit_cutoff_subtitle_today">%1$s — Date limite aujourd\'hui</string>
-    <string name="ticket_expense">EXPENSE</string>
+    <string name="ticket_expense">DÉPENSE</string>
     <string name="ticket_recurrent_expense">DÉPENSE RÉCURRENTE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Période passée</string>
@@ -552,18 +554,17 @@
     <string name="analytics_tutorial_credit_desc">Appuyez sur la carte de crédit pour afficher toutes les transactions en CC, les marquer comme payées ou ajuster votre date limite de facturation pour éviter les intérêts.</string>
     <string name="analytics_tutorial_history_title">Historique des transactions</string>
     <string name="analytics_tutorial_history_desc">Cliquez ici pour voir la liste de toutes vos dépenses pour cette période.</string>
-    <string name="skip_tutorial">Skip</string>
-    <string name="budget_graph_header_spending">Spending</string>
-    <string name="budget_graph_legend_current">Current</string>
-    <string name="budget_graph_legend_previous">Previous</string>
-    <string name="budget_graph_nav_prev">Previous</string>
+    <string name="skip_tutorial">Passer</string>
+    <string name="budget_graph_header_spending">Dépenses</string>
+    <string name="budget_graph_legend_current">Actuel</string>
+    <string name="budget_graph_legend_previous">Précédent</string>
+    <string name="budget_graph_nav_prev">Précédent</string>
     <string name="budget_graph_nav_next">Suivant</string>
-    <string name="graph_granularity_days">Days</string>
-    <string name="graph_granularity_week">Week</string>
-    <string name="graph_granularity_biweek">Biweek</string>
-    <string name="graph_granularity_month">Month</string>
+    <string name="graph_granularity_days">Jours</string>
+    <string name="graph_granularity_week">Semaine</string>
+    <string name="graph_granularity_biweek">Quinzaine</string>
+    <string name="graph_granularity_month">Mois</string>
     <string name="graph_granularity_total">Total</string>
-    <string name="budget_graph_page_indicator">%1$d / %2$d</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
 </resources>
