@@ -249,7 +249,7 @@
     <string name="settings_appearance_subtitle">Changer la couleur et l\'apparence de l\'application</string>
     <string name="settings_typography_title">Typographie</string>
     <string name="settings_typography_subtitle">Changer le style de typographie de l\'application</string>
-    <string name="settings_rounded_font_title">Rounded font style</string>
+    <string name="settings_rounded_font_title">Style de police arrondi</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Utiliser les couleurs du fond d\'écran pour appliquer un thème dynamique</string>
     <string name="settings_censor_mode_title">Mode privé</string>
@@ -290,6 +290,7 @@
     <string name="settings_about_subtitle">En savoir plus sur l\'application et son développement</string>
     <string name="settings_bug_report_title">Un bug ?</string>
     <string name="settings_bug_report_subtitle">Créez un rapport de bug et nous le corrigerons bientôt</string>
+    <string name="settings_what_is_this_for">À quoi cela sert-il ?</string>
     <string name="settings_version_title">Version</string>
     <string name="settings_version_metadata_copied">Métadonnées de l’app et de l’appareil copiées dans le presse-papiers</string>
     <!-- Bug Report -->
@@ -517,7 +518,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">Votre abonnement «%1$s» de «%2$s» sera facturé %3$s. Préparez-vous pour la charge.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Vous avez un abonnement \"%1$s\" qui sera facturé %2$s.</string>
     <string name="notification_credit_cutoff_title">Paiement à venir par carte de crédit</string>
-    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="notification_credit_cutoff_message">Votre date limite est %1$s. Il est recommandé de payer %2$s pour éviter tout intérêt.</string>
     <string name="credit_owed_label">Total dû</string>
     <string name="debt_adjusted_balance_label">Solde ajusté de la dette</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s Crédit</string>
