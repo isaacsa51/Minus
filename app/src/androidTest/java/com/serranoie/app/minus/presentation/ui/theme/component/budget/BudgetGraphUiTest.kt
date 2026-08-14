@@ -5,12 +5,17 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsState
 import com.serranoie.app.minus.presentation.ui.analytics.GraphGranularity
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import org.junit.Rule
 import org.junit.Test
+import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 
@@ -23,9 +28,23 @@ class BudgetGraphUiTest {
         return Date.from(LocalDate.of(year, month, day).atStartOfDay(ZoneId.systemDefault()).toInstant())
     }
 
+    private fun sampleSettings(start: LocalDate, end: LocalDate) = BudgetSettings(
+        totalBudget = BigDecimal("1000"),
+        period = BudgetPeriod.MONTHLY,
+        startDate = start,
+        endDate = end,
+        currencyCode = "USD"
+    )
+
+    private fun sampleSpends() = listOf(
+        Transaction(amount = BigDecimal("10"), date = LocalDateTime.now())
+    )
+
     @Test
     fun granularityToggle_updatesSelection() {
         var selectedGranularity = GraphGranularity.DAYS
+        val start = LocalDate.of(2026, 8, 1)
+        val end = LocalDate.of(2026, 8, 31)
         
         composeTestRule.setContent {
             MinusTheme {
@@ -34,7 +53,9 @@ class BudgetGraphUiTest {
                         graphGranularity = selectedGranularity,
                         startPeriodDate = fixedDate(2026, 8, 1),
                         finishPeriodDate = fixedDate(2026, 8, 31),
-                        currencyCode = "USD"
+                        currencyCode = "USD",
+                        budgetSettingsForDisplay = sampleSettings(start, end),
+                        spends = sampleSpends()
                     ),
                     onGranularityChanged = { selectedGranularity = it }
                 )
@@ -53,6 +74,8 @@ class BudgetGraphUiTest {
 
     @Test
     fun navigationArrows_visible_whenMultipleWindows() {
+        val start = LocalDate.of(2026, 8, 1)
+        val end = LocalDate.of(2026, 8, 10)
         composeTestRule.setContent {
             MinusTheme {
                 BudgetGraph(
@@ -60,7 +83,9 @@ class BudgetGraphUiTest {
                         graphGranularity = GraphGranularity.DAYS, // 1 day steps
                         startPeriodDate = fixedDate(2026, 8, 1),
                         finishPeriodDate = fixedDate(2026, 8, 10), // 10 days > 7 day window
-                        currencyCode = "USD"
+                        currencyCode = "USD",
+                        budgetSettingsForDisplay = sampleSettings(start, end),
+                        spends = sampleSpends()
                     ),
                     onGranularityChanged = {}
                 )
