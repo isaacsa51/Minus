@@ -249,7 +249,7 @@
     <string name="settings_appearance_subtitle">Alterar a cor e a aparência do aplicativo</string>
     <string name="settings_typography_title">Tipografia</string>
     <string name="settings_typography_subtitle">Alterar o estilo da tipografia do aplicativo</string>
-    <string name="settings_rounded_font_title">Rounded font style</string>
+    <string name="settings_rounded_font_title">Estilo de fonte arredondado</string>
     <string name="settings_material_you_title">Material de que você</string>
     <string name="settings_material_you_subtitle">Usar cores de papel de parede para aplicar um tema dinâmico</string>
     <string name="settings_censor_mode_title">Modo de privacidade</string>
@@ -290,6 +290,7 @@
     <string name="settings_about_subtitle">Saiba mais sobre o aplicativo e seu desenvolvimento</string>
     <string name="settings_bug_report_title">Encontrou um bug?</string>
     <string name="settings_bug_report_subtitle">Crie um relatório de erro e vamos corrigi-lo em breve</string>
+    <string name="settings_what_is_this_for">Para que serve isto?</string>
     <string name="settings_version_title">Versão</string>
     <string name="settings_version_metadata_copied">Metadados do aplicativo e do dispositivo copiados para a área de transferência</string>
     <!-- Bug Report -->
@@ -517,7 +518,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">Sua assinatura \"%1$s\" de \"%2$s\" será cobrada %3$s. Prepare-se para a cobrança.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Você tem uma assinatura de \"%1$s\" que será cobrado em %2$s.</string>
     <string name="notification_credit_cutoff_title">Próximo pagamento com cartão de crédito</string>
-    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="notification_credit_cutoff_message">Sua data de câmbio é %1$s. Recomenda-se pagar %2$s para evitar quaisquer juros.</string>
     <string name="credit_owed_label">Total devedor</string>
     <string name="debt_adjusted_balance_label">Saldo Débt-Ajustado</string>
     <string name="debt_adjusted_label_format">Dívida %1$s - %2$s</string>
