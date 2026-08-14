@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.onboarding
 
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.repository.SettingsRepository
@@ -8,10 +9,8 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -25,7 +24,7 @@ class OnboardingViewModelTest {
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @After
@@ -37,12 +36,21 @@ class OnboardingViewModelTest {
         settingsRepository = settingsRepository,
     )
 
-    @Test
-    fun `when_viewmodel_is_created_then_state_has_defaults`() {
-        val viewModel = newViewModel()
+    private suspend fun <T> ReceiveTurbine<T>.awaitCondition(predicate: (T) -> Boolean): T {
+        while (true) {
+            val item = awaitItem()
+            if (predicate(item)) return item
+        }
+    }
 
-        val state = viewModel.uiState.value
-        assertThat(state.isCompleted).isFalse()
+    @Test
+    fun `when_viewmodel_is_created_then_state_has_defaults`() = runTest {
+        val viewModel = newViewModel()
+        viewModel.uiState.test {
+            val state = awaitCondition { !it.isCompleted }
+            assertThat(state.isCompleted).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -50,17 +58,22 @@ class OnboardingViewModelTest {
         coEvery { settingsRepository.setOnboardingCompleted(any()) } returns Unit
         val viewModel = newViewModel()
 
-        viewModel.effects.test {
-            viewModel.processIntent(OnboardingUiIntent.OnWelcomeDismissed)
-            advanceUntilIdle()
-            runCurrent()
+        viewModel.uiState.test {
+            val uiTurbine = this
+            uiTurbine.awaitCondition { !it.isCompleted }
+            
+            viewModel.effects.test {
+                val effectTurbine = this
+                viewModel.processIntent(OnboardingUiIntent.OnWelcomeDismissed)
+                
+                uiTurbine.awaitCondition { it.isCompleted }
+                coVerify { settingsRepository.setOnboardingCompleted(true) }
 
-            coVerify { settingsRepository.setOnboardingCompleted(true) }
-            assertThat(viewModel.uiState.value.isCompleted).isTrue()
-
-            val effect = awaitItem()
-            assertThat(effect).isEqualTo(OnboardingUiEffect.OnboardingCompleted)
-            cancelAndIgnoreRemainingEvents()
+                val effect = effectTurbine.awaitItem()
+                assertThat(effect).isEqualTo(OnboardingUiEffect.OnboardingCompleted)
+                effectTurbine.cancelAndIgnoreRemainingEvents()
+            }
+            uiTurbine.cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -71,8 +84,6 @@ class OnboardingViewModelTest {
 
         viewModel.effects.test {
             viewModel.processIntent(OnboardingUiIntent.OnWelcomeDismissed)
-            advanceUntilIdle()
-            runCurrent()
 
             val effect = awaitItem()
             assertThat(effect).isInstanceOf(OnboardingUiEffect.OnboardingFailed::class.java)

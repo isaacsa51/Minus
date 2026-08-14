@@ -78,10 +78,10 @@ class AnalyticsViewModelTest {
     @Test
     fun `initial state is loading then success when data emits`() = runTest {
         val viewModel = createViewModel()
-        assertThat(viewModel.uiState.value.isLoading).isTrue()
-        
-        runCurrent()
-        assertThat(viewModel.uiState.value.isLoading).isFalse()
+        viewModel.uiState.test {
+            assertThat(awaitItem().isLoading).isTrue()
+            assertThat(awaitItem().isLoading).isFalse()
+        }
     }
 
     @Test
@@ -98,37 +98,38 @@ class AnalyticsViewModelTest {
         archivedFlow.value = listOf(archive)
         
         val viewModel = createViewModel()
-        runCurrent()
+        viewModel.uiState.test {
+            skipItems(2)
 
-        viewModel.onPeriodSelected(10L)
-        runCurrent()
-
-        val state = viewModel.uiState.value
-        assertThat(state.selectedPeriodId).isEqualTo(10L)
-        assertThat(state.displayState.isHistoricalView).isTrue()
-        assertThat(state.displayState.wholeBudget).isEqualTo(BigDecimal("1000.00"))
+            viewModel.onPeriodSelected(10L)
+            
+            val state = awaitItem()
+            assertThat(state.selectedPeriodId).isEqualTo(10L)
+            assertThat(state.displayState.isHistoricalView).isTrue()
+            assertThat(state.displayState.wholeBudget).isEqualTo(BigDecimal("1000.00"))
+        }
     }
 
     @Test
     fun `closing historical view returns to current`() = runTest {
         val viewModel = createViewModel()
-        runCurrent()
-        
-        viewModel.onPeriodSelected(10L)
-        runCurrent()
+        viewModel.uiState.test {
+            skipItems(2)
 
-        viewModel.onClose()
-        runCurrent()
+            viewModel.onPeriodSelected(10L)
+            awaitItem()
 
-        assertThat(viewModel.uiState.value.selectedPeriodId).isNull()
-        assertThat(viewModel.uiState.value.displayState.isHistoricalView).isFalse()
+            viewModel.onClose()
+            val state = awaitItem()
+            assertThat(state.selectedPeriodId).isNull()
+            assertThat(state.displayState.isHistoricalView).isFalse()
+        }
     }
 
     @Test
     fun `onClose without selected period triggers NavigateToMain effect`() = runTest {
         val viewModel = createViewModel()
-        runCurrent()
-
+        
         viewModel.effects.test {
             assertThat(awaitItem()).isNull()
             
@@ -140,7 +141,6 @@ class AnalyticsViewModelTest {
     @Test
     fun `onCreateNewPeriod clears early finish and navigates`() = runTest {
         val viewModel = createViewModel()
-        runCurrent()
 
         viewModel.effects.test {
             assertThat(awaitItem()).isNull()

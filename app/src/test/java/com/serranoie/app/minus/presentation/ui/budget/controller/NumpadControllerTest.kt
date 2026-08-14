@@ -4,19 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.presentation.ui.budget.controller.NumpadController.NumpadChange
 import org.junit.Test
 
-/**
- * Unit tests for [NumpadController] — a pure state machine, no Android,
- * no coroutines. Each test follows the Given / When / Then BDD convention
- * with a backticked English name (when_X_then_Y; underscores only because
- * the Android DEX bytecode format rejects spaces in method names).
- */
 class NumpadControllerTest {
 
     private fun newController() = NumpadController()
-
-    // -------------------------------------------------------------------------
-    // Initial state
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_controller_is_created_then_input_is_empty_and_calculation_is_false`() {
@@ -26,10 +16,6 @@ class NumpadControllerTest {
         assertThat(controller.isCalculation.value).isFalse()
         assertThat(controller.dragProgress.value).isEqualTo(0f)
     }
-
-    // -------------------------------------------------------------------------
-    // NumberTapped
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_number_tapped_then_input_appends_digit_and_change_is_emitted`() {
@@ -51,10 +37,6 @@ class NumpadControllerTest {
         assertThat(controller.input.value).isEqualTo("12")
         assertThat(changes).containsExactly(NumpadChange.InputChanged("12"))
     }
-
-    // -------------------------------------------------------------------------
-    // DotTapped
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_dot_tapped_on_empty_input_then_input_becomes_zero_dot`() {
@@ -85,7 +67,6 @@ class NumpadControllerTest {
 
         val changes = controller.process(NumpadIntent.DotTapped, currentIsCalculation = false)
 
-        // Second dot in the same segment is a no-op
         assertThat(controller.input.value).isEqualTo("5.")
         assertThat(changes).isEmpty()
     }
@@ -98,13 +79,8 @@ class NumpadControllerTest {
 
         val changes = controller.process(NumpadIntent.DotTapped, currentIsCalculation = true)
 
-        // After an operator, tapping dot should yield "5+0."
         assertThat(controller.input.value).isEqualTo("5+0.")
     }
-
-    // -------------------------------------------------------------------------
-    // BackspaceTapped
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_backspace_tapped_then_last_char_is_removed_and_change_is_emitted`() {
@@ -122,7 +98,6 @@ class NumpadControllerTest {
     fun `when_backspace_clears_input_and_is_calculation_then_calculation_flag_is_cleared`() {
         val controller = newController()
         controller.process(NumpadIntent.NumberTapped("1"), currentIsCalculation = false)
-        // Simulate that we entered calculation mode
         controller.process(NumpadIntent.OperatorTapped('+'), currentIsCalculation = false)
         controller.process(NumpadIntent.BackspaceTapped, currentIsCalculation = true)
 
@@ -145,10 +120,6 @@ class NumpadControllerTest {
         assertThat(controller.input.value).isEqualTo("")
         assertThat(changes).containsExactly(NumpadChange.InputChanged(""))
     }
-
-    // -------------------------------------------------------------------------
-    // OperatorTapped
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_operator_tapped_on_non_empty_input_then_operator_is_appended_and_calculation_mode_is_set`() {
@@ -206,8 +177,6 @@ class NumpadControllerTest {
 
         val changes = controller.process(NumpadIntent.OperatorTapped('-'), currentIsCalculation = true)
 
-        // Should NOT replace the existing operator — the production code
-        // ignores the second operator entirely.
         assertThat(controller.input.value).isEqualTo("5+")
         assertThat(changes).isEmpty()
     }
@@ -229,34 +198,27 @@ class NumpadControllerTest {
         val controller = newController()
         controller.process(NumpadIntent.NumberTapped("5"), currentIsCalculation = false)
         controller.process(NumpadIntent.OperatorTapped('+'), currentIsCalculation = false)
-        // Now in calculation mode
         controller.process(NumpadIntent.NumberTapped("3"), currentIsCalculation = true)
 
         val changes = controller.process(NumpadIntent.OperatorTapped('-'), currentIsCalculation = true)
 
-        // No CalculationModeChanged in the change list — already true
         assertThat(controller.input.value).isEqualTo("5+3-")
         assertThat(changes).containsExactly(NumpadChange.InputChanged("5+3-"))
     }
-
-    // -------------------------------------------------------------------------
-    // EqualsTapped
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_equals_tapped_on_valid_expression_then_input_becomes_evaluation_result`() {
         val controller = newController()
         controller.process(NumpadIntent.NumberTapped("2"), currentIsCalculation = false)
         controller.process(NumpadIntent.OperatorTapped('+'), currentIsCalculation = false)
-        controller.process(NumpadIntent.NumberTapped("3"), currentIsCalculation = false)
+        controller.process(NumpadIntent.NumberTapped("3"), currentIsCalculation = true)
 
-        val changes = controller.process(NumpadIntent.EqualsTapped, currentIsCalculation = false)
+        val changes = controller.process(NumpadIntent.EqualsTapped, currentIsCalculation = true)
 
-        // BudgetExpressionEvaluator evaluates "2+3" -> "5"
         assertThat(controller.input.value).isEqualTo("5")
         assertThat(changes).containsExactly(
             NumpadChange.InputChanged("5"),
-            NumpadChange.CalculationModeChanged(true),
+            NumpadChange.CalculationModeChanged(false),
         )
     }
 
@@ -275,17 +237,12 @@ class NumpadControllerTest {
         val controller = newController()
         controller.process(NumpadIntent.NumberTapped("2"), currentIsCalculation = false)
         controller.process(NumpadIntent.OperatorTapped('+'), currentIsCalculation = false)
-        // "2+" is invalid (trailing operator) so evaluator returns null
 
-        val changes = controller.process(NumpadIntent.EqualsTapped, currentIsCalculation = false)
+        val changes = controller.process(NumpadIntent.EqualsTapped, currentIsCalculation = true)
 
         assertThat(controller.input.value).isEqualTo("2+")
         assertThat(changes).isEmpty()
     }
-
-    // -------------------------------------------------------------------------
-    // ResetInputTapped
-    // -------------------------------------------------------------------------
 
     @Test
     fun `when_reset_tapped_then_input_is_cleared_and_calculation_is_cleared_when_in_calculation_mode`() {
@@ -293,7 +250,6 @@ class NumpadControllerTest {
         controller.process(NumpadIntent.NumberTapped("1"), currentIsCalculation = false)
         controller.process(NumpadIntent.NumberTapped("2"), currentIsCalculation = false)
         controller.process(NumpadIntent.OperatorTapped('+'), currentIsCalculation = false)
-        // Now in calculation mode
 
         val changes = controller.process(NumpadIntent.ResetInputTapped, currentIsCalculation = true)
 
@@ -314,11 +270,6 @@ class NumpadControllerTest {
         assertThat(controller.input.value).isEqualTo("")
         assertThat(changes).containsExactly(NumpadChange.InputChanged(""))
     }
-
-    // -------------------------------------------------------------------------
-    // SetCalculationMode
-    // -------------------------------------------------------------------------
-
     @Test
     fun `when_set_calculation_mode_enabled_then_calculation_flag_and_drag_progress_are_updated`() {
         val controller = newController()
@@ -349,11 +300,6 @@ class NumpadControllerTest {
             NumpadChange.DragProgressChanged(0f),
         )
     }
-
-    // -------------------------------------------------------------------------
-    // SetDragProgress
-    // -------------------------------------------------------------------------
-
     @Test
     fun `when_set_drag_progress_is_processed_then_value_and_change_are_updated`() {
         val controller = newController()
@@ -363,11 +309,6 @@ class NumpadControllerTest {
         assertThat(controller.dragProgress.value).isEqualTo(0.42f)
         assertThat(changes).containsExactly(NumpadChange.DragProgressChanged(0.42f))
     }
-
-    // -------------------------------------------------------------------------
-    // clearInput
-    // -------------------------------------------------------------------------
-
     @Test
     fun `when_clear_input_is_called_then_input_becomes_empty_and_change_is_returned`() {
         val controller = newController()

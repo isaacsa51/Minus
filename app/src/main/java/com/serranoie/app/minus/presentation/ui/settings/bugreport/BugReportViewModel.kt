@@ -11,9 +11,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.asLog
@@ -25,8 +26,12 @@ class BugReportViewModel @Inject constructor(
 	private val zipGenerator: BugReportZipGenerator,
 ) : ViewModel() {
 
-	private val _uiState = MutableStateFlow(BugReportUiState())
-	val uiState: StateFlow<BugReportUiState> = _uiState.asStateFlow()
+	private val _localState = MutableStateFlow(BugReportUiState())
+	val uiState: StateFlow<BugReportUiState> = _localState.stateIn(
+		scope = viewModelScope,
+		started = SharingStarted.WhileSubscribed(5000L),
+		initialValue = BugReportUiState()
+	)
 
 	private val _effects = MutableSharedFlow<BugReportUiEffect>()
 	val effects: SharedFlow<BugReportUiEffect> = _effects.asSharedFlow()
@@ -35,35 +40,35 @@ class BugReportViewModel @Inject constructor(
 
 	fun onIntent(intent: BugReportUiIntent) {
 		when (intent) {
-			is BugReportUiIntent.SelectIssueType -> _uiState.update {
+			is BugReportUiIntent.SelectIssueType -> _localState.update {
 				it.copy(
 					selectedIssueType = intent.issueType,
 					showReproductionSteps = intent.issueType == BugReportIssueType.BugReport
 				)
 			}
-			is BugReportUiIntent.ChangeTitle -> _uiState.update {
+			is BugReportUiIntent.ChangeTitle -> _localState.update {
 				it.copy(title = intent.value)
 			}
-			is BugReportUiIntent.ChangeDescription -> _uiState.update {
+			is BugReportUiIntent.ChangeDescription -> _localState.update {
 				it.copy(description = intent.value)
 			}
-			is BugReportUiIntent.ChangeProposedSolution -> _uiState.update {
+			is BugReportUiIntent.ChangeProposedSolution -> _localState.update {
 				it.copy(proposedSolution = intent.value)
 			}
-			is BugReportUiIntent.ChangeAlternativesConsidered -> _uiState.update {
+			is BugReportUiIntent.ChangeAlternativesConsidered -> _localState.update {
 				it.copy(alternativesConsidered = intent.value)
 			}
-			is BugReportUiIntent.ToggleReproductionSteps -> _uiState.update {
+			is BugReportUiIntent.ToggleReproductionSteps -> _localState.update {
 				it.copy(showReproductionSteps = intent.visible)
 			}
 			is BugReportUiIntent.ChangeStep -> updateStep(intent.index, intent.value)
 			BugReportUiIntent.AddStep -> addStep()
 			is BugReportUiIntent.RemoveStep -> removeStep(intent.index)
 			is BugReportUiIntent.FinishStepExit -> finishStepExit(intent.stepId)
-			is BugReportUiIntent.ChangeAdditionalInfo -> _uiState.update {
+			is BugReportUiIntent.ChangeAdditionalInfo -> _localState.update {
 				it.copy(additionalInfo = intent.value)
 			}
-			is BugReportUiIntent.SelectAttachments -> _uiState.update {
+			is BugReportUiIntent.SelectAttachments -> _localState.update {
 				it.copy(selectedAttachmentUris = intent.uris)
 			}
 			BugReportUiIntent.SubmitReport -> submitReport()
@@ -71,7 +76,7 @@ class BugReportViewModel @Inject constructor(
 	}
 
 	private fun updateStep(index: Int, value: String) {
-		_uiState.update { state ->
+		_localState.update { state ->
 			val steps = state.reproductionSteps.toMutableList()
 			val step = steps.getOrNull(index) ?: return@update state
 			steps[index] = step.copy(value = value)
@@ -80,13 +85,13 @@ class BugReportViewModel @Inject constructor(
 	}
 
 	private fun addStep() {
-		_uiState.update { state ->
+		_localState.update { state ->
 			state.copy(reproductionSteps = state.reproductionSteps + BugReportStep(id = nextStepId++))
 		}
 	}
 
 	private fun removeStep(index: Int) {
-		_uiState.update { state ->
+		_localState.update { state ->
 			val steps = state.reproductionSteps.toMutableList()
 			val step = steps.getOrNull(index) ?: return@update state
 			if (steps.size > 1) {
@@ -99,17 +104,17 @@ class BugReportViewModel @Inject constructor(
 	}
 
 	private fun finishStepExit(stepId: Long) {
-		_uiState.update { state ->
+		_localState.update { state ->
 			state.copy(reproductionSteps = state.reproductionSteps.filterNot { it.id == stepId && !it.visible })
 		}
 	}
 
 	private fun submitReport() {
-		val currentState = _uiState.value
+		val currentState = _localState.value
 		if (!currentState.canSubmit) return
 
 		viewModelScope.launch {
-			_uiState.update { it.copy(isGeneratingReport = true) }
+			_localState.update { it.copy(isGeneratingReport = true) }
 			runCatching { zipGenerator.generate(currentState) }
 				.onSuccess { report ->
 					val titlePrefix = if (currentState.selectedIssueType == BugReportIssueType.BugReport) {
@@ -129,7 +134,7 @@ class BugReportViewModel @Inject constructor(
 					logcat { "Failed to generate bug report: ${throwable.asLog()}" }
 					_effects.emit(BugReportUiEffect.ShowError(throwable.message ?: "Failed to generate report"))
 				}
-			_uiState.update { it.copy(isGeneratingReport = false) }
+			_localState.update { it.copy(isGeneratingReport = false) }
 		}
 	}
 }

@@ -12,9 +12,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,32 +27,40 @@ class MainScreenViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MainScreenUiState())
-    val uiState: StateFlow<MainScreenUiState> = _uiState.asStateFlow()
+    private val _localState = MutableStateFlow(MainScreenLocalState())
 
     private val _effects = MutableSharedFlow<MainScreenUiEffect>()
     val effects: SharedFlow<MainScreenUiEffect> = _effects.asSharedFlow()
 
     private var autoDismissJob: Job? = null
 
-    init {
-        _uiState.update { it.copy(selectedViewPeriod = BudgetPeriod.DAILY) }
-        viewModelScope.launch {
-            settingsRepository.observeSettings().collect { settings ->
-                _uiState.update {
-                    it.copy(
-                        selectedViewPeriod = settings.budgetSplitViewPeriod ?: BudgetPeriod.DAILY,
-                        onboardingCompleted = settings.onboardingCompleted,
-                        tutorialBoxCompleted = settings.tutorialBoxCompleted,
-                        showCreditQuickToggleFeature = settings.isCreditQuickToggleEnabled,
-                        directCategoryPopupEnabled = settings.categoryPickerDirectPopupEnabled,
-                        categoryGridModeEnabled = settings.categoryGridModeEnabled,
-                        tutorialStage = settings.firstLaunchTutorialStage,
-                    )
-                }
-            }
-        }
-    }
+    val uiState: StateFlow<MainScreenUiState> = combine(
+        settingsRepository.observeSettings(),
+        _localState
+    ) { settings, local ->
+        MainScreenUiState(
+            onboardingCompleted = settings.onboardingCompleted,
+            tutorialBoxCompleted = settings.tutorialBoxCompleted,
+            showCreditQuickToggleFeature = settings.isCreditQuickToggleEnabled,
+            directCategoryPopupEnabled = settings.categoryPickerDirectPopupEnabled,
+            categoryGridModeEnabled = settings.categoryGridModeEnabled,
+            tutorialStage = settings.firstLaunchTutorialStage,
+            selectedViewPeriod = settings.budgetSplitViewPeriod ?: local.selectedViewPeriod,
+            pendingDeleteTransaction = local.pendingDeleteTransaction,
+            isSnackbarVisible = local.isSnackbarVisible,
+            snackbarMessage = local.snackbarMessage,
+            snackbarActionLabel = local.snackbarActionLabel,
+            snackbarHasUndo = local.snackbarHasUndo,
+            shownStage = local.shownStage,
+            showBudgetPeriodSheet = local.showBudgetPeriodSheet,
+            forceBudgetPeriodSheetSetup = local.forceBudgetPeriodSheetSetup,
+            walletSheetOpened = local.walletSheetOpened,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = MainScreenUiState()
+    )
 
     fun processIntent(intent: MainScreenUiIntent, currentTutorialStage: FirstLaunchTutorialStage) {
         when (intent) {
@@ -76,7 +86,7 @@ class MainScreenViewModel @Inject constructor(
     fun onTransactionDeleteQueued(transaction: Transaction, message: String) {
         autoDismissJob?.cancel()
 
-        _uiState.update {
+        _localState.update {
             it.copy(
                 pendingDeleteTransaction = transaction,
                 isSnackbarVisible = true,
@@ -109,7 +119,7 @@ class MainScreenViewModel @Inject constructor(
         autoDismissJob?.cancel()
         autoDismissJob = null
 
-        _uiState.update {
+        _localState.update {
             it.copy(
                 pendingDeleteTransaction = null,
                 isSnackbarVisible = false,
@@ -121,7 +131,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun cancelPendingDelete() {
-        val transaction = _uiState.value.pendingDeleteTransaction
+        val transaction = _localState.value.pendingDeleteTransaction
         onPendingDeleteCanceled()
         if (transaction != null) {
             viewModelScope.launch {
@@ -134,7 +144,7 @@ class MainScreenViewModel @Inject constructor(
         autoDismissJob?.cancel()
         autoDismissJob = null
 
-        _uiState.update {
+        _localState.update {
             it.copy(
                 pendingDeleteTransaction = null,
                 isSnackbarVisible = false,
@@ -153,7 +163,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun setShownStage(stage: FirstLaunchTutorialStage?) {
-        _uiState.update { it.copy(shownStage = stage) }
+        _localState.update { it.copy(shownStage = stage) }
     }
 
     private fun setDragProgress(progress: Float) {
@@ -163,7 +173,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun showBudgetPeriodSheet(forceSetup: Boolean) {
-        _uiState.update {
+        _localState.update {
             it.copy(
                 showBudgetPeriodSheet = true,
                 forceBudgetPeriodSheetSetup = forceSetup,
@@ -172,7 +182,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun hideBudgetPeriodSheet() {
-        _uiState.update {
+        _localState.update {
             it.copy(
                 showBudgetPeriodSheet = false,
                 forceBudgetPeriodSheetSetup = false,
@@ -181,14 +191,14 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun setSelectedPeriod(period: BudgetPeriod) {
-        _uiState.update { it.copy(selectedViewPeriod = period) }
+        _localState.update { it.copy(selectedViewPeriod = period) }
         viewModelScope.launch {
             settingsRepository.setBudgetSplitViewPeriod(period)
         }
     }
 
     private fun markWalletSheetOpened() {
-        _uiState.update { it.copy(walletSheetOpened = true) }
+        _localState.update { it.copy(walletSheetOpened = true) }
     }
 
     private fun setTutorialBoxCompleted(completed: Boolean) {
@@ -202,3 +212,16 @@ class MainScreenViewModel @Inject constructor(
         autoDismissJob?.cancel()
     }
 }
+
+private data class MainScreenLocalState(
+    val selectedViewPeriod: BudgetPeriod = BudgetPeriod.DAILY,
+    val pendingDeleteTransaction: Transaction? = null,
+    val isSnackbarVisible: Boolean = false,
+    val snackbarMessage: String = "",
+    val snackbarActionLabel: String = "",
+    val snackbarHasUndo: Boolean = false,
+    val shownStage: FirstLaunchTutorialStage? = null,
+    val showBudgetPeriodSheet: Boolean = false,
+    val forceBudgetPeriodSheetSetup: Boolean = false,
+    val walletSheetOpened: Boolean = false,
+)

@@ -1,23 +1,26 @@
 package com.serranoie.app.minus.presentation.ui.changelog
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.ChangelogRepository
 import com.serranoie.app.minus.domain.model.changelog.VersionRelease
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 @HiltViewModel
 class ChangelogHistoryViewModel @Inject constructor(
-    changelogRepository: ChangelogRepository,
+    private val changelogRepository: ChangelogRepository,
 ) : ViewModel() {
 
-    private val _releases = MutableStateFlow<List<VersionRelease>>(emptyList())
-    val releases: StateFlow<List<VersionRelease>> = _releases.asStateFlow()
-
-    init {
-        _releases.value = changelogRepository.getAllReleases()
-    }
+    val releases: StateFlow<List<VersionRelease>> = flow {
+        emit(changelogRepository.getAllReleases())
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = emptyList()
+    )
 }

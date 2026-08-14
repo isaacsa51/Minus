@@ -69,6 +69,7 @@ class NumpadController(
         return buildList {
             add(NumpadChange.InputChanged(updated))
             if (updated.isEmpty() && currentIsCalculation) {
+                _isCalculation.value = false
                 add(NumpadChange.CalculationModeChanged(false))
             }
         }
@@ -88,6 +89,7 @@ class NumpadController(
         return buildList {
             add(NumpadChange.InputChanged(updated))
             if (!currentIsCalculation) {
+                _isCalculation.value = true
                 add(NumpadChange.CalculationModeChanged(true))
             }
         }
@@ -100,8 +102,9 @@ class NumpadController(
         _input.value = result
         return buildList {
             add(NumpadChange.InputChanged(result))
-            if (!currentIsCalculation) {
-                add(NumpadChange.CalculationModeChanged(true))
+            if (currentIsCalculation) {
+                _isCalculation.value = false
+                add(NumpadChange.CalculationModeChanged(false))
             }
         }
     }
@@ -111,6 +114,7 @@ class NumpadController(
         return buildList {
             add(NumpadChange.InputChanged(""))
             if (currentIsCalculation) {
+                _isCalculation.value = false
                 add(NumpadChange.CalculationModeChanged(false))
             }
         }
