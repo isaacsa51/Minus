@@ -34,10 +34,11 @@ import com.serranoie.app.minus.presentation.util.CensorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
@@ -82,8 +83,59 @@ class SettingsViewModel @Inject constructor(
     private val censorManager: CensorManager,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SettingsUiState())
-    val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    private val _notificationPermissionGranted = MutableStateFlow(false)
+
+    val uiState: StateFlow<SettingsUiState> = combine(
+        settingsRepository.observeSettings(),
+        budgetRepository.getBudgetSettings(),
+        censorManager.isCensored,
+        _notificationPermissionGranted
+    ) { settings, budgetSettings, isCensored, permissionGranted ->
+        SettingsUiState(
+            currentTheme = when (settings.themeMode) {
+                ThemeMode.LIGHT -> "Light"
+                ThemeMode.NIGHT -> "Dark"
+                else -> "System"
+            },
+            currentTypography = when (settings.typographyMode) {
+                TypographyMode.CONDENSED -> "Condensed"
+                TypographyMode.SYSTEM -> "System"
+                else -> "Expressive"
+            },
+            currentContrast = when (settings.contrastMode) {
+                ContrastMode.MEDIUM -> "Medium"
+                ContrastMode.HIGH -> "High"
+                else -> "Normal"
+            },
+            currentColorScheme = settings.colorScheme,
+            isMaterialYouEnabled = settings.dynamicColorEnabled,
+            isRoundedFontEnabled = settings.isRoundedFontEnabled,
+            isCreditQuickToggleEnabled = settings.isCreditQuickToggleEnabled,
+            showPastTransactions = settings.showPastTransactions,
+            isCategoryPickerDirectPopupEnabled = settings.categoryPickerDirectPopupEnabled,
+            isCategoryGridModeEnabled = settings.categoryGridModeEnabled,
+            currentLanguage = settings.language,
+            recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
+            notificationHour = settings.notificationHour,
+            notificationMinute = settings.notificationMinute,
+            recurrentNotificationHour = settings.recurrentNotificationHour,
+            recurrentNotificationMinute = settings.recurrentNotificationMinute,
+            exactAlarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val alarmManager =
+                    context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                alarmManager.canScheduleExactAlarms()
+            } else true,
+            notificationPermissionGranted = permissionGranted,
+            isCensored = isCensored,
+            periodMappingMode = settings.periodMappingMode,
+            savingsPreferences = settings.savingsPreferences,
+            creditCardCutoffDay = budgetSettings?.creditCardCutoffDay
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = SettingsUiState()
+    )
 
     private val _effects = MutableStateFlow<SettingsUiEffect?>(null)
     val effects: StateFlow<SettingsUiEffect?> = _effects.asStateFlow()
@@ -92,17 +144,7 @@ class SettingsViewModel @Inject constructor(
     private var importLauncher: ActivityResultLauncher<Array<String>>? = null
 
     init {
-        loadPreferences()
         refreshNotificationPermission()
-        observeCensorMode()
-    }
-
-    private fun observeCensorMode() {
-        viewModelScope.launch {
-            censorManager.isCensored.collect { isCensored ->
-                _uiState.update { it.copy(isCensored = isCensored) }
-            }
-        }
     }
 
     fun refreshNotificationPermission() {
@@ -115,7 +157,7 @@ class SettingsViewModel @Inject constructor(
             true
         }
         logcat("ISAAC:Settings") { "refreshNotificationPermission -> granted=$granted" }
-        _uiState.update { it.copy(notificationPermissionGranted = granted) }
+        _notificationPermissionGranted.value = granted
     }
 
     fun onOpenAppSettings() {
@@ -135,56 +177,6 @@ class SettingsViewModel @Inject constructor(
         importLauncher = launcher
     }
 
-    private fun loadPreferences() {
-        viewModelScope.launch {
-            combine(
-                settingsRepository.observeSettings(),
-                budgetRepository.getBudgetSettings()
-            ) { settings, budgetSettings ->
-                _uiState.update { current ->
-                    current.copy(
-                        currentTheme = when (settings.themeMode) {
-                            ThemeMode.LIGHT -> "Light"
-                            ThemeMode.NIGHT -> "Dark"
-                            else -> "System"
-                        },
-                        currentTypography = when (settings.typographyMode) {
-                            TypographyMode.CONDENSED -> "Condensed"
-                            TypographyMode.SYSTEM -> "System"
-                            else -> "Expressive"
-                        },
-                        currentContrast = when (settings.contrastMode) {
-                            ContrastMode.MEDIUM -> "Medium"
-                            ContrastMode.HIGH -> "High"
-                            else -> "Normal"
-                        },
-                        currentColorScheme = settings.colorScheme,
-                        isMaterialYouEnabled = settings.dynamicColorEnabled,
-                        isRoundedFontEnabled = settings.isRoundedFontEnabled,
-                        isCreditQuickToggleEnabled = settings.isCreditQuickToggleEnabled,
-                        showPastTransactions = settings.showPastTransactions,
-                        isCategoryPickerDirectPopupEnabled = settings.categoryPickerDirectPopupEnabled,
-                        isCategoryGridModeEnabled = settings.categoryGridModeEnabled,
-                        currentLanguage = settings.language,
-                        recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
-                        notificationHour = settings.notificationHour,
-                        notificationMinute = settings.notificationMinute,
-                        recurrentNotificationHour = settings.recurrentNotificationHour,
-                        recurrentNotificationMinute = settings.recurrentNotificationMinute,
-                        exactAlarmEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            val alarmManager =
-                                context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                            alarmManager.canScheduleExactAlarms()
-                        } else true,
-                        periodMappingMode = settings.periodMappingMode,
-                        savingsPreferences = settings.savingsPreferences,
-                        creditCardCutoffDay = budgetSettings?.creditCardCutoffDay
-                    )
-                }
-            }.collect {}
-        }
-    }
-
     fun onThemeChange(themeMode: String) {
         val newMode = when (themeMode) {
             "Light" -> ThemeMode.LIGHT
@@ -192,7 +184,6 @@ class SettingsViewModel @Inject constructor(
             else -> ThemeMode.SYSTEM
         }
         context.appTheme = newMode
-        _uiState.update { it.copy(currentTheme = themeMode) }
         viewModelScope.launch {
             settingsRepository.setThemeMode(newMode)
         }
@@ -206,7 +197,6 @@ class SettingsViewModel @Inject constructor(
             else -> TypographyMode.EXPRESSIVE
         }
         context.appTypography = newMode
-        _uiState.update { it.copy(currentTypography = typographyMode) }
         viewModelScope.launch {
             settingsRepository.setTypographyMode(newMode)
         }
@@ -219,7 +209,6 @@ class SettingsViewModel @Inject constructor(
             else -> ContrastMode.NORMAL
         }
         context.appContrast = newMode
-        _uiState.update { it.copy(currentContrast = contrastMode) }
         viewModelScope.launch {
             settingsRepository.setContrastMode(newMode)
         }
@@ -227,14 +216,12 @@ class SettingsViewModel @Inject constructor(
 
     fun onColorSchemeChange(colorScheme: AppColorScheme) {
         context.appColorScheme = colorScheme
-        _uiState.update { it.copy(currentColorScheme = colorScheme) }
         viewModelScope.launch {
             settingsRepository.setAppColorScheme(colorScheme)
         }
     }
 
     fun onLanguageChange(language: String) {
-        _uiState.update { it.copy(currentLanguage = language) }
         viewModelScope.launch {
             settingsRepository.setLanguage(language)
             val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(language)
@@ -243,29 +230,26 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onMaterialYouToggle() {
-        val newValue = !_uiState.value.isMaterialYouEnabled
+        val newValue = !uiState.value.isMaterialYouEnabled
         context.dynamicColorEnabled = newValue
-        _uiState.update { it.copy(isMaterialYouEnabled = newValue) }
         viewModelScope.launch {
             settingsRepository.setDynamicColorEnabled(newValue)
         }
     }
 
     fun onRoundedFontToggle() {
-        val newValue = !_uiState.value.isRoundedFontEnabled
-        _uiState.update { it.copy(isRoundedFontEnabled = newValue) }
+        val newValue = !uiState.value.isRoundedFontEnabled
         viewModelScope.launch {
             settingsRepository.setRoundedFontEnabled(newValue)
         }
     }
 
     fun onCensorModeToggle() {
-        censorManager.setCensored(!_uiState.value.isCensored)
+        censorManager.setCensored(!uiState.value.isCensored)
     }
 
     fun onCreditQuickToggleFeatureToggle() {
-        val newValue = !_uiState.value.isCreditQuickToggleEnabled
-        _uiState.update { it.copy(isCreditQuickToggleEnabled = newValue) }
+        val newValue = !uiState.value.isCreditQuickToggleEnabled
         viewModelScope.launch {
             settingsRepository.setCreditQuickToggleEnabled(newValue)
         }
@@ -281,38 +265,33 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onShowPastTransactionsToggle() {
-        val newValue = !_uiState.value.showPastTransactions
-        _uiState.update { it.copy(showPastTransactions = newValue) }
+        val newValue = !uiState.value.showPastTransactions
         viewModelScope.launch {
             settingsRepository.setShowPastTransactions(newValue)
         }
     }
 
     fun onCategoryPickerDirectPopupFeatureToggle() {
-        val newValue = !_uiState.value.isCategoryPickerDirectPopupEnabled
-        _uiState.update { it.copy(isCategoryPickerDirectPopupEnabled = newValue) }
+        val newValue = !uiState.value.isCategoryPickerDirectPopupEnabled
         viewModelScope.launch {
             settingsRepository.setCategoryPickerDirectPopupEnabled(newValue)
         }
     }
 
     fun onCategoryGridModeToggle() {
-        val newValue = !_uiState.value.isCategoryGridModeEnabled
-        _uiState.update { it.copy(isCategoryGridModeEnabled = newValue) }
+        val newValue = !uiState.value.isCategoryGridModeEnabled
         viewModelScope.launch {
             settingsRepository.setCategoryGridModeEnabled(newValue)
         }
     }
 
     fun onRecurrentPaymentsViewModeChange(mode: RecurrentPaymentsViewMode) {
-        _uiState.update { it.copy(recurrentPaymentsViewMode = mode) }
         viewModelScope.launch {
             settingsRepository.setRecurrentPaymentsViewMode(mode)
         }
     }
 
     fun onNotificationTimeChange(hour: Int, minute: Int) {
-        _uiState.update { it.copy(notificationHour = hour, notificationMinute = minute) }
         viewModelScope.launch {
             settingsRepository.setNotificationTime(hour, minute)
             updateNotificationTimeUseCase(hour, minute)
@@ -320,11 +299,6 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onRecurrentNotificationTimeChange(hour: Int, minute: Int) {
-        _uiState.update {
-            it.copy(
-                recurrentNotificationHour = hour, recurrentNotificationMinute = minute
-            )
-        }
         viewModelScope.launch {
             settingsRepository.setRecurrentNotificationTime(hour, minute)
             updateNotificationTimeUseCase.updateRecurrentNotificationTime(hour, minute)
@@ -332,14 +306,12 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onPeriodMappingModeChange(mode: PeriodMappingMode) {
-        _uiState.update { it.copy(periodMappingMode = mode) }
         viewModelScope.launch {
             settingsRepository.setPeriodMappingMode(mode)
         }
     }
 
     fun onSavingsPreferencesChange(prefs: SavingsPreferences) {
-        _uiState.update { it.copy(savingsPreferences = prefs) }
         viewModelScope.launch {
             settingsRepository.setSavingsPreferences(prefs)
         }
