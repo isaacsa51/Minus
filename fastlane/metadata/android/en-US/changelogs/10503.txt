@@ -1,0 +1,7 @@
+- chore: fix locales and add new label for info on features
+- revert: calendar heatmap scaling and card components spacing marquee
+- hotfix: solve empty/null graph values & enhance UX on data loading
+- fix: disable auto saving when tapping check on category input
+- feat: credit card tracking and enhance analytics visualizations.
+- feat: add Quick Settings Tile for new transactions
+- feat: implement rounded font toggle and update settings icons
