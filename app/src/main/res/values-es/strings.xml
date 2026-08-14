@@ -318,7 +318,6 @@
     <string name="bug_report_attachments_label_bug">Capturas de pantalla o grabaciones</string>
     <string name="bug_report_submit">Enviar reporte</string>
     <string name="bug_report_share_title">Enviar reporte</string>
-    <string name="bug_report_email_subject">%1$s</string>
     <string name="bug_report_email_body">Hola, adjunto mi reporte generado de Menos.</string>
     <string name="bug_report_help_title">Ayúdanos a mejorar</string>
     <string name="bug_report_help_message_prefix">"¿Encontraste un error o tienes una gran idea?\n\nEsta pantalla nos ayuda a crear todos los detalles necesarios en un reporte. Incluiremos automáticamente diagnósticos técnicos sobre tu dispositivo y la versión de la aplicación para ayudarnos a solucionar problemas más rápido.\n\nUna vez finalizado, puedes enviar el reporte por correo electrónico o publicarlo en "</string>
@@ -361,6 +360,7 @@
     <string name="budget_pill_over_budget">Monto del presupuesto excedido</string>
     <string name="budget_pill_no_budget">Sin presupuesto</string>
     <string name="budget_pill_no_budget_action">Establece tu presupuesto</string>
+    <string name="budget_pill_calc_subtracted">%1$s será restado</string>
     <string name="budget_pill_exhausted_daily_label">diario</string>
     <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
@@ -485,6 +485,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Sin fecha</string>
     <string name="no_name">Sin nombre</string>
+    <string name="no_name_income">Ingreso sin nombre</string>
     <string name="description">Razón de Compra</string>
     <string name="date">Fecha</string>
     <string name="frequency">Frecuencia</string>
@@ -562,7 +563,7 @@
     <string name="graph_granularity_biweek">Quincena</string>
     <string name="graph_granularity_month">Mes</string>
     <string name="graph_granularity_total">Total</string>
-    <string name="budget_graph_page_indicator">%1$d / %2$d</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
+    <string name="budget_pill_calc_added">%1$s será añadido</string>
 </resources>

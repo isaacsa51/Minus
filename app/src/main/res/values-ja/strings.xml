@@ -16,10 +16,10 @@
     <string name="tutorial_analytics_description">Analytics を開くと、時間の経過とカテゴリ別、予算目標に対する支出がどのように分割されるかを確認できます。</string>
     <string name="tutorial_privacy_title">プライバシーモード</string>
     <string name="tutorial_privacy_description">画面上のすべての金額をぼかすために、携帯電話の上部(フロントカメラが座っている場所)を手で約1秒間覆います。 電源を切るには、もう一度カバーしてください。</string>
-    <string name="tutorial_calc_title">Ongoing budget</string>
-    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
-    <string name="tutorial_credit_toggle_title">Credit Card payment</string>
-    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
+    <string name="tutorial_calc_title">予算の調整</string>
+    <string name="tutorial_calc_description">先頭に「+」または「-」を入力して、現在の期間の残りの予算を増減させます。</string>
+    <string name="tutorial_credit_toggle_title">クレジットカード払い</string>
+    <string name="tutorial_credit_toggle_description">ここをタップして、クレジットカードでの支払いであることを指定します。分析機能では個別に集計されます。</string>
     <string name="today">今日</string>
     <string name="yesterday">昨日</string>
     <string name="tomorrow">明日</string>
@@ -43,7 +43,7 @@
     <string name="recurrent_expense">反復費用</string>
     <string name="recurrent_expense_details">再発費用を定義しましょう</string>
     <string name="recurrent_expense_frequency_subtitle">この費用はどのくらいの頻度で支払いますか？</string>
-    <string name="recurrent_frequency_weekly">Weekly</string>
+    <string name="recurrent_frequency_weekly">毎週</string>
     <string name="recurrent_frequency_biweekly">隔週</string>
     <string name="recurrent_frequency_monthly">月ごと</string>
     <string name="previous_day">前の日</string>
@@ -78,12 +78,13 @@
     <string name="billing_day">請求日</string>
     <string name="end_date">終了日</string>
     <string name="frequency_label">利息支払回数</string>
-    <string name="weekly_with_desc">Weekly (every 7 days)</string>
+    <string name="weekly_with_desc">週単位（7日ごと）</string>
     <string name="biweekly_with_desc">隔週（14日毎）</string>
     <string name="edit_budget">予算を編集</string>
     <string name="new_budget">新しい予算期間</string>
     <plurals name="pending_expense">
         <item quantity="other">次の期間の%d 費用</item>
+        <item quantity="one">次期分の支出（%d件）</item>
     </plurals>
     <string name="new_period_title">新しい予算期間</string>
     <string name="widget_description">経費のクイックビューと新しい経費の追加</string>
@@ -101,7 +102,7 @@
     <string name="budget_split_logic">予算をどのように分割しますか？</string>
     <string name="new_budget_period">新しい予算期間</string>
     <string name="budget_split_calculated_amount">計算額</string>
-    <string name="budget_split_helper_format">You will have %1$s to spend every %2$s</string>
+    <string name="budget_split_helper_format">%2$sごとに%1$sを使用できるようになります</string>
     <string name="budget_split_helper_static">期間の合計：</string>
     <string name="budget_split_helper_dynamic">(合計 − 使用済み) ÷残り日数</string>
     <string name="budget_split_helper_static_brief">%1$s (総予算) / %2$d %3$s</string>
@@ -130,15 +131,17 @@
     <string name="analytics_title">分析</string>
     <plurals name="days">
         <item quantity="other">%d 日</item>
+        <item quantity="one">%d日</item>
     </plurals>
     <plurals name="analytics_days_left">
         <item quantity="other">%d 日</item>
+        <item quantity="one">%d日</item>
     </plurals>
     <string name="total_budget">予算の合計</string>
     <string name="minimum_spent">最少支出数</string>
     <string name="maximum_spent">使用した最大数</string>
     <string name="average_spent">1日あたりの平均</string>
-    <string name="days_remaining_label">Days\nremaining</string>
+    <string name="days_remaining_label">残り日数</string>
     <!-- Widget Descriptions -->
     <string name="widget_budget_overview_description">費やした予算と残りの予算を一目で見る</string>
     <string name="widget_days_countdown_description">予算の残りの残り時間</string>
@@ -153,11 +156,11 @@
     <string name="left">左</string>
     <string name="remaining">残り</string>
     <string name="total_spent">使用済み合計</string>
-    <string name="days_left">days left</string>
+    <string name="days_left">日後</string>
     <string name="budget_overview">予算の概要</string>
     <string name="spent_per_day">1日あたり使用済み：</string>
     <string name="budget_period_daily">毎日</string>
-    <string name="budget_period_weekly">Weekly</string>
+    <string name="budget_period_weekly">週単位</string>
     <string name="budget_period_biweekly">隔週</string>
     <string name="budget_period_monthly">月ごと</string>
     <string name="budget_period_label_today">今日</string>
@@ -193,7 +196,7 @@
     <string name="onboarding_step_6_subtitle">時間が経つにつれて、どの位節約できるかそしてどの位使えるか学びなさい。</string>
     <string name="onboarding_set_budget_button">続ける</string>
     <string name="recurrent_toggle_label">繰り返し</string>
-    <string name="censor_mode_alert_title">Privacy mode is active</string>
+    <string name="censor_mode_alert_title">検閲モードが有効です</string>
     <string name="censor_mode_alert_message">すべての財務価値は現在ぼやけています。</string>
     <string name="censor_mode_alert_dismiss">了解</string>
     <string name="censor_mode_card_label">プライバシーモードが有効になりました</string>
@@ -203,18 +206,18 @@
     <string name="changelog_settings_item_title">新着情報</string>
     <string name="changelog_settings_item_subtitle">最新の機能とvの%1$sの修正を見る</string>
     <string name="changelog_badge_feature">機能</string>
-    <string name="changelog_badge_improvement">Melhoria</string>
+    <string name="changelog_badge_improvement">改善</string>
     <string name="changelog_badge_bug_fix">バグ修正</string>
     <string name="changelog_release_header">バージョン %1$s — %2$s</string>
     <string name="changelog_release_version">バージョン %1$s</string>
     <string name="changelog_release_date">%1$sが解放されました</string>
     <string name="changelog_close">閉じる</string>
     <string name="changelog_previous_versions">以前のバージョン</string>
-    <string name="changelog_updated_to">Updated to: %1$s</string>
-    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
+    <string name="changelog_updated_to">更新先: %1$s</string>
+    <string name="changelog_see_changes">新機能を見逃さないよう、すべての変更点をご確認ください</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">期間を選択</string>
-    <string name="onboarding_finish_date_selector_days_range">%1$d days · %2$s - %3$s</string>
+    <string name="onboarding_finish_date_selector_days_range">%1$d日間 · %2$s - %3$s</string>
     <string name="onboarding_finish_date_selector_budget_view_question">予算をどのように確認しますか？</string>
     <!-- Settings -->
     <string name="settings_title">設定</string>
@@ -226,11 +229,11 @@
     <string name="settings_theme_system">システム</string>
     <string name="settings_theme_light">ライト</string>
     <string name="settings_theme_dark">ダーク</string>
-    <string name="settings_contrast_title">Contrast</string>
+    <string name="settings_contrast_title">コントラスト</string>
     <string name="settings_contrast_normal">標準</string>
     <string name="settings_contrast_medium">ミディアム</string>
     <string name="settings_contrast_high">高い</string>
-    <string name="settings_typography_condensed">Condensed</string>
+    <string name="settings_typography_condensed">コンデンス（幅狭）</string>
     <string name="settings_typography_expressive">表現的</string>
     <string name="settings_color_scheme_title">アプリの配色設定</string>
     <string name="settings_section_notifications">通知</string>
@@ -260,8 +263,8 @@
     <string name="settings_category_picker_direct_popup_description">カテゴリフィールドをタップするとすぐに、保存されているすべてのカテゴリの候補ポップアップを開きます。 オフの場合、入力を開始した後にのみ候補が表示されます。</string>
     <string name="settings_category_grid_mode_switch_label">リストとして表示 (実験的)</string>
     <string name="settings_category_grid_mode_description">カテゴリ タグをタップすると、インライン編集モードではなく、保存したカテゴリのグリッドが開きます。 また、これがオンの間、numpadの計算モードをオフにします。</string>
-    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
-    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
+    <string name="settings_feature_show_past_transactions_title">過去の取引を表示</string>
+    <string name="settings_feature_show_past_transactions_subtitle">過去の期間の取引を読み込む</string>
     <string name="settings_recurrent_payments_view_mode_title">反復支払い表示モード</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">定期支払いを表示するようにディスプレイの種類を変更します</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">反復支払い表示モード</string>
@@ -270,7 +273,7 @@
     <string name="settings_recurrent_payments_view_mode_vertical_title">垂直方向</string>
     <string name="settings_recurrent_payments_view_mode_vertical_subtitle">定期的な支払いを定期的な支出リストとして表示する</string>
     <string name="settings_period_end_time_title">生理終了時刻</string>
-    <string name="settings_period_end_time_subtitle">The notification will be displayed on the period date at this time</string>
+    <string name="settings_period_end_time_subtitle">期間終了日のこの時刻に通知が表示されます</string>
     <string name="settings_recurrent_notification_time_title">定期支払い時間</string>
     <string name="settings_recurrent_notification_time_subtitle">この時点で毎日の定期支払いチェックが実行されます</string>
     <string name="settings_notification_permission_title">通知の権限</string>
@@ -282,7 +285,7 @@
     <string name="settings_exact_alarm_disabled_subtitle">無効; Android が通知を遅らせる可能性があります</string>
     <string name="settings_time_picker_cancel">キャンセル</string>
     <string name="settings_time_picker_confirm">OK</string>
-    <string name="settings_about_title">About</string>
+    <string name="settings_about_title">アプリについて</string>
     <string name="settings_about_subtitle">アプリとその開発についてもっと詳しく</string>
     <string name="settings_bug_report_title">バグを見つけましたか？</string>
     <string name="settings_bug_report_subtitle">バグレポートを作成すると、すぐに修正されます</string>
@@ -304,10 +307,10 @@
     <string name="bug_report_problem_placeholder">どのような問題やワークフローが改善されますか?</string>
     <string name="bug_report_problem_required">問題の説明が必要です。</string>
     <string name="bug_report_proposed_solution_label">提案されたソリューション</string>
-    <string name="bug_report_proposed_solution_placeholder">Describe the change you would like to see…</string>
+    <string name="bug_report_proposed_solution_placeholder">希望する変更内容を記述してください…</string>
     <string name="bug_report_proposed_solution_required">機能リクエストには提案されたソリューションが必要です。</string>
     <string name="bug_report_alternatives_considered_label">代替案を検討しました</string>
-    <string name="bug_report_alternatives_considered_placeholder">Optional: other ways this could work…</string>
+    <string name="bug_report_alternatives_considered_placeholder">任意：その他の解決策や代替案…</string>
     <string name="bug_report_additional_context_label">追加の内容</string>
     <string name="bug_report_additional_context_placeholder_bug">ログ、エクスポートされたデータの詳細、繰り返し/予算の設定、またはその他の便利なもの。</string>
     <string name="bug_report_additional_context_placeholder_feature">必要に応じて追加の情報</string>
@@ -315,10 +318,9 @@
     <string name="bug_report_attachments_label_bug">スクリーンショットまたは録音</string>
     <string name="bug_report_submit">レポートを送信</string>
     <string name="bug_report_share_title">レポートを送信</string>
-    <string name="bug_report_email_subject">%1$s</string>
     <string name="bug_report_email_body">こんにちは、添付されている私の生成されたMinusレポートです。</string>
     <string name="bug_report_help_title">マイナスの改善にご協力ください</string>
-    <string name="bug_report_help_message_prefix">"Reporting issues or suggesting improvements helps us make Minus better for everyone.\n\nThis guided form helps you package all the necessary details into a report, automatically attaching device metadata and app diagnostics to speed up our investigation.\n\nOnce prepared, you can send the report via email or contribute via "</string>
+    <string name="bug_report_help_message_prefix">問題の報告や改善の提案は、Minusをより良いアプリにするために役立ちます。このガイド付きフォームを使用すると、必要な詳細情報をまとめて報告できます。また、デバイスのメタデータやアプリの診断情報が自動的に添付されるため、調査を迅速に進めることが可能になります。準備ができたら、レポートをメールで送信するか、以下から投稿してください</string>
     <string name="bug_report_help_github_issues">" GitHub Issues "</string>
     <string name="bug_report_help_message_suffix"> 私たちのリポジトリに直接。</string>
     <string name="bug_report_steps_to_reproduce_label">再現する手順</string>
@@ -326,7 +328,7 @@
     <string name="bug_report_add_step">ステップを追加</string>
     <string name="bug_report_step_placeholder_wallet">ウォレット画面を開く</string>
     <string name="bug_report_step_placeholder_transfer">「転送」をクリック</string>
-    <string name="bug_report_step_placeholder_crash">Observe the crash…</string>
+    <string name="bug_report_step_placeholder_crash">クラッシュの様子を確認してください…</string>
     <string name="bug_report_step_placeholder_format">手順 %1$d…</string>
     <string name="bug_report_step_number_format">%1$d.</string>
     <string name="bug_report_upload_assets">アセットをアップロード</string>
@@ -348,7 +350,7 @@
     <string name="settings_typography_dialog_title">アプリのタイポグラフ</string>
     <string name="settings_typography_default_title">デフォルト</string>
     <string name="settings_typography_default_subtitle">ベースの組版を使用</string>
-    <string name="settings_typography_condensed_title">Condensed</string>
+    <string name="settings_typography_condensed_title">コンデンス（幅狭）</string>
     <string name="settings_typography_condensed_subtitle">コンパクトなタイポグラフィを使用</string>
     <string name="settings_typography_expressive_title">表現的</string>
     <string name="settings_typography_expressive_subtitle">表現力豊かなタイポグラフィを使用</string>
@@ -359,7 +361,7 @@
     <string name="budget_pill_no_budget">予算なし</string>
     <string name="budget_pill_no_budget_action">予算を設定</string>
     <string name="budget_pill_exhausted_daily_label">毎日</string>
-    <string name="budget_pill_exhausted_weekly_label">Weekly</string>
+    <string name="budget_pill_exhausted_weekly_label">週単位</string>
     <string name="budget_pill_exhausted_biweekly_label">隔週</string>
     <string name="budget_pill_exhausted_single">%1$s の予算が使い果たされました</string>
     <string name="budget_pill_exhausted_double">%1$s と %2$s の予算が使い果たされました</string>
@@ -399,7 +401,7 @@
     <string name="recurrent_ticket_weekly_unnamed">ウィークリーサブスクリプションに名前がありません</string>
     <string name="recurrent_ticket_biweekly_unnamed">名前なしで隔週サブスクリプション</string>
     <string name="recurrent_ticket_monthly_unnamed">月間サブスクリプションに名前がありません</string>
-    <string name="recurrent_ticket_frequency_weekly">Weekly</string>
+    <string name="recurrent_ticket_frequency_weekly">毎週</string>
     <string name="recurrent_ticket_frequency_biweekly">隔週</string>
     <string name="recurrent_ticket_frequency_monthly">月ごと</string>
     <!-- Rollover Dialog (component local) -->
@@ -426,14 +428,14 @@
     <string name="savings_recommendation_recurrent_expenses_label">定期的な費用</string>
     <string name="savings_recommendation_one_time_expenses_label">一回限りの費用</string>
     <string name="savings_recommendation_six_month_example_intro" formatted="false">約6ヶ月間、それぞれの期間を20%節約すると、次のように作成できます。</string>
-    <string name="savings_recommendation_goal_format" formatted="false">To reach %1$s in %2$d months, save %3$s per period.</string>
+    <string name="savings_recommendation_goal_format" formatted="false">%2$dヶ月で%1$sを達成するには、1期間あたり%3$sを貯蓄してください。</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">デフォルトの %1$d%%の例を表示します。特定の金額を目標に設定します。</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">保存設定</string>
     <string name="settings_savings_preferences_subtitle">50/30/20の分割をカスタマイズし、オプションの貯蓄目標を設定します</string>
     <string name="settings_savings_dialog_split_label">予算分割</string>
     <string name="settings_savings_dialog_split_hint">3 つの値は最大 100%% まで追加する必要があります。</string>
-    <string name="settings_savings_dialog_split_invalid">3 つの値は最大 100%% (現在は %1$d% %)を足す必要があります。</string>
+    <string name="settings_savings_dialog_split_invalid">3 つの値は最大 100% (現在は %1$d%%)を足す必要があります。</string>
     <string name="settings_savings_preset_balanced_title">バランス</string>
     <string name="settings_savings_preset_balanced_subtitle">50/30/20 — 古典的な分割</string>
     <string name="settings_savings_preset_aggressive_title">攻撃的なセーバー</string>
@@ -452,13 +454,13 @@
     <string name="settings_savings_dialog_goal_hint">デフォルトの %1$d%% × 6の例を維持するには、空白のままにします。</string>
     <string name="settings_savings_dialog_reset">既定にリセット</string>
     <!-- Wavy Divider -->
-    <string name="wavy_divider_show_all_past_period_expenses">Show all expenses from the previous period…</string>
+    <string name="wavy_divider_show_all_past_period_expenses">前の期間のすべての支出を表示…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">%d 日間を使用</string>
     <string name="remaining_budget_label">残り</string>
     <string name="currency_label">通貨</string>
     <string name="select_currency">通貨を選択</string>
-    <string name="search_currency">Search currency…</string>
+    <string name="search_currency">通貨を検索…</string>
     <string name="clear">クリア</string>
     <string name="currency_no_results">通貨が見つかりません</string>
     <string name="currency_selected">選択済み</string>
@@ -475,14 +477,14 @@
     <string name="split_mode_label">分割モード</string>
     <string name="split_mode_dialog_title">予算はどのように分けましょうか。</string>
     <string name="split_mode_dialog_description" formatted="false">期間ごとの金額の計算方法を選択します。</string>
-    <string name="split_mode_static">Static</string>
-    <string name="split_mode_static_desc">Total budget is split equally across all periods, regardless of how much you spend.</string>
+    <string name="split_mode_static">固定</string>
+    <string name="split_mode_static_desc">実際の支出額にかかわらず、予算総額を全日数で均等に分割します。</string>
     <string name="split_mode_dynamic">ダイナミック (推奨)</string>
     <string name="split_mode_dynamic_desc">残りの残高は、残りの日数に分散されます。</string>
     <!-- Transaction Detail -->
     <string name="without_date">日付なし</string>
     <string name="no_name">名前がありません</string>
-    <string name="description">Description</string>
+    <string name="description">購入理由</string>
     <string name="date">日付</string>
     <string name="frequency">利息支払回数</string>
     <string name="charge_day">充電日</string>
@@ -503,7 +505,7 @@
     <string name="notification_channel_credit_description">クレジットカードのカットオフ日前の通知</string>
     <string name="notification_period_end_title">予算期間終了</string>
     <string name="notification_period_end_message_positive">期間は %1$s 残りで終了します。詳細を見るにはタップしてください。</string>
-    <string name="notification_period_end_message_negative">The period ended. You spent %1$s extra. See more details.</string>
+    <string name="notification_period_end_message_negative">期間が終了しました。%1$sの超過支出があります。詳細はこちら。</string>
     <string name="notification_period_end_message_neutral">期間は終了しました。あなたは何も費やしていません。詳細を参照してください。</string>
     <string name="notification_recurrent_expense_title">定期的な費用</string>
     <string name="notification_recurrent_expense_message_with_comment">\"%1$s\"に対する\"%2$s\"の定期的な経費は本日です。</string>
@@ -518,23 +520,23 @@
     <string name="credit_owed_label">支払済合計</string>
     <string name="debt_adjusted_balance_label">借金調整残高</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s クレジット</string>
-    <string name="credit_badge">Credit</string>
+    <string name="credit_badge">クレジット</string>
     <string name="credit_cutoff_subtitle">%1$s — %2$d 日間のカットオフ</string>
     <string name="credit_cutoff_subtitle_today">%1$s — 今日のカットオフ</string>
     <string name="ticket_expense">期限切れ</string>
-    <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
+    <string name="ticket_recurrent_expense">定期的な支出</string>
     <!-- Past Periods -->
     <string name="past_periods_title">過去の期間</string>
     <string name="past_periods_empty">アーカイブされた期間は見つかりませんでした</string>
     <string name="past_periods_spent_label">使用済み：</string>
     <string name="past_periods_limit_label">制限</string>
-    <string name="past_periods_status_on_track">On Track</string>
+    <string name="past_periods_status_on_track">順調</string>
     <string name="past_periods_status_over_budget">予算超過額</string>
     <string name="past_periods_status_saved">保存された %1$s</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">支出トレンド</string>
     <string name="analytics_tutorial_minmax_desc">これらのカードはあなたの最低費用と最高費用を表示します。\n取引を追加すると、これらは外れ値を見つけるのに役立ちます。</string>
-    <string name="analytics_tutorial_header_title">&lt;unk&gt;</string>
+    <string name="analytics_tutorial_header_title">過去の期間</string>
     <string name="analytics_tutorial_header_desc">アイコンをタップすると、過去の予算の期間を確認し、パフォーマンスを確認できます。</string>
     <string name="analytics_tutorial_budget_title">予算ステータス</string>
     <string name="analytics_tutorial_budget_desc">予算の合計を確認し、合計日数を確認してください。</string>
@@ -548,18 +550,20 @@
     <string name="analytics_tutorial_credit_desc">クレジットカードをタップして、すべてのCC取引を表示したり、支払い済みとしてマークしたり、関心を避けるために請求のカットオフ日を調整したりします。</string>
     <string name="analytics_tutorial_history_title">取引履歴</string>
     <string name="analytics_tutorial_history_desc">この期間のすべての経費のリストを表示するには、ここをタップしてください。</string>
-    <string name="skip_tutorial">Skip</string>
-    <string name="budget_graph_header_spending">Spending</string>
-    <string name="budget_graph_legend_current">Current</string>
-    <string name="budget_graph_legend_previous">Previous</string>
-    <string name="budget_graph_nav_prev">Previous</string>
-    <string name="budget_graph_nav_next">Next</string>
-    <string name="graph_granularity_days">Days</string>
-    <string name="graph_granularity_week">Week</string>
-    <string name="graph_granularity_biweek">Biweek</string>
-    <string name="graph_granularity_month">Month</string>
-    <string name="graph_granularity_total">Total</string>
-    <string name="budget_graph_page_indicator">%1$d / %2$d</string>
+    <string name="skip_tutorial">スキップ</string>
+    <string name="budget_graph_header_spending">支出</string>
+    <string name="budget_graph_legend_current">現在</string>
+    <string name="budget_graph_legend_previous">前回</string>
+    <string name="budget_graph_nav_prev">前へ</string>
+    <string name="budget_graph_nav_next">次へ</string>
+    <string name="graph_granularity_days">日</string>
+    <string name="graph_granularity_week">週</string>
+    <string name="graph_granularity_biweek">2週間</string>
+    <string name="graph_granularity_month">月</string>
+    <string name="graph_granularity_total">合計</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
+    <string name="budget_pill_calc_added">%1$sが追加されます</string>
+    <string name="budget_pill_calc_subtracted">%1$sが差し引かれます</string>
+    <string name="no_name_income">名称未設定の収入</string>
 </resources>

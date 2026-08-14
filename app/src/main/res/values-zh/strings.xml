@@ -314,7 +314,6 @@
     <string name="bug_report_attachments_label_bug">屏幕截图或录屏</string>
     <string name="bug_report_submit">提交报告</string>
     <string name="bug_report_share_title">发送报告</string>
-    <string name="bug_report_email_subject">%1$s</string>
     <string name="bug_report_email_body">你好，以下是我生成的 Minus 问题报告。</string>
     <string name="bug_report_help_title">帮助我们让 Minus 变得更好</string>
     <string name="bug_report_help_message_prefix">"提交问题报告或改进建议，帮我们将 Minus 打造成人人可用的产品。\n\n下面这个向导将帮助你打包所有关键信息并自动附加设备数据、应用诊断信息，帮我们加快问题排查。\n\n准备好之后你可以点击通过邮件发送报告或通过以下渠道参与贡献 "</string>
@@ -558,7 +557,6 @@
     <string name="graph_granularity_biweek">Biweek</string>
     <string name="graph_granularity_month">Month</string>
     <string name="graph_granularity_total">Total</string>
-    <string name="budget_graph_page_indicator">%1$d / %2$d</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
 </resources>
