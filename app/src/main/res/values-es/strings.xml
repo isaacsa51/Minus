@@ -129,10 +129,6 @@
     <string name="budget_less_than_one_day_validation">El presupuesto debe ser para al menos un día</string>
     <!--  Analytics  -->
     <string name="analytics_title">Análisis</string>
-    <string name="spent_on">Sucedió el %1$s</string>
-    <string name="category_label">Etiquetado como %1$s</string>
-    <string name="comment_label">Nota: %1$s</string>
-
     <plurals name="days">
         <item quantity="one">%d día</item>
         <item quantity="other">%d días</item>
