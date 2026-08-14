@@ -114,12 +114,14 @@ import com.serranoie.app.minus.presentation.ui.settings.savings.SavingsPreferenc
 import com.serranoie.app.minus.presentation.ui.settings.savings.savingsPreferencesSummary
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedExpandableList
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.SelectableInfoPaddedItem
+import com.serranoie.app.minus.presentation.ui.theme.component.SelectablePaddedItem
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.Utils
 import com.serranoie.app.minus.presentation.util.Utils.toggleFeedback
@@ -296,36 +298,28 @@ fun Settings(
                         )
                     }
 
-                    CustomPaddedListItem(
+                    SelectablePaddedItem(
+                        label = stringResource(R.string.settings_censor_mode_title),
+                        subtitle = stringResource(R.string.settings_censor_mode_subtitle),
+                        isActive = isCensored,
                         onClick = onCensorModeToggle,
                         position = PaddedListItemPosition.Last,
-                        modifier = Modifier.testTag("SettingsCensorModeItem")
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.RemoveRedEye,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.settings_censor_mode_title),
-                                style = MaterialTheme.typography.bodyMediumEmphasized,
-                                color = MaterialTheme.colorScheme.onSurface
+                        modifier = Modifier.testTag("SettingsCensorModeItem"),
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Outlined.RemoveRedEye,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
                             )
-                            Text(
-                                text = stringResource(R.string.settings_censor_mode_subtitle),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(end = 4.dp)
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = isCensored, onCheckedChange = {
+                                    onCensorModeToggle()
+                                }, modifier = Modifier.testTag("SettingsCensorModeSwitch")
                             )
                         }
-                        Switch(
-                            checked = isCensored, onCheckedChange = {
-                                onCensorModeToggle()
-                            }, modifier = Modifier.testTag("SettingsCensorModeSwitch")
-                        )
-                    }
+                    )
                 }
             }
 
@@ -354,6 +348,10 @@ fun Settings(
                                 onClick = onCreditQuickToggleFeatureToggle,
                                 position = PaddedListItemPosition.Middle,
                             ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
                                         contentDescription = null,
@@ -361,9 +359,16 @@ fun Settings(
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Text(
-                                        text = stringResource(R.string.settings_feature_credit_toggle_details),
-                                        style = MaterialTheme.typography.bodySmall,
+                                        text = stringResource(R.string.settings_what_is_this_for),
+                                        style = MaterialTheme.typography.labelSmallCondensed,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
+                                }
+                                Text(
+                                    text = stringResource(R.string.settings_feature_credit_toggle_details),
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
@@ -382,33 +387,26 @@ fun Settings(
                             }
                         })
 
-                    CustomPaddedListItem(
+                    SelectablePaddedItem(
+                        label = stringResource(R.string.settings_feature_show_past_transactions_title),
+                        subtitle = stringResource(R.string.settings_feature_show_past_transactions_subtitle),
+                        isActive = showPastTransactions,
                         onClick = onShowPastTransactionsToggle,
                         position = PaddedListItemPosition.Middle,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.YoutubeSearchedFor,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.settings_feature_show_past_transactions_title),
-                                style = MaterialTheme.typography.bodyMediumEmphasized,
-                                color = MaterialTheme.colorScheme.onSurface
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Rounded.YoutubeSearchedFor,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
                             )
-                            Text(
-                                text = stringResource(R.string.settings_feature_show_past_transactions_subtitle),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = showPastTransactions,
+                                onCheckedChange = { onShowPastTransactionsToggle() },
                             )
                         }
-                        Switch(
-                            checked = showPastTransactions,
-                            onCheckedChange = { onShowPastTransactionsToggle() },
-                        )
-                    }
+                    )
 
                     PaddedExpandableList(
                         isExpanded = isCategoryFeatureExpanded,
@@ -432,6 +430,10 @@ fun Settings(
                                 onClick = onCategoryPickerDirectPopupFeatureToggle,
                                 position = PaddedListItemPosition.Middle,
                             ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
                                         contentDescription = null,
@@ -439,10 +441,15 @@ fun Settings(
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Text(
-                                        text = stringResource(R.string.settings_category_picker_direct_popup_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.weight(1f)
+                                        text = stringResource(R.string.settings_what_is_this_for),
+                                        style = MaterialTheme.typography.labelSmallCondensed,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
+                                }
+                                Text(
+                                    text = stringResource(R.string.settings_category_picker_direct_popup_description),
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -464,18 +471,28 @@ fun Settings(
                                 onClick = onCategoryGridModeToggle,
                                 position = PaddedListItemPosition.Middle,
                             ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(18.dp)
                                     )
-
                                     Text(
-                                        text = stringResource(R.string.settings_category_grid_mode_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.weight(1f)
+                                        text = stringResource(R.string.settings_what_is_this_for),
+                                        style = MaterialTheme.typography.labelSmallCondensed,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
+                                }
+
+                                Text(
+                                    text = stringResource(R.string.settings_category_grid_mode_description),
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically

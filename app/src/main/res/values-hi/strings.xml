@@ -288,6 +288,7 @@
     <string name="settings_about_subtitle">Learn more about the app and its development</string>
     <string name="settings_bug_report_title">Found a bug?</string>
     <string name="settings_bug_report_subtitle">Create a bug report and we will fix it soon</string>
+    <string name="settings_what_is_this_for">यह किस लिए है?</string>
     <string name="settings_version_title">Version</string>
     <string name="settings_version_metadata_copied">App and device metadata copied to clipboard</string>
     <!-- Bug Report -->

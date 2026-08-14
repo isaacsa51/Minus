@@ -285,6 +285,7 @@
     <string name="settings_about_subtitle">了解更多应用和开发信息</string>
     <string name="settings_bug_report_title">遇到 bug？</string>
     <string name="settings_bug_report_subtitle">创建问题报告，我们将尽快修复</string>
+    <string name="settings_what_is_this_for">这是做什么用的？</string>
     <string name="settings_version_title">版本</string>
     <string name="settings_version_metadata_copied">应用与设备信息已复制至剪贴板</string>
     <!-- Bug Report -->

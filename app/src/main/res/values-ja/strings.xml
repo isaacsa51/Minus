@@ -245,6 +245,7 @@
     <string name="settings_appearance_subtitle">アプリの色と外観を変更する</string>
     <string name="settings_typography_title">タイポグラフィー（文法）</string>
     <string name="settings_typography_subtitle">アプリの組版スタイルを変更する</string>
+    <string name="settings_rounded_font_title">丸みを帯びたフォントスタイル</string>
     <string name="settings_material_you_title">自分の素材</string>
     <string name="settings_material_you_subtitle">壁紙の色を使用して動的なアプリのテーマを適用する</string>
     <string name="settings_censor_mode_title">プライバシーモード</string>
@@ -285,6 +286,7 @@
     <string name="settings_about_subtitle">アプリとその開発についてもっと詳しく</string>
     <string name="settings_bug_report_title">バグを見つけましたか？</string>
     <string name="settings_bug_report_subtitle">バグレポートを作成すると、すぐに修正されます</string>
+    <string name="settings_what_is_this_for">これは何のためのものですか？</string>
     <string name="settings_version_title">バージョン</string>
     <string name="settings_version_metadata_copied">アプリとデバイスのメタデータをクリップボードにコピーしました</string>
     <!-- Bug Report -->

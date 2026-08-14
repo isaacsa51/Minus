@@ -288,6 +288,7 @@
     <string name="settings_about_subtitle">Μάθετε περισσότερα για την εφαρμογή και την ανάπτυξη της</string>
     <string name="settings_bug_report_title">Βρέθηκε ένα σφάλμα?</string>
     <string name="settings_bug_report_subtitle">Δημιουργήστε μια αναφορά σφάλματος και θα την διορθώσουμε σύντομα</string>
+    <string name="settings_what_is_this_for">Σε τι χρησιμεύει αυτό;</string>
     <string name="settings_version_title">Έκδοση</string>
     <string name="settings_version_metadata_copied">Η εφαρμογή και τα μεταδεδομένα της συσκευής αντιγράφηκαν στο πρόχειρο</string>
     <!-- Bug Report -->

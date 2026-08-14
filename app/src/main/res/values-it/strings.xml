@@ -248,6 +248,7 @@
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
     <string name="settings_typography_title">Tipografia</string>
     <string name="settings_typography_subtitle">Cambia lo stile tipografico dell\'app</string>
+    <string name="settings_rounded_font_title">Stile di carattere arrotondato</string>
     <string name="settings_material_you_title">Materiale Tu</string>
     <string name="settings_material_you_subtitle">Usa i colori dello sfondo per applicare un tema dinamico</string>
     <string name="settings_censor_mode_title">Privacy mode</string>
@@ -288,6 +289,7 @@
     <string name="settings_about_subtitle">Scopri di più sull\'app e sul suo sviluppo</string>
     <string name="settings_bug_report_title">Trovato un bug?</string>
     <string name="settings_bug_report_subtitle">Crea una segnalazione di bug e lo risolveremo presto</string>
+    <string name="settings_what_is_this_for">A cosa serve?</string>
     <string name="settings_version_title">Versione</string>
     <string name="settings_version_metadata_copied">Metadati dell\'app e del dispositivo copiati negli appunti</string>
     <!-- Bug Report -->

@@ -288,6 +288,7 @@
     <string name="settings_about_subtitle">Научете повече за приложението и неговото разработване</string>
     <string name="settings_bug_report_title">Открихте бъг?</string>
     <string name="settings_bug_report_subtitle">Създайте доклад за грешка и ние ще я отстраним скоро</string>
+    <string name="settings_what_is_this_for">За какво е това?</string>
     <string name="settings_version_title">Версия</string>
     <string name="settings_version_metadata_copied">Метаданните за приложението и устройството са копирани в клипборда</string>
     <!-- Bug Report -->
