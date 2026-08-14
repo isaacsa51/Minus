@@ -46,7 +46,7 @@ fun StatCard(
     value: String,
     label: String,
     annotatedValue: AnnotatedString? = null,
-    contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
+    contentPadding: PaddingValues = PaddingValues(16.dp),
     colors: CardColors = CardDefaults.cardColors(
         containerColor = MaterialTheme.colorScheme.surfaceDim,
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -124,9 +124,12 @@ fun StatCard(
                             .fillMaxWidth()
                             .then(
                                 if (crossedValue != null) {
-                                    Modifier.offset(y = valueOffsetWhenCrossedY.dp).rotate(2f)
+                                    Modifier
+                                        .offset(y = valueOffsetWhenCrossedY.dp)
+                                        .rotate(2f)
                                 } else Modifier
                             )
+                            .basicMarquee()
                             .censor(),
                         style = valueFontStyle,
                         fontWeight = FontWeight.Medium,

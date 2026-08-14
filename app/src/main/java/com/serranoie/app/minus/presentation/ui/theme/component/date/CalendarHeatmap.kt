@@ -45,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -125,6 +126,9 @@ fun CalendarHeatmap(
 
         days
     }
+    val maxSpending = remember(spendingDays) {
+        spendingDays.values.maxOfOrNull { it.spending } ?: BigDecimal.ZERO
+    }
     val calendarState = remember(startDate, finishDate, actualFinishDate) {
         CalendarState(
             context = context,
@@ -170,6 +174,7 @@ fun CalendarHeatmap(
                                 week = week,
                                 calendarUiState = calendarUiState,
                                 spendingDays = spendingDays,
+                                maxSpending = maxSpending,
                                 cardContainerColor = cardContainerColor,
                                 onDayClick = onDayClick,
                             )
@@ -319,6 +324,7 @@ fun WeekRow(
     week: Week,
     calendarUiState: CalendarUiState,
     spendingDays: Map<LocalDate, SpendingDay>,
+    maxSpending: BigDecimal,
     cardContainerColor: Color,
     onDayClick: (LocalDate) -> Unit,
 ) {
@@ -339,6 +345,7 @@ fun WeekRow(
                         onDayClicked = onDayClick,
                         spendingRatio = heatIntensity,
                         hasSpending = spendingDay != null,
+                        isHighestDay = spendingDay?.spending == maxSpending && maxSpending > BigDecimal.ZERO,
                         cardContainerColor = cardContainerColor,
                     )
                 } else {
@@ -462,7 +469,8 @@ internal fun DayCell(
     spendingRatio: Float,
     hasSpending: Boolean,
     cardContainerColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isHighestDay: Boolean = false,
 ) {
     val context = LocalContext.current
     val isRounded = remember(context) { context.isRoundedFontEnabled }
@@ -493,18 +501,23 @@ internal fun DayCell(
         normalizedHeat <= 1f -> 0.25f + (normalizedHeat * 0.55f)
         else -> 0.85f
     }
+
     val backgroundColor = when {
         disabled || !hasSpending -> Color.Transparent
         else -> heatColor.copy(alpha = heatAlpha)
     }
 
-    val backgroundScale = remember(normalizedHeat) {
-        calculateHeatScale(normalizedHeat)
+    val backgroundScale = remember(normalizedHeat, isHighestDay) {
+        if (isHighestDay) calculateHeatScale(normalizedHeat).coerceAtLeast(1.15f) else 1.0f
     }
 
     val baseStyle = MaterialTheme.typography.bodyMedium
-    val dynamicStyle = remember(animatedHeat, isRounded) {
-        calculateDynamicHeatStyle(animatedHeat, isRounded, baseStyle)
+    val dynamicStyle = remember(animatedHeat, isRounded, isHighestDay) {
+        if (isHighestDay) {
+            calculateDynamicHeatStyle(animatedHeat, isRounded, baseStyle)
+        } else {
+            baseStyle
+        }
     }
 
     Box(
@@ -536,17 +549,11 @@ internal fun DayCell(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(1.dp)
-                .border(
-                    width = 2.dp,
-                    color = cardContainerColor,
-                    shape = MaterialTheme.shapes.small
-                )
                 .padding(2.dp)
                 .border(
                     width = if (current) 2.dp else 1.dp,
                     color = if (current) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(
-                        alpha = 0.5f
+                        alpha = 0.65f
                     ),
                     shape = MaterialTheme.shapes.extraSmall
                 )
@@ -555,9 +562,10 @@ internal fun DayCell(
         Text(
             text = day.dayOfMonth.toString(),
             style = dynamicStyle,
+            fontStyle = if (disabled) FontStyle.Italic else FontStyle.Normal,
             color = when {
                 disabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                hasSpending && spendingRatio > 1.0f -> MaterialTheme.colorScheme.onError
+                hasSpending && spendingRatio > 1.0f -> MaterialTheme.colorScheme.onErrorContainer
                 hasSpending -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
                 else -> MaterialTheme.colorScheme.onSurface
             },
@@ -566,12 +574,8 @@ internal fun DayCell(
 }
 
 private fun calculateHeatScale(intensity: Float): Float {
-    return when {
-        intensity <= 0.3f -> lerpFloat(0.3f, 0.5f, intensity / 0.3f)
-        intensity <= 0.7f -> lerpFloat(0.5f, 0.96f, (intensity - 0.3f) / 0.4f)
-        intensity <= 1.0f -> lerpFloat(0.96f, 1.0f, (intensity - 0.7f) / 0.3f)
-        else -> lerpFloat(1.0f, 1.35f, (intensity - 1.0f) / 0.2f)
-    }
+    return if (intensity <= 1.0f) 1.0f
+    else lerpFloat(1.0f, 1.35f, (intensity - 1.0f) / 0.2f)
 }
 
 @OptIn(ExperimentalTextApi::class)

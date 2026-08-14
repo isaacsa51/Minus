@@ -111,7 +111,12 @@ fun MinMaxSpentCard(
             val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: ""
             if (currencySymbol.length > 2 && formattedSpent.startsWith(currencySymbol)) {
                 buildAnnotatedString {
-                    withStyle(SpanStyle(fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f, baselineShift = BaselineShift(0f))) {
+                    withStyle(
+                        SpanStyle(
+                            fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f,
+                            baselineShift = BaselineShift(0f)
+                        )
+                    ) {
                         append(currencySymbol)
                     }
                     append(formattedSpent.removePrefix(currencySymbol))
@@ -212,7 +217,7 @@ fun MinMaxSpentCard(
     )
 }
 
-@Preview(name = "MinMaxSpentCard")
+@Preview
 @Composable
 private fun PreviewMinMaxSpentCard() {
     MinusTheme {
@@ -246,7 +251,7 @@ private fun PreviewMinMaxSpentCard() {
     }
 }
 
-@Preview(name = "MinMaxSpentCard Mobile", widthDp = 380, heightDp = 300)
+@Preview(name = "MinMaxSpentCard Mobile", widthDp = 300, heightDp = 120)
 @Composable
 private fun PreviewMinMaxSpentCardMobile() {
     MinusTheme {
@@ -289,7 +294,7 @@ private fun PreviewMinMaxSpentCardMobile() {
                             date = LocalDate.now().minusDays(2).toDate().toLocalDateTime()
                         ),
                         Transaction(
-                            amount = BigDecimal(72),
+                            amount = BigDecimal(72000),
                             date = LocalDate.now().minusDays(1).toDate().toLocalDateTime()
                         ),
                         Transaction(
