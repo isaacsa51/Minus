@@ -148,7 +148,7 @@
     <string name="widget_add_expense_label">添加新支出</string>
     <string name="widget_add_expense_compact_label">添加支出</string>
     <!-- Quick Settings Tile -->
-    <string name="tile_new_transaction_label">新交易</string>
+    <string name="tile_new_transaction_label">New Transaction</string>
     <!-- Widget Labels -->
     <string name="spent">已支出</string>
     <string name="left">剩余</string>
@@ -220,10 +220,10 @@
     <!-- Settings -->
     <string name="settings_title">设置</string>
     <string name="settings_section_appearance">外观</string>
-    <string name="settings_section_language">語言</string>
-    <string name="settings_language_header">應用語言</string>
-    <string name="settings_language_currently_format">當前: %1$s</string>
-    <string name="settings_language_disclaimer">語言翻譯可能不準確。</string>
+    <string name="settings_section_language">Language</string>
+    <string name="settings_language_header">App Language</string>
+    <string name="settings_language_currently_format">Currently: %1$s</string>
+    <string name="settings_language_disclaimer">Language translations might be incorrect.</string>
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
@@ -233,7 +233,7 @@
     <string name="settings_contrast_high">High</string>
     <string name="settings_typography_condensed">Condensed</string>
     <string name="settings_typography_expressive">Expressive</string>
-    <string name="settings_color_scheme_title">App Color Scheme</string>
+    <string name="settings_color_scheme_title">Colorscheme</string>
     <string name="settings_section_notifications">通知</string>
     <string name="settings_section_features">功能</string>
     <string name="settings_section_app_info">应用信息</string>
@@ -287,6 +287,7 @@
     <string name="settings_about_subtitle">了解更多应用和开发信息</string>
     <string name="settings_bug_report_title">遇到 bug？</string>
     <string name="settings_bug_report_subtitle">创建问题报告，我们将尽快修复</string>
+    <string name="settings_what_is_this_for">What is this for?</string>
     <string name="settings_version_title">版本</string>
     <string name="settings_version_metadata_copied">应用与设备信息已复制至剪贴板</string>
     <!-- Bug Report -->
@@ -355,7 +356,7 @@
     <string name="expand">展开</string>
     <string name="collapse">折叠</string>
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">已超出預算金額</string>
+    <string name="budget_pill_over_budget">Budget amount exceeded</string>
     <string name="budget_pill_no_budget">没有预算</string>
     <string name="budget_pill_no_budget_action">设置预算</string>
     <string name="budget_pill_exhausted_daily_label">每天</string>
