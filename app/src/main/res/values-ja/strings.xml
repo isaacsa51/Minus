@@ -246,7 +246,7 @@
     <string name="settings_appearance_subtitle">アプリの色と外観を変更する</string>
     <string name="settings_typography_title">タイポグラフィー（文法）</string>
     <string name="settings_typography_subtitle">アプリの組版スタイルを変更する</string>
-    <string name="settings_rounded_font_title">Rounded font style</string>
+    <string name="settings_rounded_font_title">丸みを帯びたフォントスタイル</string>
     <string name="settings_material_you_title">自分の素材</string>
     <string name="settings_material_you_subtitle">壁紙の色を使用して動的なアプリのテーマを適用する</string>
     <string name="settings_censor_mode_title">プライバシーモード</string>
@@ -287,6 +287,7 @@
     <string name="settings_about_subtitle">アプリとその開発についてもっと詳しく</string>
     <string name="settings_bug_report_title">バグを見つけましたか？</string>
     <string name="settings_bug_report_subtitle">バグレポートを作成すると、すぐに修正されます</string>
+    <string name="settings_what_is_this_for">これは何のためのものですか？</string>
     <string name="settings_version_title">バージョン</string>
     <string name="settings_version_metadata_copied">アプリとデバイスのメタデータをクリップボードにコピーしました</string>
     <!-- Bug Report -->
@@ -514,7 +515,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">サブスクリプション「%1$s」の「%2$s」は %3$sが課金されます。料金の準備をしてください。</string>
     <string name="notification_upcoming_subscription_message_without_comment">\"%1$s\" のサブスクリプションがあります。このサブスクリプションは %2$s となります。</string>
     <string name="notification_credit_cutoff_title">今後のクレジットカードでの支払い</string>
-    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="notification_credit_cutoff_message">あなたのカットオフ日は %1$sです。利息を避けるために %2$s を支払うことをお勧めします。</string>
     <string name="credit_owed_label">支払済合計</string>
     <string name="debt_adjusted_balance_label">借金調整残高</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s クレジット</string>
