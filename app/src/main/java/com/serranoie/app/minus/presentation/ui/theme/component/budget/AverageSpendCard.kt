@@ -19,11 +19,13 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.font.format.numberFormat
 import java.math.RoundingMode
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.Date
 
 @Composable
@@ -49,7 +51,7 @@ fun AverageSpendCard(
             val minDate = dates.minOrNull()
             val maxDate = dates.maxOrNull()
             if (minDate != null && maxDate != null) {
-                java.time.temporal.ChronoUnit.DAYS.between(minDate, maxDate).coerceAtLeast(1)
+                ChronoUnit.DAYS.between(minDate, maxDate).coerceAtLeast(1)
             } else 1
         }
     }
@@ -70,7 +72,12 @@ fun AverageSpendCard(
             val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: ""
             if (currencySymbol.length > 2 && formattedAverage.startsWith(currencySymbol)) {
                 AnnotatedString.Builder().apply {
-                    pushStyle(SpanStyle(fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f, baselineShift = BaselineShift(0f)))
+                    pushStyle(
+                        SpanStyle(
+                            fontSize = TextUnit(1f, TextUnitType.Em) * 0.5f,
+                            baselineShift = BaselineShift(0f)
+                        )
+                    )
                     append(currencySymbol)
                     pop()
                     append(formattedAverage.removePrefix(currencySymbol))
@@ -86,6 +93,7 @@ fun AverageSpendCard(
     StatCard(
         modifier = modifier,
         value = formattedAverage ?: emptyLabel,
+        valueFontStyle = MaterialTheme.typography.labelSmallEmphasized,
         annotatedValue = annotatedAverage,
         colors = CardDefaults.cardColors(
             containerColor = combineColors(
@@ -102,18 +110,19 @@ fun AverageSpendCard(
 
 
 @Preview(
-    name = "AverageSpendCard",
     device = "spec:width=500px,height=200px,dpi=440"
 )
 @Composable
 private fun PreviewAverageSpendCard() {
-    AverageSpendCard(
-        spends = listOf(
-            Transaction(
-                amount = 100.toBigDecimal(),
-                date = LocalDateTime.now(),
-                comment = "Category",
-            ),
+    MinusTheme {
+        AverageSpendCard(
+            spends = listOf(
+                Transaction(
+                    amount = 100.toBigDecimal(),
+                    date = LocalDateTime.now(),
+                    comment = "Category",
+                ),
+            )
         )
-    )
+    }
 }

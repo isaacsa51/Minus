@@ -16,41 +16,41 @@ import java.text.NumberFormat
 
 @Composable
 fun DayTotalItem(
-	total: BigDecimal,
-	currencyFormat: NumberFormat,
-	modifier: Modifier = Modifier,
-	showLabel: Boolean = true,
+    total: BigDecimal,
+    currencyFormat: NumberFormat,
+    modifier: Modifier = Modifier,
+    showLabel: Boolean = true,
 ) {
-	Row(
-		modifier = modifier,
-		horizontalArrangement = Arrangement.End
-	) {
-		val isIncome = total < BigDecimal.ZERO
-		val absoluteTotal = total.abs()
-		val formattedValue = if (isIncome) {
-			"+${currencyFormat.format(absoluteTotal)}"
-		} else {
-			currencyFormat.format(total)
-		}
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.End
+    ) {
+        val isIncome = total < BigDecimal.ZERO
+        val absoluteTotal = total.abs()
+        val formattedValue = if (isIncome) {
+            "+${currencyFormat.format(absoluteTotal)}"
+        } else {
+            currencyFormat.format(total)
+        }
 
-		Text(
-			text = if (showLabel) {
-				stringResource(R.string.day_total_format, formattedValue)
-			} else {
-				formattedValue
-			},
-			style = MaterialTheme.typography.labelMediumCondensed,
-			color = MaterialTheme.colorScheme.onSurfaceVariant
-		)
-	}
+        Text(
+            text = if (showLabel) {
+                stringResource(R.string.day_total_format, formattedValue)
+            } else {
+                formattedValue
+            },
+            style = MaterialTheme.typography.labelMediumCondensed,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun DayTotalPreview() {
-	MinusTheme {
-		DayTotalItem(
-			total = BigDecimal("10.00"), currencyFormat = NumberFormat.getCurrencyInstance()
-		)
-	}
+    MinusTheme {
+        DayTotalItem(
+            total = BigDecimal("10.00"), currencyFormat = NumberFormat.getCurrencyInstance()
+        )
+    }
 }

@@ -138,8 +138,8 @@
         <item quantity="other">%d días</item>
     </plurals>
     <string name="total_budget">Presupuesto total</string>
-    <string name="minimum_spent">Mínimo Gustito</string>
-    <string name="maximum_spent">Gran Compra</string>
+    <string name="minimum_spent">Gasto mínimo</string>
+    <string name="maximum_spent">Gasto máximo</string>
     <string name="average_spent">Promedio por día empleado</string>
     <string name="days_remaining_label">Días\nrestantes</string>
     <!-- Widget Descriptions -->
@@ -550,15 +550,15 @@
     <string name="analytics_tutorial_history_title">Historial de Transacciones</string>
     <string name="analytics_tutorial_history_desc">Haz tap aquí para ver la lista completa de gastos en este periodo.</string>
     <string name="skip_tutorial">Omitir</string>
-    <string name="budget_graph_header_spending">Spending</string>
-    <string name="budget_graph_legend_current">Current</string>
-    <string name="budget_graph_legend_previous">Previous</string>
-    <string name="budget_graph_nav_prev">Previous</string>
+    <string name="budget_graph_header_spending">Gasto</string>
+    <string name="budget_graph_legend_current">Actual</string>
+    <string name="budget_graph_legend_previous">Anterior</string>
+    <string name="budget_graph_nav_prev">Anterior</string>
     <string name="budget_graph_nav_next">Siguiente</string>
-    <string name="graph_granularity_days">Days</string>
-    <string name="graph_granularity_week">Week</string>
-    <string name="graph_granularity_biweek">Biweek</string>
-    <string name="graph_granularity_month">Month</string>
+    <string name="graph_granularity_days">Días</string>
+    <string name="graph_granularity_week">Semana</string>
+    <string name="graph_granularity_biweek">Quincena</string>
+    <string name="graph_granularity_month">Mes</string>
     <string name="graph_granularity_total">Total</string>
     <string name="budget_graph_page_indicator">%1$d / %2$d</string>
     <string name="unit_thousands">K</string>

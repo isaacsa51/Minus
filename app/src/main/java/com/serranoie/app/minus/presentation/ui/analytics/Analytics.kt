@@ -129,7 +129,7 @@ data class AnalyticsState(
     val userSettings: UserSettings = UserSettings.DEFAULT,
     val previousPeriodTransactions: List<Transaction> = emptyList(),
     val categories: List<Category> = emptyList(),
-    val graphGranularity: GraphGranularity = GraphGranularity.DAYS,
+    val graphGranularity: GraphGranularity = GraphGranularity.TOTAL,
 )
 
 data class AnalyticsActions(
