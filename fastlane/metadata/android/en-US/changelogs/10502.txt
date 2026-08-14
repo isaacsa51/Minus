@@ -1,0 +1,4 @@
+- fix: disable auto saving when tapping check on category input
+- feat: credit card tracking and enhance analytics visualizations.
+- feat: add Quick Settings Tile for new transactions
+- feat: implement rounded font toggle and update settings icons
