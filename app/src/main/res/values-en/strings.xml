@@ -290,6 +290,7 @@
     <string name="settings_about_subtitle">Learn more about the app and its development</string>
     <string name="settings_bug_report_title">Found a bug?</string>
     <string name="settings_bug_report_subtitle">Create a bug report and we will fix it soon</string>
+    <string name="settings_what_is_this_for">What is this for?</string>
     <string name="settings_version_title">Version</string>
     <string name="settings_version_metadata_copied">App and device metadata copied to clipboard</string>
     <!-- Bug Report -->
@@ -517,7 +518,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">Your subscription \"%1$s\" of \"%2$s\" will be charged %3$s. Prepare for the charge.</string>
     <string name="notification_upcoming_subscription_message_without_comment">You have a subscription of \"%1$s\" that will be charged %2$s.</string>
     <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
-    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="notification_credit_cutoff_message">Your cutoff date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
     <string name="credit_owed_label">Total owed</string>
     <string name="debt_adjusted_balance_label">Debt-Adjusted Balance</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s credit debt</string>
