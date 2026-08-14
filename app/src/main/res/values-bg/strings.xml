@@ -249,7 +249,7 @@
     <string name="settings_appearance_subtitle">Промяна на цвета и външния вид на приложението</string>
     <string name="settings_typography_title">Типография</string>
     <string name="settings_typography_subtitle">Промяна на шрифтовия стил</string>
-    <string name="settings_rounded_font_title">Rounded font style</string>
+    <string name="settings_rounded_font_title">Закръглен шрифт</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Използване на цветовете от тапета за динамична тема</string>
     <string name="settings_censor_mode_title">Режим за поверителност</string>
@@ -319,7 +319,6 @@
     <string name="bug_report_attachments_label_bug">Снимки на екрана или записи</string>
     <string name="bug_report_submit">Изпрати доклада</string>
     <string name="bug_report_share_title">Изпращане на доклад</string>
-    <string name="bug_report_email_subject">%1$s</string>
     <string name="bug_report_email_body">Здравейте, прикачен е моят генериран доклад от Минус.</string>
     <string name="bug_report_help_title">Помогнете ни да направим Минус по-добър</string>
     <string name="bug_report_help_message_prefix">"Съобщаването за проблеми или предлагането на подобрения ни помага да направим Минус по-добър за всички.\n\nТази задвижвана форма ви помага да съберете всички необходими подробности в доклад, като автоматично прикачва метаданни за устройството и диагностика на приложението, за да ускори нашата проверка.\n\nСлед като е готов, можете да изпратите доклада по имейл или да допринесете чрез "</string>
@@ -337,7 +336,7 @@
     <string name="bug_report_upload_assets_subtitle">Снимки на екрана или видеа (до 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">Избрани %1$d прикачен(и)</string>
     <string name="settings_backup_title">Резервно копие на данните</string>
-    <string name="settings_backup_subtitle">Запазване на резервно копие в minus_export.csv</string>
+    <string name="settings_backup_subtitle">Архивиране на данни в minus_export.csv</string>
     <string name="settings_import_csv_title">Импортиране на CSV</string>
     <string name="settings_import_csv_subtitle">Импортиране на данни от CSV файл</string>
     <string name="settings_reset_tutorial_title">Рестарт на ръководството</string>
@@ -362,6 +361,8 @@
     <string name="budget_pill_over_budget">Бюджетната сума е надвишена</string>
     <string name="budget_pill_no_budget">Няма бюджет</string>
     <string name="budget_pill_no_budget_action">Настройте бюджета си</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">Дневно</string>
     <string name="budget_pill_exhausted_weekly_label">Седмично</string>
     <string name="budget_pill_exhausted_biweekly_label">Двуседмично</string>
@@ -486,6 +487,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Без дата</string>
     <string name="no_name">Няма име</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">Причина за покупката</string>
     <string name="date">Дата</string>
     <string name="frequency">Честота</string>
@@ -563,7 +565,6 @@
     <string name="graph_granularity_biweek">Двуседмичен</string>
     <string name="graph_granularity_month">Месец</string>
     <string name="graph_granularity_total">Общо</string>
-    <string name="budget_graph_page_indicator">%1$d / %2$d</string>
     <string name="unit_thousands">Х</string>
     <string name="unit_millions">М</string>
 </resources>
