@@ -60,6 +60,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -452,67 +453,48 @@ fun Editor(
         }
 
         AnimatedContent(
-            targetState = animState,
+            targetState = if (animState == AnimState.EDITING) AnimState.EDITING else AnimState.IDLE,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
             transitionSpec = {
-                when (targetState) {
-                    AnimState.EDITING -> fadeIn(tween(200)) togetherWith fadeOut(tween(200))
-                    AnimState.IDLE -> fadeIn(tween(300)) togetherWith fadeOut(tween(200))
-                    else -> fadeIn(tween(200)) togetherWith fadeOut(tween(200))
+                if (targetState == AnimState.EDITING) {
+                    fadeIn(tween(200)) togetherWith fadeOut(tween(200))
+                } else {
+                    fadeIn(tween(300)) togetherWith fadeOut(tween(200))
                 }
             },
             label = "editorContent"
         ) { state ->
-            when (state) {
-                AnimState.EDITING -> {
-                    logcat("IMPL:TUTORIAL") { "Editor entered EDITING state → composing EditingContent (category tag + recurrent will register)" }
-                    EditingContent(
-                        input = uiState.numpadInput,
-                        currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-                        tags = uiState.tags,
-                        currentComment = uiState.currentComment,
-                        onCommentUpdate = onCommentUpdate,
-                        onDeleteTag = onDeleteTag,
-                        editorFocusController = editorFocusController,
-                        directCategoryPopupEnabled = directCategoryPopupEnabled,
-                        categoryGridModeEnabled = categoryGridModeEnabled,
-                        isCategoryGridVisible = isCategoryGridVisible,
-                        isCalculation = isCalculation,
-                        onShowCategoryGrid = onShowCategoryGrid,
-                        onHideCategoryGrid = onHideCategoryGrid,
-                        onDisableCalculationMode = onDisableCalculationMode,
-                        onApply = onApply,
-                        tutorialBoxState = tutorialBoxState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    )
-                }
-
-                AnimState.IDLE, AnimState.RESET -> {
-                    IdleContent(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    )
-                }
-
-                else -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Saving...",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+            if (state == AnimState.EDITING) {
+                logcat("IMPL:TUTORIAL") { "Editor entered EDITING state → composing EditingContent (category tag + recurrent will register)" }
+                EditingContent(
+                    input = uiState.numpadInput,
+                    currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+                    tags = uiState.tags,
+                    currentComment = uiState.currentComment,
+                    onCommentUpdate = onCommentUpdate,
+                    onDeleteTag = onDeleteTag,
+                    editorFocusController = editorFocusController,
+                    directCategoryPopupEnabled = directCategoryPopupEnabled,
+                    categoryGridModeEnabled = categoryGridModeEnabled,
+                    isCategoryGridVisible = isCategoryGridVisible,
+                    isCalculation = isCalculation,
+                    onShowCategoryGrid = onShowCategoryGrid,
+                    onHideCategoryGrid = onHideCategoryGrid,
+                    onDisableCalculationMode = onDisableCalculationMode,
+                    onApply = onApply,
+                    tutorialBoxState = tutorialBoxState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            } else {
+                IdleContent(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
             }
         }
     }
@@ -945,16 +927,17 @@ private fun IdleContent(
     ) {
         val dashWidth = 4.dp
         val dashHeight = 96.dp
-        if (cursorVisible.value) {
-            Box(
-                modifier = Modifier
-                    .size(width = dashWidth, height = dashHeight)
-                    .background(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
-                        shape = CircleShape
-                    )
-            )
-        }
+        Box(
+            modifier = Modifier
+                .size(width = dashWidth, height = dashHeight)
+                .graphicsLayer {
+                    alpha = if (cursorVisible.value) 1f else 0f
+                }
+                .background(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
+                    shape = CircleShape
+                )
+        )
     }
 }
 

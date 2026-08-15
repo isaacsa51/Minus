@@ -46,6 +46,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.Utils.abortFeedback
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil
 import com.serranoie.app.minus.presentation.util.font.format.getFloatDivider
 import com.serranoie.app.minus.presentation.util.font.format.join
 import com.serranoie.app.minus.presentation.util.font.format.tryConvertStringToNumber
@@ -103,7 +104,6 @@ fun Numpad(
     tutorialBoxState: TutorialBoxState? = null,
 ) {
     val view = LocalView.current
-    val haptic = LocalHapticFeedback.current
     var debugProgress by remember { mutableIntStateOf(0) }
 
     val effectiveDragProgress by animateFloatAsState(
@@ -157,18 +157,18 @@ fun Numpad(
                         }
 
                         if (abs(progress - lastTickProgress) > 0.15f) {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            HapticUtil.performSliderHaptic(view)
                             lastTickProgress = progress
                         }
 
-                        if (abs(progress - lastReportedProgress) >= 0.05f) {
+                        if (progress != lastReportedProgress) {
                             onDragProgressChanged(progress)
                             lastReportedProgress = progress
                         }
 
                         if (progress >= 1f && !hasTriggered) {
+                            HapticUtil.performHeavyHaptic(view)
                             onCalculationModeChanged(!isCalculation)
-                            onDragProgressChanged(0f)
                             hasTriggered = true
                         }
                     },

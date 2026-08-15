@@ -7,7 +7,11 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -23,11 +27,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -59,14 +64,11 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
@@ -74,12 +76,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.material.icons.rounded.ExpandLess
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Density
@@ -107,6 +103,8 @@ import com.serranoie.app.minus.presentation.ui.theme.colorEditor
 import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetLayout
 import com.serranoie.app.minus.presentation.ui.theme.component.TopSheetValue
+import com.serranoie.app.minus.presentation.ui.theme.component.animatedHeightPx
+import com.serranoie.app.minus.presentation.ui.theme.component.animatedRequiredHeightPx
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
@@ -578,33 +576,17 @@ private fun PhoneLayout(
             }
         }
 
-    val editorHeightAnimated by animateFloatAsState(
+    val editorHeightAnimatedState = animateFloatAsState(
         label = "editorHeightAnimatedValue",
         targetValue = editorHeight,
         animationSpec = keyboardAnimationSpec,
     )
 
-    val keyboardHeightAnimated by animateFloatAsState(
+    val keyboardHeightAnimatedState = animateFloatAsState(
         label = "keyboardHeightAnimatedValue",
         targetValue = currentKeyboardHeight,
         animationSpec = keyboardAnimationSpec,
     )
-
-    val currentEditorHeight =
-        with(localDensity) {
-            val halfExpanedOffset =
-                (-contentHeight + navBarHeightPx + with(localDensity) { 18.dp.toPx() } + editorHeightAnimated).coerceAtMost(
-                    0f,
-                )
-
-            val computed =
-                topSheetState.offset.value.coerceIn(
-                    halfExpanedOffset,
-                    0f,
-                ) + contentHeight - navBarHeightPx - with(localDensity) { 18.dp.toPx() }
-
-            minOf(computed, editorHeightAnimated).toDp()
-        }
 
     Box(
         modifier = Modifier
@@ -798,7 +780,7 @@ private fun PhoneLayout(
         }
         val halfExpandedOffsetPx =
             with(localDensity) {
-                (-contentHeight + navBarHeightPx + 18.dp.toPx() + editorHeightAnimated).coerceAtMost(
+                (-contentHeight + navBarHeightPx + 18.dp.toPx() + editorHeightAnimatedState.value).coerceAtMost(
                     0f
                 )
             }
@@ -816,7 +798,9 @@ private fun PhoneLayout(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(with(localDensity) { (keyboardHeightAnimated + navBarHeightPx + 16.dp.toPx()).toDp() })
+                    .animatedHeightPx {
+                        keyboardHeightAnimatedState.value + navBarHeightPx + with(localDensity) { 16.dp.toPx() }
+                    }
                     .zIndex(if (isSheetExpanding) 0f else 1f),
         ) {
             Box(
@@ -878,9 +862,9 @@ private fun PhoneLayout(
         val expandHeightPx = contentHeight - navBarHeightPx - with(localDensity) { 18.dp.toPx() }
         TopSheetLayout(
             swipeableState = topSheetState,
-            customHalfHeight = editorHeightAnimated,
+            customHalfHeight = editorHeightAnimatedState.value,
             customCardHeight = {
-                val halfHeightPx = editorHeightAnimated
+                val halfHeightPx = editorHeightAnimatedState.value
                 val maxOffset = (-(expandHeightPx - halfHeightPx)).coerceAtMost(0f)
                 val offset = runCatching { topSheetState.offset.value }.getOrDefault(maxOffset)
                 val progress =
@@ -912,7 +896,18 @@ private fun PhoneLayout(
                     showCategoryGrid = showCategoryGrid,
                     onShowCategoryGrid = onShowCategoryGrid,
                     onHideCategoryGrid = onHideCategoryGrid,
-                    modifier = Modifier.requiredHeight(currentEditorHeight),
+                    modifier = Modifier.animatedRequiredHeightPx {
+                        with(localDensity) {
+                            val statusOffsetPx = 18.dp.toPx()
+                            val halfExpanedOffsetPxLocal =
+                                (-contentHeight + navBarHeightPx + statusOffsetPx + editorHeightAnimatedState.value)
+                                    .coerceAtMost(0f)
+                            val computed =
+                                topSheetState.offset.value.coerceIn(halfExpanedOffsetPxLocal, 0f) +
+                                    contentHeight - navBarHeightPx - statusOffsetPx
+                            minOf(computed, editorHeightAnimatedState.value)
+                        }
+                    },
                     onNavigateToSettings = actions.onNavigateToSettings,
                     onNavigateToAnalytics = actions.onNavigateToAnalytics,
                     openWalletOnStart = openWalletOnStart,
@@ -1042,11 +1037,22 @@ private fun TabletLayout(
 
     var localDragProgress by remember { mutableFloatStateOf(0f) }
 
-    val effectiveProgress =
-        if (budgetUiState.isCalculation) 1f - localDragProgress else localDragProgress
+    val effectiveProgressState = remember(budgetUiState.isCalculation) {
+        derivedStateOf {
+            if (budgetUiState.isCalculation) 1f - localDragProgress else localDragProgress
+        }
+    }
+    val effectiveProgress by effectiveProgressState
 
-    val internalKeyboardTarget =
-        defaultInternalKeyboardHeight + (calcModeKeyboardHeight - defaultInternalKeyboardHeight) * effectiveProgress
+    val internalKeyboardTargetState = remember(
+        defaultInternalKeyboardHeight,
+        calcModeKeyboardHeight,
+        budgetUiState.isCalculation
+    ) {
+        derivedStateOf {
+            defaultInternalKeyboardHeight + (calcModeKeyboardHeight - defaultInternalKeyboardHeight) * effectiveProgressState.value
+        }
+    }
 
     val keyboardAnimationSpec =
         remember<AnimationSpec<Float>>(localDragProgress) {
@@ -1057,10 +1063,10 @@ private fun TabletLayout(
             }
         }
 
-    val keyboardHeightAnimated by animateFloatAsState(
-        label = "keyboardHeightAnimatedValue",
-        targetValue = internalKeyboardTarget,
+    val keyboardHeightAnimatedState = animateFloatAsState(
+        targetValue = internalKeyboardTargetState.value,
         animationSpec = keyboardAnimationSpec,
+        label = "keyboardHeightAnimatedValue",
     )
 
     Row(modifier = Modifier.fillMaxSize()) {
@@ -1140,7 +1146,7 @@ private fun TabletLayout(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(with(localDensity) { (keyboardHeightAnimated + navBarHeightPx).toDp() }),
+                        .height(with(localDensity) { (keyboardHeightAnimatedState.value + navBarHeightPx).toDp() }),
             ) {
                 Box(
                     modifier = Modifier

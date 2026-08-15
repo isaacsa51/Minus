@@ -31,12 +31,13 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -57,6 +58,24 @@ import kotlin.math.roundToInt
 private val ScrimColor: Color
     @Composable
     get() = Color.Black.copy(alpha = 0.45f)
+
+internal fun Modifier.animatedHeightPx(heightPx: () -> Float): Modifier =
+    layout { measurable, constraints ->
+        val target = heightPx().roundToInt().coerceIn(constraints.minHeight, constraints.maxHeight)
+        val placeable = measurable.measure(constraints.copy(minHeight = target, maxHeight = target))
+        layout(placeable.width, target) {
+            placeable.placeRelative(0, 0)
+        }
+    }
+
+internal fun Modifier.animatedRequiredHeightPx(heightPx: () -> Float): Modifier =
+    layout { measurable, constraints ->
+        val target = heightPx().roundToInt().coerceAtLeast(0)
+        val placeable = measurable.measure(constraints.copy(minHeight = target, maxHeight = target))
+        layout(placeable.width, target) {
+            placeable.placeRelative(0, 0)
+        }
+    }
 
 enum class TopSheetValue {
     Expanded,
@@ -103,7 +122,6 @@ fun TopSheetLayout(
         val halfHeight = customHalfHeight ?: (fullHeight / 2)
         val expandHeight =
             with(localDensity) { (fullHeight - navigationBarHeight.toPx() - 18.dp.toPx()) }
-        val currOffset = swipeableState.offset.value + externalDragOffset()
         val maxOffset = (-(expandHeight - halfHeight)).coerceAtMost(0f)
 
         val prevHalfHeight = remember { mutableFloatStateOf(halfHeight) }
@@ -120,6 +138,7 @@ fun TopSheetLayout(
         val halfHeightMovingSync = halfHeight != prevHalfHeightValue.floatValue
         prevHalfHeightValue.floatValue = halfHeight
 
+        val currOffset = swipeableState.offset.value + externalDragOffset()
         val progress = if (halfHeightChanging.value || halfHeightMovingSync || isLockDraggable() || isLockSwipeable()) {
             when (swipeableState.currentValue) {
                 TopSheetValue.HalfExpanded -> 0f
@@ -140,7 +159,7 @@ fun TopSheetLayout(
         }
 
         val halfExpanedOffset = (-(expandHeight - halfHeight)).coerceAtMost(-1f)
-        val dismissOffsetAbove = -expandHeight * 0.5f
+        val dismissOffsetAbove = halfExpanedOffset - (fullHeight * 0.3f)
         val dismissOffsetBelow = expandHeight * 0.8f
 
         val anchors = remember(halfExpanedOffset, dismissOffsetAbove, dismissOffsetBelow, onDismiss, canDismissBySwipeUp) {
@@ -172,11 +191,11 @@ fun TopSheetLayout(
             ),
             modifier = modifier
                 .fillMaxWidth()
-                .height(with(localDensity) {
-                    (customCardHeight()
-                        ?: (fullHeight - navigationBarHeight.toPx() - 18.dp.toPx()))
-                        .toDp()
-                })
+                .animatedHeightPx {
+                    customCardHeight() ?: with(localDensity) {
+                        fullHeight - navigationBarHeight.toPx() - 18.dp.toPx()
+                    }
+                }
                 .offset {
                     val swipeOffset =
                         swipeableState.offset.value + externalDragOffset() + cardOffsetAdjustment()
@@ -213,7 +232,9 @@ fun TopSheetLayout(
                         Modifier
                             .fillMaxSize()
                             .padding(top = 24.dp) // Status bar padding
-                            .alpha(max(progress * 2f - 1f, 0f))
+                            .graphicsLayer {
+                                alpha = max(progress * 2f - 1f, 0f)
+                            }
                     ) {
                         sheetContentExpand()
                     }
@@ -231,15 +252,11 @@ fun TopSheetLayout(
                     Column(
                         Modifier
                             .fillMaxSize()
-                            .alpha(max(1f - progress * 2, 0f)),
+                            .graphicsLayer {
+                                alpha = max(1f - progress * 2, 0f)
+                            },
                     ) {
                         sheetContentHalfExpand()
-//                        Box(
-//                            Modifier
-//                                .fillMaxWidth()
-//                                .weight(1F)
-//                                .background(colorEditor)
-//                        )
                     }
                 }
 
