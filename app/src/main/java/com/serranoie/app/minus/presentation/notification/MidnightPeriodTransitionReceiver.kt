@@ -54,6 +54,11 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
                     return@launch
                 }
 
+                if (settingsRepository.getSettings().earlyFinishActive) {
+                    logcat { "Period was already finished early, skipping midnight transition" }
+                    return@launch
+                }
+
                 val periodEnd = settings.getPeriodEndDate()
                 val today = LocalDate.now()
 
