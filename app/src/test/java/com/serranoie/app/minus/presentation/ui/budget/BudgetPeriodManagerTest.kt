@@ -72,6 +72,9 @@ class BudgetPeriodManagerTest {
                 earlyFinishOriginalEndDate = 0L,
             )
         }
+        coEvery { settingsRepository.setPeriodEndAlreadyHandled(any()) } answers {
+            userSettings = userSettings.copy(periodEndAlreadyHandled = firstArg())
+        }
         every { timeProvider.nowEpochMillis() } returns 1_000_000L
     }
 
@@ -302,5 +305,61 @@ class BudgetPeriodManagerTest {
             periodManager.persistBudgetSettings(newSettings, forceNewPeriodBoundary = true)
 
             assertThat(archivedSettingsSlot.single().endDate).isEqualTo(today)
+        }
+
+    @Test
+    fun `when the user edits the active budget mid-period while earlyFinishActive is true then it is not silently cleared`() =
+        runTest {
+            val today = LocalDate.now()
+            val activeSettings = budget(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                startDate = today.minusDays(5),
+                endDate = today.plusDays(25),
+            )
+            coEvery { budgetRepository.getBudgetSettingsSync() } returns activeSettings
+            coEvery { budgetRepository.getTransactions() } returns flowOf(emptyList())
+            userSettings = userSettings.copy(
+                currentPeriodId = 999L,
+                currentPeriodStartedAt = 1L,
+                earlyFinishActive = true,
+                earlyFinishActualDate = 123L,
+                periodEndAlreadyHandled = true,
+            )
+
+            val editedSettings = activeSettings.copy(creditCardCutoffDay = 5)
+            periodManager.persistBudgetSettings(editedSettings, forceNewPeriodBoundary = false)
+
+            assertThat(userSettings.earlyFinishActive).isTrue()
+            assertThat(userSettings.periodEndAlreadyHandled).isTrue()
+        }
+
+    @Test
+    fun `when a genuinely new period starts then earlyFinishActive and periodEndAlreadyHandled are cleared`() =
+        runTest {
+            val today = LocalDate.now()
+            val oldSettings = budget(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                startDate = today.minusDays(20),
+                endDate = today.plusDays(10),
+            )
+            coEvery { budgetRepository.getBudgetSettingsSync() } returns oldSettings
+            coEvery { budgetRepository.getTransactions() } returns flowOf(emptyList())
+            userSettings = userSettings.copy(
+                currentPeriodId = 42L,
+                currentPeriodStartedAt = 1L,
+                earlyFinishActive = true,
+                earlyFinishActualDate = 123L,
+                periodEndAlreadyHandled = true,
+            )
+
+            val newSettings = budget(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                startDate = today,
+                endDate = today.plusDays(27),
+            )
+            periodManager.persistBudgetSettings(newSettings, forceNewPeriodBoundary = false)
+
+            assertThat(userSettings.earlyFinishActive).isFalse()
+            assertThat(userSettings.periodEndAlreadyHandled).isFalse()
         }
 }

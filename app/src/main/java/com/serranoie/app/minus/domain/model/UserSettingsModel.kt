@@ -7,6 +7,7 @@ data class UserSettings(
     val earlyFinishActive: Boolean = false,
     val earlyFinishActualDate: Long = 0L,
     val earlyFinishOriginalEndDate: Long = 0L,
+    val periodEndAlreadyHandled: Boolean = false,
     val currentPeriodStartedAt: Long = 0L,
     val currentPeriodId: Long = 0L,
     val notificationHour: Int = DEFAULT_NOTIFICATION_HOUR,

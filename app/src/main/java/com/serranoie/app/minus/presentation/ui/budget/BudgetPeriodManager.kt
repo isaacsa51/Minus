@@ -115,7 +115,6 @@ class BudgetPeriodManager @Inject constructor(
             settings
         }
 
-        clearEarlyFinishState()
         val previousPeriodId = userSettings.currentPeriodId
 
         if (isNewPeriodBoundary && previousSettings != null && previousPeriodId != 0L) {
@@ -158,6 +157,8 @@ class BudgetPeriodManager @Inject constructor(
         }
         if (isNewPeriodBoundary) {
             settingsRepository.clearLastPeriodSnapshot()
+            settingsRepository.setPeriodEndAlreadyHandled(false)
+            clearEarlyFinishState()
         }
 
         if (isNewPeriodBoundary) {
