@@ -47,6 +47,7 @@ const val CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME = "category_picker_direct_popup_
 const val CATEGORY_GRID_MODE_KEY_NAME = "category_grid_mode_enabled"
 const val RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME = "recurrent_payments_view_mode"
 const val EARLY_FINISH_ACTIVE_KEY_NAME = "early_finish_active"
+const val PERIOD_END_ALREADY_HANDLED_KEY_NAME = "period_end_already_handled"
 const val EARLY_FINISH_ACTUAL_DATE_KEY_NAME = "early_finish_actual_date_millis"
 const val EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME = "early_finish_original_end_date_millis"
 const val CURRENT_PERIOD_STARTED_AT_KEY_NAME = "current_period_started_at_millis"
@@ -64,6 +65,7 @@ const val ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME = "analytics_spends_tutor
 
 private val ONBOARDING_COMPLETED = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NAME)
 private val EARLY_FINISH_ACTIVE = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
+private val PERIOD_END_ALREADY_HANDLED = booleanPreferencesKey(PERIOD_END_ALREADY_HANDLED_KEY_NAME)
 private val EARLY_FINISH_ACTUAL_DATE = longPreferencesKey(EARLY_FINISH_ACTUAL_DATE_KEY_NAME)
 private val EARLY_FINISH_ORIGINAL_END_DATE =
     longPreferencesKey(EARLY_FINISH_ORIGINAL_END_DATE_KEY_NAME)
@@ -131,6 +133,7 @@ class SettingsRepositoryImpl @Inject constructor(
             UserSettings(
                 onboardingCompleted = preferences[ONBOARDING_COMPLETED] ?: false,
                 earlyFinishActive = preferences[EARLY_FINISH_ACTIVE] ?: false,
+                periodEndAlreadyHandled = preferences[PERIOD_END_ALREADY_HANDLED] ?: false,
                 earlyFinishActualDate = preferences[EARLY_FINISH_ACTUAL_DATE] ?: 0L,
                 earlyFinishOriginalEndDate = preferences[EARLY_FINISH_ORIGINAL_END_DATE] ?: 0L,
                 currentPeriodStartedAt = preferences[CURRENT_PERIOD_STARTED_AT] ?: 0L,
@@ -240,6 +243,12 @@ class SettingsRepositoryImpl @Inject constructor(
             preferences[EARLY_FINISH_ACTIVE] = active
             preferences[EARLY_FINISH_ACTUAL_DATE] = actualDate
             preferences[EARLY_FINISH_ORIGINAL_END_DATE] = originalEndDate
+        }
+    }
+
+    override suspend fun setPeriodEndAlreadyHandled(handled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PERIOD_END_ALREADY_HANDLED] = handled
         }
     }
 

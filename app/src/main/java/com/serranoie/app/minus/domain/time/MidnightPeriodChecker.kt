@@ -78,6 +78,8 @@ class MidnightPeriodChecker @Inject constructor(
             return
         }
 
+        settingsRepository.setPeriodEndAlreadyHandled(true)
+
         if (endingPeriodState.remainingAmount <= BigDecimal.ZERO) {
             val daysInPeriod =
                 ChronoUnit.DAYS.between(settings.startDate, settings.getPeriodEndDate()) + 1
@@ -141,7 +143,9 @@ class MidnightPeriodChecker @Inject constructor(
         val transitionOccurred = settingsRepository.observeMidnightTransitionOccurred().first()
         val today = LocalDate.now()
 
-        if (settingsRepository.getSettings().earlyFinishActive) {
+        val userSettings = settingsRepository.getSettings()
+
+        if (userSettings.earlyFinishActive || userSettings.periodEndAlreadyHandled) {
             if (transitionOccurred) {
                 settingsRepository.setMidnightTransitionOccurred(false)
             }

@@ -54,8 +54,13 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
                     return@launch
                 }
 
-                if (settingsRepository.getSettings().earlyFinishActive) {
+                val userSettings = settingsRepository.getSettings()
+                if (userSettings.earlyFinishActive) {
                     logcat { "Period was already finished early, skipping midnight transition" }
+                    return@launch
+                }
+                if (userSettings.periodEndAlreadyHandled) {
+                    logcat { "Period end already handled, skipping duplicate notification" }
                     return@launch
                 }
 

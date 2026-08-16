@@ -26,6 +26,8 @@ interface SettingsRepository {
 
     suspend fun setEarlyFinishActive(active: Boolean, actualDate: Long, originalEndDate: Long)
 
+    suspend fun setPeriodEndAlreadyHandled(handled: Boolean)
+
     suspend fun setCurrentPeriod(periodId: Long, startedAt: Long)
 
     suspend fun setCurrentPeriodRollover(amount: BigDecimal, carryForward: Boolean)

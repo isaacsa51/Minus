@@ -152,4 +152,58 @@ class MidnightPeriodCheckerTest {
         assertThat(data?.remainingAmount).isEqualTo(BigDecimal("-50.00"))
         assertThat(data?.totalSpent).isEqualTo(BigDecimal("1050.00"))
     }
+
+    @Test
+    fun `when a period end was already surfaced then it is never re-flagged as ended, even past the schedule`() = runTest {
+        val originalEndDate = LocalDate.now().minusDays(5)
+        stubEndDate(originalEndDate)
+        coEvery { settingsRepository.observeMidnightTransitionOccurred() } returns flowOf(false)
+        coEvery { settingsRepository.getSettings() } returns UserSettings.DEFAULT.copy(
+            earlyFinishActive = false,
+            periodEndAlreadyHandled = true,
+        )
+
+        val state = checker.resolveEndingPeriodState()
+
+        assertThat(state.shouldHandleEndingPeriod).isFalse()
+    }
+
+    @Test
+    fun `when a natural end is processed then periodEndAlreadyHandled is marked so the next app foreground won't re-trigger it`() = runTest {
+        val originalEndDate = LocalDate.now().minusDays(1)
+        stubEndDate(originalEndDate)
+        coEvery { settingsRepository.observeMidnightTransitionOccurred() } returns flowOf(false)
+        coEvery { settingsRepository.getSettings() } returns UserSettings.DEFAULT.copy(
+            earlyFinishActive = false,
+            periodEndAlreadyHandled = false,
+        )
+        coEvery { budgetRepository.getTransactions() } returns flowOf(emptyList())
+
+        checker.handleEndingPeriod()
+
+        coVerify { settingsRepository.setPeriodEndAlreadyHandled(true) }
+    }
+
+    @Test
+    fun `when the period ended over budget then it is also marked as already handled`() = runTest {
+        val originalEndDate = LocalDate.now().minusDays(1)
+        stubEndDate(originalEndDate)
+        coEvery { settingsRepository.observeMidnightTransitionOccurred() } returns flowOf(false)
+        coEvery { settingsRepository.getSettings() } returns UserSettings.DEFAULT.copy(
+            earlyFinishActive = false,
+            periodEndAlreadyHandled = false,
+        )
+        coEvery { budgetRepository.getTransactions() } returns flowOf(
+            listOf(
+                Transaction.create(
+                    amount = BigDecimal("1050.00"),
+                    date = originalEndDate.minusDays(5).atStartOfDay(),
+                )
+            )
+        )
+
+        checker.handleEndingPeriod()
+
+        coVerify { settingsRepository.setPeriodEndAlreadyHandled(true) }
+    }
 }
