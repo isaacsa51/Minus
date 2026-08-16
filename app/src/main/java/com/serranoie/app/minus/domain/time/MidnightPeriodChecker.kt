@@ -87,7 +87,7 @@ class MidnightPeriodChecker @Inject constructor(
                 periodEndDate = lastPeriodEndDate,
                 totalBudget = settings.totalBudget,
                 remainingAmount = endingPeriodState.remainingAmount,
-                totalSpent = settings.totalBudget,
+                totalSpent = settings.totalBudget.subtract(endingPeriodState.remainingAmount),
                 currencyCode = settings.currencyCode,
                 shouldNavigateToAnalyticsOnly = true,
             )
@@ -100,11 +100,7 @@ class MidnightPeriodChecker @Inject constructor(
             ChronoUnit.DAYS.between(settings.startDate, settings.getPeriodEndDate()) + 1
         val periodStartDate = lastPeriodEndDate.minusDays(daysInPeriod - 1)
 
-        val totalSpent = if (endingPeriodState.transitionOccurred) {
-            settings.totalBudget.subtract(endingPeriodState.remainingAmount)
-        } else {
-            settings.totalBudget
-        }
+        val totalSpent = settings.totalBudget.subtract(endingPeriodState.remainingAmount)
 
         when (settings.remainingBudgetStrategy) {
             RemainingBudgetStrategy.ASK_ALWAYS -> {
@@ -144,6 +140,18 @@ class MidnightPeriodChecker @Inject constructor(
     suspend fun resolveEndingPeriodState(): EndingPeriodState {
         val transitionOccurred = settingsRepository.observeMidnightTransitionOccurred().first()
         val today = LocalDate.now()
+
+        if (settingsRepository.getSettings().earlyFinishActive) {
+            if (transitionOccurred) {
+                settingsRepository.setMidnightTransitionOccurred(false)
+            }
+            return EndingPeriodState(
+                shouldHandleEndingPeriod = false,
+                transitionOccurred = false,
+                periodEndDate = null,
+                remainingAmount = BigDecimal.ZERO,
+            )
+        }
 
         val settings = budgetRepository.getBudgetSettingsSync()
         val settingsEndDate = settings?.getPeriodEndDate()
