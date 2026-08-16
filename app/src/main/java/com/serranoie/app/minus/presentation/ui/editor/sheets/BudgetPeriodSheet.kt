@@ -103,6 +103,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
+import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
@@ -532,6 +533,16 @@ private fun ViewBudgetContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        val remaining = totalBudget.subtract(totalSpent)
+        if (showFinishEarly && remaining > BigDecimal.ZERO && daysRemaining <= 3) {
+            RolloverPreviewBanner(
+                remainingAmount = remaining,
+                strategy = budgetSettings?.remainingBudgetStrategy ?: RemainingBudgetStrategy.ASK_ALWAYS,
+                currencyFormat = currencyFormat,
+                modifier = Modifier.padding(bottom = 12.dp),
+            )
+        }
+
         if (showFinishEarly) {
             OutlinedButton(
                 onClick = onFinishEarlyClick,
@@ -552,6 +563,54 @@ private fun ViewBudgetContent(
                     lineHeight = TextUnit(0.925f, TextUnitType.Em),
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun RolloverPreviewBanner(
+    remainingAmount: BigDecimal,
+    strategy: RemainingBudgetStrategy,
+    currencyFormat: NumberFormat,
+    modifier: Modifier = Modifier,
+) {
+    val message = when (strategy) {
+        RemainingBudgetStrategy.SPLIT_EQUALLY -> stringResource(
+            R.string.rollover_preview_split_equally,
+            currencyFormat.format(remainingAmount),
+        )
+
+        RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> stringResource(
+            R.string.rollover_preview_add_to_first_day,
+            currencyFormat.format(remainingAmount),
+        )
+
+        RemainingBudgetStrategy.ASK_ALWAYS -> stringResource(
+            R.string.rollover_preview_ask_always,
+            currencyFormat.format(remainingAmount),
+        )
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.16f)),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.size(20.dp),
+            )
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmallCondensed,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
         }
     }
 }

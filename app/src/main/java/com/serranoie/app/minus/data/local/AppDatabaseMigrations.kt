@@ -75,4 +75,14 @@ object AppDatabaseMigrations {
             )
         }
     }
+
+    val MIGRATION_13_14: Migration = object : Migration(13, 14) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // rollOverLimit was a domain-only field on BudgetSettings that was
+            // never persisted -- it round-tripped to null on every save/reload,
+            // silently dropping the "crossed out previous total" rollover display
+            // as soon as anything re-read budget_settings from disk.
+            db.execSQL("ALTER TABLE budget_settings ADD COLUMN rollOverLimit TEXT")
+        }
+    }
 }
