@@ -98,6 +98,9 @@
     <string name="finalize_period">Finalizar periodo de ahorro temprano</string>
     <string name="finalize_period_confirm">Esto cerrará el período actual y comenzará uno nuevo. ¿Está seguro?</string>
     <string name="finalize_action">Finalizar</string>
+    <string name="rollover_preview_split_equally">Te quedan %1$s sin gastar. Cuando termine este período, se repartirán entre todos los días de tu próximo presupuesto.</string>
+    <string name="rollover_preview_add_to_first_day">Te quedan %1$s sin gastar. Cuando termine este período, se añadirán al primer día de tu próximo presupuesto.</string>
+    <string name="rollover_preview_ask_always">Te quedan %1$s sin gastar. Se te preguntará qué hacer con ellos cuando termine este período.</string>
     <string name="no_ending_date">Sin fecha de finalización</string>
     <string name="budget_split_logic">¿Cómo quieres dividir el presupuesto?</string>
     <string name="new_budget_period">Nuevo período de ahorro</string>

@@ -98,6 +98,9 @@
     <string name="finalize_period">Budgetzeitraum frühzeitig abschließen</string>
     <string name="finalize_period_confirm">Dies wird den aktuellen Zeitraum schließen und einen neuen starten. Bist du sicher?</string>
     <string name="finalize_action">Abschließen</string>
+    <string name="rollover_preview_split_equally">Dir sind noch %1$s ungenutzt. Wenn dieser Zeitraum endet, wird der Betrag auf jeden Tag deines nächsten Budgets verteilt.</string>
+    <string name="rollover_preview_add_to_first_day">Dir sind noch %1$s ungenutzt. Wenn dieser Zeitraum endet, wird der Betrag dem ersten Tag deines nächsten Budgets hinzugefügt.</string>
+    <string name="rollover_preview_ask_always">Dir sind noch %1$s ungenutzt. Du wirst gefragt, was damit geschehen soll, wenn dieser Zeitraum endet.</string>
     <string name="no_ending_date">Kein Enddatum</string>
     <string name="budget_split_logic">Wie möchtest du das Budget aufteilen?</string>
     <string name="new_budget_period">Neuer Budgetzeitraum</string>

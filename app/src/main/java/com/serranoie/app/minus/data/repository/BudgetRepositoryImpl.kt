@@ -124,6 +124,7 @@ class BudgetRepositoryImpl @Inject constructor(
             daysInPeriod = this.daysInPeriod,
             rollOverEnabled = this.rollOverEnabled,
             rollOverCarryForward = this.rollOverCarryForward,
+            rollOverLimit = this.rollOverLimit?.let { BigDecimal(it) },
             remainingBudgetStrategy = try {
                 RemainingBudgetStrategy.valueOf(this.remainingBudgetStrategy)
             } catch (_: Exception) {
@@ -151,6 +152,7 @@ class BudgetRepositoryImpl @Inject constructor(
             daysInPeriod = this.daysInPeriod,
             rollOverEnabled = this.rollOverEnabled,
             rollOverCarryForward = this.rollOverCarryForward,
+            rollOverLimit = this.rollOverLimit?.toPlainString(),
             remainingBudgetStrategy = this.remainingBudgetStrategy.name,
             creditCardCutoffDay = this.creditCardCutoffDay,
             splitMode = this.splitMode.name

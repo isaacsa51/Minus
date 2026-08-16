@@ -2,6 +2,7 @@ package com.serranoie.app.minus.domain.time
 
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -209,6 +210,34 @@ class MidnightPeriodChecker @Inject constructor(
 
     fun onBudgetSetupHandled() {
         _needsBudgetSetup.value = false
+    }
+
+    suspend fun handleEarlyFinish(settings: BudgetSettings, remainingAmount: BigDecimal) {
+        if (remainingAmount <= BigDecimal.ZERO) return
+
+        when (settings.remainingBudgetStrategy) {
+            RemainingBudgetStrategy.ASK_ALWAYS -> {
+                _midnightTransitionData.value = MidnightTransitionData(
+                    periodStartDate = settings.startDate,
+                    periodEndDate = LocalDate.now(),
+                    totalBudget = settings.totalBudget,
+                    remainingAmount = remainingAmount,
+                    totalSpent = settings.totalBudget.subtract(remainingAmount),
+                    currencyCode = settings.currencyCode,
+                )
+                _shouldShowTransitionDialog.value = true
+                logcat { "Early finish detected, asking user for rollover strategy" }
+            }
+
+            RemainingBudgetStrategy.SPLIT_EQUALLY,
+            RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> {
+                enqueuePendingRollover(
+                    strategy = settings.remainingBudgetStrategy,
+                    remainingAmount = remainingAmount,
+                )
+                logcat { "Early finish detected, queued pending rollover amount=$remainingAmount strategy=${settings.remainingBudgetStrategy}" }
+            }
+        }
     }
 
     suspend fun rollRemainingSplitEqually() {
