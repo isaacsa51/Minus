@@ -134,6 +134,7 @@ const val BUDGET_PERIOD_STRATEGY_ROW_TAG = "BudgetPeriodSheet.StrategyRow"
 const val BUDGET_PERIOD_CURRENCY_ROW_TAG = "BudgetPeriodSheet.CurrencyRow"
 const val BUDGET_PERIOD_SPLIT_TOGGLE_ROW_TAG = "BudgetPeriodSheet.SplitToggleRow"
 const val BUDGET_PERIOD_SPLIT_MODE_ROW_TAG = "BudgetPeriodSheet.SplitModeRow"
+const val BUDGET_PERIOD_ROLLOVER_PREVIEW_BANNER_TAG = "BudgetPeriodSheet.RolloverPreviewBanner"
 
 fun budgetPeriodCardTag(period: BudgetPeriod) = "BudgetPeriodSheet.Period.${period.name}"
 fun budgetPeriodToggleTag(period: BudgetPeriod) = "BudgetPeriodSheet.SplitToggle.${period.name}"
@@ -539,7 +540,9 @@ private fun ViewBudgetContent(
                 remainingAmount = remaining,
                 strategy = budgetSettings?.remainingBudgetStrategy ?: RemainingBudgetStrategy.ASK_ALWAYS,
                 currencyFormat = currencyFormat,
-                modifier = Modifier.padding(bottom = 12.dp),
+                modifier = Modifier
+                    .padding(bottom = 12.dp)
+                    .testTag(BUDGET_PERIOD_ROLLOVER_PREVIEW_BANNER_TAG),
             )
         }
 
