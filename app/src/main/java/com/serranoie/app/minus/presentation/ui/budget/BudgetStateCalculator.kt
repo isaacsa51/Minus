@@ -51,7 +51,7 @@ class BudgetStateCalculator @Inject constructor(
         val daysRemaining = ChronoUnit.DAYS.between(currentDate, periodEnd).toInt() + 1
         val originalTotalDays = ChronoUnit.DAYS.between(settings.startDate, periodEnd).toInt() + 1
 
-        val activeTransactions = transactions.filter { !it.isDeleted }
+        val activeTransactions = transactions.filter { !it.isDeleted && !it.isRecurrent }
         val totalExpensesInPeriod = activeTransactions.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
         val totalIncomeInPeriod = activeTransactions.filter { it.amount < BigDecimal.ZERO }.sumOf { it.amount }.abs()
 
@@ -202,7 +202,7 @@ class BudgetStateCalculator @Inject constructor(
         val blockStart = budgetStart.plusDays(currentBlockIndex * blockDays)
         val blockEnd = blockStart.plusDays(blockDays.toLong() - 1)
 
-        return transactions.filter { !it.isDeleted }
+        return transactions.filter { !it.isDeleted && !it.isRecurrent }
             .filter {
                 val txDate = it.date?.toLocalDate()
                 txDate != null && !txDate.isBefore(blockStart) && !txDate.isAfter(blockEnd)
