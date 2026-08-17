@@ -230,6 +230,35 @@ class BudgetStateCalculatorTest {
         )
 
         assertThat(result.totalSpentToday).isEqualTo(BigDecimal("15.00"))
+        assertThat(result.totalSpentInPeriod).isEqualTo(BigDecimal("15.00"))
+    }
+
+    @Test
+    fun `a recurring templates own row never counts toward period totals, only its projection or a materialized transaction does`() {
+        val today = LocalDate.of(2026, 3, 15)
+        val recurringTemplate = Transaction(
+            id = 1L,
+            amount = BigDecimal("15.00"),
+            comment = "Netflix",
+            date = LocalDate.of(2026, 3, 1).atStartOfDay(),
+            periodId = 5L,
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.MONTHLY,
+            subscriptionDay = 15,
+        )
+
+        val result = calculator.calculateBudgetState(
+            settings = settings(
+                totalBudget = BigDecimal("1000"),
+                start = LocalDate.of(2026, 3, 1),
+                end = LocalDate.of(2026, 3, 31),
+            ),
+            transactions = listOf(recurringTemplate),
+            currentDate = today,
+        )
+
+        assertThat(result.totalSpentInPeriod).isEqualTo(BigDecimal("15.00"))
+        assertThat(result.totalSpentToday).isEqualTo(BigDecimal("15.00"))
     }
 
     @Test
