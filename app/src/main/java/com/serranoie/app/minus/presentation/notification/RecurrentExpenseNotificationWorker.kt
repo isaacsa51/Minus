@@ -86,6 +86,7 @@ class RecurrentExpenseNotificationWorker(
                     today = today,
                     notificationHelper = notificationHelper,
                     settingsRepository = settingsRepository,
+                    budgetRepository = budgetRepository,
                 )
                 notificationScheduler.scheduleRecurrentExpenseNotification(transaction)
                 return Result.success()
@@ -157,10 +158,18 @@ class RecurrentExpenseNotificationWorker(
         today: LocalDate,
         notificationHelper: NotificationHelper,
         settingsRepository: SettingsRepository,
+        budgetRepository: BudgetRepository,
     ) {
         val frequency = transaction.recurrentFrequency ?: return
         if (!isDueToday(transaction, today, frequency)) {
             logcat { "Recurrent notification worker fired but transaction is not due today: transactionId=${transaction.id} today=$today" }
+            return
+        }
+
+        val stableId = transaction.sourceTransactionId ?: transaction.id
+        val paidDates = budgetRepository.getPaidOccurrenceDatesFor(stableId)
+        if (paidDates.contains(today)) {
+            logcat { "Recurrent notification worker fired but today's occurrence is already marked paid: transactionId=${transaction.id} today=$today" }
             return
         }
 

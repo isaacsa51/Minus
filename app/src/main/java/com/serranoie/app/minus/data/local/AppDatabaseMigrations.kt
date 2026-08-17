@@ -78,11 +78,22 @@ object AppDatabaseMigrations {
 
     val MIGRATION_13_14: Migration = object : Migration(13, 14) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            // rollOverLimit was a domain-only field on BudgetSettings that was
-            // never persisted -- it round-tripped to null on every save/reload,
-            // silently dropping the "crossed out previous total" rollover display
-            // as soon as anything re-read budget_settings from disk.
             db.execSQL("ALTER TABLE budget_settings ADD COLUMN rollOverLimit TEXT")
+        }
+    }
+
+    val MIGRATION_14_15: Migration = object : Migration(14, 15) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `paid_recurrent_occurrences` (
+                    `transactionId` INTEGER NOT NULL,
+                    `occurrenceDateEpochDay` INTEGER NOT NULL,
+                    `paidAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`transactionId`, `occurrenceDateEpochDay`)
+                )
+                """.trimIndent()
+            )
         }
     }
 }

@@ -50,6 +50,7 @@ class NotificationScheduler @Inject constructor(
         private const val MIDNIGHT_ALARM_REQUEST_CODE = 5002
         const val ACTION_MIDNIGHT_PERIOD_CHECK =
             "com.serranoie.app.minus.action.MIDNIGHT_PERIOD_CHECK"
+        private const val MAX_OCCURRENCE_LOOKUP_ITERATIONS = 500
     }
 
     private val workManager by lazy { WorkManager.getInstance(context) }
@@ -231,7 +232,7 @@ class NotificationScheduler @Inject constructor(
         logcat { "Cancelled recurrent notification work: workName=$workName transactionId=${transaction.id}" }
     }
 
-    private fun scheduleRecurrentExpenseNotification(
+    private suspend fun scheduleRecurrentExpenseNotification(
         transaction: Transaction,
         notificationTime: Pair<Int, Int>,
     ) {
@@ -240,8 +241,11 @@ class NotificationScheduler @Inject constructor(
             return
         }
 
+        val stableId = transaction.sourceTransactionId ?: transaction.id
+        val paidDates = budgetRepository.getPaidOccurrenceDatesFor(stableId)
+
         val nextRunDateTime =
-            nextOccurrenceDateTime(transaction, LocalDateTime.now(), notificationTime) ?: run {
+            nextOccurrenceDateTime(transaction, LocalDateTime.now(), notificationTime, paidDates) ?: run {
                 cancelRecurrentExpenseNotification(transaction)
                 logcat { "No future recurrent notification to schedule for transactionId=${transaction.id}" }
                 return
@@ -288,39 +292,51 @@ class NotificationScheduler @Inject constructor(
         transaction: Transaction,
         now: LocalDateTime,
         notificationTime: Pair<Int, Int>,
+        paidDates: Set<LocalDate> = emptySet(),
     ): LocalDateTime? {
         val startDate = transaction.date?.toLocalDate() ?: return null
         val frequency = transaction.recurrentFrequency ?: return null
         val endDate = transaction.recurrentEndDate?.toLocalDate()
+        val billingDay = transaction.subscriptionDay ?: startDate.dayOfMonth
+
+        fun advance(from: LocalDate): LocalDate = when (frequency) {
+            RecurrentFrequency.WEEKLY -> from.plusWeeks(1)
+            RecurrentFrequency.BIWEEKLY -> from.plusWeeks(2)
+            RecurrentFrequency.MONTHLY -> nextMonthlyOccurrence(
+                startDate = startDate,
+                today = from.plusDays(1),
+                subscriptionDay = billingDay,
+            )
+        }
+
         var occurrenceDate = when (frequency) {
             RecurrentFrequency.WEEKLY -> nextSteppedOccurrence(startDate, now.toLocalDate(), 7)
             RecurrentFrequency.BIWEEKLY -> nextSteppedOccurrence(startDate, now.toLocalDate(), 14)
             RecurrentFrequency.MONTHLY -> nextMonthlyOccurrence(
                 startDate = startDate,
                 today = now.toLocalDate(),
-                subscriptionDay = transaction.subscriptionDay ?: startDate.dayOfMonth,
+                subscriptionDay = billingDay,
             )
         }
         var triggerDateTime = LocalDateTime.of(
             occurrenceDate,
             LocalTime.of(notificationTime.first, notificationTime.second)
         )
-        if (!triggerDateTime.isAfter(now)) {
-            occurrenceDate = when (frequency) {
-                RecurrentFrequency.WEEKLY -> occurrenceDate.plusWeeks(1)
-                RecurrentFrequency.BIWEEKLY -> occurrenceDate.plusWeeks(2)
-                RecurrentFrequency.MONTHLY -> nextMonthlyOccurrence(
-                    startDate = startDate,
-                    today = occurrenceDate.plusDays(1),
-                    subscriptionDay = transaction.subscriptionDay ?: startDate.dayOfMonth,
-                )
-            }
+
+        var iterations = 0
+        while ((!triggerDateTime.isAfter(now) || paidDates.contains(occurrenceDate)) &&
+            iterations < MAX_OCCURRENCE_LOOKUP_ITERATIONS
+        ) {
+            occurrenceDate = advance(occurrenceDate)
             triggerDateTime = LocalDateTime.of(
                 occurrenceDate,
                 LocalTime.of(notificationTime.first, notificationTime.second)
             )
+            iterations++
         }
+
         if (endDate != null && occurrenceDate.isAfter(endDate)) return null
+        if (paidDates.contains(occurrenceDate)) return null
         return triggerDateTime
     }
 

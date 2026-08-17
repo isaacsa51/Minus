@@ -15,27 +15,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.RecurrentPaymentsDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableUpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
-import java.text.NumberFormat
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.serranoie.app.minus.domain.model.RecurrentFrequency
-import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import java.math.BigDecimal
+import java.text.NumberFormat
 import java.time.LocalDate
+import java.time.LocalTime
 
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -98,7 +98,17 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
                             isExpanded = expandedTransactionId == item.transaction.id,
                             onDelete = { onDelete(item.transaction) },
                             onEdit = { onEdit(item.transaction) },
-                            onMarkAsPaid = { onMarkAsPaid(item.transaction) },
+                            onMarkAsPaid = {
+                                onMarkAsPaid(
+                                    item.transaction.copy(
+                                        date = item.nextChargeDate.atTime(
+                                            item.transaction.date?.toLocalTime() ?: LocalTime.MIDNIGHT
+                                        ),
+                                        sourceTransactionId = item.transaction.sourceTransactionId
+                                            ?: item.transaction.id,
+                                    )
+                                )
+                            },
                             onClick = { onClick(item.transaction) },
                             creditCardCutoffDay = creditCardCutoffDay,
                         )

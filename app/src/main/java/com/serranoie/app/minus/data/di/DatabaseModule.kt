@@ -7,6 +7,7 @@ import com.serranoie.app.minus.data.local.AppDatabaseMigrations
 import com.serranoie.app.minus.data.local.dao.ArchivedBudgetDao
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
+import com.serranoie.app.minus.data.local.dao.PaidRecurrentOccurrenceDao
 import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import dagger.Module
@@ -37,6 +38,7 @@ object DatabaseModule {
             .addMigrations(AppDatabaseMigrations.MIGRATION_11_12)
             .addMigrations(AppDatabaseMigrations.MIGRATION_12_13)
             .addMigrations(AppDatabaseMigrations.MIGRATION_13_14)
+            .addMigrations(AppDatabaseMigrations.MIGRATION_14_15)
             .build()
     }
 
@@ -63,5 +65,10 @@ object DatabaseModule {
     @Provides
     fun provideQueuedTransactionDao(database: AppDatabase): QueuedTransactionDao {
         return database.queuedTransactionDao()
+    }
+
+    @Provides
+    fun providePaidRecurrentOccurrenceDao(database: AppDatabase): PaidRecurrentOccurrenceDao {
+        return database.paidRecurrentOccurrenceDao()
     }
 }

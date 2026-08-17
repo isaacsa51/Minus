@@ -5,6 +5,8 @@ import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import org.junit.Test
 import java.math.BigDecimal
@@ -51,9 +53,6 @@ class BudgetStateCalculatorTest {
 
     @Test
     fun `static split - daily budget ignores how much was spent and how many days are left`() {
-        // The static formula is fixed: it's always totalBudget / totalDays,
-        // regardless of remaining days or spending. So the same totalBudget
-        // and totalDays produce the same dailyBudget no matter what.
         val baseSettings = settings(
             totalBudget = BigDecimal("2000"),
             start = LocalDate.of(2026, 7, 1),
@@ -128,12 +127,6 @@ class BudgetStateCalculatorTest {
         )
         assertThat(day2.dailyBudget).isEqualTo(BigDecimal("693.77"))
 
-        // The key invariant: the daily amount INCREASES when the user
-        // doesn't spend and a day rolls over. This is the intended
-        // behavior of the DYNAMIC split mode (and the source of the
-        // user's confusion: "why is it more if I didn't spend
-        // yesterday?"). The fix is to make the top-bar pill use the
-        // same formula so it doesn't appear stuck.
         assertThat(day2.dailyBudget).isGreaterThan(day1.dailyBudget)
     }
 
@@ -154,7 +147,6 @@ class BudgetStateCalculatorTest {
 
     @Test
     fun `dynamic split - daily budget is zero when the remaining balance is non-positive`() {
-        // Over budget, don't show a negative daily.
         val result = calculator.calculateBudgetState(
             settings = settings(
                 totalBudget = BigDecimal("1000"),
@@ -203,4 +195,68 @@ class BudgetStateCalculatorTest {
         date = date.atTime(12, 0),
         periodId = 1L,
     )
+
+    @Test
+    fun `marking a recurring occurrence paid on its due date does not double-count todays spend`() {
+        val today = LocalDate.of(2026, 3, 15)
+        val recurringTemplate = Transaction(
+            id = 1L,
+            amount = BigDecimal("15.00"),
+            comment = "Netflix",
+            date = LocalDate.of(2026, 3, 1).atStartOfDay(),
+            periodId = 5L,
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.MONTHLY,
+            subscriptionDay = 15,
+        )
+        val materializedFromMarkAsPaid = Transaction(
+            id = 2L,
+            amount = BigDecimal("15.00"),
+            comment = "Netflix",
+            date = today.atStartOfDay(),
+            periodId = 5L,
+            isRecurrent = false,
+        )
+
+        val result = calculator.calculateBudgetState(
+            settings = settings(
+                totalBudget = BigDecimal("1000"),
+                start = LocalDate.of(2026, 3, 1),
+                end = LocalDate.of(2026, 3, 31),
+            ),
+            transactions = listOf(recurringTemplate, materializedFromMarkAsPaid),
+            currentDate = today,
+            paidOccurrences = setOf(PaidRecurrentOccurrence(transactionId = 1L, occurrenceDate = today)),
+        )
+
+        assertThat(result.totalSpentToday).isEqualTo(BigDecimal("15.00"))
+    }
+
+    @Test
+    fun `an unpaid recurring occurrence still counts as projected spend today`() {
+        val today = LocalDate.of(2026, 3, 15)
+        val recurringTemplate = Transaction(
+            id = 1L,
+            amount = BigDecimal("15.00"),
+            comment = "Netflix",
+            date = LocalDate.of(2026, 3, 1).atStartOfDay(),
+            periodId = 5L,
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.MONTHLY,
+            subscriptionDay = 15,
+        )
+
+        val result = calculator.calculateBudgetState(
+            settings = settings(
+                totalBudget = BigDecimal("1000"),
+                start = LocalDate.of(2026, 3, 1),
+                end = LocalDate.of(2026, 3, 31),
+            ),
+            transactions = listOf(recurringTemplate),
+            currentDate = today,
+            paidOccurrences = emptySet(),
+        )
+
+        assertThat(result.totalSpentToday).isEqualTo(BigDecimal("15.00"))
+    }
 }

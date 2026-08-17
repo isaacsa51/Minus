@@ -8,6 +8,7 @@ import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.CreditCard
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.calculatePaymentDueDate
@@ -112,7 +113,8 @@ class BudgetViewModel @Inject constructor(
         numpadController.isCalculation,
         numpadController.dragProgress,
         editorStateController.state,
-        budgetRepository.getActiveCategories()
+        budgetRepository.getActiveCategories(),
+        budgetRepository.getPaidRecurrentOccurrences()
     ) { params ->
         val settings = params[0] as BudgetSettings?
         val transactions = params[1] as List<Transaction>
@@ -124,6 +126,8 @@ class BudgetViewModel @Inject constructor(
         val dragProgress = params[7] as Float
         val editorState = params[8] as EditorLocalState
         val categories = params[9] as List<Category>
+        @Suppress("UNCHECKED_CAST")
+        val paidOccurrences = params[10] as Set<PaidRecurrentOccurrence>
 
         val settingsWithRollover = settings?.copy(
             rollOverLimit = if (rolloverAmount > BigDecimal.ZERO) rolloverAmount else null,
@@ -137,7 +141,7 @@ class BudgetViewModel @Inject constructor(
                 currentPeriodId = currentPeriodId,
                 currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             )
-            budgetStateCalculator.calculateBudgetState(s, periodTransactions, LocalDate.now())
+            budgetStateCalculator.calculateBudgetState(s, periodTransactions, LocalDate.now(), paidOccurrences)
         }
 
         val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }.sumOf { it.amount }

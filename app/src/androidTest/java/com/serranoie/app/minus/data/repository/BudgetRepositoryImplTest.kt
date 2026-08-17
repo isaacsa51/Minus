@@ -47,6 +47,7 @@ class BudgetRepositoryImplTest {
             archivedBudgetDao = database.archivedBudgetDao(),
             categoryDao = database.categoryDao(),
             queuedTransactionDao = database.queuedTransactionDao(),
+            paidRecurrentOccurrenceDao = database.paidRecurrentOccurrenceDao(),
             budgetCalculator = BudgetCalculator(),
         )
     }

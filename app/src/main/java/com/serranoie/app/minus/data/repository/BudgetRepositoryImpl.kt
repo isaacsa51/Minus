@@ -5,11 +5,13 @@ import com.serranoie.app.minus.data.local.AppDatabase
 import com.serranoie.app.minus.data.local.dao.ArchivedBudgetDao
 import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
+import com.serranoie.app.minus.data.local.dao.PaidRecurrentOccurrenceDao
 import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import com.serranoie.app.minus.data.local.entity.ArchivedBudgetEntity
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
 import com.serranoie.app.minus.data.local.entity.CategoryEntity
+import com.serranoie.app.minus.data.local.entity.PaidRecurrentOccurrenceEntity
 import com.serranoie.app.minus.data.local.entity.QueuedTransactionEntity
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
 import com.serranoie.app.minus.domain.calculator.BudgetCalculator
@@ -19,6 +21,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
@@ -40,6 +43,7 @@ class BudgetRepositoryImpl @Inject constructor(
     private val archivedBudgetDao: ArchivedBudgetDao,
     private val categoryDao: CategoryDao,
     private val queuedTransactionDao: QueuedTransactionDao,
+    private val paidRecurrentOccurrenceDao: PaidRecurrentOccurrenceDao,
     private val budgetCalculator: BudgetCalculator
 ) : BudgetRepository {
     private fun TransactionEntity.toDomain(): Transaction = Transaction(
@@ -270,6 +274,7 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun deleteTransaction(transaction: Transaction) {
         transactionDao.delete(transaction.toEntity())
+        paidRecurrentOccurrenceDao.deleteAllForTransaction(transaction.id)
     }
 
     override fun getSpentForDate(date: LocalDate): Flow<BigDecimal> {
@@ -375,6 +380,32 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun markTransactionAsPaid(transactionId: Long) {
         transactionDao.markTransactionAsPaid(transactionId)
+    }
+
+    override fun getPaidRecurrentOccurrences(): Flow<Set<PaidRecurrentOccurrence>> {
+        return paidRecurrentOccurrenceDao.getAllPaidOccurrences().map { entities ->
+            entities.map {
+                PaidRecurrentOccurrence(
+                    transactionId = it.transactionId,
+                    occurrenceDate = LocalDate.ofEpochDay(it.occurrenceDateEpochDay),
+                )
+            }.toSet()
+        }
+    }
+
+    override suspend fun markRecurrentOccurrencePaid(transactionId: Long, occurrenceDate: LocalDate) {
+        paidRecurrentOccurrenceDao.markPaid(
+            PaidRecurrentOccurrenceEntity(
+                transactionId = transactionId,
+                occurrenceDateEpochDay = occurrenceDate.toEpochDay(),
+            )
+        )
+    }
+
+    override suspend fun getPaidOccurrenceDatesFor(transactionId: Long): Set<LocalDate> {
+        return paidRecurrentOccurrenceDao.getPaidOccurrenceDatesFor(transactionId)
+            .map { LocalDate.ofEpochDay(it) }
+            .toSet()
     }
 
     override fun getArchivedBudgets(): Flow<List<ArchivedBudget>> {
