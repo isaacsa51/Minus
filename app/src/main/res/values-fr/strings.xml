@@ -97,6 +97,9 @@
     <string name="finalize_period">Finaliser la période budgétaire plus tôt</string>
     <string name="finalize_period_confirm">Cela clôturera la période actuelle et en commencera une nouvelle. Êtes-vous sûr ?</string>
     <string name="finalize_action">Finaliser</string>
+    <string name="rollover_preview_split_equally">Il vous reste %1$s non dépensés. À la fin de cette période, ce montant sera réparti sur chaque jour de votre prochain budget.</string>
+    <string name="rollover_preview_add_to_first_day">Il vous reste %1$s non dépensés. À la fin de cette période, ce montant sera ajouté au premier jour de votre prochain budget.</string>
+    <string name="rollover_preview_ask_always">Il vous reste %1$s non dépensés. On vous demandera quoi en faire à la fin de cette période.</string>
     <string name="no_ending_date">Pas de date de fin</string>
     <string name="budget_split_logic">Comment voulez-vous répartir le budget ?</string>
     <string name="new_budget_period">Nouvelle période budgétaire</string>
