@@ -97,6 +97,9 @@
     <string name="finalize_period">Completare il periodo di bilancio in anticipo</string>
     <string name="finalize_period_confirm">Questo chiuderà il periodo corrente e ne inizierà uno nuovo. Sei sicuro?</string>
     <string name="finalize_action">Finalizza</string>
+    <string name="rollover_preview_split_equally">You have %1$s left unspent. When this period ends, it will be spread across every day of your next budget.</string>
+    <string name="rollover_preview_add_to_first_day">You have %1$s left unspent. When this period ends, it will be added to the first day of your next budget.</string>
+    <string name="rollover_preview_ask_always">You have %1$s left unspent. You\'ll be asked what to do with it when this period ends.</string>
     <string name="no_ending_date">Nessuna data di fine</string>
     <string name="budget_split_logic">Come vuoi dividere il bilancio?</string>
     <string name="new_budget_period">Nuovo Periodo Bilancio</string>
