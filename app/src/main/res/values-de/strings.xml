@@ -97,6 +97,9 @@
     <string name="finalize_period">Budgetzeitraum frühzeitig abschließen</string>
     <string name="finalize_period_confirm">Dies wird den aktuellen Zeitraum schließen und einen neuen starten. Bist du sicher?</string>
     <string name="finalize_action">Abschließen</string>
+    <string name="rollover_preview_split_equally">Dir sind noch %1$s ungenutzt. Wenn dieser Zeitraum endet, wird der Betrag auf jeden Tag deines nächsten Budgets verteilt.</string>
+    <string name="rollover_preview_add_to_first_day">Dir sind noch %1$s ungenutzt. Wenn dieser Zeitraum endet, wird der Betrag dem ersten Tag deines nächsten Budgets hinzugefügt.</string>
+    <string name="rollover_preview_ask_always">Dir sind noch %1$s ungenutzt. Du wirst gefragt, was damit geschehen soll, wenn dieser Zeitraum endet.</string>
     <string name="no_ending_date">Kein Enddatum</string>
     <string name="budget_split_logic">Wie möchtest du das Budget aufteilen?</string>
     <string name="new_budget_period">Neuer Budgetzeitraum</string>
@@ -319,7 +322,6 @@
     <string name="bug_report_attachments_label_bug">Screenshots or recordings</string>
     <string name="bug_report_submit">Submit Report</string>
     <string name="bug_report_share_title">Send report</string>
-    <string name="bug_report_email_subject">%1$s</string>
     <string name="bug_report_email_body">Hi, attached is my generated Minus report.</string>
     <string name="bug_report_help_title">Help us make Minus better</string>
     <string name="bug_report_help_message_prefix">"Reporting issues or suggesting improvements helps us make Minus better for everyone.\n\nThis guided form helps you package all the necessary details into a report, automatically attaching device metadata and app diagnostics to speed up our investigation.\n\nOnce prepared, you can send the report via email or contribute via "</string>
@@ -362,6 +364,8 @@
     <string name="budget_pill_over_budget">Budget amount Exceeded</string>
     <string name="budget_pill_no_budget">No budget</string>
     <string name="budget_pill_no_budget_action">Set up your budget</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Wöchentlich</string>
     <string name="budget_pill_exhausted_biweekly_label">alle zwei Wochen</string>
@@ -486,6 +490,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>
     <string name="no_name">No name</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">Description</string>
     <string name="date">Datum</string>
     <string name="frequency">Häufigkeit</string>
@@ -563,7 +568,6 @@
     <string name="graph_granularity_biweek">Biweek</string>
     <string name="graph_granularity_month">Month</string>
     <string name="graph_granularity_total">Total</string>
-    <string name="budget_graph_page_indicator">%1$d / %2$d</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
 </resources>
