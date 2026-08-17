@@ -96,6 +96,9 @@
     <string name="finalize_period">예산 기간 조기 마감</string>
     <string name="finalize_period_confirm">현재 기간을 종료하고 새 기간을 시작합니다. 진행하시겠습니까?</string>
     <string name="finalize_action">마감하기</string>
+    <string name="rollover_preview_split_equally">You have %1$s left unspent. When this period ends, it will be spread across every day of your next budget.</string>
+    <string name="rollover_preview_add_to_first_day">You have %1$s left unspent. When this period ends, it will be added to the first day of your next budget.</string>
+    <string name="rollover_preview_ask_always">You have %1$s left unspent. You\'ll be asked what to do with it when this period ends.</string>
     <string name="no_ending_date">종료일 없음</string>
     <string name="budget_split_logic">예산을 어떻게 나누시겠습니까?</string>
     <string name="new_budget_period">새 예산 기간</string>
