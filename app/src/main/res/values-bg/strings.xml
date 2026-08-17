@@ -97,6 +97,9 @@
     <string name="finalize_period">Предсрочно приключване на бюджетния период</string>
     <string name="finalize_period_confirm">Това ще затвори текущия период и ще започне нов. Сигурни ли сте?</string>
     <string name="finalize_action">Приключи</string>
+    <string name="rollover_preview_split_equally">You have %1$s left unspent. When this period ends, it will be spread across every day of your next budget.</string>
+    <string name="rollover_preview_add_to_first_day">You have %1$s left unspent. When this period ends, it will be added to the first day of your next budget.</string>
+    <string name="rollover_preview_ask_always">You have %1$s left unspent. You\'ll be asked what to do with it when this period ends.</string>
     <string name="no_ending_date">Без крайна дата</string>
     <string name="budget_split_logic">Как искате да разделите бюджета?</string>
     <string name="new_budget_period">Нов бюджетен период</string>
