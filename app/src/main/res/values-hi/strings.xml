@@ -97,6 +97,9 @@
     <string name="finalize_period">बजट की अवधि जल्दी पूरी करें</string>
     <string name="finalize_period_confirm">इससे मौजूदा अवधि बंद हो जाएगी और नई अवधि शुरू होगी। क्या आप पक्का करना चाहते हैं?</string>
     <string name="finalize_action">पूरा करें</string>
+    <string name="rollover_preview_split_equally">You have %1$s left unspent. When this period ends, it will be spread across every day of your next budget.</string>
+    <string name="rollover_preview_add_to_first_day">You have %1$s left unspent. When this period ends, it will be added to the first day of your next budget.</string>
+    <string name="rollover_preview_ask_always">You have %1$s left unspent. You\'ll be asked what to do with it when this period ends.</string>
     <string name="no_ending_date">कोई समाप्ति तिथि नहीं</string>
     <string name="budget_split_logic">आप बजट को कैसे बांटना चाहते हैं?</string>
     <string name="new_budget_period">नया बजट समय-सीमा</string>
