@@ -21,6 +21,7 @@ sealed interface HistoryUiIntent {
     data class DeleteTransaction(val transaction: Transaction) : HistoryUiIntent
     data class SaveEditedTransaction(val transaction: Transaction) : HistoryUiIntent
     data class ConfirmDeleteRecurrent(val transaction: Transaction) : HistoryUiIntent
+    data class MarkTransactionAsPaid(val transaction: Transaction) : HistoryUiIntent
 
     data class SetLockSwipeable(val locked: Boolean) : HistoryUiIntent
 

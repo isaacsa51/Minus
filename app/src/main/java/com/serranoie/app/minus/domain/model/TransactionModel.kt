@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.domain.model
 
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class Transaction(
@@ -60,3 +61,8 @@ enum class RecurrentFrequency {
     BIWEEKLY,
     MONTHLY
 }
+
+data class PaidRecurrentOccurrence(
+    val transactionId: Long,
+    val occurrenceDate: LocalDate,
+)

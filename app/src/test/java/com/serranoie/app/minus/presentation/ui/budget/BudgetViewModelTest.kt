@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.FinishBudgetEarlyUseCase
@@ -73,6 +74,7 @@ class BudgetViewModelTest {
     private val rolloverFlow = MutableStateFlow(BigDecimal.ZERO to false)
     private val categoriesFlow = MutableStateFlow<List<com.serranoie.app.minus.domain.model.Category>>(emptyList())
     private val queuedTransactionsFlow = MutableStateFlow<List<Transaction>>(emptyList())
+    private val paidOccurrencesFlow = MutableStateFlow<Set<PaidRecurrentOccurrence>>(emptySet())
 
     @Before
     fun setUp() {
@@ -81,6 +83,7 @@ class BudgetViewModelTest {
         every { budgetRepository.getTransactions() } returns transactionsFlow
         every { budgetRepository.getQueuedTransactions() } returns queuedTransactionsFlow
         every { budgetRepository.getActiveCategories() } returns categoriesFlow
+        every { budgetRepository.getPaidRecurrentOccurrences() } returns paidOccurrencesFlow
         every { observeCurrentPeriodBoundaryUseCase() } returns boundaryFlow
         every { observeCurrentPeriodRolloverUseCase() } returns rolloverFlow
     }

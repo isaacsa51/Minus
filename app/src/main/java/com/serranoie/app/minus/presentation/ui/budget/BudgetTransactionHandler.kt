@@ -195,6 +195,32 @@ class BudgetTransactionHandler @Inject constructor(
         }
     }
 
+    suspend fun markRecurrentOccurrencePaid(transaction: Transaction, activePeriodId: Long): Result<Unit> {
+        return runCatching {
+            val realId = transaction.sourceTransactionId ?: transaction.id
+            val occurrenceDate = transaction.date?.toLocalDate() ?: LocalDate.now()
+            budgetRepository.markRecurrentOccurrencePaid(realId, occurrenceDate)
+            val template = budgetRepository.getTransactionById(realId) ?: return@runCatching
+
+            val categoryId: Long? = if (template.comment.isNotBlank()) {
+                budgetRepository.findOrCreateCategory(template.comment.trim()).id
+            } else {
+                null
+            }
+            val paidTransaction = Transaction.create(
+                amount = template.amount,
+                comment = template.comment,
+                date = LocalDateTime.now(),
+                periodId = activePeriodId,
+                categoryId = categoryId,
+                isCredit = template.isCredit,
+            )
+            addTransactionUseCase(paidTransaction)
+
+            notificationScheduler.scheduleRecurrentExpenseNotification(template)
+        }
+    }
+
     suspend fun restoreTransaction(transaction: Transaction): Result<Unit> {
         return runCatching {
             addTransactionUseCase(transaction)

@@ -5,6 +5,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.splitBudget
@@ -44,6 +45,7 @@ class BudgetStateCalculator @Inject constructor(
         settings: BudgetSettings,
         transactions: List<Transaction>,
         currentDate: LocalDate,
+        paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
     ): BudgetState {
         val periodEnd = settings.getPeriodEndDate()
         val daysRemaining = ChronoUnit.DAYS.between(currentDate, periodEnd).toInt() + 1
@@ -100,7 +102,9 @@ class BudgetStateCalculator @Inject constructor(
         val regularSpentToday = todayTransactions.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
         val incomeToday = todayTransactions.filter { it.amount < BigDecimal.ZERO }.sumOf { it.amount }.abs()
 
-        val recurringDueToday = recurringExpenseCalculator.calculateRecurringDueToday(transactions, currentDate)
+        val recurringDueToday = recurringExpenseCalculator.calculateRecurringDueToday(
+            transactions, currentDate, paidOccurrences
+        )
         val spentToday = regularSpentToday.add(recurringDueToday)
 
         val totalSpentThisWeek = calculateSpentInSubPeriod(

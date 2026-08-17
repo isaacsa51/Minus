@@ -37,6 +37,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.ui.tooling.preview.Preview
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import java.time.LocalDate
+import java.time.LocalTime
 import java.text.NumberFormat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -113,7 +114,17 @@ internal fun LazyListScope.futureRecurrentSection(
                             isExpanded = expandedTransactionId == item.transaction.id,
                             onDelete = { onDelete(item.transaction) },
                             onEdit = { onEdit(item.transaction) },
-                            onMarkAsPaid = { onMarkAsPaid(item.transaction) },
+                            onMarkAsPaid = {
+                                onMarkAsPaid(
+                                    item.transaction.copy(
+                                        date = item.nextChargeDate.atTime(
+                                            item.transaction.date?.toLocalTime() ?: LocalTime.MIDNIGHT
+                                        ),
+                                        sourceTransactionId = item.transaction.sourceTransactionId
+                                            ?: item.transaction.id,
+                                    )
+                                )
+                            },
                             onClick = { onClick(item.transaction) },
                             creditCardCutoffDay = creditCardCutoffDay,
                         )

@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.history
 
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
@@ -49,6 +50,7 @@ internal fun buildUpcomingRecurrentItems(
     budgetStartDate: LocalDate,
     budgetEndDate: LocalDate,
     today: LocalDate,
+    paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
 ): Pair<List<UpcomingRecurrentItem>, List<UpcomingRecurrentItem>> {
     val recurrentTransactions = transactions.filter { it.isRecurrent }
 
@@ -58,7 +60,9 @@ internal fun buildUpcomingRecurrentItems(
             date.isAfter(today)
         }
         nextDate?.let { date ->
-            if (!date.isBefore(budgetStartDate) && !date.isAfter(budgetEndDate)) {
+            if (!date.isBefore(budgetStartDate) && !date.isAfter(budgetEndDate) &&
+                !paidOccurrences.contains(PaidRecurrentOccurrence(transaction.id, date))
+            ) {
                 UpcomingRecurrentItem(
                     transaction = transaction,
                     nextChargeDate = date,
@@ -72,7 +76,9 @@ internal fun buildUpcomingRecurrentItems(
 
     val futureOutOfPeriod = recurrentTransactions.mapNotNull { transaction ->
         calculateNextChargeDate(transaction, today)?.let { nextDate ->
-            if (nextDate.isAfter(budgetEndDate)) {
+            if (nextDate.isAfter(budgetEndDate) &&
+                !paidOccurrences.contains(PaidRecurrentOccurrence(transaction.id, nextDate))
+            ) {
                 UpcomingRecurrentItem(
                     transaction = transaction,
                     nextChargeDate = nextDate,
@@ -94,11 +100,12 @@ internal fun buildGroupedCurrentTransactions(
     budgetStartDate: LocalDate,
     budgetEndDate: LocalDate,
     today: LocalDate,
+    paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
 ): Map<LocalDate?, List<Transaction>> {
     val regularTransactions = currentPeriodTransactions.filterNot { it.isRecurrent }
     val recurrentCharges = displayTransactions.filter { it.isRecurrent && !it.isDeleted }
         .flatMap { transaction ->
-            getRecurringChargesInPeriod(transaction, budgetStartDate, budgetEndDate, today)
+            getRecurringChargesInPeriod(transaction, budgetStartDate, budgetEndDate, today, paidOccurrences)
         }
 
     return groupTransactionsByDate(regularTransactions + recurrentCharges)
@@ -161,6 +168,7 @@ internal fun getRecurringChargesInPeriod(
     periodStart: LocalDate,
     periodEnd: LocalDate,
     today: LocalDate,
+    paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
 ): List<Transaction> {
     val frequency = transaction.recurrentFrequency ?: return emptyList()
     val originalDateTime = transaction.date ?: return emptyList()
@@ -172,9 +180,9 @@ internal fun getRecurringChargesInPeriod(
     var chargeDate = startDate
 
     while (!chargeDate.isAfter(subscriptionEnd)) {
-        if (!chargeDate.isBefore(periodStart) && !chargeDate.isAfter(periodEnd) && !chargeDate.isAfter(
-                today
-            )
+        if (!chargeDate.isBefore(periodStart) && !chargeDate.isAfter(periodEnd) &&
+            !chargeDate.isAfter(today) &&
+            !paidOccurrences.contains(PaidRecurrentOccurrence(transaction.id, chargeDate))
         ) {
             virtualTransactions.add(
                 transaction.copy(

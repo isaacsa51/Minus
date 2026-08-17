@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Category
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
+import com.serranoie.app.minus.domain.usecase.GetCurrentPeriodIdUseCase
 import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
@@ -35,6 +37,7 @@ class HistoryViewModel @Inject constructor(
     private val budgetStateCalculator: BudgetStateCalculator,
     private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase,
     private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
+    private val getCurrentPeriodIdUseCase: GetCurrentPeriodIdUseCase,
 ) : ViewModel() {
 
     private val _expandedDates = MutableStateFlow(emptySet<LocalDate>())
@@ -90,6 +93,7 @@ class HistoryViewModel @Inject constructor(
         observeCurrentPeriodBoundaryUseCase(),
         settingsRepository.observeSettings(),
         budgetTransactionHandler.budgetRepository.getActiveCategories(),
+        budgetTransactionHandler.budgetRepository.getPaidRecurrentOccurrences(),
         uiInputs
     ) { array ->
         val transactions = array[0] as List<Transaction>
@@ -99,7 +103,9 @@ class HistoryViewModel @Inject constructor(
         val userSettings = array[3] as UserSettings?
         @Suppress("UNCHECKED_CAST")
         val categories = array[4] as List<Category>
-        val inputs = array[5] as UIInputs
+        @Suppress("UNCHECKED_CAST")
+        val paidOccurrences = array[5] as Set<PaidRecurrentOccurrence>
+        val inputs = array[6] as UIInputs
 
         calculateHistoryUiState(
             transactions = transactions,
@@ -108,6 +114,7 @@ class HistoryViewModel @Inject constructor(
             currentPeriodId = periodBoundary.second,
             userSettings = userSettings,
             categories = categories,
+            paidOccurrences = paidOccurrences,
             inputs = inputs
         )
     }.stateIn(
@@ -137,6 +144,7 @@ class HistoryViewModel @Inject constructor(
             is HistoryUiIntent.DeleteTransaction -> deleteTransaction(intent.transaction)
             is HistoryUiIntent.SaveEditedTransaction -> saveEditedTransaction(intent.transaction)
             is HistoryUiIntent.ConfirmDeleteRecurrent -> confirmDeleteRecurrent(intent.transaction)
+            is HistoryUiIntent.MarkTransactionAsPaid -> markTransactionAsPaid(intent.transaction)
             is HistoryUiIntent.SetLockSwipeable -> _lockSwipeable.value = intent.locked
             is HistoryUiIntent.ToggleExpandedTransaction -> toggleExpandedTransaction(intent.transactionId)
             is HistoryUiIntent.UpdateCreditCutoffDay -> updateCreditCutoffDay(intent.day)
@@ -190,6 +198,17 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
+    private fun markTransactionAsPaid(transaction: Transaction) {
+        viewModelScope.launch {
+            val activePeriodId = getCurrentPeriodIdUseCase().takeIf { it > 0L }
+                ?: uiState.value.currentPeriodId
+            val result = budgetTransactionHandler.markRecurrentOccurrencePaid(transaction, activePeriodId)
+            if (result.isFailure) {
+                _effects.emit(HistoryUiEffect.ShowSnackbar("Could not mark transaction as paid"))
+            }
+        }
+    }
+
     private fun toggleExpandedDate(date: LocalDate) {
         _expandedDates.update { expanded ->
             val currentExpanded = if (expanded.isEmpty()) {
@@ -208,6 +227,7 @@ class HistoryViewModel @Inject constructor(
         currentPeriodId: Long,
         userSettings: UserSettings?,
         categories: List<Category>,
+        paidOccurrences: Set<PaidRecurrentOccurrence>,
         inputs: UIInputs
     ): HistoryUiState {
         val displayTx = buildDisplayTransactions(transactions, inputs.pendingRemovedTransactions)
@@ -233,7 +253,7 @@ class HistoryViewModel @Inject constructor(
                 currentPeriodId = currentPeriodId,
                 currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             )
-            budgetStateCalculator.calculateBudgetState(s, periodTransactions, today)
+            budgetStateCalculator.calculateBudgetState(s, periodTransactions, today, paidOccurrences)
         }
 
         val (upcomingInPeriod, futureOutOfPeriod) = buildUpcomingRecurrentItems(
@@ -241,6 +261,7 @@ class HistoryViewModel @Inject constructor(
             budgetStartDate = startDate,
             budgetEndDate = endDate,
             today = today,
+            paidOccurrences = paidOccurrences,
         )
 
         val groupedCurrent = buildGroupedCurrentTransactions(
@@ -249,6 +270,7 @@ class HistoryViewModel @Inject constructor(
             budgetStartDate = startDate,
             budgetEndDate = endDate,
             today = today,
+            paidOccurrences = paidOccurrences,
         )
 
         val groupedPast = if (userSettings?.showPastTransactions == false) {

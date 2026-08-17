@@ -202,6 +202,7 @@ fun History(
                 },
                 onEdit = { expense -> onProcessIntent(HistoryUiIntent.SetEditingTransaction(expense)) },
                 onMarkAsPaid = { expense ->
+                    onProcessIntent(HistoryUiIntent.MarkTransactionAsPaid(expense))
                     onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
                 },
                 onClick = { expense ->
@@ -241,6 +242,7 @@ fun History(
                 },
                 onEdit = { expense -> onProcessIntent(HistoryUiIntent.SetEditingTransaction(expense)) },
                 onMarkAsPaid = { expense ->
+                    onProcessIntent(HistoryUiIntent.MarkTransactionAsPaid(expense))
                     onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
                 },
                 onClick = { expense ->
@@ -269,6 +271,7 @@ fun History(
                 onDelete = { expense -> onProcessIntent(HistoryUiIntent.SetRecurrentToDelete(expense)) },
                 onEdit = { expense -> onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(expense)) },
                 onMarkAsPaid = { expense ->
+                    onProcessIntent(HistoryUiIntent.MarkTransactionAsPaid(expense))
                     onShowInfoSnackbar(resources.getString(R.string.mark_as_paid_success))
                 },
                 onClick = { expense ->
