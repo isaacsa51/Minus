@@ -97,9 +97,9 @@
     <string name="finalize_period">Предсрочно приключване на бюджетния период</string>
     <string name="finalize_period_confirm">Това ще затвори текущия период и ще започне нов. Сигурни ли сте?</string>
     <string name="finalize_action">Приключи</string>
-    <string name="rollover_preview_split_equally">You have %1$s left unspent. When this period ends, it will be spread across every day of your next budget.</string>
-    <string name="rollover_preview_add_to_first_day">You have %1$s left unspent. When this period ends, it will be added to the first day of your next budget.</string>
-    <string name="rollover_preview_ask_always">You have %1$s left unspent. You\'ll be asked what to do with it when this period ends.</string>
+    <string name="rollover_preview_split_equally">Остават ви %1$s неизразходвани. Когато този период приключи, те ще бъдат разпределени за всеки ден от следващия ви бюджет.</string>
+    <string name="rollover_preview_add_to_first_day">Остават ви %1$s неизразходвани. Когато този период приключи, сумата ще бъде добавена към първия ден от следващия ви бюджет.</string>
+    <string name="rollover_preview_ask_always">Остават ви %1$s непохарчени. Ще бъдете попитани какво да правите с тях, когато този период приключи.</string>
     <string name="no_ending_date">Без крайна дата</string>
     <string name="budget_split_logic">Как искате да разделите бюджета?</string>
     <string name="new_budget_period">Нов бюджетен период</string>
@@ -338,6 +338,7 @@
     <string name="bug_report_upload_assets">Качване на асетове</string>
     <string name="bug_report_upload_assets_subtitle">Снимки на екрана или видеа (до 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">Избрани %1$d прикачен(и)</string>
+    <string name="bug_report_remove_attachment">Премахване на прикачения файл</string>
     <string name="settings_backup_title">Резервно копие на данните</string>
     <string name="settings_backup_subtitle">Архивиране на данни в minus_export.csv</string>
     <string name="settings_import_csv_title">Импортиране на CSV</string>
