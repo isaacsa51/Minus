@@ -2,6 +2,7 @@
 
 package com.serranoie.app.minus.presentation.ui.settings.bugreport
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -31,6 +32,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,10 +43,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Help
+import androidx.compose.material.icons.automirrored.rounded.Help
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.UploadFile
-import androidx.compose.material.icons.outlined.Help
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
@@ -101,6 +104,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.permission.PermissionHandler
+import com.serranoie.app.minus.presentation.ui.settings.bugreport.component.AttachmentThumbnailCard
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportIssueType
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiIntent
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiState
@@ -312,11 +316,14 @@ fun BugReportForm(
             )
             Spacer(modifier = Modifier.height(8.dp))
             AttachmentDropZone(
-                attachmentCount = uiState.attachmentCount,
+                attachments = uiState.selectedAttachmentUris,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    permissionHandler.requestAttachmentPickerPermissionIfNeeded(attachmentPickerLauncher)
-                }
+                    permissionHandler.requestAttachmentPickerPermissionIfNeeded(
+                        attachmentPickerLauncher
+                    )
+                },
+                onRemoveAttachment = { uri -> onIntent(BugReportUiIntent.RemoveAttachment(uri)) }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -378,12 +385,10 @@ private fun IssueTypeSelector(
                     .weight(1f)
                     .semantics { role = Role.RadioButton },
                 colors = ToggleButtonDefaults.toggleButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
+                    checkedContainerColor = MaterialTheme.colorScheme.tertiary,
                     contentColor = MaterialTheme.colorScheme.tertiary,
-                    checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    checkedContentColor = MaterialTheme.colorScheme.onTertiary,
                 ),
                 shapes = when (index) {
                     0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
@@ -681,8 +686,9 @@ private fun ReproductionStepRow(
 
 @Composable
 private fun AttachmentDropZone(
-    attachmentCount: Int,
+    attachments: List<Uri>,
     onClick: () -> Unit,
+    onRemoveAttachment: (Uri) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val outlineColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.9f)
@@ -690,7 +696,7 @@ private fun AttachmentDropZone(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(164.dp)
+            .heightIn(min = 164.dp)
             .clip(RoundedCornerShape(18.dp))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
@@ -707,43 +713,79 @@ private fun AttachmentDropZone(
             )
         }
 
-        val subtitle = if (attachmentCount > 0) {
-            stringResource(R.string.bug_report_upload_assets_selected_count, attachmentCount)
-        } else {
-            stringResource(R.string.bug_report_upload_assets_subtitle)
-        }
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f)),
-                contentAlignment = Alignment.Center
+        if (attachments.isEmpty()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    imageVector = Icons.Default.UploadFile,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.size(32.dp)
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.22f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.UploadFile,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.bug_report_upload_assets),
+                    style = MaterialTheme.typography.titleSmallEmphasized,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.bug_report_upload_assets_subtitle),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(
+                    text = stringResource(
+                        R.string.bug_report_upload_assets_selected_count,
+                        attachments.size
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                AttachmentThumbnailRow(
+                    attachments = attachments,
+                    onRemove = onRemoveAttachment,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.bug_report_upload_assets),
-                style = MaterialTheme.typography.titleSmallEmphasized,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+@Composable
+private fun AttachmentThumbnailRow(
+    attachments: List<Uri>,
+    onRemove: (Uri) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        items(items = attachments, key = { it.toString() }) { uri ->
+            AttachmentThumbnailCard(
+                uri = uri,
+                onRemove = { onRemove(uri) }
             )
         }
     }

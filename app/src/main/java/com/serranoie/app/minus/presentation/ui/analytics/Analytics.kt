@@ -2,16 +2,23 @@ package com.serranoie.app.minus.presentation.ui.analytics
 
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.relocation.BringIntoViewRequester
@@ -29,12 +37,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,11 +55,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -85,12 +99,12 @@ import com.serranoie.app.minus.presentation.ui.theme.component.charts.Categories
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarHeatmap
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
-import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
+import com.serranoie.app.minus.presentation.util.combineColors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -172,33 +186,35 @@ fun Analytics(
         state.userSettings.analyticsTutorialCompleted
     }
 
-    val effectiveTutorialCompleted = showTutorialOverride?.let { !it } ?: (tutorialCompleted || state.isHistoricalView)
+    val effectiveTutorialCompleted =
+        showTutorialOverride?.let { !it } ?: (tutorialCompleted || state.isHistoricalView)
 
-    val tutorialOrder = remember(hasSpends, state.creditOwed, state.periodFinished, state.isHistoricalView) {
-        buildList {
-            // 1. Header (if visible)
-            if (!state.periodFinished || state.isHistoricalView) {
-                add(1)
-            }
-
-            // 2. Budget Summary (Graph)
-            add(2)
-
-            if (hasSpends) {
-                add(3) // Heatmap
-                add(0) // MinMax
-                if (state.creditOwed > BigDecimal.ZERO) {
-                    add(6) // Credit Owed
+    val tutorialOrder =
+        remember(hasSpends, state.creditOwed, state.periodFinished, state.isHistoricalView) {
+            buildList {
+                // 1. Header (if visible)
+                if (!state.periodFinished || state.isHistoricalView) {
+                    add(1)
                 }
-                add(4) // Categories
-            } else {
-                add(5) // Savings
-                if (state.creditOwed > BigDecimal.ZERO) {
-                    add(6) // Credit Owed
+
+                // 2. Budget Summary (Graph)
+                add(2)
+
+                if (hasSpends) {
+                    add(3) // Heatmap
+                    add(0) // MinMax
+                    if (state.creditOwed > BigDecimal.ZERO) {
+                        add(6) // Credit Owed
+                    }
+                    add(4) // Categories
+                } else {
+                    add(5) // Savings
+                    if (state.creditOwed > BigDecimal.ZERO) {
+                        add(6) // Credit Owed
+                    }
                 }
             }
         }
-    }
 
     val tutorialBoxState = rememberTutorialBoxState(
         order = tutorialOrder,
@@ -326,6 +342,17 @@ fun Analytics(
                     .padding(paddingValues)
             ) {
                 val useWideAnalyticsLayout = maxWidth >= 840.dp
+
+                if (state.periodFinished) {
+                    FinishedPeriodBackgroundShapes(
+                        scrollState = scrollState,
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .fillMaxWidth()
+                            .padding(top = 500.dp)
+                            .height(800.dp),
+                    )
+                }
 
                 val transitionKey = remember(state.periodFinished, state.isHistoricalView) {
                     "${state.periodFinished}-${state.isHistoricalView}"
@@ -526,6 +553,66 @@ fun Analytics(
                 onCutoffDayChanged = actions.onCutoffDayChanged
             )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun FinishedPeriodBackgroundShapes(
+    modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
+) {
+    val localDensity = LocalDensity.current
+    var containerSize by remember { mutableStateOf(Size(0.dp, 0.dp)) }
+    val scroll = with(localDensity) { scrollState.value.toDp() }
+
+    Box(
+        modifier = modifier
+            .onGloballyPositioned {
+                containerSize = Size(
+                    width = with(localDensity) { it.size.width.toDp() },
+                    height = with(localDensity) { it.size.height.toDp() })
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        val halfWidth = containerSize.width / 2
+        val halfHeight = containerSize.height / 2
+
+        val shapeColor = combineColors(
+            MaterialTheme.colorScheme.secondaryContainer,
+            MaterialTheme.colorScheme.surface,
+            0.5f,
+        ).copy(alpha = 0.6f)
+
+        val angleShape1 by rememberInfiniteTransition("angleBgShape1").animateFloat(
+            label = "angleBgShape1",
+            initialValue = -30f,
+            targetValue = 30f,
+            animationSpec = infiniteRepeatable(tween(16000), RepeatMode.Reverse)
+        )
+
+        val angleShape4 by rememberInfiniteTransition("angleBgShape4").animateFloat(
+            label = "angleBgShape4",
+            initialValue = 55f,
+            targetValue = -55f,
+            animationSpec = infiniteRepeatable(tween(26000), RepeatMode.Reverse)
+        )
+
+        Box(
+            modifier = Modifier
+                .requiredSize(256.dp)
+                .absoluteOffset(x = halfWidth * 0.85f, y = -halfHeight * 0.7f - scroll * 0.1f)
+                .rotate(angleShape1)
+                .background(color = shapeColor, shape = MaterialShapes.SoftBurst.toShape())
+        )
+
+        Box(
+            modifier = Modifier
+                .requiredSize(256.dp)
+                .absoluteOffset(x = -halfWidth * 0.55f, y = halfHeight * 0.35f - scroll * 0.25f)
+                .rotate(angleShape4)
+                .background(color = shapeColor, shape = MaterialShapes.Puffy.toShape())
+        )
     }
 }
 

@@ -98,6 +98,9 @@
     <string name="finalize_period">Finalize o período de orçamento mais cedo</string>
     <string name="finalize_period_confirm">Isto irá fechar o período atual e iniciar um novo. Tem certeza?</string>
     <string name="finalize_action">Finalizar</string>
+    <string name="rollover_preview_split_equally">Tem %1$ restante não gasto. Quando este período terminar, será distribuído por todos os dias do seu próximo orçamento.</string>
+    <string name="rollover_preview_add_to_first_day">Tem %1$ restantes sem gastar. Quando este período terminar, este valor será adicionado ao primeiro dia do seu próximo orçamento.</string>
+    <string name="rollover_preview_ask_always">Continua a ter %1$ sem gastar. Ser-lhe-á perguntado o que fazer com ele quando este período terminar.</string>
     <string name="no_ending_date">Sem data final</string>
     <string name="budget_split_logic">Como pretende dividir o orçamento?</string>
     <string name="new_budget_period">Novo Período de Orçamento</string>
@@ -334,6 +337,7 @@
     <string name="bug_report_upload_assets">Enviar mídias</string>
     <string name="bug_report_upload_assets_subtitle">Capturas de tela ou vídeos (até 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d anexo(s) selecionado(s)</string>
+    <string name="bug_report_remove_attachment">Remover anexo</string>
     <string name="settings_backup_title">Fazer backup dos dados</string>
     <string name="settings_backup_subtitle">Fazer backup dos dados para minus_export.csv</string>
     <string name="settings_import_csv_title">Importar CSV</string>

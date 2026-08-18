@@ -98,6 +98,7 @@
     <string name="finalize_period">बजट की अवधि जल्दी पूरी करें</string>
     <string name="finalize_period_confirm">इससे मौजूदा अवधि बंद हो जाएगी और नई अवधि शुरू होगी। क्या आप पक्का करना चाहते हैं?</string>
     <string name="finalize_action">पूरा करें</string>
+    <string name="rollover_preview_ask_always">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म होगी, तो आपसे पूछा जाएगा कि इनका क्या करना है।</string>
     <string name="no_ending_date">कोई समाप्ति तिथि नहीं</string>
     <string name="budget_split_logic">आप बजट को कैसे बांटना चाहते हैं?</string>
     <string name="new_budget_period">नया बजट समय-सीमा</string>
@@ -333,6 +334,7 @@
     <string name="bug_report_upload_assets">एसेट अपलोड करें</string>
     <string name="bug_report_upload_assets_subtitle">स्क्रीनशॉट या वीडियो (10M तक) B)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d अटैचमेंट चुने गए</string>
+    <string name="bug_report_remove_attachment">अटैचमेंट हटाएं</string>
     <string name="settings_backup_title">डेटा का बैकअप लें</string>
     <string name="settings_backup_subtitle">डेटा का बैकअप minus_export.csv में लें</string>
     <string name="settings_import_csv_title">CSV इंपोर्ट करें</string>
@@ -566,4 +568,6 @@
     <string name="budget_pill_calc_subtracted">%1$s घटाया जाएगा</string>
     <string name="no_name_income">बिना नाम वाली आय</string>
     <string name="settings_rounded_font_title">गोल फ़ॉन्ट स्टाइल</string>
+    <string name="rollover_preview_split_equally">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म हो जाएगी, तो यह रकम आपके अगले बजट के हर दिन में बांट दी जाएगी।</string>
+    <string name="rollover_preview_add_to_first_day">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म हो जाएगी, तो यह रकम आपके अगले बजट के पहले दिन में जोड़ दी जाएगी।</string>
 </resources>

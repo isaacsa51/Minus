@@ -69,7 +69,10 @@ class BugReportViewModel @Inject constructor(
 				it.copy(additionalInfo = intent.value)
 			}
 			is BugReportUiIntent.SelectAttachments -> _localState.update {
-				it.copy(selectedAttachmentUris = intent.uris)
+				it.copy(selectedAttachmentUris = (it.selectedAttachmentUris + intent.uris).distinct())
+			}
+			is BugReportUiIntent.RemoveAttachment -> _localState.update {
+				it.copy(selectedAttachmentUris = it.selectedAttachmentUris.filterNot { uri -> uri == intent.uri })
 			}
 			BugReportUiIntent.SubmitReport -> submitReport()
 		}

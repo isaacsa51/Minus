@@ -337,6 +337,7 @@
     <string name="bug_report_upload_assets">Importer des fichiers</string>
     <string name="bug_report_upload_assets_subtitle">Captures d’écran ou vidéos (jusqu’à 10 Mo)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d pièce(s) jointe(s) sélectionnée(s)</string>
+    <string name="bug_report_remove_attachment">Supprimer la pièce jointe</string>
     <string name="settings_backup_title">Sauvegarder les données</string>
     <string name="settings_backup_subtitle">Sauvegarder les données dans minus_export.csv</string>
     <string name="settings_import_csv_title">Importer un CSV</string>
