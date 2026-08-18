@@ -52,6 +52,8 @@ interface BudgetRepository {
 
     fun getActiveCategories(): Flow<List<Category>>
 
+    fun getAllCategories(): Flow<List<Category>>
+
     suspend fun findOrCreateCategory(name: String): Category
 
     suspend fun hideCategory(name: String)

@@ -11,6 +11,7 @@ import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.ChartDateRange
 import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarHeatmap
 import com.serranoie.app.minus.presentation.ui.theme.component.date.SpendingDay
 import org.junit.Rule
@@ -41,6 +42,54 @@ class CalendarHeatmapScreenshotTest {
                     transactions = sampleTransactions(),
                     startDate = fixedDate(2026, 1, 1),
                     finishDate = fixedDate(2026, 1, 30),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .padding(16.dp),
+                )
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun calendarHeatmap_withHighlightedRange() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                CalendarHeatmap(
+                    budget = BigDecimal("50.00"),
+                    transactions = sampleTransactions(),
+                    startDate = fixedDate(2026, 1, 1),
+                    finishDate = fixedDate(2026, 1, 30),
+                    highlightedRange = ChartDateRange(
+                        start = LocalDate.of(2026, 1, 12),
+                        end = LocalDate.of(2026, 1, 18),
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .padding(16.dp),
+                )
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun calendarHeatmap_withSelectedDay() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                CalendarHeatmap(
+                    budget = BigDecimal("50.00"),
+                    transactions = sampleTransactions(),
+                    startDate = fixedDate(2026, 1, 1),
+                    finishDate = fixedDate(2026, 1, 30),
+                    highlightedRange = ChartDateRange(
+                        start = LocalDate.of(2026, 1, 20),
+                        end = LocalDate.of(2026, 1, 20),
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp)

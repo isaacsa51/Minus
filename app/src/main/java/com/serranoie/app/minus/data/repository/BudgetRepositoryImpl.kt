@@ -331,6 +331,10 @@ class BudgetRepositoryImpl @Inject constructor(
         return categoryDao.getActiveCategories().map { entities -> entities.map { it.toDomain() } }
     }
 
+    override fun getAllCategories(): Flow<List<Category>> {
+        return categoryDao.getAllCategories().map { entities -> entities.map { it.toDomain() } }
+    }
+
     override suspend fun findOrCreateCategory(name: String): Category {
         val existing = categoryDao.getCategoryByName(name)
         return if (existing != null) {

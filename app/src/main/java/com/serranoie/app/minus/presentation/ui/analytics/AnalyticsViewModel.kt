@@ -77,7 +77,8 @@ class AnalyticsViewModel @Inject constructor(
         settingsRepository.observeSettings().distinctUntilChanged(),
         settingsRepository.observeCurrentPeriodRollover().distinctUntilChanged(),
         _granularity,
-        _selectedPeriodId
+        _selectedPeriodId,
+        budgetRepository.getAllCategories().distinctUntilChanged(),
     ) { args: Array<Any?> ->
         val settings = args[0] as BudgetSettings?
         val transactions = args[1] as List<Transaction>
@@ -88,6 +89,10 @@ class AnalyticsViewModel @Inject constructor(
         val rollover = args[6] as Pair<BigDecimal, Boolean>
         val granularity = args[7] as GraphGranularity
         val selectedPeriodId = args[8] as Long?
+        // Includes hidden/deleted tags, unlike `categories` — needed so past transactions that
+        // point at a since-deleted category can still resolve its name instead of falling back
+        // to "Uncategorized" (e.g. in DetailedChart's tooltip).
+        val allCategories = args[9] as List<Category>
 
         val currentPeriodId = periodBoundary.second
         val reconstructedArchives = reconstructHistory(transactions, archives, settings)
@@ -100,7 +105,7 @@ class AnalyticsViewModel @Inject constructor(
                 allTransactions = transactions,
                 archives = allArchives,
                 granularity = granularity,
-                categories = categories,
+                categories = allCategories,
                 currentSettings = settings,
                 currentPeriodId = currentPeriodId,
                 userSettings = userSettings
@@ -113,7 +118,7 @@ class AnalyticsViewModel @Inject constructor(
                 userSettings = userSettings,
                 granularity = granularity,
                 archives = allArchives,
-                categories = categories
+                categories = allCategories
             )
         }
 

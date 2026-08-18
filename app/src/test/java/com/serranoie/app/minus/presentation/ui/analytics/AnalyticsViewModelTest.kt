@@ -44,6 +44,7 @@ class AnalyticsViewModelTest {
     private val settingsFlow = MutableStateFlow<BudgetSettings?>(null)
     private val transactionsFlow = MutableStateFlow<List<Transaction>>(emptyList())
     private val categoriesFlow = MutableStateFlow<List<Category>>(emptyList())
+    private val allCategoriesFlow = MutableStateFlow<List<Category>>(emptyList())
     private val archivedFlow = MutableStateFlow<List<ArchivedBudget>>(emptyList())
     private val boundaryFlow = flowOf(0L to 1L)
     private val userSettingsFlow = flowOf(UserSettings())
@@ -55,6 +56,7 @@ class AnalyticsViewModelTest {
         every { budgetRepository.getBudgetSettings() } returns settingsFlow
         every { budgetRepository.getTransactions() } returns transactionsFlow
         every { budgetRepository.getActiveCategories() } returns categoriesFlow
+        every { budgetRepository.getAllCategories() } returns allCategoriesFlow
         every { budgetRepository.getArchivedBudgets() } returns archivedFlow
         every { observeCurrentPeriodBoundaryUseCase() } returns boundaryFlow
         every { settingsRepository.observeSettings() } returns userSettingsFlow
@@ -135,6 +137,22 @@ class AnalyticsViewModelTest {
             
             viewModel.onClose()
             assertThat(awaitItem()).isEqualTo(AnalyticsUiEffect.NavigateToMain)
+        }
+    }
+
+    @Test
+    fun `displayState categories includes hidden categories, unlike active-only list`() = runTest {
+        val hiddenGroceries = Category(id = 5L, name = "Groceries", isHidden = true)
+        categoriesFlow.value = emptyList()
+        allCategoriesFlow.value = listOf(hiddenGroceries)
+
+        val viewModel = createViewModel()
+        viewModel.uiState.test {
+            skipItems(1)
+
+            val state = awaitItem()
+            assertThat(state.categories).isEmpty()
+            assertThat(state.displayState.categories).containsExactly(hiddenGroceries)
         }
     }
 
