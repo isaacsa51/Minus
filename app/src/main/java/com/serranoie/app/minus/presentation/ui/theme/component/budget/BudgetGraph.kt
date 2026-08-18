@@ -1,7 +1,11 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -52,17 +56,21 @@ import kotlin.math.abs
 
 const val BUDGET_GRAPH_TAG = "BUDGET_GRAPH_TAG"
 
-/** The inclusive date span currently visible on the chart's paginated window. */
 data class ChartDateRange(val start: LocalDate, val end: LocalDate) {
     operator fun contains(date: LocalDate): Boolean = !date.isBefore(start) && !date.isAfter(end)
 }
 
-/** Which representation [BudgetGraph] draws its currently visible window with. */
 enum class BudgetGraphViewMode { CUMULATIVE, CATEGORIES }
 
-/** One category's total on one day within the visible window, colored for [MultiCategoryChart]. */
 data class CategoryDayEntry(
     val date: LocalDate,
+    val label: String,
+    val amount: BigDecimal,
+    val color: Color,
+)
+
+data class CategoryHourEntry(
+    val hour: Int,
     val label: String,
     val amount: BigDecimal,
     val color: Color,
@@ -234,11 +242,34 @@ class BudgetGraphState(
     }
 }
 
+private fun anchoredWindowIndex(
+    granularity: GraphGranularity,
+    anchorDayIndex: Int,
+    pointsCount: Int,
+    windowSize: Int,
+    scrollStep: Int,
+    totalWindows: Int,
+): Int {
+    if (granularity == GraphGranularity.TOTAL) return 0
+
+    val lastValidIndex = (pointsCount - 1).coerceAtLeast(0)
+    val clampedAnchor = anchorDayIndex.coerceIn(0, lastValidIndex)
+
+    val windowStartIndex = if (scrollStep >= windowSize) {
+        (clampedAnchor / scrollStep) * scrollStep
+    } else {
+        (clampedAnchor - windowSize + 1).coerceAtLeast(0)
+    }
+
+    return (windowStartIndex / scrollStep).coerceIn(0, (totalWindows - 1).coerceAtLeast(0))
+}
+
 @Composable
 fun rememberBudgetGraphState(
     allCurrentPoints: List<BigDecimal>,
     allPreviousPoints: List<BigDecimal>,
     granularity: GraphGranularity,
+    anchorDayIndex: Int,
 ): BudgetGraphState {
     val (windowSize, scrollStep) = remember(granularity, allCurrentPoints.size) {
         when (granularity) {
@@ -256,7 +287,16 @@ fun rememberBudgetGraphState(
         else ((allCurrentPoints.size - windowSize) / scrollStep) + 1
     }
 
-    val initialWindowIndex = remember(granularity) { (totalWindows - 1).coerceAtLeast(0) }
+    val initialWindowIndex = remember(granularity) {
+        anchoredWindowIndex(
+            granularity = granularity,
+            anchorDayIndex = anchorDayIndex,
+            pointsCount = allCurrentPoints.size,
+            windowSize = windowSize,
+            scrollStep = scrollStep,
+            totalWindows = totalWindows,
+        )
+    }
 
     val state = remember {
         BudgetGraphState(
@@ -269,8 +309,14 @@ fun rememberBudgetGraphState(
     }
 
     LaunchedEffect(allCurrentPoints, allPreviousPoints, windowSize, scrollStep, granularity) {
-        val targetWindowIndex = if (granularity == GraphGranularity.TOTAL) 0
-        else (totalWindows - 1).coerceAtLeast(0)
+        val targetWindowIndex = anchoredWindowIndex(
+            granularity = granularity,
+            anchorDayIndex = anchorDayIndex,
+            pointsCount = allCurrentPoints.size,
+            windowSize = windowSize,
+            scrollStep = scrollStep,
+            totalWindows = totalWindows,
+        )
 
         state.updateConfig(
             newAllCurrentPoints = allCurrentPoints,
@@ -290,11 +336,6 @@ fun rememberBudgetGraphState(
     return state
 }
 
-/**
- * Groups [spends] falling within [dateRange] by (day, resolved category), coloring each category
- * with the same [baseColors]-hashed palette CategoriesChartCard uses, so a category reads as the
- * same color across screens.
- */
 @Composable
 private fun rememberCategoryDayEntries(
     spends: List<Transaction>,
@@ -325,12 +366,38 @@ private fun rememberCategoryDayEntries(
 }
 
 @Composable
+private fun rememberCategoryHourEntries(
+    spends: List<Transaction>,
+    categories: List<Category>,
+    date: LocalDate?,
+): List<CategoryHourEntry> {
+    val uncategorizedLabel = stringResource(R.string.categories_chart_uncategorized)
+    return remember(spends, categories, date, uncategorizedLabel) {
+        if (date == null) return@remember emptyList()
+        spends
+            .mapNotNull { tx -> tx.date?.let { dt -> if (dt.toLocalDate() == date) dt.hour to tx else null } }
+            .groupBy { (hour, tx) ->
+                hour to (categories.find { it.id == tx.categoryId }?.name ?: uncategorizedLabel)
+            }
+            .map { (key, entries) ->
+                val (hour, label) = key
+                CategoryHourEntry(
+                    hour = hour,
+                    label = label,
+                    amount = entries.sumOf { it.second.amount },
+                    color = baseColors[abs(label.hashCode()) % baseColors.size],
+                )
+            }
+    }
+}
+
+@Composable
 fun BudgetGraph(
     state: AnalyticsState,
     onGranularityChanged: (GraphGranularity) -> Unit,
     modifier: Modifier = Modifier,
-    onVisibleDateRangeChanged: (ChartDateRange?) -> Unit = {},
     onDayTap: ((LocalDate) -> Unit)? = null,
+    onSelectedDateChanged: (LocalDate) -> Unit = {},
     selectedDate: LocalDate? = null,
     initialViewMode: BudgetGraphViewMode = BudgetGraphViewMode.CUMULATIVE,
 ) {
@@ -350,6 +417,9 @@ fun BudgetGraph(
             )
         }
     }
+    val dayLabelFormatter = remember(locale) {
+        DateTimeFormatter.ofPattern("EEEE, MMMM d", locale)
+    }
 
     val currencyFormat = remember(state.currencyCode) {
         symbolOnlyCurrencyFormat(state.currencyCode)
@@ -363,14 +433,19 @@ fun BudgetGraph(
 
     val hasPeriod = state.budgetSettingsForDisplay != null
 
-    val totalDaysCount = remember(state.startPeriodDate, state.finishPeriodDate, hasPeriod) {
-        if (!hasPeriod) return@remember 1
-        val startLocalDate =
-            state.startPeriodDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-        val endLocalDate =
-            (state.finishPeriodDate ?: Date()).toInstant().atZone(ZoneId.systemDefault())
-                .toLocalDate()
-        ChronoUnit.DAYS.between(startLocalDate, endLocalDate).toInt().coerceAtLeast(1)
+    val periodStartLocalDate = remember(state.startPeriodDate, hasPeriod) {
+        if (!hasPeriod) null
+        else state.startPeriodDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+    val periodEndLocalDate = remember(state.finishPeriodDate, hasPeriod) {
+        if (!hasPeriod) null
+        else (state.finishPeriodDate ?: Date()).toInstant().atZone(ZoneId.systemDefault())
+            .toLocalDate()
+    }
+
+    val totalDaysCount = remember(periodStartLocalDate, periodEndLocalDate) {
+        if (periodStartLocalDate == null || periodEndLocalDate == null) return@remember 1
+        ChronoUnit.DAYS.between(periodStartLocalDate, periodEndLocalDate).toInt().coerceAtLeast(1)
     }
 
     val allCurrentPoints =
@@ -403,10 +478,20 @@ fun BudgetGraph(
         }
     }
 
+    val todayDayIndex = remember(state.startPeriodDate, hasPeriod) {
+        if (!hasPeriod) 0
+        else {
+            val startLocalDate =
+                state.startPeriodDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+            ChronoUnit.DAYS.between(startLocalDate, LocalDate.now()).toInt().coerceAtLeast(0)
+        }
+    }
+
     val graphState = rememberBudgetGraphState(
         allCurrentPoints = allCurrentPoints,
         allPreviousPoints = allPreviousPoints,
-        granularity = state.graphGranularity
+        granularity = state.graphGranularity,
+        anchorDayIndex = todayDayIndex,
     )
 
     val visibleDateRange = remember(
@@ -427,10 +512,6 @@ fun BudgetGraph(
         )
     }
 
-    LaunchedEffect(visibleDateRange) {
-        onVisibleDateRangeChanged(visibleDateRange)
-    }
-
     val categoryDayEntries = rememberCategoryDayEntries(
         spends = state.spends,
         categories = state.categories,
@@ -445,6 +526,38 @@ fun BudgetGraph(
             .distinctBy { it.label }
             .sortedBy { it.label }
             .map { LegendEntry(it.label, it.color) }
+    }
+
+    val isDaysGranularity = state.graphGranularity == GraphGranularity.DAYS
+    val hourlyDate = remember(selectedDate, periodStartLocalDate, periodEndLocalDate) {
+        val requested = selectedDate ?: LocalDate.now()
+        if (periodStartLocalDate != null && periodEndLocalDate != null) {
+            requested.coerceIn(periodStartLocalDate, periodEndLocalDate)
+        } else {
+            requested
+        }
+    }
+    val categoryHourEntries = rememberCategoryHourEntries(
+        spends = state.spends,
+        categories = state.categories,
+        date = hourlyDate,
+    )
+    val hourlyLegendEntries = remember(categoryHourEntries) {
+        categoryHourEntries
+            .distinctBy { it.label }
+            .sortedBy { it.label }
+            .map { LegendEntry(it.label, it.color) }
+    }
+    val hourlyCumulativePoints = remember(state.spends, hourlyDate) {
+        calculateHourlyCumulativePoints(state.spends, hourlyDate)
+    }
+    val periodDayCount = remember(periodStartLocalDate, periodEndLocalDate) {
+        if (periodStartLocalDate == null || periodEndLocalDate == null) 1
+        else ChronoUnit.DAYS.between(periodStartLocalDate, periodEndLocalDate).toInt() + 1
+    }
+    val currentDayIndex = remember(hourlyDate, periodStartLocalDate) {
+        if (periodStartLocalDate == null) 1
+        else ChronoUnit.DAYS.between(periodStartLocalDate, hourlyDate).toInt() + 1
     }
 
     Card(
@@ -463,11 +576,13 @@ fun BudgetGraph(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         val isCategoriesMode = viewMode == BudgetGraphViewMode.CATEGORIES
+        val isHourlyView = isCategoriesMode && isDaysGranularity
 
         Column(modifier = Modifier.padding(20.dp)) {
             BudgetGraphHeader(
                 totalSpent = totalSpent,
                 currencyFormat = currencyFormat,
+                currencyCode = state.currencyCode,
             )
 
             if (hasPeriod && state.spends.isNotEmpty()) {
@@ -484,11 +599,12 @@ fun BudgetGraph(
             }
 
             if (isCategoriesMode) {
-                if (categoryLegendEntries.isNotEmpty()) {
-                    ChartLegend(entries = categoryLegendEntries)
+                val legendEntries = if (isHourlyView) hourlyLegendEntries else categoryLegendEntries
+                if (legendEntries.isNotEmpty()) {
+                    ChartLegend(entries = legendEntries)
                 }
             } else {
-                BudgetGraphLegend()
+                BudgetGraphLegend(showPrevious = !isDaysGranularity)
             }
 
             Box(
@@ -497,38 +613,73 @@ fun BudgetGraph(
                     .height(220.dp)
             ) {
                 if (isCategoriesMode) {
-                    MultiCategoryChart(
-                        entries = categoryDayEntries,
-                        dayTotals = dayTotals,
-                        currencyCode = state.currencyCode,
-                        modifier = Modifier.fillMaxSize(),
-                        startDate = if (hasPeriod) state.startPeriodDate else Date(),
-                        windowIndex = graphState.currentWindowIndex,
-                        scrollStep = graphState.scrollStep,
-                        dataSize = graphState.windowSize,
-                        dateFormatter = dateLabelFormatter,
-                        selectedDate = selectedDate,
-                        onDayTap = onDayTap,
-                    )
+                    AnimatedContent(
+                        targetState = isDaysGranularity,
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
+                        },
+                        label = "BudgetGraphCategoriesChartTransition",
+                    ) { daysGranularity ->
+                        if (daysGranularity) {
+                            MultiCategoryHourChart(
+                                entries = categoryHourEntries,
+                                date = hourlyDate,
+                                currencyCode = state.currencyCode,
+                                modifier = Modifier.fillMaxSize(),
+                                isToday = hourlyDate == LocalDate.now(),
+                            )
+                        } else {
+                            MultiCategoryChart(
+                                entries = categoryDayEntries,
+                                dayTotals = dayTotals,
+                                currencyCode = state.currencyCode,
+                                modifier = Modifier.fillMaxSize(),
+                                startDate = if (hasPeriod) state.startPeriodDate else Date(),
+                                windowIndex = graphState.currentWindowIndex,
+                                scrollStep = graphState.scrollStep,
+                                dataSize = graphState.windowSize,
+                                dateFormatter = dateLabelFormatter,
+                                selectedDate = selectedDate,
+                                onDayTap = onDayTap,
+                            )
+                        }
+                    }
                 } else {
-                    GraphCanvas(
-                        currentPoints = graphState.interpolatedCurrent,
-                        previousPoints = graphState.interpolatedPrevious,
-                        maxVal = graphState.maxVal,
-                        oldMaxVal = graphState.oldMaxVal,
-                        newMaxVal = graphState.newMaxVal,
-                        modifier = Modifier.fillMaxSize(),
-                        currencyCode = state.currencyCode,
-                        startDate = if (hasPeriod) state.startPeriodDate else Date(),
-                        currentWindowIndex = graphState.renderWindowIndex,
-                        oldWindowIndex = graphState.oldWindowIndex,
-                        scrollStep = graphState.renderScrollStep,
-                        oldScrollStep = graphState.oldScrollStep,
-                        renderDataSize = graphState.renderDataSize,
-                        oldDataSize = graphState.oldDataSize,
-                        animProgress = graphState.animProgress.value,
-                        dateFormatter = dateLabelFormatter,
-                    )
+                    AnimatedContent(
+                        targetState = isDaysGranularity,
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
+                        },
+                        label = "BudgetGraphTrendChartTransition",
+                    ) { daysGranularity ->
+                        if (daysGranularity) {
+                            GraphHourCanvas(
+                                points = hourlyCumulativePoints,
+                                currencyCode = state.currencyCode,
+                                modifier = Modifier.fillMaxSize(),
+                                isToday = hourlyDate == LocalDate.now(),
+                            )
+                        } else {
+                            GraphCanvas(
+                                currentPoints = graphState.interpolatedCurrent,
+                                previousPoints = graphState.interpolatedPrevious,
+                                maxVal = graphState.maxVal,
+                                oldMaxVal = graphState.oldMaxVal,
+                                newMaxVal = graphState.newMaxVal,
+                                modifier = Modifier.fillMaxSize(),
+                                currencyCode = state.currencyCode,
+                                startDate = if (hasPeriod) state.startPeriodDate else Date(),
+                                currentWindowIndex = graphState.renderWindowIndex,
+                                oldWindowIndex = graphState.oldWindowIndex,
+                                scrollStep = graphState.renderScrollStep,
+                                oldScrollStep = graphState.oldScrollStep,
+                                renderDataSize = graphState.renderDataSize,
+                                oldDataSize = graphState.oldDataSize,
+                                animProgress = graphState.animProgress.value,
+                                dateFormatter = dateLabelFormatter,
+                            )
+                        }
+                    }
                 }
             }
 
@@ -546,7 +697,18 @@ fun BudgetGraph(
                 )
             }
 
-            if (hasPeriod && graphState.totalWindows > 1) {
+            if (hasPeriod && isDaysGranularity) {
+                BudgetGraphDayNavigation(
+                    date = hourlyDate,
+                    dayIndex = currentDayIndex,
+                    totalDays = periodDayCount,
+                    dateFormatter = dayLabelFormatter,
+                    onPrevDay = { onSelectedDateChanged(hourlyDate.minusDays(1)) },
+                    onNextDay = { onSelectedDateChanged(hourlyDate.plusDays(1)) },
+                    canGoPrev = periodStartLocalDate == null || hourlyDate.isAfter(periodStartLocalDate),
+                    canGoNext = periodEndLocalDate == null || hourlyDate.isBefore(periodEndLocalDate),
+                )
+            } else if (hasPeriod && graphState.totalWindows > 1) {
                 BudgetGraphNavigation(
                     currentWindow = graphState.currentWindowIndex + 1,
                     totalWindows = graphState.totalWindows,
@@ -631,6 +793,24 @@ internal fun calculateCumulativePoints(
     }
 
     return if (points.isEmpty()) listOf(BigDecimal.ZERO) else points
+}
+
+internal fun calculateHourlyCumulativePoints(
+    transactions: List<Transaction>,
+    date: LocalDate,
+): List<BigDecimal> {
+    val hourlyTotals = transactions
+        .mapNotNull { tx -> tx.date?.let { dt -> if (dt.toLocalDate() == date) dt.hour to tx.amount else null } }
+        .groupBy({ it.first }, { it.second })
+        .mapValues { it.value.sumOf { amount -> amount } }
+
+    val points = mutableListOf<BigDecimal>()
+    var cumulativeSum = BigDecimal.ZERO
+    for (hour in 0 until 24) {
+        cumulativeSum += hourlyTotals[hour] ?: BigDecimal.ZERO
+        points.add(cumulativeSum)
+    }
+    return points
 }
 
 @Preview(showBackground = true)

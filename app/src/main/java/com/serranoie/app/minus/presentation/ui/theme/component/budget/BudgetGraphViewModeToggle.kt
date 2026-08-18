@@ -32,7 +32,7 @@ internal fun BudgetGraphViewModeToggle(
 
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.End),
+        horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally),
     ) {
         modes.forEachIndexed { index, mode ->
             val isSelected = selected == mode

@@ -1,9 +1,17 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -15,6 +23,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
+import kotlin.math.roundToInt
 
 /** Shared draw params for [GraphCanvas] and [MultiCategoryChart]. */
 internal data class GraphDrawParams(
@@ -191,5 +200,226 @@ internal fun formatAxisValue(
         }
 
         else -> currencyFormat.format(value)
+    }
+}
+
+/** Draws a tap/drag tooltip (marker + value bubble) over [currentPoints] at [pos]; shared by [GraphCanvas] and [GraphHourCanvas]. */
+internal fun DrawScope.drawTooltipInteraction(
+    pos: Offset,
+    currentPoints: List<BigDecimal>,
+    maxVal: Float,
+    color: Color,
+    surfaceColor: Color,
+    currencyFormat: java.text.Format,
+    textMeasurer: TextMeasurer,
+    tooltipStyle: TextStyle,
+    leftMargin: Float,
+    topPadding: Float,
+    bottomMargin: Float
+) {
+    val width = size.width
+    val height = size.height
+    val drawableWidth = width - leftMargin
+    val drawableHeight = height - bottomMargin - topPadding
+
+    val stepWidth = drawableWidth / (currentPoints.size - 1).coerceAtLeast(1)
+    val index = ((pos.x - leftMargin) / stepWidth).roundToInt().coerceIn(0, currentPoints.size - 1)
+
+    val amount = currentPoints[index]
+    val pointX = leftMargin + index * stepWidth
+    val pointY = height - bottomMargin - (amount.toFloat() / maxVal * drawableHeight)
+
+    drawLine(
+        color = color.copy(alpha = 0.5f),
+        start = Offset(pointX, topPadding),
+        end = Offset(pointX, height - bottomMargin),
+        strokeWidth = 1.dp.toPx()
+    )
+
+    drawCircle(
+        color = color,
+        radius = 6.dp.toPx(),
+        center = Offset(pointX, pointY)
+    )
+
+    drawCircle(
+        color = surfaceColor,
+        radius = 3.dp.toPx(),
+        center = Offset(pointX, pointY)
+    )
+
+    val textLayoutResult = textMeasurer.measure(
+        text = currencyFormat.format(amount),
+        style = tooltipStyle
+    )
+    val tooltipWidth = textLayoutResult.size.width + 16.dp.toPx()
+    val tooltipHeight = textLayoutResult.size.height + 8.dp.toPx()
+
+    val tooltipX = (pointX - tooltipWidth / 2).coerceIn(0f, width - tooltipWidth)
+    val tooltipY = (pointY - tooltipHeight - 12.dp.toPx()).coerceAtLeast(topPadding)
+
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.8f),
+        topLeft = Offset(tooltipX, tooltipY),
+        size = Size(tooltipWidth, tooltipHeight),
+        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
+    )
+
+    drawText(
+        textMeasurer = textMeasurer,
+        text = currencyFormat.format(amount),
+        style = tooltipStyle,
+        topLeft = Offset(tooltipX + 8.dp.toPx(), tooltipY + 4.dp.toPx())
+    )
+}
+
+/** Draws [points] as a gradient-filled area under a line; shared by [GraphCanvas] and [GraphHourCanvas]. */
+internal fun DrawScope.drawGraphArea(
+    points: List<BigDecimal>,
+    maxVal: Float,
+    color: Color,
+    leftMargin: Float,
+    topPadding: Float,
+    bottomMargin: Float
+) {
+    val canvasWidth = size.width
+    val canvasHeight = size.height
+    val drawableWidth = canvasWidth - leftMargin
+    val drawableHeight = canvasHeight - bottomMargin - topPadding
+
+    val stepWidth = drawableWidth / (points.size - 1).coerceAtLeast(1)
+
+    val path = Path().apply {
+        points.forEachIndexed { index, value ->
+            val x = leftMargin + index * stepWidth
+            val y = canvasHeight - bottomMargin - (value.toFloat() / maxVal * drawableHeight)
+            if (index == 0) moveTo(x, y) else lineTo(x, y)
+        }
+        val lastX = leftMargin + (points.size - 1) * stepWidth
+        lineTo(lastX, canvasHeight - bottomMargin)
+        lineTo(leftMargin, canvasHeight - bottomMargin)
+        close()
+    }
+
+    drawPath(
+        path = path,
+        brush = Brush.verticalGradient(
+            colors = listOf(
+                color.copy(alpha = 0.35f),
+                color.copy(alpha = 0.15f),
+                Color.Transparent
+            ),
+            startY = topPadding,
+            endY = canvasHeight - bottomMargin
+        ),
+        style = Fill
+    )
+}
+
+/** Draws [points] as a rounded stroke line; shared by [GraphCanvas] and [GraphHourCanvas]. */
+internal fun DrawScope.drawGraphLine(
+    points: List<BigDecimal>,
+    maxVal: Float,
+    color: Color,
+    width: Float,
+    leftMargin: Float,
+    topPadding: Float,
+    bottomMargin: Float
+) {
+    val canvasWidth = size.width
+    val canvasHeight = size.height
+    val drawableWidth = canvasWidth - leftMargin
+    val drawableHeight = canvasHeight - bottomMargin - topPadding
+
+    val stepWidth = drawableWidth / (points.size - 1).coerceAtLeast(1)
+
+    val path = Path().apply {
+        points.forEachIndexed { index, value ->
+            val x = leftMargin + index * stepWidth
+            val y = canvasHeight - bottomMargin - (value.toFloat() / maxVal * drawableHeight)
+            if (index == 0) moveTo(x, y) else lineTo(x, y)
+        }
+    }
+
+    drawPath(
+        path = path,
+        color = color,
+        style = Stroke(
+            width = width,
+            cap = StrokeCap.Round,
+            join = StrokeJoin.Round
+        )
+    )
+}
+
+/** The 12a.m./4a.m./etc-style tick hours [MultiCategoryHourChart] and [GraphHourCanvas] label their hour axis with. */
+internal val AXIS_TICK_HOURS = listOf(0, 4, 8, 12, 16, 20, 23)
+
+/** Formats an hour-of-day (0-23) as "12a.m.", "4a.m.", "11p.m.", etc. */
+internal fun hourLabel(hour: Int): String {
+    val displayHour = hour % 12
+    val suffix = if (hour < 12) "a.m." else "p.m."
+    return "${if (displayHour == 0) 12 else displayHour}$suffix"
+}
+
+/** Draws the shared $ gridlines for the 24-hour axis used by [MultiCategoryHourChart] and [GraphHourCanvas]. */
+internal fun DrawScope.drawHourGridlines(
+    leftMargin: Float,
+    baseline: Float,
+    drawableWidth: Float,
+    drawableHeight: Float,
+    width: Float,
+    maxVal: Float,
+    gridColor: Color,
+    textMeasurer: TextMeasurer,
+    labelStyle: TextStyle,
+    currencyFormat: java.text.Format,
+    alpha: Float = 1f,
+) {
+    val gridLinesCount = 3
+    for (i in 0..gridLinesCount) {
+        val fraction = i.toFloat() / gridLinesCount
+        val y = baseline - (fraction * drawableHeight)
+
+        drawLine(
+            color = gridColor.copy(alpha = gridColor.alpha * alpha),
+            start = Offset(leftMargin, y),
+            end = Offset(width, y),
+            strokeWidth = 1.dp.toPx(),
+        )
+
+        val value = (maxVal * fraction).toBigDecimal()
+        val textLayoutResult = textMeasurer.measure(
+            text = currencyFormat.format(value),
+            style = labelStyle.copy(color = labelStyle.color.copy(alpha = labelStyle.color.alpha * alpha)),
+        )
+        drawText(
+            textLayoutResult = textLayoutResult,
+            topLeft = Offset(
+                x = leftMargin - textLayoutResult.size.width - 8.dp.toPx(),
+                y = y - textLayoutResult.size.height / 2
+            )
+        )
+    }
+}
+
+/** Draws the shared 12a.m.-11p.m. tick labels used by [MultiCategoryHourChart] and [GraphHourCanvas]. */
+internal fun DrawScope.drawHourAxisLabels(
+    leftMargin: Float,
+    baseline: Float,
+    stepWidth: Float,
+    textMeasurer: TextMeasurer,
+    labelStyle: TextStyle,
+) {
+    AXIS_TICK_HOURS.forEach { hour ->
+        val x = leftMargin + hour * stepWidth
+        val textLayoutResult = textMeasurer.measure(hourLabel(hour), labelStyle)
+        drawText(
+            textLayoutResult = textLayoutResult,
+            topLeft = Offset(
+                x = x - textLayoutResult.size.width / 2,
+                y = baseline + 4.dp.toPx()
+            )
+        )
     }
 }
