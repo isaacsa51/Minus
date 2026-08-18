@@ -96,9 +96,9 @@
     <string name="finalize_period">예산 기간 조기 마감</string>
     <string name="finalize_period_confirm">현재 기간을 종료하고 새 기간을 시작합니다. 진행하시겠습니까?</string>
     <string name="finalize_action">마감하기</string>
-    <string name="rollover_preview_split_equally">You have %1$s left unspent. When this period ends, it will be spread across every day of your next budget.</string>
-    <string name="rollover_preview_add_to_first_day">You have %1$s left unspent. When this period ends, it will be added to the first day of your next budget.</string>
-    <string name="rollover_preview_ask_always">You have %1$s left unspent. You\'ll be asked what to do with it when this period ends.</string>
+    <string name="rollover_preview_split_equally">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 종료되면 이 금액은 다음 예산 기간의 매일매일로 분배됩니다.</string>
+    <string name="rollover_preview_add_to_first_day">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 종료되면 이 금액은 다음 예산의 첫날에 합산됩니다.</string>
+    <string name="rollover_preview_ask_always">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 끝나면 이 금액을 어떻게 처리할지 묻는 메시지가 표시됩니다.</string>
     <string name="no_ending_date">종료일 없음</string>
     <string name="budget_split_logic">예산을 어떻게 나누시겠습니까?</string>
     <string name="new_budget_period">새 예산 기간</string>
@@ -335,6 +335,7 @@
     <string name="bug_report_upload_assets">파일 업로드</string>
     <string name="bug_report_upload_assets_subtitle">스크린샷 또는 동영상(최대 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">첨부 파일 %1$d개 선택됨</string>
+    <string name="bug_report_remove_attachment">첨부 파일 제거</string>
     <string name="settings_backup_title">데이터 백업</string>
     <string name="settings_backup_subtitle">데이터를 minus_export.csv 파일로 백업합니다.</string>
     <string name="settings_import_csv_title">CSV 가져오기</string>
