@@ -98,6 +98,7 @@
     <string name="finalize_period">予算期間を早期に完了</string>
     <string name="finalize_period_confirm">現在の期間を終了し、新しい期間を開始します。よろしいですか？</string>
     <string name="finalize_action">完了</string>
+    <string name="rollover_preview_ask_always">未使用の残高が %1$s あります。この期間が終了した際に、その残高の取り扱いについて確認されます。</string>
     <string name="no_ending_date">終了日なし</string>
     <string name="budget_split_logic">予算をどのように分割しますか？</string>
     <string name="new_budget_period">新しい予算期間</string>
@@ -334,6 +335,7 @@
     <string name="bug_report_upload_assets">アセットをアップロード</string>
     <string name="bug_report_upload_assets_subtitle">スクリーンショットまたは動画 (最大 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d 添付ファイルが選択されています</string>
+    <string name="bug_report_remove_attachment">添付ファイルを削除する</string>
     <string name="settings_backup_title">データのバックアップ</string>
     <string name="settings_backup_subtitle">minus_export.csvにデータをバックアップ</string>
     <string name="settings_import_csv_title">CSVをインポート</string>
@@ -566,4 +568,6 @@
     <string name="budget_pill_calc_added">%1$sが追加されます</string>
     <string name="budget_pill_calc_subtracted">%1$sが差し引かれます</string>
     <string name="no_name_income">名称未設定の収入</string>
+    <string name="rollover_preview_split_equally">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算期間の各日に割り当てられます。</string>
+    <string name="rollover_preview_add_to_first_day">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算の初日に繰り越されます。</string>
 </resources>

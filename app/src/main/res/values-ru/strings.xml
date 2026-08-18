@@ -100,6 +100,7 @@
     <string name="finalize_period">Finalize budget period early</string>
     <string name="finalize_period_confirm">This will close the current period and start a new one. Are you sure?</string>
     <string name="finalize_action">Finalize</string>
+    <string name="rollover_preview_ask_always">У вас осталось неизрасходованным %1$s. По окончании этого периода вам будет предложено решить, как распорядиться этой суммой.</string>
     <string name="no_ending_date">No ending date</string>
     <string name="budget_split_logic">How do you want to split the budget?</string>
     <string name="new_budget_period">New Budget Period</string>
@@ -340,6 +341,7 @@
     <string name="bug_report_upload_assets">Upload Assets</string>
     <string name="bug_report_upload_assets_subtitle">Screenshots or videos (up to 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d attachment(s) selected</string>
+    <string name="bug_report_remove_attachment">Удалить вложение</string>
     <string name="settings_backup_title">Back up data</string>
     <string name="settings_backup_subtitle">Back up data to minus_export.csv</string>
     <string name="settings_import_csv_title">Import CSV</string>
@@ -366,6 +368,7 @@
     <string name="budget_pill_over_budget">Budget amount Exceeded</string>
     <string name="budget_pill_no_budget">No budget</string>
     <string name="budget_pill_no_budget_action">Set up your budget</string>
+    <string name="budget_pill_calc_subtracted">Будет вычтено %1$s</string>
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Weekly</string>
     <string name="budget_pill_exhausted_biweekly_label">Biweekly</string>
@@ -490,6 +493,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>
     <string name="no_name">No name</string>
+    <string name="no_name_income">Неуказанный доход</string>
     <string name="description">Description</string>
     <string name="date">Date</string>
     <string name="frequency">Frequency</string>
@@ -569,4 +573,7 @@
     <string name="graph_granularity_total">Total</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
+    <string name="rollover_preview_split_equally">У вас осталось неизрасходованным %1$s. По окончании этого периода данная сумма будет распределена по дням вашего следующего бюджета.</string>
+    <string name="rollover_preview_add_to_first_day">У вас осталось неизрасходованным %1$s. По окончании этого периода эта сумма будет перенесена на первый день вашего следующего бюджетного периода.</string>
+    <string name="budget_pill_calc_added">Будет добавлено: %1$s</string>
 </resources>

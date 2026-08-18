@@ -98,6 +98,9 @@
     <string name="finalize_period">Completare il periodo di bilancio in anticipo</string>
     <string name="finalize_period_confirm">Questo chiuderà il periodo corrente e ne inizierà uno nuovo. Sei sicuro?</string>
     <string name="finalize_action">Finalizza</string>
+    <string name="rollover_preview_split_equally">Ti rimangono %1$s non spesi. Al termine di questo periodo, l\'importo verrà ripartito su ogni giorno del tuo prossimo budget.</string>
+    <string name="rollover_preview_add_to_first_day">Ti rimangono %1$s non spesi. Al termine di questo periodo, l\'importo verrà aggiunto al primo giorno del tuo prossimo budget.</string>
+    <string name="rollover_preview_ask_always">Ti sono rimasti %1$s non spesi. Ti verrà chiesto cosa farne al termine di questo periodo.</string>
     <string name="no_ending_date">Nessuna data di fine</string>
     <string name="budget_split_logic">Come vuoi dividere il bilancio?</string>
     <string name="new_budget_period">Nuovo Periodo Bilancio</string>
@@ -334,6 +337,7 @@
     <string name="bug_report_upload_assets">Carica Risorse</string>
     <string name="bug_report_upload_assets_subtitle">Screenshot o video (fino a 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d allegato(i) selezionato(i)</string>
+    <string name="bug_report_remove_attachment">Rimuovi allegato</string>
     <string name="settings_backup_title">Backup dati</string>
     <string name="settings_backup_subtitle">Backup dei dati su minus_export.csv</string>
     <string name="settings_import_csv_title">Importa CSV</string>

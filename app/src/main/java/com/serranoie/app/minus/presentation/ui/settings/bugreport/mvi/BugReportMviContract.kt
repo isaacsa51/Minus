@@ -54,6 +54,7 @@ sealed interface BugReportUiIntent {
 	data class FinishStepExit(val stepId: Long) : BugReportUiIntent
 	data class ChangeAdditionalInfo(val value: String) : BugReportUiIntent
 	data class SelectAttachments(val uris: List<Uri>) : BugReportUiIntent
+	data class RemoveAttachment(val uri: Uri) : BugReportUiIntent
 	data object SubmitReport : BugReportUiIntent
 }
 

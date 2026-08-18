@@ -98,6 +98,7 @@
     <string name="finalize_period">Ολοκλήρωση της περιόδου προϋπολογισμού νωρίς</string>
     <string name="finalize_period_confirm">Αυτό θα κλείσει την τρέχουσα περίοδο και θα ξεκινήσει μια νέα. Είσαι σίγουρος?</string>
     <string name="finalize_action">Ολοκλήρωση</string>
+    <string name="rollover_preview_ask_always">You have %1$s left unspent. You\'ll be asked what to do with it when this period ends.</string>
     <string name="no_ending_date">Χωρίς ημερομηνία λήξης</string>
     <string name="budget_split_logic">Πώς θέλετε να χωρίσετε τον προϋπολογισμό?</string>
     <string name="new_budget_period">Νέα Περίοδος Προϋπολογισμού</string>
@@ -333,6 +334,7 @@
     <string name="bug_report_upload_assets">Μεταφόρτωση Αντικειμένων</string>
     <string name="bug_report_upload_assets_subtitle">Στιγμιότυπα ή βίντεο (μέχρι 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">Επιλέχθηκε %1$d συνημμένο(α)</string>
+    <string name="bug_report_remove_attachment">Αφαίρεση συνημμένου</string>
     <string name="settings_backup_title">Αντίγραφο ασφαλείας δεδομένων</string>
     <string name="settings_backup_subtitle">Δημιουργία αντιγράφων ασφαλείας δεδομένων σε minus_export.csv</string>
     <string name="settings_import_csv_title">Εισαγωγή CSV</string>
@@ -566,4 +568,6 @@
     <string name="budget_pill_calc_added">Θα προστεθεί %1$s</string>
     <string name="budget_pill_calc_subtracted">Θα αφαιρεθεί %1$s</string>
     <string name="no_name_income">Μη κατονομασμένο εισόδημα</string>
+    <string name="rollover_preview_split_equally">Σας έχουν μείνει %1$s αχρησιμοποίητα. Όταν λήξει αυτή η περίοδος, θα κατανεμηθεί σε κάθε ημέρα του επόμενου προϋπολογισμού σας.</string>
+    <string name="rollover_preview_add_to_first_day">Σας έχουν μείνει %1$s αχρησιμοποίητα. Όταν λήξει αυτή η περίοδος, θα προστεθεί στην πρώτη ημέρα του επόμενου προϋπολογισμού σας.</string>
 </resources>

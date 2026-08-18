@@ -98,6 +98,7 @@
     <string name="finalize_period">Finalizar periodo de ahorro temprano</string>
     <string name="finalize_period_confirm">Esto cerrará el período actual y comenzará uno nuevo. ¿Está seguro?</string>
     <string name="finalize_action">Finalizar</string>
+    <string name="rollover_preview_ask_always">Te quedan %1$s sin gastar. Se te preguntará qué hacer con ellos cuando termine este período.</string>
     <string name="no_ending_date">Sin fecha de finalización</string>
     <string name="budget_split_logic">¿Cómo quieres dividir el presupuesto?</string>
     <string name="new_budget_period">Nuevo período de ahorro</string>
@@ -334,6 +335,7 @@
     <string name="bug_report_upload_assets">Subir archivos</string>
     <string name="bug_report_upload_assets_subtitle">Capturas o videos (hasta 10 MB)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d archivo(s) seleccionado(s)</string>
+    <string name="bug_report_remove_attachment">Eliminar archivo adjunto</string>
     <string name="settings_backup_title">Copia de seguridad de datos</string>
     <string name="settings_backup_subtitle">Realizar una copia de seguridad de los datos en minus_export.csv</string>
     <string name="settings_import_csv_title">Importar CSV</string>
@@ -360,6 +362,7 @@
     <string name="budget_pill_over_budget">Monto del presupuesto excedido</string>
     <string name="budget_pill_no_budget">Sin presupuesto</string>
     <string name="budget_pill_no_budget_action">Establece tu presupuesto</string>
+    <string name="budget_pill_calc_subtracted">%1$s será restado</string>
     <string name="budget_pill_exhausted_daily_label">diario</string>
     <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
@@ -484,6 +487,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Sin fecha</string>
     <string name="no_name">Sin nombre</string>
+    <string name="no_name_income">Ingreso sin nombre</string>
     <string name="description">Razón de Compra</string>
     <string name="date">Fecha</string>
     <string name="frequency">Frecuencia</string>
@@ -563,4 +567,7 @@
     <string name="graph_granularity_total">Total</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
+    <string name="rollover_preview_split_equally">Te quedan %1$s sin gastar. Cuando termine este período, se repartirán entre todos los días de tu próximo presupuesto.</string>
+    <string name="rollover_preview_add_to_first_day">Te quedan %1$s sin gastar. Cuando termine este período, se añadirán al primer día de tu próximo presupuesto.</string>
+    <string name="budget_pill_calc_added">%1$s será añadido</string>
 </resources>

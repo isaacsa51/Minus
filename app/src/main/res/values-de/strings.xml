@@ -337,6 +337,7 @@
     <string name="bug_report_upload_assets">Upload Assets</string>
     <string name="bug_report_upload_assets_subtitle">Screenshots or videos (up to 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d attachment(s) selected</string>
+    <string name="bug_report_remove_attachment">Anhang entfernen</string>
     <string name="settings_backup_title">Back up data</string>
     <string name="settings_backup_subtitle">Back up data to minus_export.csv</string>
     <string name="settings_import_csv_title">Import CSV</string>
@@ -363,6 +364,7 @@
     <string name="budget_pill_over_budget">Budget amount Exceeded</string>
     <string name="budget_pill_no_budget">No budget</string>
     <string name="budget_pill_no_budget_action">Set up your budget</string>
+    <string name="budget_pill_calc_subtracted">%1$s wird abgezogen</string>
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Wöchentlich</string>
     <string name="budget_pill_exhausted_biweekly_label">alle zwei Wochen</string>
@@ -487,6 +489,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>
     <string name="no_name">No name</string>
+    <string name="no_name_income">Nicht näher bezeichnete Einkünfte</string>
     <string name="description">Description</string>
     <string name="date">Datum</string>
     <string name="frequency">Häufigkeit</string>
@@ -566,4 +569,5 @@
     <string name="graph_granularity_total">Total</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
+    <string name="budget_pill_calc_added">%1$s wird hinzugefügt</string>
 </resources>

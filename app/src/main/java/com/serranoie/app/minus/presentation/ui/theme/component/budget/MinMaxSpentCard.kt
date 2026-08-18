@@ -208,7 +208,7 @@ fun MinMaxSpentCard(
                         .fillMaxWidth(),
                     spends = spends,
                     markedTransaction = spent,
-                    chartPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
+                    chartPadding = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
                     showBeforeMarked = 4,
                     showAfterMarked = 1,
                 )
