@@ -1,22 +1,43 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
+import android.content.res.Configuration
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
@@ -25,6 +46,124 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import kotlin.math.roundToInt
+
+@Stable
+private class CategoryChartTransitionState(
+    initialEntries: List<CategoryDayEntry>,
+    initialDayTotals: Map<LocalDate, BigDecimal>,
+    initialWindowIndex: Int,
+    initialScrollStep: Int,
+    initialDataSize: Int,
+) {
+    private var targetEntries by mutableStateOf(initialEntries)
+    private var targetDayTotals by mutableStateOf(initialDayTotals)
+    private var targetWindowIndex by mutableIntStateOf(initialWindowIndex)
+    private var targetScrollStep by mutableIntStateOf(initialScrollStep)
+    private var targetDataSize by mutableIntStateOf(initialDataSize)
+
+    var renderEntries by mutableStateOf(initialEntries)
+        private set
+    var renderDayTotals by mutableStateOf(initialDayTotals)
+        private set
+    var renderWindowIndex by mutableIntStateOf(initialWindowIndex)
+        private set
+    var renderScrollStep by mutableIntStateOf(initialScrollStep)
+        private set
+    var renderDataSize by mutableIntStateOf(initialDataSize)
+        private set
+
+    var oldEntries by mutableStateOf(initialEntries)
+        private set
+    var oldDayTotals by mutableStateOf(initialDayTotals)
+        private set
+    var oldWindowIndex by mutableIntStateOf(initialWindowIndex)
+        private set
+    var oldScrollStep by mutableIntStateOf(initialScrollStep)
+        private set
+    var oldDataSize by mutableIntStateOf(initialDataSize)
+        private set
+
+    val animProgress = Animatable(1f)
+
+    fun updateTarget(
+        entries: List<CategoryDayEntry>,
+        dayTotals: Map<LocalDate, BigDecimal>,
+        windowIndex: Int,
+        scrollStep: Int,
+        dataSize: Int,
+    ) {
+        targetEntries = entries
+        targetDayTotals = dayTotals
+        targetWindowIndex = windowIndex
+        targetScrollStep = scrollStep
+        targetDataSize = dataSize
+    }
+
+    suspend fun reconcile(animDuration: Int = 600) {
+        val layoutChanged = targetWindowIndex != renderWindowIndex ||
+            targetScrollStep != renderScrollStep ||
+            targetDataSize != renderDataSize
+
+        if (layoutChanged) {
+            oldEntries = renderEntries
+            oldDayTotals = renderDayTotals
+            oldWindowIndex = renderWindowIndex
+            oldScrollStep = renderScrollStep
+            oldDataSize = renderDataSize
+
+            renderEntries = targetEntries
+            renderDayTotals = targetDayTotals
+            renderWindowIndex = targetWindowIndex
+            renderScrollStep = targetScrollStep
+            renderDataSize = targetDataSize
+
+            animProgress.snapTo(0f)
+            animProgress.animateTo(1f, animationSpec = tween(animDuration))
+        } else if (targetEntries != renderEntries || targetDayTotals != renderDayTotals) {
+            renderEntries = targetEntries
+            renderDayTotals = targetDayTotals
+        }
+    }
+}
+
+@Composable
+private fun rememberCategoryChartTransitionState(
+    entries: List<CategoryDayEntry>,
+    dayTotals: Map<LocalDate, BigDecimal>,
+    windowIndex: Int,
+    scrollStep: Int,
+    dataSize: Int,
+): CategoryChartTransitionState {
+    val state = remember {
+        CategoryChartTransitionState(
+            initialEntries = entries,
+            initialDayTotals = dayTotals,
+            initialWindowIndex = windowIndex,
+            initialScrollStep = scrollStep,
+            initialDataSize = dataSize,
+        )
+    }
+    LaunchedEffect(entries, dayTotals, windowIndex, scrollStep, dataSize) {
+        state.updateTarget(entries, dayTotals, windowIndex, scrollStep, dataSize)
+        state.reconcile()
+    }
+    return state
+}
+
+private fun categoryChartMaxVal(dayTotals: Map<LocalDate, BigDecimal>): Float {
+    val rawMax = dayTotals.values.maxOrNull() ?: BigDecimal.ZERO
+    return if (rawMax <= BigDecimal.ZERO) 100f else rawMax.multiply(BigDecimal("1.25")).toFloat()
+}
+
+private fun categoryEntriesByDayIndex(
+    entries: List<CategoryDayEntry>,
+    startLocalDate: LocalDate,
+    windowStartIndex: Int,
+    dataSize: Int,
+): Map<Int, List<CategoryDayEntry>> = (0 until dataSize).associateWith { index ->
+    val date = startLocalDate.plusDays((windowStartIndex + index).toLong())
+    entries.filter { it.date == date }.sortedBy { it.label }
+}
 
 @Composable
 internal fun MultiCategoryChart(
@@ -73,21 +212,53 @@ internal fun MultiCategoryChart(
             )
         }
 
-    val maxVal = remember(dayTotals) {
-        val rawMax = dayTotals.values.maxOrNull() ?: BigDecimal.ZERO
-        if (rawMax <= BigDecimal.ZERO) 100f else rawMax.multiply(BigDecimal("1.25")).toFloat()
-    }
-
     val startLocalDate = remember(startDate) {
         startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
     }
     val windowStartIndex = windowIndex * scrollStep
 
-    val entriesByDayIndex = remember(entries, startLocalDate, windowStartIndex, dataSize) {
-        (0 until dataSize).associateWith { index ->
-            val date = startLocalDate.plusDays((windowStartIndex + index).toLong())
-            entries.filter { it.date == date }.sortedBy { it.label }
-        }
+    val transitionState = rememberCategoryChartTransitionState(
+        entries = entries,
+        dayTotals = dayTotals,
+        windowIndex = windowIndex,
+        scrollStep = scrollStep,
+        dataSize = dataSize,
+    )
+
+    val renderEntriesByDayIndex = remember(
+        transitionState.renderEntries,
+        startLocalDate,
+        transitionState.renderWindowIndex,
+        transitionState.renderScrollStep,
+        transitionState.renderDataSize,
+    ) {
+        categoryEntriesByDayIndex(
+            entries = transitionState.renderEntries,
+            startLocalDate = startLocalDate,
+            windowStartIndex = transitionState.renderWindowIndex * transitionState.renderScrollStep,
+            dataSize = transitionState.renderDataSize,
+        )
+    }
+    val oldEntriesByDayIndex = remember(
+        transitionState.oldEntries,
+        startLocalDate,
+        transitionState.oldWindowIndex,
+        transitionState.oldScrollStep,
+        transitionState.oldDataSize,
+    ) {
+        categoryEntriesByDayIndex(
+            entries = transitionState.oldEntries,
+            startLocalDate = startLocalDate,
+            windowStartIndex = transitionState.oldWindowIndex * transitionState.oldScrollStep,
+            dataSize = transitionState.oldDataSize,
+        )
+    }
+
+    val renderMaxVal = remember(transitionState.renderDayTotals) {
+        categoryChartMaxVal(transitionState.renderDayTotals)
+    }
+    val oldMaxVal = remember(transitionState.oldDayTotals) {
+        categoryChartMaxVal(transitionState.oldDayTotals)
     }
 
     val gestureModifier = if (onDayTap != null) {
@@ -116,72 +287,262 @@ internal fun MultiCategoryChart(
         val topPadding = 10.dp.toPx()
         val drawableHeight = height - bottomMargin - topPadding
         val drawableWidth = width - leftMargin
-        val stepWidth = drawableWidth / (dataSize - 1).coerceAtLeast(1)
-        val barWidth = (stepWidth * 0.55f).coerceAtMost(28.dp.toPx())
-        val segmentGap = 3.dp.toPx()
-        val maxSegmentCornerRadius = 6.dp.toPx()
+        val segmentGap = 1.dp.toPx()
+        val maxSegmentCornerRadius = 5.dp.toPx()
         val baseline = height - bottomMargin
 
-        drawCoordinateSystem(
-            params = drawParams,
-            textMeasurer = textMeasurer,
-            currencyFormat = currencyFormat,
-            dateFormatter = dateFormatter,
-            startDate = startDate,
-            windowIndex = windowIndex,
-            scrollStep = scrollStep,
-            dataSize = dataSize,
-            maxVal = maxVal,
-            alpha = 1f,
-            thousandsUnit = thousandsUnit,
-            millionsUnit = millionsUnit,
-            isTodayHighlighted = true,
-        )
+        val progress = transitionState.animProgress.value
+        val oldStepWidth = drawableWidth / (transitionState.oldDataSize - 1).coerceAtLeast(1)
+        val newStepWidth = drawableWidth / (transitionState.renderDataSize - 1).coerceAtLeast(1)
+        val stepWidth = lerp(oldStepWidth, newStepWidth, progress)
+        val barWidth = (stepWidth * 0.55f).coerceAtMost(28.dp.toPx())
 
-        for (index in 0 until dataSize) {
-            val dayEntries = entriesByDayIndex[index].orEmpty()
-            if (dayEntries.isEmpty()) continue
+        val oldAlpha = (1f - progress).coerceIn(0f, 1f)
+        val newAlpha = progress.coerceIn(0f, 1f)
 
-            val x = leftMargin + index * stepWidth
-            val date = startLocalDate.plusDays((windowStartIndex + index).toLong())
-            val total = dayTotals[date] ?: BigDecimal.ZERO
-
-            if (date == selectedDate) {
-                drawRoundRect(
-                    color = tertiaryColor.copy(alpha = 0.15f),
-                    topLeft = Offset(x - barWidth / 2 - 4.dp.toPx(), topPadding),
-                    size = Size(barWidth + 8.dp.toPx(), baseline - topPadding),
-                    cornerRadius = CornerRadius(4.dp.toPx()),
-                )
-            }
-
-            var segmentBottom = baseline
-            var barTop = baseline
-            dayEntries.forEach { entry ->
-                val segmentHeight =
-                    (entry.amount.toFloat() / maxVal * drawableHeight).coerceAtLeast(1f)
-                val segmentTop = segmentBottom - segmentHeight
-                val cornerRadiusPx =
-                    maxSegmentCornerRadius.coerceAtMost(minOf(barWidth, segmentHeight) / 2f)
-                drawRoundRect(
-                    color = entry.color,
-                    topLeft = Offset(x - barWidth / 2, segmentTop),
-                    size = Size(barWidth, segmentHeight),
-                    cornerRadius = CornerRadius(cornerRadiusPx),
-                )
-                barTop = segmentTop
-                segmentBottom = segmentTop - segmentGap
-            }
-
-            val labelText = formatAxisValue(total, currencyFormat, thousandsUnit, millionsUnit)
-            val textLayoutResult = textMeasurer.measure(labelText, totalLabelStyle)
-            drawText(
-                textLayoutResult = textLayoutResult,
-                topLeft = Offset(
-                    x = x - textLayoutResult.size.width / 2,
-                    y = barTop - textLayoutResult.size.height - 4.dp.toPx(),
-                ),
+        if (oldAlpha > 0f && progress < 1f) {
+            drawCoordinateSystem(
+                params = drawParams,
+                textMeasurer = textMeasurer,
+                currencyFormat = currencyFormat,
+                dateFormatter = dateFormatter,
+                startDate = startDate,
+                windowIndex = transitionState.oldWindowIndex,
+                scrollStep = transitionState.oldScrollStep,
+                dataSize = transitionState.oldDataSize,
+                maxVal = oldMaxVal,
+                alpha = oldAlpha,
+                thousandsUnit = thousandsUnit,
+                millionsUnit = millionsUnit,
             )
+            drawCategoryBars(
+                entriesByDayIndex = oldEntriesByDayIndex,
+                dayTotals = transitionState.oldDayTotals,
+                startLocalDate = startLocalDate,
+                windowStartIndex = transitionState.oldWindowIndex * transitionState.oldScrollStep,
+                dataSize = transitionState.oldDataSize,
+                leftMargin = leftMargin,
+                baseline = baseline,
+                topPadding = topPadding,
+                stepWidth = stepWidth,
+                barWidth = barWidth,
+                segmentGap = segmentGap,
+                maxSegmentCornerRadius = maxSegmentCornerRadius,
+                drawableHeight = drawableHeight,
+                maxVal = oldMaxVal,
+                alpha = oldAlpha,
+                selectedDate = null,
+                tertiaryColor = tertiaryColor,
+                textMeasurer = textMeasurer,
+                totalLabelStyle = totalLabelStyle,
+                currencyFormat = currencyFormat,
+                thousandsUnit = thousandsUnit,
+                millionsUnit = millionsUnit,
+            )
+        }
+
+        if (newAlpha > 0f) {
+            drawCoordinateSystem(
+                params = drawParams,
+                textMeasurer = textMeasurer,
+                currencyFormat = currencyFormat,
+                dateFormatter = dateFormatter,
+                startDate = startDate,
+                windowIndex = transitionState.renderWindowIndex,
+                scrollStep = transitionState.renderScrollStep,
+                dataSize = transitionState.renderDataSize,
+                maxVal = renderMaxVal,
+                alpha = newAlpha,
+                thousandsUnit = thousandsUnit,
+                millionsUnit = millionsUnit,
+                isTodayHighlighted = true,
+            )
+            drawCategoryBars(
+                entriesByDayIndex = renderEntriesByDayIndex,
+                dayTotals = transitionState.renderDayTotals,
+                startLocalDate = startLocalDate,
+                windowStartIndex = transitionState.renderWindowIndex * transitionState.renderScrollStep,
+                dataSize = transitionState.renderDataSize,
+                leftMargin = leftMargin,
+                baseline = baseline,
+                topPadding = topPadding,
+                stepWidth = stepWidth,
+                barWidth = barWidth,
+                segmentGap = segmentGap,
+                maxSegmentCornerRadius = maxSegmentCornerRadius,
+                drawableHeight = drawableHeight,
+                maxVal = renderMaxVal,
+                alpha = newAlpha,
+                selectedDate = selectedDate,
+                tertiaryColor = tertiaryColor,
+                textMeasurer = textMeasurer,
+                totalLabelStyle = totalLabelStyle,
+                currencyFormat = currencyFormat,
+                thousandsUnit = thousandsUnit,
+                millionsUnit = millionsUnit,
+            )
+        }
+    }
+}
+
+private fun DrawScope.drawCategoryBars(
+    entriesByDayIndex: Map<Int, List<CategoryDayEntry>>,
+    dayTotals: Map<LocalDate, BigDecimal>,
+    startLocalDate: LocalDate,
+    windowStartIndex: Int,
+    dataSize: Int,
+    leftMargin: Float,
+    baseline: Float,
+    topPadding: Float,
+    stepWidth: Float,
+    barWidth: Float,
+    segmentGap: Float,
+    maxSegmentCornerRadius: Float,
+    drawableHeight: Float,
+    maxVal: Float,
+    alpha: Float,
+    selectedDate: LocalDate?,
+    tertiaryColor: Color,
+    textMeasurer: TextMeasurer,
+    totalLabelStyle: TextStyle,
+    currencyFormat: java.text.Format,
+    thousandsUnit: String,
+    millionsUnit: String,
+) {
+    for (index in 0 until dataSize) {
+        val dayEntries = entriesByDayIndex[index].orEmpty()
+        if (dayEntries.isEmpty()) continue
+
+        val x = leftMargin + index * stepWidth
+        val date = startLocalDate.plusDays((windowStartIndex + index).toLong())
+        val total = dayTotals[date] ?: BigDecimal.ZERO
+
+        if (date == selectedDate) {
+            drawRoundRect(
+                color = tertiaryColor.copy(alpha = 0.15f * alpha),
+                topLeft = Offset(x - barWidth / 2 - 4.dp.toPx(), topPadding),
+                size = Size(barWidth + 8.dp.toPx(), baseline - topPadding),
+                cornerRadius = CornerRadius(4.dp.toPx()),
+            )
+        }
+
+        var segmentBottom = baseline
+        var barTop = baseline
+        dayEntries.forEach { entry ->
+            val segmentHeight =
+                (entry.amount.toFloat() / maxVal * drawableHeight).coerceAtLeast(1f)
+            val segmentTop = segmentBottom - segmentHeight
+            val cornerRadiusPx =
+                maxSegmentCornerRadius.coerceAtMost(minOf(barWidth, segmentHeight) / 2f)
+            drawRoundRect(
+                color = entry.color.copy(alpha = entry.color.alpha * alpha),
+                topLeft = Offset(x - barWidth / 2, segmentTop),
+                size = Size(barWidth, segmentHeight),
+                cornerRadius = CornerRadius(cornerRadiusPx),
+            )
+            barTop = segmentTop
+            segmentBottom = segmentTop - segmentGap
+        }
+
+        val labelText = formatAxisValue(total, currencyFormat, thousandsUnit, millionsUnit)
+        val style = totalLabelStyle.copy(
+            color = totalLabelStyle.color.copy(alpha = totalLabelStyle.color.alpha * alpha)
+        )
+        val textLayoutResult = textMeasurer.measure(labelText, style)
+        drawText(
+            textLayoutResult = textLayoutResult,
+            topLeft = Offset(
+                x = x - textLayoutResult.size.width / 2,
+                y = barTop - textLayoutResult.size.height - 4.dp.toPx(),
+            ),
+        )
+    }
+}
+
+private val previewCategoryColors = listOf(
+    Color(0xFFF86BAE), // Food
+    Color(0xFF5FC7E7), // Transport
+    Color(0xFFFFD386), // Shopping
+)
+
+@Preview(showBackground = true, name = "Multi-Category Chart")
+@Preview(
+    showBackground = true, name = "Multi-Category Chart",
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Composable
+private fun PreviewMultiCategoryChart() {
+    val startLocalDate = LocalDate.now().minusDays(6)
+    val startDate = Date.from(startLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+    val entries = listOf(
+        CategoryDayEntry(startLocalDate.plusDays(0), "Food", BigDecimal("18"), previewCategoryColors[0]),
+        CategoryDayEntry(startLocalDate.plusDays(0), "Transport", BigDecimal("6"), previewCategoryColors[1]),
+        CategoryDayEntry(startLocalDate.plusDays(1), "Shopping", BigDecimal("42"), previewCategoryColors[2]),
+        CategoryDayEntry(startLocalDate.plusDays(3), "Food", BigDecimal("12"), previewCategoryColors[0]),
+        CategoryDayEntry(startLocalDate.plusDays(3), "Shopping", BigDecimal("20"), previewCategoryColors[2]),
+        CategoryDayEntry(startLocalDate.plusDays(4), "Transport", BigDecimal("30"), previewCategoryColors[1]),
+        CategoryDayEntry(startLocalDate.plusDays(6), "Food", BigDecimal("15"), previewCategoryColors[0]),
+        CategoryDayEntry(startLocalDate.plusDays(6), "Transport", BigDecimal("10"), previewCategoryColors[1]),
+        CategoryDayEntry(startLocalDate.plusDays(6), "Shopping", BigDecimal("25"), previewCategoryColors[2]),
+    )
+    val dayTotals = entries.groupBy { it.date }.mapValues { (_, dayEntries) -> dayEntries.sumOf { it.amount } }
+
+    MinusTheme {
+        Surface {
+            Box(Modifier.padding(16.dp)) {
+                MultiCategoryChart(
+                    entries = entries,
+                    dayTotals = dayTotals,
+                    currencyCode = "USD",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp),
+                    startDate = startDate,
+                    windowIndex = 0,
+                    scrollStep = 1,
+                    dataSize = 7,
+                    dateFormatter = DateTimeFormatter.ofPattern("dd MMM"),
+                    selectedDate = startLocalDate.plusDays(6),
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Multi-Category Chart - Sparse")
+@Preview(
+    showBackground = true, name = "Multi-Category Chart - Sparse",
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Composable
+private fun PreviewMultiCategoryChartSparse() {
+    val startLocalDate = LocalDate.now().minusDays(6)
+    val startDate = Date.from(startLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+    val entries = listOf(
+        CategoryDayEntry(startLocalDate.plusDays(2), "Food", BigDecimal("8"), previewCategoryColors[0]),
+        CategoryDayEntry(startLocalDate.plusDays(5), "Shopping", BigDecimal("60"), previewCategoryColors[2]),
+    )
+    val dayTotals = entries.groupBy { it.date }.mapValues { (_, dayEntries) -> dayEntries.sumOf { it.amount } }
+
+    MinusTheme {
+        Surface {
+            Box(Modifier.padding(16.dp)) {
+                MultiCategoryChart(
+                    entries = entries,
+                    dayTotals = dayTotals,
+                    currencyCode = "USD",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp),
+                    startDate = startDate,
+                    windowIndex = 0,
+                    scrollStep = 1,
+                    dataSize = 7,
+                    dateFormatter = DateTimeFormatter.ofPattern("dd MMM"),
+                )
+            }
         }
     }
 }

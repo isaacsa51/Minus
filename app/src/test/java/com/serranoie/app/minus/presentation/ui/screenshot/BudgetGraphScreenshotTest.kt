@@ -54,7 +54,7 @@ class BudgetGraphScreenshotTest {
     }
 
     @Test
-    fun budgetGraph_daysView_cumulative() {
+    fun budgetGraph_daysView_hourly() {
         Locale.setDefault(Locale.US)
         val start = LocalDate.of(2026, 8, 1)
         val end = LocalDate.of(2026, 8, 30)
@@ -71,6 +71,8 @@ class BudgetGraphScreenshotTest {
                             currencyCode = "USD"
                         ),
                         onGranularityChanged = {},
+                        // Mid-period day with data on both sides, so prev/next stay enabled.
+                        selectedDate = start.plusDays(10),
                     )
                 }
             }
@@ -78,19 +80,84 @@ class BudgetGraphScreenshotTest {
     }
 
     @Test
-    fun budgetGraph_categoriesView() {
+    fun budgetGraph_daysView_hourly_atPeriodStart() {
         Locale.setDefault(Locale.US)
         val start = LocalDate.of(2026, 8, 1)
-        val end = LocalDate.of(2026, 8, 7)
+        val end = LocalDate.of(2026, 8, 30)
+        paparazzi.snapshot {
+            MinusTheme {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    BudgetGraph(
+                        state = AnalyticsState(
+                            spends = mockTransactions(start),
+                            startPeriodDate = fixedDate(2026, 8, 1),
+                            finishPeriodDate = fixedDate(2026, 8, 30),
+                            budgetSettingsForDisplay = sampleSettings(start, end),
+                            graphGranularity = GraphGranularity.DAYS,
+                            currencyCode = "USD"
+                        ),
+                        onGranularityChanged = {},
+                        // The period's first day: the "previous day" stepper must be disabled,
+                        // since the graph can't show data from before the current period.
+                        selectedDate = start,
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun budgetGraph_categoriesView_hourly() {
+        Locale.setDefault(Locale.US)
+        val start = LocalDate.of(2026, 8, 1)
+        val end = LocalDate.of(2026, 8, 30)
+        val selectedDay = LocalDate.of(2026, 8, 3)
         val categories = listOf(
             Category(id = 1L, name = "Groceries"),
             Category(id = 2L, name = "Transport"),
         )
         val spends = listOf(
-            Transaction(amount = BigDecimal("150.00"), date = start.atTime(10, 0), categoryId = 1L),
-            Transaction(amount = BigDecimal("85.50"), date = start.plusDays(2).atTime(10, 0), categoryId = 2L),
-            Transaction(amount = BigDecimal("60.00"), date = start.plusDays(2).atTime(18, 0), categoryId = 1L),
-            Transaction(amount = BigDecimal("120.00"), date = start.plusDays(5).atTime(10, 0), categoryId = null),
+            Transaction(amount = BigDecimal("15.00"), date = selectedDay.atTime(8, 0), categoryId = 1L),
+            Transaction(amount = BigDecimal("6.00"), date = selectedDay.atTime(9, 30), categoryId = 2L),
+            Transaction(amount = BigDecimal("42.00"), date = selectedDay.atTime(13, 0), categoryId = null),
+            // A different day's spends must not leak into the selected day's hourly breakdown.
+            Transaction(amount = BigDecimal("300.00"), date = selectedDay.plusDays(1).atTime(10, 0), categoryId = 1L),
+        )
+        paparazzi.snapshot {
+            MinusTheme {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    BudgetGraph(
+                        state = AnalyticsState(
+                            spends = spends,
+                            categories = categories,
+                            startPeriodDate = fixedDate(2026, 8, 1),
+                            finishPeriodDate = fixedDate(2026, 8, 30),
+                            budgetSettingsForDisplay = sampleSettings(start, end),
+                            graphGranularity = GraphGranularity.DAYS,
+                            currencyCode = "USD"
+                        ),
+                        onGranularityChanged = {},
+                        initialViewMode = BudgetGraphViewMode.CATEGORIES,
+                        selectedDate = selectedDay,
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun budgetGraph_categoriesView_hourly_sameHourMultipleCategories() {
+        Locale.setDefault(Locale.US)
+        val start = LocalDate.of(2026, 8, 1)
+        val end = LocalDate.of(2026, 8, 7)
+        val selectedDay = LocalDate.of(2026, 8, 3)
+        val categories = listOf(
+            Category(id = 1L, name = "Groceries"),
+            Category(id = 2L, name = "Transport"),
+        )
+        val spends = listOf(
+            Transaction(amount = BigDecimal("25.00"), date = selectedDay.atTime(12, 15), categoryId = 1L),
+            Transaction(amount = BigDecimal("10.00"), date = selectedDay.atTime(12, 45), categoryId = 2L),
         )
         paparazzi.snapshot {
             MinusTheme {
@@ -107,43 +174,7 @@ class BudgetGraphScreenshotTest {
                         ),
                         onGranularityChanged = {},
                         initialViewMode = BudgetGraphViewMode.CATEGORIES,
-                    )
-                }
-            }
-        }
-    }
-
-    @Test
-    fun budgetGraph_categoriesView_selectedDayHighlight() {
-        Locale.setDefault(Locale.US)
-        val start = LocalDate.of(2026, 8, 1)
-        val end = LocalDate.of(2026, 8, 7)
-        val categories = listOf(
-            Category(id = 1L, name = "Groceries"),
-            Category(id = 2L, name = "Transport"),
-        )
-        val spends = listOf(
-            Transaction(amount = BigDecimal("150.00"), date = start.atTime(10, 0), categoryId = 1L),
-            Transaction(amount = BigDecimal("85.50"), date = start.plusDays(2).atTime(10, 0), categoryId = 2L),
-            Transaction(amount = BigDecimal("60.00"), date = start.plusDays(2).atTime(18, 0), categoryId = 1L),
-            Transaction(amount = BigDecimal("120.00"), date = start.plusDays(5).atTime(10, 0), categoryId = null),
-        )
-        paparazzi.snapshot {
-            MinusTheme {
-                Box(modifier = Modifier.padding(16.dp)) {
-                    BudgetGraph(
-                        state = AnalyticsState(
-                            spends = spends,
-                            categories = categories,
-                            startPeriodDate = fixedDate(2026, 8, 1),
-                            finishPeriodDate = fixedDate(2026, 8, 7),
-                            budgetSettingsForDisplay = sampleSettings(start, end),
-                            graphGranularity = GraphGranularity.DAYS,
-                            currencyCode = "USD"
-                        ),
-                        onGranularityChanged = {},
-                        initialViewMode = BudgetGraphViewMode.CATEGORIES,
-                        selectedDate = start.plusDays(2),
+                        selectedDate = selectedDay,
                     )
                 }
             }
@@ -169,6 +200,7 @@ class BudgetGraphScreenshotTest {
                         ),
                         onGranularityChanged = {},
                         initialViewMode = BudgetGraphViewMode.CATEGORIES,
+                        selectedDate = LocalDate.of(2026, 8, 3),
                     )
                 }
             }

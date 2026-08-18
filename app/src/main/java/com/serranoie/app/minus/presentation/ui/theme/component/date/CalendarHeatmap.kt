@@ -60,7 +60,6 @@ import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.googleSansFlex
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.ChartDateRange
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.font.format.getWeek
 import com.serranoie.app.minus.presentation.util.font.format.prettyWeekDay
@@ -92,7 +91,6 @@ fun CalendarHeatmap(
     startDate: Date,
     finishDate: Date,
     actualFinishDate: Date? = null,
-    highlightedRange: ChartDateRange? = null,
     onDayClick: (LocalDate) -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -178,7 +176,6 @@ fun CalendarHeatmap(
                                 spendingDays = spendingDays,
                                 maxSpending = maxSpending,
                                 cardContainerColor = cardContainerColor,
-                                highlightedRange = highlightedRange,
                                 onDayClick = onDayClick,
                             )
                         }
@@ -330,7 +327,6 @@ fun WeekRow(
     maxSpending: BigDecimal,
     cardContainerColor: Color,
     onDayClick: (LocalDate) -> Unit,
-    highlightedRange: ChartDateRange? = null,
 ) {
     val beginningWeek = week.yearMonth.atDay(1).plusWeeks(week.number.toLong())
     var currentDay = beginningWeek.with(TemporalAdjusters.previousOrSame(getWeek()[0]))
@@ -351,7 +347,6 @@ fun WeekRow(
                         hasSpending = spendingDay != null,
                         isHighestDay = spendingDay?.spending == maxSpending && maxSpending > BigDecimal.ZERO,
                         cardContainerColor = cardContainerColor,
-                        isChartHighlighted = highlightedRange?.contains(currentDay) == true,
                     )
                 } else {
                     Box(
@@ -476,7 +471,6 @@ internal fun DayCell(
     cardContainerColor: Color,
     modifier: Modifier = Modifier,
     isHighestDay: Boolean = false,
-    isChartHighlighted: Boolean = false,
 ) {
     val context = LocalContext.current
     val isRounded = remember(context) { context.isRoundedFontEnabled }
@@ -557,11 +551,11 @@ internal fun DayCell(
                 .fillMaxSize()
                 .padding(2.dp)
                 .border(
-                    width = if (current) 2.dp else if (isChartHighlighted) 1.5.dp else 1.dp,
-                    color = when {
-                        current -> MaterialTheme.colorScheme.primary
-                        isChartHighlighted -> MaterialTheme.colorScheme.tertiary
-                        else -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.65f)
+                    width = if (current) 2.dp else 1.dp,
+                    color = if (current) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.65f)
                     },
                     shape = MaterialTheme.shapes.extraSmall
                 )

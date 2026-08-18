@@ -41,18 +41,24 @@ fun ChartLegend(entries: List<LegendEntry>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-internal fun BudgetGraphLegend() {
+internal fun BudgetGraphLegend(showPrevious: Boolean = true) {
     ChartLegend(
-        entries = listOf(
-            LegendEntry(
-                label = stringResource(R.string.budget_graph_legend_current),
-                color = MaterialTheme.colorScheme.tertiary,
-            ),
-            LegendEntry(
-                label = stringResource(R.string.budget_graph_legend_previous),
-                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
-            ),
-        )
+        entries = buildList {
+            add(
+                LegendEntry(
+                    label = stringResource(R.string.budget_graph_legend_current),
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+            )
+            if (showPrevious) {
+                add(
+                    LegendEntry(
+                        label = stringResource(R.string.budget_graph_legend_previous),
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
+                    )
+                )
+            }
+        }
     )
 }
 

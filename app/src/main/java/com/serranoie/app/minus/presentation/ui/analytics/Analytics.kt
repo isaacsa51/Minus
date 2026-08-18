@@ -92,7 +92,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeade
 import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetGraph
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.ChartDateRange
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditOwedCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditTransactionsBottomSheet
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.MinMaxSpentCard
@@ -282,7 +281,6 @@ fun Analytics(
 
     val locale = LocalConfiguration.current.locales[0]
 
-    var chartVisibleRange by remember { mutableStateOf<ChartDateRange?>(null) }
     var selectedChartDate by remember { mutableStateOf<LocalDate?>(null) }
 
     val openDaySheet: (LocalDate) -> Unit = { date ->
@@ -415,8 +413,8 @@ fun Analytics(
                             modifier = Modifier.padding(horizontal = 16.dp)
                                 .bringIntoViewRequester(bringIntoViewRequesters[2]!!)
                                 .markIfInOrder(2),
-                            onVisibleDateRangeChanged = { chartVisibleRange = it },
                             onDayTap = openDaySheet,
+                            onSelectedDateChanged = { date -> selectedChartDate = date },
                             selectedDate = selectedChartDate,
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -436,8 +434,6 @@ fun Analytics(
                                 view.weakHapticFeedback()
                             },
                             onDayClick = onCalendarDayClick,
-                            highlightedRange = chartVisibleRange
-                                ?: selectedChartDate?.let { ChartDateRange(it, it) },
                             bringIntoViewRequesters = bringIntoViewRequesters,
                             markIfInOrder = markIfInOrder,
                         )
@@ -633,7 +629,7 @@ private fun FinishedPeriodBackgroundShapes(
                 .requiredSize(256.dp)
                 .absoluteOffset(x = -halfWidth * 0.55f, y = halfHeight * 0.35f - scroll * 0.25f)
                 .rotate(angleShape4)
-                .background(color = shapeColor, shape = MaterialShapes.Puffy.toShape())
+                .background(color = shapeColor, shape = MaterialShapes.Flower.toShape())
         )
     }
 }
@@ -647,7 +643,6 @@ private fun AnalyticsResponsiveLayout(
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
     onDayClick: (LocalDate) -> Unit,
-    highlightedRange: ChartDateRange?,
     bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
     markIfInOrder: Modifier.(Int) -> Modifier,
 ) {
@@ -659,7 +654,6 @@ private fun AnalyticsResponsiveLayout(
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
             onDayClick = onDayClick,
-            highlightedRange = highlightedRange,
             bringIntoViewRequesters = bringIntoViewRequesters,
             markIfInOrder = markIfInOrder,
         )
@@ -671,7 +665,6 @@ private fun AnalyticsResponsiveLayout(
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
             onDayClick = onDayClick,
-            highlightedRange = highlightedRange,
             bringIntoViewRequesters = bringIntoViewRequesters,
             markIfInOrder = markIfInOrder,
         )
@@ -686,7 +679,6 @@ private fun AnalyticsCompactLayout(
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
     onDayClick: (LocalDate) -> Unit,
-    highlightedRange: ChartDateRange?,
     bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
     markIfInOrder: Modifier.(Int) -> Modifier,
 ) {
@@ -703,7 +695,6 @@ private fun AnalyticsCompactLayout(
                     startDate = state.startPeriodDate,
                     finishDate = state.finishPeriodDate,
                     onDayClick = onDayClick,
-                    highlightedRange = highlightedRange,
                     modifier = Modifier
                         .weight(1f)
                         .wrapContentHeight()
@@ -821,7 +812,6 @@ private fun AnalyticsTabletLayout(
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
     onDayClick: (LocalDate) -> Unit,
-    highlightedRange: ChartDateRange?,
     bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
     markIfInOrder: Modifier.(Int) -> Modifier,
 ) {
@@ -848,7 +838,6 @@ private fun AnalyticsTabletLayout(
                         startDate = state.startPeriodDate,
                         finishDate = state.finishPeriodDate,
                         onDayClick = onDayClick,
-                        highlightedRange = highlightedRange,
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight()
