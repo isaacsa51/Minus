@@ -338,6 +338,7 @@
     <string name="bug_report_upload_assets">Subir archivos</string>
     <string name="bug_report_upload_assets_subtitle">Capturas o videos (hasta 10 MB)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d archivo(s) seleccionado(s)</string>
+    <string name="bug_report_remove_attachment">Eliminar archivo adjunto</string>
     <string name="settings_backup_title">Copia de seguridad de datos</string>
     <string name="settings_backup_subtitle">Realizar una copia de seguridad de los datos en minus_export.csv</string>
     <string name="settings_import_csv_title">Importar CSV</string>
