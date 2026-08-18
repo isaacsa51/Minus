@@ -96,4 +96,30 @@ object AppDatabaseMigrations {
             )
         }
     }
+
+    val MIGRATION_15_16: Migration = object : Migration(15, 16) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Transactions created before category auto-resolution existed (e.g. CSV imports,
+            // which never called findOrCreateCategory) are left with categoryId = NULL even
+            // though their comment holds the category name, so they always render as
+            // "Uncategorized" in analytics. Back-fill a category per distinct comment and link it.
+            db.execSQL(
+                """
+                INSERT OR IGNORE INTO category (name, isHidden, usageCount, lastUsedAt, createdAt)
+                SELECT DISTINCT TRIM(comment), 0, 0, NULL, ${System.currentTimeMillis()}
+                FROM transactions
+                WHERE categoryId IS NULL AND TRIM(comment) != ''
+                """.trimIndent()
+            )
+            db.execSQL(
+                """
+                UPDATE transactions
+                SET categoryId = (
+                    SELECT id FROM category WHERE category.name = TRIM(transactions.comment)
+                )
+                WHERE categoryId IS NULL AND TRIM(comment) != ''
+                """.trimIndent()
+            )
+        }
+    }
 }

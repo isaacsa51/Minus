@@ -41,7 +41,7 @@ data class CsvImportResult(
     val errors: List<String>
 )
 
-fun CsvTransactionRow.toDomainTransaction(): Transaction {
+fun CsvTransactionRow.toDomainTransaction(categoryId: Long? = null): Transaction {
     return Transaction(
         id = id,
         amount = amount,
@@ -53,6 +53,7 @@ fun CsvTransactionRow.toDomainTransaction(): Transaction {
         recurrentFrequency = frequency,
         recurrentEndDate = endDate?.atStartOfDay(),
         subscriptionDay = subscriptionDay,
+        categoryId = categoryId,
         isCredit = isCredit,
         isCreditPaid = isCreditPaid
     )

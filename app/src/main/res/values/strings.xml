@@ -660,6 +660,8 @@
     <string name="budget_graph_header_spending">Spending</string>
     <string name="budget_graph_legend_current">Current</string>
     <string name="budget_graph_legend_previous">Previous</string>
+    <string name="budget_graph_view_mode_cumulative">Trend</string>
+    <string name="budget_graph_view_mode_categories">Categories</string>
     <string name="budget_graph_nav_prev">Previous</string>
     <string name="budget_graph_nav_next">Next</string>
     <string name="graph_granularity_days">Days</string>

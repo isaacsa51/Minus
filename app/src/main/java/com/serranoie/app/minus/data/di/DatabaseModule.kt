@@ -39,6 +39,7 @@ object DatabaseModule {
             .addMigrations(AppDatabaseMigrations.MIGRATION_12_13)
             .addMigrations(AppDatabaseMigrations.MIGRATION_13_14)
             .addMigrations(AppDatabaseMigrations.MIGRATION_14_15)
+            .addMigrations(AppDatabaseMigrations.MIGRATION_15_16)
             .build()
     }
 

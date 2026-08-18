@@ -24,7 +24,7 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
         ArchivedBudgetEntity::class,
         PaidRecurrentOccurrenceEntity::class
     ],
-    version = 15,
+    version = 16,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

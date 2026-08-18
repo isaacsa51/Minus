@@ -53,8 +53,17 @@ class MinusCsvService @Inject constructor(
         val payload = parser.parse(inputStream)
         val rows = payload.rows
 
-        val reusable = rows.filter { it.id > 0L }.map { it.toDomainTransaction() }
-        val fresh = rows.filter { it.id == 0L }.map { it.toDomainTransaction() }
+        // Rows only carry free-text comments, so resolve/create the matching category per
+        // distinct comment the same way manual entry does (BudgetTransactionHandler), otherwise
+        // imported transactions would all fall back to "Uncategorized".
+        val categoryIdsByComment = rows.mapNotNull { it.comment.trim().ifBlank { null } }
+            .distinct()
+            .associateWith { repository.findOrCreateCategory(it).id }
+
+        val reusable = rows.filter { it.id > 0L }
+            .map { it.toDomainTransaction(categoryId = categoryIdsByComment[it.comment.trim()]) }
+        val fresh = rows.filter { it.id == 0L }
+            .map { it.toDomainTransaction(categoryId = categoryIdsByComment[it.comment.trim()]) }
 
         if (reusable.isNotEmpty()) {
             repository.upsertTransactions(reusable)
