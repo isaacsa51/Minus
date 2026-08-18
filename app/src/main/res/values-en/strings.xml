@@ -338,6 +338,7 @@
     <string name="bug_report_upload_assets">Upload Assets</string>
     <string name="bug_report_upload_assets_subtitle">Screenshots or videos (up to 10MB)</string>
     <string name="bug_report_upload_assets_selected_count">%1$d attachment(s) selected</string>
+    <string name="bug_report_remove_attachment">Remove attachment</string>
     <string name="settings_backup_title">Back up data</string>
     <string name="settings_backup_subtitle">Back up data to minus_export.csv</string>
     <string name="settings_import_csv_title">Import CSV</string>
