@@ -90,6 +90,7 @@ fun CategoryToolbar(
     onShowCategoryGrid: () -> Unit = {},
     onHideCategoryGrid: () -> Unit = {},
     onDisableCalculationMode: () -> Unit = {},
+    onEditingChanged: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val localDensity = LocalDensity.current
@@ -192,7 +193,10 @@ fun CategoryToolbar(
                     editorFocusController = editorFocusController,
                     extendWidth = toolbarWidth,
                     onlyIcon = tags.isNotEmpty(),
-                    onEdit = { isEdit = it },
+                    onEdit = { editing ->
+                        isEdit = editing
+                        onEditingChanged(editing)
+                    },
                     onDeleteTag = onDeleteTag,
                     directCategoryPopupEnabled = directCategoryPopupEnabled,
                     categoryGridModeEnabled = categoryGridModeEnabled,
