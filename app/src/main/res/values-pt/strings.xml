@@ -531,6 +531,7 @@
     <string name="ticket_recurrent_expense">EXPÊNCIA DO RECURSO</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Períodos anteriores</string>
+    <string name="past_periods_subtitle">Toque em um período para ver o detalhamento completo.</string>
     <string name="past_periods_empty">Nenhum período arquivado foi encontrado</string>
     <string name="past_periods_spent_label">Gasto</string>
     <string name="past_periods_limit_label">Limitar</string>

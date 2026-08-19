@@ -537,6 +537,7 @@
     <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Past periods</string>
+    <string name="past_periods_subtitle">Нажмите на период, чтобы увидеть полную разбивку.</string>
     <string name="past_periods_empty">No archived periods found</string>
     <string name="past_periods_spent_label">Spent</string>
     <string name="past_periods_limit_label">Limit</string>

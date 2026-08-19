@@ -79,7 +79,13 @@ fun PastPeriodsBottomSheet(
         Text(
             text = stringResource(R.string.past_periods_title),
             style = MaterialTheme.typography.titleLargeEmphasized,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 2.dp)
+        )
+        Text(
+            text = stringResource(R.string.past_periods_subtitle),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
         )
 
         if (periods.isEmpty()) {

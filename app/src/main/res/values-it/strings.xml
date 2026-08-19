@@ -531,6 +531,7 @@
     <string name="ticket_recurrent_expense">SPESE DI REITERAZIONE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Periodi passati</string>
+    <string name="past_periods_subtitle">Tocca un periodo per vedere il riepilogo completo.</string>
     <string name="past_periods_empty">Nessun periodo archiviato trovato</string>
     <string name="past_periods_spent_label">Speso</string>
     <string name="past_periods_limit_label">Limite</string>

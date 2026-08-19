@@ -530,6 +530,7 @@
     <string name="ticket_recurrent_expense">반복 지출</string>
     <!-- Past Periods -->
     <string name="past_periods_title">지난 기간</string>
+    <string name="past_periods_subtitle">기간을 탭하면 전체 내역을 볼 수 있습니다.</string>
     <string name="past_periods_empty">지난 기간 기록이 없습니다</string>
     <string name="past_periods_spent_label">지출액</string>
     <string name="past_periods_limit_label">한도</string>

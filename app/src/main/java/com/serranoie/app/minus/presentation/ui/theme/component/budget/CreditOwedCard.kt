@@ -100,13 +100,13 @@ fun CreditOwedCard(
                 }
                 .background(
                     color = MaterialTheme.colorScheme.tertiary,
-                    shape = MaterialShapes.SoftBurst.toShape()
+                    shape = MaterialShapes.Clover4Leaf.toShape()
                 )
         )
 
         Card(
             modifier = Modifier.fillMaxSize(),
-            shape = MaterialShapes.SoftBurst.toShape(),
+            shape = MaterialShapes.Clover4Leaf.toShape(),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.9f),
                 contentColor = MaterialTheme.colorScheme.onTertiaryContainer,

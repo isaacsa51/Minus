@@ -55,7 +55,8 @@ class BudgetGraphUiTest {
                         finishPeriodDate = fixedDate(2026, 8, 31),
                         currencyCode = "USD",
                         budgetSettingsForDisplay = sampleSettings(start, end),
-                        spends = sampleSpends()
+                        spends = sampleSpends(),
+                        isLoading = false,
                     ),
                     onGranularityChanged = { selectedGranularity = it }
                 )
@@ -80,12 +81,13 @@ class BudgetGraphUiTest {
             MinusTheme {
                 BudgetGraph(
                     state = AnalyticsState(
-                        graphGranularity = GraphGranularity.DAYS, // 1 day steps
+                        graphGranularity = GraphGranularity.DAYS,
                         startPeriodDate = fixedDate(2026, 8, 1),
-                        finishPeriodDate = fixedDate(2026, 8, 10), // 10 days > 7 day window
+                        finishPeriodDate = fixedDate(2026, 8, 10),
                         currencyCode = "USD",
                         budgetSettingsForDisplay = sampleSettings(start, end),
-                        spends = sampleSpends()
+                        spends = sampleSpends(),
+                        isLoading = false,
                     ),
                     onGranularityChanged = {}
                 )
@@ -105,7 +107,8 @@ class BudgetGraphUiTest {
                         graphGranularity = GraphGranularity.TOTAL,
                         startPeriodDate = fixedDate(2026, 8, 1),
                         finishPeriodDate = fixedDate(2026, 8, 5),
-                        currencyCode = "USD"
+                        currencyCode = "USD",
+                        isLoading = false,
                     ),
                     onGranularityChanged = {}
                 )
