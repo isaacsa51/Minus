@@ -535,12 +535,16 @@
     <string name="ticket_recurrent_expense">ΕΠΑΝΑΛΗΠΤΟΜΕΝΑ ΕΞΟΔΑ</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Προηγούμενες περίοδοι</string>
+    <string name="past_periods_subtitle">Πατήστε μια περίοδο για την πλήρη ανάλυσή της.</string>
     <string name="past_periods_empty">Δεν βρέθηκαν αρχειοθετημένες περίοδοι</string>
     <string name="past_periods_spent_label">Δαπανήθηκε</string>
     <string name="past_periods_limit_label">Όριο</string>
     <string name="past_periods_status_on_track">Στο Κομμάτι</string>
     <string name="past_periods_status_over_budget">Υπέρβαση Προϋπολογισμού</string>
+    <string name="past_periods_status_estimated">Εκτιμώμενο</string>
+    <string name="past_periods_estimated_divider">Εκτιμώμενες περίοδοι παρακάτω</string>
     <string name="past_periods_status_saved">Αποθηκεύτηκε %1$s</string>
+    <string name="past_periods_saved_label">Χρήματα που εξοικονομήθηκαν</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Τάσεις Δαπάνης</string>
     <string name="analytics_tutorial_minmax_desc">Αυτές οι κάρτες δείχνουν τα χαμηλότερα και υψηλότερα έξοδά σας. Καθώς προσθέτετε περισσότερες συναλλαγές, αυτές θα ενημερώνονται για να σας βοηθήσουν να εντοπίσετε τις ακραίες τιμές.</string>
@@ -562,6 +566,8 @@
     <string name="budget_graph_header_spending">Δαπάνες</string>
     <string name="budget_graph_legend_current">Τρέχουσες</string>
     <string name="budget_graph_legend_previous">Προηγούμενη</string>
+    <string name="budget_graph_view_mode_cumulative">Trend</string>
+    <string name="budget_graph_view_mode_categories">Categories</string>
     <string name="budget_graph_nav_prev">Προηγούμενη</string>
     <string name="budget_graph_nav_next">Επόμενο</string>
     <string name="graph_granularity_days">Ημέρες</string>
