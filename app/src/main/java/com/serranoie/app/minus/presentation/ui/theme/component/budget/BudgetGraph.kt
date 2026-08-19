@@ -258,7 +258,7 @@ private fun anchoredWindowIndex(
     val clampedAnchor = anchorDayIndex.coerceIn(0, lastValidIndex)
 
     val windowStartIndex = if (scrollStep >= windowSize) {
-        (clampedAnchor / scrollStep) * scrollStep
+        clampedAnchor / scrollStep * scrollStep
     } else {
         (clampedAnchor - windowSize + 1).coerceAtLeast(0)
     }
