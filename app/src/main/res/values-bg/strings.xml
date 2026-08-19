@@ -535,12 +535,16 @@
     <string name="ticket_recurrent_expense">ПОВТАРЯЩ СЕ РАЗХОД</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Минали периоди</string>
+    <string name="past_periods_subtitle">Докоснете период, за да видите пълната разбивка.</string>
     <string name="past_periods_empty">Няма намерени архивирани периоди</string>
     <string name="past_periods_spent_label">Изразходвано</string>
     <string name="past_periods_limit_label">Лимит</string>
     <string name="past_periods_status_on_track">В нормата</string>
     <string name="past_periods_status_over_budget">Надвишен бюджет</string>
+    <string name="past_periods_status_estimated">Приблизително</string>
+    <string name="past_periods_estimated_divider">По-долу са приблизителни периоди</string>
     <string name="past_periods_status_saved">Спестени %1$s</string>
+    <string name="past_periods_saved_label">Спестени пари</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Тенденции на разходите</string>
     <string name="analytics_tutorial_minmax_desc">Тези карти показват най-ниските и най-високите ви разходи.\nС добавянето на повече трансакции те ще се актуализират, за да ви помогнат да забележите отклоненията.</string>
@@ -562,6 +566,8 @@
     <string name="budget_graph_header_spending">Харчене</string>
     <string name="budget_graph_legend_current">Текущ</string>
     <string name="budget_graph_legend_previous">Предишен</string>
+    <string name="budget_graph_view_mode_cumulative">Trend</string>
+    <string name="budget_graph_view_mode_categories">Categories</string>
     <string name="budget_graph_nav_prev">Предишен</string>
     <string name="budget_graph_nav_next">Напред</string>
     <string name="graph_granularity_days">Дни</string>
