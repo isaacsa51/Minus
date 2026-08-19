@@ -523,6 +523,7 @@
     <string name="ticket_recurrent_expense">周期性支出</string>
     <!-- Past Periods -->
     <string name="past_periods_title">以往周期</string>
+    <string name="past_periods_subtitle">点按某个周期查看完整明细。</string>
     <string name="past_periods_empty">未找到归档的周期</string>
     <string name="past_periods_spent_label">已支出</string>
     <string name="past_periods_limit_label">限额</string>

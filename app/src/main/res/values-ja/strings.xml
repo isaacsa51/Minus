@@ -529,6 +529,7 @@
     <string name="ticket_recurrent_expense">定期的な支出</string>
     <!-- Past Periods -->
     <string name="past_periods_title">過去の期間</string>
+    <string name="past_periods_subtitle">期間をタップすると詳細な内訳が表示されます。</string>
     <string name="past_periods_empty">アーカイブされた期間は見つかりませんでした</string>
     <string name="past_periods_spent_label">使用済み：</string>
     <string name="past_periods_limit_label">制限</string>

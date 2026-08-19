@@ -531,6 +531,7 @@
     <string name="ticket_recurrent_expense">DÉPENSE RÉCURRENTE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Période passée</string>
+    <string name="past_periods_subtitle">Touchez une période pour voir le détail complet.</string>
     <string name="past_periods_empty">Aucune période archivée trouvée</string>
     <string name="past_periods_spent_label">Dépensé</string>
     <string name="past_periods_limit_label">Limite</string>

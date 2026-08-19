@@ -108,6 +108,7 @@ class AnalyticsE2ETest {
                                 currencyCode = "USD",
                                 startPeriodDate = startPeriodDate,
                                 finishPeriodDate = finishPeriodDate,
+                                isLoading = false,
                             ),
                         showTutorialOverride = false,
                     )

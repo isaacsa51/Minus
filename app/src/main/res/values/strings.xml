@@ -631,6 +631,7 @@
 
     <!-- Past Periods -->
     <string name="past_periods_title">Past periods</string>
+    <string name="past_periods_subtitle">Tap a period to see its full breakdown.</string>
     <string name="past_periods_empty">No archived periods found</string>
     <string name="past_periods_spent_label">Spent</string>
     <string name="past_periods_limit_label">Limit</string>

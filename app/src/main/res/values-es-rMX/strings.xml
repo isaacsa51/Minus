@@ -531,6 +531,7 @@
     <string name="ticket_recurrent_expense">GASTO RECURRENTE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Periodos pasados</string>
+    <string name="past_periods_subtitle">Toca un periodo para ver su desglose completo.</string>
     <string name="past_periods_empty">No se encontraron periodos archivados</string>
     <string name="past_periods_spent_label">Gastado</string>
     <string name="past_periods_limit_label">Límite</string>

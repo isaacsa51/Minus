@@ -456,7 +456,7 @@ fun Analytics(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(androidx.compose.ui.Alignment.BottomCenter)
+                        .align(Alignment.BottomCenter)
                         .zIndex(1f)
                         .padding(bottom = navigationBarHeight, start = 16.dp, end = 16.dp)
                 ) {

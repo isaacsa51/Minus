@@ -528,6 +528,7 @@
     <string name="ticket_recurrent_expense">बार-बार होने वाला खर्च</string>
     <!-- Past Periods -->
     <string name="past_periods_title">पिछले पीरियड</string>
+    <string name="past_periods_subtitle">पूरा विवरण देखने के लिए किसी पीरियड पर टैप करें।</string>
     <string name="past_periods_empty">कोई आर्काइव्ड पीरियड नहीं मिला</string>
     <string name="past_periods_spent_label">खर्च किया गया</string>
     <string name="past_periods_limit_label">सीमा</string>

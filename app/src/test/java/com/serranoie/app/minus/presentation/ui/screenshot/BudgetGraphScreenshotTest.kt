@@ -68,10 +68,10 @@ class BudgetGraphScreenshotTest {
                             finishPeriodDate = fixedDate(2026, 8, 30),
                             budgetSettingsForDisplay = sampleSettings(start, end),
                             graphGranularity = GraphGranularity.DAYS,
-                            currencyCode = "USD"
+                            currencyCode = "USD",
+                            isLoading = false,
                         ),
                         onGranularityChanged = {},
-                        // Mid-period day with data on both sides, so prev/next stay enabled.
                         selectedDate = start.plusDays(10),
                     )
                 }
@@ -94,11 +94,10 @@ class BudgetGraphScreenshotTest {
                             finishPeriodDate = fixedDate(2026, 8, 30),
                             budgetSettingsForDisplay = sampleSettings(start, end),
                             graphGranularity = GraphGranularity.DAYS,
-                            currencyCode = "USD"
+                            currencyCode = "USD",
+                            isLoading = false,
                         ),
                         onGranularityChanged = {},
-                        // The period's first day: the "previous day" stepper must be disabled,
-                        // since the graph can't show data from before the current period.
                         selectedDate = start,
                     )
                 }
@@ -134,7 +133,8 @@ class BudgetGraphScreenshotTest {
                             finishPeriodDate = fixedDate(2026, 8, 30),
                             budgetSettingsForDisplay = sampleSettings(start, end),
                             graphGranularity = GraphGranularity.DAYS,
-                            currencyCode = "USD"
+                            currencyCode = "USD",
+                            isLoading = false,
                         ),
                         onGranularityChanged = {},
                         initialViewMode = BudgetGraphViewMode.CATEGORIES,
@@ -170,7 +170,8 @@ class BudgetGraphScreenshotTest {
                             finishPeriodDate = fixedDate(2026, 8, 7),
                             budgetSettingsForDisplay = sampleSettings(start, end),
                             graphGranularity = GraphGranularity.DAYS,
-                            currencyCode = "USD"
+                            currencyCode = "USD",
+                            isLoading = false,
                         ),
                         onGranularityChanged = {},
                         initialViewMode = BudgetGraphViewMode.CATEGORIES,
@@ -196,7 +197,8 @@ class BudgetGraphScreenshotTest {
                             finishPeriodDate = fixedDate(2026, 8, 7),
                             budgetSettingsForDisplay = sampleSettings(start, end),
                             graphGranularity = GraphGranularity.DAYS,
-                            currencyCode = "USD"
+                            currencyCode = "USD",
+                            isLoading = false,
                         ),
                         onGranularityChanged = {},
                         initialViewMode = BudgetGraphViewMode.CATEGORIES,
@@ -222,7 +224,8 @@ class BudgetGraphScreenshotTest {
                             finishPeriodDate = fixedDate(2026, 8, 30),
                             budgetSettingsForDisplay = sampleSettings(start, end),
                             graphGranularity = GraphGranularity.TOTAL,
-                            currencyCode = "USD"
+                            currencyCode = "USD",
+                            isLoading = false,
                         ),
                         onGranularityChanged = {}
                     )

@@ -1,5 +1,12 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,12 +36,6 @@ const val BUDGET_GRAPH_DAY_PREV_TAG = "BUDGET_GRAPH_DAY_PREV_TAG"
 const val BUDGET_GRAPH_DAY_NEXT_TAG = "BUDGET_GRAPH_DAY_NEXT_TAG"
 const val BUDGET_GRAPH_DAY_LABEL_TAG = "BUDGET_GRAPH_DAY_LABEL_TAG"
 
-/**
- * Replaces [BudgetGraphNavigation]'s window pagination for [GraphGranularity.DAYS]: since the
- * chart now shows a single day's 24 hours rather than a paginated window of several days, this
- * instead names which day is on screen and steps to the adjacent day — bounded to the current
- * budget period, since the graph only has data for days within it.
- */
 @Composable
 internal fun BudgetGraphDayNavigation(
     date: LocalDate,
@@ -53,16 +54,31 @@ internal fun BudgetGraphDayNavigation(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
+        AnimatedContent(
+            targetState = date,
             modifier = Modifier
                 .weight(1f)
                 .testTag(BUDGET_GRAPH_DAY_LABEL_TAG),
-            text = date.format(dateFormatter),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+            transitionSpec = {
+                val fadeSpec = tween<Float>(180)
+                if (targetState.isAfter(initialState)) {
+                    (slideInHorizontally(animationSpec = tween(220)) { it } + fadeIn(fadeSpec)) togetherWith
+                        (slideOutHorizontally(animationSpec = tween(180)) { -it } + fadeOut(tween(120)))
+                } else {
+                    (slideInHorizontally(animationSpec = tween(220)) { -it } + fadeIn(fadeSpec)) togetherWith
+                        (slideOutHorizontally(animationSpec = tween(180)) { it } + fadeOut(tween(120)))
+                }
+            },
+            label = "dayLabelSlide",
+        ) { animatedDate ->
+            Text(
+                text = animatedDate.format(dateFormatter),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 modifier = Modifier

@@ -528,6 +528,7 @@
     <string name="ticket_recurrent_expense">ΕΠΑΝΑΛΗΠΤΟΜΕΝΑ ΕΞΟΔΑ</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Προηγούμενες περίοδοι</string>
+    <string name="past_periods_subtitle">Πατήστε μια περίοδο για την πλήρη ανάλυσή της.</string>
     <string name="past_periods_empty">Δεν βρέθηκαν αρχειοθετημένες περίοδοι</string>
     <string name="past_periods_spent_label">Δαπανήθηκε</string>
     <string name="past_periods_limit_label">Όριο</string>

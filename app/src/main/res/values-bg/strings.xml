@@ -530,6 +530,7 @@
     <string name="ticket_recurrent_expense">ПОВТАРЯЩ СЕ РАЗХОД</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Минали периоди</string>
+    <string name="past_periods_subtitle">Докоснете период, за да видите пълната разбивка.</string>
     <string name="past_periods_empty">Няма намерени архивирани периоди</string>
     <string name="past_periods_spent_label">Изразходвано</string>
     <string name="past_periods_limit_label">Лимит</string>
