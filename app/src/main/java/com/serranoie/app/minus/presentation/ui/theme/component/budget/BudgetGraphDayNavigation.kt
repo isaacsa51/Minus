@@ -62,11 +62,11 @@ internal fun BudgetGraphDayNavigation(
             transitionSpec = {
                 val fadeSpec = tween<Float>(180)
                 if (targetState.isAfter(initialState)) {
-                    (slideInHorizontally(animationSpec = tween(220)) { it } + fadeIn(fadeSpec)) togetherWith
-                        (slideOutHorizontally(animationSpec = tween(180)) { -it } + fadeOut(tween(120)))
+                    slideInHorizontally(animationSpec = tween(220)) { it } + fadeIn(fadeSpec) togetherWith
+                        slideOutHorizontally(animationSpec = tween(180)) { -it } + fadeOut(tween(120))
                 } else {
-                    (slideInHorizontally(animationSpec = tween(220)) { -it } + fadeIn(fadeSpec)) togetherWith
-                        (slideOutHorizontally(animationSpec = tween(180)) { it } + fadeOut(tween(120)))
+                    slideInHorizontally(animationSpec = tween(220)) { -it } + fadeIn(fadeSpec) togetherWith
+                        slideOutHorizontally(animationSpec = tween(180)) { it } + fadeOut(tween(120))
                 }
             },
             label = "dayLabelSlide",
