@@ -535,12 +535,16 @@
     <string name="ticket_recurrent_expense">GASTO RECURRENTE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Periodos pasados</string>
+    <string name="past_periods_subtitle">Toca un periodo para ver su desglose completo.</string>
     <string name="past_periods_empty">No se encontraron periodos archivados</string>
     <string name="past_periods_spent_label">Gastado</string>
     <string name="past_periods_limit_label">Límite</string>
     <string name="past_periods_status_on_track">Al día</string>
     <string name="past_periods_status_over_budget">Excedido</string>
+    <string name="past_periods_status_estimated">Estimado</string>
+    <string name="past_periods_estimated_divider">Periodos estimados abajo</string>
     <string name="past_periods_status_saved">Ahorrado %1$s</string>
+    <string name="past_periods_saved_label">Dinero guardado</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendencias de gasto</string>
     <string name="analytics_tutorial_minmax_desc">Estas gráficas muestran los gastos máximos y mínimos.\nComo vayas agregando más transacciones, estos te ayudaran a detectar valores atípicos.</string>
@@ -562,6 +566,8 @@
     <string name="budget_graph_header_spending">Gasto</string>
     <string name="budget_graph_legend_current">Actual</string>
     <string name="budget_graph_legend_previous">Anterior</string>
+    <string name="budget_graph_view_mode_cumulative">Trend</string>
+    <string name="budget_graph_view_mode_categories">Categories</string>
     <string name="budget_graph_nav_prev">Anterior</string>
     <string name="budget_graph_nav_next">Siguiente</string>
     <string name="graph_granularity_days">Días</string>
