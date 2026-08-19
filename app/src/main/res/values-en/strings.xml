@@ -535,12 +535,16 @@
     <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Past periods</string>
+    <string name="past_periods_subtitle">Tap a period to see its full breakdown.</string>
     <string name="past_periods_empty">No archived periods found</string>
     <string name="past_periods_spent_label">Spent</string>
     <string name="past_periods_limit_label">Limit</string>
     <string name="past_periods_status_on_track">On Track</string>
     <string name="past_periods_status_over_budget">Over Budget</string>
+    <string name="past_periods_status_estimated">Estimated</string>
+    <string name="past_periods_estimated_divider">Estimated periods below</string>
     <string name="past_periods_status_saved">Saved %1$s</string>
+    <string name="past_periods_saved_label">Money Saved</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Spending Trends</string>
     <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>
@@ -562,6 +566,8 @@
     <string name="budget_graph_header_spending">Spending</string>
     <string name="budget_graph_legend_current">Current</string>
     <string name="budget_graph_legend_previous">Previous</string>
+    <string name="budget_graph_view_mode_cumulative">Trend</string>
+    <string name="budget_graph_view_mode_categories">Categories</string>
     <string name="budget_graph_nav_prev">Previous</string>
     <string name="budget_graph_nav_next">Next</string>
     <string name="graph_granularity_days">Days</string>
