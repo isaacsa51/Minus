@@ -488,6 +488,7 @@ private fun PhoneLayout(
     val configuration = LocalConfiguration.current
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+    var isCategoryEditorFocused by remember { mutableStateOf(false) }
     val navigationBarOffset = windowInsets.calculateBottomPadding()
     val navBarHeightPx = with(localDensity) { navigationBarOffset.toPx() }
 
@@ -594,6 +595,9 @@ private fun PhoneLayout(
             .focusRequester(focusRequester)
             .focusable()
             .onKeyEvent { keyEvent ->
+                if (isCategoryEditorFocused) {
+                    return@onKeyEvent false
+                }
                 if (keyEvent.type == KeyEventType.KeyUp) {
                     when (keyEvent.key) {
                         Key.Zero, Key.NumPad0 -> {
@@ -912,6 +916,7 @@ private fun PhoneLayout(
                     onNavigateToAnalytics = actions.onNavigateToAnalytics,
                     openWalletOnStart = openWalletOnStart,
                     tutorialBoxState = tutorialBoxState,
+                    onCategoryEditingChanged = { isCategoryEditorFocused = it },
                     onFocus = {
                         focusRequester.requestFocus()
                         if (budgetUiState.numpadInput.isNotEmpty() && budgetUiState.animState != AnimState.EDITING) {
@@ -1323,6 +1328,7 @@ private fun MainScreenEditorSection(
     showSettingsButton: Boolean = true,
     onFocus: () -> Unit = {},
     onApply: () -> Unit = {},
+    onCategoryEditingChanged: (Boolean) -> Unit = {},
 ) {
     Editor(
         uiState = budgetUiState,
@@ -1358,6 +1364,7 @@ private fun MainScreenEditorSection(
             actions.onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANALYTICS)
         },
         onFocus = onFocus,
+        onCategoryEditingChanged = onCategoryEditingChanged,
         onCommentClick = {},
         onCommentUpdate = { comment ->
             actions.onProcessIntent(

@@ -125,6 +125,7 @@ fun TransactionEditScreen(
 
     val focusController = remember { FocusController() }
     val focusRequester = remember { FocusRequester() }
+    var isCategoryEditorFocused by remember { mutableStateOf(false) }
 
     var isCalculation by remember { mutableStateOf(false) }
 
@@ -164,6 +165,9 @@ fun TransactionEditScreen(
             .focusRequester(focusRequester)
             .focusable()
             .onKeyEvent { keyEvent ->
+                if (isCategoryEditorFocused) {
+                    return@onKeyEvent false
+                }
                 handleHardwareNumpadKeyEvent(keyEvent) { intent ->
                     when (intent) {
                         is BudgetNumpadIntent.NumberTapped -> {
@@ -298,6 +302,7 @@ fun TransactionEditScreen(
                 stage = EditStage.EDIT_SPENT,
                 onCommentUpdate = { editedComment = it },
                 editorFocusController = focusController,
+                onEditingChanged = { isCategoryEditorFocused = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp)
