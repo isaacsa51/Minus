@@ -535,12 +535,16 @@
     <string name="ticket_recurrent_expense">बार-बार होने वाला खर्च</string>
     <!-- Past Periods -->
     <string name="past_periods_title">पिछले पीरियड</string>
+    <string name="past_periods_subtitle">पूरा विवरण देखने के लिए किसी पीरियड पर टैप करें।</string>
     <string name="past_periods_empty">कोई आर्काइव्ड पीरियड नहीं मिला</string>
     <string name="past_periods_spent_label">खर्च किया गया</string>
     <string name="past_periods_limit_label">सीमा</string>
     <string name="past_periods_status_on_track">सही रास्ते पर</string>
     <string name="past_periods_status_over_budget">बजट से ज़्यादा</string>
+    <string name="past_periods_status_estimated">अनुमानित</string>
+    <string name="past_periods_estimated_divider">नीचे अनुमानित अवधियाँ हैं</string>
     <string name="past_periods_status_saved">%1$s बचाया गया</string>
+    <string name="past_periods_saved_label">बचाया गया पैसा</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">खर्च करने के ट्रेंड</string>
     <string name="analytics_tutorial_minmax_desc">ये कार्ड आपके सबसे कम और सबसे ज़्यादा खर्च दिखाते हैं। जैसे-जैसे आप और ट्रांज़ैक्शन जोड़ेंगे, ये अपडेट होते रहेंगे ताकि आप असामान्य खर्चों (आउटलायर्स) की पहचान कर सकें।</string>
@@ -562,6 +566,8 @@
     <string name="budget_graph_header_spending">खर्च</string>
     <string name="budget_graph_legend_current">मौजूदा</string>
     <string name="budget_graph_legend_previous">पिछला</string>
+    <string name="budget_graph_view_mode_cumulative">Trend</string>
+    <string name="budget_graph_view_mode_categories">Categories</string>
     <string name="budget_graph_nav_prev">पिछला</string>
     <string name="budget_graph_nav_next">अगला</string>
     <string name="graph_granularity_days">दिन</string>
