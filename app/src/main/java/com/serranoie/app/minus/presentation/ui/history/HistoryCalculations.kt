@@ -5,6 +5,7 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import java.time.LocalDate
+import java.time.LocalTime
 
 internal fun buildDisplayTransactions(
     transactions: List<Transaction>,
@@ -206,4 +207,42 @@ internal fun getRecurringChargesInPeriod(
     }
 
     return virtualTransactions
+}
+
+internal fun splitRecurringAndOneTime(
+    allTransactions: List<Transaction>,
+    filteredTransactions: List<Transaction>,
+    periodStart: LocalDate,
+    periodEnd: LocalDate,
+    today: LocalDate,
+    paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
+): Triple<List<Transaction>, List<Transaction>, List<Transaction>> {
+    val oneTimeSpends =
+        filteredTransactions.filterNot { it.isDeleted }.filterNot { it.isRecurrent }
+
+    val paidRecurringInPeriod =
+        filteredTransactions.filterNot { it.isDeleted }.filter { it.isRecurrent }
+
+    val recurringParents = (paidRecurringInPeriod + allTransactions.filterNot { it.isDeleted }
+        .filter { it.isRecurrent }).distinctBy { it.id }
+
+    val paidCharges = recurringParents.flatMap { parent ->
+        getRecurringChargesInPeriod(parent, periodStart, periodEnd, today, paidOccurrences)
+    }
+
+    val upcomingCharges = recurringParents.mapNotNull { parent ->
+        val date = calculateNextChargeDate(parent, today) ?: parent.date?.toLocalDate()
+            ?.takeIf { it.isAfter(today) } ?: return@mapNotNull null
+
+        if (date.isBefore(periodStart) || date.isAfter(periodEnd)) {
+            return@mapNotNull null
+        }
+        val chargeId = parent.id * 1_000_000L + date.toEpochDay()
+        parent.copy(
+            date = date.atTime(parent.date?.toLocalTime() ?: LocalTime.MIDNIGHT),
+            id = chargeId,
+        )
+    }
+
+    return Triple(paidCharges, upcomingCharges, oneTimeSpends)
 }

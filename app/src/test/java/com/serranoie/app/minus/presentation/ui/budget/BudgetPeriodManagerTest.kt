@@ -5,6 +5,8 @@ import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
@@ -361,5 +363,50 @@ class BudgetPeriodManagerTest {
 
             assertThat(userSettings.earlyFinishActive).isFalse()
             assertThat(userSettings.periodEndAlreadyHandled).isFalse()
+        }
+
+    @Test
+    fun `archiving a period includes a recurring charge projected from before it started, matching what reopening it would show`() =
+        runTest {
+            val today = LocalDate.now()
+            val oldSettings = budget(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                startDate = today.minusDays(20),
+                endDate = today.plusDays(10),
+            )
+            coEvery { budgetRepository.getBudgetSettingsSync() } returns oldSettings
+
+            val netflixAnchor = oldSettings.startDate.minusMonths(1).plusDays(3)
+            val netflix = Transaction.create(
+                amount = BigDecimal("100.00"),
+                comment = "Netflix",
+                date = netflixAnchor.atTime(10, 0),
+                isRecurrent = true,
+                recurrentFrequency = RecurrentFrequency.MONTHLY,
+            )
+            val coffee = Transaction.create(
+                amount = BigDecimal("20.00"),
+                comment = "Coffee",
+                date = today.minusDays(10).atStartOfDay(),
+                periodId = 500L,
+            )
+            coEvery { budgetRepository.getTransactions() } returns flowOf(listOf(netflix, coffee))
+            coEvery { budgetRepository.getPaidRecurrentOccurrences() } returns
+                flowOf(emptySet<PaidRecurrentOccurrence>())
+            userSettings = userSettings.copy(currentPeriodId = 500L, currentPeriodStartedAt = 1L)
+
+            val spentSlot = mutableListOf<BigDecimal>()
+            coEvery {
+                budgetRepository.archiveCurrentPeriod(any(), any(), any())
+            } answers { spentSlot.add(thirdArg()) }
+
+            val newSettings = budget(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                startDate = today.plusDays(11),
+                endDate = today.plusDays(40),
+            )
+            periodManager.persistBudgetSettings(newSettings, forceNewPeriodBoundary = true)
+
+            assertThat(spentSlot.single()).isEqualTo(BigDecimal("120.00"))
         }
 }

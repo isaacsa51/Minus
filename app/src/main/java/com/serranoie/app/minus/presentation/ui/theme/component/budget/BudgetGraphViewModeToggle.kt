@@ -1,27 +1,25 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.ButtonGroupDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 
 fun budgetGraphViewModeToggleTag(viewMode: BudgetGraphViewMode) =
     "BUDGET_GRAPH_VIEW_MODE_TOGGLE_${viewMode.name}"
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun BudgetGraphViewModeToggle(
     selected: BudgetGraphViewMode,
@@ -29,36 +27,41 @@ internal fun BudgetGraphViewModeToggle(
     modifier: Modifier = Modifier,
 ) {
     val modes = BudgetGraphViewMode.entries
+    val selectedIndex = modes.indexOf(selected).coerceAtLeast(0)
 
-    Row(
+    SecondaryTabRow(
+        selectedTabIndex = selectedIndex,
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally),
+        containerColor = Color.Transparent,
     ) {
-        modes.forEachIndexed { index, mode ->
-            val isSelected = selected == mode
-            ToggleButton(
-                checked = isSelected,
-                onCheckedChange = { onSelected(mode) },
-                modifier = Modifier
-                    .testTag(budgetGraphViewModeToggleTag(mode))
-                    .height(32.dp),
-                colors = ToggleButtonDefaults.toggleButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                ),
-                shapes = when (index) {
-                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                    modes.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                }
-            ) {
-                Text(
-                    text = when (mode) {
-                        BudgetGraphViewMode.CUMULATIVE -> stringResource(R.string.budget_graph_view_mode_cumulative)
-                        BudgetGraphViewMode.CATEGORIES -> stringResource(R.string.budget_graph_view_mode_categories)
-                    },
-                    style = MaterialTheme.typography.labelSmallCondensed,
-                )
-            }
+        modes.forEach { mode ->
+            Tab(
+                selected = selected == mode,
+                onClick = { onSelected(mode) },
+                modifier = Modifier.testTag(budgetGraphViewModeToggleTag(mode)),
+                text = {
+                    Text(
+                        text = when (mode) {
+                            BudgetGraphViewMode.CUMULATIVE -> stringResource(R.string.budget_graph_view_mode_cumulative)
+                            BudgetGraphViewMode.CATEGORIES -> stringResource(R.string.budget_graph_view_mode_categories)
+                        },
+                        style = MaterialTheme.typography.labelSmallCondensed,
+                    )
+                },
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ViewModePreview() {
+    MinusTheme {
+        Surface {
+            BudgetGraphViewModeToggle(
+                selected = BudgetGraphViewMode.CUMULATIVE,
+                onSelected = { }
+            )
         }
     }
 }

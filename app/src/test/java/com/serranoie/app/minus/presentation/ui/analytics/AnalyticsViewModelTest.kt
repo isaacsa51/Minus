@@ -8,6 +8,8 @@ import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Category
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
@@ -46,6 +48,7 @@ class AnalyticsViewModelTest {
     private val categoriesFlow = MutableStateFlow<List<Category>>(emptyList())
     private val allCategoriesFlow = MutableStateFlow<List<Category>>(emptyList())
     private val archivedFlow = MutableStateFlow<List<ArchivedBudget>>(emptyList())
+    private val paidOccurrencesFlow = MutableStateFlow<Set<PaidRecurrentOccurrence>>(emptySet())
     private val boundaryFlow = flowOf(0L to 1L)
     private val userSettingsFlow = flowOf(UserSettings())
     private val rolloverFlow = flowOf(BigDecimal.ZERO to false)
@@ -58,6 +61,7 @@ class AnalyticsViewModelTest {
         every { budgetRepository.getActiveCategories() } returns categoriesFlow
         every { budgetRepository.getAllCategories() } returns allCategoriesFlow
         every { budgetRepository.getArchivedBudgets() } returns archivedFlow
+        every { budgetRepository.getPaidRecurrentOccurrences() } returns paidOccurrencesFlow
         every { observeCurrentPeriodBoundaryUseCase() } returns boundaryFlow
         every { settingsRepository.observeSettings() } returns userSettingsFlow
         every { settingsRepository.observeCurrentPeriodRollover() } returns rolloverFlow
@@ -153,6 +157,101 @@ class AnalyticsViewModelTest {
             val state = awaitItem()
             assertThat(state.categories).isEmpty()
             assertThat(state.displayState.categories).containsExactly(hiddenGroceries)
+        }
+    }
+
+    @Test
+    fun `paid recurring occurrence is not double-counted in historical period spend total`() = runTest {
+        val periodStart = LocalDate.now().minusMonths(2)
+        val periodEnd = LocalDate.now().minusMonths(1).minusDays(1)
+        val recurrentDate = periodStart.plusDays(5)
+
+        val archive = ArchivedBudget(
+            periodId = 10L,
+            totalBudget = BigDecimal("1000.00"),
+            spentAmount = BigDecimal("100.00"),
+            startDate = periodStart,
+            endDate = periodEnd,
+            currencyCode = "USD",
+            periodType = BudgetPeriod.MONTHLY
+        )
+        archivedFlow.value = listOf(archive)
+
+        val recurringParent = Transaction(
+            id = 1L,
+            amount = BigDecimal("100.00"),
+            comment = "Netflix",
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.MONTHLY,
+            date = recurrentDate.atTime(10, 0),
+            periodId = 10L,
+        )
+        val paidOccurrenceTransaction = Transaction(
+            id = 2L,
+            amount = BigDecimal("100.00"),
+            comment = "Netflix",
+            isRecurrent = false,
+            date = recurrentDate.atTime(10, 0),
+            periodId = 10L,
+        )
+
+        transactionsFlow.value = listOf(recurringParent, paidOccurrenceTransaction)
+        paidOccurrencesFlow.value = setOf(PaidRecurrentOccurrence(1L, recurrentDate))
+
+        val viewModel = createViewModel()
+        viewModel.uiState.test {
+            skipItems(2)
+
+            viewModel.onPeriodSelected(10L)
+
+            val state = awaitItem()
+            assertThat(state.displayState.spends.sumOf { it.amount }).isEqualTo(BigDecimal("100.00"))
+        }
+    }
+
+    @Test
+    fun `reconstructed virtual period total matches what opening it recomputes`() = runTest {
+        val baseAnchor = LocalDate.now().withDayOfMonth(10)
+        val netflixAnchor = baseAnchor.minusMonths(2)
+        val monthBDate = baseAnchor.minusMonths(1)
+
+        settingsFlow.value = BudgetSettings(
+            totalBudget = BigDecimal("1000"),
+            period = BudgetPeriod.MONTHLY,
+            startDate = LocalDate.now(),
+            endDate = LocalDate.now().plusDays(20),
+            currencyCode = "USD",
+        )
+
+        val netflix = Transaction(
+            id = 1L,
+            amount = BigDecimal("100.00"),
+            comment = "Netflix",
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.MONTHLY,
+            date = netflixAnchor.atTime(10, 0),
+        )
+        val coffee = Transaction(
+            id = 2L,
+            amount = BigDecimal("20.00"),
+            comment = "Coffee",
+            date = monthBDate.atTime(9, 0),
+        )
+
+        transactionsFlow.value = listOf(netflix, coffee)
+
+        val viewModel = createViewModel()
+        viewModel.uiState.test {
+            skipItems(1)
+            val state = awaitItem()
+
+            val monthBPeriodId = -(monthBDate.year.toLong() * 100 + monthBDate.monthValue.toLong())
+            val monthBArchive = state.archivedBudgets.first { it.periodId == monthBPeriodId }
+            assertThat(monthBArchive.spentAmount).isEqualTo(BigDecimal("120.00"))
+
+            viewModel.onPeriodSelected(monthBPeriodId)
+            val openedState = awaitItem()
+            assertThat(openedState.displayState.spends.sumOf { it.amount }).isEqualTo(BigDecimal("120.00"))
         }
     }
 

@@ -586,7 +586,6 @@ fun BudgetGraph(
             )
 
             if (hasPeriod && state.spends.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
                 BudgetGraphViewModeToggle(
                     selected = viewMode,
                     onSelected = {

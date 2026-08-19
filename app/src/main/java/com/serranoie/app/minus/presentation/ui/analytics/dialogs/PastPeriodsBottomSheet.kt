@@ -21,13 +21,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,11 +41,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
@@ -53,6 +56,7 @@ import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.util.font.calcAdaptiveFont
 import com.serranoie.app.minus.presentation.util.combineColors
@@ -92,12 +96,17 @@ fun PastPeriodsBottomSheet(
                 )
             }
         } else {
+            val firstEstimatedIndex = periods.indexOfFirst { it.periodId < 0L }
+
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(periods) { period ->
+                itemsIndexed(periods, key = { _, period -> period.periodId }) { index, period ->
+                    if (index == firstEstimatedIndex) {
+                        WavyDivider(text = stringResource(R.string.past_periods_estimated_divider))
+                    }
                     ArchivedPeriodCard(
                         period = period,
                         allTransactions = allTransactions,
@@ -171,7 +180,9 @@ private fun ArchivedPeriodCard(
                     }
                 }
 
-                if (!isVirtual) {
+                if (isVirtual) {
+                    EstimatedChip()
+                } else {
                     StatusChip(period)
                 }
             }
@@ -268,6 +279,7 @@ private fun CategoryDistributionBar(
 ) {
     val uncategorizedLabel = stringResource(R.string.categories_chart_uncategorized)
     val recurrentLabel = stringResource(R.string.tutorial_recurrent_title)
+    val savedLabel = stringResource(R.string.past_periods_saved_label)
 
     val data = remember(transactions, totalBudget, uncategorizedLabel, recurrentLabel) {
         val recurrentTotal = transactions.filter { it.isRecurrent }.sumOf { it.amount }
@@ -277,11 +289,15 @@ private fun CategoryDistributionBar(
             .mapValues { (_, txs) -> txs.sumOf { it.amount } }
             .toList()
             .sortedByDescending { it.second }
-            .take(4)
 
         val totalSpent = transactions.sumOf { it.amount }
         val base = totalBudget ?: totalSpent.coerceAtLeast(BigDecimal.ONE)
         val isOverBudget = totalBudget != null && totalSpent > totalBudget
+        val remaining = if (totalBudget != null && totalSpent < totalBudget) {
+            totalBudget - totalSpent
+        } else {
+            BigDecimal.ZERO
+        }
 
         val segments = mutableListOf<DistributionSegment>()
 
@@ -314,7 +330,8 @@ private fun CategoryDistributionBar(
             totalSpent = totalSpent,
             totalBudget = totalBudget,
             totalWeight = totalWeight,
-            isOverBudget = isOverBudget
+            isOverBudget = isOverBudget,
+            remaining = remaining,
         )
     }
 
@@ -332,6 +349,16 @@ private fun CategoryDistributionBar(
         Color(0xFFF06292),
     )
     val recurrentColor = MaterialTheme.colorScheme.outline
+    val hasRecurrentSegment = data.segments.any { it.isRecurrent }
+
+    fun colorFor(index: Int, segment: DistributionSegment): Color {
+        if (segment.isRecurrent) return recurrentColor
+        val categoryIndex = index - if (hasRecurrentSegment) 1 else 0
+        return colors[categoryIndex.mod(colors.size)]
+    }
+
+    val savedStripeColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f)
+    val savedBackgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Box(
@@ -339,7 +366,6 @@ private fun CategoryDistributionBar(
                 .fillMaxWidth()
                 .height(14.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f))
         ) {
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -347,29 +373,40 @@ private fun CategoryDistributionBar(
             ) {
                 data.segments.forEachIndexed { index, segment ->
                     val weight = (segment.amount.toFloat() / data.totalWeight).coerceAtLeast(0.01f)
-                    val color =
-                        if (segment.isRecurrent) recurrentColor else colors.getOrElse(index - if (data.segments.any { it.isRecurrent }) 1 else 0) { MaterialTheme.colorScheme.outlineVariant }
 
                     Box(
                         modifier = Modifier
                             .weight(weight)
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(4.dp))
-                            .background(color)
+                            .background(colorFor(index, segment))
                     )
                 }
 
-                if (data.totalBudget != null && data.totalSpent < data.totalBudget) {
-                    val remaining = (data.totalBudget - data.totalSpent).toFloat()
-                    if (remaining > 0) {
-                        Box(
-                            modifier = Modifier
-                                .weight(remaining / data.totalWeight)
-                                .fillMaxHeight()
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                        )
-                    }
+                if (data.remaining > BigDecimal.ZERO) {
+                    val weight = (data.remaining.toFloat() / data.totalWeight).coerceAtLeast(0.01f)
+                    Box(
+                        modifier = Modifier
+                            .weight(weight)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(savedBackgroundColor)
+                            .drawBehind {
+                                val stripeWidth = 1.5.dp.toPx()
+                                val gap = 3.5.dp.toPx()
+                                val spacing = stripeWidth + gap
+                                var x = -size.height
+                                while (x < size.width) {
+                                    drawLine(
+                                        color = savedStripeColor,
+                                        start = Offset(x, size.height),
+                                        end = Offset(x + size.height, 0f),
+                                        strokeWidth = stripeWidth,
+                                    )
+                                    x += spacing
+                                }
+                            }
+                    )
                 }
             }
         }
@@ -379,8 +416,7 @@ private fun CategoryDistributionBar(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             itemsIndexed(data.segments) { index, segment ->
-                val color =
-                    if (segment.isRecurrent) recurrentColor else colors.getOrElse(index - if (data.segments.any { it.isRecurrent }) 1 else 0) { MaterialTheme.colorScheme.outlineVariant }
+                val color = colorFor(index, segment)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
@@ -395,6 +431,27 @@ private fun CategoryDistributionBar(
                         color = color,
                         fontWeight = FontWeight.Bold
                     )
+                }
+            }
+
+            if (data.remaining > BigDecimal.ZERO) {
+                item {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(savedBackgroundColor)
+                                .border(0.5.dp, savedStripeColor, CircleShape)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = savedLabel,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
@@ -412,7 +469,8 @@ private data class DistributionData(
     val totalSpent: BigDecimal,
     val totalBudget: BigDecimal?,
     val totalWeight: Float,
-    val isOverBudget: Boolean
+    val isOverBudget: Boolean,
+    val remaining: BigDecimal,
 )
 
 @Composable
@@ -462,7 +520,35 @@ private fun StatusChip(period: ArchivedBudget) {
     }
 }
 
-@Preview(showBackground = true)
+@Composable
+private fun EstimatedChip() {
+    val color = MaterialTheme.colorScheme.onSurfaceVariant
+
+    Surface(
+        color = color.copy(alpha = 0.1f), shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.History,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(16.dp)
+            )
+            Text(
+                text = stringResource(R.string.past_periods_status_estimated),
+                style = MaterialTheme.typography.labelMediumCondensed,
+                color = color,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@PreviewLightDark
 @Composable
 private fun PastPeriodsBottomSheetPreview() {
     val today = LocalDate.now()

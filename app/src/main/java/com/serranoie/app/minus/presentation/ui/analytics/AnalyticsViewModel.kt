@@ -8,14 +8,14 @@ import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
-import com.serranoie.app.minus.presentation.ui.history.calculateNextChargeDate
-import com.serranoie.app.minus.presentation.ui.history.getRecurringChargesInPeriod
+import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,7 +29,6 @@ import logcat.logcat
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.ZoneId
 import java.util.Date
 import javax.inject.Inject
@@ -79,6 +78,7 @@ class AnalyticsViewModel @Inject constructor(
         _granularity,
         _selectedPeriodId,
         budgetRepository.getAllCategories().distinctUntilChanged(),
+        budgetRepository.getPaidRecurrentOccurrences().distinctUntilChanged(),
     ) { args: Array<Any?> ->
         val settings = args[0] as BudgetSettings?
         val transactions = args[1] as List<Transaction>
@@ -89,13 +89,11 @@ class AnalyticsViewModel @Inject constructor(
         val rollover = args[6] as Pair<BigDecimal, Boolean>
         val granularity = args[7] as GraphGranularity
         val selectedPeriodId = args[8] as Long?
-        // Includes hidden/deleted tags, unlike `categories` — needed so past transactions that
-        // point at a since-deleted category can still resolve its name instead of falling back
-        // to "Uncategorized" (e.g. in DetailedChart's tooltip).
         val allCategories = args[9] as List<Category>
+        val paidOccurrences = args[10] as Set<PaidRecurrentOccurrence>
 
         val currentPeriodId = periodBoundary.second
-        val reconstructedArchives = reconstructHistory(transactions, archives, settings)
+        val reconstructedArchives = reconstructHistory(transactions, archives, settings, paidOccurrences)
         val allArchives = (archives + reconstructedArchives).distinctBy { it.periodId }
             .sortedByDescending { it.startDate }
 
@@ -108,7 +106,8 @@ class AnalyticsViewModel @Inject constructor(
                 categories = allCategories,
                 currentSettings = settings,
                 currentPeriodId = currentPeriodId,
-                userSettings = userSettings
+                userSettings = userSettings,
+                paidOccurrences = paidOccurrences,
             )
         } else {
             buildDisplayState(
@@ -118,7 +117,8 @@ class AnalyticsViewModel @Inject constructor(
                 userSettings = userSettings,
                 granularity = granularity,
                 archives = allArchives,
-                categories = allCategories
+                categories = allCategories,
+                paidOccurrences = paidOccurrences,
             )
         }
 
@@ -155,7 +155,8 @@ class AnalyticsViewModel @Inject constructor(
     private fun reconstructHistory(
         allTransactions: List<Transaction>,
         existingArchives: List<ArchivedBudget>,
-        currentSettings: BudgetSettings?
+        currentSettings: BudgetSettings?,
+        paidOccurrences: Set<PaidRecurrentOccurrence>,
     ): List<ArchivedBudget> {
         if (currentSettings == null) return emptyList()
 
@@ -200,10 +201,25 @@ class AnalyticsViewModel @Inject constructor(
                     actualEndDate.plusDays(1)
                 )
 
+                val periodTransactions = allTransactions.filter { tx ->
+                    val date = tx.date?.toLocalDate() ?: return@filter false
+                    !date.isBefore(actualStartDate) && !date.isAfter(actualEndDate) && !tx.isDeleted
+                }
+                val (paidRecurring, _, oneTimeSpends) = splitRecurringAndOneTime(
+                    allTransactions = allTransactions,
+                    filteredTransactions = periodTransactions,
+                    periodStart = actualStartDate,
+                    periodEnd = actualEndDate,
+                    today = actualEndDate,
+                    paidOccurrences = paidOccurrences,
+                )
+                val spentAmount = (oneTimeSpends + paidRecurring).distinctBy { it.id }
+                    .sumOf { it.amount }
+
                 ArchivedBudget(
                     periodId = virtualId,
                     totalBudget = dailyBudget.multiply(BigDecimal(daysInMonth)),
-                    spentAmount = txs.sumOf { it.amount },
+                    spentAmount = spentAmount,
                     startDate = actualStartDate,
                     endDate = actualEndDate,
                     currencyCode = currentSettings.currencyCode,
@@ -222,6 +238,7 @@ class AnalyticsViewModel @Inject constructor(
         currentSettings: BudgetSettings?,
         currentPeriodId: Long,
         userSettings: UserSettings,
+        paidOccurrences: Set<PaidRecurrentOccurrence>,
     ): AnalyticsState {
         val archive = archives.find { it.periodId == periodId } ?: return buildDisplayState(
             settings = currentSettings,
@@ -230,7 +247,8 @@ class AnalyticsViewModel @Inject constructor(
             userSettings = userSettings,
             granularity = granularity,
             archives = archives,
-            categories = categories
+            categories = categories,
+            paidOccurrences = paidOccurrences,
         )
 
         val transactions = findTransactionsForArchive(archive, allTransactions, periodId)
@@ -240,6 +258,7 @@ class AnalyticsViewModel @Inject constructor(
             periodStart = archive.startDate,
             periodEnd = archive.endDate,
             today = archive.endDate,
+            paidOccurrences = paidOccurrences,
         )
 
         val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
@@ -310,6 +329,7 @@ class AnalyticsViewModel @Inject constructor(
         granularity: GraphGranularity,
         archives: List<ArchivedBudget>,
         categories: List<Category>,
+        paidOccurrences: Set<PaidRecurrentOccurrence>,
     ): AnalyticsState {
         if (settings == null) return AnalyticsState(isLoading = false, graphGranularity = granularity, categories = categories)
 
@@ -336,6 +356,7 @@ class AnalyticsViewModel @Inject constructor(
             periodStart = settings.startDate,
             periodEnd = settings.getPeriodEndDate(),
             today = today,
+            paidOccurrences = paidOccurrences,
         )
 
         val displayBudgetState = budgetStateCalculator.calculateBudgetState(
@@ -441,43 +462,6 @@ class AnalyticsViewModel @Inject constructor(
     }
 
     private fun LocalDate.toDate(): Date = Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant())
-
-    private fun splitRecurringAndOneTime(
-        allTransactions: List<Transaction>,
-        filteredTransactions: List<Transaction>,
-        periodStart: LocalDate,
-        periodEnd: LocalDate,
-        today: LocalDate,
-    ): Triple<List<Transaction>, List<Transaction>, List<Transaction>> {
-        val oneTimeSpends =
-            filteredTransactions.filterNot { it.isDeleted }.filterNot { it.isRecurrent }
-
-        val paidRecurringInPeriod =
-            filteredTransactions.filterNot { it.isDeleted }.filter { it.isRecurrent }
-
-        val recurringParents = (paidRecurringInPeriod + allTransactions.filterNot { it.isDeleted }
-            .filter { it.isRecurrent }).distinctBy { it.id }
-
-        val paidCharges = recurringParents.flatMap { parent ->
-            getRecurringChargesInPeriod(parent, periodStart, periodEnd, today)
-        }
-
-        val upcomingCharges = recurringParents.mapNotNull { parent ->
-            val date = calculateNextChargeDate(parent, today) ?: parent.date?.toLocalDate()
-                ?.takeIf { it.isAfter(today) } ?: return@mapNotNull null
-
-            if (date.isBefore(periodStart) || date.isAfter(periodEnd)) {
-                return@mapNotNull null
-            }
-            val chargeId = parent.id * 1_000_000L + date.toEpochDay()
-            parent.copy(
-                date = date.atTime(parent.date?.toLocalTime() ?: LocalTime.MIDNIGHT),
-                id = chargeId,
-            )
-        }
-
-        return Triple(paidCharges, upcomingCharges, oneTimeSpends)
-    }
 
     private fun filterTransactions(
         allTransactions: List<Transaction>,

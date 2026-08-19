@@ -536,7 +536,10 @@
     <string name="past_periods_limit_label">Limite</string>
     <string name="past_periods_status_on_track">Dans les temps</string>
     <string name="past_periods_status_over_budget">Dépassement du budget</string>
+    <string name="past_periods_status_estimated">Estimé</string>
+    <string name="past_periods_estimated_divider">Périodes estimées ci-dessous</string>
     <string name="past_periods_status_saved">Enregistrer%1$s</string>
+    <string name="past_periods_saved_label">Argent économisé</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendances des dépenses</string>
     <string name="analytics_tutorial_minmax_desc">Ces cartes indiquent vos dépenses les plus basses et les plus élevées.\nAu fur et à mesure que vous ajoutez des transactions, elles se mettent à jour pour vous aider à repérer les valeurs aberrantes.</string>

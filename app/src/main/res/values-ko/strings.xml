@@ -535,7 +535,10 @@
     <string name="past_periods_limit_label">한도</string>
     <string name="past_periods_status_on_track">예산 범위 내</string>
     <string name="past_periods_status_over_budget">예산 초과</string>
+    <string name="past_periods_status_estimated">추정치</string>
+    <string name="past_periods_estimated_divider">아래는 추정된 기간입니다</string>
     <string name="past_periods_status_saved">%1$s 절약됨</string>
+    <string name="past_periods_saved_label">절약한 금액</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">지출 추이</string>
     <string name="analytics_tutorial_minmax_desc">이 카드들은 최저 및 최고 지출액을 보여줍니다. 거래 내역이 추가됨에 따라 정보가 업데이트되며, 이를 통해 특이 지출(이상치)을 파악할 수 있습니다.</string>
