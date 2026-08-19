@@ -536,7 +536,10 @@
     <string name="past_periods_limit_label">Limite</string>
     <string name="past_periods_status_on_track">In linea con il budget</string>
     <string name="past_periods_status_over_budget">Budget superato</string>
+    <string name="past_periods_status_estimated">Stimato</string>
+    <string name="past_periods_estimated_divider">Periodi stimati qui sotto</string>
     <string name="past_periods_status_saved">Risparmiato %1$s</string>
+    <string name="past_periods_saved_label">Denaro risparmiato</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendenze di spesa</string>
     <string name="analytics_tutorial_minmax_desc">Queste schede mostrano le tue spese minime e massime. Si aggiorneranno man mano che aggiungerai transazioni, aiutandoti a individuare valori anomali.</string>

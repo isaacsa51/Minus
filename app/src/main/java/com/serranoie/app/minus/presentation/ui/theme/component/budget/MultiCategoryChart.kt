@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,6 +45,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import kotlin.math.roundToInt
 
@@ -165,6 +167,17 @@ private fun categoryEntriesByDayIndex(
     entries.filter { it.date == date }.sortedBy { it.label }
 }
 
+/**
+ * Renders one day's spending as 24 hourly stacked-category bars instead of [MultiCategoryChart]'s
+ * one-bar-per-day-across-a-window — this is what [GraphGranularity.DAYS] shows in categories mode,
+ * since paginating through several individual days doesn't apply once the window is a single day.
+ * Cross-fades between days the same way [MultiCategoryChart] cross-fades between windows.
+ *
+ * Bars don't show their total permanently — press and hold (optionally dragging across bars,
+ * the same way [GraphCanvas]'s tooltip works) reveals each bar's total as you touch it, and
+ * double-tapping a bar opens that day's transactions via [onDayTap]. [forcedTooltipDate] forces
+ * the tooltip open for previewing its appearance.
+ */
 @Composable
 internal fun MultiCategoryChart(
     entries: List<CategoryDayEntry>,
@@ -178,20 +191,20 @@ internal fun MultiCategoryChart(
     dateFormatter: DateTimeFormatter,
     selectedDate: LocalDate? = null,
     onDayTap: ((LocalDate) -> Unit)? = null,
+    forcedTooltipDate: LocalDate? = null,
 ) {
     val secondaryColor = MaterialTheme.colorScheme.secondary
     val tertiaryColor = MaterialTheme.colorScheme.tertiary
     val surfaceColor = MaterialTheme.colorScheme.surface
     val gridColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
 
     val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
     val textMeasurer = rememberTextMeasurer()
     val labelStyle = MaterialTheme.typography.labelSmallCondensed.copy(
         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
     )
-    val totalLabelStyle = MaterialTheme.typography.labelSmallCondensed.copy(
-        color = onSurfaceColor.copy(alpha = 0.8f),
+    val tooltipStyle = MaterialTheme.typography.labelSmallEmphasized.copy(
+        color = Color.White,
         fontWeight = FontWeight.Bold,
     )
 
@@ -261,23 +274,40 @@ internal fun MultiCategoryChart(
         categoryChartMaxVal(transitionState.oldDayTotals)
     }
 
-    val gestureModifier = if (onDayTap != null) {
-        Modifier.pointerInput(windowIndex, scrollStep, dataSize, startDate) {
-            detectTapGestures(onTap = { offset ->
-                val leftMargin = 42.dp.toPx()
-                if (offset.x >= leftMargin) {
-                    val drawableWidth = size.width - leftMargin
-                    val stepWidth = drawableWidth / (dataSize - 1).coerceAtLeast(1)
-                    val index =
-                        ((offset.x - leftMargin) / stepWidth).roundToInt().coerceIn(0, dataSize - 1)
-                    val date = startLocalDate.plusDays((windowStartIndex + index).toLong())
-                    onDayTap(date)
-                }
-            })
+    var touchPosition by remember { mutableStateOf<Offset?>(null) }
+
+    val gestureModifier = Modifier
+        .pointerInput(windowIndex, scrollStep, dataSize, startDate) {
+            detectDragGestures(
+                onDragStart = { offset -> touchPosition = offset },
+                onDrag = { change, _ -> touchPosition = change.position },
+                onDragEnd = { touchPosition = null },
+                onDragCancel = { touchPosition = null },
+            )
         }
-    } else {
-        Modifier
-    }
+        .pointerInput(windowIndex, scrollStep, dataSize, startDate) {
+            fun resolveDate(offset: Offset): LocalDate? {
+                val leftMargin = 42.dp.toPx()
+                if (offset.x < leftMargin) return null
+                val drawableWidth = size.width - leftMargin
+                val stepWidth = drawableWidth / (dataSize - 1).coerceAtLeast(1)
+                val index = ((offset.x - leftMargin) / stepWidth).roundToInt().coerceIn(0, dataSize - 1)
+                return startLocalDate.plusDays((windowStartIndex + index).toLong())
+            }
+
+            detectTapGestures(
+                onPress = { offset ->
+                    touchPosition = offset
+                    tryAwaitRelease()
+                    touchPosition = null
+                },
+                onDoubleTap = { offset ->
+                    touchPosition = null
+                    val date = resolveDate(offset) ?: return@detectTapGestures
+                    onDayTap?.invoke(date)
+                },
+            )
+        }
 
     Canvas(modifier = modifier.then(gestureModifier)) {
         val width = size.width
@@ -317,7 +347,6 @@ internal fun MultiCategoryChart(
             )
             drawCategoryBars(
                 entriesByDayIndex = oldEntriesByDayIndex,
-                dayTotals = transitionState.oldDayTotals,
                 startLocalDate = startLocalDate,
                 windowStartIndex = transitionState.oldWindowIndex * transitionState.oldScrollStep,
                 dataSize = transitionState.oldDataSize,
@@ -333,11 +362,6 @@ internal fun MultiCategoryChart(
                 alpha = oldAlpha,
                 selectedDate = null,
                 tertiaryColor = tertiaryColor,
-                textMeasurer = textMeasurer,
-                totalLabelStyle = totalLabelStyle,
-                currencyFormat = currencyFormat,
-                thousandsUnit = thousandsUnit,
-                millionsUnit = millionsUnit,
             )
         }
 
@@ -359,7 +383,6 @@ internal fun MultiCategoryChart(
             )
             drawCategoryBars(
                 entriesByDayIndex = renderEntriesByDayIndex,
-                dayTotals = transitionState.renderDayTotals,
                 startLocalDate = startLocalDate,
                 windowStartIndex = transitionState.renderWindowIndex * transitionState.renderScrollStep,
                 dataSize = transitionState.renderDataSize,
@@ -375,19 +398,46 @@ internal fun MultiCategoryChart(
                 alpha = newAlpha,
                 selectedDate = selectedDate,
                 tertiaryColor = tertiaryColor,
-                textMeasurer = textMeasurer,
-                totalLabelStyle = totalLabelStyle,
-                currencyFormat = currencyFormat,
-                thousandsUnit = thousandsUnit,
-                millionsUnit = millionsUnit,
             )
+        }
+
+        if (progress >= 1f) {
+            val renderWindowStartIndex = transitionState.renderWindowIndex * transitionState.renderScrollStep
+            val touchedDayOffset = if (forcedTooltipDate != null) {
+                ChronoUnit.DAYS.between(startLocalDate, forcedTooltipDate).toInt() - renderWindowStartIndex
+            } else {
+                touchPosition?.let { pos ->
+                    if (pos.x < leftMargin) null
+                    else ((pos.x - leftMargin) / stepWidth).roundToInt()
+                        .coerceIn(0, transitionState.renderDataSize - 1)
+                }
+            }
+
+            if (touchedDayOffset != null && touchedDayOffset in 0 until transitionState.renderDataSize) {
+                val date = startLocalDate.plusDays((renderWindowStartIndex + touchedDayOffset).toLong())
+                val total = transitionState.renderDayTotals[date] ?: BigDecimal.ZERO
+                if (total > BigDecimal.ZERO) {
+                    val x = leftMargin + touchedDayOffset * stepWidth
+                    val barTopY = baseline - (total.toFloat() / renderMaxVal * drawableHeight).coerceAtLeast(1f)
+                    drawCategoryTooltip(
+                        x = x,
+                        barTopY = barTopY,
+                        baseline = baseline,
+                        topPadding = topPadding,
+                        width = width,
+                        text = currencyFormat.format(total),
+                        textMeasurer = textMeasurer,
+                        tooltipStyle = tooltipStyle,
+                        lineColor = tertiaryColor,
+                    )
+                }
+            }
         }
     }
 }
 
 private fun DrawScope.drawCategoryBars(
     entriesByDayIndex: Map<Int, List<CategoryDayEntry>>,
-    dayTotals: Map<LocalDate, BigDecimal>,
     startLocalDate: LocalDate,
     windowStartIndex: Int,
     dataSize: Int,
@@ -403,11 +453,6 @@ private fun DrawScope.drawCategoryBars(
     alpha: Float,
     selectedDate: LocalDate?,
     tertiaryColor: Color,
-    textMeasurer: TextMeasurer,
-    totalLabelStyle: TextStyle,
-    currencyFormat: java.text.Format,
-    thousandsUnit: String,
-    millionsUnit: String,
 ) {
     for (index in 0 until dataSize) {
         val dayEntries = entriesByDayIndex[index].orEmpty()
@@ -415,7 +460,6 @@ private fun DrawScope.drawCategoryBars(
 
         val x = leftMargin + index * stepWidth
         val date = startLocalDate.plusDays((windowStartIndex + index).toLong())
-        val total = dayTotals[date] ?: BigDecimal.ZERO
 
         if (date == selectedDate) {
             drawRoundRect(
@@ -427,7 +471,6 @@ private fun DrawScope.drawCategoryBars(
         }
 
         var segmentBottom = baseline
-        var barTop = baseline
         dayEntries.forEach { entry ->
             val segmentHeight =
                 (entry.amount.toFloat() / maxVal * drawableHeight).coerceAtLeast(1f)
@@ -440,23 +483,47 @@ private fun DrawScope.drawCategoryBars(
                 size = Size(barWidth, segmentHeight),
                 cornerRadius = CornerRadius(cornerRadiusPx),
             )
-            barTop = segmentTop
             segmentBottom = segmentTop - segmentGap
         }
-
-        val labelText = formatAxisValue(total, currencyFormat, thousandsUnit, millionsUnit)
-        val style = totalLabelStyle.copy(
-            color = totalLabelStyle.color.copy(alpha = totalLabelStyle.color.alpha * alpha)
-        )
-        val textLayoutResult = textMeasurer.measure(labelText, style)
-        drawText(
-            textLayoutResult = textLayoutResult,
-            topLeft = Offset(
-                x = x - textLayoutResult.size.width / 2,
-                y = barTop - textLayoutResult.size.height - 4.dp.toPx(),
-            ),
-        )
     }
+}
+
+private fun DrawScope.drawCategoryTooltip(
+    x: Float,
+    barTopY: Float,
+    baseline: Float,
+    topPadding: Float,
+    width: Float,
+    text: String,
+    textMeasurer: TextMeasurer,
+    tooltipStyle: TextStyle,
+    lineColor: Color,
+) {
+    drawLine(
+        color = lineColor.copy(alpha = 0.5f),
+        start = Offset(x, topPadding),
+        end = Offset(x, baseline),
+        strokeWidth = 1.dp.toPx(),
+    )
+
+    val textLayoutResult = textMeasurer.measure(text, tooltipStyle)
+    val tooltipWidth = textLayoutResult.size.width + 16.dp.toPx()
+    val tooltipHeight = textLayoutResult.size.height + 8.dp.toPx()
+    val tooltipX = (x - tooltipWidth / 2).coerceIn(0f, width - tooltipWidth)
+    val tooltipY = (barTopY - tooltipHeight - 8.dp.toPx()).coerceAtLeast(topPadding)
+
+    drawRoundRect(
+        color = Color.Black.copy(alpha = 0.8f),
+        topLeft = Offset(tooltipX, tooltipY),
+        size = Size(tooltipWidth, tooltipHeight),
+        cornerRadius = CornerRadius(8.dp.toPx()),
+    )
+    drawText(
+        textMeasurer = textMeasurer,
+        text = text,
+        style = tooltipStyle,
+        topLeft = Offset(tooltipX + 8.dp.toPx(), tooltipY + 4.dp.toPx()),
+    )
 }
 
 private val previewCategoryColors = listOf(
@@ -504,6 +571,7 @@ private fun PreviewMultiCategoryChart() {
                     dataSize = 7,
                     dateFormatter = DateTimeFormatter.ofPattern("dd MMM"),
                     selectedDate = startLocalDate.plusDays(6),
+                    forcedTooltipDate = startLocalDate.plusDays(6),
                 )
             }
         }

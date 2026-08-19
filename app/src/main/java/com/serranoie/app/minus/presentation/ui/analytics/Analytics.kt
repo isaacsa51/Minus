@@ -621,7 +621,7 @@ private fun FinishedPeriodBackgroundShapes(
                 .requiredSize(256.dp)
                 .absoluteOffset(x = halfWidth * 0.85f, y = -halfHeight * 0.7f - scroll * 0.1f)
                 .rotate(angleShape1)
-                .background(color = shapeColor, shape = MaterialShapes.SoftBurst.toShape())
+                .background(color = shapeColor, shape = MaterialShapes.Clover4Leaf.toShape())
         )
 
         Box(

@@ -542,7 +542,10 @@
     <string name="past_periods_limit_label">Limit</string>
     <string name="past_periods_status_on_track">On Track</string>
     <string name="past_periods_status_over_budget">Over Budget</string>
+    <string name="past_periods_status_estimated">Оценочно</string>
+    <string name="past_periods_estimated_divider">Ниже — оценочные периоды</string>
     <string name="past_periods_status_saved">Saved %1$s</string>
+    <string name="past_periods_saved_label">Сэкономленные деньги</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Spending Trends</string>
     <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>

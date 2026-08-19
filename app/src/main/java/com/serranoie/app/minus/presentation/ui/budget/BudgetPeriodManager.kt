@@ -7,6 +7,7 @@ import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.time.MidnightPeriodChecker
 import com.serranoie.app.minus.domain.time.TimeProvider
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
+import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
 import kotlinx.coroutines.flow.firstOrNull
 import java.math.BigDecimal
 import java.time.Instant
@@ -77,13 +78,6 @@ class BudgetPeriodManager @Inject constructor(
         val userSettings = settingsRepository.getSettings()
         val previousSettings = budgetRepository.getBudgetSettingsSync()
 
-        // No UI call site actually passes forceNewPeriodBoundary=true today (the
-        // "New Budget Period" screen after a finish-early/natural period end reuses
-        // the same generic "save settings" callback as a mid-period edit). The real,
-        // reliable signal that this save is starting a new period rather than
-        // tweaking the active one is the start date changing — archiving and
-        // rollover application must key off the SAME condition that already
-        // resets the period boundary below, or they silently never fire.
         val isNewPeriodBoundary =
             forceNewPeriodBoundary || previousSettings == null || previousSettings.startDate != settings.startDate
 
@@ -174,8 +168,20 @@ class BudgetPeriodManager @Inject constructor(
         val periodTransactions = transactions.filter {
             it.periodId == periodId && !it.isDeleted
         }
-        val totalSpent = periodTransactions.sumOf { it.amount }
         val archivedSettings = if (actualEndDate != null) settings.copy(endDate = actualEndDate) else settings
+        val periodEnd = archivedSettings.getPeriodEndDate()
+        val paidOccurrences = budgetRepository.getPaidRecurrentOccurrences().firstOrNull() ?: emptySet()
+
+        val (paidRecurring, _, oneTimeSpends) = splitRecurringAndOneTime(
+            allTransactions = transactions,
+            filteredTransactions = periodTransactions,
+            periodStart = archivedSettings.startDate,
+            periodEnd = periodEnd,
+            today = periodEnd,
+            paidOccurrences = paidOccurrences,
+        )
+        val totalSpent = (oneTimeSpends + paidRecurring).distinctBy { it.id }.sumOf { it.amount }
+
         budgetRepository.archiveCurrentPeriod(periodId, archivedSettings, totalSpent)
     }
 }
