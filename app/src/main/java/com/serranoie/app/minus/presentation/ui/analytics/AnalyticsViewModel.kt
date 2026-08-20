@@ -289,6 +289,7 @@ class AnalyticsViewModel @Inject constructor(
             finishPeriodDate = archive.endDate.toDate(),
             budgetSettingsForDisplay = budgetSettings,
             budgetStateForDisplay = budgetState,
+            isLoading = false,
             isHistoricalView = true,
             previousPeriodTransactions = previousTransactions,
             categories = categories,
