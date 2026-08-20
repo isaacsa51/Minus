@@ -59,6 +59,26 @@ platform :android do
     "metadata/android/en-US/changelogs/#{version_code_from(version_tag)}.txt"
   end
 
+  # Google Play rechaza el upload completo si el "whatsnew" de CUALQUIER
+  # locale supera este límite. Chequeamos todos los locales presentes para
+  # el versionCode (en-US, es-ES, los que se agreguen), no sólo en-US.
+  CHANGELOG_CHAR_LIMIT = 500
+
+  def validate_changelog_length!(version_tag)
+    version_code = version_code_from(version_tag)
+    offenders = Dir["metadata/android/*/changelogs/#{version_code}.txt"].filter_map do |path|
+      length = File.read(path).strip.length
+      "  #{path} — #{length} chars (límite #{CHANGELOG_CHAR_LIMIT})" if length > CHANGELOG_CHAR_LIMIT
+    end
+
+    return if offenders.empty?
+
+    UI.user_error!(
+      "Changelog(s) exceden el límite de Google Play:\n#{offenders.join("\n")}\n" \
+      "Editá el/los archivo(s) para acortarlos antes de continuar."
+    )
+  end
+
   desc "Genera fastlane/metadata/.../changelogs/<versionCode>.txt desde git log entre el tag anterior y el HEAD/tag."
   desc "Usar ANTES de taggear (ver :prep_release)."
   lane :generate_changelog do |options|
@@ -108,6 +128,7 @@ platform :android do
 
     generate_changelog(version_tag: version_tag)
     txt_path = changelog_path_for(version_tag)
+    validate_changelog_length!(version_tag)
 
     UI.important(
       "Próximos pasos manuales (CRUCIAL: commit ANTES del tag):\n" \
@@ -188,6 +209,7 @@ platform :android do
     unless File.exist?(expected_txt)
       UI.user_error!("Missing #{expected_txt}. Run prep_release or generate_changelog first.")
     end
+    validate_changelog_length!(version_tag)
 
     # Build the App Bundle
     gradle(task: ":app:bundleWearRelease")

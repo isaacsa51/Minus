@@ -123,6 +123,15 @@ source on the next build.
 - fix: crash when entering negative amounts (#43)
 ```
 
+> **500-char limit**: Google Play rejects the entire metadata upload if a
+> `whatsnew` text exceeds 500 characters for any locale. `prep_release`
+> checks every `metadata/android/*/changelogs/<versionCode>.txt` for the
+> version and fails immediately (`UI.user_error!`) if any is over the
+> limit — a raw `git log` dump for a release with several commits almost
+> always is. Trim the bullets (drop noisy/internal ones, shorten titles)
+> until it passes. `deploy_play_store` re-checks the same limit right
+> before uploading, as a CI-side safety net.
+
 ### Step 4 — Commit the changelog BEFORE tagging
 
 ```bash
