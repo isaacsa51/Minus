@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -32,12 +31,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.Cross
 import com.serranoie.app.minus.presentation.ui.theme.displayMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
+import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.censor
 
 @Composable
@@ -69,6 +68,7 @@ fun StatCard(
         colors = colors,
     ) {
         val textColor = LocalContentColor.current
+        val isCensored = LocalCensorMode.current
 
         Box(
             Modifier
@@ -129,7 +129,9 @@ fun StatCard(
                                         .rotate(2f)
                                 } else Modifier
                             )
-                            .basicMarquee()
+                            .then(
+                                if (isCensored) Modifier else Modifier.basicMarquee()
+                            )
                             .censor(),
                         style = valueFontStyle,
                         fontWeight = FontWeight.Medium,
