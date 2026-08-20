@@ -145,6 +145,7 @@
     <string name="average_spent">रोज़ाना का औसत खर्च</string>
     <string name="days_remaining_label">बाकी दिन</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">खर्च किए गए और बचे हुए बजट को एक नज़र में देखें</string>
     <string name="widget_days_countdown_description">बजट की अवधि में बचे हुए दिनों का काउंटडाउन</string>
     <string name="widget_budget_detail_description">टॉप कैटेगरी और बचे हुए दिनों के साथ बजट की पूरी जानकारी</string>
