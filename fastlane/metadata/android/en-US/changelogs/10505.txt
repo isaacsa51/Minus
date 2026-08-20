@@ -1,0 +1,8 @@
+- feat: add hourly view and category charts to budget analytics
+- feat: implement Complete Budget widget with shared components
+- feat: track and mark individual recurring occurrences as paid
+- feat: persist rollover limit, improve early finish rollover logic
+- fix: exclude recurrent transactions from budget totals
+- fix: budget period transitions for early and midnight finishes
+- fix: disable hardware numpad events while editing categories
+- refactor: optimize editor performance
