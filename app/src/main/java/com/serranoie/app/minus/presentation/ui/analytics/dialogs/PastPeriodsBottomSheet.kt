@@ -271,6 +271,7 @@ private fun ArchivedPeriodCard(
             CategoryDistributionBar(
                 transactions = periodTransactions,
                 totalBudget = if (isVirtual) null else period.totalBudget,
+                totalSpent = period.spentAmount,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -281,13 +282,14 @@ private fun ArchivedPeriodCard(
 private fun CategoryDistributionBar(
     transactions: List<Transaction>,
     totalBudget: BigDecimal?,
+    totalSpent: BigDecimal,
     modifier: Modifier = Modifier
 ) {
     val uncategorizedLabel = stringResource(R.string.categories_chart_uncategorized)
     val recurrentLabel = stringResource(R.string.tutorial_recurrent_title)
     val savedLabel = stringResource(R.string.past_periods_saved_label)
 
-    val data = remember(transactions, totalBudget, uncategorizedLabel, recurrentLabel) {
+    val data = remember(transactions, totalBudget, totalSpent, uncategorizedLabel, recurrentLabel) {
         val recurrentTotal = transactions.filter { it.isRecurrent }.sumOf { it.amount }
         val categoryTotals = transactions
             .filter { !it.isRecurrent }
@@ -296,7 +298,6 @@ private fun CategoryDistributionBar(
             .toList()
             .sortedByDescending { it.second }
 
-        val totalSpent = transactions.sumOf { it.amount }
         val base = totalBudget ?: totalSpent.coerceAtLeast(BigDecimal.ONE)
         val isOverBudget = totalBudget != null && totalSpent > totalBudget
         val remaining = if (totalBudget != null && totalSpent < totalBudget) {
@@ -390,7 +391,7 @@ private fun CategoryDistributionBar(
                 }
 
                 if (data.remaining > BigDecimal.ZERO) {
-                    val weight = (data.remaining.toFloat() / data.totalWeight).coerceAtLeast(0.01f)
+                    val weight = (data.remaining.toFloat() / data.totalWeight).coerceAtLeast(0.0001f)
                     Box(
                         modifier = Modifier
                             .weight(weight)
