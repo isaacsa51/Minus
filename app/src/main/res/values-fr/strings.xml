@@ -145,6 +145,7 @@
     <string name="average_spent">Moyenne dépensée par jour</string>
     <string name="days_remaining_label">Jours\nrestants</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">Consultez le budget dépensé et restant en un coup d\'œil</string>
     <string name="widget_days_countdown_description">Compte à rebours des jours restants dans la période budgétaire</string>
     <string name="widget_budget_detail_description">Aperçu complet du budget avec la catégorie principale et les jours restants</string>
