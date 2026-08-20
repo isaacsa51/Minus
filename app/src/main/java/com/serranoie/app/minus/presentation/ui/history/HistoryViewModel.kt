@@ -1,7 +1,9 @@
 ﻿package com.serranoie.app.minus.presentation.ui.history
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Category
@@ -14,6 +16,7 @@ import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import com.serranoie.app.minus.presentation.ui.budget.BudgetTransactionHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,9 +29,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.inject.Inject
+
+private const val TAG = "HistoryViewModel"
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
@@ -38,6 +44,7 @@ class HistoryViewModel @Inject constructor(
     private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase,
     private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
     private val getCurrentPeriodIdUseCase: GetCurrentPeriodIdUseCase,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _expandedDates = MutableStateFlow(emptySet<LocalDate>())
@@ -174,8 +181,16 @@ class HistoryViewModel @Inject constructor(
         _pendingRemovedTransactions.update { it + (transaction.id to transaction) }
         autoDismissJob = viewModelScope.launch {
             delay(EXIT_ANIMATION_DURATION_MS)
-            budgetTransactionHandler.deleteTransaction(transaction)
+            val result = budgetTransactionHandler.deleteTransaction(transaction)
             _pendingRemovedTransactions.update { it - transaction.id }
+            if (result.isFailure) {
+                logcat(TAG) { "deleteTransaction failed for id=${transaction.id}: ${result.exceptionOrNull()}" }
+                _effects.emit(
+                    HistoryUiEffect.ShowSnackbar(
+                        context.getString(R.string.history_snackbar_delete_transaction_failed)
+                    )
+                )
+            }
         }
     }
 
@@ -185,7 +200,11 @@ class HistoryViewModel @Inject constructor(
             if (success) {
                 _editingTransaction.value = null
             } else {
-                _effects.emit(HistoryUiEffect.ShowSnackbar("Could not save transaction"))
+                _effects.emit(
+                    HistoryUiEffect.ShowSnackbar(
+                        context.getString(R.string.history_snackbar_save_transaction_failed)
+                    )
+                )
             }
         }
     }
@@ -194,7 +213,15 @@ class HistoryViewModel @Inject constructor(
         viewModelScope.launch {
             _recurrentToDelete.value = null
             _showDeleteRecurrentDialog.value = false
-            budgetTransactionHandler.deleteTransaction(transaction)
+            val result = budgetTransactionHandler.deleteTransaction(transaction)
+            if (result.isFailure) {
+                logcat(TAG) { "confirmDeleteRecurrent failed for id=${transaction.id}: ${result.exceptionOrNull()}" }
+                _effects.emit(
+                    HistoryUiEffect.ShowSnackbar(
+                        context.getString(R.string.history_snackbar_delete_recurrent_failed)
+                    )
+                )
+            }
         }
     }
 
@@ -204,7 +231,11 @@ class HistoryViewModel @Inject constructor(
                 ?: uiState.value.currentPeriodId
             val result = budgetTransactionHandler.markRecurrentOccurrencePaid(transaction, activePeriodId)
             if (result.isFailure) {
-                _effects.emit(HistoryUiEffect.ShowSnackbar("Could not mark transaction as paid"))
+                _effects.emit(
+                    HistoryUiEffect.ShowSnackbar(
+                        context.getString(R.string.history_snackbar_mark_paid_failed)
+                    )
+                )
             }
         }
     }

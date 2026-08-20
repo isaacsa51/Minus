@@ -131,6 +131,10 @@
     <string name="show_subscriptions_outside_period">Show subscriptions outside of the period</string>
     <string name="hide_past_period_expenses">Hide past period expenses</string>
     <string name="show_past_period_expenses">Show past period expenses</string>
+    <string name="history_snackbar_delete_transaction_failed">Could not delete transaction</string>
+    <string name="history_snackbar_save_transaction_failed">Could not save transaction</string>
+    <string name="history_snackbar_delete_recurrent_failed">Could not delete recurring payment</string>
+    <string name="history_snackbar_mark_paid_failed">Could not mark transaction as paid</string>
 
     <string name="add_new_category">Category</string>
     <string name="add_new_category_action">Add New Category</string>

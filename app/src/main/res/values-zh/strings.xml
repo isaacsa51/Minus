@@ -120,6 +120,10 @@
     <string name="show_subscriptions_outside_period">显示周期外的订阅</string>
     <string name="hide_past_period_expenses">隐藏上一周期支出</string>
     <string name="show_past_period_expenses">显示上一周期支出</string>
+    <string name="history_snackbar_delete_transaction_failed">无法删除交易</string>
+    <string name="history_snackbar_save_transaction_failed">无法保存交易</string>
+    <string name="history_snackbar_delete_recurrent_failed">无法删除定期付款</string>
+    <string name="history_snackbar_mark_paid_failed">无法将交易标记为已付款</string>
     <string name="add_new_category">类别</string>
     <string name="add_new_category_action">添加新类别</string>
     <string name="budget_validation_major_zero">预算必须比 0 多</string>

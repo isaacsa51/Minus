@@ -124,6 +124,10 @@
     <string name="show_subscriptions_outside_period">Показване на абонаментите извън периода</string>
     <string name="hide_past_period_expenses">Скриване на разходите от минали периоди</string>
     <string name="show_past_period_expenses">Показване на разходите от минали периоди</string>
+    <string name="history_snackbar_delete_transaction_failed">Транзакцията не можа да бъде изтрита</string>
+    <string name="history_snackbar_save_transaction_failed">Транзакцията не можа да бъде запазена</string>
+    <string name="history_snackbar_delete_recurrent_failed">Повтарящото се плащане не можа да бъде изтрито</string>
+    <string name="history_snackbar_mark_paid_failed">Транзакцията не можа да бъде отбелязана като платена</string>
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавяне на нова категория</string>
     <string name="budget_validation_major_zero">Бюджетът трябва да е по-голям от 0</string>

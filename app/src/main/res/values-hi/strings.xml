@@ -122,6 +122,10 @@
     <string name="show_subscriptions_outside_period">समय-सीमा के बाहर के सब्सक्रिप्शन दिखाएं</string>
     <string name="hide_past_period_expenses">पिछली अवधि के खर्च छिपाएँ</string>
     <string name="show_past_period_expenses">पिछले समय के खर्च दिखाएं</string>
+    <string name="history_snackbar_delete_transaction_failed">लेन-देन हटाया नहीं जा सका</string>
+    <string name="history_snackbar_save_transaction_failed">लेन-देन सेव नहीं हो सका</string>
+    <string name="history_snackbar_delete_recurrent_failed">बार-बार होने वाला पेमेंट हटाया नहीं जा सका</string>
+    <string name="history_snackbar_mark_paid_failed">लेन-देन को भुगतान किया हुआ चिह्नित नहीं किया जा सका</string>
     <string name="add_new_category">कैटेगरी</string>
     <string name="add_new_category_action">नई कैटेगरी जोड़ें</string>
     <string name="budget_validation_major_zero">बजट 0 से ज़्यादा होना चाहिए</string>

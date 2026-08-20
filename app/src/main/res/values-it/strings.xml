@@ -124,6 +124,10 @@
     <string name="show_subscriptions_outside_period">Mostra sottoscrizioni al di fuori del periodo</string>
     <string name="hide_past_period_expenses">Nascondi le spese del periodo passato</string>
     <string name="show_past_period_expenses">Mostra le spese del periodo passato</string>
+    <string name="history_snackbar_delete_transaction_failed">Impossibile eliminare la transazione</string>
+    <string name="history_snackbar_save_transaction_failed">Impossibile salvare la transazione</string>
+    <string name="history_snackbar_delete_recurrent_failed">Impossibile eliminare il pagamento ricorrente</string>
+    <string name="history_snackbar_mark_paid_failed">Impossibile contrassegnare la transazione come pagata</string>
     <string name="add_new_category">Categoria</string>
     <string name="add_new_category_action">Aggiungi Nuova Categoria</string>
     <string name="budget_validation_major_zero">Il budget deve essere maggiore di 0</string>

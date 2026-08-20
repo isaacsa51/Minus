@@ -122,6 +122,10 @@
     <string name="show_subscriptions_outside_period">해당 기간 외 구독 내역 표시</string>
     <string name="hide_past_period_expenses">지난 기간 지출 숨기기</string>
     <string name="show_past_period_expenses">지난 기간 지출 내역 표시</string>
+    <string name="history_snackbar_delete_transaction_failed">거래를 삭제할 수 없습니다</string>
+    <string name="history_snackbar_save_transaction_failed">거래를 저장할 수 없습니다</string>
+    <string name="history_snackbar_delete_recurrent_failed">반복 지출을 삭제할 수 없습니다</string>
+    <string name="history_snackbar_mark_paid_failed">거래를 결제 완료로 표시할 수 없습니다</string>
     <string name="add_new_category">카테고리</string>
     <string name="add_new_category_action">새 카테고리 추가</string>
     <string name="budget_validation_major_zero">예산은 0보다 커야 합니다.</string>

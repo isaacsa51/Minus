@@ -122,6 +122,10 @@
     <string name="show_subscriptions_outside_period">期間外のサブスクリプションを表示</string>
     <string name="hide_past_period_expenses">過去の経費を非表示</string>
     <string name="show_past_period_expenses">過去の経費を表示</string>
+    <string name="history_snackbar_delete_transaction_failed">取引を削除できませんでした</string>
+    <string name="history_snackbar_save_transaction_failed">取引を保存できませんでした</string>
+    <string name="history_snackbar_delete_recurrent_failed">定期的な支払いを削除できませんでした</string>
+    <string name="history_snackbar_mark_paid_failed">取引を支払い済みにできませんでした</string>
     <string name="add_new_category">カテゴリ</string>
     <string name="add_new_category_action">新しいカテゴリを追加</string>
     <string name="budget_validation_major_zero">予算は0より大きくなければなりません</string>

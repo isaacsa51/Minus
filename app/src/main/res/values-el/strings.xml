@@ -122,6 +122,10 @@
     <string name="show_subscriptions_outside_period">Εμφάνιση συνδρομών εκτός της περιόδου</string>
     <string name="hide_past_period_expenses">Απόκρυψη προηγούμενων εξόδων περιόδου</string>
     <string name="show_past_period_expenses">Εμφάνιση προηγούμενων εξόδων περιόδου</string>
+    <string name="history_snackbar_delete_transaction_failed">Δεν ήταν δυνατή η διαγραφή της συναλλαγής</string>
+    <string name="history_snackbar_save_transaction_failed">Δεν ήταν δυνατή η αποθήκευση της συναλλαγής</string>
+    <string name="history_snackbar_delete_recurrent_failed">Δεν ήταν δυνατή η διαγραφή της επαναλαμβανόμενης πληρωμής</string>
+    <string name="history_snackbar_mark_paid_failed">Δεν ήταν δυνατή η σήμανση της συναλλαγής ως πληρωμένης</string>
     <string name="add_new_category">Κατηγορία</string>
     <string name="add_new_category_action">Προσθήκη Νέας Κατηγορίας</string>
     <string name="budget_validation_major_zero">Ο προϋπολογισμός πρέπει να είναι μεγαλύτερος από 0</string>

@@ -124,6 +124,10 @@
     <string name="show_subscriptions_outside_period">Mostrar assinaturas fora do período</string>
     <string name="hide_past_period_expenses">Ocultar as despesas da menstruação passada</string>
     <string name="show_past_period_expenses">Mostrar despesas do período anterior</string>
+    <string name="history_snackbar_delete_transaction_failed">Não foi possível excluir a transação</string>
+    <string name="history_snackbar_save_transaction_failed">Não foi possível guardar a transação</string>
+    <string name="history_snackbar_delete_recurrent_failed">Não foi possível excluir o pagamento recorrente</string>
+    <string name="history_snackbar_mark_paid_failed">Não foi possível marcar a transação como paga</string>
     <string name="add_new_category">categoria</string>
     <string name="add_new_category_action">Adicionar Nova Categoria</string>
     <string name="budget_validation_major_zero">O orçamento deve ser maior que 0</string>
