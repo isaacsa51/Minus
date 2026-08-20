@@ -113,6 +113,17 @@
         </receiver>
 
         <receiver
+            android:name=".presentation.widget.CompleteBudgetWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_complete_budget_info" />
+        </receiver>
+
+        <receiver
             android:name=".presentation.widget.DaysCountdownWidgetReceiver"
             android:exported="true">
             <intent-filter>

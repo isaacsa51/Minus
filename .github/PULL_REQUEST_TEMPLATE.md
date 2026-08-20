@@ -1,5 +1,7 @@
 ## Description
-<!-- Porpuse of the PR and what changed and why? -->
+<!-- Purpose of the PR -->
+
+#### Issue Linked (if any)
 
 ## Change strategy
 <!-- Briefly explain the approach. -->
