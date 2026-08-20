@@ -6,6 +6,7 @@ import com.serranoie.app.minus.presentation.widget.DailySpending
 import com.serranoie.app.minus.presentation.widget.MonthHeatmapData
 import com.serranoie.app.minus.presentation.widget.updateAverageSpendWidget
 import com.serranoie.app.minus.presentation.widget.updateBudgetOverviewWidget
+import com.serranoie.app.minus.presentation.widget.updateCompleteBudgetWidget
 import com.serranoie.app.minus.presentation.widget.updateDaysCountdownWidget
 import com.serranoie.app.minus.presentation.widget.updateExpenseWidget
 import com.serranoie.app.minus.presentation.widget.updateHeatmapWidget
@@ -35,6 +36,7 @@ class BudgetWidgetUpdater @Inject constructor(
 
         updateExpenseWidget(context, totalSpent, totalBudget, currency)
         updateBudgetOverviewWidget(context, budgetAmount, currency, startDate, endDate, daysLeft)
+        updateCompleteBudgetWidget(context, totalSpent, budgetAmount, currency, startDate, endDate, daysLeft)
         updateDaysCountdownWidget(context, daysLeft, budget.totalBudget.toInt())
         updateHeatmapWidget(context, heatmapData.monthHeatmapData)
         updateMonthHeatmapWidget(context, heatmapData.currentMonthHeatmap, heatmapData.currentMonthTotalSpent, currency)

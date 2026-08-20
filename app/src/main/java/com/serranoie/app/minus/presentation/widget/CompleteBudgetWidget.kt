@@ -7,6 +7,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -43,11 +44,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class BudgetOverviewWidgetReceiver : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget: GlanceAppWidget = BudgetOverviewWidget()
+class CompleteBudgetWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = CompleteBudgetWidget()
 }
 
-class BudgetOverviewWidget : GlanceAppWidget() {
+class CompleteBudgetWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
@@ -60,21 +61,23 @@ class BudgetOverviewWidget : GlanceAppWidget() {
     @Composable
     private fun WidgetContent(context: Context) {
         val prefs = currentState<Preferences>()
-        val budgetAmount =
-            prefs[androidx.datastore.preferences.core.intPreferencesKey("budget_amount")] ?: 0
+        val spendAmount = prefs[intPreferencesKey("spend_amount")] ?: 0
+        val budgetAmount = prefs[intPreferencesKey("budget_amount")] ?: 0
         val currency = prefs[stringPreferencesKey("currency_code")] ?: "USD"
         val startDate = prefs[stringPreferencesKey("start_date")] ?: "-"
         val endDate = prefs[stringPreferencesKey("end_date")] ?: "-"
-        val daysCount =
-            prefs[androidx.datastore.preferences.core.intPreferencesKey("days_count")] ?: -1
+        val daysCount = prefs[intPreferencesKey("days_count")] ?: -1
 
-        BudgetOverviewContent(
+        CompleteBudgetContent(
+            spendAmount = spendAmount,
             budgetAmount = budgetAmount,
             currency = currency,
             startDate = startDate,
             endDate = endDate,
             daysCount = daysCount,
+            totalSpentLabel = context.getString(R.string.total_spent),
             totalBudgetLabel = context.getString(R.string.total_budget),
+            addExpenseContentDescription = context.getString(R.string.widget_add_expense_label),
             daysCountFormat = { count ->
                 context.resources.getQuantityString(R.plurals.analytics_days_left, count, count)
             },
@@ -82,21 +85,34 @@ class BudgetOverviewWidget : GlanceAppWidget() {
     }
 
     @Composable
-    internal fun BudgetOverviewContent(
+    internal fun CompleteBudgetContent(
+        spendAmount: Int,
         budgetAmount: Int,
         currency: String,
         startDate: String,
         endDate: String,
         daysCount: Int,
+        totalSpentLabel: String = "Total Spent",
         totalBudgetLabel: String = "Total Budget",
         daysCountFormat: (Int) -> String = { count -> "$count days" },
+        addExpenseContentDescription: String = "Add new expense",
     ) {
         Column(
-            modifier = GlanceModifier.fillMaxSize().background(GlanceTheme.colors.surface)
+            modifier = GlanceModifier
+                .fillMaxSize()
+                .background(GlanceTheme.colors.surface)
                 .clickable(actionRunCallback<OpenAppAction>())
-                .padding(horizontal = 16.dp, vertical = 2.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(horizontal = 16.dp, vertical = 14.dp),
         ) {
+            SpentInsetBlock(
+                spendAmount = spendAmount,
+                currency = currency,
+                totalSpentLabel = totalSpentLabel,
+                addExpenseContentDescription = addExpenseContentDescription,
+            )
+
+            Spacer(modifier = GlanceModifier.height(14.dp))
+
             Text(
                 text = formatWidgetCurrency(currency, budgetAmount), style = TextStyle(
                     fontSize = MaterialTheme.typography.h4.fontSize,
@@ -114,6 +130,49 @@ class BudgetOverviewWidget : GlanceAppWidget() {
             Spacer(modifier = GlanceModifier.height(12.dp))
 
             DateRangeRow(startDate, endDate, daysCount, daysCountFormat)
+        }
+    }
+
+    @Composable
+    private fun SpentInsetBlock(
+        spendAmount: Int,
+        currency: String,
+        totalSpentLabel: String,
+        addExpenseContentDescription: String,
+    ) {
+        Box(
+            modifier = GlanceModifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterEnd,
+        ) {
+            Box(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .background(GlanceTheme.colors.primaryContainer)
+                    .cornerRadius(18.dp)
+                    .padding(start = 14.dp, top = 10.dp, end = 44.dp, bottom = 10.dp),
+            ) {
+                Column {
+                    Text(
+                        text = totalSpentLabel, style = TextStyle(
+                            color = GlanceTheme.colors.onPrimaryContainer,
+                            fontSize = MaterialTheme.typography.caption.fontSize,
+                        )
+                    )
+                    Text(
+                        text = formatWidgetCurrency(currency, spendAmount), style = TextStyle(
+                            color = GlanceTheme.colors.onPrimaryContainer,
+                            fontSize = MaterialTheme.typography.h6.fontSize,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    )
+                }
+            }
+
+            AddExpenseButton(
+                contentDescription = addExpenseContentDescription,
+                size = 32.dp,
+                modifier = GlanceModifier.padding(end = 6.dp),
+            )
         }
     }
 
@@ -187,12 +246,12 @@ class BudgetOverviewWidget : GlanceAppWidget() {
     }
 }
 
-
-@Preview(widthDp = 420, heightDp = 210)
+@Preview(widthDp = 220, heightDp = 190)
 @Composable
-private fun BudgetOverviewWidgetPreview() {
+private fun CompleteBudgetWidgetPreview() {
     GlanceTheme {
-        BudgetOverviewWidget().BudgetOverviewContent(
+        CompleteBudgetWidget().CompleteBudgetContent(
+            spendAmount = 180,
             budgetAmount = 500,
             currency = "USD",
             startDate = "06 Mar",
@@ -204,9 +263,25 @@ private fun BudgetOverviewWidgetPreview() {
 
 @Preview(widthDp = 420, heightDp = 210)
 @Composable
-private fun BudgetOverviewWidgetPreviewShort() {
+private fun CompleteBudgetWidgetPreviewWide() {
     GlanceTheme {
-        BudgetOverviewWidget().BudgetOverviewContent(
+        CompleteBudgetWidget().CompleteBudgetContent(
+            spendAmount = 180,
+            budgetAmount = 500,
+            currency = "USD",
+            startDate = "06 Mar",
+            endDate = "21 Mar",
+            daysCount = 16,
+        )
+    }
+}
+
+@Preview(widthDp = 420, heightDp = 210)
+@Composable
+private fun CompleteBudgetWidgetPreviewShort() {
+    GlanceTheme {
+        CompleteBudgetWidget().CompleteBudgetContent(
+            spendAmount = 90,
             budgetAmount = 300,
             currency = "USD",
             startDate = "06 Mar",
@@ -216,8 +291,9 @@ private fun BudgetOverviewWidgetPreviewShort() {
     }
 }
 
-suspend fun updateBudgetOverviewWidget(
+suspend fun updateCompleteBudgetWidget(
     context: Context,
+    spendAmount: Int,
     budgetAmount: Int,
     currency: String,
     startDate: Date,
@@ -227,17 +303,17 @@ suspend fun updateBudgetOverviewWidget(
     val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
 
     val manager = GlanceAppWidgetManager(context)
-    val glanceIds = manager.getGlanceIds(BudgetOverviewWidget::class.java)
+    val glanceIds = manager.getGlanceIds(CompleteBudgetWidget::class.java)
 
     glanceIds.forEach { glanceId ->
         updateAppWidgetState(context, glanceId) { prefs ->
-            prefs[androidx.datastore.preferences.core.intPreferencesKey("budget_amount")] =
-                budgetAmount
+            prefs[intPreferencesKey("spend_amount")] = spendAmount
+            prefs[intPreferencesKey("budget_amount")] = budgetAmount
             prefs[stringPreferencesKey("currency_code")] = currency
             prefs[stringPreferencesKey("start_date")] = dateFormat.format(startDate)
             prefs[stringPreferencesKey("end_date")] = dateFormat.format(endDate)
-            prefs[androidx.datastore.preferences.core.intPreferencesKey("days_count")] = daysCount
+            prefs[intPreferencesKey("days_count")] = daysCount
         }
-        BudgetOverviewWidget().update(context, glanceId)
+        CompleteBudgetWidget().update(context, glanceId)
     }
 }
