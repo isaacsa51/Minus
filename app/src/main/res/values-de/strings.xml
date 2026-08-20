@@ -145,6 +145,7 @@
     <string name="average_spent">Average per day spent</string>
     <string name="days_remaining_label">Days\nremaining</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">See spent and remaining budget at a glance</string>
     <string name="widget_days_countdown_description">Countdown days remaining in budget period</string>
     <string name="widget_budget_detail_description">Full budget overview with top category and days left</string>
