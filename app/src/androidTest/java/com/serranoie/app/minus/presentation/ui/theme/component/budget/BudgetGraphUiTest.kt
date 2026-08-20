@@ -76,6 +76,31 @@ class BudgetGraphUiTest {
     @Test
     fun navigationArrows_visible_whenMultipleWindows() {
         val start = LocalDate.of(2026, 8, 1)
+        val end = LocalDate.of(2026, 11, 10)
+        composeTestRule.setContent {
+            MinusTheme {
+                BudgetGraph(
+                    state = AnalyticsState(
+                        graphGranularity = GraphGranularity.WEEK,
+                        startPeriodDate = fixedDate(2026, 8, 1),
+                        finishPeriodDate = fixedDate(2026, 11, 10),
+                        currencyCode = "USD",
+                        budgetSettingsForDisplay = sampleSettings(start, end),
+                        spends = sampleSpends(),
+                        isLoading = false,
+                    ),
+                    onGranularityChanged = {}
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithTag(BUDGET_GRAPH_NEXT_PAGE_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(BUDGET_GRAPH_WINDOW_LABEL_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun dayNavigation_visible_whenInDaysGranularity() {
+        val start = LocalDate.of(2026, 8, 1)
         val end = LocalDate.of(2026, 8, 10)
         composeTestRule.setContent {
             MinusTheme {
@@ -94,8 +119,8 @@ class BudgetGraphUiTest {
             }
         }
 
-        composeTestRule.onNodeWithTag(BUDGET_GRAPH_NEXT_PAGE_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BUDGET_GRAPH_WINDOW_LABEL_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(BUDGET_GRAPH_DAY_NEXT_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(BUDGET_GRAPH_DAY_LABEL_TAG).assertIsDisplayed()
     }
 
     @Test

@@ -210,10 +210,10 @@ class BudgetGraphScreenshotTest {
     }
 
     @Test
-    fun budgetGraph_totalView() {
+    fun budgetGraph_multiWindowView() {
         Locale.setDefault(Locale.US)
         val start = LocalDate.of(2026, 8, 1)
-        val end = LocalDate.of(2026, 8, 30)
+        val end = LocalDate.of(2026, 11, 10) // ~100 days
         paparazzi.snapshot {
             MinusTheme {
                 Box(modifier = Modifier.padding(16.dp)) {
@@ -221,9 +221,9 @@ class BudgetGraphScreenshotTest {
                         state = AnalyticsState(
                             spends = mockTransactions(start),
                             startPeriodDate = fixedDate(2026, 8, 1),
-                            finishPeriodDate = fixedDate(2026, 8, 30),
+                            finishPeriodDate = fixedDate(2026, 11, 10),
                             budgetSettingsForDisplay = sampleSettings(start, end),
-                            graphGranularity = GraphGranularity.TOTAL,
+                            graphGranularity = GraphGranularity.WEEK,
                             currencyCode = "USD",
                             isLoading = false,
                         ),
