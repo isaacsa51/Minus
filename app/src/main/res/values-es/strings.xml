@@ -145,6 +145,7 @@
     <string name="average_spent">Promedio por día empleado</string>
     <string name="days_remaining_label">Días\nrestantes</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">Vea el presupuesto gastado y restante de un vistazo</string>
     <string name="widget_days_countdown_description">Días de cuenta regresiva restantes en el período presupuestario</string>
     <string name="widget_budget_detail_description">Resumen completo del presupuesto con la categoría principal y los días restantes</string>
