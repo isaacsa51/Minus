@@ -8,6 +8,7 @@ import androidx.core.content.FileProvider
 import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportIssueType
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiState
+import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,16 +25,18 @@ import javax.inject.Singleton
 @Singleton
 class BugReportZipGenerator @Inject constructor(
 	@param:ApplicationContext private val context: Context,
+	private val errorLogRecorder: ErrorLogRecorder,
 ) {
 
 	suspend fun generate(state: BugReportUiState): GeneratedBugReport = withContext(Dispatchers.IO) {
 		val reportDir = File(context.cacheDir, BUG_REPORT_CACHE_DIR).apply { mkdirs() }
 		val fileName = buildFileName(state.selectedIssueType)
 		val zipFile = File(reportDir, fileName)
+		val markdown = buildMarkdown(state)
 
 		ZipOutputStream(zipFile.outputStream().buffered()).use { zipOutput ->
 			zipOutput.putNextEntry(ZipEntry(REPORT_MARKDOWN_FILE_NAME))
-			zipOutput.write(buildMarkdown(state).toByteArray(Charsets.UTF_8))
+			zipOutput.write(markdown.toByteArray(Charsets.UTF_8))
 			zipOutput.closeEntry()
 
 			state.selectedAttachmentUris.forEachIndexed { index, uri ->
@@ -44,6 +47,12 @@ class BugReportZipGenerator @Inject constructor(
 				}
 				zipOutput.closeEntry()
 			}
+
+			if (errorLogRecorder.hasEntries()) {
+				zipOutput.putNextEntry(ZipEntry(ERROR_LOG_ENTRY_NAME))
+				zipOutput.write(errorLogRecorder.readAll().toByteArray(Charsets.UTF_8))
+				zipOutput.closeEntry()
+			}
 		}
 
 		val uri = FileProvider.getUriForFile(
@@ -51,7 +60,7 @@ class BugReportZipGenerator @Inject constructor(
 			"${context.packageName}.fileprovider",
 			zipFile,
 		)
-		GeneratedBugReport(uri = uri, fileName = fileName)
+		GeneratedBugReport(uri = uri, fileName = fileName, markdown = markdown)
 	}
 
 	private fun buildFileName(issueType: BugReportIssueType): String {
@@ -176,6 +185,7 @@ class BugReportZipGenerator @Inject constructor(
 	companion object {
 		private const val BUG_REPORT_CACHE_DIR = "bug_reports"
 		private const val REPORT_MARKDOWN_FILE_NAME = "report.md"
+		private const val ERROR_LOG_ENTRY_NAME = "diagnostics/error_log.txt"
 		private val FILE_DATE_FORMATTER = DateTimeFormatter.ofPattern("ddMMMyyyy", Locale.US)
 	}
 }
@@ -183,6 +193,7 @@ class BugReportZipGenerator @Inject constructor(
 data class GeneratedBugReport(
 	val uri: Uri,
 	val fileName: String,
+	val markdown: String,
 )
 
 fun buildAppEnvironmentMetadata(): String {

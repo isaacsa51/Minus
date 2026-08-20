@@ -16,6 +16,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.serranoie.app.minus.data.csv.CsvImportWorker
 import com.serranoie.app.minus.data.csv.MinusCsvService
+import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,7 +29,8 @@ import javax.inject.Singleton
 @Singleton
 class CsvTransferManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val csvService: MinusCsvService
+    private val csvService: MinusCsvService,
+    private val errorLogRecorder: ErrorLogRecorder,
 ) {
 
     suspend fun exportAndShareCsv() = withContext(Dispatchers.IO) {
@@ -77,6 +79,7 @@ class CsvTransferManager @Inject constructor(
                 )
             } catch (e: Exception) {
                 logcat { "Failed to export CSV: ${e.asLog()}" }
+                errorLogRecorder.record("CsvTransferManager.exportAndShareCsv", e)
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Failed to export CSV", Toast.LENGTH_SHORT).show()
                 }
@@ -104,6 +107,7 @@ class CsvTransferManager @Inject constructor(
             }
         } catch (e: Exception) {
             logcat { "Failed to save CSV to Downloads: ${e.asLog()}" }
+            errorLogRecorder.record("CsvTransferManager.saveCsvToDownloads", e)
         }
         null
     }

@@ -322,7 +322,6 @@
     <string name="bug_report_attachments_label_bug">स्क्रीनशॉट या रिकॉर्डिंग</string>
     <string name="bug_report_submit">रिपोर्ट सबमिट करें</string>
     <string name="bug_report_share_title">रिपोर्ट भेजें</string>
-    <string name="bug_report_email_body">नमस्ते, मेरी बनाई गई Minus रिपोर्ट अटैच की गई है।</string>
     <string name="bug_report_help_title">Minus को बेहतर बनाने में हमारी मदद करें</string>
     <string name="bug_report_help_message_prefix">इश्यू की रिपोर्ट करने या सुधार का सुझाव देने से हमें Minus को सभी के लिए बेहतर बनाने में मदद मिलती है। यह गाइडेड फ़ॉर्म आपको सभी ज़रूरी जानकारी को एक रिपोर्ट में इकट्ठा करने में मदद करता है। यह हमारी जांच को तेज़ करने के लिए अपने-आप डिवाइस मेटाडेटा और ऐप डायग्नोस्टिक्स को भी जोड़ देता है। एक बार तैयार हो जाने पर, आप रिपोर्ट ईमेल से भेज सकते हैं या सीधे हमारी रिपॉज़िटरी में योगदान कर सकते हैं।</string>
     <string name="bug_report_help_github_issues">GitHub इश्यू</string>

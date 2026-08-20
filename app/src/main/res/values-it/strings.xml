@@ -325,7 +325,6 @@
     <string name="bug_report_attachments_label_bug">Screenshot o registrazioni</string>
     <string name="bug_report_submit">Invia Report</string>
     <string name="bug_report_share_title">Invia report</string>
-    <string name="bug_report_email_body">Ciao, allegato è il mio rapporto Minus generato.</string>
     <string name="bug_report_help_title">Aiutaci a migliorare Minus</string>
     <string name="bug_report_help_message_prefix">"Segnalare problemi o suggerire miglioramenti ci aiuta a rendere Minus migliore per tutti.\n\nQuesto modulo guidato ti aiuta a confezionare tutti i dettagli necessari in un rapporto, collegare automaticamente i metadati del dispositivo e la diagnostica delle app per accelerare la nostra indagine.\n\nUna volta preparato, puoi inviare il report via email o contribuire tramite "</string>
     <string name="bug_report_help_github_issues">Issue su GitHub</string>

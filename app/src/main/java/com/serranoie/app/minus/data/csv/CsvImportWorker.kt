@@ -6,6 +6,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
+import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -13,7 +14,8 @@ import dagger.assisted.AssistedInject
 class CsvImportWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val csvService: MinusCsvService
+    private val csvService: MinusCsvService,
+    private val errorLogRecorder: ErrorLogRecorder,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -39,6 +41,7 @@ class CsvImportWorker @AssistedInject constructor(
                 )
             }
         }.getOrElse {
+            errorLogRecorder.record("CsvImportWorker.doWork", it)
             Result.failure(
                 Data.Builder().putString(KEY_ERROR, it.message ?: "Import failed").build()
             )

@@ -324,7 +324,6 @@
     <string name="bug_report_attachments_label_bug">스크린샷 또는 녹화 영상</string>
     <string name="bug_report_submit">보고서 제출</string>
     <string name="bug_report_share_title">보고서 제출</string>
-    <string name="bug_report_email_body">안녕하세요, 생성된 Minus 보고서를 첨부합니다.</string>
     <string name="bug_report_help_title">Minus를 더 좋게 만드는 데 도움을 주세요</string>
     <string name="bug_report_help_message_prefix">문제 제보나 개선 제안은 모두를 위해 Minus를 더 좋게 만드는 데 도움이 됩니다. 이 안내 양식을 사용하면 필요한 모든 세부 정보를 보고서로 구성할 수 있으며, 기기 메타데이터와 앱 진단 정보가 자동으로 첨부되어 조사가 신속하게 진행됩니다. 보고서가 준비되면 이메일로 보내거나 다음을 통해 기여할 수 있습니다.</string>
     <string name="bug_report_help_github_issues">GitHub 이슈</string>

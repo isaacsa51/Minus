@@ -16,7 +16,9 @@ import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCas
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
+import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -62,6 +64,7 @@ class AnalyticsViewModel @Inject constructor(
     private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase,
     private val clearEarlyFinishStateUseCase: ClearEarlyFinishStateUseCase,
     private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase,
+    private val errorLogRecorder: ErrorLogRecorder,
 ) : ViewModel() {
 
     private val _selectedPeriodId = MutableStateFlow<Long?>(null)
@@ -80,62 +83,72 @@ class AnalyticsViewModel @Inject constructor(
         budgetRepository.getAllCategories().distinctUntilChanged(),
         budgetRepository.getPaidRecurrentOccurrences().distinctUntilChanged(),
     ) { args: Array<Any?> ->
-        val settings = args[0] as BudgetSettings?
-        val transactions = args[1] as List<Transaction>
-        val categories = args[2] as List<Category>
-        val archives = args[3] as List<ArchivedBudget>
-        val periodBoundary = args[4] as Pair<Long, Long>
-        val userSettings = args[5] as UserSettings
-        val rollover = args[6] as Pair<BigDecimal, Boolean>
-        val granularity = args[7] as GraphGranularity
-        val selectedPeriodId = args[8] as Long?
-        val allCategories = args[9] as List<Category>
-        val paidOccurrences = args[10] as Set<PaidRecurrentOccurrence>
+        try {
+            val settings = args[0] as BudgetSettings?
+            val transactions = args[1] as List<Transaction>
+            val categories = args[2] as List<Category>
+            val archives = args[3] as List<ArchivedBudget>
+            val periodBoundary = args[4] as Pair<Long, Long>
+            val userSettings = args[5] as UserSettings
+            val rollover = args[6] as Pair<BigDecimal, Boolean>
+            val granularity = args[7] as GraphGranularity
+            val selectedPeriodId = args[8] as Long?
+            val allCategories = args[9] as List<Category>
+            val paidOccurrences = args[10] as Set<PaidRecurrentOccurrence>
 
-        val currentPeriodId = periodBoundary.second
-        val reconstructedArchives = reconstructHistory(transactions, archives, settings, paidOccurrences)
-        val allArchives = (archives + reconstructedArchives).distinctBy { it.periodId }
-            .sortedByDescending { it.startDate }
+            val currentPeriodId = periodBoundary.second
+            val reconstructedArchives = reconstructHistory(transactions, archives, settings, paidOccurrences)
+            val allArchives = (archives + reconstructedArchives).distinctBy { it.periodId }
+                .sortedByDescending { it.startDate }
 
-        val displayState = if (selectedPeriodId != null && selectedPeriodId != currentPeriodId) {
-            buildHistoricalDisplayState(
-                periodId = selectedPeriodId,
+            val displayState = if (selectedPeriodId != null && selectedPeriodId != currentPeriodId) {
+                buildHistoricalDisplayState(
+                    periodId = selectedPeriodId,
+                    allTransactions = transactions,
+                    archives = allArchives,
+                    granularity = granularity,
+                    categories = allCategories,
+                    currentSettings = settings,
+                    currentPeriodId = currentPeriodId,
+                    userSettings = userSettings,
+                    paidOccurrences = paidOccurrences,
+                )
+            } else {
+                buildDisplayState(
+                    settings = settings,
+                    allTransactions = transactions,
+                    currentPeriodId = currentPeriodId,
+                    userSettings = userSettings,
+                    granularity = granularity,
+                    archives = allArchives,
+                    categories = allCategories,
+                    paidOccurrences = paidOccurrences,
+                )
+            }
+
+            AnalyticsUiState(
+                isLoading = false,
+                budgetSettings = settings,
                 allTransactions = transactions,
-                archives = allArchives,
-                granularity = granularity,
-                categories = allCategories,
-                currentSettings = settings,
+                categories = categories,
+                archivedBudgets = allArchives,
                 currentPeriodId = currentPeriodId,
+                selectedPeriodId = selectedPeriodId,
                 userSettings = userSettings,
-                paidOccurrences = paidOccurrences,
+                rolloverAmount = rollover.first,
+                rolloverCarryForward = rollover.second,
+                graphGranularity = granularity,
+                displayState = displayState
             )
-        } else {
-            buildDisplayState(
-                settings = settings,
-                allTransactions = transactions,
-                currentPeriodId = currentPeriodId,
-                userSettings = userSettings,
-                granularity = granularity,
-                archives = allArchives,
-                categories = allCategories,
-                paidOccurrences = paidOccurrences,
-            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // This combine() drives the entire Analytics screen — an uncaught exception here
+            // would kill the StateFlow's upstream collection and break the screen until the
+            // app restarts. Fall back to a safe, empty state instead of crashing.
+            errorLogRecorder.record("AnalyticsViewModel.uiState combine", e)
+            AnalyticsUiState(isLoading = false)
         }
-
-        AnalyticsUiState(
-            isLoading = false,
-            budgetSettings = settings,
-            allTransactions = transactions,
-            categories = categories,
-            archivedBudgets = allArchives,
-            currentPeriodId = currentPeriodId,
-            selectedPeriodId = selectedPeriodId,
-            userSettings = userSettings,
-            rolloverAmount = rollover.first,
-            rolloverCarryForward = rollover.second,
-            graphGranularity = granularity,
-            displayState = displayState
-        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000L),

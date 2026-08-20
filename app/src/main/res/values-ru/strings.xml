@@ -329,7 +329,6 @@
     <string name="bug_report_attachments_label_bug">Screenshots or recordings</string>
     <string name="bug_report_submit">Submit Report</string>
     <string name="bug_report_share_title">Send report</string>
-    <string name="bug_report_email_body">Hi, attached is my generated Minus report.</string>
     <string name="bug_report_help_title">Help us make Minus better</string>
     <string name="bug_report_help_message_prefix">"Reporting issues or suggesting improvements helps us make Minus better for everyone.\n\nThis guided form helps you package all the necessary details into a report, automatically attaching device metadata and app diagnostics to speed up our investigation.\n\nOnce prepared, you can send the report via email or contribute via "</string>
     <string name="bug_report_help_github_issues">" GitHub Issues "</string>

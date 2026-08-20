@@ -73,6 +73,10 @@ class TransactionActionsController(
                 TransactionAction.ClearEditorFlags,
                 TransactionAction.TransactionAdded,
             )
+
+            is ApplyTransactionResult.Failed -> listOf(
+                TransactionAction.ShowMessage("Could not save transaction"),
+            )
         }
     }
 

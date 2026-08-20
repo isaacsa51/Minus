@@ -59,6 +59,6 @@ sealed interface BugReportUiIntent {
 }
 
 sealed interface BugReportUiEffect {
-	data class OpenEmailComposer(val uri: Uri, val fileName: String, val title: String) : BugReportUiEffect
+	data class OpenEmailComposer(val uri: Uri, val fileName: String, val title: String, val body: String) : BugReportUiEffect
 	data class ShowError(val message: String) : BugReportUiEffect
 }

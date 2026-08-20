@@ -322,7 +322,6 @@
     <string name="bug_report_attachments_label_bug">Στιγμιότυπα ή ηχογραφήσεις</string>
     <string name="bug_report_submit">Υποβολή Αναφοράς</string>
     <string name="bug_report_share_title">Αποστολή αναφοράς</string>
-    <string name="bug_report_email_body">Γεια σας, επισυναπτόμενη είναι η παραγόμενη έκθεση Minus.</string>
     <string name="bug_report_help_title">Βοηθήστε μας να κάνουμε το Minus καλύτερο</string>
     <string name="bug_report_help_message_prefix">"Η αναφορά προβλημάτων ή η πρόταση βελτιώσεων μας βοηθά να βελτιώσουμε το Minus για όλους.\n\nΑυτή η καθοδηγούμενη φόρμα σάς βοηθά να συμπεριλάβετε όλες τις απαραίτητες λεπτομέρειες σε μια αναφορά, επισυνάπτοντας αυτόματα μεταδεδομένα συσκευής και διαγνωστικά εφαρμογών για να επιταχύνετε την έρευνά μας.\n\nΜόλις προετοιμαστείτε, μπορείτε να στείλετε την αναφορά μέσω email ή να συνεισφέρετε μέσω"</string>
     <string name="bug_report_help_github_issues">Προβλήματα GitHub</string>

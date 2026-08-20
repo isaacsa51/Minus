@@ -129,7 +129,8 @@ class BugReportViewModel @Inject constructor(
 						BugReportUiEffect.OpenEmailComposer(
 							uri = report.uri,
 							fileName = report.fileName,
-							title = "$titlePrefix${currentState.title}"
+							title = "$titlePrefix${currentState.title}",
+							body = report.markdown,
 						)
 					)
 				}

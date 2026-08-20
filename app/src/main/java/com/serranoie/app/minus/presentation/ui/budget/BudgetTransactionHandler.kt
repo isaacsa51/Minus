@@ -7,6 +7,8 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.usecase.AddTransactionUseCase
 import com.serranoie.app.minus.domain.usecase.DeleteTransactionUseCase
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
+import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
+import kotlinx.coroutines.CancellationException
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -28,6 +30,7 @@ sealed interface ApplyTransactionResult {
     ) : ApplyTransactionResult
 
     data object InvalidInput : ApplyTransactionResult
+    data object Failed : ApplyTransactionResult
 }
 
 class BudgetTransactionHandler @Inject constructor(
@@ -36,6 +39,7 @@ class BudgetTransactionHandler @Inject constructor(
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val budgetExpressionEvaluator: BudgetExpressionEvaluator,
     private val notificationScheduler: NotificationScheduler,
+    private val errorLogRecorder: ErrorLogRecorder,
 ) {
     companion object {
         private const val TAG = "BudgetTransactionHandler"
@@ -82,42 +86,49 @@ class BudgetTransactionHandler @Inject constructor(
         }
 
         val today = LocalDate.now()
-        if (budgetSettings != null && today.isAfter(budgetSettings.getPeriodEndDate())) {
+        return try {
+            if (budgetSettings != null && today.isAfter(budgetSettings.getPeriodEndDate())) {
+                val categoryId: Long? = if (comment.isNotBlank()) {
+                    budgetRepository.findOrCreateCategory(comment.trim()).id
+                } else {
+                    null
+                }
+
+                val pendingTransaction = Transaction.create(
+                    amount = amount,
+                    comment = comment,
+                    date = LocalDateTime.now(),
+                    periodId = 0L,
+                    categoryId = categoryId,
+                    isCredit = isCreditEnabled,
+                )
+                budgetRepository.addQueuedTransaction(pendingTransaction)
+                return ApplyTransactionResult.QueuedForNextPeriod(normalizedInput = normalizedInput)
+            }
+
+            val activePeriodId = resolveActivePeriodId()
             val categoryId: Long? = if (comment.isNotBlank()) {
                 budgetRepository.findOrCreateCategory(comment.trim()).id
             } else {
                 null
             }
 
-            val pendingTransaction = Transaction.create(
+            val transaction = Transaction.create(
                 amount = amount,
                 comment = comment,
                 date = LocalDateTime.now(),
-                periodId = 0L,
+                periodId = activePeriodId,
                 categoryId = categoryId,
                 isCredit = isCreditEnabled,
             )
-            budgetRepository.addQueuedTransaction(pendingTransaction)
-            return ApplyTransactionResult.QueuedForNextPeriod(normalizedInput = normalizedInput)
+            addTransactionUseCase(transaction)
+            ApplyTransactionResult.Added(normalizedInput = normalizedInput)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            errorLogRecorder.record("BudgetTransactionHandler.applyTransaction", e)
+            ApplyTransactionResult.Failed
         }
-
-        val activePeriodId = resolveActivePeriodId()
-        val categoryId: Long? = if (comment.isNotBlank()) {
-            budgetRepository.findOrCreateCategory(comment.trim()).id
-        } else {
-            null
-        }
-
-        val transaction = Transaction.create(
-            amount = amount,
-            comment = comment,
-            date = LocalDateTime.now(),
-            periodId = activePeriodId,
-            categoryId = categoryId,
-            isCredit = isCreditEnabled,
-        )
-        addTransactionUseCase(transaction)
-        return ApplyTransactionResult.Added(normalizedInput = normalizedInput)
     }
 
     suspend fun applyRecurrentExpense(
@@ -134,33 +145,40 @@ class BudgetTransactionHandler @Inject constructor(
         val rawComment = pendingComment.trim()
         val now = LocalDateTime.now()
 
-        val finalComment = rawComment.ifEmpty { fallbackComment }
-        val activePeriodId = resolveActivePeriodId()
-        val transactionDate = resolveRecurrentTransactionDate(
-            frequency = frequency, subscriptionDay = subscriptionDay, now = now
-        )
+        return try {
+            val finalComment = rawComment.ifEmpty { fallbackComment }
+            val activePeriodId = resolveActivePeriodId()
+            val transactionDate = resolveRecurrentTransactionDate(
+                frequency = frequency, subscriptionDay = subscriptionDay, now = now
+            )
 
-        val categoryId: Long? = if (finalComment.isNotBlank()) {
-            budgetRepository.findOrCreateCategory(finalComment.trim()).id
-        } else {
-            null
+            val categoryId: Long? = if (finalComment.isNotBlank()) {
+                budgetRepository.findOrCreateCategory(finalComment.trim()).id
+            } else {
+                null
+            }
+
+            val transaction = Transaction.create(
+                amount = amount,
+                comment = finalComment,
+                date = transactionDate,
+                periodId = activePeriodId,
+                isRecurrent = true,
+                recurrentFrequency = frequency,
+                recurrentEndDate = endDate.atTime(now.toLocalTime()),
+                subscriptionDay = subscriptionDay,
+                categoryId = categoryId,
+                isCredit = isCredit,
+            )
+            addTransactionUseCase(transaction)
+            notificationScheduler.rescheduleRecurrentExpenseNotifications()
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            errorLogRecorder.record("BudgetTransactionHandler.applyRecurrentExpense", e)
+            false
         }
-
-        val transaction = Transaction.create(
-            amount = amount,
-            comment = finalComment,
-            date = transactionDate,
-            periodId = activePeriodId,
-            isRecurrent = true,
-            recurrentFrequency = frequency,
-            recurrentEndDate = endDate.atTime(now.toLocalTime()),
-            subscriptionDay = subscriptionDay,
-            categoryId = categoryId,
-            isCredit = isCredit,
-        )
-        addTransactionUseCase(transaction)
-        notificationScheduler.rescheduleRecurrentExpenseNotifications()
-        return true
     }
 
     private fun resolveRecurrentTransactionDate(
@@ -192,7 +210,7 @@ class BudgetTransactionHandler @Inject constructor(
                 logcat(TAG) { "deleteTransaction failed: row with id $realId still exists after delete" }
                 throw IllegalStateException("Delete operation did not remove the transaction")
             }
-        }
+        }.onFailure { errorLogRecorder.record("BudgetTransactionHandler.deleteTransaction id=${transaction.id}", it) }
     }
 
     suspend fun markRecurrentOccurrencePaid(transaction: Transaction, activePeriodId: Long): Result<Unit> {
@@ -218,7 +236,7 @@ class BudgetTransactionHandler @Inject constructor(
             addTransactionUseCase(paidTransaction)
 
             notificationScheduler.scheduleRecurrentExpenseNotification(template)
-        }
+        }.onFailure { errorLogRecorder.record("BudgetTransactionHandler.markRecurrentOccurrencePaid id=${transaction.id}", it) }
     }
 
     suspend fun restoreTransaction(transaction: Transaction): Result<Unit> {
@@ -227,26 +245,33 @@ class BudgetTransactionHandler @Inject constructor(
             if (transaction.isRecurrent) {
                 notificationScheduler.rescheduleRecurrentExpenseNotifications()
             }
-        }
+        }.onFailure { errorLogRecorder.record("BudgetTransactionHandler.restoreTransaction id=${transaction.id}", it) }
     }
 
     suspend fun editTransaction(updatedTransaction: Transaction): Boolean {
         if (updatedTransaction.amount < BigDecimal.ZERO) return false
 
-        val resolvedTransaction = if (updatedTransaction.comment.isNotBlank()) {
-            val categoryId =
-                budgetRepository.findOrCreateCategory(updatedTransaction.comment.trim()).id
-            updatedTransaction.copy(categoryId = categoryId)
-        } else {
-            updatedTransaction.copy(categoryId = null)
+        return try {
+            val resolvedTransaction = if (updatedTransaction.comment.isNotBlank()) {
+                val categoryId =
+                    budgetRepository.findOrCreateCategory(updatedTransaction.comment.trim()).id
+                updatedTransaction.copy(categoryId = categoryId)
+            } else {
+                updatedTransaction.copy(categoryId = null)
+            }
+            budgetRepository.updateTransaction(resolvedTransaction)
+            if (resolvedTransaction.isRecurrent) {
+                notificationScheduler.scheduleRecurrentExpenseNotification(resolvedTransaction)
+            } else {
+                notificationScheduler.cancelRecurrentExpenseNotification(resolvedTransaction)
+            }
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            errorLogRecorder.record("BudgetTransactionHandler.editTransaction id=${updatedTransaction.id}", e)
+            false
         }
-        budgetRepository.updateTransaction(resolvedTransaction)
-        if (resolvedTransaction.isRecurrent) {
-            notificationScheduler.scheduleRecurrentExpenseNotification(resolvedTransaction)
-        } else {
-            notificationScheduler.cancelRecurrentExpenseNotification(resolvedTransaction)
-        }
-        return true
     }
 
     private fun validateNumpadInput(input: String): Boolean {

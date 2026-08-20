@@ -26,7 +26,6 @@ fun BugReportScreen(
     val shareTitle = stringResource(R.string.bug_report_share_title)
     val recipientEmail = stringResource(R.string.bug_report_recipient_email)
     val emailSubjectTemplate = stringResource(R.string.bug_report_email_subject)
-    val emailBody = stringResource(R.string.bug_report_email_body)
 
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
@@ -41,7 +40,7 @@ fun BugReportScreen(
                         defaultEmailPackage?.let(::setPackage)
                         putExtra(Intent.EXTRA_EMAIL, arrayOf(recipientEmail))
                         putExtra(Intent.EXTRA_SUBJECT, emailSubjectTemplate.format(effect.title))
-                        putExtra(Intent.EXTRA_TEXT, emailBody)
+                        putExtra(Intent.EXTRA_TEXT, effect.body)
                         putExtra(Intent.EXTRA_STREAM, effect.uri)
                         putExtra(Intent.EXTRA_TITLE, effect.fileName)
                         clipData = ClipData.newUri(

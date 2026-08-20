@@ -323,7 +323,6 @@
     <string name="bug_report_attachments_label_bug">スクリーンショットまたは録音</string>
     <string name="bug_report_submit">レポートを送信</string>
     <string name="bug_report_share_title">レポートを送信</string>
-    <string name="bug_report_email_body">こんにちは、添付されている私の生成されたMinusレポートです。</string>
     <string name="bug_report_help_title">マイナスの改善にご協力ください</string>
     <string name="bug_report_help_message_prefix">問題の報告や改善の提案は、Minusをより良いアプリにするために役立ちます。このガイド付きフォームを使用すると、必要な詳細情報をまとめて報告できます。また、デバイスのメタデータやアプリの診断情報が自動的に添付されるため、調査を迅速に進めることが可能になります。準備ができたら、レポートをメールで送信するか、以下から投稿してください</string>
     <string name="bug_report_help_github_issues">" GitHub Issues "</string>
