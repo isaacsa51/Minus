@@ -145,6 +145,7 @@
     <string name="average_spent">Μέσος όρος ανά ημέρα</string>
     <string name="days_remaining_label">Απομένουν ημέρες\n</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">Δείτε το κόστος και τον υπόλοιπο προϋπολογισμό με μια ματιά</string>
     <string name="widget_days_countdown_description">Ημέρες αντίστροφης μέτρησης που απομένουν στην δημοσιονομική περίοδο</string>
     <string name="widget_budget_detail_description">Πλήρης επισκόπηση προϋπολογισμού με κορυφαία κατηγορία και μέρες αριστερά</string>
