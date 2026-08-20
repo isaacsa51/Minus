@@ -145,6 +145,7 @@
     <string name="average_spent">Media al giorno trascorso</string>
     <string name="days_remaining_label">Giorni\nrimanenti</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">Vedi a colpo d\'occhio il budget speso e il budget rimanente</string>
     <string name="widget_days_countdown_description">Conto alla rovescia giorni rimanenti nell\'esercizio di bilancio</string>
     <string name="widget_budget_detail_description">Panoramica completa del budget con la categoria superiore e i giorni rimasti</string>
