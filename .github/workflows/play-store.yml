@@ -1,37 +1,69 @@
-name: Release Minus
+name: Deploy to Google Play
 
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Tag to deploy (e.g. v1.5.4)'
+        required: true
+      track:
+        description: 'Play Store track'
+        required: false
+        default: production
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: play-store-${{ github.event.inputs.version_tag || github.ref }}
   cancel-in-progress: false
 
 jobs:
-  release:
-    name: Build signed APK and publish GitHub Release
+  deploy:
+    name: Build AAB and upload to Google Play
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
 
     steps:
+      - name: Resolve version tag
+        id: resolve
+        run: |
+          TAG="${{ github.event.inputs.version_tag || github.ref_name }}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
       - name: Checkout (pinned to tag commit)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.ref }}
+          ref: ${{ steps.resolve.outputs.tag }}
 
       - name: Verify tag is reachable from master
         run: |
           DEFAULT_BRANCH=${{ github.event.repository.default_branch }}
           git fetch origin "$DEFAULT_BRANCH"
           if ! git merge-base --is-ancestor \
-               "${{ github.ref_name }}" \
+               "${{ steps.resolve.outputs.tag }}" \
                "origin/$DEFAULT_BRANCH"; then
-            echo "::error::Tag ${{ github.ref_name }} no es alcanzable desde origin/$DEFAULT_BRANCH"
+            echo "::error::Tag ${{ steps.resolve.outputs.tag }} no es alcanzable desde origin/$DEFAULT_BRANCH"
+            exit 1
+          fi
+
+      - name: Verify HEAD matches tag
+        run: |
+          # Use ^{commit} to dereference annotated tags — otherwise
+          # rev-parse returns the tag object hash, not the commit hash.
+          HEAD_SHA=$(git rev-parse HEAD)
+          TAG_SHA=$(git rev-parse "${{ steps.resolve.outputs.tag }}^{commit}")
+          if [ "$HEAD_SHA" != "$TAG_SHA" ]; then
+            echo "::error::HEAD ($HEAD_SHA) ≠ tag commit ($TAG_SHA)"
             exit 1
           fi
 
@@ -71,6 +103,12 @@ jobs:
         run: |
           echo "$MINUS_RELEASE_KEYSTORE_BASE64" | base64 --decode > release-keystore.jks
 
+      - name: Write Google Play Service Account Key
+        env:
+          GOOGLE_PLAY_KEY_JSON: ${{ secrets.GOOGLE_PLAY_KEY_JSON }}
+        run: |
+          echo "$GOOGLE_PLAY_KEY_JSON" > fastlane/minus-app-504107-53ece865faf4.json
+
       - name: Write keystore.properties for CI build
         env:
           MINUS_RELEASE_STORE_PASSWORD: ${{ secrets.MINUS_RELEASE_STORE_PASSWORD }}
@@ -87,24 +125,7 @@ jobs:
       - name: Run Detekt
         run: ./gradlew detekt
 
-      - name: Verify HEAD matches tag
-        run: |
-          # Use ^{commit} to dereference annotated tags — otherwise
-          # rev-parse returns the tag object hash, not the commit hash.
-          HEAD_SHA=$(git rev-parse HEAD)
-          TAG_SHA=$(git rev-parse "${{ github.ref_name }}^{commit}")
-          if [ "$HEAD_SHA" != "$TAG_SHA" ]; then
-            echo "::error::HEAD ($HEAD_SHA) ≠ tag commit ($TAG_SHA)"
-            exit 1
-          fi
-
-      - name: Run Fastlane release lane
+      - name: Deploy to Google Play
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_TAG: ${{ github.ref_name }}
-          MINUS_RELEASE_STORE_FILE: ${{ github.workspace }}/release-keystore.jks
-          MINUS_RELEASE_STORE_PASSWORD: ${{ secrets.MINUS_RELEASE_STORE_PASSWORD }}
-          MINUS_RELEASE_KEY_ALIAS: ${{ secrets.MINUS_RELEASE_KEY_ALIAS }}
-          MINUS_RELEASE_KEY_PASSWORD: ${{ secrets.MINUS_RELEASE_KEY_PASSWORD }}
-        run: bundle exec fastlane android publish_github
+          VERSION_TAG: ${{ steps.resolve.outputs.tag }}
+        run: bundle exec fastlane android deploy_play_store track:${{ github.event.inputs.track || 'production' }}
