@@ -1,0 +1,14 @@
+- test: update BudgetGraph tests for multi-window navigation and granularity
+- feat: implement Complete Budget widget and refactor shared widget components
+- fix: disable hardware numpad events while editing categories
+- feat: unify historical spend logic and enhance analytics visualization
+- feat: implement hourly view mode for daily budget analytics and refine graph transitions
+- feat: implement category-wise spending chart and synchronized analytics interactions
+- feat: enhance bug report attachments and refresh finished period visuals
+- fix: exclude recurrent transaction from budget totals
+- feat: implement tracking and marking individual recurring occurrences as paid
+- feat: track handled budget period ends to prevent redundant transitions
+- fix: midnight period transition logic for early finishes
+- feat: persist rollover limit and improve early finish rollover logic
+- refactor: optimize editor performance
+- chore: add missing locales
