@@ -142,6 +142,7 @@
     <string name="average_spent">일일 평균 지출</string>
     <string name="days_remaining_label">남은 일수</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">소비 내역과 남은 예산을 한눈에 확인하세요</string>
     <string name="widget_days_countdown_description">예산 기간 남은 일수 카운트다운</string>
     <string name="widget_budget_detail_description">주요 지출 항목 및 일별 내역을 포함한 전체 예산 개요 왼쪽</string>
