@@ -142,6 +142,7 @@
     <string name="average_spent">1日あたりの平均</string>
     <string name="days_remaining_label">残り日数</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">費やした予算と残りの予算を一目で見る</string>
     <string name="widget_days_countdown_description">予算の残りの残り時間</string>
     <string name="widget_budget_detail_description">トップカテゴリと残り日数を含む全予算の概要</string>
