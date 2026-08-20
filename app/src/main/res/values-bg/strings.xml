@@ -145,6 +145,7 @@
     <string name="average_spent">Средно изразходвано на ден</string>
     <string name="days_remaining_label">Оставащи\nдни</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">Бърз преглед на изразходвания и оставащия бюджет</string>
     <string name="widget_days_countdown_description">Обратно броене на оставащите дни от бюджетния период</string>
     <string name="widget_budget_detail_description">Пълен преглед на бюджета с основната категория и оставащите дни</string>
