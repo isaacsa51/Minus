@@ -152,7 +152,7 @@
     <string name="widget_add_expense_label">添加新支出</string>
     <string name="widget_add_expense_compact_label">添加支出</string>
     <!-- Quick Settings Tile -->
-    <string name="tile_new_transaction_label">New Transaction</string>
+    <string name="tile_new_transaction_label">新交易</string>
     <!-- Widget Labels -->
     <string name="spent">已支出</string>
     <string name="left">剩余</string>
@@ -224,10 +224,10 @@
     <!-- Settings -->
     <string name="settings_title">设置</string>
     <string name="settings_section_appearance">外观</string>
-    <string name="settings_section_language">Language</string>
-    <string name="settings_language_header">App Language</string>
-    <string name="settings_language_currently_format">Currently: %1$s</string>
-    <string name="settings_language_disclaimer">Language translations might be incorrect.</string>
+    <string name="settings_section_language">語言</string>
+    <string name="settings_language_header">應用語言</string>
+    <string name="settings_language_currently_format">當前: %1$s</string>
+    <string name="settings_language_disclaimer">語言翻譯可能不準確。</string>
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
@@ -237,7 +237,7 @@
     <string name="settings_contrast_high">High</string>
     <string name="settings_typography_condensed">Condensed</string>
     <string name="settings_typography_expressive">Expressive</string>
-    <string name="settings_color_scheme_title">Colorscheme</string>
+    <string name="settings_color_scheme_title">App Color Scheme</string>
     <string name="settings_section_notifications">通知</string>
     <string name="settings_section_features">功能</string>
     <string name="settings_section_app_info">应用信息</string>
@@ -291,7 +291,7 @@
     <string name="settings_about_subtitle">了解更多应用和开发信息</string>
     <string name="settings_bug_report_title">遇到 bug？</string>
     <string name="settings_bug_report_subtitle">创建问题报告，我们将尽快修复</string>
-    <string name="settings_what_is_this_for">What is this for?</string>
+    <string name="settings_what_is_this_for">这是做什么用的？</string>
     <string name="settings_version_title">版本</string>
     <string name="settings_version_metadata_copied">应用与设备信息已复制至剪贴板</string>
     <!-- Bug Report -->
@@ -360,7 +360,7 @@
     <string name="expand">展开</string>
     <string name="collapse">折叠</string>
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">Budget amount exceeded</string>
+    <string name="budget_pill_over_budget">已超出預算金額</string>
     <string name="budget_pill_no_budget">没有预算</string>
     <string name="budget_pill_no_budget_action">设置预算</string>
     <string name="budget_pill_calc_added">%1$s will be added</string>
@@ -522,7 +522,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">你「%2$s」中的「%1$s」订阅将收费 %3$s，请准备付款。</string>
     <string name="notification_upcoming_subscription_message_without_comment">你有一项名为「%1$s」的订阅将收费 %2$s。</string>
     <string name="notification_credit_cutoff_title">即将到来的信用卡付款</string>
-    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="notification_credit_cutoff_message">你的账单日期是 %1$s。推荐支付 %2$s 来避免利息产生。</string>
     <string name="credit_owed_label">总负债</string>
     <string name="debt_adjusted_balance_label">经调整的余额</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s 信用债务</string>
@@ -533,16 +533,16 @@
     <string name="ticket_recurrent_expense">周期性支出</string>
     <!-- Past Periods -->
     <string name="past_periods_title">以往周期</string>
-    <string name="past_periods_subtitle">Tap a period to see its full breakdown.</string>
+    <string name="past_periods_subtitle">点按某个周期查看完整明细。</string>
     <string name="past_periods_empty">未找到归档的周期</string>
     <string name="past_periods_spent_label">已支出</string>
     <string name="past_periods_limit_label">限额</string>
     <string name="past_periods_status_on_track">追踪中</string>
     <string name="past_periods_status_over_budget">超出预算</string>
-    <string name="past_periods_status_estimated">Estimated</string>
-    <string name="past_periods_estimated_divider">Estimated periods below</string>
+    <string name="past_periods_status_estimated">估算</string>
+    <string name="past_periods_estimated_divider">以下为估算周期</string>
     <string name="past_periods_status_saved">节约 %1$s</string>
-    <string name="past_periods_saved_label">Money Saved</string>
+    <string name="past_periods_saved_label">节省的钱</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">支出趋势</string>
     <string name="analytics_tutorial_minmax_desc">此处展示你的最低与最高支出。\n随记账实时更新，轻松识别异常开支</string>
