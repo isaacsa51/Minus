@@ -257,6 +257,8 @@
     <string name="settings_theme_subtitle">Change the app theme style</string>
     <string name="settings_appearance_title">Theming and color</string>
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
+    <string name="settings_widgets_title">Виджеты</string>
+    <string name="settings_widgets_subtitle">Изучите виджеты для главного экрана</string>
     <string name="settings_typography_title">Typography</string>
     <string name="settings_typography_subtitle">Change the app typography style</string>
     <string name="settings_rounded_font_title">Скругленный стиль шрифта</string>

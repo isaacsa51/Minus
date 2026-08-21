@@ -253,6 +253,8 @@
     <string name="settings_theme_subtitle">Alterar o estilo do tema do aplicativo</string>
     <string name="settings_appearance_title">Tema e cor</string>
     <string name="settings_appearance_subtitle">Alterar a cor e a aparência do aplicativo</string>
+    <string name="settings_widgets_title">Widgets</string>
+    <string name="settings_widgets_subtitle">Explore e veja widgets para usar na tela inicial</string>
     <string name="settings_typography_title">Tipografia</string>
     <string name="settings_typography_subtitle">Alterar o estilo da tipografia do aplicativo</string>
     <string name="settings_rounded_font_title">Estilo de fonte arredondado</string>

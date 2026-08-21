@@ -251,6 +251,8 @@
     <string name="settings_theme_subtitle">ऐप थीम का स्टाइल बदलें</string>
     <string name="settings_appearance_title">थीम और रंग</string>
     <string name="settings_appearance_subtitle">ऐप का रंग और रूप बदलें</string>
+    <string name="settings_widgets_title">विजेट</string>
+    <string name="settings_widgets_subtitle">अपनी होम स्क्रीन पर उपयोग के लिए विजेट देखें</string>
     <string name="settings_typography_title">टाइपोग्राफी</string>
     <string name="settings_typography_subtitle">ऐप टाइपोग्राफी स्टाइल बदलें</string>
     <string name="settings_material_you_title">मटीरियल यू</string>

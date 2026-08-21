@@ -247,6 +247,8 @@
     <string name="settings_theme_subtitle">更改应用主题风格</string>
     <string name="settings_appearance_title">Theming and color</string>
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
+    <string name="settings_widgets_title">小组件</string>
+    <string name="settings_widgets_subtitle">探索可添加到主屏幕的小组件</string>
     <string name="settings_typography_title">排版</string>
     <string name="settings_typography_subtitle">更改应用的排版风格</string>
     <string name="settings_material_you_title">Material You</string>

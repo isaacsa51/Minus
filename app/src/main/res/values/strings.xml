@@ -163,6 +163,16 @@
 
     <string name="days_remaining_label">Days\nremaining</string>
 
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Your device doesn\'t support adding widgets this way. Long-press your home screen and look for Minus instead.</string>
+    <string name="widget_complete_budget_title">Complete Budget</string>
+    <string name="widget_average_spend_title">Average Spend</string>
+    <string name="widget_days_countdown_title">Days Countdown</string>
+    <string name="widget_expense_title">Expense Summary</string>
+    <string name="widget_heatmap_title">Spending Heatmap</string>
+    <string name="widget_min_max_spent_title">Min/Max Spent</string>
+    <string name="widget_month_heatmap_title">Month Heatmap</string>
+
     <!-- Widget Descriptions -->
     <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_complete_budget_preview_spent_label" translatable="false">Total Spent</string>
@@ -318,6 +328,8 @@
     <string name="settings_theme_subtitle">Change the app theme style</string>
     <string name="settings_appearance_title">Theming and color</string>
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
+    <string name="settings_widgets_title">Widgets</string>
+    <string name="settings_widgets_subtitle">Explore and see widgets to use on your home screen</string>
     <string name="settings_typography_title">Typography</string>
     <string name="settings_typography_subtitle">Change the app typography style</string>
     <string name="settings_rounded_font_title">Rounded font style</string>

@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.TipsAndUpdates
+import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material.icons.rounded.Alarm
@@ -69,6 +70,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -82,6 +84,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -112,6 +115,7 @@ import com.serranoie.app.minus.presentation.ui.settings.bugreport.buildAppEnviro
 import com.serranoie.app.minus.presentation.ui.settings.components.NotificationPermissionItem
 import com.serranoie.app.minus.presentation.ui.settings.savings.SavingsPreferencesEditor
 import com.serranoie.app.minus.presentation.ui.settings.savings.savingsPreferencesSummary
+import com.serranoie.app.minus.presentation.ui.settings.widgets.WidgetGallerySheet
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
@@ -172,6 +176,8 @@ fun Settings(
     var showRecurrentPaymentsViewModeDialog by remember { mutableStateOf(false) }
     var showNotificationTimePicker by remember { mutableStateOf(false) }
     var showRecurrentNotificationTimePicker by remember { mutableStateOf(false) }
+    var showWidgetsSheet by remember { mutableStateOf(false) }
+    val widgetsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isCreditFeatureExpanded by remember { mutableStateOf(false) }
     var isCategoryFeatureExpanded by remember { mutableStateOf(false) }
     var isSavingsExpanded by remember { mutableStateOf(false) }
@@ -303,7 +309,7 @@ fun Settings(
                         subtitle = stringResource(R.string.settings_censor_mode_subtitle),
                         isActive = isCensored,
                         onClick = onCensorModeToggle,
-                        position = PaddedListItemPosition.Last,
+                        position = PaddedListItemPosition.Middle,
                         modifier = Modifier.testTag("SettingsCensorModeItem"),
                         leadingIcon = {
                             Icon(
@@ -320,6 +326,34 @@ fun Settings(
                             )
                         }
                     )
+
+                    CustomPaddedListItem(
+                        onClick = {
+                            showWidgetsSheet = true
+                            view.weakHapticFeedback()
+                        },
+                        position = PaddedListItemPosition.Last,
+                        modifier = Modifier.testTag("SettingsWidgetsItem")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Widgets,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_widgets_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_widgets_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             }
 
@@ -969,6 +1003,15 @@ fun Settings(
                     onRecurrentNotificationTimeChange(hour, minute)
                     dismissRecurrentNotificationTimePicker()
                 })
+        }
+
+        if (showWidgetsSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showWidgetsSheet = false },
+                sheetState = widgetsSheetState,
+            ) {
+                WidgetGallerySheet()
+            }
         }
 
     }

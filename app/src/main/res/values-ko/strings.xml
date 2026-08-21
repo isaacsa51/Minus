@@ -251,6 +251,8 @@
     <string name="settings_theme_subtitle">앱 테마 스타일 변경</string>
     <string name="settings_appearance_title">테마 및 색상</string>
     <string name="settings_appearance_subtitle">앱 색상 및 디자인 변경</string>
+    <string name="settings_widgets_title">위젯</string>
+    <string name="settings_widgets_subtitle">홈 화면에 추가할 수 있는 위젯을 살펴보세요</string>
     <string name="settings_typography_title">서체</string>
     <string name="settings_typography_subtitle">앱 서체 스타일 변경</string>
 

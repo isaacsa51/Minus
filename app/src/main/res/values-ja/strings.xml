@@ -251,6 +251,8 @@
     <string name="settings_theme_subtitle">アプリのテーマスタイルを変更する</string>
     <string name="settings_appearance_title">テーマと色</string>
     <string name="settings_appearance_subtitle">アプリの色と外観を変更する</string>
+    <string name="settings_widgets_title">ウィジェット</string>
+    <string name="settings_widgets_subtitle">ホーム画面で使えるウィジェットを見てみましょう</string>
     <string name="settings_typography_title">タイポグラフィー（文法）</string>
     <string name="settings_typography_subtitle">アプリの組版スタイルを変更する</string>
     <string name="settings_rounded_font_title">丸みを帯びたフォントスタイル</string>

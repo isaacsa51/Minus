@@ -251,6 +251,8 @@
     <string name="settings_theme_subtitle">Αλλαγή του στυλ θέματος εφαρμογής</string>
     <string name="settings_appearance_title">Θέμα και χρώμα</string>
     <string name="settings_appearance_subtitle">Αλλάξτε το χρώμα και την εμφάνιση της εφαρμογής</string>
+    <string name="settings_widgets_title">Γραφικά στοιχεία</string>
+    <string name="settings_widgets_subtitle">Εξερευνήστε τα γραφικά στοιχεία για την αρχική οθόνη</string>
     <string name="settings_typography_title">Τυπογραφία</string>
     <string name="settings_typography_subtitle">Αλλαγή του στυλ τυπογραφίας εφαρμογών</string>
     <string name="settings_material_you_title">Υλικό Εσείς</string>

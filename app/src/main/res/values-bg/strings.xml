@@ -253,6 +253,8 @@
     <string name="settings_theme_subtitle">Промяна на стила на темата</string>
     <string name="settings_appearance_title">Тема и цветове</string>
     <string name="settings_appearance_subtitle">Промяна на цвета и външния вид на приложението</string>
+    <string name="settings_widgets_title">Джаджи</string>
+    <string name="settings_widgets_subtitle">Разгледайте джаджите за началния екран</string>
     <string name="settings_typography_title">Типография</string>
     <string name="settings_typography_subtitle">Промяна на шрифтовия стил</string>
     <string name="settings_material_you_title">Material You</string>
