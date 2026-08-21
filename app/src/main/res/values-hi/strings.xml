@@ -123,6 +123,10 @@
     <string name="show_subscriptions_outside_period">समय-सीमा के बाहर के सब्सक्रिप्शन दिखाएं</string>
     <string name="hide_past_period_expenses">पिछली अवधि के खर्च छिपाएँ</string>
     <string name="show_past_period_expenses">पिछले समय के खर्च दिखाएं</string>
+    <string name="history_snackbar_delete_transaction_failed">लेन-देन हटाया नहीं जा सका</string>
+    <string name="history_snackbar_save_transaction_failed">लेन-देन सेव नहीं हो सका</string>
+    <string name="history_snackbar_delete_recurrent_failed">बार-बार होने वाला पेमेंट हटाया नहीं जा सका</string>
+    <string name="history_snackbar_mark_paid_failed">लेन-देन को भुगतान किया हुआ चिह्नित नहीं किया जा सका</string>
     <string name="add_new_category">कैटेगरी</string>
     <string name="add_new_category_action">नई कैटेगरी जोड़ें</string>
     <string name="budget_validation_major_zero">बजट 0 से ज़्यादा होना चाहिए</string>
@@ -144,6 +148,15 @@
     <string name="maximum_spent">अधिकतम खर्च</string>
     <string name="average_spent">रोज़ाना का औसत खर्च</string>
     <string name="days_remaining_label">बाकी दिन</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Your device doesn\'t support adding widgets this way. Long-press your home screen and look for Minus instead.</string>
+    <string name="widget_complete_budget_title">Complete Budget</string>
+    <string name="widget_average_spend_title">Average Spend</string>
+    <string name="widget_days_countdown_title">Days Countdown</string>
+    <string name="widget_expense_title">Expense Summary</string>
+    <string name="widget_heatmap_title">Spending Heatmap</string>
+    <string name="widget_min_max_spent_title">Min/Max Spent</string>
+    <string name="widget_month_heatmap_title">Month Heatmap</string>
     <!-- Widget Descriptions -->
     <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">खर्च किए गए और बचे हुए बजट को एक नज़र में देखें</string>
@@ -251,6 +264,8 @@
     <string name="settings_theme_subtitle">ऐप थीम का स्टाइल बदलें</string>
     <string name="settings_appearance_title">थीम और रंग</string>
     <string name="settings_appearance_subtitle">ऐप का रंग और रूप बदलें</string>
+    <string name="settings_widgets_title">विजेट</string>
+    <string name="settings_widgets_subtitle">अपनी होम स्क्रीन पर उपयोग के लिए विजेट देखें</string>
     <string name="settings_typography_title">टाइपोग्राफी</string>
     <string name="settings_typography_subtitle">ऐप टाइपोग्राफी स्टाइल बदलें</string>
     <string name="settings_rounded_font_title">गोल फ़ॉन्ट स्टाइल</string>
@@ -323,7 +338,6 @@
     <string name="bug_report_attachments_label_bug">स्क्रीनशॉट या रिकॉर्डिंग</string>
     <string name="bug_report_submit">रिपोर्ट सबमिट करें</string>
     <string name="bug_report_share_title">रिपोर्ट भेजें</string>
-    <string name="bug_report_email_body">नमस्ते, मेरी बनाई गई Minus रिपोर्ट अटैच की गई है।</string>
     <string name="bug_report_help_title">Minus को बेहतर बनाने में हमारी मदद करें</string>
     <string name="bug_report_help_message_prefix">"इश्यू की रिपोर्ट करने या सुधार का सुझाव देने से हमें Minus को सभी के लिए बेहतर बनाने में मदद मिलती है। यह गाइडेड फ़ॉर्म आपको सभी ज़रूरी जानकारी को एक रिपोर्ट में इकट्ठा करने में मदद करता है। यह हमारी जांच को तेज़ करने के लिए अपने-आप डिवाइस मेटाडेटा और ऐप डायग्नोस्टिक्स को भी जोड़ देता है। एक बार तैयार हो जाने पर, आप रिपोर्ट ईमेल से भेज सकते हैं या सीधे हमारी रिपॉज़िटरी में योगदान कर सकते हैं।"</string>
     <string name="bug_report_help_github_issues">"GitHub इश्यू"</string>
