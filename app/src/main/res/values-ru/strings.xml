@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
-    <string name="tutorial_numpad_title">Numpad</string>
-    <string name="tutorial_numpad_description">Enter the amount you spent and tap the green checkmark to save. Swipe up on the numpad to calculate.</string>
-    <string name="tutorial_comment_title">Add a category</string>
-    <string name="tutorial_comment_description">Add a category or short note to remember what the spend was for.</string>
-    <string name="tutorial_budget_pill_title">Budget progress</string>
-    <string name="tutorial_budget_pill_description">Tap to switch between daily, weekly, and monthly budget views, or to edit the period setup.</string>
-    <string name="tutorial_settings_title">Settings</string>
+    <string name="tutorial_numpad_title">Клавиатура</string>
+    <string name="tutorial_numpad_description">Введите потраченное количество и нажмите зеленый флажок, чтобы сохранить. Проведите вверх по номеру для вычисления.</string>
+    <string name="tutorial_comment_title">Добавить категорию</string>
+    <string name="tutorial_comment_description">Добавьте категорию или короткую заметку, чтобы вспомнить, для чего была трата.</string>
+    <string name="tutorial_budget_pill_title">Прогресс бюджета</string>
+    <string name="tutorial_budget_pill_description">Нажмите, чтобы переключиться между просмотром бюджета ежедневно, еженедельно и ежемесячно, или изменить настройки периода.</string>
+    <string name="tutorial_settings_title">Настройки</string>
     <string name="tutorial_settings_description">Open Settings to enable features, set up home-screen widgets, or reset this tutorial.</string>
     <string name="tutorial_recurrent_title">Recurrent payments</string>
     <string name="tutorial_recurrent_description">Tap here to mark this spend as a recurring payment (weekly, biweekly, or monthly). The app will remind you to log it on schedule.</string>
@@ -244,7 +244,7 @@
     <string name="onboarding_finish_date_selector_days_range">%1$d days · %2$s - %3$s</string>
     <string name="onboarding_finish_date_selector_budget_view_question">How do you want to view your budget?</string>
     <!-- Settings -->
-    <string name="settings_title">Settings</string>
+    <string name="settings_title">Настройки</string>
     <string name="settings_section_appearance">Оформление</string>
     <string name="settings_section_language">Язык</string>
     <string name="settings_language_header">Язык приложения</string>
