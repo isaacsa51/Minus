@@ -123,6 +123,10 @@
     <string name="show_subscriptions_outside_period">Mostrar suscripciones fuera del periodo</string>
     <string name="hide_past_period_expenses">Ocultar gastos del período pasado</string>
     <string name="show_past_period_expenses">Mostrar gastos del período pasado</string>
+    <string name="history_snackbar_delete_transaction_failed">No se pudo eliminar la transacción</string>
+    <string name="history_snackbar_save_transaction_failed">No se pudo guardar la transacción</string>
+    <string name="history_snackbar_delete_recurrent_failed">No se pudo eliminar el pago recurrente</string>
+    <string name="history_snackbar_mark_paid_failed">No se pudo marcar la transacción como pagada</string>
     <string name="add_new_category">Categoría</string>
     <string name="add_new_category_action">Añadir nueva categoría</string>
     <string name="budget_validation_major_zero">El presupuesto debe ser mayor que 0</string>
@@ -144,6 +148,15 @@
     <string name="maximum_spent">Máximo gastado</string>
     <string name="average_spent">Promedio por día empleado</string>
     <string name="days_remaining_label">Días\nrestantes</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Your device doesn\'t support adding widgets this way. Long-press your home screen and look for Minus instead.</string>
+    <string name="widget_complete_budget_title">Complete Budget</string>
+    <string name="widget_average_spend_title">Average Spend</string>
+    <string name="widget_days_countdown_title">Days Countdown</string>
+    <string name="widget_expense_title">Expense Summary</string>
+    <string name="widget_heatmap_title">Spending Heatmap</string>
+    <string name="widget_min_max_spent_title">Min/Max Spent</string>
+    <string name="widget_month_heatmap_title">Month Heatmap</string>
     <!-- Widget Descriptions -->
     <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">Vea el presupuesto gastado y restante de un vistazo</string>
@@ -251,6 +264,8 @@
     <string name="settings_theme_subtitle">Cambiar el estilo del tema de la aplicación</string>
     <string name="settings_appearance_title">Tema y color</string>
     <string name="settings_appearance_subtitle">Cambia el color y apariencia de la app</string>
+    <string name="settings_widgets_title">Widgets</string>
+    <string name="settings_widgets_subtitle">Explora y descubre widgets para usar en tu pantalla de inicio</string>
     <string name="settings_typography_title">Tipografía</string>
     <string name="settings_typography_subtitle">Cambiar el estilo de tipografía de la aplicación</string>
     <string name="settings_rounded_font_title">Estilo de fuente redondo</string>
@@ -323,7 +338,6 @@
     <string name="bug_report_attachments_label_bug">Capturas de pantalla o grabaciones</string>
     <string name="bug_report_submit">Enviar reporte</string>
     <string name="bug_report_share_title">Enviar reporte</string>
-    <string name="bug_report_email_body">Hola, adjunto mi reporte generado de Menos.</string>
     <string name="bug_report_help_title">Ayúdanos a mejorar</string>
     <string name="bug_report_help_message_prefix">"¿Encontraste un error o tienes una gran idea?\n\nEsta pantalla nos ayuda a crear todos los detalles necesarios en un reporte. Incluiremos automáticamente diagnósticos técnicos sobre tu dispositivo y la versión de la aplicación para ayudarnos a solucionar problemas más rápido.\n\nUna vez finalizado, puedes enviar el reporte por correo electrónico o publicarlo en "</string>
     <string name="bug_report_help_github_issues">" GitHub Issues "</string>
