@@ -122,6 +122,10 @@
     <string name="show_subscriptions_outside_period">해당 기간 외 구독 내역 표시</string>
     <string name="hide_past_period_expenses">지난 기간 지출 숨기기</string>
     <string name="show_past_period_expenses">지난 기간 지출 내역 표시</string>
+    <string name="history_snackbar_delete_transaction_failed">거래를 삭제할 수 없습니다</string>
+    <string name="history_snackbar_save_transaction_failed">거래를 저장할 수 없습니다</string>
+    <string name="history_snackbar_delete_recurrent_failed">반복 지출을 삭제할 수 없습니다</string>
+    <string name="history_snackbar_mark_paid_failed">거래를 결제 완료로 표시할 수 없습니다</string>
     <string name="add_new_category">카테고리</string>
     <string name="add_new_category_action">새 카테고리 추가</string>
     <string name="budget_validation_major_zero">예산은 0보다 커야 합니다.</string>
@@ -141,6 +145,15 @@
     <string name="maximum_spent">최대 지출액</string>
     <string name="average_spent">일일 평균 지출</string>
     <string name="days_remaining_label">남은 일수</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Your device doesn\'t support adding widgets this way. Long-press your home screen and look for Minus instead.</string>
+    <string name="widget_complete_budget_title">Complete Budget</string>
+    <string name="widget_average_spend_title">Average Spend</string>
+    <string name="widget_days_countdown_title">Days Countdown</string>
+    <string name="widget_expense_title">Expense Summary</string>
+    <string name="widget_heatmap_title">Spending Heatmap</string>
+    <string name="widget_min_max_spent_title">Min/Max Spent</string>
+    <string name="widget_month_heatmap_title">Month Heatmap</string>
     <!-- Widget Descriptions -->
     <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">소비 내역과 남은 예산을 한눈에 확인하세요</string>
@@ -248,6 +261,8 @@
     <string name="settings_theme_subtitle">앱 테마 스타일 변경</string>
     <string name="settings_appearance_title">테마 및 색상</string>
     <string name="settings_appearance_subtitle">앱 색상 및 디자인 변경</string>
+    <string name="settings_widgets_title">위젯</string>
+    <string name="settings_widgets_subtitle">홈 화면에 추가할 수 있는 위젯을 살펴보세요</string>
     <string name="settings_typography_title">서체</string>
     <string name="settings_typography_subtitle">앱 서체 스타일 변경</string>
     <string name="settings_rounded_font_title">둥근 글꼴 스타일</string>
@@ -320,7 +335,6 @@
     <string name="bug_report_attachments_label_bug">스크린샷 또는 녹화 영상</string>
     <string name="bug_report_submit">보고서 제출</string>
     <string name="bug_report_share_title">보고서 제출</string>
-    <string name="bug_report_email_body">안녕하세요, 생성된 Minus 보고서를 첨부합니다.</string>
     <string name="bug_report_help_title">Minus를 더 좋게 만드는 데 도움을 주세요</string>
     <string name="bug_report_help_message_prefix">"문제 제보나 개선 제안은 모두를 위해 Minus를 더 좋게 만드는 데 도움이 됩니다. 이 안내 양식을 사용하면 필요한 모든 세부 정보를 보고서로 구성할 수 있으며, 기기 메타데이터와 앱 진단 정보가 자동으로 첨부되어 조사가 신속하게 진행됩니다. 보고서가 준비되면 이메일로 보내거나 다음을 통해 기여할 수 있습니다."</string>
     <string name="bug_report_help_github_issues">"GitHub 이슈"</string>
