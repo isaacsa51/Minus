@@ -123,6 +123,10 @@
     <string name="show_subscriptions_outside_period">Εμφάνιση συνδρομών εκτός της περιόδου</string>
     <string name="hide_past_period_expenses">Απόκρυψη προηγούμενων εξόδων περιόδου</string>
     <string name="show_past_period_expenses">Εμφάνιση προηγούμενων εξόδων περιόδου</string>
+    <string name="history_snackbar_delete_transaction_failed">Δεν ήταν δυνατή η διαγραφή της συναλλαγής</string>
+    <string name="history_snackbar_save_transaction_failed">Δεν ήταν δυνατή η αποθήκευση της συναλλαγής</string>
+    <string name="history_snackbar_delete_recurrent_failed">Δεν ήταν δυνατή η διαγραφή της επαναλαμβανόμενης πληρωμής</string>
+    <string name="history_snackbar_mark_paid_failed">Δεν ήταν δυνατή η σήμανση της συναλλαγής ως πληρωμένης</string>
     <string name="add_new_category">Κατηγορία</string>
     <string name="add_new_category_action">Προσθήκη Νέας Κατηγορίας</string>
     <string name="budget_validation_major_zero">Ο προϋπολογισμός πρέπει να είναι μεγαλύτερος από 0</string>
@@ -144,6 +148,15 @@
     <string name="maximum_spent">Μέγιστη δαπάνη</string>
     <string name="average_spent">Μέσος όρος ανά ημέρα</string>
     <string name="days_remaining_label">Απομένουν ημέρες\n</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Your device doesn\'t support adding widgets this way. Long-press your home screen and look for Minus instead.</string>
+    <string name="widget_complete_budget_title">Complete Budget</string>
+    <string name="widget_average_spend_title">Average Spend</string>
+    <string name="widget_days_countdown_title">Days Countdown</string>
+    <string name="widget_expense_title">Expense Summary</string>
+    <string name="widget_heatmap_title">Spending Heatmap</string>
+    <string name="widget_min_max_spent_title">Min/Max Spent</string>
+    <string name="widget_month_heatmap_title">Month Heatmap</string>
     <!-- Widget Descriptions -->
     <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">Δείτε το κόστος και τον υπόλοιπο προϋπολογισμό με μια ματιά</string>
@@ -251,6 +264,8 @@
     <string name="settings_theme_subtitle">Αλλαγή του στυλ θέματος εφαρμογής</string>
     <string name="settings_appearance_title">Θέμα και χρώμα</string>
     <string name="settings_appearance_subtitle">Αλλάξτε το χρώμα και την εμφάνιση της εφαρμογής</string>
+    <string name="settings_widgets_title">Γραφικά στοιχεία</string>
+    <string name="settings_widgets_subtitle">Εξερευνήστε τα γραφικά στοιχεία για την αρχική οθόνη</string>
     <string name="settings_typography_title">Τυπογραφία</string>
     <string name="settings_typography_subtitle">Αλλαγή του στυλ τυπογραφίας εφαρμογών</string>
     <string name="settings_rounded_font_title">Στρογγυλοποιημένο στυλ γραμματοσειράς</string>
@@ -323,7 +338,6 @@
     <string name="bug_report_attachments_label_bug">Στιγμιότυπα ή ηχογραφήσεις</string>
     <string name="bug_report_submit">Υποβολή Αναφοράς</string>
     <string name="bug_report_share_title">Αποστολή αναφοράς</string>
-    <string name="bug_report_email_body">Γεια σας, επισυναπτόμενη είναι η παραγόμενη έκθεση Minus.</string>
     <string name="bug_report_help_title">Βοηθήστε μας να κάνουμε το Minus καλύτερο</string>
     <string name="bug_report_help_message_prefix">"Η αναφορά προβλημάτων ή η πρόταση βελτιώσεων μας βοηθά να βελτιώσουμε το Minus για όλους.\n\nΑυτή η καθοδηγούμενη φόρμα σάς βοηθά να συμπεριλάβετε όλες τις απαραίτητες λεπτομέρειες σε μια αναφορά, επισυνάπτοντας αυτόματα μεταδεδομένα συσκευής και διαγνωστικά εφαρμογών για να επιταχύνετε την έρευνά μας.\n\nΜόλις προετοιμαστείτε, μπορείτε να στείλετε την αναφορά μέσω email ή να συνεισφέρετε μέσω"</string>
     <string name="bug_report_help_github_issues">"Προβλήματα GitHub"</string>
