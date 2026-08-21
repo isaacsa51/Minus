@@ -123,6 +123,10 @@
     <string name="show_subscriptions_outside_period">Показване на абонаментите извън периода</string>
     <string name="hide_past_period_expenses">Скриване на разходите от минали периоди</string>
     <string name="show_past_period_expenses">Показване на разходите от минали периоди</string>
+    <string name="history_snackbar_delete_transaction_failed">Транзакцията не можа да бъде изтрита</string>
+    <string name="history_snackbar_save_transaction_failed">Транзакцията не можа да бъде запазена</string>
+    <string name="history_snackbar_delete_recurrent_failed">Повтарящото се плащане не можа да бъде изтрито</string>
+    <string name="history_snackbar_mark_paid_failed">Транзакцията не можа да бъде отбелязана като платена</string>
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавяне на нова категория</string>
     <string name="budget_validation_major_zero">Бюджетът трябва да е по-голям от 0</string>
@@ -144,6 +148,15 @@
     <string name="maximum_spent">Максимално изразходвано</string>
     <string name="average_spent">Средно изразходвано на ден</string>
     <string name="days_remaining_label">Оставащи\nдни</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Your device doesn\'t support adding widgets this way. Long-press your home screen and look for Minus instead.</string>
+    <string name="widget_complete_budget_title">Complete Budget</string>
+    <string name="widget_average_spend_title">Average Spend</string>
+    <string name="widget_days_countdown_title">Days Countdown</string>
+    <string name="widget_expense_title">Expense Summary</string>
+    <string name="widget_heatmap_title">Spending Heatmap</string>
+    <string name="widget_min_max_spent_title">Min/Max Spent</string>
+    <string name="widget_month_heatmap_title">Month Heatmap</string>
     <!-- Widget Descriptions -->
     <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">Бърз преглед на изразходвания и оставащия бюджет</string>
@@ -251,6 +264,8 @@
     <string name="settings_theme_subtitle">Промяна на стила на темата</string>
     <string name="settings_appearance_title">Тема и цветове</string>
     <string name="settings_appearance_subtitle">Промяна на цвета и външния вид на приложението</string>
+    <string name="settings_widgets_title">Джаджи</string>
+    <string name="settings_widgets_subtitle">Разгледайте джаджите за началния екран</string>
     <string name="settings_typography_title">Типография</string>
     <string name="settings_typography_subtitle">Промяна на шрифтовия стил</string>
     <string name="settings_rounded_font_title">Закръглен шрифт</string>
@@ -323,7 +338,6 @@
     <string name="bug_report_attachments_label_bug">Снимки на екрана или записи</string>
     <string name="bug_report_submit">Изпрати доклада</string>
     <string name="bug_report_share_title">Изпращане на доклад</string>
-    <string name="bug_report_email_body">Здравейте, прикачен е моят генериран доклад от Минус.</string>
     <string name="bug_report_help_title">Помогнете ни да направим Минус по-добър</string>
     <string name="bug_report_help_message_prefix">"Съобщаването за проблеми или предлагането на подобрения ни помага да направим Минус по-добър за всички.\n\nТази задвижвана форма ви помага да съберете всички необходими подробности в доклад, като автоматично прикачва метаданни за устройството и диагностика на приложението, за да ускори нашата проверка.\n\nСлед като е готов, можете да изпратите доклада по имейл или да допринесете чрез "</string>
     <string name="bug_report_help_github_issues">" GitHub проблеми "</string>
