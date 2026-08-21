@@ -1,0 +1,5 @@
+- feat: widget gallery selector
+- feat: handmade Crashlytics to send when providing a bug/feature request if any
+- chore: show proper text value when trying to delete a recurring payment
+- fix: disable marquee effect in StatCard when censored
+- fix: turn off loading state when finished loading data on graphs
