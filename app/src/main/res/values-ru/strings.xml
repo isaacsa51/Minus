@@ -125,6 +125,10 @@
     <string name="show_subscriptions_outside_period">Show subscriptions outside of the period</string>
     <string name="hide_past_period_expenses">Hide past period expenses</string>
     <string name="show_past_period_expenses">Show past period expenses</string>
+    <string name="history_snackbar_delete_transaction_failed">Не удалось удалить транзакцию</string>
+    <string name="history_snackbar_save_transaction_failed">Не удалось сохранить транзакцию</string>
+    <string name="history_snackbar_delete_recurrent_failed">Не удалось удалить повторяющийся платёж</string>
+    <string name="history_snackbar_mark_paid_failed">Не удалось отметить транзакцию как оплаченную</string>
     <string name="add_new_category">Category</string>
     <string name="add_new_category_action">Add New Category</string>
     <string name="budget_validation_major_zero">Budget must be greater than 0</string>
@@ -150,6 +154,15 @@
     <string name="maximum_spent">Maximum spent</string>
     <string name="average_spent">Average per day spent</string>
     <string name="days_remaining_label">Days\nremaining</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Your device doesn\'t support adding widgets this way. Long-press your home screen and look for Minus instead.</string>
+    <string name="widget_complete_budget_title">Complete Budget</string>
+    <string name="widget_average_spend_title">Average Spend</string>
+    <string name="widget_days_countdown_title">Days Countdown</string>
+    <string name="widget_expense_title">Expense Summary</string>
+    <string name="widget_heatmap_title">Spending Heatmap</string>
+    <string name="widget_min_max_spent_title">Min/Max Spent</string>
+    <string name="widget_month_heatmap_title">Month Heatmap</string>
     <!-- Widget Descriptions -->
     <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">See spent and remaining budget at a glance</string>
@@ -257,6 +270,8 @@
     <string name="settings_theme_subtitle">Change the app theme style</string>
     <string name="settings_appearance_title">Theming and color</string>
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
+    <string name="settings_widgets_title">Виджеты</string>
+    <string name="settings_widgets_subtitle">Изучите виджеты для главного экрана</string>
     <string name="settings_typography_title">Typography</string>
     <string name="settings_typography_subtitle">Change the app typography style</string>
     <string name="settings_rounded_font_title">Скругленный стиль шрифта</string>
@@ -329,7 +344,6 @@
     <string name="bug_report_attachments_label_bug">Screenshots or recordings</string>
     <string name="bug_report_submit">Submit Report</string>
     <string name="bug_report_share_title">Send report</string>
-    <string name="bug_report_email_body">Hi, attached is my generated Minus report.</string>
     <string name="bug_report_help_title">Help us make Minus better</string>
     <string name="bug_report_help_message_prefix">"Reporting issues or suggesting improvements helps us make Minus better for everyone.\n\nThis guided form helps you package all the necessary details into a report, automatically attaching device metadata and app diagnostics to speed up our investigation.\n\nOnce prepared, you can send the report via email or contribute via "</string>
     <string name="bug_report_help_github_issues">" GitHub Issues "</string>
