@@ -11,6 +11,7 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.usecase.AddTransactionUseCase
 import com.serranoie.app.minus.domain.usecase.DeleteTransactionUseCase
+import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -50,6 +51,7 @@ class MarkRecurrentOccurrencePaidIntegrationTest {
             deleteTransactionUseCase = DeleteTransactionUseCase(repository),
             budgetExpressionEvaluator = BudgetExpressionEvaluator(),
             notificationScheduler = mockk(relaxed = true),
+            errorLogRecorder = mockk<ErrorLogRecorder>(relaxed = true),
         )
     }
 
