@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
@@ -85,6 +86,9 @@ private class CategoryChartTransitionState(
     var oldDataSize by mutableIntStateOf(initialDataSize)
         private set
 
+    var direction by mutableIntStateOf(1)
+        private set
+
     val animProgress = Animatable(1f)
 
     fun updateTarget(
@@ -107,6 +111,12 @@ private class CategoryChartTransitionState(
             targetDataSize != renderDataSize
 
         if (layoutChanged) {
+            direction = when {
+                targetWindowIndex > renderWindowIndex -> 1
+                targetWindowIndex < renderWindowIndex -> -1
+                else -> direction
+            }
+
             oldEntries = renderEntries
             oldDayTotals = renderDayTotals
             oldWindowIndex = renderWindowIndex
@@ -329,6 +339,9 @@ internal fun MultiCategoryChart(
 
         val oldAlpha = (1f - progress).coerceIn(0f, 1f)
         val newAlpha = progress.coerceIn(0f, 1f)
+        val slideDirection = transitionState.direction.toFloat()
+        val oldOffsetX = -width * slideDirection * progress
+        val newOffsetX = width * slideDirection * (1f - progress)
 
         if (oldAlpha > 0f && progress < 1f) {
             drawCoordinateSystem(
@@ -345,24 +358,26 @@ internal fun MultiCategoryChart(
                 thousandsUnit = thousandsUnit,
                 millionsUnit = millionsUnit,
             )
-            drawCategoryBars(
-                entriesByDayIndex = oldEntriesByDayIndex,
-                startLocalDate = startLocalDate,
-                windowStartIndex = transitionState.oldWindowIndex * transitionState.oldScrollStep,
-                dataSize = transitionState.oldDataSize,
-                leftMargin = leftMargin,
-                baseline = baseline,
-                topPadding = topPadding,
-                stepWidth = stepWidth,
-                barWidth = barWidth,
-                segmentGap = segmentGap,
-                maxSegmentCornerRadius = maxSegmentCornerRadius,
-                drawableHeight = drawableHeight,
-                maxVal = oldMaxVal,
-                alpha = oldAlpha,
-                selectedDate = null,
-                tertiaryColor = tertiaryColor,
-            )
+            translate(left = oldOffsetX) {
+                drawCategoryBars(
+                    entriesByDayIndex = oldEntriesByDayIndex,
+                    startLocalDate = startLocalDate,
+                    windowStartIndex = transitionState.oldWindowIndex * transitionState.oldScrollStep,
+                    dataSize = transitionState.oldDataSize,
+                    leftMargin = leftMargin,
+                    baseline = baseline,
+                    topPadding = topPadding,
+                    stepWidth = stepWidth,
+                    barWidth = barWidth,
+                    segmentGap = segmentGap,
+                    maxSegmentCornerRadius = maxSegmentCornerRadius,
+                    drawableHeight = drawableHeight,
+                    maxVal = oldMaxVal,
+                    alpha = oldAlpha,
+                    selectedDate = null,
+                    tertiaryColor = tertiaryColor,
+                )
+            }
         }
 
         if (newAlpha > 0f) {
@@ -381,24 +396,26 @@ internal fun MultiCategoryChart(
                 millionsUnit = millionsUnit,
                 isTodayHighlighted = true,
             )
-            drawCategoryBars(
-                entriesByDayIndex = renderEntriesByDayIndex,
-                startLocalDate = startLocalDate,
-                windowStartIndex = transitionState.renderWindowIndex * transitionState.renderScrollStep,
-                dataSize = transitionState.renderDataSize,
-                leftMargin = leftMargin,
-                baseline = baseline,
-                topPadding = topPadding,
-                stepWidth = stepWidth,
-                barWidth = barWidth,
-                segmentGap = segmentGap,
-                maxSegmentCornerRadius = maxSegmentCornerRadius,
-                drawableHeight = drawableHeight,
-                maxVal = renderMaxVal,
-                alpha = newAlpha,
-                selectedDate = selectedDate,
-                tertiaryColor = tertiaryColor,
-            )
+            translate(left = newOffsetX) {
+                drawCategoryBars(
+                    entriesByDayIndex = renderEntriesByDayIndex,
+                    startLocalDate = startLocalDate,
+                    windowStartIndex = transitionState.renderWindowIndex * transitionState.renderScrollStep,
+                    dataSize = transitionState.renderDataSize,
+                    leftMargin = leftMargin,
+                    baseline = baseline,
+                    topPadding = topPadding,
+                    stepWidth = stepWidth,
+                    barWidth = barWidth,
+                    segmentGap = segmentGap,
+                    maxSegmentCornerRadius = maxSegmentCornerRadius,
+                    drawableHeight = drawableHeight,
+                    maxVal = renderMaxVal,
+                    alpha = newAlpha,
+                    selectedDate = selectedDate,
+                    tertiaryColor = tertiaryColor,
+                )
+            }
         }
 
         if (progress >= 1f) {
@@ -488,7 +505,7 @@ private fun DrawScope.drawCategoryBars(
     }
 }
 
-private fun DrawScope.drawCategoryTooltip(
+internal fun DrawScope.drawCategoryTooltip(
     x: Float,
     barTopY: Float,
     baseline: Float,

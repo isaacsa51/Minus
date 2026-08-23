@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +27,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +38,7 @@ import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyF
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
+import kotlin.math.roundToInt
 
 private fun categoryHourEntriesMaxVal(entries: List<CategoryHourEntry>): Float {
     val rawMax = entries.groupBy { it.hour }
@@ -46,13 +51,6 @@ private fun categoryHourEntriesMaxVal(entries: List<CategoryHourEntry>): Float {
 private fun categoryHourEntriesByHour(entries: List<CategoryHourEntry>): Map<Int, List<CategoryHourEntry>> =
     (0 until 24).associateWith { hour -> entries.filter { it.hour == hour }.sortedBy { it.label } }
 
-/**
- * Tracks the old/render entry pair [MultiCategoryHourChart] cross-fades and slides between
- * whenever the selected day changes, mirroring how [CategoryChartTransitionState] cross-fades
- * bars for [MultiCategoryChart] between windows. [direction] (+1 for a later day, -1 for an
- * earlier one) drives which way the bars slide, so paging forward/back through days reads the
- * same as paging forward/back through a calendar.
- */
 @Stable
 private class CategoryHourTransitionState(
     initialEntries: List<CategoryHourEntry>,
@@ -94,14 +92,6 @@ private fun rememberCategoryHourTransitionState(
     return state
 }
 
-/**
- * Renders one day's spending as 24 hourly stacked-category bars instead of [MultiCategoryChart]'s
- * one-bar-per-day-across-a-window — this is what [GraphGranularity.DAYS] shows in categories mode,
- * since paginating through several individual days doesn't apply once the window is a single day.
- * Cross-fades between days the same way [MultiCategoryChart] cross-fades between windows, and
- * additionally slides the bars in the direction of travel: forward a day slides the new bars in
- * from the right, back a day slides them in from the left.
- */
 @Composable
 internal fun MultiCategoryHourChart(
     entries: List<CategoryHourEntry>,
@@ -118,8 +108,33 @@ internal fun MultiCategoryHourChart(
     val labelStyle = MaterialTheme.typography.labelSmallCondensed.copy(
         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
     )
+    val tooltipStyle = MaterialTheme.typography.labelSmallEmphasized.copy(
+        color = Color.White,
+        fontWeight = FontWeight.Bold,
+    )
 
     val transitionState = rememberCategoryHourTransitionState(entries, date)
+
+    var touchPosition by remember { mutableStateOf<Offset?>(null) }
+
+    val gestureModifier = Modifier
+        .pointerInput(date) {
+            detectDragGestures(
+                onDragStart = { offset -> touchPosition = offset },
+                onDrag = { change, _ -> touchPosition = change.position },
+                onDragEnd = { touchPosition = null },
+                onDragCancel = { touchPosition = null },
+            )
+        }
+        .pointerInput(date) {
+            detectTapGestures(
+                onPress = { offset ->
+                    touchPosition = offset
+                    tryAwaitRelease()
+                    touchPosition = null
+                },
+            )
+        }
 
     val renderEntriesByHour = remember(transitionState.renderEntries) {
         categoryHourEntriesByHour(transitionState.renderEntries)
@@ -134,7 +149,7 @@ internal fun MultiCategoryHourChart(
         categoryHourEntriesMaxVal(transitionState.oldEntries)
     }
 
-    Canvas(modifier = modifier) {
+    Canvas(modifier = modifier.then(gestureModifier)) {
         val width = size.width
         val height = size.height
         val leftMargin = 42.dp.toPx()
@@ -232,6 +247,35 @@ internal fun MultiCategoryHourChart(
                 )
             }
         }
+
+        if (progress >= 1f) {
+            val touchedHour = touchPosition?.let { pos ->
+                if (pos.x < leftMargin) null
+                else ((pos.x - leftMargin) / stepWidth).roundToInt().coerceIn(0, 23)
+            }
+
+            if (touchedHour != null) {
+                val total = transitionState.renderEntries
+                    .filter { it.hour == touchedHour }
+                    .sumOf { it.amount }
+                if (total > BigDecimal.ZERO) {
+                    val x = leftMargin + touchedHour * stepWidth
+                    val barTopY =
+                        baseline - (total.toFloat() / renderMaxVal * drawableHeight).coerceAtLeast(1f)
+                    drawCategoryTooltip(
+                        x = x,
+                        barTopY = barTopY,
+                        baseline = baseline,
+                        topPadding = topPadding,
+                        width = width,
+                        text = currencyFormat.format(total),
+                        textMeasurer = textMeasurer,
+                        tooltipStyle = tooltipStyle,
+                        lineColor = tertiaryColor,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -271,8 +315,8 @@ private fun DrawScope.drawCategoryHourBars(
 }
 
 private val previewHourCategoryColors = listOf(
-    Color(0xFFF86BAE), // Food
-    Color(0xFF5FC7E7), // Transport
+    Color(0xFFF86BAE),
+    Color(0xFF5FC7E7),
 )
 
 @Preview(showBackground = true, name = "Multi-Category Hour Chart")

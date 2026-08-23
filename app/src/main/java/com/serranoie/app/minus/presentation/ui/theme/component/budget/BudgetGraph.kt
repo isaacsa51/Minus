@@ -31,11 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.ColorUtils
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.Transaction
@@ -338,14 +340,48 @@ fun rememberBudgetGraphState(
     return state
 }
 
+private fun deriveColorVariant(base: Color, variantIndex: Int): Color {
+    if (variantIndex <= 0) return base
+
+    val hsl = FloatArray(3)
+    ColorUtils.colorToHSL(base.toArgb(), hsl)
+
+    val step = (variantIndex + 1) / 2
+    val direction = if (variantIndex % 2 == 1) 1f else -1f
+
+    hsl[0] = (hsl[0] + direction * 16f * step + 360f) % 360f
+    hsl[2] = (hsl[2] + direction * 0.05f * step).coerceIn(0.15f, 0.85f)
+
+    return Color(ColorUtils.HSLToColor(hsl))
+}
+
+private fun assignCategoryColors(labels: Collection<String>): Map<String, Color> {
+    val distinctLabels = labels.distinct().sorted()
+    if (distinctLabels.isEmpty()) return emptyMap()
+
+    val paletteSize = baseColors.size
+    val variantCountPerSlot = IntArray(paletteSize)
+    val result = LinkedHashMap<String, Color>()
+
+    distinctLabels.forEach { label ->
+        val slot = abs(label.hashCode()) % paletteSize
+        val variantIndex = variantCountPerSlot[slot]
+        variantCountPerSlot[slot] = variantIndex + 1
+        result[label] = deriveColorVariant(baseColors[slot], variantIndex)
+    }
+
+    return result
+}
+
 @Composable
 private fun rememberCategoryDayEntries(
     spends: List<Transaction>,
     categories: List<Category>,
     dateRange: ChartDateRange?,
+    categoryColors: Map<String, Color>,
 ): List<CategoryDayEntry> {
     val uncategorizedLabel = stringResource(R.string.categories_chart_uncategorized)
-    return remember(spends, categories, dateRange, uncategorizedLabel) {
+    return remember(spends, categories, dateRange, uncategorizedLabel, categoryColors) {
         if (dateRange == null) return@remember emptyList()
         spends
             .mapNotNull { tx ->
@@ -361,7 +397,7 @@ private fun rememberCategoryDayEntries(
                     date = date,
                     label = label,
                     amount = entries.sumOf { it.second.amount },
-                    color = baseColors[abs(label.hashCode()) % baseColors.size],
+                    color = categoryColors[label] ?: baseColors.first(),
                 )
             }
     }
@@ -372,9 +408,10 @@ private fun rememberCategoryHourEntries(
     spends: List<Transaction>,
     categories: List<Category>,
     date: LocalDate?,
+    categoryColors: Map<String, Color>,
 ): List<CategoryHourEntry> {
     val uncategorizedLabel = stringResource(R.string.categories_chart_uncategorized)
-    return remember(spends, categories, date, uncategorizedLabel) {
+    return remember(spends, categories, date, uncategorizedLabel, categoryColors) {
         if (date == null) return@remember emptyList()
         spends
             .mapNotNull { tx -> tx.date?.let { dt -> if (dt.toLocalDate() == date) dt.hour to tx else null } }
@@ -387,7 +424,7 @@ private fun rememberCategoryHourEntries(
                     hour = hour,
                     label = label,
                     amount = entries.sumOf { it.second.amount },
-                    color = baseColors[abs(label.hashCode()) % baseColors.size],
+                    color = categoryColors[label] ?: baseColors.first(),
                 )
             }
     }
@@ -514,10 +551,16 @@ fun BudgetGraph(
         )
     }
 
+    val categoriesUncategorizedLabel = stringResource(R.string.categories_chart_uncategorized)
+    val categoryColorMap = remember(state.categories, categoriesUncategorizedLabel) {
+        assignCategoryColors(state.categories.map { it.name } + categoriesUncategorizedLabel)
+    }
+
     val categoryDayEntries = rememberCategoryDayEntries(
         spends = state.spends,
         categories = state.categories,
         dateRange = visibleDateRange,
+        categoryColors = categoryColorMap,
     )
     val dayTotals = remember(categoryDayEntries) {
         categoryDayEntries.groupBy { it.date }
@@ -543,6 +586,7 @@ fun BudgetGraph(
         spends = state.spends,
         categories = state.categories,
         date = hourlyDate,
+        categoryColors = categoryColorMap,
     )
     val hourlyLegendEntries = remember(categoryHourEntries) {
         categoryHourEntries
