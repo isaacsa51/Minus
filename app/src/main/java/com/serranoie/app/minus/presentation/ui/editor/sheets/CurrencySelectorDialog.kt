@@ -50,12 +50,13 @@ fun CurrencySelectorDialog(
     onSelect: (String) -> Unit,
 ) {
     var query by remember { mutableStateOf("") }
-    val filteredCurrencies = remember(query) {
+    val sortedCurrencies = remember { SupportedCurrency.ALL.sortedBy { it.code } }
+    val filteredCurrencies = remember(query, sortedCurrencies) {
         if (query.isBlank()) {
-            SupportedCurrency.ALL
+            sortedCurrencies
         } else {
             val q = query.trim()
-            SupportedCurrency.ALL.filter {
+            sortedCurrencies.filter {
                 it.code.contains(q, ignoreCase = true) ||
                     it.displayName(Locale.getDefault()).contains(q, ignoreCase = true)
             }

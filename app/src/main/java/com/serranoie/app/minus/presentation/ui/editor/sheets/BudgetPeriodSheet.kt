@@ -987,12 +987,7 @@ fun EditBudgetContent(
             modifier = Modifier.testTag(BUDGET_PERIOD_CURRENCY_ROW_TAG),
             icon = Icons.Rounded.FiberSmartRecord,
             label = stringResource(R.string.currency_label),
-            trailingText =
-                if (currencyDisplay != null) {
-                    "${currencyDisplay.symbol} ${currencyDisplay.code}"
-                } else {
-                    currencyCache
-                },
+            trailingText = currencyDisplay?.displayName() ?: currencyCache,
             onClick = { showCurrencyPicker = true },
         )
 
