@@ -8,6 +8,7 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.usecase.AddTransactionUseCase
 import com.serranoie.app.minus.domain.usecase.DeleteTransactionUseCase
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
+import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -25,6 +26,7 @@ class BudgetTransactionHandlerTest {
 
     private val budgetRepository: BudgetRepository = mockk(relaxed = true)
     private val notificationScheduler: NotificationScheduler = mockk(relaxed = true)
+    private val errorLogRecorder: ErrorLogRecorder = mockk(relaxed = true)
 
     private lateinit var handler: BudgetTransactionHandler
 
@@ -46,6 +48,7 @@ class BudgetTransactionHandlerTest {
             deleteTransactionUseCase = DeleteTransactionUseCase(budgetRepository),
             budgetExpressionEvaluator = BudgetExpressionEvaluator(),
             notificationScheduler = notificationScheduler,
+            errorLogRecorder = errorLogRecorder,
         )
 
         coEvery { budgetRepository.getTransactionById(template.id) } returns template

@@ -16,6 +16,7 @@ import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
+import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +43,7 @@ class AnalyticsViewModelTest {
     private val observeCurrentPeriodBoundaryUseCase: ObserveCurrentPeriodBoundaryUseCase = mockk()
     private val clearEarlyFinishStateUseCase: ClearEarlyFinishStateUseCase = mockk(relaxed = true)
     private val persistBudgetSettingsUseCase: PersistBudgetSettingsUseCase = mockk(relaxed = true)
+    private val errorLogRecorder: ErrorLogRecorder = mockk(relaxed = true)
 
     private val settingsFlow = MutableStateFlow<BudgetSettings?>(null)
     private val transactionsFlow = MutableStateFlow<List<Transaction>>(emptyList())
@@ -78,7 +80,8 @@ class AnalyticsViewModelTest {
         budgetStateCalculator,
         observeCurrentPeriodBoundaryUseCase,
         clearEarlyFinishStateUseCase,
-        persistBudgetSettingsUseCase
+        persistBudgetSettingsUseCase,
+        errorLogRecorder
     )
 
     @Test
