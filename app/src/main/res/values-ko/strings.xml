@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
-    <string name="tile_new_transaction_label">새 거래</string>
     <string name="tutorial_numpad_title">숫자 패드</string>
     <string name="tutorial_numpad_description">지출 금액을 입력하고 녹색 체크 표시를 탭하여 저장하세요. 숫자 패드를 위로 쓸어 올리면 계산 기능을 사용할 수 있습니다.</string>
     <string name="tutorial_comment_title">카테고리 추가</string>
@@ -59,8 +58,9 @@
     <string name="credit_cutoff_dialog_title">신용카드 결제일</string>
     <string name="credit_cutoff_dialog_message">크레딧 지출을 추적하려면 청구 마감일(1~31일)을 설정하세요.</string>
     <string name="credit_cutoff_dialog_label">마감일</string>
-    <!-- Rollover Dialog -->
+    <string name="expand_numpad">숫자 키패드 확장</string>
     <string name="numpad_action">숫자 키패드 동작</string>
+    <!-- Rollover Dialog -->
     <string name="period_finished">기간 종료</string>
     <string name="remaining_budget">남은 금액 예산</string>
     <string name="rollover_question">남은 금액은 어떻게 사용하시겠습니까?</string>
@@ -86,7 +86,6 @@
     <string name="new_budget">새 예산 기간</string>
     <plurals name="pending_expense">
         <item quantity="other">다음 기간 지출 %d건</item>
-        <item quantity="one">다음 기간의 %d 비용</item>
     </plurals>
     <string name="new_period_title">새 예산 기간</string>
     <string name="widget_description">지출 내역을 빠르게 확인하고 새 항목을 추가하세요</string>
@@ -100,6 +99,8 @@
     <string name="finalize_period">예산 기간 조기 마감</string>
     <string name="finalize_period_confirm">현재 기간을 종료하고 새 기간을 시작합니다. 진행하시겠습니까?</string>
     <string name="finalize_action">마감하기</string>
+    <string name="rollover_preview_split_equally">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 종료되면 이 금액은 다음 예산 기간의 매일매일로 분배됩니다.</string>
+    <string name="rollover_preview_add_to_first_day">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 종료되면 이 금액은 다음 예산의 첫날에 합산됩니다.</string>
     <string name="rollover_preview_ask_always">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 끝나면 이 금액을 어떻게 처리할지 묻는 메시지가 표시됩니다.</string>
     <string name="no_ending_date">종료일 없음</string>
     <string name="budget_split_logic">예산을 어떻게 나누시겠습니까?</string>
@@ -130,6 +131,7 @@
     <string name="history_snackbar_mark_paid_failed">거래를 결제 완료로 표시할 수 없습니다</string>
     <string name="add_new_category">카테고리</string>
     <string name="add_new_category_action">새 카테고리 추가</string>
+    <string name="delete_category">카테고리 삭제</string>
     <string name="budget_validation_major_zero">예산은 0보다 커야 합니다.</string>
     <string name="budget_no_date_defined">종료일이 지정되지 않았습니다</string>
     <string name="budget_no_days_defined">기간이 지정되지 않았습니다</string>
@@ -138,18 +140,26 @@
     <string name="analytics_title">분석</string>
     <plurals name="days">
         <item quantity="other">%d일</item>
-        <item quantity="one">%d일</item>
     </plurals>
     <plurals name="analytics_days_left">
         <item quantity="other">%d일</item>
-        <item quantity="one">%d일</item>
     </plurals>
     <string name="total_budget">총 예산</string>
     <string name="minimum_spent">최소 지출액</string>
     <string name="maximum_spent">최대 지출액</string>
     <string name="average_spent">일일 평균 지출</string>
     <string name="days_remaining_label">남은 일수</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">이 기기에서는 이 방식으로 위젯을 추가할 수 없습니다. 홈 화면을 길게 누른 다음 Minus를 찾아보세요.</string>
+    <string name="widget_complete_budget_title">전체 예산</string>
+    <string name="widget_average_spend_title">평균 지출</string>
+    <string name="widget_days_countdown_title">남은 일수 카운트다운</string>
+    <string name="widget_expense_title">지출 요약</string>
+    <string name="widget_heatmap_title">지출 히트맵</string>
+    <string name="widget_min_max_spent_title">최소/최대 지출</string>
+    <string name="widget_month_heatmap_title">월간 히트맵</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">지출, 총 예산 및 남은 일수 추적 — 새 지출 빠른 추가 기능 포함</string>
     <string name="widget_budget_overview_description">소비 내역과 남은 예산을 한눈에 확인하세요</string>
     <string name="widget_days_countdown_description">예산 기간 남은 일수 카운트다운</string>
     <string name="widget_budget_detail_description">주요 지출 항목 및 일별 내역을 포함한 전체 예산 개요 왼쪽</string>
@@ -158,6 +168,8 @@
     <string name="widget_add_expense_description">새 지출을 추가하는 빠른 바로가기</string>
     <string name="widget_add_expense_label">새 지출 추가</string>
     <string name="widget_add_expense_compact_label">지출 추가</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">새 거래</string>
     <!-- Widget Labels -->
     <string name="spent">지출액</string>
     <string name="left">남은 금액</string>
@@ -257,7 +269,6 @@
     <string name="settings_widgets_subtitle">홈 화면에 추가할 수 있는 위젯을 살펴보세요</string>
     <string name="settings_typography_title">서체</string>
     <string name="settings_typography_subtitle">앱 서체 스타일 변경</string>
-
     <string name="settings_rounded_font_title">둥근 글꼴 스타일</string>
     <string name="settings_material_you_title">귀하의 재료</string>
     <string name="settings_material_you_subtitle">배경화면 색상을 사용하여 동적 앱 테마 적용</string>
@@ -329,8 +340,8 @@
     <string name="bug_report_submit">보고서 제출</string>
     <string name="bug_report_share_title">보고서 제출</string>
     <string name="bug_report_help_title">Minus를 더 좋게 만드는 데 도움을 주세요</string>
-    <string name="bug_report_help_message_prefix">문제 제보나 개선 제안은 모두를 위해 Minus를 더 좋게 만드는 데 도움이 됩니다. 이 안내 양식을 사용하면 필요한 모든 세부 정보를 보고서로 구성할 수 있으며, 기기 메타데이터와 앱 진단 정보가 자동으로 첨부되어 조사가 신속하게 진행됩니다. 보고서가 준비되면 이메일로 보내거나 다음을 통해 기여할 수 있습니다.</string>
-    <string name="bug_report_help_github_issues">GitHub 이슈</string>
+    <string name="bug_report_help_message_prefix">"문제 제보나 개선 제안은 모두를 위해 Minus를 더 좋게 만드는 데 도움이 됩니다. 이 안내 양식을 사용하면 필요한 모든 세부 정보를 보고서로 구성할 수 있으며, 기기 메타데이터와 앱 진단 정보가 자동으로 첨부되어 조사가 신속하게 진행됩니다. 보고서가 준비되면 이메일로 보내거나 다음을 통해 기여할 수 있습니다."</string>
+    <string name="bug_report_help_github_issues">"GitHub 이슈"</string>
     <string name="bug_report_help_message_suffix">저장소에 직접 기여하기.</string>
     <string name="bug_report_steps_to_reproduce_label">재현 단계</string>
     <string name="bug_report_include_steps_label">재현 단계 포함</string>
@@ -370,6 +381,8 @@
     <string name="budget_pill_over_budget">예산 초과</string>
     <string name="budget_pill_no_budget">예산 없음</string>
     <string name="budget_pill_no_budget_action">예산 설정하기</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">일일</string>
     <string name="budget_pill_exhausted_weekly_label">주간</string>
     <string name="budget_pill_exhausted_biweekly_label">2주 단위</string>
@@ -494,6 +507,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">날짜 제외</string>
     <string name="no_name">이름 없음</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">지출 사유</string>
     <string name="date">날짜</string>
     <string name="frequency">빈도</string>
@@ -568,6 +582,8 @@
     <string name="budget_graph_header_spending">지출</string>
     <string name="budget_graph_legend_current">현재</string>
     <string name="budget_graph_legend_previous">이전</string>
+    <string name="budget_graph_view_mode_cumulative">트랜드</string>
+    <string name="budget_graph_view_mode_categories">카테고리</string>
     <string name="budget_graph_nav_prev">이전</string>
     <string name="budget_graph_nav_next">다음</string>
     <string name="graph_granularity_days">일 단위</string>
@@ -577,22 +593,4 @@
     <string name="graph_granularity_total">합계</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
-    <string name="budget_pill_calc_added">%1$s 추가됨</string>
-    <string name="budget_pill_calc_subtracted">%1$s 차감됨</string>
-    <string name="no_name_income">이름 없는 수입</string>
-    <string name="rollover_preview_split_equally">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 종료되면 이 금액은 다음 예산 기간의 매일매일로 분배됩니다.</string>
-    <string name="rollover_preview_add_to_first_day">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 종료되면 이 금액은 다음 예산의 첫날에 합산됩니다.</string>
-    <string name="expand_numpad">숫자 키패드 확장</string>
-    <string name="delete_category">카테고리 삭제</string>
-    <string name="budget_graph_view_mode_cumulative">트랜드</string>
-    <string name="budget_graph_view_mode_categories">카테고리</string>
-    <string name="settings_widgets_pin_not_supported">이 기기에서는 이 방식으로 위젯을 추가할 수 없습니다. 홈 화면을 길게 누른 다음 Minus를 찾아보세요.</string>
-    <string name="widget_complete_budget_title">전체 예산</string>
-    <string name="widget_average_spend_title">평균 지출</string>
-    <string name="widget_days_countdown_title">남은 일수 카운트다운</string>
-    <string name="widget_expense_title">지출 요약</string>
-    <string name="widget_heatmap_title">지출 히트맵</string>
-    <string name="widget_min_max_spent_title">최소/최대 지출</string>
-    <string name="widget_month_heatmap_title">월간 히트맵</string>
-    <string name="widget_complete_budget_description">지출, 총 예산 및 남은 일수 추적 — 새 지출 빠른 추가 기능 포함</string>
 </resources>
