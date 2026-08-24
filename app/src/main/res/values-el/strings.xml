@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Πλην</string>
-    <string name="tile_new_transaction_label">Νέα συναλλαγή</string>
     <string name="tutorial_numpad_title">Καντράν</string>
     <string name="tutorial_numpad_description">Εισαγάγετε το ποσό που ξοδέψατε και πατήστε το πράσινο σημάδι επιλογής για εξοικονόμηση. Σύρετε προς τα πάνω στο αριθμητικό πληκτρολόγιο για να υπολογίσετε.</string>
     <string name="tutorial_comment_title">Προσθήκη κατηγορίας</string>
@@ -59,8 +58,9 @@
     <string name="credit_cutoff_dialog_title">Ημερομηνία διακοπής πιστωτικής κάρτας</string>
     <string name="credit_cutoff_dialog_message">Για την παρακολούθηση των πιστωτικών εξόδων, ορίστε την ημέρα περικοπής χρέωσης (1-31).</string>
     <string name="credit_cutoff_dialog_label">Ημέρα αποκοπής</string>
-    <!-- Rollover Dialog -->
+    <string name="expand_numpad">Ανάπτυξη αριθμητικού πληκτρολογίου</string>
     <string name="numpad_action">Ενέργεια αριθμητικού πληκτρολογίου</string>
+    <!-- Rollover Dialog -->
     <string name="period_finished">Η περίοδος ολοκληρώθηκε</string>
     <string name="remaining_budget">Υπόλοιπο προϋπολογισμό</string>
     <string name="rollover_question">Τι θέλετε να κάνετε με τα υπόλοιπα χρήματα?</string>
@@ -100,6 +100,8 @@
     <string name="finalize_period">Ολοκλήρωση της περιόδου προϋπολογισμού νωρίς</string>
     <string name="finalize_period_confirm">Αυτό θα κλείσει την τρέχουσα περίοδο και θα ξεκινήσει μια νέα. Είσαι σίγουρος?</string>
     <string name="finalize_action">Ολοκλήρωση</string>
+    <string name="rollover_preview_split_equally">Σας έχουν μείνει %1$s αχρησιμοποίητα. Όταν λήξει αυτή η περίοδος, θα κατανεμηθεί σε κάθε ημέρα του επόμενου προϋπολογισμού σας.</string>
+    <string name="rollover_preview_add_to_first_day">Σας έχουν μείνει %1$s αχρησιμοποίητα. Όταν λήξει αυτή η περίοδος, θα προστεθεί στην πρώτη ημέρα του επόμενου προϋπολογισμού σας.</string>
     <string name="rollover_preview_ask_always">You have %1$s left unspent. You\'ll be asked what to do with it when this period ends.</string>
     <string name="no_ending_date">Χωρίς ημερομηνία λήξης</string>
     <string name="budget_split_logic">Πώς θέλετε να χωρίσετε τον προϋπολογισμό?</string>
@@ -130,6 +132,7 @@
     <string name="history_snackbar_mark_paid_failed">Δεν ήταν δυνατή η σήμανση της συναλλαγής ως πληρωμένης</string>
     <string name="add_new_category">Κατηγορία</string>
     <string name="add_new_category_action">Προσθήκη Νέας Κατηγορίας</string>
+    <string name="delete_category">Διαγραφή κατηγορίας</string>
     <string name="budget_validation_major_zero">Ο προϋπολογισμός πρέπει να είναι μεγαλύτερος από 0</string>
     <string name="budget_no_date_defined">Δεν ορίστηκε ημερομηνία λήξης</string>
     <string name="budget_no_days_defined">Δεν έχουν οριστεί ημέρες</string>
@@ -149,7 +152,17 @@
     <string name="maximum_spent">Μέγιστη δαπάνη</string>
     <string name="average_spent">Μέσος όρος ανά ημέρα</string>
     <string name="days_remaining_label">Απομένουν ημέρες\n</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Η συσκευή σας δεν υποστηρίζει την προσθήκη γραφικών στοιχείων με αυτόν τον τρόπο. Πατήστε παρατεταμένα στην αρχική οθόνη σας και αναζητήστε το Minus.</string>
+    <string name="widget_complete_budget_title">Πλήρης προϋπολογισμός</string>
+    <string name="widget_average_spend_title">Μέση δαπάνη</string>
+    <string name="widget_days_countdown_title">Αντίστροφη μέτρηση ημερών</string>
+    <string name="widget_expense_title">Σύνοψη εξόδων</string>
+    <string name="widget_heatmap_title">Χάρτης θερμότητας δαπανών</string>
+    <string name="widget_min_max_spent_title">Ελάχιστα/Μέγιστα δαπανηθέντα</string>
+    <string name="widget_month_heatmap_title">Μηνιαίος χάρτης θερμότητας</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Παρακολουθήστε τις δαπάνες, το συνολικό προϋπολογισμό και τις ημέρες που απομένουν — με γρήγορη προσθήκη για νέα έξοδα</string>
     <string name="widget_budget_overview_description">Δείτε το κόστος και τον υπόλοιπο προϋπολογισμό με μια ματιά</string>
     <string name="widget_days_countdown_description">Ημέρες αντίστροφης μέτρησης που απομένουν στην δημοσιονομική περίοδο</string>
     <string name="widget_budget_detail_description">Πλήρης επισκόπηση προϋπολογισμού με κορυφαία κατηγορία και μέρες αριστερά</string>
@@ -158,6 +171,8 @@
     <string name="widget_add_expense_description">Γρήγορη συντόμευση για την προσθήκη νέας δαπάνης</string>
     <string name="widget_add_expense_label">Προσθήκη νέου κόστους</string>
     <string name="widget_add_expense_compact_label">Προσθήκη εξόδων</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Νέα συναλλαγή</string>
     <!-- Widget Labels -->
     <string name="spent">Δαπανήθηκε</string>
     <string name="left">Αριστερά</string>
@@ -257,6 +272,7 @@
     <string name="settings_widgets_subtitle">Εξερευνήστε τα γραφικά στοιχεία για την αρχική οθόνη</string>
     <string name="settings_typography_title">Τυπογραφία</string>
     <string name="settings_typography_subtitle">Αλλαγή του στυλ τυπογραφίας εφαρμογών</string>
+    <string name="settings_rounded_font_title">Στρογγυλοποιημένο στυλ γραμματοσειράς</string>
     <string name="settings_material_you_title">Υλικό Εσείς</string>
     <string name="settings_material_you_subtitle">Χρήση χρωμάτων ταπετσαρίας για την εφαρμογή ενός δυναμικού θέματος εφαρμογής</string>
     <string name="settings_censor_mode_title">Λειτουργία απορρήτου</string>
@@ -328,7 +344,7 @@
     <string name="bug_report_share_title">Αποστολή αναφοράς</string>
     <string name="bug_report_help_title">Βοηθήστε μας να κάνουμε το Minus καλύτερο</string>
     <string name="bug_report_help_message_prefix">"Η αναφορά προβλημάτων ή η πρόταση βελτιώσεων μας βοηθά να βελτιώσουμε το Minus για όλους.\n\nΑυτή η καθοδηγούμενη φόρμα σάς βοηθά να συμπεριλάβετε όλες τις απαραίτητες λεπτομέρειες σε μια αναφορά, επισυνάπτοντας αυτόματα μεταδεδομένα συσκευής και διαγνωστικά εφαρμογών για να επιταχύνετε την έρευνά μας.\n\nΜόλις προετοιμαστείτε, μπορείτε να στείλετε την αναφορά μέσω email ή να συνεισφέρετε μέσω"</string>
-    <string name="bug_report_help_github_issues">Προβλήματα GitHub</string>
+    <string name="bug_report_help_github_issues">"Προβλήματα GitHub"</string>
     <string name="bug_report_help_message_suffix"> απευθείας στο αποθετήριό μας.</string>
     <string name="bug_report_steps_to_reproduce_label">Βήματα για αναπαραγωγή</string>
     <string name="bug_report_include_steps_label">Συμπερίληψη βημάτων αναπαραγωγής</string>
@@ -368,6 +384,8 @@
     <string name="budget_pill_over_budget">Υπέρβαση του προϋπολογισμού</string>
     <string name="budget_pill_no_budget">Χωρίς προϋπολογισμό</string>
     <string name="budget_pill_no_budget_action">Δημιουργήστε τον προϋπολογισμό σας</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">Καθημερινά</string>
     <string name="budget_pill_exhausted_weekly_label">Εβδομαδιαία</string>
     <string name="budget_pill_exhausted_biweekly_label">Ανά δύο εβδομάδες</string>
@@ -492,6 +510,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Χωρίς ημερομηνία</string>
     <string name="no_name">Χωρίς όνομα</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">Αιτία αγοράς</string>
     <string name="date">Ημερομηνία</string>
     <string name="frequency">Συχνότητα</string>
@@ -566,6 +585,8 @@
     <string name="budget_graph_header_spending">Δαπάνες</string>
     <string name="budget_graph_legend_current">Τρέχουσες</string>
     <string name="budget_graph_legend_previous">Προηγούμενη</string>
+    <string name="budget_graph_view_mode_cumulative">Τάση</string>
+    <string name="budget_graph_view_mode_categories">Κατηγορίες</string>
     <string name="budget_graph_nav_prev">Προηγούμενη</string>
     <string name="budget_graph_nav_next">Επόμενο</string>
     <string name="graph_granularity_days">Ημέρες</string>
@@ -575,23 +596,4 @@
     <string name="graph_granularity_total">Σύνολο</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
-    <string name="settings_rounded_font_title">Στρογγυλοποιημένο στυλ γραμματοσειράς</string>
-    <string name="budget_pill_calc_added">Θα προστεθεί %1$s</string>
-    <string name="budget_pill_calc_subtracted">Θα αφαιρεθεί %1$s</string>
-    <string name="no_name_income">Μη κατονομασμένο εισόδημα</string>
-    <string name="rollover_preview_split_equally">Σας έχουν μείνει %1$s αχρησιμοποίητα. Όταν λήξει αυτή η περίοδος, θα κατανεμηθεί σε κάθε ημέρα του επόμενου προϋπολογισμού σας.</string>
-    <string name="rollover_preview_add_to_first_day">Σας έχουν μείνει %1$s αχρησιμοποίητα. Όταν λήξει αυτή η περίοδος, θα προστεθεί στην πρώτη ημέρα του επόμενου προϋπολογισμού σας.</string>
-    <string name="expand_numpad">Ανάπτυξη αριθμητικού πληκτρολογίου</string>
-    <string name="delete_category">Διαγραφή κατηγορίας</string>
-    <string name="budget_graph_view_mode_cumulative">Τάση</string>
-    <string name="budget_graph_view_mode_categories">Κατηγορίες</string>
-    <string name="settings_widgets_pin_not_supported">Η συσκευή σας δεν υποστηρίζει την προσθήκη γραφικών στοιχείων με αυτόν τον τρόπο. Πατήστε παρατεταμένα στην αρχική οθόνη σας και αναζητήστε το Minus.</string>
-    <string name="widget_complete_budget_title">Πλήρης προϋπολογισμός</string>
-    <string name="widget_average_spend_title">Μέση δαπάνη</string>
-    <string name="widget_days_countdown_title">Αντίστροφη μέτρηση ημερών</string>
-    <string name="widget_expense_title">Σύνοψη εξόδων</string>
-    <string name="widget_heatmap_title">Χάρτης θερμότητας δαπανών</string>
-    <string name="widget_min_max_spent_title">Ελάχιστα/Μέγιστα δαπανηθέντα</string>
-    <string name="widget_month_heatmap_title">Μηνιαίος χάρτης θερμότητας</string>
-    <string name="widget_complete_budget_description">Παρακολουθήστε τις δαπάνες, το συνολικό προϋπολογισμό και τις ημέρες που απομένουν — με γρήγορη προσθήκη για νέα έξοδα</string>
 </resources>
