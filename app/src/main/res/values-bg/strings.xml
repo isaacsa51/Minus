@@ -37,6 +37,7 @@
     <string name="undo">Отмени</string>
     <string name="back">Назад</string>
     <string name="next">Напред</string>
+    <string name="navigate">Навигиране</string>
     <string name="period">Период</string>
     <string name="previous_values">Предишни стойности</string>
     <string name="budget">Бюджет</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">За да проследявате разходите по кредитната карта, задайте деня на падеж (1–31).</string>
     <string name="credit_cutoff_dialog_label">Ден на падеж</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">Действие с цифровия блок на клавиатурата</string>
     <string name="period_finished">Периодът приключи</string>
     <string name="remaining_budget">Оставащ бюджет</string>
     <string name="rollover_question">Какво искаш да направиш с оставащите пари?</string>
@@ -130,6 +132,7 @@
     <string name="history_snackbar_mark_paid_failed">Транзакцията не можа да бъде отбелязана като платена</string>
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавяне на нова категория</string>
+    <string name="delete_category">Изтриване на категория</string>
     <string name="budget_validation_major_zero">Бюджетът трябва да е по-голям от 0</string>
     <string name="budget_no_date_defined">Не е зададена крайна дата</string>
     <string name="budget_no_days_defined">Не са зададени дни</string>
@@ -566,6 +569,7 @@
     <string name="budget_graph_header_spending">Харчене</string>
     <string name="budget_graph_legend_current">Текущ</string>
     <string name="budget_graph_legend_previous">Предишен</string>
+    <string name="budget_graph_view_mode_categories">Категории</string>
     <string name="budget_graph_nav_prev">Предишен</string>
     <string name="budget_graph_nav_next">Напред</string>
     <string name="graph_granularity_days">Дни</string>
@@ -579,4 +583,15 @@
     <string name="budget_pill_calc_subtracted">%1$s ще бъдат извадени</string>
     <string name="no_name_income">Неназован доход</string>
     <string name="settings_rounded_font_title">Закръглен шрифт</string>
+    <string name="expand_numpad">Разгъване на цифровата клавиатура</string>
+    <string name="settings_widgets_pin_not_supported">Изтриване на категория</string>
+    <string name="widget_complete_budget_title">Пълен бюджет</string>
+    <string name="widget_average_spend_title">Среден разход</string>
+    <string name="widget_days_countdown_title">Обратно броене на дните</string>
+    <string name="widget_expense_title">Обобщение на разходите</string>
+    <string name="widget_heatmap_title">Топлинна карта на разходите</string>
+    <string name="widget_min_max_spent_title">Мин./Макс. разходи</string>
+    <string name="widget_month_heatmap_title">Месечна топлинна карта</string>
+    <string name="widget_complete_budget_description">Проследявайте разходите, общия бюджет и оставащите дни — с бързо добавяне за нов разход</string>
+    <string name="budget_graph_view_mode_cumulative">Тенденция</string>
 </resources>

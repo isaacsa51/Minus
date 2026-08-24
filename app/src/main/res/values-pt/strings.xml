@@ -37,6 +37,7 @@
     <string name="undo">DESFAZER</string>
     <string name="back">Anterior</string>
     <string name="next">Próximo</string>
+    <string name="navigate">Navegar</string>
     <string name="period">Menstruação</string>
     <string name="previous_values">Valores anteriores</string>
     <string name="budget">Orçamento</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">Para controlar as despesas de crédito, defina o dia do faturamento (1-31).</string>
     <string name="credit_cutoff_dialog_label">Cortar dia</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">Ação do teclado numérico</string>
     <string name="period_finished">Período terminado</string>
     <string name="remaining_budget">Orçamento restante</string>
     <string name="rollover_question">O que você quer fazer com o dinheiro restante?</string>
@@ -579,4 +581,17 @@
     <string name="budget_pill_calc_added">%1$s será adicionado</string>
     <string name="budget_pill_calc_subtracted">%1$s será subtraído</string>
     <string name="no_name_income">Receita sem nome</string>
+    <string name="expand_numpad">Expandir teclado numérico</string>
+    <string name="delete_category">Excluir categoria</string>
+    <string name="budget_graph_view_mode_cumulative">Tendência</string>
+    <string name="budget_graph_view_mode_categories">Categorias</string>
+    <string name="settings_widgets_pin_not_supported">Seu dispositivo não suporta a adição de widgets desta forma. Pressione e segure sua tela inicial e procure por Minus.</string>
+    <string name="widget_complete_budget_title">Orçamento completo</string>
+    <string name="widget_average_spend_title">Gasto médio</string>
+    <string name="widget_days_countdown_title">Contagem regressiva de dias</string>
+    <string name="widget_expense_title">Resumo de despesas</string>
+    <string name="widget_heatmap_title">Mapa de calor de gastos</string>
+    <string name="widget_min_max_spent_title">Gasto Mín/Máx</string>
+    <string name="widget_month_heatmap_title">Mapa de calor mensal</string>
+    <string name="widget_complete_budget_description">Acompanhe gastos, orçamento total e dias restantes — com adição rápida para uma nova despesa</string>
 </resources>

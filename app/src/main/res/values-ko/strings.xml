@@ -37,6 +37,7 @@
     <string name="undo">UNDO</string>
     <string name="back">뒤로</string>
     <string name="next">다음</string>
+    <string name="navigate">탐색</string>
     <string name="period">기간</string>
     <string name="previous_values">이전 값</string>
     <string name="budget">예산</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">크레딧 지출을 추적하려면 청구 마감일(1~31일)을 설정하세요.</string>
     <string name="credit_cutoff_dialog_label">마감일</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">숫자 키패드 동작</string>
     <string name="period_finished">기간 종료</string>
     <string name="remaining_budget">남은 금액 예산</string>
     <string name="rollover_question">남은 금액은 어떻게 사용하시겠습니까?</string>
@@ -580,4 +582,17 @@
     <string name="no_name_income">이름 없는 수입</string>
     <string name="rollover_preview_split_equally">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 종료되면 이 금액은 다음 예산 기간의 매일매일로 분배됩니다.</string>
     <string name="rollover_preview_add_to_first_day">사용하지 않은 금액이 %1$s 남아 있습니다. 이번 기간이 종료되면 이 금액은 다음 예산의 첫날에 합산됩니다.</string>
+    <string name="expand_numpad">숫자 키패드 확장</string>
+    <string name="delete_category">카테고리 삭제</string>
+    <string name="budget_graph_view_mode_cumulative">트랜드</string>
+    <string name="budget_graph_view_mode_categories">카테고리</string>
+    <string name="settings_widgets_pin_not_supported">이 기기에서는 이 방식으로 위젯을 추가할 수 없습니다. 홈 화면을 길게 누른 다음 Minus를 찾아보세요.</string>
+    <string name="widget_complete_budget_title">전체 예산</string>
+    <string name="widget_average_spend_title">평균 지출</string>
+    <string name="widget_days_countdown_title">남은 일수 카운트다운</string>
+    <string name="widget_expense_title">지출 요약</string>
+    <string name="widget_heatmap_title">지출 히트맵</string>
+    <string name="widget_min_max_spent_title">최소/최대 지출</string>
+    <string name="widget_month_heatmap_title">월간 히트맵</string>
+    <string name="widget_complete_budget_description">지출, 총 예산 및 남은 일수 추적 — 새 지출 빠른 추가 기능 포함</string>
 </resources>

@@ -37,6 +37,7 @@
     <string name="undo">ANNULLA</string>
     <string name="back">Indietro</string>
     <string name="next">Successivo</string>
+    <string name="navigate">Navigare</string>
     <string name="period">Periodo</string>
     <string name="previous_values">Valori precedenti</string>
     <string name="budget">Bilancio</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">Per monitorare le spese di credito, impostare il giorno cutoff di fatturazione (1-31).</string>
     <string name="credit_cutoff_dialog_label">Giorno di taglio</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">Azione del tastierino numerico</string>
     <string name="period_finished">Periodo terminato</string>
     <string name="remaining_budget">Bilancio rimanente</string>
     <string name="rollover_question">Che cosa vuoi fare con i soldi restanti?</string>
@@ -579,4 +581,17 @@
     <string name="budget_pill_calc_added">Verranno aggiunti %1$s</string>
     <string name="budget_pill_calc_subtracted">Verranno sottratti %1$s</string>
     <string name="no_name_income">Entrata senza nome</string>
+    <string name="expand_numpad">Espandi tastierino numerico</string>
+    <string name="delete_category">Elimina categoria</string>
+    <string name="budget_graph_view_mode_cumulative">Andamento</string>
+    <string name="budget_graph_view_mode_categories">Categorie</string>
+    <string name="settings_widgets_pin_not_supported">Il tuo dispositivo non supporta l\'aggiunta di widget in questo modo. Tieni premuto sulla schermata home e cerca Minus.</string>
+    <string name="widget_complete_budget_title">Budget completo</string>
+    <string name="widget_average_spend_title">Spesa media</string>
+    <string name="widget_days_countdown_title">Conto alla rovescia giorni</string>
+    <string name="widget_expense_title">Riepilogo spese</string>
+    <string name="widget_heatmap_title">Mappa termica delle spese</string>
+    <string name="widget_min_max_spent_title">Spesa Min/Max</string>
+    <string name="widget_month_heatmap_title">Mappa termica mensile</string>
+    <string name="widget_complete_budget_description">Monitora le spese, il budget totale e i giorni rimasti — con aggiunta rapida per una nuova spesa</string>
 </resources>

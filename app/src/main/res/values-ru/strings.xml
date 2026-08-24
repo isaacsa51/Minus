@@ -37,6 +37,7 @@
     <string name="undo">UNDO</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
+    <string name="navigate">Навигация</string>
     <string name="period">Period</string>
     <string name="previous_values">Previous values</string>
     <string name="budget">Budget</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">To track credit expenses, set the billing cutoff day (1-31).</string>
     <string name="credit_cutoff_dialog_label">Cutoff day</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">Действие на цифровой клавиатуре</string>
     <string name="period_finished">Period finished</string>
     <string name="remaining_budget">Remaining budget</string>
     <string name="rollover_question">What do you want to do with the remaining money?</string>
@@ -585,4 +587,17 @@
     <string name="rollover_preview_split_equally">У вас осталось неизрасходованным %1$s. По окончании этого периода данная сумма будет распределена по дням вашего следующего бюджета.</string>
     <string name="rollover_preview_add_to_first_day">У вас осталось неизрасходованным %1$s. По окончании этого периода эта сумма будет перенесена на первый день вашего следующего бюджетного периода.</string>
     <string name="budget_pill_calc_added">Будет добавлено: %1$s</string>
+    <string name="expand_numpad">Развернуть цифровую клавиатуру</string>
+    <string name="delete_category">Удалить категорию</string>
+    <string name="budget_graph_view_mode_cumulative">Тренд</string>
+    <string name="budget_graph_view_mode_categories">Категории</string>
+    <string name="settings_widgets_pin_not_supported">Ваше устройство не поддерживает добавление виджетов таким способом. Нажмите и удерживайте главный экран и найдите Minus.</string>
+    <string name="widget_complete_budget_title">Полный бюджет</string>
+    <string name="widget_average_spend_title">Средние расходы</string>
+    <string name="widget_days_countdown_title">Обратный отсчет дней</string>
+    <string name="widget_expense_title">Сводка расходов</string>
+    <string name="widget_heatmap_title">Тепловая карта расходов</string>
+    <string name="widget_min_max_spent_title">Мин/Макс расходы</string>
+    <string name="widget_month_heatmap_title">Месячная тепловая карта</string>
+    <string name="widget_complete_budget_description">Отслеживайте расходы, общий бюджет и оставшиеся дни — с быстрым добавлением нового расхода</string>
 </resources>

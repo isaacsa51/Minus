@@ -37,6 +37,7 @@
     <string name="undo">UNDO</string>
     <string name="back">पीछे</string>
     <string name="next">अगला</string>
+    <string name="navigate">नेविगेट</string>
     <string name="period">पीरियड</string>
     <string name="previous_values">पिछली वैल्यूज़</string>
     <string name="budget">बजट</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">क्रेडिट खर्चों को ट्रैक करने के लिए, बिलिंग कट-ऑफ़ का दिन (1-31) सेट करें।</string>
     <string name="credit_cutoff_dialog_label">कट-ऑफ़ का दिन</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">नंपैड एक्शन</string>
     <string name="period_finished">पीरियड खत्म हो गया</string>
     <string name="remaining_budget">बचा हुआ बजट</string>
     <string name="rollover_question">आप बचे हुए पैसे का क्या करना चाहते हैं?</string>
@@ -579,4 +581,17 @@
     <string name="settings_rounded_font_title">गोल फ़ॉन्ट स्टाइल</string>
     <string name="rollover_preview_split_equally">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म हो जाएगी, तो यह रकम आपके अगले बजट के हर दिन में बांट दी जाएगी।</string>
     <string name="rollover_preview_add_to_first_day">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म हो जाएगी, तो यह रकम आपके अगले बजट के पहले दिन में जोड़ दी जाएगी।</string>
+    <string name="expand_numpad">नंपैड को बड़ा करें</string>
+    <string name="delete_category">कैटेगरी मिटाएं</string>
+    <string name="budget_graph_view_mode_cumulative">ट्रेंड</string>
+    <string name="budget_graph_view_mode_categories">कैटेगरी</string>
+    <string name="settings_widgets_pin_not_supported">आपका डिवाइस इस तरह से विजेट जोड़ने का समर्थन नहीं करता है। अपनी होम स्क्रीन को देर तक दबाएं और इसके बजाय Minus खोजें।</string>
+    <string name="widget_complete_budget_title">पूरा बजट</string>
+    <string name="widget_average_spend_title">औसत खर्च</string>
+    <string name="widget_days_countdown_title">दिनों का काउंटडाउन</string>
+    <string name="widget_expense_title">खर्च का सारांश</string>
+    <string name="widget_heatmap_title">खर्च का हीटमैप</string>
+    <string name="widget_min_max_spent_title">न्यूनतम/अधिकतम खर्च</string>
+    <string name="widget_month_heatmap_title">महीने का हीटमैप</string>
+    <string name="widget_complete_budget_description">खर्च, कुल बजट और बचे हुए दिनों को ट्रैक करें — नए खर्च के लिए क्विक-एड के साथ</string>
 </resources>

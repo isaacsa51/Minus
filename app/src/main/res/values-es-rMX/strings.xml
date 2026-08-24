@@ -37,6 +37,7 @@
     <string name="undo">DESHACER</string>
     <string name="back">Atrás</string>
     <string name="next">Próximo</string>
+    <string name="navigate">Navegar</string>
     <string name="period">Período</string>
     <string name="previous_values">Valores anteriores</string>
     <string name="budget">Presupuesto</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">Para rastrear gastos a crédito, define el día de corte (1–31).</string>
     <string name="credit_cutoff_dialog_label">Día de corte</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">Acción del teclado numérico</string>
     <string name="period_finished">Periodo terminado</string>
     <string name="remaining_budget">Presupuesto restante</string>
     <string name="rollover_question">¿Qué quieres hacer con el dinero restante?</string>
@@ -98,6 +100,8 @@
     <string name="finalize_period">Finalizar periodo de ahorro temprano</string>
     <string name="finalize_period_confirm">Esto cerrará el período actual y comenzará uno nuevo. ¿Está seguro?</string>
     <string name="finalize_action">Finalizar</string>
+    <string name="rollover_preview_split_equally">Te quedan %1$s sin gastar. Cuando termine este período, se repartirán entre todos los días de tu próximo presupuesto.</string>
+    <string name="rollover_preview_add_to_first_day">Te quedan %1$s sin gastar. Cuando termine este período, se añadirán al primer día de tu próximo presupuesto.</string>
     <string name="rollover_preview_ask_always">Te quedan %1$s sin gastar. Se te preguntará qué hacer con ellos cuando termine este período.</string>
     <string name="no_ending_date">Sin fecha de finalización</string>
     <string name="budget_split_logic">¿Cómo quieres dividir el presupuesto?</string>
@@ -576,7 +580,18 @@
     <string name="graph_granularity_total">Total</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
-    <string name="rollover_preview_split_equally">Te quedan %1$s sin gastar. Cuando termine este período, se repartirán entre todos los días de tu próximo presupuesto.</string>
-    <string name="rollover_preview_add_to_first_day">Te quedan %1$s sin gastar. Cuando termine este período, se añadirán al primer día de tu próximo presupuesto.</string>
     <string name="budget_pill_calc_added">%1$s será añadido</string>
+    <string name="expand_numpad">Expandir teclado númerico</string>
+    <string name="delete_category">Borrar categoría</string>
+    <string name="budget_graph_view_mode_cumulative">Tendencia</string>
+    <string name="budget_graph_view_mode_categories">Categorías</string>
+    <string name="settings_widgets_pin_not_supported">Tu dispositivo no admite la adición de widgets de esta manera. Mantén presionada la pantalla de inicio y busca Menos en su lugar.</string>
+    <string name="widget_complete_budget_title">Presupuesto completo</string>
+    <string name="widget_average_spend_title">Gasto promedio</string>
+    <string name="widget_days_countdown_title">Cuenta regresiva de días</string>
+    <string name="widget_expense_title">Resumen de gastos</string>
+    <string name="widget_heatmap_title">Mapa de calor de gastos</string>
+    <string name="widget_min_max_spent_title">Gasto mín/máx</string>
+    <string name="widget_month_heatmap_title">Mapa de calor mensual</string>
+    <string name="widget_complete_budget_description">Rastrea gastos, presupuesto total y días restantes — con adición rápida para un nuevo gasto</string>
 </resources>

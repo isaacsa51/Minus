@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -133,7 +134,7 @@ fun NumpadButton(
                     imageVector = icon,
                     tint = contentColor,
                     modifier = Modifier.size(32.dp),
-                    contentDescription = "Editor action",
+                    contentDescription = stringResource(R.string.numpad_action),
                 )
             }
         }

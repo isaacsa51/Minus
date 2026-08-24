@@ -395,7 +395,7 @@ fun LazyListScope.itemSuggest(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Delete",
+                        contentDescription = stringResource(R.string.delete),
                         modifier = Modifier.size(16.dp),
                     )
                 }

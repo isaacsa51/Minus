@@ -67,7 +67,7 @@ fun MiddlePeriodHeader(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.History,
-                    contentDescription = "Past Periods",
+                    contentDescription = stringResource(R.string.past_periods_title),
                     modifier = Modifier.size(24.dp)
                 )
             }

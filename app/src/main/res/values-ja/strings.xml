@@ -37,6 +37,7 @@
     <string name="undo">元に戻す</string>
     <string name="back">戻る</string>
     <string name="next">次へ</string>
+    <string name="navigate">ナビゲート</string>
     <string name="period">期間</string>
     <string name="previous_values">前の値</string>
     <string name="budget">予算</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">クレジット費用を追跡するには、請求のカットオフ日(1-31)を設定します。</string>
     <string name="credit_cutoff_dialog_label">カットオフ日</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">テンキーの動作</string>
     <string name="period_finished">生理が終了しました</string>
     <string name="remaining_budget">残りの予算</string>
     <string name="rollover_question">残りのお金で何をしたいですか。</string>
@@ -579,4 +581,17 @@
     <string name="no_name_income">名称未設定の収入</string>
     <string name="rollover_preview_split_equally">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算期間の各日に割り当てられます。</string>
     <string name="rollover_preview_add_to_first_day">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算の初日に繰り越されます。</string>
+    <string name="delete_category">カテゴリを削除</string>
+    <string name="budget_graph_view_mode_cumulative">トレンド</string>
+    <string name="budget_graph_view_mode_categories">カテゴリ</string>
+    <string name="settings_widgets_pin_not_supported">お使いのデバイスはこの方法でのウィジェット追加に対応していません。ホーム画面を長押ししてMinusを探してください。</string>
+    <string name="widget_complete_budget_title">完全な予算</string>
+    <string name="widget_average_spend_title">平均支出</string>
+    <string name="widget_days_countdown_title">日数のカウントダウン</string>
+    <string name="widget_expense_title">支出の概要</string>
+    <string name="widget_heatmap_title">支出ヒートマップ</string>
+    <string name="widget_min_max_spent_title">最小/最大支出</string>
+    <string name="widget_month_heatmap_title">月間ヒートマップ</string>
+    <string name="widget_complete_budget_description">支出、総予算、残り日数を追跡 — 新しい支出をすぐに追加可能</string>
+    <string name="expand_numpad">テンキーを展開</string>
 </resources>

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CreditCard
-import com.serranoie.app.minus.presentation.LocalWindowInsets
 import androidx.compose.material3.ElevatedToggleButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -26,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -34,19 +34,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.util.handleHardwareNumpadKeyEvent
+import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalculation
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.runtime.LaunchedEffect
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
@@ -59,6 +60,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorStat
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
+import com.serranoie.app.minus.presentation.util.handleHardwareNumpadKeyEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -171,8 +173,10 @@ fun TransactionEditScreen(
                 handleHardwareNumpadKeyEvent(keyEvent) { intent ->
                     when (intent) {
                         is BudgetNumpadIntent.NumberTapped -> {
-                            editedAmount = if (editedAmount == "0") intent.digit else editedAmount + intent.digit
+                            editedAmount =
+                                if (editedAmount == "0") intent.digit else editedAmount + intent.digit
                         }
+
                         BudgetNumpadIntent.DotTapped -> {
                             val lastChar = editedAmount.lastOrNull()
                             if (editedAmount.isEmpty() || (lastChar != null && lastChar in "+-×÷")) {
@@ -185,26 +189,41 @@ fun TransactionEditScreen(
                                 }
                             }
                         }
+
                         BudgetNumpadIntent.BackspaceTapped -> {
                             editedAmount = editedAmount.dropLast(1).ifEmpty { "0" }
                         }
+
                         BudgetNumpadIntent.ResetInputTapped -> {
                             editedAmount = "0"
                         }
+
                         is BudgetNumpadIntent.OperatorTapped -> {
                             val lastChar = editedAmount.lastOrNull()
                             if (editedAmount.isNotEmpty() && lastChar != null && lastChar !in "+-×÷" && lastChar != '.') {
                                 editedAmount += intent.operator.toString()
                             }
                         }
+
                         BudgetNumpadIntent.EqualsTapped -> {
                             val result = evaluateCalculation(editedAmount)
                             if (result != null) editedAmount = result
                         }
+
                         BudgetNumpadIntent.ApplyTapped -> {
                             val newAmount = editedAmount.toBigDecimalOrNull() ?: transaction.amount
-                            onSave(newAmount, editedComment, editedDate.atTime(editedTime), isRecurrent, if (isRecurrent) selectedFrequency else null, if (isRecurrent) recurrentEndDate else null, if (isRecurrent && selectedFrequency == RecurrentFrequency.MONTHLY) subscriptionDay else null, isCredit)
+                            onSave(
+                                newAmount,
+                                editedComment,
+                                editedDate.atTime(editedTime),
+                                isRecurrent,
+                                if (isRecurrent) selectedFrequency else null,
+                                if (isRecurrent) recurrentEndDate else null,
+                                if (isRecurrent && selectedFrequency == RecurrentFrequency.MONTHLY) subscriptionDay else null,
+                                isCredit
+                            )
                         }
+
                         else -> {}
                     }
                 }
@@ -262,7 +281,7 @@ fun TransactionEditScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.CreditCard,
-                        contentDescription = "Credit card payment"
+                        contentDescription = stringResource(R.string.settings_feature_credit_toggle_title)
                     )
                 }
             }

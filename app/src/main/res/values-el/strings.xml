@@ -37,6 +37,7 @@
     <string name="undo">ΑΝΑΙΡΕΣΗ</string>
     <string name="back">Πίσω</string>
     <string name="next">Επόμενο</string>
+    <string name="navigate">Πλοήγηση</string>
     <string name="period">Περίοδος</string>
     <string name="previous_values">Προηγούμενες τιμές</string>
     <string name="budget">Προϋπολογισμός</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">Για την παρακολούθηση των πιστωτικών εξόδων, ορίστε την ημέρα περικοπής χρέωσης (1-31).</string>
     <string name="credit_cutoff_dialog_label">Ημέρα αποκοπής</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">Ενέργεια αριθμητικού πληκτρολογίου</string>
     <string name="period_finished">Η περίοδος ολοκληρώθηκε</string>
     <string name="remaining_budget">Υπόλοιπο προϋπολογισμό</string>
     <string name="rollover_question">Τι θέλετε να κάνετε με τα υπόλοιπα χρήματα?</string>
@@ -579,4 +581,17 @@
     <string name="no_name_income">Μη κατονομασμένο εισόδημα</string>
     <string name="rollover_preview_split_equally">Σας έχουν μείνει %1$s αχρησιμοποίητα. Όταν λήξει αυτή η περίοδος, θα κατανεμηθεί σε κάθε ημέρα του επόμενου προϋπολογισμού σας.</string>
     <string name="rollover_preview_add_to_first_day">Σας έχουν μείνει %1$s αχρησιμοποίητα. Όταν λήξει αυτή η περίοδος, θα προστεθεί στην πρώτη ημέρα του επόμενου προϋπολογισμού σας.</string>
+    <string name="expand_numpad">Ανάπτυξη αριθμητικού πληκτρολογίου</string>
+    <string name="delete_category">Διαγραφή κατηγορίας</string>
+    <string name="budget_graph_view_mode_cumulative">Τάση</string>
+    <string name="budget_graph_view_mode_categories">Κατηγορίες</string>
+    <string name="settings_widgets_pin_not_supported">Η συσκευή σας δεν υποστηρίζει την προσθήκη γραφικών στοιχείων με αυτόν τον τρόπο. Πατήστε παρατεταμένα στην αρχική οθόνη σας και αναζητήστε το Minus.</string>
+    <string name="widget_complete_budget_title">Πλήρης προϋπολογισμός</string>
+    <string name="widget_average_spend_title">Μέση δαπάνη</string>
+    <string name="widget_days_countdown_title">Αντίστροφη μέτρηση ημερών</string>
+    <string name="widget_expense_title">Σύνοψη εξόδων</string>
+    <string name="widget_heatmap_title">Χάρτης θερμότητας δαπανών</string>
+    <string name="widget_min_max_spent_title">Ελάχιστα/Μέγιστα δαπανηθέντα</string>
+    <string name="widget_month_heatmap_title">Μηνιαίος χάρτης θερμότητας</string>
+    <string name="widget_complete_budget_description">Παρακολουθήστε τις δαπάνες, το συνολικό προϋπολογισμό και τις ημέρες που απομένουν — με γρήγορη προσθήκη για νέα έξοδα</string>
 </resources>

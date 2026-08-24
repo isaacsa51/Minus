@@ -37,6 +37,7 @@
     <string name="undo">ANNULER</string>
     <string name="back">Retour</string>
     <string name="next">Suivant</string>
+    <string name="navigate">Naviguer</string>
     <string name="period">Période</string>
     <string name="previous_values">Valeurs précédentes</string>
     <string name="budget">Budget</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">Pour suivre les dépenses à crédit, définissez le jour de clôture de facturation (1-31).</string>
     <string name="credit_cutoff_dialog_label">Jour de clôture</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">Action du pavé numérique</string>
     <string name="period_finished">Période terminée</string>
     <string name="remaining_budget">Budget restant</string>
     <string name="rollover_question">Que voulez-vous faire de l\'argent restant ?</string>
@@ -130,6 +132,7 @@
     <string name="history_snackbar_mark_paid_failed">Impossible de marquer la transaction comme payée</string>
     <string name="add_new_category">Catégorie</string>
     <string name="add_new_category_action">Ajouter une nouvelle catégorie</string>
+    <string name="delete_category">Supprimer la catégorie</string>
     <string name="budget_validation_major_zero">Le budget doit être supérieur à 0</string>
     <string name="budget_no_date_defined">Aucune date de fin définie</string>
     <string name="budget_no_days_defined">Aucun jour défini</string>
@@ -567,6 +570,7 @@
     <string name="budget_graph_header_spending">Dépenses</string>
     <string name="budget_graph_legend_current">Actuel</string>
     <string name="budget_graph_legend_previous">Précédent</string>
+    <string name="budget_graph_view_mode_categories">Catégories</string>
     <string name="budget_graph_nav_prev">Précédent</string>
     <string name="budget_graph_nav_next">Suivant</string>
     <string name="graph_granularity_days">Jours</string>
@@ -579,4 +583,15 @@
     <string name="budget_pill_calc_added">%1$s sera ajouté</string>
     <string name="budget_pill_calc_subtracted">%1$s sera soustrait</string>
     <string name="no_name_income">Revenu sans nom</string>
+    <string name="expand_numpad">Développer le pavé numérique</string>
+    <string name="settings_widgets_pin_not_supported">Votre appareil ne prend pas en charge l\'ajout de widgets de cette manière. Appuyez de manière prolongée sur votre écran d\'accueil et recherchez plutôt l\'option « Moins ».</string>
+    <string name="widget_complete_budget_title">Budget complet</string>
+    <string name="widget_average_spend_title">Dépense moyenne</string>
+    <string name="widget_days_countdown_title">Compte à rebours en jours</string>
+    <string name="widget_expense_title">Récapitulatif des dépenses</string>
+    <string name="widget_heatmap_title">Carte thermique des dépenses</string>
+    <string name="widget_min_max_spent_title">Dépenses min/max</string>
+    <string name="widget_month_heatmap_title">Carte thermique mensuelle</string>
+    <string name="widget_complete_budget_description">Suivez vos dépenses, le budget total et les jours restants — avec une fonction d\'ajout rapide pour une nouvelle dépense.</string>
+    <string name="budget_graph_view_mode_cumulative">Tendance</string>
 </resources>

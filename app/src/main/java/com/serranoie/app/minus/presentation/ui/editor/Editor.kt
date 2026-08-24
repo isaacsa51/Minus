@@ -413,7 +413,7 @@ fun Editor(
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.BarChart,
-                                    contentDescription = "Analytics",
+                                    contentDescription = stringResource(R.string.analytics_title),
                                     tint = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.size(28.dp),
                                 )
@@ -441,7 +441,7 @@ fun Editor(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Settings,
-                                        contentDescription = "Settings",
+                                        contentDescription = stringResource(R.string.settings_title),
                                         tint = MaterialTheme.colorScheme.onSurface,
                                         modifier = Modifier.size(28.dp),
                                     )

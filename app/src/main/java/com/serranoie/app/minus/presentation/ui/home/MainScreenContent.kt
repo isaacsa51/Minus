@@ -76,6 +76,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Density
@@ -84,6 +85,7 @@ import androidx.compose.ui.zIndex
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.SwipeableState
 import androidx.wear.compose.material.rememberSwipeableState
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -440,8 +442,13 @@ private fun MainNavigationRail(
             modifier = analyticsItemModifier,
             selected = false,
             onClick = onNavigateToAnalytics,
-            icon = { Icon(Icons.Rounded.BarChart, contentDescription = "Analytics") },
-            label = { Text("Analytics") },
+            icon = {
+                Icon(
+                    Icons.Rounded.BarChart,
+                    contentDescription = stringResource(R.string.settings_title)
+                )
+            },
+            label = { Text(stringResource(R.string.settings_title)) },
         )
         NavigationRailItem(
             modifier = itemModifier,
@@ -452,10 +459,13 @@ private fun MainNavigationRail(
                 BadgedBox(
                     badge = { if (isCensored) Badge() },
                 ) {
-                    Icon(Icons.Rounded.Settings, contentDescription = "Settings")
+                    Icon(
+                        Icons.Rounded.Settings,
+                        contentDescription = stringResource(R.string.settings_title)
+                    )
                 }
             },
-            label = { Text("Settings") },
+            label = { Text(text = stringResource(R.string.settings_title)) },
         )
         Spacer(Modifier.weight(1f))
     }
@@ -843,7 +853,7 @@ private fun PhoneLayout(
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.ExpandLess,
-                            contentDescription = "Expand Numpad",
+                            contentDescription = stringResource(R.string.expand_numpad),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.size(24.dp)
                         )
@@ -908,7 +918,7 @@ private fun PhoneLayout(
                                     .coerceAtMost(0f)
                             val computed =
                                 topSheetState.offset.value.coerceIn(halfExpanedOffsetPxLocal, 0f) +
-                                    contentHeight - navBarHeightPx - statusOffsetPx
+                                        contentHeight - navBarHeightPx - statusOffsetPx
                             minOf(computed, editorHeightAnimatedState.value)
                         }
                     },
@@ -1038,7 +1048,8 @@ private fun TabletLayout(
             .coerceAtMost(contentHeight / 2.5f)
     val rowHeightPx = defaultInternalKeyboardHeightBase / 4
     val defaultInternalKeyboardHeight = rowHeightPx * 4
-    val calcModeKeyboardHeight = if (hasHardKeyboard) defaultInternalKeyboardHeight else rowHeightPx * 5
+    val calcModeKeyboardHeight =
+        if (hasHardKeyboard) defaultInternalKeyboardHeight else rowHeightPx * 5
 
     var localDragProgress by remember { mutableFloatStateOf(0f) }
 

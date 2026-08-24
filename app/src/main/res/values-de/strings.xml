@@ -37,6 +37,7 @@
     <string name="undo">Rückgängig</string>
     <string name="back">Zurück</string>
     <string name="next">Weiter</string>
+    <string name="navigate">Navigieren</string>
     <string name="period">Zeitraum</string>
     <string name="previous_values">Vorherige Werte</string>
     <string name="budget">Budget</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">Um die Kreditkosten zu verfolgen, setze den Tag der Abrechnung (1-31).</string>
     <string name="credit_cutoff_dialog_label">Ausschnitt Tag</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">Aktion über den Ziffernblock</string>
     <string name="period_finished">Zeitraum beendet</string>
     <string name="remaining_budget">Verbleibendes Budget</string>
     <string name="rollover_question">Was möchtest du mit dem verbleibenden Geld tun?</string>
@@ -130,6 +132,7 @@
     <string name="history_snackbar_mark_paid_failed">Transaktion konnte nicht als bezahlt markiert werden</string>
     <string name="add_new_category">Kategorie</string>
     <string name="add_new_category_action">Füge neue Kategorie hinzu</string>
+    <string name="delete_category">Kategorie löschen</string>
     <string name="budget_validation_major_zero">Budget must be greater than 0</string>
     <string name="budget_no_date_defined">No end date defined</string>
     <string name="budget_no_days_defined">No days defined</string>
@@ -569,6 +572,7 @@
     <string name="budget_graph_header_spending">Spending</string>
     <string name="budget_graph_legend_current">Current</string>
     <string name="budget_graph_legend_previous">Previous</string>
+    <string name="budget_graph_view_mode_categories">Kategorien</string>
     <string name="budget_graph_nav_prev">Previous</string>
     <string name="budget_graph_nav_next">Weiter</string>
     <string name="graph_granularity_days">Days</string>
@@ -579,4 +583,15 @@
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
     <string name="budget_pill_calc_added">%1$s wird hinzugefügt</string>
+    <string name="expand_numpad">Ziffernblock erweitern</string>
+    <string name="settings_widgets_pin_not_supported">Ihr Gerät unterstützt das Hinzufügen von Widgets auf diese Weise nicht. Halten Sie stattdessen den Startbildschirm gedrückt und suchen Sie nach dem Minus-Symbol.</string>
+    <string name="widget_complete_budget_title">Gesamtbudget</string>
+    <string name="widget_average_spend_title">Durchschnittliche Ausgaben</string>
+    <string name="widget_days_countdown_title">Countdown in Tagen</string>
+    <string name="widget_expense_title">Ausgabenübersicht</string>
+    <string name="widget_heatmap_title">Ausgaben-Heatmap</string>
+    <string name="widget_min_max_spent_title">Min/Max Ausgaben</string>
+    <string name="widget_month_heatmap_title">Monats-Heatmap</string>
+    <string name="widget_complete_budget_description">Behalten Sie Ausgaben, Gesamtbudget und verbleibende Tage im Blick – mit Schnellfunktion zum Hinzufügen neuer Ausgaben.</string>
+    <string name="budget_graph_view_mode_cumulative">Tendenz</string>
 </resources>

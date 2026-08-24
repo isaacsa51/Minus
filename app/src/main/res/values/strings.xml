@@ -39,6 +39,7 @@
     <string name="undo">UNDO</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
+    <string name="navigate">Navigate</string>
     <string name="period">Period</string>
     <string name="previous_values">Previous values</string>
     <string name="budget">Budget</string>
@@ -60,6 +61,8 @@
     <string name="credit_cutoff_dialog_title">Credit card cutoff date</string>
     <string name="credit_cutoff_dialog_message">To track credit expenses, set the billing cutoff day (1-31).</string>
     <string name="credit_cutoff_dialog_label">Cutoff day</string>
+    <string name="expand_numpad">Expand numpad</string>
+    <string name="numpad_action">Numpad action</string>
 
     <!-- Rollover Dialog -->
     <string name="period_finished">Period finished</string>
@@ -138,6 +141,7 @@
 
     <string name="add_new_category">Category</string>
     <string name="add_new_category_action">Add New Category</string>
+    <string name="delete_category">Delete Category</string>
 
     <string name="budget_validation_major_zero">Budget must be greater than 0</string>
     <string name="budget_no_date_defined">No end date defined</string>

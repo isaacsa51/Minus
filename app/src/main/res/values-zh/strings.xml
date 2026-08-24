@@ -37,6 +37,7 @@
     <string name="undo">撤销</string>
     <string name="back">返回</string>
     <string name="next">继续</string>
+    <string name="navigate">导航</string>
     <string name="period">周期</string>
     <string name="previous_values">先前值</string>
     <string name="budget">预算</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">设置账单日（1-31）来追踪信用卡支出。</string>
     <string name="credit_cutoff_dialog_label">账单日</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">数字小键盘操作</string>
     <string name="period_finished">已完成周期</string>
     <string name="remaining_budget">剩余的预算</string>
     <string name="rollover_question">剩余的钱你想如何规划？</string>
@@ -97,6 +99,7 @@
     <string name="finalize_period">提前结束预算周期</string>
     <string name="finalize_period_confirm">这将关闭当前周期并开始一个新周期。你确定吗？</string>
     <string name="finalize_action">确定</string>
+    <string name="rollover_preview_ask_always">您还有 %1$s 未使用。本期结束后，系统会询问您如何处理这笔余额。</string>
     <string name="no_ending_date">没有结束日期</string>
     <string name="budget_split_logic">你想如何拆分预算？</string>
     <string name="new_budget_period">新的预算周期</string>
@@ -126,6 +129,7 @@
     <string name="history_snackbar_mark_paid_failed">无法将交易标记为已付款</string>
     <string name="add_new_category">类别</string>
     <string name="add_new_category_action">添加新类别</string>
+    <string name="delete_category">删除分类</string>
     <string name="budget_validation_major_zero">预算必须比 0 多</string>
     <string name="budget_no_date_defined">未设定结束日期</string>
     <string name="budget_no_days_defined">未设定天数</string>
@@ -251,6 +255,7 @@
     <string name="settings_widgets_subtitle">探索可添加到主屏幕的小组件</string>
     <string name="settings_typography_title">排版</string>
     <string name="settings_typography_subtitle">更改应用的排版风格</string>
+    <string name="settings_rounded_font_title">圆体字形</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">基于壁纸颜色的动态应用主题</string>
     <string name="settings_censor_mode_title">隐私模式</string>
@@ -335,6 +340,7 @@
     <string name="bug_report_upload_assets">上传素材</string>
     <string name="bug_report_upload_assets_subtitle">截图或视频（最多 10MB）</string>
     <string name="bug_report_upload_assets_selected_count">已选择 %1$d 个附件</string>
+    <string name="bug_report_remove_attachment">移除附件</string>
     <string name="settings_backup_title">备份数据</string>
     <string name="settings_backup_subtitle">备份数据至 minus_export.csv</string>
     <string name="settings_import_csv_title">导入 CSV</string>
@@ -361,6 +367,7 @@
     <string name="budget_pill_over_budget">已超出預算金額</string>
     <string name="budget_pill_no_budget">没有预算</string>
     <string name="budget_pill_no_budget_action">设置预算</string>
+    <string name="budget_pill_calc_subtracted">将扣除 %1$s</string>
     <string name="budget_pill_exhausted_daily_label">每天</string>
     <string name="budget_pill_exhausted_weekly_label">每周</string>
     <string name="budget_pill_exhausted_biweekly_label">每半个月</string>
@@ -485,6 +492,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">没有日期</string>
     <string name="no_name">没有名称</string>
+    <string name="no_name_income">未具名收入</string>
     <string name="description">购买原因</string>
     <string name="date">日期</string>
     <string name="frequency">频率</string>
@@ -559,6 +567,7 @@
     <string name="budget_graph_header_spending">Spending</string>
     <string name="budget_graph_legend_current">Current</string>
     <string name="budget_graph_legend_previous">Previous</string>
+    <string name="budget_graph_view_mode_categories">分类</string>
     <string name="budget_graph_nav_prev">Previous</string>
     <string name="budget_graph_nav_next">Next</string>
     <string name="graph_granularity_days">Days</string>
@@ -568,4 +577,18 @@
     <string name="graph_granularity_total">Total</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
+    <string name="expand_numpad">展开数字小键盘</string>
+    <string name="rollover_preview_split_equally">您还有 %1$s 未使用。本周期结束后，这笔金额将分摊到您下一个预算周期的每一天。</string>
+    <string name="rollover_preview_add_to_first_day">您还有 %1$s 未使用。本周期结束后，这笔金额将计入您下一个预算周期的首日。</string>
+    <string name="settings_widgets_pin_not_supported">您的设备不支持通过这种方式添加小组件。请改为长按主屏幕，然后查找“减号”图标。</string>
+    <string name="widget_complete_budget_title">完整预算</string>
+    <string name="widget_average_spend_title">平均消费额</string>
+    <string name="widget_days_countdown_title">天数倒计时</string>
+    <string name="widget_expense_title">费用汇总</string>
+    <string name="widget_heatmap_title">支出热力图</string>
+    <string name="widget_min_max_spent_title">最低/最高消费额</string>
+    <string name="widget_month_heatmap_title">月份热力图</string>
+    <string name="widget_complete_budget_description">追踪支出、总预算及剩余天数——支持快速添加新支出</string>
+    <string name="budget_pill_calc_added">将添加 %1$s</string>
+    <string name="budget_graph_view_mode_cumulative">趋势</string>
 </resources>

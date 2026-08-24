@@ -37,6 +37,7 @@
     <string name="undo">DESHACER</string>
     <string name="back">Atrás</string>
     <string name="next">Próximo</string>
+    <string name="navigate">Navegar</string>
     <string name="period">Período</string>
     <string name="previous_values">Valores anteriores</string>
     <string name="budget">Presupuesto</string>
@@ -59,6 +60,7 @@
     <string name="credit_cutoff_dialog_message">Para rastrear gastos a crédito, define el día de corte (1–31).</string>
     <string name="credit_cutoff_dialog_label">Día de corte</string>
     <!-- Rollover Dialog -->
+    <string name="numpad_action">Acción del teclado numérico</string>
     <string name="period_finished">Periodo terminado</string>
     <string name="remaining_budget">Presupuesto restante</string>
     <string name="rollover_question">¿Qué quieres hacer con el dinero restante?</string>
@@ -579,4 +581,17 @@
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
     <string name="budget_pill_calc_added">%1$s será añadido</string>
+    <string name="expand_numpad">Expandir teclado númerico</string>
+    <string name="delete_category">Borrar categoría</string>
+    <string name="budget_graph_view_mode_cumulative">Tendencia</string>
+    <string name="budget_graph_view_mode_categories">Categorías</string>
+    <string name="settings_widgets_pin_not_supported">Tu dispositivo no admite la adición de widgets de esta manera. Mantén presionada la pantalla de inicio y busca Menos en su lugar.</string>
+    <string name="widget_complete_budget_title">Presupuesto completo</string>
+    <string name="widget_average_spend_title">Gasto promedio</string>
+    <string name="widget_days_countdown_title">Cuenta regresiva de días</string>
+    <string name="widget_expense_title">Resumen de gastos</string>
+    <string name="widget_heatmap_title">Mapa de calor de gastos</string>
+    <string name="widget_min_max_spent_title">Gasto mín/máx</string>
+    <string name="widget_month_heatmap_title">Mapa de calor mensual</string>
+    <string name="widget_complete_budget_description">Rastrea gastos, presupuesto total y días restantes — con adición rápida para un nuevo gasto</string>
 </resources>
