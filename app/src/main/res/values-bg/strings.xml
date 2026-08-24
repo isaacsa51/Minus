@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Минус</string>
-    <string name="tile_new_transaction_label">Нова транзакция</string>
     <string name="tutorial_numpad_title">Цифрова клавиатура</string>
     <string name="tutorial_numpad_description">Въведете похарчената сума и докоснете зелената отметка, за да запазите. Плъзнете нагоре върху цифровата клавиатура, за да пресметнете.</string>
     <string name="tutorial_comment_title">Добави категория</string>
@@ -59,8 +58,9 @@
     <string name="credit_cutoff_dialog_title">Краен срок за кредитната карта</string>
     <string name="credit_cutoff_dialog_message">За да проследявате разходите по кредитната карта, задайте деня на падеж (1–31).</string>
     <string name="credit_cutoff_dialog_label">Ден на падеж</string>
-    <!-- Rollover Dialog -->
+    <string name="expand_numpad">Разгъване на цифровата клавиатура</string>
     <string name="numpad_action">Действие с цифровия блок на клавиатурата</string>
+    <!-- Rollover Dialog -->
     <string name="period_finished">Периодът приключи</string>
     <string name="remaining_budget">Оставащ бюджет</string>
     <string name="rollover_question">Какво искаш да направиш с оставащите пари?</string>
@@ -152,7 +152,17 @@
     <string name="maximum_spent">Максимално изразходвано</string>
     <string name="average_spent">Средно изразходвано на ден</string>
     <string name="days_remaining_label">Оставащи\nдни</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Изтриване на категория</string>
+    <string name="widget_complete_budget_title">Пълен бюджет</string>
+    <string name="widget_average_spend_title">Среден разход</string>
+    <string name="widget_days_countdown_title">Обратно броене на дните</string>
+    <string name="widget_expense_title">Обобщение на разходите</string>
+    <string name="widget_heatmap_title">Топлинна карта на разходите</string>
+    <string name="widget_min_max_spent_title">Мин./Макс. разходи</string>
+    <string name="widget_month_heatmap_title">Месечна топлинна карта</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Проследявайте разходите, общия бюджет и оставащите дни — с бързо добавяне за нов разход</string>
     <string name="widget_budget_overview_description">Бърз преглед на изразходвания и оставащия бюджет</string>
     <string name="widget_days_countdown_description">Обратно броене на оставащите дни от бюджетния период</string>
     <string name="widget_budget_detail_description">Пълен преглед на бюджета с основната категория и оставащите дни</string>
@@ -161,6 +171,8 @@
     <string name="widget_add_expense_description">Бърз пряк път за добавяне на нов разход</string>
     <string name="widget_add_expense_label">Добавяне на нов разход</string>
     <string name="widget_add_expense_compact_label">Добави разход</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Нова транзакция</string>
     <!-- Widget Labels -->
     <string name="spent">Изразходвано</string>
     <string name="left">Остатък</string>
@@ -260,6 +272,7 @@
     <string name="settings_widgets_subtitle">Разгледайте джаджите за началния екран</string>
     <string name="settings_typography_title">Типография</string>
     <string name="settings_typography_subtitle">Промяна на шрифтовия стил</string>
+    <string name="settings_rounded_font_title">Закръглен шрифт</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Използване на цветовете от тапета за динамична тема</string>
     <string name="settings_censor_mode_title">Режим за поверителност</string>
@@ -371,6 +384,8 @@
     <string name="budget_pill_over_budget">Бюджетната сума е надвишена</string>
     <string name="budget_pill_no_budget">Няма бюджет</string>
     <string name="budget_pill_no_budget_action">Настройте бюджета си</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">Дневно</string>
     <string name="budget_pill_exhausted_weekly_label">Седмично</string>
     <string name="budget_pill_exhausted_biweekly_label">Двуседмично</string>
@@ -495,6 +510,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Без дата</string>
     <string name="no_name">Няма име</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">Причина за покупката</string>
     <string name="date">Дата</string>
     <string name="frequency">Честота</string>
@@ -569,6 +585,7 @@
     <string name="budget_graph_header_spending">Харчене</string>
     <string name="budget_graph_legend_current">Текущ</string>
     <string name="budget_graph_legend_previous">Предишен</string>
+    <string name="budget_graph_view_mode_cumulative">Тенденция</string>
     <string name="budget_graph_view_mode_categories">Категории</string>
     <string name="budget_graph_nav_prev">Предишен</string>
     <string name="budget_graph_nav_next">Напред</string>
@@ -579,19 +596,4 @@
     <string name="graph_granularity_total">Общо</string>
     <string name="unit_thousands">Х</string>
     <string name="unit_millions">М</string>
-    <string name="budget_pill_calc_added">%1$s ще бъдат добавени</string>
-    <string name="budget_pill_calc_subtracted">%1$s ще бъдат извадени</string>
-    <string name="no_name_income">Неназован доход</string>
-    <string name="settings_rounded_font_title">Закръглен шрифт</string>
-    <string name="expand_numpad">Разгъване на цифровата клавиатура</string>
-    <string name="settings_widgets_pin_not_supported">Изтриване на категория</string>
-    <string name="widget_complete_budget_title">Пълен бюджет</string>
-    <string name="widget_average_spend_title">Среден разход</string>
-    <string name="widget_days_countdown_title">Обратно броене на дните</string>
-    <string name="widget_expense_title">Обобщение на разходите</string>
-    <string name="widget_heatmap_title">Топлинна карта на разходите</string>
-    <string name="widget_min_max_spent_title">Мин./Макс. разходи</string>
-    <string name="widget_month_heatmap_title">Месечна топлинна карта</string>
-    <string name="widget_complete_budget_description">Проследявайте разходите, общия бюджет и оставащите дни — с бързо добавяне за нов разход</string>
-    <string name="budget_graph_view_mode_cumulative">Тенденция</string>
 </resources>
