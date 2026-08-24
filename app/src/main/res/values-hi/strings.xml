@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
-    <string name="tile_new_transaction_label">नया लेन-देन</string>
     <string name="tutorial_numpad_title">नंपैड</string>
     <string name="tutorial_numpad_description">अपनी खर्च की गई रकम डालें और सेव करने के लिए हरे रंग के चेक मार्क पर टैप करें। कैलकुलेट करने के लिए नंपैड पर ऊपर की ओर स्वाइप करें।</string>
     <string name="tutorial_comment_title">कैटेगरी जोड़ें</string>
@@ -59,8 +58,9 @@
     <string name="credit_cutoff_dialog_title">क्रेडिट कार्ड कट-ऑफ़ तारीख</string>
     <string name="credit_cutoff_dialog_message">क्रेडिट खर्चों को ट्रैक करने के लिए, बिलिंग कट-ऑफ़ का दिन (1-31) सेट करें।</string>
     <string name="credit_cutoff_dialog_label">कट-ऑफ़ का दिन</string>
-    <!-- Rollover Dialog -->
+    <string name="expand_numpad">नंपैड को बड़ा करें</string>
     <string name="numpad_action">नंपैड एक्शन</string>
+    <!-- Rollover Dialog -->
     <string name="period_finished">पीरियड खत्म हो गया</string>
     <string name="remaining_budget">बचा हुआ बजट</string>
     <string name="rollover_question">आप बचे हुए पैसे का क्या करना चाहते हैं?</string>
@@ -100,6 +100,8 @@
     <string name="finalize_period">बजट की अवधि जल्दी पूरी करें</string>
     <string name="finalize_period_confirm">इससे मौजूदा अवधि बंद हो जाएगी और नई अवधि शुरू होगी। क्या आप पक्का करना चाहते हैं?</string>
     <string name="finalize_action">पूरा करें</string>
+    <string name="rollover_preview_split_equally">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म हो जाएगी, तो यह रकम आपके अगले बजट के हर दिन में बांट दी जाएगी।</string>
+    <string name="rollover_preview_add_to_first_day">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म हो जाएगी, तो यह रकम आपके अगले बजट के पहले दिन में जोड़ दी जाएगी।</string>
     <string name="rollover_preview_ask_always">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म होगी, तो आपसे पूछा जाएगा कि इनका क्या करना है।</string>
     <string name="no_ending_date">कोई समाप्ति तिथि नहीं</string>
     <string name="budget_split_logic">आप बजट को कैसे बांटना चाहते हैं?</string>
@@ -130,6 +132,7 @@
     <string name="history_snackbar_mark_paid_failed">लेन-देन को भुगतान किया हुआ चिह्नित नहीं किया जा सका</string>
     <string name="add_new_category">कैटेगरी</string>
     <string name="add_new_category_action">नई कैटेगरी जोड़ें</string>
+    <string name="delete_category">कैटेगरी मिटाएं</string>
     <string name="budget_validation_major_zero">बजट 0 से ज़्यादा होना चाहिए</string>
     <string name="budget_no_date_defined">कोई समाप्ति तिथि तय नहीं है</string>
     <string name="budget_no_days_defined">कोई दिन तय नहीं हैं</string>
@@ -149,7 +152,17 @@
     <string name="maximum_spent">अधिकतम खर्च</string>
     <string name="average_spent">रोज़ाना का औसत खर्च</string>
     <string name="days_remaining_label">बाकी दिन</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">आपका डिवाइस इस तरह से विजेट जोड़ने का समर्थन नहीं करता है। अपनी होम स्क्रीन को देर तक दबाएं और इसके बजाय Minus खोजें।</string>
+    <string name="widget_complete_budget_title">पूरा बजट</string>
+    <string name="widget_average_spend_title">औसत खर्च</string>
+    <string name="widget_days_countdown_title">दिनों का काउंटडाउन</string>
+    <string name="widget_expense_title">खर्च का सारांश</string>
+    <string name="widget_heatmap_title">खर्च का हीटमैप</string>
+    <string name="widget_min_max_spent_title">न्यूनतम/अधिकतम खर्च</string>
+    <string name="widget_month_heatmap_title">महीने का हीटमैप</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">खर्च, कुल बजट और बचे हुए दिनों को ट्रैक करें — नए खर्च के लिए क्विक-एड के साथ</string>
     <string name="widget_budget_overview_description">खर्च किए गए और बचे हुए बजट को एक नज़र में देखें</string>
     <string name="widget_days_countdown_description">बजट की अवधि में बचे हुए दिनों का काउंटडाउन</string>
     <string name="widget_budget_detail_description">टॉप कैटेगरी और बचे हुए दिनों के साथ बजट की पूरी जानकारी</string>
@@ -158,6 +171,8 @@
     <string name="widget_add_expense_description">नया खर्च जोड़ने का आसान शॉर्टकट</string>
     <string name="widget_add_expense_label">नया खर्च जोड़ें</string>
     <string name="widget_add_expense_compact_label">खर्च जोड़ें</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">नया लेन-देन</string>
     <!-- Widget Labels -->
     <string name="spent">खर्च किया गया</string>
     <string name="left">बाकी</string>
@@ -257,6 +272,7 @@
     <string name="settings_widgets_subtitle">अपनी होम स्क्रीन पर उपयोग के लिए विजेट देखें</string>
     <string name="settings_typography_title">टाइपोग्राफी</string>
     <string name="settings_typography_subtitle">ऐप टाइपोग्राफी स्टाइल बदलें</string>
+    <string name="settings_rounded_font_title">गोल फ़ॉन्ट स्टाइल</string>
     <string name="settings_material_you_title">मटीरियल यू</string>
     <string name="settings_material_you_subtitle">डायनामिक ऐप थीम लागू करने के लिए वॉलपेपर के रंगों का इस्तेमाल करें</string>
     <string name="settings_censor_mode_title">प्राइवेसी मोड</string>
@@ -327,8 +343,8 @@
     <string name="bug_report_submit">रिपोर्ट सबमिट करें</string>
     <string name="bug_report_share_title">रिपोर्ट भेजें</string>
     <string name="bug_report_help_title">Minus को बेहतर बनाने में हमारी मदद करें</string>
-    <string name="bug_report_help_message_prefix">इश्यू की रिपोर्ट करने या सुधार का सुझाव देने से हमें Minus को सभी के लिए बेहतर बनाने में मदद मिलती है। यह गाइडेड फ़ॉर्म आपको सभी ज़रूरी जानकारी को एक रिपोर्ट में इकट्ठा करने में मदद करता है। यह हमारी जांच को तेज़ करने के लिए अपने-आप डिवाइस मेटाडेटा और ऐप डायग्नोस्टिक्स को भी जोड़ देता है। एक बार तैयार हो जाने पर, आप रिपोर्ट ईमेल से भेज सकते हैं या सीधे हमारी रिपॉज़िटरी में योगदान कर सकते हैं।</string>
-    <string name="bug_report_help_github_issues">GitHub इश्यू</string>
+    <string name="bug_report_help_message_prefix">"इश्यू की रिपोर्ट करने या सुधार का सुझाव देने से हमें Minus को सभी के लिए बेहतर बनाने में मदद मिलती है। यह गाइडेड फ़ॉर्म आपको सभी ज़रूरी जानकारी को एक रिपोर्ट में इकट्ठा करने में मदद करता है। यह हमारी जांच को तेज़ करने के लिए अपने-आप डिवाइस मेटाडेटा और ऐप डायग्नोस्टिक्स को भी जोड़ देता है। एक बार तैयार हो जाने पर, आप रिपोर्ट ईमेल से भेज सकते हैं या सीधे हमारी रिपॉज़िटरी में योगदान कर सकते हैं।"</string>
+    <string name="bug_report_help_github_issues">"GitHub इश्यू"</string>
     <string name="bug_report_help_message_suffix">सीधे हमारे रिपॉज़िटरी पर।</string>
     <string name="bug_report_steps_to_reproduce_label">दोहराने के चरण</string>
     <string name="bug_report_include_steps_label">समस्या को दोहराने के चरण शामिल करें</string>
@@ -368,6 +384,8 @@
     <string name="budget_pill_over_budget">बजट की सीमा से ज़्यादा रकम</string>
     <string name="budget_pill_no_budget">कोई बजट नहीं</string>
     <string name="budget_pill_no_budget_action">अपना बजट सेट करें</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">रोज़ाना</string>
     <string name="budget_pill_exhausted_weekly_label">हफ़्तेवार</string>
     <string name="budget_pill_exhausted_biweekly_label">हर दो हफ़्ते में</string>
@@ -492,6 +510,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">बिना तारीख के</string>
     <string name="no_name">कोई नाम नहीं</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">खरीदने का कारण</string>
     <string name="date">तारीख</string>
     <string name="frequency">आवृत्ति</string>
@@ -566,6 +585,8 @@
     <string name="budget_graph_header_spending">खर्च</string>
     <string name="budget_graph_legend_current">मौजूदा</string>
     <string name="budget_graph_legend_previous">पिछला</string>
+    <string name="budget_graph_view_mode_cumulative">ट्रेंड</string>
+    <string name="budget_graph_view_mode_categories">कैटेगरी</string>
     <string name="budget_graph_nav_prev">पिछला</string>
     <string name="budget_graph_nav_next">अगला</string>
     <string name="graph_granularity_days">दिन</string>
@@ -575,23 +596,4 @@
     <string name="graph_granularity_total">कुल</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
-    <string name="budget_pill_calc_added">%1$s जोड़ा जाएगा</string>
-    <string name="budget_pill_calc_subtracted">%1$s घटाया जाएगा</string>
-    <string name="no_name_income">बिना नाम वाली आय</string>
-    <string name="settings_rounded_font_title">गोल फ़ॉन्ट स्टाइल</string>
-    <string name="rollover_preview_split_equally">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म हो जाएगी, तो यह रकम आपके अगले बजट के हर दिन में बांट दी जाएगी।</string>
-    <string name="rollover_preview_add_to_first_day">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म हो जाएगी, तो यह रकम आपके अगले बजट के पहले दिन में जोड़ दी जाएगी।</string>
-    <string name="expand_numpad">नंपैड को बड़ा करें</string>
-    <string name="delete_category">कैटेगरी मिटाएं</string>
-    <string name="budget_graph_view_mode_cumulative">ट्रेंड</string>
-    <string name="budget_graph_view_mode_categories">कैटेगरी</string>
-    <string name="settings_widgets_pin_not_supported">आपका डिवाइस इस तरह से विजेट जोड़ने का समर्थन नहीं करता है। अपनी होम स्क्रीन को देर तक दबाएं और इसके बजाय Minus खोजें।</string>
-    <string name="widget_complete_budget_title">पूरा बजट</string>
-    <string name="widget_average_spend_title">औसत खर्च</string>
-    <string name="widget_days_countdown_title">दिनों का काउंटडाउन</string>
-    <string name="widget_expense_title">खर्च का सारांश</string>
-    <string name="widget_heatmap_title">खर्च का हीटमैप</string>
-    <string name="widget_min_max_spent_title">न्यूनतम/अधिकतम खर्च</string>
-    <string name="widget_month_heatmap_title">महीने का हीटमैप</string>
-    <string name="widget_complete_budget_description">खर्च, कुल बजट और बचे हुए दिनों को ट्रैक करें — नए खर्च के लिए क्विक-एड के साथ</string>
 </resources>
