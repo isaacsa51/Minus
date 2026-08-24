@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
-    <string name="tile_new_transaction_label">Nova transação</string>
     <string name="tutorial_numpad_title">Empada</string>
     <string name="tutorial_numpad_description">Digite a quantidade que gastou e toque na marca verde para salvar. Deslize para cima no empada para calcular.</string>
     <string name="tutorial_comment_title">Adicionar uma categoria</string>
@@ -59,8 +58,9 @@
     <string name="credit_cutoff_dialog_title">Data de corte no cartão de crédito</string>
     <string name="credit_cutoff_dialog_message">Para controlar as despesas de crédito, defina o dia do faturamento (1-31).</string>
     <string name="credit_cutoff_dialog_label">Cortar dia</string>
-    <!-- Rollover Dialog -->
+    <string name="expand_numpad">Expandir teclado numérico</string>
     <string name="numpad_action">Ação do teclado numérico</string>
+    <!-- Rollover Dialog -->
     <string name="period_finished">Período terminado</string>
     <string name="remaining_budget">Orçamento restante</string>
     <string name="rollover_question">O que você quer fazer com o dinheiro restante?</string>
@@ -132,6 +132,7 @@
     <string name="history_snackbar_mark_paid_failed">Não foi possível marcar a transação como paga</string>
     <string name="add_new_category">categoria</string>
     <string name="add_new_category_action">Adicionar Nova Categoria</string>
+    <string name="delete_category">Excluir categoria</string>
     <string name="budget_validation_major_zero">O orçamento deve ser maior que 0</string>
     <string name="budget_no_date_defined">Nenhuma data de término definida</string>
     <string name="budget_no_days_defined">Nenhum dia definido</string>
@@ -151,7 +152,17 @@
     <string name="maximum_spent">Máximo gasto</string>
     <string name="average_spent">Média por dia gasto</string>
     <string name="days_remaining_label">Dias\nrestantes</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Seu dispositivo não suporta a adição de widgets desta forma. Pressione e segure sua tela inicial e procure por Minus.</string>
+    <string name="widget_complete_budget_title">Orçamento completo</string>
+    <string name="widget_average_spend_title">Gasto médio</string>
+    <string name="widget_days_countdown_title">Contagem regressiva de dias</string>
+    <string name="widget_expense_title">Resumo de despesas</string>
+    <string name="widget_heatmap_title">Mapa de calor de gastos</string>
+    <string name="widget_min_max_spent_title">Gasto Mín/Máx</string>
+    <string name="widget_month_heatmap_title">Mapa de calor mensal</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Acompanhe gastos, orçamento total e dias restantes — com adição rápida para uma nova despesa</string>
     <string name="widget_budget_overview_description">Veja rapidamente os gastos e o orçamento restante</string>
     <string name="widget_days_countdown_description">Contagem regressiva de dias restantes no período orçamental</string>
     <string name="widget_budget_detail_description">Resumo do orçamento completo com categoria superior e dias restantes</string>
@@ -160,6 +171,8 @@
     <string name="widget_add_expense_description">Atalho rápido para adicionar uma nova despesa</string>
     <string name="widget_add_expense_label">Adicionar nova despesa</string>
     <string name="widget_add_expense_compact_label">Adicionar despesa</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Nova transação</string>
     <!-- Widget Labels -->
     <string name="spent">Gasto</string>
     <string name="left">Esquerda</string>
@@ -331,7 +344,7 @@
     <string name="bug_report_share_title">Enviar relatório</string>
     <string name="bug_report_help_title">Ajude-nos a melhorar o Menus</string>
     <string name="bug_report_help_message_prefix">"Relatar problemas ou sugerir melhorias nos ajuda a fazer o Menus melhor para todos.\n\nEste formulário guiado o ajuda a empacotar todos os detalhes necessários em um relatório anexando automaticamente metadados do dispositivo e diagnósticos de aplicativos para acelerar nossa investigação.\n\nUma vez preparado, você pode enviar o relatório por e-mail ou contribuir via "</string>
-    <string name="bug_report_help_github_issues">Issues do GitHub</string>
+    <string name="bug_report_help_github_issues">"Issues do GitHub"</string>
     <string name="bug_report_help_message_suffix"> diretamente em nosso repositório.</string>
     <string name="bug_report_steps_to_reproduce_label">Passos para reproduzir</string>
     <string name="bug_report_include_steps_label">Incluir etapas de reprodução</string>
@@ -371,6 +384,8 @@
     <string name="budget_pill_over_budget">Valor do orçamento excedido</string>
     <string name="budget_pill_no_budget">Nenhum orçamento</string>
     <string name="budget_pill_no_budget_action">Configurar seu orçamento</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">Diariamente</string>
     <string name="budget_pill_exhausted_weekly_label">Semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">Bienal</string>
@@ -495,6 +510,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">Sem data</string>
     <string name="no_name">Sem nome</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">Descrição:</string>
     <string name="date">Encontro</string>
     <string name="frequency">Frequência</string>
@@ -569,6 +585,8 @@
     <string name="budget_graph_header_spending">Gastos</string>
     <string name="budget_graph_legend_current">Atual</string>
     <string name="budget_graph_legend_previous">Anterior</string>
+    <string name="budget_graph_view_mode_cumulative">Tendência</string>
+    <string name="budget_graph_view_mode_categories">Categorias</string>
     <string name="budget_graph_nav_prev">Anterior</string>
     <string name="budget_graph_nav_next">Próximo</string>
     <string name="graph_granularity_days">Dias</string>
@@ -578,20 +596,4 @@
     <string name="graph_granularity_total">Total</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
-    <string name="budget_pill_calc_added">%1$s será adicionado</string>
-    <string name="budget_pill_calc_subtracted">%1$s será subtraído</string>
-    <string name="no_name_income">Receita sem nome</string>
-    <string name="expand_numpad">Expandir teclado numérico</string>
-    <string name="delete_category">Excluir categoria</string>
-    <string name="budget_graph_view_mode_cumulative">Tendência</string>
-    <string name="budget_graph_view_mode_categories">Categorias</string>
-    <string name="settings_widgets_pin_not_supported">Seu dispositivo não suporta a adição de widgets desta forma. Pressione e segure sua tela inicial e procure por Minus.</string>
-    <string name="widget_complete_budget_title">Orçamento completo</string>
-    <string name="widget_average_spend_title">Gasto médio</string>
-    <string name="widget_days_countdown_title">Contagem regressiva de dias</string>
-    <string name="widget_expense_title">Resumo de despesas</string>
-    <string name="widget_heatmap_title">Mapa de calor de gastos</string>
-    <string name="widget_min_max_spent_title">Gasto Mín/Máx</string>
-    <string name="widget_month_heatmap_title">Mapa de calor mensal</string>
-    <string name="widget_complete_budget_description">Acompanhe gastos, orçamento total e dias restantes — com adição rápida para uma nova despesa</string>
 </resources>
