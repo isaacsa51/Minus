@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">負</string>
-    <string name="tile_new_transaction_label">新しい取引</string>
     <string name="tutorial_numpad_title">テンキー</string>
     <string name="tutorial_numpad_description">使用した金額を入力し、緑色のチェックマークをタップして保存します。数値パッドを上にスワイプして計算します。</string>
     <string name="tutorial_comment_title">カテゴリを追加</string>
@@ -59,8 +58,9 @@
     <string name="credit_cutoff_dialog_title">クレジットカードのカットオフ日</string>
     <string name="credit_cutoff_dialog_message">クレジット費用を追跡するには、請求のカットオフ日(1-31)を設定します。</string>
     <string name="credit_cutoff_dialog_label">カットオフ日</string>
-    <!-- Rollover Dialog -->
+    <string name="expand_numpad">テンキーを展開</string>
     <string name="numpad_action">テンキーの動作</string>
+    <!-- Rollover Dialog -->
     <string name="period_finished">生理が終了しました</string>
     <string name="remaining_budget">残りの予算</string>
     <string name="rollover_question">残りのお金で何をしたいですか。</string>
@@ -86,7 +86,6 @@
     <string name="new_budget">新しい予算期間</string>
     <plurals name="pending_expense">
         <item quantity="other">次の期間の%d 費用</item>
-        <item quantity="one">次期分の支出（%d件）</item>
     </plurals>
     <string name="new_period_title">新しい予算期間</string>
     <string name="widget_description">経費のクイックビューと新しい経費の追加</string>
@@ -100,6 +99,8 @@
     <string name="finalize_period">予算期間を早期に完了</string>
     <string name="finalize_period_confirm">現在の期間を終了し、新しい期間を開始します。よろしいですか？</string>
     <string name="finalize_action">完了</string>
+    <string name="rollover_preview_split_equally">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算期間の各日に割り当てられます。</string>
+    <string name="rollover_preview_add_to_first_day">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算の初日に繰り越されます。</string>
     <string name="rollover_preview_ask_always">未使用の残高が %1$s あります。この期間が終了した際に、その残高の取り扱いについて確認されます。</string>
     <string name="no_ending_date">終了日なし</string>
     <string name="budget_split_logic">予算をどのように分割しますか？</string>
@@ -130,6 +131,7 @@
     <string name="history_snackbar_mark_paid_failed">取引を支払い済みにできませんでした</string>
     <string name="add_new_category">カテゴリ</string>
     <string name="add_new_category_action">新しいカテゴリを追加</string>
+    <string name="delete_category">カテゴリを削除</string>
     <string name="budget_validation_major_zero">予算は0より大きくなければなりません</string>
     <string name="budget_no_date_defined">終了日が定義されていません</string>
     <string name="budget_no_days_defined">日数が定義されていません</string>
@@ -138,18 +140,26 @@
     <string name="analytics_title">分析</string>
     <plurals name="days">
         <item quantity="other">%d 日</item>
-        <item quantity="one">%d日</item>
     </plurals>
     <plurals name="analytics_days_left">
         <item quantity="other">%d 日</item>
-        <item quantity="one">%d日</item>
     </plurals>
     <string name="total_budget">予算の合計</string>
     <string name="minimum_spent">最少支出数</string>
     <string name="maximum_spent">使用した最大数</string>
     <string name="average_spent">1日あたりの平均</string>
     <string name="days_remaining_label">残り日数</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">お使いのデバイスはこの方法でのウィジェット追加に対応していません。ホーム画面を長押ししてMinusを探してください。</string>
+    <string name="widget_complete_budget_title">完全な予算</string>
+    <string name="widget_average_spend_title">平均支出</string>
+    <string name="widget_days_countdown_title">日数のカウントダウン</string>
+    <string name="widget_expense_title">支出の概要</string>
+    <string name="widget_heatmap_title">支出ヒートマップ</string>
+    <string name="widget_min_max_spent_title">最小/最大支出</string>
+    <string name="widget_month_heatmap_title">月間ヒートマップ</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">支出、総予算、残り日数を追跡 — 新しい支出をすぐに追加可能</string>
     <string name="widget_budget_overview_description">費やした予算と残りの予算を一目で見る</string>
     <string name="widget_days_countdown_description">予算の残りの残り時間</string>
     <string name="widget_budget_detail_description">トップカテゴリと残り日数を含む全予算の概要</string>
@@ -158,6 +168,8 @@
     <string name="widget_add_expense_description">新しい費用を追加するためのクイックショートカット</string>
     <string name="widget_add_expense_label">新しい費用を追加</string>
     <string name="widget_add_expense_compact_label">費用を追加</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">新しい取引</string>
     <!-- Widget Labels -->
     <string name="spent">使用済み：</string>
     <string name="left">左</string>
@@ -328,7 +340,7 @@
     <string name="bug_report_submit">レポートを送信</string>
     <string name="bug_report_share_title">レポートを送信</string>
     <string name="bug_report_help_title">マイナスの改善にご協力ください</string>
-    <string name="bug_report_help_message_prefix">問題の報告や改善の提案は、Minusをより良いアプリにするために役立ちます。このガイド付きフォームを使用すると、必要な詳細情報をまとめて報告できます。また、デバイスのメタデータやアプリの診断情報が自動的に添付されるため、調査を迅速に進めることが可能になります。準備ができたら、レポートをメールで送信するか、以下から投稿してください</string>
+    <string name="bug_report_help_message_prefix">"問題の報告や改善の提案は、Minusをより良いアプリにするために役立ちます。このガイド付きフォームを使用すると、必要な詳細情報をまとめて報告できます。また、デバイスのメタデータやアプリの診断情報が自動的に添付されるため、調査を迅速に進めることが可能になります。準備ができたら、レポートをメールで送信するか、以下から投稿してください"</string>
     <string name="bug_report_help_github_issues">" GitHub Issues "</string>
     <string name="bug_report_help_message_suffix"> 私たちのリポジトリに直接。</string>
     <string name="bug_report_steps_to_reproduce_label">再現する手順</string>
@@ -369,6 +381,8 @@
     <string name="budget_pill_over_budget">予算額を超えました</string>
     <string name="budget_pill_no_budget">予算なし</string>
     <string name="budget_pill_no_budget_action">予算を設定</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">毎日</string>
     <string name="budget_pill_exhausted_weekly_label">週単位</string>
     <string name="budget_pill_exhausted_biweekly_label">隔週</string>
@@ -493,6 +507,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">日付なし</string>
     <string name="no_name">名前がありません</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">購入理由</string>
     <string name="date">日付</string>
     <string name="frequency">利息支払回数</string>
@@ -567,6 +582,8 @@
     <string name="budget_graph_header_spending">支出</string>
     <string name="budget_graph_legend_current">現在</string>
     <string name="budget_graph_legend_previous">前回</string>
+    <string name="budget_graph_view_mode_cumulative">トレンド</string>
+    <string name="budget_graph_view_mode_categories">カテゴリ</string>
     <string name="budget_graph_nav_prev">前へ</string>
     <string name="budget_graph_nav_next">次へ</string>
     <string name="graph_granularity_days">日</string>
@@ -576,22 +593,4 @@
     <string name="graph_granularity_total">合計</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
-    <string name="budget_pill_calc_added">%1$sが追加されます</string>
-    <string name="budget_pill_calc_subtracted">%1$sが差し引かれます</string>
-    <string name="no_name_income">名称未設定の収入</string>
-    <string name="rollover_preview_split_equally">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算期間の各日に割り当てられます。</string>
-    <string name="rollover_preview_add_to_first_day">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算の初日に繰り越されます。</string>
-    <string name="delete_category">カテゴリを削除</string>
-    <string name="budget_graph_view_mode_cumulative">トレンド</string>
-    <string name="budget_graph_view_mode_categories">カテゴリ</string>
-    <string name="settings_widgets_pin_not_supported">お使いのデバイスはこの方法でのウィジェット追加に対応していません。ホーム画面を長押ししてMinusを探してください。</string>
-    <string name="widget_complete_budget_title">完全な予算</string>
-    <string name="widget_average_spend_title">平均支出</string>
-    <string name="widget_days_countdown_title">日数のカウントダウン</string>
-    <string name="widget_expense_title">支出の概要</string>
-    <string name="widget_heatmap_title">支出ヒートマップ</string>
-    <string name="widget_min_max_spent_title">最小/最大支出</string>
-    <string name="widget_month_heatmap_title">月間ヒートマップ</string>
-    <string name="widget_complete_budget_description">支出、総予算、残り日数を追跡 — 新しい支出をすぐに追加可能</string>
-    <string name="expand_numpad">テンキーを展開</string>
 </resources>
