@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.theme.component.budget
+package com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs
 
 import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
@@ -53,10 +53,6 @@ private fun interpolateHourPoints(
     }
 }
 
-/**
- * Tracks the old/render point pair [GraphHourCanvas] morphs between whenever the selected day
- * changes, mirroring how [BudgetGraphState] holds old/render points for [GraphCanvas].
- */
 @Stable
 private class GraphHourTransitionState(initialPoints: List<BigDecimal>) {
     var renderPoints by mutableStateOf(initialPoints)
@@ -90,12 +86,6 @@ private fun rememberGraphHourTransitionState(points: List<BigDecimal>): GraphHou
     return state
 }
 
-/**
- * Renders one day's cumulative spending across its 24 hours instead of [GraphCanvas]'s
- * cumulative-across-several-days trend line — this is what [GraphGranularity.DAYS] shows in
- * cumulative mode, mirroring [MultiCategoryHourChart]'s per-hour breakdown in categories mode.
- * Morphs between days the same way [GraphCanvas] morphs between windows.
- */
 @Composable
 internal fun GraphHourCanvas(
     points: List<BigDecimal>,

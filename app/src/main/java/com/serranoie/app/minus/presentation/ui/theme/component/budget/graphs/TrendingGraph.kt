@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.theme.component.budget
+package com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -441,7 +442,7 @@ fun BudgetGraph(
     initialViewMode: BudgetGraphViewMode = BudgetGraphViewMode.CUMULATIVE,
 ) {
     val view = LocalView.current
-    val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales[0]
     val dateLabelFormatter = remember(state.graphGranularity, locale) {
         when (state.graphGranularity) {
             GraphGranularity.DAYS -> DateTimeFormatter.ofPattern("dd MMM", locale)
@@ -754,7 +755,9 @@ fun BudgetGraph(
                     dateFormatter = dayLabelFormatter,
                     onPrevDay = { onSelectedDateChanged(hourlyDate.minusDays(1)) },
                     onNextDay = { onSelectedDateChanged(hourlyDate.plusDays(1)) },
-                    canGoPrev = periodStartLocalDate == null || hourlyDate.isAfter(periodStartLocalDate),
+                    canGoPrev = periodStartLocalDate == null || hourlyDate.isAfter(
+                        periodStartLocalDate
+                    ),
                     canGoNext = periodEndLocalDate == null || hourlyDate.isBefore(periodEndLocalDate),
                 )
             } else if (hasPeriod && graphState.totalWindows > 1) {
@@ -869,6 +872,7 @@ private fun PreviewBudgetGraph() {
         Surface {
             BudgetGraph(
                 state = AnalyticsState(
+                    isLoading = false,
                     spends = listOf(
                         Transaction(
                             amount = BigDecimal("10"),

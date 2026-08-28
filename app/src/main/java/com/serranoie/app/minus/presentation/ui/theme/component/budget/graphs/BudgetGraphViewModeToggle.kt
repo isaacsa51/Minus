@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.theme.component.budget
+package com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme

@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.theme.component.budget
+package com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs
 
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.Format
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -40,7 +41,7 @@ internal data class GraphDrawParams(
 internal fun DrawScope.drawCoordinateSystem(
     params: GraphDrawParams,
     textMeasurer: TextMeasurer,
-    currencyFormat: java.text.Format,
+    currencyFormat: Format,
     dateFormatter: DateTimeFormatter,
     startDate: Date,
     windowIndex: Int,
@@ -184,7 +185,7 @@ internal fun DrawScope.drawCoordinateSystem(
 
 internal fun formatAxisValue(
     value: BigDecimal,
-    currencyFormat: java.text.Format,
+    currencyFormat: Format,
     thousandsUnit: String,
     millionsUnit: String
 ): String {
@@ -210,7 +211,7 @@ internal fun DrawScope.drawTooltipInteraction(
     maxVal: Float,
     color: Color,
     surfaceColor: Color,
-    currencyFormat: java.text.Format,
+    currencyFormat: Format,
     textMeasurer: TextMeasurer,
     tooltipStyle: TextStyle,
     leftMargin: Float,
@@ -373,7 +374,7 @@ internal fun DrawScope.drawHourGridlines(
     gridColor: Color,
     textMeasurer: TextMeasurer,
     labelStyle: TextStyle,
-    currencyFormat: java.text.Format,
+    currencyFormat: Format,
     alpha: Float = 1f,
 ) {
     val gridLinesCount = 3

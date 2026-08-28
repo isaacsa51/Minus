@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.theme.component.budget
+package com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,16 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 
-/** A single colored dot + label pair for [ChartLegend]. */
 data class LegendEntry(val label: String, val color: Color)
 
-/**
- * A wrapping row of colored-dot legend entries, reusable across any chart that needs to explain
- * what its colors mean (series names, category breakdowns, etc.).
- */
 @Composable
 fun ChartLegend(entries: List<LegendEntry>, modifier: Modifier = Modifier) {
     FlowRow(
@@ -75,6 +72,20 @@ private fun LegendItem(color: Color, label: String) {
             text = label,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ChartLegendPreview() {
+    MinusTheme {
+        ChartLegend(
+            entries = listOf(
+                LegendEntry("Current Period", MaterialTheme.colorScheme.primary),
+                LegendEntry("Previous Period", MaterialTheme.colorScheme.secondary),
+                LegendEntry("Other Category", MaterialTheme.colorScheme.tertiary),
+            )
         )
     }
 }

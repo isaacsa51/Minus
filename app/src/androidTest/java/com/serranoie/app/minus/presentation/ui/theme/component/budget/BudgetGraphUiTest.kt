@@ -11,6 +11,12 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsState
 import com.serranoie.app.minus.presentation.ui.analytics.GraphGranularity
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BUDGET_GRAPH_DAY_LABEL_TAG
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BUDGET_GRAPH_DAY_NEXT_TAG
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BUDGET_GRAPH_NEXT_PAGE_TAG
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BUDGET_GRAPH_WINDOW_LABEL_TAG
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BudgetGraph
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.budgetGraphGranularityToggleTag
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal

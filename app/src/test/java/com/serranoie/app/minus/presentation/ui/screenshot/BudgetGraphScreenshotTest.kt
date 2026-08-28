@@ -14,8 +14,8 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsState
 import com.serranoie.app.minus.presentation.ui.analytics.GraphGranularity
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetGraph
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetGraphViewMode
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BudgetGraph
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BudgetGraphViewMode
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal

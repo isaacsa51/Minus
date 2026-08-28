@@ -10,8 +10,8 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.CategoryDayEntry
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.MultiCategoryChart
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.CategoryDayEntry
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.MultiCategoryChart
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.baseColors
 import org.junit.Rule
 import org.junit.Test

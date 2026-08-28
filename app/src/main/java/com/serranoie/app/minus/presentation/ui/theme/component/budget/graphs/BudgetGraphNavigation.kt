@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.theme.component.budget
+package com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -20,6 +20,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
 
 const val BUDGET_GRAPH_PREV_PAGE_TAG = "BUDGET_GRAPH_PREV_PAGE_TAG"
@@ -81,5 +83,18 @@ internal fun BudgetGraphNavigation(
                 contentDescription = stringResource(R.string.budget_graph_nav_next)
             )
         }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun BudgetGraphNavigationPreview() {
+    MinusTheme {
+        BudgetGraphNavigation(
+            currentWindow = 2,
+            totalWindows = 5,
+            onPrevWindow = {},
+            onNextWindow = {},
+        )
     }
 }

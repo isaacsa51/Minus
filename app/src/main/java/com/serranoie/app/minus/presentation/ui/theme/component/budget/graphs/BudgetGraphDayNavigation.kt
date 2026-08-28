@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.theme.component.budget
+package com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,8 +27,10 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -116,6 +119,25 @@ internal fun BudgetGraphDayNavigation(
                     contentDescription = stringResource(R.string.budget_graph_nav_next)
                 )
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BudgetGraphDayNavigationPreview() {
+    MinusTheme {
+        Surface {
+            BudgetGraphDayNavigation(
+                date = LocalDate.now(),
+                dayIndex = 5,
+                totalDays = 30,
+                dateFormatter = DateTimeFormatter.ofPattern("EEE, MMM d"),
+                onPrevDay = {},
+                onNextDay = {},
+                canGoPrev = true,
+                canGoNext = false,
+            )
         }
     }
 }

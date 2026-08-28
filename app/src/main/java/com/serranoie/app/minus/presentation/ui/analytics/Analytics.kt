@@ -91,7 +91,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHea
 import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeader
 import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetGraph
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BudgetGraph
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditOwedCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditTransactionsBottomSheet
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.MinMaxSpentCard

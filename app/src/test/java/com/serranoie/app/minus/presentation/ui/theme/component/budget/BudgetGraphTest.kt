@@ -3,6 +3,7 @@ package com.serranoie.app.minus.presentation.ui.theme.component.budget
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.analytics.GraphGranularity
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.calculateCumulativePoints
 import org.junit.Test
 import java.math.BigDecimal
 import java.time.LocalDate

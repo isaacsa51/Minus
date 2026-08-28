@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.theme.component.budget
+package com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,15 +10,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.SupportedCurrency
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
+import java.text.Format
 
 @Composable
 internal fun BudgetGraphHeader(
     totalSpent: BigDecimal,
-    currencyFormat: java.text.Format,
+    currencyFormat: Format,
     currencyCode: String,
 ) {
     val symbol = remember(currencyCode) { SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$" }
@@ -50,5 +55,29 @@ internal fun BudgetGraphHeader(
             )
             if (symbolAtEnd) symbolText()
         }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun BudgetGraphHeaderPreview() {
+    MinusTheme {
+        BudgetGraphHeader(
+            totalSpent = BigDecimal("1234.56"),
+            currencyFormat = symbolOnlyCurrencyFormat("USD"),
+            currencyCode = "USD"
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BudgetGraphHeaderEndSymbolPreview() {
+    MinusTheme {
+        BudgetGraphHeader(
+            totalSpent = BigDecimal("123456"),
+            currencyFormat = symbolOnlyCurrencyFormat("VND"),
+            currencyCode = "VND"
+        )
     }
 }

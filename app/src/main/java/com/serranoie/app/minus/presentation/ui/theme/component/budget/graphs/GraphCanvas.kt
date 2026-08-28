@@ -1,4 +1,4 @@
-package com.serranoie.app.minus.presentation.ui.theme.component.budget
+package com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
@@ -24,7 +24,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,9 +33,9 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
+import java.text.Format
 import java.time.format.DateTimeFormatter
 import java.util.Date
-import kotlin.math.roundToInt
 
 @Composable
 internal fun GraphCanvas(
@@ -188,7 +187,7 @@ private fun DrawScope.drawGraphLinesContent(
     maxVal: Float,
     params: GraphDrawParams,
     touchPosition: Offset?,
-    currencyFormat: java.text.Format,
+    currencyFormat: Format,
     textMeasurer: TextMeasurer,
     tooltipStyle: TextStyle,
     thousandsUnit: String,
