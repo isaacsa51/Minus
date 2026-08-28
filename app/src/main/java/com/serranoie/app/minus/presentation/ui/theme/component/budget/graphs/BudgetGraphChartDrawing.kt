@@ -183,6 +183,19 @@ internal fun DrawScope.drawCoordinateSystem(
     }
 }
 
+internal fun plotY(
+    value: Float,
+    maxVal: Float,
+    canvasHeight: Float,
+    topPadding: Float,
+    bottomMargin: Float,
+): Float {
+    val drawableHeight = canvasHeight - bottomMargin - topPadding
+    val safeMax = if (maxVal <= 0f) 1f else maxVal
+    val fraction = (value / safeMax).coerceIn(0f, 1f)
+    return canvasHeight - bottomMargin - fraction * drawableHeight
+}
+
 internal fun formatAxisValue(
     value: BigDecimal,
     currencyFormat: Format,
@@ -221,14 +234,13 @@ internal fun DrawScope.drawTooltipInteraction(
     val width = size.width
     val height = size.height
     val drawableWidth = width - leftMargin
-    val drawableHeight = height - bottomMargin - topPadding
 
     val stepWidth = drawableWidth / (currentPoints.size - 1).coerceAtLeast(1)
     val index = ((pos.x - leftMargin) / stepWidth).roundToInt().coerceIn(0, currentPoints.size - 1)
 
     val amount = currentPoints[index]
     val pointX = leftMargin + index * stepWidth
-    val pointY = height - bottomMargin - (amount.toFloat() / maxVal * drawableHeight)
+    val pointY = plotY(amount.toFloat(), maxVal, height, topPadding, bottomMargin)
 
     drawLine(
         color = color.copy(alpha = 0.5f),
@@ -286,14 +298,13 @@ internal fun DrawScope.drawGraphArea(
     val canvasWidth = size.width
     val canvasHeight = size.height
     val drawableWidth = canvasWidth - leftMargin
-    val drawableHeight = canvasHeight - bottomMargin - topPadding
 
     val stepWidth = drawableWidth / (points.size - 1).coerceAtLeast(1)
 
     val path = Path().apply {
         points.forEachIndexed { index, value ->
             val x = leftMargin + index * stepWidth
-            val y = canvasHeight - bottomMargin - (value.toFloat() / maxVal * drawableHeight)
+            val y = plotY(value.toFloat(), maxVal, canvasHeight, topPadding, bottomMargin)
             if (index == 0) moveTo(x, y) else lineTo(x, y)
         }
         val lastX = leftMargin + (points.size - 1) * stepWidth
@@ -330,14 +341,13 @@ internal fun DrawScope.drawGraphLine(
     val canvasWidth = size.width
     val canvasHeight = size.height
     val drawableWidth = canvasWidth - leftMargin
-    val drawableHeight = canvasHeight - bottomMargin - topPadding
 
     val stepWidth = drawableWidth / (points.size - 1).coerceAtLeast(1)
 
     val path = Path().apply {
         points.forEachIndexed { index, value ->
             val x = leftMargin + index * stepWidth
-            val y = canvasHeight - bottomMargin - (value.toFloat() / maxVal * drawableHeight)
+            val y = plotY(value.toFloat(), maxVal, canvasHeight, topPadding, bottomMargin)
             if (index == 0) moveTo(x, y) else lineTo(x, y)
         }
     }

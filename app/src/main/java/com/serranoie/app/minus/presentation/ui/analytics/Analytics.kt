@@ -91,12 +91,12 @@ import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHea
 import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeader
 import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BudgetGraph
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditOwedCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditTransactionsBottomSheet
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.MinMaxSpentCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendsCountCard
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BudgetGraph
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.CategoriesChartCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarHeatmap
@@ -104,8 +104,8 @@ import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
-import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
+import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.combineColors
 import kotlinx.coroutines.delay
@@ -126,6 +126,7 @@ data class AnalyticsState(
     val transactions: List<Transaction> = emptyList(),
     val allTransactions: List<Transaction> = emptyList(),
     val spends: List<Transaction> = emptyList(),
+    val chartSpends: List<Transaction> = emptyList(),
     val recurringInPeriod: List<Transaction> = emptyList(),
     val oneTimeSpends: List<Transaction> = emptyList(),
     val wholeBudget: BigDecimal = BigDecimal.ZERO,

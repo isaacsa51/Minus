@@ -148,13 +148,6 @@ class BudgetGraphState(
         interpolatePoints(_oldPreviousPoints, _renderPreviousPoints, animProgress.value)
     }
 
-    val maxVal by derivedStateOf {
-        val currentMax = interpolatedCurrent.maxOfOrNull { it } ?: BigDecimal.ZERO
-        val previousMax = interpolatedPrevious.maxOfOrNull { it } ?: BigDecimal.ZERO
-        val absoluteMax = currentMax.max(previousMax)
-        if (absoluteMax <= BigDecimal.ZERO) 100f else absoluteMax.toFloat()
-    }
-
     val oldMaxVal by derivedStateOf {
         val currentMax = _oldCurrentPoints.maxOfOrNull { it } ?: BigDecimal.ZERO
         val previousMax = _oldPreviousPoints.maxOfOrNull { it } ?: BigDecimal.ZERO
@@ -465,8 +458,15 @@ fun BudgetGraph(
         symbolOnlyCurrencyFormat(state.currencyCode)
     }
 
-    val totalSpent = remember(state.spends) {
-        state.spends.sumOf { it.amount }
+    val chartSpends = remember(state.chartSpends, state.spends) {
+        state.chartSpends.ifEmpty { state.spends.filter { it.amount > BigDecimal.ZERO } }
+    }
+    val chartPreviousTransactions = remember(state.previousPeriodTransactions) {
+        state.previousPeriodTransactions.filter { it.amount > BigDecimal.ZERO }
+    }
+
+    val totalSpent = remember(chartSpends) {
+        chartSpends.sumOf { it.amount }
     }
 
     var viewMode by remember { mutableStateOf(initialViewMode) }
@@ -489,26 +489,26 @@ fun BudgetGraph(
     }
 
     val allCurrentPoints =
-        remember(state.spends, state.startPeriodDate, state.finishPeriodDate, hasPeriod) {
+        remember(chartSpends, state.startPeriodDate, state.finishPeriodDate, hasPeriod) {
             if (!hasPeriod) return@remember listOf(BigDecimal.ZERO, BigDecimal.ZERO)
             calculateCumulativePoints(
-                transactions = state.spends,
+                transactions = chartSpends,
                 startDate = state.startPeriodDate,
                 endDate = state.finishPeriodDate ?: Date(),
                 granularity = GraphGranularity.DAYS
             )
         }
 
-    val allPreviousPoints = remember(state.previousPeriodTransactions, hasPeriod) {
-        if (!hasPeriod || state.previousPeriodTransactions.isEmpty()) return@remember emptyList<BigDecimal>()
+    val allPreviousPoints = remember(chartPreviousTransactions, hasPeriod) {
+        if (!hasPeriod || chartPreviousTransactions.isEmpty()) return@remember emptyList<BigDecimal>()
 
         val start =
-            state.previousPeriodTransactions.mapNotNull { it.date?.toLocalDate() }.minOrNull()
-        val end = state.previousPeriodTransactions.mapNotNull { it.date?.toLocalDate() }.maxOrNull()
+            chartPreviousTransactions.mapNotNull { it.date?.toLocalDate() }.minOrNull()
+        val end = chartPreviousTransactions.mapNotNull { it.date?.toLocalDate() }.maxOrNull()
 
         if (start != null && end != null) {
             calculateCumulativePoints(
-                transactions = state.previousPeriodTransactions,
+                transactions = chartPreviousTransactions,
                 startDate = Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant()),
                 endDate = Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant()),
                 granularity = GraphGranularity.DAYS
@@ -558,7 +558,7 @@ fun BudgetGraph(
     }
 
     val categoryDayEntries = rememberCategoryDayEntries(
-        spends = state.spends,
+        spends = chartSpends,
         categories = state.categories,
         dateRange = visibleDateRange,
         categoryColors = categoryColorMap,
@@ -584,7 +584,7 @@ fun BudgetGraph(
         }
     }
     val categoryHourEntries = rememberCategoryHourEntries(
-        spends = state.spends,
+        spends = chartSpends,
         categories = state.categories,
         date = hourlyDate,
         categoryColors = categoryColorMap,
@@ -595,8 +595,8 @@ fun BudgetGraph(
             .sortedBy { it.label }
             .map { LegendEntry(it.label, it.color) }
     }
-    val hourlyCumulativePoints = remember(state.spends, hourlyDate) {
-        calculateHourlyCumulativePoints(state.spends, hourlyDate)
+    val hourlyCumulativePoints = remember(chartSpends, hourlyDate) {
+        calculateHourlyCumulativePoints(chartSpends, hourlyDate)
     }
     val periodDayCount = remember(periodStartLocalDate, periodEndLocalDate) {
         if (periodStartLocalDate == null || periodEndLocalDate == null) 1
@@ -713,7 +713,6 @@ fun BudgetGraph(
                             GraphCanvas(
                                 currentPoints = graphState.interpolatedCurrent,
                                 previousPoints = graphState.interpolatedPrevious,
-                                maxVal = graphState.maxVal,
                                 oldMaxVal = graphState.oldMaxVal,
                                 newMaxVal = graphState.newMaxVal,
                                 modifier = Modifier.fillMaxSize(),

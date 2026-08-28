@@ -294,6 +294,7 @@ class AnalyticsViewModel @Inject constructor(
             transactions = actualSpends,
             allTransactions = allTransactions,
             spends = actualSpends,
+            chartSpends = actualSpends.toChartSpends(),
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
             wholeBudget = archive.totalBudget,
@@ -393,6 +394,7 @@ class AnalyticsViewModel @Inject constructor(
             transactions = transactions,
             allTransactions = allTransactions,
             spends = transactions,
+            chartSpends = transactions.toChartSpends(),
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
             wholeBudget = displayBudgetState.totalBudget,
@@ -567,3 +569,6 @@ class AnalyticsViewModel @Inject constructor(
         _effects.value = null
     }
 }
+
+private fun List<Transaction>.toChartSpends(): List<Transaction> =
+    filter { it.amount > BigDecimal.ZERO }

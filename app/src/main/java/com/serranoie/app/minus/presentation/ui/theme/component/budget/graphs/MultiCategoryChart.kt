@@ -435,7 +435,9 @@ internal fun MultiCategoryChart(
                 val total = transitionState.renderDayTotals[date] ?: BigDecimal.ZERO
                 if (total > BigDecimal.ZERO) {
                     val x = leftMargin + touchedDayOffset * stepWidth
-                    val barTopY = baseline - (total.toFloat() / renderMaxVal * drawableHeight).coerceAtLeast(1f)
+                    val barTopY = baseline -
+                        (total.toFloat() / renderMaxVal * drawableHeight)
+                            .coerceAtMost(drawableHeight).coerceAtLeast(1f)
                     drawCategoryTooltip(
                         x = x,
                         barTopY = barTopY,
@@ -490,7 +492,8 @@ private fun DrawScope.drawCategoryBars(
         var segmentBottom = baseline
         dayEntries.forEach { entry ->
             val segmentHeight =
-                (entry.amount.toFloat() / maxVal * drawableHeight).coerceAtLeast(1f)
+                (entry.amount.toFloat() / maxVal * drawableHeight)
+                    .coerceAtMost(drawableHeight).coerceAtLeast(1f)
             val segmentTop = segmentBottom - segmentHeight
             val cornerRadiusPx =
                 maxSegmentCornerRadius.coerceAtMost(minOf(barWidth, segmentHeight) / 2f)

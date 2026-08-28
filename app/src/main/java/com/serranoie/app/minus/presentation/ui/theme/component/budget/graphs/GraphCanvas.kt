@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
@@ -41,7 +42,6 @@ import java.util.Date
 internal fun GraphCanvas(
     currentPoints: List<BigDecimal>,
     previousPoints: List<BigDecimal>,
-    maxVal: Float,
     oldMaxVal: Float,
     newMaxVal: Float,
     modifier: Modifier = Modifier,
@@ -166,10 +166,12 @@ internal fun GraphCanvas(
             )
         }
 
+        val lineMaxVal = lerp(oldMaxVal, newMaxVal, animProgress.coerceIn(0f, 1f))
+
         drawGraphLinesContent(
             currentPoints = currentPoints,
             previousPoints = previousPoints,
-            maxVal = maxVal,
+            maxVal = lineMaxVal,
             params = drawParams,
             touchPosition = touchPosition,
             currencyFormat = currencyFormat,
@@ -264,7 +266,6 @@ private fun PreviewBudgetGraphTooltip() {
                         BigDecimal("30"), BigDecimal("60"), BigDecimal("50"), BigDecimal("80")
                     ),
                     previousPoints = emptyList(),
-                    maxVal = 100f,
                     oldMaxVal = 100f,
                     newMaxVal = 100f,
                     modifier = Modifier
