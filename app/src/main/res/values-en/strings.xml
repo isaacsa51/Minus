@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">To track credit expenses, set the billing cutoff day (1-31).</string>
     <string name="credit_cutoff_dialog_label">Cutoff day</string>
     <string name="expand_numpad">Expand numpad</string>
-    <string name="numpad_action">Numpad action</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">Period finished</string>
     <string name="remaining_budget">Remaining budget</string>
@@ -92,6 +92,8 @@
     <string name="widget_description">Quick view of your expenses and add new ones</string>
     <string name="total_expenses">Total Expenses</string>
     <string name="new_expense">New Expense</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">Daily average</string>
     <string name="expenses_history">Expenses history</string>
     <string name="single_expense">Single expense</string>
@@ -512,6 +514,7 @@
     <string name="no_name">No name</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">Purchase Reason</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">Date</string>
     <string name="frequency">Frequency</string>
     <string name="charge_day">Charge day</string>
