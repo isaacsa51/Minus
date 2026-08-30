@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">Para controlar as despesas de crédito, defina o dia do faturamento (1-31).</string>
     <string name="credit_cutoff_dialog_label">Cortar dia</string>
     <string name="expand_numpad">Expandir teclado numérico</string>
-    <string name="numpad_action">Ação do teclado numérico</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">Período terminado</string>
     <string name="remaining_budget">Orçamento restante</string>
@@ -92,6 +92,8 @@
     <string name="widget_description">Visualização rápida de suas despesas e adição de novas despesas</string>
     <string name="total_expenses">Total Despesas</string>
     <string name="new_expense">Nova despesa</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">Média diária</string>
     <string name="expenses_history">Histórico de despesas</string>
     <string name="single_expense">Gasto único</string>
@@ -512,6 +514,7 @@
     <string name="no_name">Sem nome</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">Descrição:</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">Encontro</string>
     <string name="frequency">Frequência</string>
     <string name="charge_day">Carregar dia</string>
