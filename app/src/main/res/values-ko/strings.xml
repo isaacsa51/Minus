@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">크레딧 지출을 추적하려면 청구 마감일(1~31일)을 설정하세요.</string>
     <string name="credit_cutoff_dialog_label">마감일</string>
     <string name="expand_numpad">숫자 키패드 확장</string>
-    <string name="numpad_action">숫자 키패드 동작</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">기간 종료</string>
     <string name="remaining_budget">남은 금액 예산</string>
@@ -91,6 +91,8 @@
     <string name="widget_description">지출 내역을 빠르게 확인하고 새 항목을 추가하세요</string>
     <string name="total_expenses">총 지출</string>
     <string name="new_expense">새 지출</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">일일 평균</string>
     <string name="expenses_history">지출 내역</string>
     <string name="single_expense">단일 지출</string>
@@ -509,6 +511,7 @@
     <string name="no_name">이름 없음</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">지출 사유</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">날짜</string>
     <string name="frequency">빈도</string>
     <string name="charge_day">청구일</string>
