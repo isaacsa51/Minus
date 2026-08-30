@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">क्रेडिट खर्चों को ट्रैक करने के लिए, बिलिंग कट-ऑफ़ का दिन (1-31) सेट करें।</string>
     <string name="credit_cutoff_dialog_label">कट-ऑफ़ का दिन</string>
     <string name="expand_numpad">नंपैड को बड़ा करें</string>
-    <string name="numpad_action">नंपैड एक्शन</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">पीरियड खत्म हो गया</string>
     <string name="remaining_budget">बचा हुआ बजट</string>
@@ -92,6 +92,8 @@
     <string name="widget_description">अपने खर्चों को जल्दी से देखें और नए खर्च जोड़ें</string>
     <string name="total_expenses">कुल खर्च</string>
     <string name="new_expense">नया खर्च</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">रोज़ाना का औसत</string>
     <string name="expenses_history">खर्चों का इतिहास</string>
     <string name="single_expense">एक खर्च</string>
@@ -512,6 +514,7 @@
     <string name="no_name">कोई नाम नहीं</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">खरीदने का कारण</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">तारीख</string>
     <string name="frequency">आवृत्ति</string>
     <string name="charge_day">चार्ज का दिन</string>
