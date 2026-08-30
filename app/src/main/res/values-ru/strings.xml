@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">Чтобы учитывать расходы по кредитной карте, укажите день закрытия расчётного периода (1–31).</string>
     <string name="credit_cutoff_dialog_label">День закрытия</string>
     <string name="expand_numpad">Развернуть цифровую клавиатуру</string>
-    <string name="numpad_action">Действие на цифровой клавиатуре</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">Период завершён</string>
     <string name="remaining_budget">Остаток бюджета</string>
@@ -94,6 +94,8 @@
     <string name="widget_description">Быстрый просмотр расходов и добавление новых</string>
     <string name="total_expenses">Всего расходов</string>
     <string name="new_expense">Новый расход</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">Среднее за день</string>
     <string name="expenses_history">История расходов</string>
     <string name="single_expense">Разовый расход</string>
@@ -518,6 +520,7 @@
     <string name="no_name">Без названия</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">Назначение</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">Дата</string>
     <string name="frequency">Периодичность</string>
     <string name="charge_day">День списания</string>
