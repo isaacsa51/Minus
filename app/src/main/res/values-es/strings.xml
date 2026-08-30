@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">Para rastrear gastos a crédito, define el día de corte (1–31).</string>
     <string name="credit_cutoff_dialog_label">Día de corte</string>
     <string name="expand_numpad">Expandir teclado númerico</string>
-    <string name="numpad_action">Acción del teclado numérico</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">Periodo terminado</string>
     <string name="remaining_budget">Presupuesto restante</string>
@@ -92,6 +92,8 @@
     <string name="widget_description">Vista rápida de tus gastos y añade nuevos</string>
     <string name="total_expenses">Gastos Totales</string>
     <string name="new_expense">Nuevo Gasto</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">Promedio diario</string>
     <string name="expenses_history">Historial de gastos</string>
     <string name="single_expense">Gasto único</string>
@@ -512,6 +514,7 @@
     <string name="no_name">Sin nombre</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">Razón de Compra</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">Fecha</string>
     <string name="frequency">Frecuencia</string>
     <string name="charge_day">Día de cobro</string>
