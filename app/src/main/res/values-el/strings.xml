@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">Για την παρακολούθηση των πιστωτικών εξόδων, ορίστε την ημέρα περικοπής χρέωσης (1-31).</string>
     <string name="credit_cutoff_dialog_label">Ημέρα αποκοπής</string>
     <string name="expand_numpad">Ανάπτυξη αριθμητικού πληκτρολογίου</string>
-    <string name="numpad_action">Ενέργεια αριθμητικού πληκτρολογίου</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">Η περίοδος ολοκληρώθηκε</string>
     <string name="remaining_budget">Υπόλοιπο προϋπολογισμό</string>
@@ -92,6 +92,8 @@
     <string name="widget_description">Γρήγορη προβολή των εξόδων σας και να προσθέσετε νέα</string>
     <string name="total_expenses">Συνολικά Έξοδα</string>
     <string name="new_expense">Νέα Έξοδα</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">Μέσος όρος ημέρας</string>
     <string name="expenses_history">Ιστορικό εξόδων</string>
     <string name="single_expense">Ενιαία δαπάνη</string>
@@ -512,6 +514,7 @@
     <string name="no_name">Χωρίς όνομα</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">Αιτία αγοράς</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">Ημερομηνία</string>
     <string name="frequency">Συχνότητα</string>
     <string name="charge_day">Ημέρα φόρτισης</string>
