@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">Per monitorare le spese di credito, impostare il giorno cutoff di fatturazione (1-31).</string>
     <string name="credit_cutoff_dialog_label">Giorno di taglio</string>
     <string name="expand_numpad">Espandi tastierino numerico</string>
-    <string name="numpad_action">Azione del tastierino numerico</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">Periodo terminato</string>
     <string name="remaining_budget">Bilancio rimanente</string>
@@ -92,6 +92,8 @@
     <string name="widget_description">Visualizzazione rapida delle tue spese e aggiungerne di nuove</string>
     <string name="total_expenses">Totale Spese</string>
     <string name="new_expense">Nuova Spesa</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">Media giornaliera</string>
     <string name="expenses_history">Cronologia spese</string>
     <string name="single_expense">Singola spesa</string>
@@ -512,6 +514,7 @@
     <string name="no_name">Nessun nome</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">Descrizione</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">Data</string>
     <string name="frequency">Frequenza</string>
     <string name="charge_day">Giorno di ricarica</string>
