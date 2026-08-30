@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">Pour suivre les dépenses à crédit, définissez le jour de clôture de facturation (1-31).</string>
     <string name="credit_cutoff_dialog_label">Jour de clôture</string>
     <string name="expand_numpad">Développer le pavé numérique</string>
-    <string name="numpad_action">Action du pavé numérique</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">Période terminée</string>
     <string name="remaining_budget">Budget restant</string>
@@ -92,6 +92,8 @@
     <string name="widget_description">Aperçu rapide de vos dépenses et ajout de nouvelles</string>
     <string name="total_expenses">Total des dépenses</string>
     <string name="new_expense">Nouvelle dépense</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">Moyenne quotidienne</string>
     <string name="expenses_history">Historique des dépenses</string>
     <string name="single_expense">Dépense unique</string>
@@ -512,6 +514,7 @@
     <string name="no_name">Sans nom</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">Raison de l\'achat</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">Date</string>
     <string name="frequency">Fréquence</string>
     <string name="charge_day">Jour de facturation</string>
