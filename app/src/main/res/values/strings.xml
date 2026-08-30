@@ -62,7 +62,7 @@
     <string name="credit_cutoff_dialog_message">To track credit expenses, set the billing cutoff day (1-31).</string>
     <string name="credit_cutoff_dialog_label">Cutoff day</string>
     <string name="expand_numpad">Expand numpad</string>
-    <string name="numpad_action">Numpad action</string>
+    <string name="numpad_action">Editor action</string>
 
     <!-- Rollover Dialog -->
     <string name="period_finished">Period finished</string>

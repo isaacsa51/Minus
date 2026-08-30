@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.date
 
 import android.content.Context
-import android.content.res.Configuration
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -40,6 +39,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -81,6 +81,16 @@ data class SpendingDay(
     val budget: BigDecimal,
     val spending: BigDecimal,
     val intensity: Float = 0f,
+)
+
+data class Week(
+    val startDate: LocalDate,
+    val yearMonth: YearMonth
+)
+
+data class Month(
+    val yearMonth: YearMonth,
+    val weeks: List<Week>
 )
 
 @Composable
@@ -129,11 +139,16 @@ fun CalendarHeatmap(
     val maxSpending = remember(spendingDays) {
         spendingDays.values.maxOfOrNull { it.spending } ?: BigDecimal.ZERO
     }
-    val calendarState = remember(startDate, finishDate, actualFinishDate) {
+
+    val locale = LocalConfiguration.current.locales[0]
+    val firstDayOfWeek = remember(locale) { WeekFields.of(locale).firstDayOfWeek }
+
+    val calendarState = remember(startDate, finishDate, actualFinishDate, locale) {
         CalendarState(
             context = context,
             disableBeforeDate = startDate,
             disableAfterDate = actualFinishDate ?: finishDate,
+            locale = locale
         )
     }
 
@@ -160,14 +175,14 @@ fun CalendarHeatmap(
                     )
 
                     month.weeks.forEach { week ->
-                        val beginningWeek = week.yearMonth.atDay(1).plusWeeks(week.number.toLong())
-                        val currentDay =
-                            beginningWeek.with(TemporalAdjusters.previousOrSame(getWeek()[0]))
+                        val currentDay = week.startDate
+                        val endOfWeek = currentDay.plusDays(6)
+                        val periodStart = calendarUiState.disabledBefore
+                        val periodEnd = calendarUiState.disabledAfter
 
-                        if (currentDay.plusDays(6)
-                                .isAfter(calendarUiState.disabledBefore) && currentDay.isBefore(
-                                calendarUiState.disabledAfter!!.plusDays(1)
-                            )
+                        if (periodStart != null && periodEnd != null &&
+                            !endOfWeek.isBefore(periodStart) &&
+                            !currentDay.isAfter(periodEnd)
                         ) {
                             WeekRow(
                                 modifier = Modifier.layoutId("fullWidth"),
@@ -313,11 +328,6 @@ internal fun DaysOfWeek(modifier: Modifier = Modifier) {
     }
 }
 
-
-data class Week(
-    val number: Int, val yearMonth: YearMonth
-)
-
 @Composable
 fun WeekRow(
     modifier: Modifier = Modifier,
@@ -328,8 +338,7 @@ fun WeekRow(
     cardContainerColor: Color,
     onDayClick: (LocalDate) -> Unit,
 ) {
-    val beginningWeek = week.yearMonth.atDay(1).plusWeeks(week.number.toLong())
-    var currentDay = beginningWeek.with(TemporalAdjusters.previousOrSame(getWeek()[0]))
+    var currentDay = week.startDate
 
     Box(modifier.fillMaxWidth()) {
         Row {
@@ -612,14 +621,11 @@ data class CalendarUiState(
     val disabledAfter: LocalDate? = null,
 )
 
-data class Month(
-    val yearMonth: YearMonth, val weeks: List<Week>
-)
-
 class CalendarState(
     context: Context,
     disableBeforeDate: Date,
     disableAfterDate: Date,
+    locale: Locale,
 ) {
     val calendarUiState = mutableStateOf(
         CalendarUiState(
@@ -628,35 +634,34 @@ class CalendarState(
         )
     )
 
-    val listMonths: List<Month> = generateMonths(disableBeforeDate, disableAfterDate)
+    val listMonths: List<Month> = generateMonths(disableBeforeDate, disableAfterDate, locale)
 
-    private fun generateMonths(startDate: Date, endDate: Date): List<Month> {
+    private fun generateMonths(startDate: Date, endDate: Date, locale: Locale): List<Month> {
         val start = startDate.toLocalDate()
         val end = endDate.toLocalDate()
         val months = mutableListOf<Month>()
 
-        var current = YearMonth.from(start)
+        val weekFields = WeekFields.of(locale)
+
+        var currentMonth = YearMonth.from(start)
         val endMonth = YearMonth.from(end)
 
-        while (!current.isAfter(endMonth)) {
+        while (!currentMonth.isAfter(endMonth)) {
             val weeks = mutableListOf<Week>()
-            val firstDayOfMonth = current.atDay(1)
-            val lastDayOfMonth = current.atEndOfMonth()
+            val firstDayOfMonth = currentMonth.atDay(1)
+            val lastDayOfMonth = currentMonth.atEndOfMonth()
 
-            // Calculate week numbers in this month
-            var currentWeekDay = firstDayOfMonth
-            while (!currentWeekDay.isAfter(lastDayOfMonth)) {
-                val weekNumber = currentWeekDay.get(
-                    WeekFields.of(Locale.getDefault()).weekOfMonth()
-                ) - 1
-                if (weekNumber >= 0 && weeks.none { it.number == weekNumber && it.yearMonth == current }) {
-                    weeks.add(Week(weekNumber, current))
+            var d = firstDayOfMonth
+            while (!d.isAfter(lastDayOfMonth)) {
+                val weekStart = d.with(TemporalAdjusters.previousOrSame(weekFields.firstDayOfWeek))
+                if (weeks.none { it.startDate == weekStart }) {
+                    weeks.add(Week(weekStart, currentMonth))
                 }
-                currentWeekDay = currentWeekDay.plusDays(7)
+                d = d.plusDays(1)
             }
 
-            months.add(Month(current, weeks.sortedBy { it.number }))
-            current = current.plusMonths(1)
+            months.add(Month(currentMonth, weeks.sortedBy { it.startDate }))
+            currentMonth = currentMonth.plusMonths(1)
         }
 
         return months
@@ -680,61 +685,56 @@ class CalendarState(
     }
 }
 
-@Preview(name = "Calendar Heatmap - Diverse Intensity", widthDp = 420)
-@Preview(
-    name = "Calendar Heatmap - Diverse Intensity Dark",
-    widthDp = 420,
-    showSystemUi = false,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
-)
+@Preview(name = "Heatmap - Short Period (Aug 29-31)", widthDp = 420)
 @Composable
-private fun PreviewCalendarHeatmap() {
-    val start = LocalDate.now().minusDays(13)
-    val budget = BigDecimal(100)
-
-    // We want to hit specific intensity thresholds:
-    // 0.0 (None), ~0.3 (Low), ~0.5 (Scaling start), ~0.8 (Outline start), 1.0+ (Peak/Cutout)
-    val mockTransactions = buildList {
-        val scenarios = listOf(
-            0 to 0,      // Day 0: Empty (0.0)
-            1 to 10,     // Day 1: Low (10%)
-            3 to 30,     // Day 2: Light (~0.3)
-            5 to 50,     // Day 3: Medium (0.5 - scaling begins)
-            7 to 75,     // Day 4: High (0.8 - outline begins)
-            10 to 110,   // Day 5: Peak (1.1 - extreme cutout)
-            12 to 20,    // Day 6: High count, low amount
-            2 to 95,     // Day 7: Low count, high amount
-            0 to 0,      // Day 8: Gap
-            4 to 45,     // Day 9: Normal
-            6 to 85,     // Day 10: High
-            15 to 130,   // Day 11: Absolute Max
-            1 to 5,      // Day 12: Minimal
-            2 to 15      // Day 13: Normal low
-        )
-
-        scenarios.forEachIndexed { index, (count, totalAmount) ->
-            repeat(count) { txIndex ->
-                val splitAmount = BigDecimal(totalAmount).divide(
-                    BigDecimal(count), 2, java.math.RoundingMode.HALF_UP
-                )
-                add(
-                    Transaction(
-                        id = (index * 100 + txIndex).toLong(),
-                        amount = splitAmount,
-                        date = start.plusDays(index.toLong()).atTime(9 + (txIndex % 8), 0),
-                        comment = "Preview Tx $index-$txIndex",
-                    )
-                )
-            }
-        }
-    }
-
+private fun PreviewHeatmapShortPeriod() {
+    val start = LocalDate.of(2026, 8, 29)
+    val end = LocalDate.of(2026, 8, 31)
     MinusTheme {
         CalendarHeatmap(
-            budget = budget,
-            transactions = mockTransactions,
+            budget = BigDecimal(1000),
+            transactions = listOf(
+                Transaction(amount = BigDecimal(100), date = start.atTime(12, 0)),
+                Transaction(amount = BigDecimal(200), date = end.atTime(12, 0))
+            ),
             startDate = start.toDate(),
-            finishDate = start.plusDays(13).toDate(),
+            finishDate = end.toDate(),
+        )
+    }
+}
+
+@Preview(name = "Heatmap - Two Months", widthDp = 420)
+@Composable
+private fun PreviewHeatmapTwoMonths() {
+    val start = LocalDate.of(2026, 6, 15)
+    val end = LocalDate.of(2026, 7, 15)
+    MinusTheme {
+        CalendarHeatmap(
+            budget = BigDecimal(1000),
+            transactions = listOf(
+                Transaction(amount = BigDecimal(50), date = start.atTime(12, 0)),
+                Transaction(amount = BigDecimal(150), date = end.atTime(12, 0))
+            ),
+            startDate = start.toDate(),
+            finishDate = end.toDate(),
+        )
+    }
+}
+
+@Preview(name = "Heatmap - Year Cross", widthDp = 420)
+@Composable
+private fun PreviewHeatmapYearCross() {
+    val start = LocalDate.of(2025, 12, 28)
+    val end = LocalDate.of(2026, 1, 5)
+    MinusTheme {
+        CalendarHeatmap(
+            budget = BigDecimal(1000),
+            transactions = listOf(
+                Transaction(amount = BigDecimal(100), date = start.atTime(12, 0)),
+                Transaction(amount = BigDecimal(200), date = end.atTime(12, 0))
+            ),
+            startDate = start.toDate(),
+            finishDate = end.toDate(),
         )
     }
 }
