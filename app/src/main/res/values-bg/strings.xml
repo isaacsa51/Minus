@@ -59,7 +59,7 @@
     <string name="credit_cutoff_dialog_message">За да проследявате разходите по кредитната карта, задайте деня на падеж (1–31).</string>
     <string name="credit_cutoff_dialog_label">Ден на падеж</string>
     <string name="expand_numpad">Разгъване на цифровата клавиатура</string>
-    <string name="numpad_action">Действие с цифровия блок на клавиатурата</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
     <string name="period_finished">Периодът приключи</string>
     <string name="remaining_budget">Оставащ бюджет</string>
@@ -92,6 +92,8 @@
     <string name="widget_description">Бърз преглед на разходите ви и добавяне на нови</string>
     <string name="total_expenses">Общо разходи</string>
     <string name="new_expense">Нов разход</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">Средно на ден</string>
     <string name="expenses_history">История на разходите</string>
     <string name="single_expense">Единичен разход</string>
@@ -512,6 +514,7 @@
     <string name="no_name">Няма име</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">Причина за покупката</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">Дата</string>
     <string name="frequency">Честота</string>
     <string name="charge_day">Ден на таксуване</string>
