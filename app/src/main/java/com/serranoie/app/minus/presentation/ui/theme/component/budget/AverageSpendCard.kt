@@ -23,6 +23,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.font.format.numberFormat
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -38,16 +39,20 @@ fun AverageSpendCard(
 ) {
     val context = LocalContext.current
 
-    val totalAmount = remember(spends) {
-        spends.sumOf { it.amount }
+    val filteredSpends = remember(spends) {
+        spends.filter { it.amount > BigDecimal.ZERO }
     }
 
-    val days = remember(spends, startDate, finishDate) {
+    val totalAmount = remember(filteredSpends) {
+        filteredSpends.sumOf { it.amount }
+    }
+
+    val days = remember(filteredSpends, startDate, finishDate) {
         if (startDate != null && finishDate != null) {
             val diff = finishDate.time - startDate.time
             (diff / (1000 * 60 * 60 * 24)).coerceAtLeast(1)
         } else {
-            val dates = spends.mapNotNull { it.date?.toLocalDate() }
+            val dates = filteredSpends.mapNotNull { it.date?.toLocalDate() }
             val minDate = dates.minOrNull()
             val maxDate = dates.maxOrNull()
             if (minDate != null && maxDate != null) {
@@ -56,8 +61,8 @@ fun AverageSpendCard(
         }
     }
 
-    val averagePerDay = remember(totalAmount, days, spends.isEmpty()) {
-        if (spends.isEmpty()) return@remember null
+    val averagePerDay = remember(totalAmount, days, filteredSpends.isEmpty()) {
+        if (filteredSpends.isEmpty()) return@remember null
         totalAmount.divide(days.toBigDecimal(), 2, RoundingMode.HALF_EVEN)
     }
 

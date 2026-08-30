@@ -3,7 +3,10 @@ package com.serranoie.app.minus.presentation.ui.theme.component.expense
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -12,17 +15,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.SlantedShape
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActions
 import com.serranoie.app.minus.presentation.ui.theme.component.SwipeActionsConfig
@@ -51,23 +48,31 @@ fun SwipeableExpenseItem(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     creditCardCutoffDay: Int? = null,
 ) {
-    val shape = when (position) {
-        PaddedListItemPosition.First -> RoundedCornerShape(
-            topStart = 16.dp,
-            topEnd = 16.dp,
-            bottomStart = 4.dp,
-            bottomEnd = 4.dp
-        )
+    val isIncome = transaction.amount < java.math.BigDecimal.ZERO
+    val isDecrease = transaction.amount > java.math.BigDecimal.ZERO && transaction.isAdjustment
+    val isSlanted = isIncome || isDecrease
 
-        PaddedListItemPosition.Last -> RoundedCornerShape(
-            bottomStart = 16.dp,
-            bottomEnd = 16.dp,
-            topStart = 4.dp,
-            topEnd = 4.dp
-        )
+    val shape = if (isSlanted) {
+        SlantedShape
+    } else {
+        when (position) {
+            PaddedListItemPosition.First -> RoundedCornerShape(
+                topStart = 16.dp,
+                topEnd = 16.dp,
+                bottomStart = 4.dp,
+                bottomEnd = 4.dp
+            )
 
-        PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
-        PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
+            PaddedListItemPosition.Last -> RoundedCornerShape(
+                bottomStart = 16.dp,
+                bottomEnd = 16.dp,
+                topStart = 4.dp,
+                topEnd = 4.dp
+            )
+
+            PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
+            PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
+        }
     }
 
     if (readOnly) {
@@ -158,23 +163,31 @@ fun SwipeableUpcomingRecurrentItem(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     creditCardCutoffDay: Int? = null,
 ) {
-    val shape = when (position) {
-        PaddedListItemPosition.First -> RoundedCornerShape(
-            topStart = 16.dp,
-            topEnd = 16.dp,
-            bottomStart = 4.dp,
-            bottomEnd = 4.dp
-        )
+    val isIncome = item.transaction.amount < java.math.BigDecimal.ZERO
+    val isDecrease = item.transaction.amount > java.math.BigDecimal.ZERO && item.transaction.isAdjustment
+    val isSlanted = isIncome || isDecrease
 
-        PaddedListItemPosition.Last -> RoundedCornerShape(
-            bottomStart = 16.dp,
-            bottomEnd = 16.dp,
-            topStart = 4.dp,
-            topEnd = 4.dp
-        )
+    val shape = if (isSlanted) {
+        SlantedShape
+    } else {
+        when (position) {
+            PaddedListItemPosition.First -> RoundedCornerShape(
+                topStart = 16.dp,
+                topEnd = 16.dp,
+                bottomStart = 4.dp,
+                bottomEnd = 4.dp
+            )
 
-        PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
-        PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
+            PaddedListItemPosition.Last -> RoundedCornerShape(
+                bottomStart = 16.dp,
+                bottomEnd = 16.dp,
+                topStart = 4.dp,
+                topEnd = 4.dp
+            )
+
+            PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
+            PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
+        }
     }
 
     SwipeActions(
@@ -258,25 +271,71 @@ private fun SwipeableExpenseItemCreditPreview() {
 @Composable
 private fun SwipeableExpenseItemPreview() {
     MinusTheme {
-        SwipeableExpenseItem(
-            transaction = Transaction(
-                id = 1L,
-                amount = java.math.BigDecimal("150.50"),
-                comment = "Compra en supermercado",
-                date = LocalDateTime.now(),
-                isDeleted = false,
-                isRecurrent = false
-            ),
-            currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
-            position = PaddedListItemPosition.Single,
-            onDelete = {},
-            onEdit = {},
-            readOnly = false,
-            isBeingDeleted = false,
-            onClick = {},
-            sharedTransitionScope = null,
-            animatedVisibilityScope = null,
-        )
+        Column {
+            SwipeableExpenseItem(
+                transaction = Transaction(
+                    id = 1L,
+                    amount = java.math.BigDecimal("15.00"),
+                    comment = "Lend",
+                    date = LocalDateTime.now(),
+                    isDeleted = false,
+                    isRecurrent = false,
+                    categoryId = null
+                ),
+                currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
+                position = PaddedListItemPosition.First,
+                onDelete = {},
+                onEdit = {},
+                readOnly = false,
+                isBeingDeleted = false,
+                onClick = {},
+                sharedTransitionScope = null,
+                animatedVisibilityScope = null,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            SwipeableExpenseItem(
+                transaction = Transaction(
+                    id = 2L,
+                    amount = java.math.BigDecimal("-220.25"),
+                    comment = "Bonus",
+                    date = LocalDateTime.now(),
+                    isDeleted = false,
+                    isRecurrent = false,
+                    categoryId = 1L
+                ),
+                currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
+                position = PaddedListItemPosition.Middle,
+                onDelete = {},
+                onEdit = {},
+                readOnly = false,
+                isBeingDeleted = false,
+                onClick = {},
+                sharedTransitionScope = null,
+                animatedVisibilityScope = null,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            // Normal Expense (With category)
+            SwipeableExpenseItem(
+                transaction = Transaction(
+                    id = 3L,
+                    amount = java.math.BigDecimal("5.00"),
+                    comment = "Food",
+                    date = LocalDateTime.now(),
+                    isDeleted = false,
+                    isRecurrent = false,
+                    categoryId = 1L
+                ),
+                currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
+                position = PaddedListItemPosition.Last,
+                onDelete = {},
+                onEdit = {},
+                readOnly = false,
+                isBeingDeleted = false,
+                onClick = {},
+                sharedTransitionScope = null,
+                animatedVisibilityScope = null,
+            )
+        }
     }
 }
 

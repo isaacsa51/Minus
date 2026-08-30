@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -28,7 +29,9 @@ data class TransactionEntity(
     val subscriptionDay: Int? = null,
     val categoryId: Long? = null,
     val isCredit: Boolean = false,
-    val isCreditPaid: Boolean = false
+    val isCreditPaid: Boolean = false,
+    @ColumnInfo(defaultValue = "0")
+    val isAdjustment: Boolean = false
 ) {
     companion object {
         fun fromDomain(
@@ -41,7 +44,8 @@ data class TransactionEntity(
             subscriptionDay: Int? = null,
             categoryId: Long? = null,
             isCredit: Boolean = false,
-            isCreditPaid: Boolean = false
+            isCreditPaid: Boolean = false,
+            isAdjustment: Boolean = false
         ): TransactionEntity = TransactionEntity(
             id = 0,
             amount = amount,
@@ -53,7 +57,8 @@ data class TransactionEntity(
             subscriptionDay = subscriptionDay,
             categoryId = categoryId,
             isCredit = isCredit,
-            isCreditPaid = isCreditPaid
+            isCreditPaid = isCreditPaid,
+            isAdjustment = isAdjustment
         )
     }
 }

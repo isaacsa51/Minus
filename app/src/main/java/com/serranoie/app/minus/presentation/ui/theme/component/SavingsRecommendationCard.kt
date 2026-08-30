@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,8 +68,8 @@ fun SavingsRecommendationCard(
     currency: String = "MXN",
     preferences: SavingsPreferences = SavingsPreferences.DEFAULT,
 ) {
-    val recurrentSpent = recurringInPeriod.sumOf { it.amount }
-    val variableSpent = oneTimeSpends.sumOf { it.amount }
+    val recurrentSpent = recurringInPeriod.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
+    val variableSpent = oneTimeSpends.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
     val totalSpent = recurrentSpent.add(variableSpent)
     val savings = budget.subtract(totalSpent).max(BigDecimal.ZERO)
 
@@ -80,12 +81,12 @@ fun SavingsRecommendationCard(
         recurrentSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
     val variablePct =
         variableSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
-    val projectedPerPeriod =
-        preferences.projectedPerPeriod() ?: budget.multiply(BigDecimal(preferences.savingsPct))
-            .divide(BigDecimal(100), 2, RoundingMode.HALF_UP)
-
     val idealSavingsPerPeriod = budget.multiply(BigDecimal(preferences.savingsPct))
         .divide(BigDecimal(100), 2, RoundingMode.HALF_UP)
+
+    val projectedPerPeriod =
+        preferences.projectedPerPeriod() ?: idealSavingsPerPeriod
+
     val projectedSavingsSixMonths = idealSavingsPerPeriod.multiply(BigDecimal(6))
 
     val spendingCeiling = preferences.spendingCeilingPct
@@ -254,74 +255,41 @@ fun LinearSavingsBar(
     val totalSpentPct = recurrentPct + variablePct
     val ceiling = spendingCeilingPct.coerceIn(0, 100)
 
-    Box(
-        modifier = modifier
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-    ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            val recSafe = recurrentPct.coerceAtMost(ceiling).toFloat()
-            val varSafe = if (recurrentPct < ceiling) {
-                variablePct.coerceAtMost(ceiling - recurrentPct).toFloat()
-            } else 0f
-            val gapSafe = (ceiling - (recSafe + varSafe)).coerceAtLeast(0f)
+    val recSafe = recurrentPct.coerceAtMost(ceiling).toFloat()
+    val varSafe = if (recurrentPct < ceiling) {
+        variablePct.coerceAtMost(ceiling - recurrentPct).toFloat()
+    } else 0f
+    val gapSafe = (ceiling - (recSafe + varSafe)).coerceAtLeast(0f)
 
-            val invasionBudget = (100 - ceiling).coerceAtLeast(0)
-            val totalInvasion = (totalSpentPct - ceiling).coerceIn(0, invasionBudget).toFloat()
-            val safeSavings = (invasionBudget - totalInvasion).coerceAtLeast(0f)
+    val invasionBudget = (100 - ceiling).coerceAtLeast(0)
+    val totalInvasion = (totalSpentPct - ceiling).coerceIn(0, invasionBudget).toFloat()
+    val safeSavings = (invasionBudget - totalInvasion).coerceAtLeast(0f)
 
-            if (recSafe > 0) {
-                Box(
-                    Modifier
-                        .weight(recSafe)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(MaterialTheme.colorScheme.outlineVariant)
-                )
-            }
-            if (varSafe > 0) {
-                Box(
-                    Modifier
-                        .weight(varSafe)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(MaterialTheme.colorScheme.primary)
-                )
-            }
-            if (gapSafe > 0) {
-                Spacer(Modifier.weight(gapSafe))
-            }
+    val recurringColor = MaterialTheme.colorScheme.outlineVariant
+    val variableColor = MaterialTheme.colorScheme.primary
+    val errorColor = MaterialTheme.colorScheme.error
 
-            Box(
-                Modifier
-                    .width(1.dp)
-                    .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f))
-            )
-
-            if (totalInvasion > 0) {
-                Box(
-                    Modifier
-                        .weight(totalInvasion)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(MaterialTheme.colorScheme.error)
-                )
-            }
-            if (safeSavings > 0) {
-                Box(
-                    Modifier
-                        .weight(safeSavings)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(MaterialTheme.colorScheme.error.copy(alpha = 0.15f))
-                )
-            }
+    val mainSegments = remember(recSafe, varSafe, gapSafe, recurringColor, variableColor) {
+        buildList {
+            if (recSafe > 0) add(BarSegment(recSafe, recurringColor))
+            if (varSafe > 0) add(BarSegment(varSafe, variableColor))
+            if (gapSafe > 0) add(BarSegment(gapSafe, Color.Transparent))
         }
     }
+
+    val secondarySegments = remember(totalInvasion, safeSavings, errorColor) {
+        buildList {
+            if (totalInvasion > 0) add(BarSegment(totalInvasion, errorColor))
+            if (safeSavings > 0) add(BarSegment(safeSavings, errorColor.copy(alpha = 0.15f)))
+        }
+    }
+
+    LinearSavingBar(
+        segments = mainSegments,
+        secondarySegments = secondarySegments,
+        modifier = modifier,
+        separatorWeight = 1f
+    )
 }
 
 @Composable
@@ -336,7 +304,7 @@ private fun RecommendationItem(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(10.dp)
+                    .size(8.dp)
                     .clip(CircleShape)
                     .background(color)
             )

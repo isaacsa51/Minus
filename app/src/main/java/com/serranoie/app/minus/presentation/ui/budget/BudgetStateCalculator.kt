@@ -52,8 +52,16 @@ class BudgetStateCalculator @Inject constructor(
         val originalTotalDays = ChronoUnit.DAYS.between(settings.startDate, periodEnd).toInt() + 1
 
         val activeTransactions = transactions.filter { !it.isDeleted && !it.isRecurrent }
-        val totalExpensesInPeriod = activeTransactions.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
-        val totalIncomeInPeriod = activeTransactions.filter { it.amount < BigDecimal.ZERO }.sumOf { it.amount }.abs()
+        val totalExpensesInPeriod = activeTransactions
+            .filter { it.amount > BigDecimal.ZERO && !it.isAdjustment }
+            .sumOf { it.amount }
+        val totalIncomeInPeriod = activeTransactions
+            .filter { it.amount < BigDecimal.ZERO }
+            .sumOf { it.amount }
+            .abs()
+        val totalDecreasesInPeriod = activeTransactions
+            .filter { it.amount > BigDecimal.ZERO && it.isAdjustment }
+            .sumOf { it.amount }
 
         val carryForFirstDay = if (
             settings.rollOverCarryForward && currentDate.isEqual(settings.startDate)
@@ -69,7 +77,10 @@ class BudgetStateCalculator @Inject constructor(
             BigDecimal.ZERO
         }
 
-        val effectiveTotalBudget = settings.totalBudget.add(rolloverAmount).add(totalIncomeInPeriod)
+        val effectiveTotalBudget = settings.totalBudget
+            .add(rolloverAmount)
+            .add(totalIncomeInPeriod)
+            .subtract(totalDecreasesInPeriod)
         val remainingBudget = effectiveTotalBudget.subtract(totalExpensesInPeriod)
         val originalDailyBudget = when (settings.splitMode) {
             BudgetSplitMode.DYNAMIC -> {

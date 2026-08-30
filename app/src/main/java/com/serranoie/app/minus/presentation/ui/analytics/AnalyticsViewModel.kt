@@ -275,6 +275,9 @@ class AnalyticsViewModel @Inject constructor(
         )
 
         val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
+            .filter { it.amount > BigDecimal.ZERO }
+        val actualIncomes = (oneTimeSpends + paidRecurring).distinctBy { it.id }
+            .filter { it.amount < BigDecimal.ZERO }
         val budgetSettings = archive.toBudgetSettings()
 
         val budgetState = budgetStateCalculator.calculateBudgetState(
@@ -294,6 +297,7 @@ class AnalyticsViewModel @Inject constructor(
             transactions = actualSpends,
             allTransactions = allTransactions,
             spends = actualSpends,
+            incomes = actualIncomes,
             chartSpends = actualSpends.toChartSpends(),
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
@@ -359,6 +363,10 @@ class AnalyticsViewModel @Inject constructor(
             lastPeriodEnd = null,
         )
 
+        val spends = transactions.filter { it.amount > BigDecimal.ZERO && !it.isAdjustment }
+        val incomes = transactions.filter { it.amount < BigDecimal.ZERO }
+        val decreases = transactions.filter { it.amount > BigDecimal.ZERO && it.isAdjustment }
+
         val previousTransactions = findPreviousPeriodTransactions(
             allTransactions = allTransactions,
             archives = archives,
@@ -393,7 +401,9 @@ class AnalyticsViewModel @Inject constructor(
             periodFinished = settings.getPeriodEndDate().isBefore(today) || earlyFinishActive,
             transactions = transactions,
             allTransactions = allTransactions,
-            spends = transactions,
+            spends = spends,
+            incomes = incomes,
+            decreases = decreases,
             chartSpends = transactions.toChartSpends(),
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,

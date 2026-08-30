@@ -273,12 +273,16 @@ fun SwipeActions(
             val swipingEnd = state.dismissDirection == SwipeToDismissBoxValue.EndToStart
 
             val currentShapeInner = remember(animateCorners, currentShape, cornerAnim, swipingStart, swipingEnd) {
-                RoundedCornerShape(
-                    topStart = if (swipingStart && animateCorners) cornerAnim else 16.dp,
-                    bottomStart = if (swipingStart && animateCorners) cornerAnim else 16.dp,
-                    topEnd = if (swipingEnd && animateCorners) cornerAnim else 16.dp,
-                    bottomEnd = if (swipingEnd && animateCorners) cornerAnim else 16.dp
-                )
+                if (animateCorners) {
+                    RoundedCornerShape(
+                        topStart = if (swipingStart) cornerAnim else 16.dp,
+                        bottomStart = if (swipingStart) cornerAnim else 16.dp,
+                        topEnd = if (swipingEnd) cornerAnim else 16.dp,
+                        bottomEnd = if (swipingEnd) cornerAnim else 16.dp
+                    )
+                } else {
+                    currentShape
+                }
             }
 
             Surface(

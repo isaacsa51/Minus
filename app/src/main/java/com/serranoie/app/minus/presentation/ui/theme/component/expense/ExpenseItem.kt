@@ -40,6 +40,7 @@ import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.font.format.calculateDaysToCutoff
 import com.serranoie.app.minus.presentation.util.font.format.prettyDate
+import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.util.Locale
@@ -104,6 +105,7 @@ fun ExpenseItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val isIncome = transaction.amount < java.math.BigDecimal.ZERO
+                        val isDecrease = transaction.amount > java.math.BigDecimal.ZERO && transaction.isAdjustment
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
@@ -187,13 +189,17 @@ fun ExpenseItem(
                         }
 
                         Text(
-                            text = if (isIncome) {
-                                "+${currencyFormat.format(transaction.amount.abs())}"
-                            } else {
-                                currencyFormat.format(transaction.amount)
+                            text = when {
+                                isIncome -> "+${currencyFormat.format(transaction.amount.abs())}"
+                                isDecrease -> "-${currencyFormat.format(transaction.amount)}"
+                                else -> currencyFormat.format(transaction.amount)
                             },
                             style = MaterialTheme.typography.titleSmallEmphasized,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = when {
+                                isIncome -> colorGood
+                                isDecrease -> MaterialTheme.colorScheme.error
+                                else -> MaterialTheme.colorScheme.onSurface
+                            },
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier
                                 .censor()

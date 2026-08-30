@@ -93,6 +93,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommenda
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.AverageSpendCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditOwedCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditTransactionsBottomSheet
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.DeductedBudgetCard
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.IncomeAddedCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.MinMaxSpentCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendsCountCard
@@ -126,6 +128,8 @@ data class AnalyticsState(
     val transactions: List<Transaction> = emptyList(),
     val allTransactions: List<Transaction> = emptyList(),
     val spends: List<Transaction> = emptyList(),
+    val incomes: List<Transaction> = emptyList(),
+    val decreases: List<Transaction> = emptyList(),
     val chartSpends: List<Transaction> = emptyList(),
     val recurringInPeriod: List<Transaction> = emptyList(),
     val oneTimeSpends: List<Transaction> = emptyList(),
@@ -747,7 +751,7 @@ private fun AnalyticsCompactLayout(
                 .padding(horizontal = 16.dp)
         ) {
             SpendsCountCard(
-                count = state.spends.size,
+                count = state.spends.filter { it.amount > BigDecimal.ZERO }.size,
                 onClick = onShowHistory,
                 modifier = Modifier
                     .weight(1f)
@@ -773,7 +777,7 @@ private fun AnalyticsCompactLayout(
         ) {
             SpendBudgetCard(
                 budget = state.wholeBudget,
-                spend = state.spends.sumOf { it.amount },
+                spend = state.spends.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount },
                 currency = state.currencyCode,
                 modifier = Modifier.weight(1f),
             )
@@ -790,6 +794,27 @@ private fun AnalyticsCompactLayout(
                         .markIfInOrder(6),
                 )
             }
+        }
+        if (state.incomes.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            IncomeAddedCard(
+                incomes = state.incomes,
+                categories = categories,
+                currency = state.currencyCode,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+            )
+        }
+        if (state.decreases.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            DeductedBudgetCard(
+                decreases = state.decreases,
+                currency = state.currencyCode,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
         CategoriesChartCard(
@@ -884,7 +909,7 @@ private fun AnalyticsTabletLayout(
         ) {
             SpendBudgetCard(
                 budget = state.wholeBudget,
-                spend = state.spends.sumOf { it.amount },
+                spend = state.spends.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount },
                 currency = state.currencyCode,
                 modifier = Modifier.weight(1f),
             )
@@ -908,7 +933,7 @@ private fun AnalyticsTabletLayout(
                     .fillMaxHeight()
             ) {
                 SpendsCountCard(
-                    count = state.spends.size,
+                    count = state.spends.filter { it.amount > BigDecimal.ZERO }.size,
                     onClick = onShowHistory,
                     modifier = Modifier
                         .weight(1f)
@@ -923,6 +948,23 @@ private fun AnalyticsTabletLayout(
                     modifier = Modifier.weight(1f),
                 )
             }
+        }
+        if (state.incomes.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            IncomeAddedCard(
+                incomes = state.incomes,
+                categories = categories,
+                currency = state.currencyCode,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        if (state.decreases.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            DeductedBudgetCard(
+                decreases = state.decreases,
+                currency = state.currencyCode,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
         Spacer(modifier = Modifier.height(8.dp))
         CategoriesChartCard(

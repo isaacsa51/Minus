@@ -85,14 +85,16 @@ class BudgetTransactionHandler @Inject constructor(
             )
         }
 
+        val isAdjustment = input.startsWith("+") || input.startsWith("-")
         val today = LocalDate.now()
         return try {
+            val categoryId: Long? = if (comment.isNotBlank()) {
+                budgetRepository.findOrCreateCategory(comment.trim()).id
+            } else {
+                null
+            }
+
             if (budgetSettings != null && today.isAfter(budgetSettings.getPeriodEndDate())) {
-                val categoryId: Long? = if (comment.isNotBlank()) {
-                    budgetRepository.findOrCreateCategory(comment.trim()).id
-                } else {
-                    null
-                }
 
                 val pendingTransaction = Transaction.create(
                     amount = amount,
@@ -101,18 +103,13 @@ class BudgetTransactionHandler @Inject constructor(
                     periodId = 0L,
                     categoryId = categoryId,
                     isCredit = isCreditEnabled,
+                    isAdjustment = isAdjustment
                 )
                 budgetRepository.addQueuedTransaction(pendingTransaction)
                 return ApplyTransactionResult.QueuedForNextPeriod(normalizedInput = normalizedInput)
             }
 
             val activePeriodId = resolveActivePeriodId()
-            val categoryId: Long? = if (comment.isNotBlank()) {
-                budgetRepository.findOrCreateCategory(comment.trim()).id
-            } else {
-                null
-            }
-
             val transaction = Transaction.create(
                 amount = amount,
                 comment = comment,
@@ -120,6 +117,7 @@ class BudgetTransactionHandler @Inject constructor(
                 periodId = activePeriodId,
                 categoryId = categoryId,
                 isCredit = isCreditEnabled,
+                isAdjustment = isAdjustment
             )
             addTransactionUseCase(transaction)
             ApplyTransactionResult.Added(normalizedInput = normalizedInput)

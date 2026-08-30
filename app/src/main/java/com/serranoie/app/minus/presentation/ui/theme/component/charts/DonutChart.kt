@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
@@ -113,7 +114,8 @@ fun DonutChart(
                         val innerRadius = radius * 0.45f
 
                         if (distance in innerRadius..radius) {
-                            var angle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+                            var angle =
+                                Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
                             if (angle < -90) angle += 360
 
                             var currentAngle = -90f
@@ -154,7 +156,7 @@ fun DonutChart(
                 Path().apply {
                     arcTo(
                         rect =
-                            androidx.compose.ui.geometry.Rect(
+                            Rect(
                                 arcCenterX - outerRadius,
                                 arcCenterY - outerRadius,
                                 arcCenterX + outerRadius,
@@ -166,7 +168,7 @@ fun DonutChart(
                     )
                     arcTo(
                         rect =
-                            androidx.compose.ui.geometry.Rect(
+                            Rect(
                                 arcCenterX - innerRadius,
                                 arcCenterY - innerRadius,
                                 arcCenterX + innerRadius,
@@ -195,10 +197,13 @@ fun DonutChart(
                         .toInt()
 
                 val labelRadius = (outerRadius + innerRadius) / 2f
-                val labelX = arcCenterX + cos(Math.toRadians(midAngle.toDouble())).toFloat() * labelRadius
-                val labelY = arcCenterY + sin(Math.toRadians(midAngle.toDouble())).toFloat() * labelRadius
+                val labelX =
+                    arcCenterX + cos(Math.toRadians(midAngle.toDouble())).toFloat() * labelRadius
+                val labelY =
+                    arcCenterY + sin(Math.toRadians(midAngle.toDouble())).toFloat() * labelRadius
 
-                textPaint.color = (if (items[index].isSpecial) surfaceColor else onSurfaceColor).toArgb()
+                textPaint.color =
+                    (if (items[index].isSpecial) surfaceColor else onSurfaceColor).toArgb()
                 textPaint.alpha = (255 * ((offsetProgress - 0.5f) * 2f)).toInt().coerceIn(0, 255)
 
                 drawContext.canvas.nativeCanvas.drawText(

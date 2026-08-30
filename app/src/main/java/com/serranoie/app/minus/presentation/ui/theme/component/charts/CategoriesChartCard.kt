@@ -154,10 +154,14 @@ fun CategoriesChartCard(
 
     var offsetColor = 0
 
+    val filteredSpends = remember(spends) {
+        spends.filter { it.amount > BigDecimal.ZERO }
+    }
+
     val tags =
-        remember(spends, labelWithoutTag, labelRest, colors, restColor) {
+        remember(filteredSpends, labelWithoutTag, labelRest, colors, restColor) {
             var result =
-                spends
+                filteredSpends
                     .map { it.copy(comment = it.comment.ifEmpty { labelWithoutTag }) }
                     .groupBy { it.comment.trim() }
                     .map { tag ->
@@ -228,7 +232,7 @@ fun CategoriesChartCard(
             ChartContent(
                 tags = tags,
                 selectedCategoryName = selectedCategoryName,
-                spends = spends,
+                spends = filteredSpends,
                 labelWithoutTag = labelWithoutTag,
                 currency = currency,
                 onCategoryClick = onCategoryClick,

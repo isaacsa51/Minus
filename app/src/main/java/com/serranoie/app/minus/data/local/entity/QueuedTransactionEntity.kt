@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -13,5 +14,7 @@ data class QueuedTransactionEntity(
     val createdAt: Long = System.currentTimeMillis(),
     val categoryId: Long? = null,
     val isCredit: Boolean = false,
-    val isCreditPaid: Boolean = false
+    val isCreditPaid: Boolean = false,
+    @ColumnInfo(defaultValue = "0")
+    val isAdjustment: Boolean = false
 )

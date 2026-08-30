@@ -62,6 +62,8 @@ fun ExpenseItemExpandedContent(
     val chargeDayLabel = stringResource(R.string.charge_day)
 
     val isIncome = transaction.amount < BigDecimal.ZERO
+    val isDecrease = transaction.amount > BigDecimal.ZERO && transaction.isAdjustment
+    val isSlanted = isIncome || isDecrease
 
     val transactionDateText = transaction.date?.let { date ->
         prettyDate(date, showTime = true, forceHideDate = false, human = true)
@@ -73,8 +75,12 @@ fun ExpenseItemExpandedContent(
         null -> ""
     }
 
+    val descriptionLabel = stringResource(R.string.description)
+    val adjustmentReasonLabel = stringResource(R.string.adjustment_reason)
+
     val details = buildList {
-        add(stringResource(R.string.description) to transaction.comment.ifEmpty { stringResource(if (isIncome) R.string.no_name_income else R.string.no_name) })
+        val reasonLabel = if (isSlanted) adjustmentReasonLabel else descriptionLabel
+        add(reasonLabel to transaction.comment.ifEmpty { stringResource(if (isIncome) R.string.no_name_income else R.string.no_name) })
         add(dateLabel to transactionDateText)
 
         if (transaction.isCredit && creditCardCutoffDay != null) {
@@ -126,10 +132,10 @@ fun ExpenseItemExpandedContent(
         )
 
         Text(
-            text = if (isIncome) {
-                "+${currencyFormat.format(transaction.amount.abs())}"
-            } else {
-                currencyFormat.format(transaction.amount)
+            text = when {
+                isIncome -> "+${currencyFormat.format(transaction.amount.abs())}"
+                isDecrease -> "-${currencyFormat.format(transaction.amount)}"
+                else -> currencyFormat.format(transaction.amount)
             },
             style = MaterialTheme.typography.headlineSmallEmphasized,
             color = if (isIncome) colorGood else MaterialTheme.colorScheme.error,
@@ -170,7 +176,7 @@ fun ExpenseItemExpandedContent(
                     modifier = Modifier
                         .weight(1f)
                         .then(
-                            if (label == stringResource(R.string.description) && sharedTransitionScope != null && animatedVisibilityScope != null) {
+                            if ((label == descriptionLabel || label == adjustmentReasonLabel) && sharedTransitionScope != null && animatedVisibilityScope != null) {
                                 with(sharedTransitionScope) {
                                     Modifier.sharedElement(
                                         rememberSharedContentState(key = "comment_${transaction.id}"),

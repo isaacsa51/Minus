@@ -69,7 +69,8 @@ class BudgetRepositoryImpl @Inject constructor(
         subscriptionDay = this.subscriptionDay,
         categoryId = this.categoryId,
         isCredit = this.isCredit,
-        isCreditPaid = this.isCreditPaid
+        isCreditPaid = this.isCreditPaid,
+        isAdjustment = this.isAdjustment
     )
 
     private fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
@@ -86,7 +87,8 @@ class BudgetRepositoryImpl @Inject constructor(
         subscriptionDay = this.subscriptionDay,
         categoryId = this.categoryId,
         isCredit = this.isCredit,
-        isCreditPaid = this.isCreditPaid
+        isCreditPaid = this.isCreditPaid,
+        isAdjustment = this.isAdjustment
     )
 
     private fun QueuedTransactionEntity.toDomain(): Transaction = Transaction(
@@ -104,7 +106,8 @@ class BudgetRepositoryImpl @Inject constructor(
         subscriptionDay = null,
         categoryId = this.categoryId,
         isCredit = this.isCredit,
-        isCreditPaid = this.isCreditPaid
+        isCreditPaid = this.isCreditPaid,
+        isAdjustment = this.isAdjustment
     )
 
     private fun Transaction.toQueuedEntity(): QueuedTransactionEntity = QueuedTransactionEntity(
@@ -115,7 +118,8 @@ class BudgetRepositoryImpl @Inject constructor(
         createdAt = this.createdAt,
         categoryId = this.categoryId,
         isCredit = this.isCredit,
-        isCreditPaid = this.isCreditPaid
+        isCreditPaid = this.isCreditPaid,
+        isAdjustment = this.isAdjustment
     )
 
     private fun BudgetSettingsEntity.toDomain(): BudgetSettings {

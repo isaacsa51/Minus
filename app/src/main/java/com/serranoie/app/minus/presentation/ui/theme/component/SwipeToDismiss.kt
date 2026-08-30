@@ -28,17 +28,11 @@ import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-/**
- * Direction of the dismiss action
- */
 enum class DismissDirection {
     StartToEnd,
     EndToStart
 }
 
-/**
- * State representing the dismiss state of an item
- */
 class DismissState(
     val initialValue: DismissValue = DismissValue.Default,
     val confirmStateChange: (DismissValue) -> Boolean = { true }
@@ -75,18 +69,12 @@ class DismissState(
     }
 }
 
-/**
- * Value representing the dismiss state
- */
 enum class DismissValue {
     Default,
     DismissedToEnd,
     DismissedToStart
 }
 
-/**
- * Creates and remembers a [DismissState]
- */
 @Composable
 fun rememberDismissState(
     initialValue: DismissValue = DismissValue.Default,
@@ -97,15 +85,6 @@ fun rememberDismissState(
     }
 }
 
-/**
- * Custom SwipeToDismiss composable that works with Material3
- * 
- * @param state The state of the dismiss
- * @param modifier Modifier for the layout
- * @param directions Directions in which the item can be dismissed
- * @param background Background content shown during swipe
- * @param dismissContent Content that can be dismissed
- */
 @Composable
 fun SwipeToDismiss(
     state: DismissState,
@@ -118,21 +97,16 @@ fun SwipeToDismiss(
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
     
-    // Threshold for dismissing (40% of width)
     val dismissThreshold = 0.4f
     
-    // Animate offset
     val offsetAnim = remember { Animatable(0f) }
     
-    // Track if we're currently dismissing
     var isDismissing by remember { mutableStateOf(false) }
     
-    // Draggable state
     val draggableState = rememberDraggableState(
         onDelta = { delta ->
             scope.launch {
                 val newOffset = offsetAnim.value + delta
-                // Only allow swipe in configured directions
                 val allowed = when {
                     directions.contains(DismissDirection.StartToEnd) && 
                             directions.contains(DismissDirection.EndToStart) -> true
@@ -145,7 +119,6 @@ fun SwipeToDismiss(
                     offsetAnim.snapTo(newOffset)
                     state.offset = newOffset
                     
-                    // Calculate progress for haptic feedback
                     val progress = newOffset.absoluteValue / 1000f // approximate width
                     if (progress > dismissThreshold && !isDismissing) {
                         isDismissing = true
@@ -159,7 +132,6 @@ fun SwipeToDismiss(
     )
     
     Box(modifier = modifier) {
-        // Background layer (revealed during swipe)
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -171,7 +143,6 @@ fun SwipeToDismiss(
             background()
         }
         
-        // Foreground content (draggable)
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -182,24 +153,21 @@ fun SwipeToDismiss(
                     onDragStopped = { velocity ->
                         scope.launch {
                             val offset = offsetAnim.value
-                            val width = 1000f // approximate
+                            val width = 1000f
                             val threshold = width * dismissThreshold
                             
                             when {
                                 offset > threshold && directions.contains(DismissDirection.StartToEnd) -> {
-                                    // Dismiss to end
                                     offsetAnim.animateTo(width, spring())
                                     state.dismiss(DismissDirection.StartToEnd)
                                     state.confirmStateChange(DismissValue.DismissedToEnd)
                                 }
                                 offset < -threshold && directions.contains(DismissDirection.EndToStart) -> {
-                                    // Dismiss to start
                                     offsetAnim.animateTo(-width, spring())
                                     state.dismiss(DismissDirection.EndToStart)
                                     state.confirmStateChange(DismissValue.DismissedToStart)
                                 }
                                 else -> {
-                                    // Reset
                                     offsetAnim.animateTo(0f, spring())
                                     state.reset()
                                 }

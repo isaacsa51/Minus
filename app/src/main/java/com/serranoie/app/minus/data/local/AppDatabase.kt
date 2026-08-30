@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.data.local
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.serranoie.app.minus.data.local.dao.ArchivedBudgetDao
@@ -24,7 +25,10 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
         ArchivedBudgetEntity::class,
         PaidRecurrentOccurrenceEntity::class
     ],
-    version = 16,
+    version = 17,
+    autoMigrations = [
+        AutoMigration(from = 16, to = 17)
+    ],
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

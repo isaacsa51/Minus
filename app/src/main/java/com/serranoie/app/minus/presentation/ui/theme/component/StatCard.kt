@@ -59,12 +59,13 @@ fun StatCard(
     valueOffsetWhenCrossedY: Int = -4,
     labelFontStyle: TextStyle = MaterialTheme.typography.labelMediumCondensed,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    shape: androidx.compose.ui.graphics.Shape = MaterialTheme.shapes.extraLarge,
     content: @Composable ColumnScope.() -> Unit = {},
     backdropContent: @Composable () -> Unit = {},
 ) {
     Card(
         modifier = modifier,
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = shape,
         colors = colors,
     ) {
         val textColor = LocalContentColor.current

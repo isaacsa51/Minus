@@ -76,8 +76,12 @@ fun MinMaxSpentCard(
 ) {
     val context = LocalContext.current
 
-    val minSpent = spends.minByOrNull { it.amount }
-    val maxSpent = spends.maxByOrNull { it.amount }
+    val filteredSpends = remember(spends) {
+        spends.filter { it.amount > BigDecimal.ZERO && !it.isAdjustment }
+    }
+
+    val minSpent = filteredSpends.minByOrNull { it.amount }
+    val maxSpent = filteredSpends.maxByOrNull { it.amount }
 
     val spent = if (isMin) minSpent else maxSpent
 
@@ -201,12 +205,12 @@ fun MinMaxSpentCard(
             }
         },
         backdropContent = {
-            if (spends.isNotEmpty()) {
+            if (filteredSpends.isNotEmpty()) {
                 SpendsChart(
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(),
-                    spends = spends,
+                    spends = filteredSpends,
                     markedTransaction = spent,
                     chartPadding = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
                     showBeforeMarked = 4,
