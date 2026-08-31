@@ -566,6 +566,11 @@ private fun EditingContent(
 
     val hasExpressionOperators = remember(input) { input.any { it in "+-×÷" } }
 
+    val isSimpleSignEntry = remember(input) {
+        (input.startsWith("+") || input.startsWith("-")) &&
+            input.substring(1).none { it in "+-×÷" }
+    }
+
     val calculationResult = remember(input, hasExpressionOperators) {
         if (!hasExpressionOperators || input.isEmpty()) return@remember null
 
@@ -696,10 +701,7 @@ private fun EditingContent(
             }
         }
 
-    val annotatedCalculationResult = remember(calculationResult, currencyCode, symbolStyle, input) {
-        val isSimpleSignEntry = (input.startsWith("+") || input.startsWith("-")) &&
-                input.substring(1).none { it in "+-×÷" }
-
+    val annotatedCalculationResult = remember(calculationResult, currencyCode, symbolStyle, isSimpleSignEntry) {
         if (calculationResult == null || isSimpleSignEntry) return@remember null
         val supportedCurrency = SupportedCurrency.findByCode(currencyCode)
         val currencySymbol = supportedCurrency?.symbol ?: "$"
@@ -773,7 +775,7 @@ private fun EditingContent(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 AnimatedContent(
-                    targetState = if (hasExpressionOperators && calculationResult != null) "result" else "input",
+                    targetState = if (hasExpressionOperators && calculationResult != null && !isSimpleSignEntry) "result" else "input",
                     transitionSpec = {
                         (
                                 fadeIn(animationSpec = tween(200)) + slideInHorizontally(
@@ -788,7 +790,7 @@ private fun EditingContent(
                     label = "EditorNumberTransition",
                     modifier = Modifier.fillMaxWidth()
                 ) { state ->
-                    if (state == "result" && hasExpressionOperators && calculationResult != null) {
+                    if (state == "result" && hasExpressionOperators && calculationResult != null && !isSimpleSignEntry) {
                         Column(
                             horizontalAlignment = Alignment.End,
                             modifier = Modifier.fillMaxWidth()
