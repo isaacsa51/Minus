@@ -49,7 +49,7 @@ touchRobot = "0.1.0"
 truth = "1.4.4"
 kotlinxCoroutinesTest = "1.10.2"
 turbine = "1.2.0"
-mockk = "1.13.13"
+mockk = "1.14.11"
 byteBuddyAgent = "1.14.17"
 
 [libraries]

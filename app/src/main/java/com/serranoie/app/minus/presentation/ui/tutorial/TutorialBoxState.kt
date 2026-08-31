@@ -181,7 +181,12 @@ fun Modifier.markForTutorial(
                 } else if (currentPos > targetPos) {
                     if (index in GatedIndices) state.gatedJumpedIndices.add(index)
                     state.pendingRewindCandidates.add(index)
-                } else if (index in GatedIndices && currentPos < targetPos && state.registrationOrder[currentPos] !in GatedIndices) {
+                } else if (
+                    index in GatedIndices &&
+                    currentPos < targetPos &&
+                    state.registrationOrder[currentPos] !in GatedIndices &&
+                    state.visitedIndices.isEmpty()
+                ) {
                     state.gatedJumpedIndices.add(index)
                     state.pendingRewindCandidates.add(index)
                 }

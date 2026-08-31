@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
@@ -59,6 +60,15 @@ class AnalyticsTutorialE2ETest {
         composeTestRule.waitForIdle()
     }
 
+    private fun awaitTutorialStep(resId: Int, timeoutMillis: Long = 5_000L) {
+        val text = composeTestRule.activity.getString(resId)
+        composeTestRule.waitUntil(timeoutMillis) {
+            composeTestRule.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty() &&
+                runCatching { composeTestRule.onNodeWithText(text).assertIsDisplayed() }.isSuccess
+        }
+        composeTestRule.onNodeWithText(text).assertIsDisplayed()
+    }
+
     @Test
     fun when_no_spends_tutorial_shows_header_step_first() {
         setAnalyticsContent(hasSpends = false)
@@ -67,10 +77,8 @@ class AnalyticsTutorialE2ETest {
         composeTestRule.onNodeWithText(title).assertIsDisplayed()
 
         composeTestRule.onNodeWithText(title).performClick()
-        composeTestRule.waitForIdle()
 
-        val nextTitle = composeTestRule.activity.getString(R.string.analytics_tutorial_budget_title)
-        composeTestRule.onNodeWithText(nextTitle).assertIsDisplayed()
+        awaitTutorialStep(R.string.analytics_tutorial_budget_title)
     }
 
     @Test
@@ -81,9 +89,7 @@ class AnalyticsTutorialE2ETest {
         composeTestRule.onNodeWithText(title).assertIsDisplayed()
 
         composeTestRule.onNodeWithText(title).performClick()
-        composeTestRule.waitForIdle()
 
-        val nextTitle = composeTestRule.activity.getString(R.string.analytics_tutorial_minmax_title)
-        composeTestRule.onNodeWithText(nextTitle).assertIsDisplayed()
+        awaitTutorialStep(R.string.analytics_tutorial_minmax_title)
     }
 }
