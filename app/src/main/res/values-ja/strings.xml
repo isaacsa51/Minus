@@ -262,6 +262,8 @@
     <string name="settings_rounded_font_title">丸みを帯びたフォントスタイル</string>
     <string name="settings_material_you_title">自分の素材</string>
     <string name="settings_material_you_subtitle">壁紙の色を使用して動的なアプリのテーマを適用する</string>
+    <string name="settings_amoled_title">AMOLEDテーマ</string>
+    <string name="settings_amoled_subtitle">ダークモードで背景と表面を純粋な黒にする</string>
     <string name="settings_censor_mode_title">プライバシーモード</string>
     <string name="settings_censor_mode_subtitle">アプリ内のすべての財務値を非表示にしたりぼかしたり</string>
     <string name="settings_feature_credit_toggle_title">クレジットカードを支払いとして使用</string>

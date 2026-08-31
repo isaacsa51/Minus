@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Brightness4
+import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
@@ -97,6 +98,7 @@ fun AppearanceOptionsScreen(
     onLanguageChange: (String) -> Unit = {},
     onMaterialYouToggle: () -> Unit,
     onRoundedFontToggle: () -> Unit,
+    onAmoledToggle: () -> Unit,
     onBack: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -153,6 +155,8 @@ fun AppearanceOptionsScreen(
                             HorizontalDivider()
 
                             MaterialYouSection(state.isMaterialYouEnabled, onMaterialYouToggle)
+
+                            AmoledSection(state.isAmoledEnabled, onAmoledToggle)
                         }
 
                         ColorSchemeSection(state.currentColorScheme, darkTheme, onColorSchemeChange)
@@ -352,6 +356,42 @@ private fun MaterialYouSection(
 }
 
 @Composable
+private fun AmoledSection(
+    isEnabled: Boolean,
+    onToggle: () -> Unit
+) {
+    Column {
+        Text(
+            stringResource(R.string.settings_amoled_title),
+            style = MaterialTheme.typography.titleSmallEmphasized
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                Icons.Default.Contrast,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp)
+            )
+            Text(
+                stringResource(R.string.settings_amoled_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f)
+            )
+            Switch(
+                checked = isEnabled,
+                onCheckedChange = { onToggle() }
+            )
+        }
+    }
+}
+
+@Composable
 private fun ColorSchemeSection(
     currentColorScheme: AppColorScheme,
     isDark: Boolean,
@@ -402,7 +442,7 @@ private fun ColorSchemeSwatch(
         )
     )
 
-    val borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+    val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
 
     Box(
         modifier = Modifier
@@ -650,6 +690,7 @@ private fun AppearanceOptionsScreenPreview() {
             onContrastChange = {},
             onMaterialYouToggle = {},
             onRoundedFontToggle = {},
+            onAmoledToggle = {},
             onBack = {}
         )
     }
@@ -664,13 +705,15 @@ private fun AppearanceOptionsScreenDarkPreview() {
                 currentTheme = "Dark",
                 currentTypography = "Condensed",
                 currentContrast = "High",
-                isMaterialYouEnabled = false
+                isMaterialYouEnabled = false,
+                isAmoledEnabled = true
             ),
             onThemeChange = {},
             onTypographyChange = {},
             onContrastChange = {},
             onMaterialYouToggle = {},
             onRoundedFontToggle = {},
+            onAmoledToggle = {},
             onBack = {}
         )
     }

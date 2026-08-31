@@ -28,6 +28,7 @@ import com.serranoie.app.minus.presentation.appContrast
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
 import com.serranoie.app.minus.presentation.dynamicColorEnabled
+import com.serranoie.app.minus.presentation.isAmoledEnabled
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferManager
 import com.serranoie.app.minus.presentation.util.CensorManager
@@ -52,6 +53,7 @@ data class SettingsUiState(
     val currentLanguage: String = "English",
     val isMaterialYouEnabled: Boolean = false,
     val isRoundedFontEnabled: Boolean = true,
+    val isAmoledEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,
     val showPastTransactions: Boolean = true,
     val isCategoryPickerDirectPopupEnabled: Boolean = false,
@@ -110,6 +112,7 @@ class SettingsViewModel @Inject constructor(
             currentColorScheme = settings.colorScheme,
             isMaterialYouEnabled = settings.dynamicColorEnabled,
             isRoundedFontEnabled = settings.isRoundedFontEnabled,
+            isAmoledEnabled = settings.isAmoledEnabled,
             isCreditQuickToggleEnabled = settings.isCreditQuickToggleEnabled,
             showPastTransactions = settings.showPastTransactions,
             isCategoryPickerDirectPopupEnabled = settings.categoryPickerDirectPopupEnabled,
@@ -241,6 +244,14 @@ class SettingsViewModel @Inject constructor(
         val newValue = !uiState.value.isRoundedFontEnabled
         viewModelScope.launch {
             settingsRepository.setRoundedFontEnabled(newValue)
+        }
+    }
+
+    fun onAmoledToggle() {
+        val newValue = !uiState.value.isAmoledEnabled
+        context.isAmoledEnabled = newValue
+        viewModelScope.launch {
+            settingsRepository.setAmoledEnabled(newValue)
         }
     }
 

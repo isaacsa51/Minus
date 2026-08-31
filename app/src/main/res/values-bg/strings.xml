@@ -264,6 +264,8 @@
     <string name="settings_typography_subtitle">Промяна на шрифтовия стил</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Използване на цветовете от тапета за динамична тема</string>
+    <string name="settings_amoled_title">AMOLED тема</string>
+    <string name="settings_amoled_subtitle">Използвайте чисто черен фон и повърхности в тъмен режим</string>
     <string name="settings_censor_mode_title">Режим за поверителност</string>
     <string name="settings_censor_mode_subtitle">Скриване и замъгляване на всички финансови стойности в приложението</string>
     <string name="settings_feature_credit_toggle_title">Използване на кредитна карта за плащане</string>

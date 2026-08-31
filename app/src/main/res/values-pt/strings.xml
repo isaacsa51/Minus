@@ -264,6 +264,8 @@
     <string name="settings_rounded_font_title">Estilo de fonte arredondado</string>
     <string name="settings_material_you_title">Material de que você</string>
     <string name="settings_material_you_subtitle">Usar cores de papel de parede para aplicar um tema dinâmico</string>
+    <string name="settings_amoled_title">Tema AMOLED</string>
+    <string name="settings_amoled_subtitle">Usar fundos e superfícies em preto puro no modo escuro</string>
     <string name="settings_censor_mode_title">Modo de privacidade</string>
     <string name="settings_censor_mode_subtitle">Ocultar e desfocar todos os valores financeiros no app</string>
     <string name="settings_feature_credit_toggle_title">Usar Cartão de Crédito como pagamento</string>

@@ -520,7 +520,8 @@ private fun AppearanceMockupContainer(
         dynamicColor = state.isMaterialYouEnabled,
         typographyMode = typographyMode,
         appColorScheme = state.currentColorScheme,
-        contrastMode = contrastMode
+        contrastMode = contrastMode,
+        isAmoledEnabled = state.isAmoledEnabled
     ) {
         Surface(
             modifier = Modifier

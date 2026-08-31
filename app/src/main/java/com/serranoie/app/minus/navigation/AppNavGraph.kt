@@ -169,6 +169,7 @@ fun AppNavGraph(
                 onLanguageChange = viewModel::onLanguageChange,
                 onMaterialYouToggle = viewModel::onMaterialYouToggle,
                 onRoundedFontToggle = viewModel::onRoundedFontToggle,
+                onAmoledToggle = viewModel::onAmoledToggle,
                 onBack = { navController.popBackStack() }
             )
         }

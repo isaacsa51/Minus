@@ -262,6 +262,8 @@
     <string name="settings_rounded_font_title">圆体字形</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">基于壁纸颜色的动态应用主题</string>
+    <string name="settings_amoled_title">AMOLED 主题</string>
+    <string name="settings_amoled_subtitle">在深色模式下为背景和界面使用纯黑色</string>
     <string name="settings_censor_mode_title">隐私模式</string>
     <string name="settings_censor_mode_subtitle">隐藏并模糊应用内的所有财务数值</string>
     <string name="settings_feature_credit_toggle_title">使用信用卡支付</string>

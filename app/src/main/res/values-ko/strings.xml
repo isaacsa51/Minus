@@ -263,6 +263,8 @@
     <string name="settings_rounded_font_title">둥근 글꼴 스타일</string>
     <string name="settings_material_you_title">귀하의 재료</string>
     <string name="settings_material_you_subtitle">배경화면 색상을 사용하여 동적 앱 테마 적용</string>
+    <string name="settings_amoled_title">AMOLED 테마</string>
+    <string name="settings_amoled_subtitle">다크 모드에서 배경과 표면을 순수한 검정으로 사용</string>
     <string name="settings_censor_mode_title">개인 정보 보호 모드</string>
     <string name="settings_censor_mode_subtitle">앱 내 모든 금액 정보 숨기기 및 블러 처리</string>
     <string name="settings_feature_credit_toggle_title">결제 수단으로 신용카드 사용</string>

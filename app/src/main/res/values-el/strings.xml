@@ -261,6 +261,8 @@
     <string name="settings_typography_subtitle">Αλλαγή του στυλ τυπογραφίας εφαρμογών</string>
     <string name="settings_material_you_title">Υλικό Εσείς</string>
     <string name="settings_material_you_subtitle">Χρήση χρωμάτων ταπετσαρίας για την εφαρμογή ενός δυναμικού θέματος εφαρμογής</string>
+    <string name="settings_amoled_title">Θέμα AMOLED</string>
+    <string name="settings_amoled_subtitle">Χρήση καθαρού μαύρου για φόντο και επιφάνειες στη σκοτεινή λειτουργία</string>
     <string name="settings_censor_mode_title">Λειτουργία απορρήτου</string>
     <string name="settings_censor_mode_subtitle">Απόκρυψη και θόλωση όλων των οικονομικών αξιών σε όλη την εφαρμογή</string>
     <string name="settings_feature_credit_toggle_title">Χρήση πιστωτικής κάρτας ως πληρωμή</string>

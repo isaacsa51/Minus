@@ -261,6 +261,8 @@
     <string name="settings_typography_subtitle">ऐप टाइपोग्राफी स्टाइल बदलें</string>
     <string name="settings_material_you_title">मटीरियल यू</string>
     <string name="settings_material_you_subtitle">डायनामिक ऐप थीम लागू करने के लिए वॉलपेपर के रंगों का इस्तेमाल करें</string>
+    <string name="settings_amoled_title">AMOLED थीम</string>
+    <string name="settings_amoled_subtitle">डार्क मोड में शुद्ध काली पृष्ठभूमि और सतहों का उपयोग करें</string>
     <string name="settings_censor_mode_title">प्राइवेसी मोड</string>
     <string name="settings_censor_mode_subtitle">ऐप में सभी फाइनेंशियल वैल्यू को छिपाएं और धुंधला करें</string>
     <string name="settings_feature_credit_toggle_title">पेमेंट के लिए क्रेडिट कार्ड का इस्तेमाल करें</string>
