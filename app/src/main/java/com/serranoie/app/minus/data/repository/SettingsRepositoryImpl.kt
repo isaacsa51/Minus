@@ -43,6 +43,7 @@ const val DYNAMIC_COLOR_KEY_NAME = "dynamic_color_enabled"
 const val CREDIT_QUICK_TOGGLE_FEATURE_KEY_NAME = "credit_quick_toggle_feature_enabled"
 const val SHOW_PAST_TRANSACTIONS_KEY_NAME = "show_past_transactions"
 const val ROUNDED_FONT_KEY_NAME = "rounded_font_enabled"
+const val AMOLED_KEY_NAME = "amoled_enabled"
 const val CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME = "category_picker_direct_popup_enabled"
 const val CATEGORY_GRID_MODE_KEY_NAME = "category_grid_mode_enabled"
 const val RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME = "recurrent_payments_view_mode"
@@ -87,6 +88,8 @@ private val SHOW_PAST_TRANSACTIONS =
     booleanPreferencesKey(SHOW_PAST_TRANSACTIONS_KEY_NAME)
 private val ROUNDED_FONT =
     booleanPreferencesKey(ROUNDED_FONT_KEY_NAME)
+private val AMOLED =
+    booleanPreferencesKey(AMOLED_KEY_NAME)
 private val CATEGORY_PICKER_DIRECT_POPUP_ENABLED =
     booleanPreferencesKey(CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME)
 private val CATEGORY_GRID_MODE_ENABLED =
@@ -156,6 +159,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 language = preferences[LANGUAGE] ?: "en",
                 dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false,
                 isRoundedFontEnabled = preferences[ROUNDED_FONT] ?: true,
+                isAmoledEnabled = preferences[AMOLED] ?: false,
                 showPastTransactions = preferences[SHOW_PAST_TRANSACTIONS] ?: true,
                 isCreditQuickToggleEnabled = preferences[CREDIT_QUICK_TOGGLE_FEATURE_ENABLED] ?: false,
                 categoryPickerDirectPopupEnabled = preferences[CATEGORY_PICKER_DIRECT_POPUP_ENABLED] ?: false,
@@ -333,6 +337,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setRoundedFontEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[ROUNDED_FONT] = enabled
+        }
+    }
+
+    override suspend fun setAmoledEnabled(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[AMOLED] = enabled
         }
     }
 

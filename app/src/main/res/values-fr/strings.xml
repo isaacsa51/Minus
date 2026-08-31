@@ -265,6 +265,8 @@
     <string name="settings_rounded_font_title">Style de police arrondi</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Utiliser les couleurs du fond d\'écran pour appliquer un thème dynamique</string>
+    <string name="settings_amoled_title">Thème AMOLED</string>
+    <string name="settings_amoled_subtitle">Utiliser des fonds et surfaces noir pur en mode sombre</string>
     <string name="settings_censor_mode_title">Mode privé</string>
     <string name="settings_censor_mode_subtitle">Cacher et flouter toutes les valeurs financières dans l\'application</string>
     <string name="settings_feature_credit_toggle_title">Utiliser la carte de crédit comme paiement</string>

@@ -54,6 +54,8 @@ interface SettingsRepository {
 
     suspend fun setRoundedFontEnabled(enabled: Boolean)
 
+    suspend fun setAmoledEnabled(enabled: Boolean)
+
     suspend fun setCreditQuickToggleEnabled(enabled: Boolean)
 
     suspend fun setShowPastTransactions(enabled: Boolean)

@@ -264,6 +264,8 @@
     <string name="settings_rounded_font_title">Stile di carattere arrotondato</string>
     <string name="settings_material_you_title">Materiale Tu</string>
     <string name="settings_material_you_subtitle">Usa i colori dello sfondo per applicare un tema dinamico</string>
+    <string name="settings_amoled_title">Tema AMOLED</string>
+    <string name="settings_amoled_subtitle">Usa sfondi e superfici in nero puro nella modalità scura</string>
     <string name="settings_censor_mode_title">Modalità privacy</string>
     <string name="settings_censor_mode_subtitle">Nascondi e sfoca tutti i valori finanziari nell\'app</string>
     <string name="settings_feature_credit_toggle_title">Usa carta di credito come pagamento</string>

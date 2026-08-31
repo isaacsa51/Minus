@@ -265,6 +265,8 @@
     <string name="settings_rounded_font_title">Abgerundeter Schriftstil</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">Use wallpaper colors to apply a dynamic app theme</string>
+    <string name="settings_amoled_title">AMOLED-Design</string>
+    <string name="settings_amoled_subtitle">Reines Schwarz für Hintergründe und Flächen im dunklen Modus verwenden</string>
     <string name="settings_censor_mode_title">Privatsphäre-Modus</string>
     <string name="settings_censor_mode_subtitle">Hide and blur all financial values across the app</string>
     <string name="settings_feature_credit_toggle_title">Use Credit Card as payment</string>

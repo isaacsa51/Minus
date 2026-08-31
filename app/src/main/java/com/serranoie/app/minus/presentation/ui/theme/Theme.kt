@@ -7,12 +7,14 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MotionScheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.serranoie.app.minus.domain.model.AppColorScheme
 import com.serranoie.app.minus.domain.model.ContrastMode
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
@@ -20,8 +22,10 @@ import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.appContrast
 import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
+import com.serranoie.app.minus.presentation.isAmoledEnabled
 import com.serranoie.app.minus.presentation.isRoundedFontEnabled
 import com.serranoie.app.minus.presentation.ui.theme.schemes.getAppColorScheme
+import com.serranoie.app.minus.presentation.ui.theme.schemes.toAmoled
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -270,17 +274,18 @@ fun MinusTheme(
     dynamicColor: Boolean = false,
     typographyMode: TypographyMode = LocalContext.current.appTypography,
     isRoundedFontEnabled: Boolean = LocalContext.current.isRoundedFontEnabled,
-    appColorScheme: com.serranoie.app.minus.domain.model.AppColorScheme = LocalContext.current.appColorScheme,
+    appColorScheme: AppColorScheme = LocalContext.current.appColorScheme,
     contrastMode: ContrastMode = LocalContext.current.appContrast,
+    isAmoledEnabled: Boolean = LocalContext.current.isAmoledEnabled,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    val colorScheme = when {
+    val baseColorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        appColorScheme != com.serranoie.app.minus.domain.model.AppColorScheme.BRAND -> {
+        appColorScheme != AppColorScheme.BRAND -> {
             getAppColorScheme(appColorScheme, darkTheme) ?: if (darkTheme) darkScheme else lightScheme
         }
 
@@ -297,8 +302,14 @@ fun MinusTheme(
         }
     }
 
+    val colorScheme = if (isAmoledEnabled && darkTheme) {
+        baseColorScheme.toAmoled()
+    } else {
+        baseColorScheme
+    }
+
     val typography = when (typographyMode) {
-        TypographyMode.SYSTEM -> androidx.compose.material3.Typography()
+        TypographyMode.SYSTEM -> Typography()
         TypographyMode.DEFAULT -> getTypography(isRoundedFontEnabled)
         TypographyMode.CONDENSED -> getTypography(isRoundedFontEnabled).withCondensedStyles(isRoundedFontEnabled)
         TypographyMode.EXPRESSIVE -> getTypography(isRoundedFontEnabled).withEmphasizedStyles(isRoundedFontEnabled)
