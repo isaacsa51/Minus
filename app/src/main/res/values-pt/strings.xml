@@ -92,6 +92,8 @@
     <string name="widget_description">Visualização rápida de suas despesas e adição de novas despesas</string>
     <string name="total_expenses">Total Despesas</string>
     <string name="new_expense">Nova despesa</string>
+    <string name="income_added">Rendimento adicionado</string>
+    <string name="deducted_budget">Orçamento deduzido</string>
     <string name="daily_average">Média diária</string>
     <string name="expenses_history">Histórico de despesas</string>
     <string name="single_expense">Gasto único</string>
@@ -496,6 +498,7 @@
     <string name="without_date">Sem data</string>
     <string name="no_name">Sem nome</string>
     <string name="description">Descrição:</string>
+    <string name="adjustment_reason">Motivo</string>
     <string name="date">Encontro</string>
     <string name="frequency">Frequência</string>
     <string name="charge_day">Carregar dia</string>

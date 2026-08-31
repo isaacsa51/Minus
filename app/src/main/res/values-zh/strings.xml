@@ -85,12 +85,15 @@
     <string name="edit_budget">编辑预算</string>
     <string name="new_budget">新的预算周期</string>
     <plurals name="pending_expense">
+        <item quantity="one">%d 笔下个周期的支出</item>
         <item quantity="other">下一周期的 %d 支出</item>
     </plurals>
     <string name="new_period_title">新的预算周期</string>
     <string name="widget_description">快速查看你的支出并添加新纪录</string>
     <string name="total_expenses">总计支出</string>
     <string name="new_expense">新的支出</string>
+    <string name="income_added">已添加收入</string>
+    <string name="deducted_budget">已扣除预算</string>
     <string name="daily_average">每天平均</string>
     <string name="expenses_history">支出历史</string>
     <string name="single_expense">单笔支出</string>
@@ -140,6 +143,7 @@
         <item quantity="other">%d 天</item>
     </plurals>
     <plurals name="analytics_days_left">
+        <item quantity="one">%d 天</item>
         <item quantity="other">%d 天</item>
     </plurals>
     <string name="total_budget">总预算</string>
@@ -494,6 +498,7 @@
     <string name="no_name">没有名称</string>
     <string name="no_name_income">未具名收入</string>
     <string name="description">购买原因</string>
+    <string name="adjustment_reason">原因</string>
     <string name="date">日期</string>
     <string name="frequency">频率</string>
     <string name="charge_day">计费日期</string>

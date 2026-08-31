@@ -92,6 +92,8 @@
     <string name="widget_description">Schnellansicht deiner Ausgaben und neue hinzufügen</string>
     <string name="total_expenses">Gesamte Ausgaben</string>
     <string name="new_expense">Neue Ausgaben</string>
+    <string name="income_added">Einkommen hinzugefügt</string>
+    <string name="deducted_budget">Abgezogenes Budget</string>
     <string name="daily_average">Täglicher Durchschnitt</string>
     <string name="expenses_history">Ausgabenverlauf</string>
     <string name="single_expense">Einzelne Ausgabe</string>
@@ -499,6 +501,7 @@
     <string name="no_name">No name</string>
     <string name="no_name_income">Nicht näher bezeichnete Einkünfte</string>
     <string name="description">Description</string>
+    <string name="adjustment_reason">Grund</string>
     <string name="date">Datum</string>
     <string name="frequency">Häufigkeit</string>
     <string name="charge_day">Charge day</string>

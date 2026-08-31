@@ -92,6 +92,8 @@
     <string name="widget_description">Бърз преглед на разходите ви и добавяне на нови</string>
     <string name="total_expenses">Общо разходи</string>
     <string name="new_expense">Нов разход</string>
+    <string name="income_added">Добавен приход</string>
+    <string name="deducted_budget">Намален бюджет</string>
     <string name="daily_average">Средно на ден</string>
     <string name="expenses_history">История на разходите</string>
     <string name="single_expense">Единичен разход</string>
@@ -496,6 +498,7 @@
     <string name="without_date">Без дата</string>
     <string name="no_name">Няма име</string>
     <string name="description">Причина за покупката</string>
+    <string name="adjustment_reason">Причина</string>
     <string name="date">Дата</string>
     <string name="frequency">Честота</string>
     <string name="charge_day">Ден на таксуване</string>

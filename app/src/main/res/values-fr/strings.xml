@@ -92,6 +92,8 @@
     <string name="widget_description">Aperçu rapide de vos dépenses et ajout de nouvelles</string>
     <string name="total_expenses">Total des dépenses</string>
     <string name="new_expense">Nouvelle dépense</string>
+    <string name="income_added">Revenu ajouté</string>
+    <string name="deducted_budget">Budget déduit</string>
     <string name="daily_average">Moyenne quotidienne</string>
     <string name="expenses_history">Historique des dépenses</string>
     <string name="single_expense">Dépense unique</string>
@@ -497,6 +499,7 @@
     <string name="without_date">Sans date</string>
     <string name="no_name">Sans nom</string>
     <string name="description">Raison de l\'achat</string>
+    <string name="adjustment_reason">Raison</string>
     <string name="date">Date</string>
     <string name="frequency">Fréquence</string>
     <string name="charge_day">Jour de facturation</string>

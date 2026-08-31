@@ -136,6 +136,7 @@ data class SupportedCurrency(
             SupportedCurrency("GEL", "₾"),
             SupportedCurrency("QAR", "QAR"),
             SupportedCurrency("AED", "AED"),
+            SupportedCurrency("CRC", "₡")
         )
 
         fun findByCode(code: String): SupportedCurrency? =
@@ -284,7 +285,8 @@ data class SupportedCurrencyData(
             "HUF" to SymbolPosition.END,
             "UAH" to SymbolPosition.END,
             "QAR" to SymbolPosition.START,
-            "AED" to SymbolPosition.START
+            "AED" to SymbolPosition.START,
+            "CRC" to SymbolPosition.START,
         )
 
         private fun fractionDigits(code: String): Int =

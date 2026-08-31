@@ -92,6 +92,8 @@
     <string name="widget_description">Γρήγορη προβολή των εξόδων σας και να προσθέσετε νέα</string>
     <string name="total_expenses">Συνολικά Έξοδα</string>
     <string name="new_expense">Νέα Έξοδα</string>
+    <string name="income_added">Προστέθηκε εισόδημα</string>
+    <string name="deducted_budget">Μειωμένος προϋπολογισμός</string>
     <string name="daily_average">Μέσος όρος ημέρας</string>
     <string name="expenses_history">Ιστορικό εξόδων</string>
     <string name="single_expense">Ενιαία δαπάνη</string>
@@ -493,6 +495,7 @@
     <string name="without_date">Χωρίς ημερομηνία</string>
     <string name="no_name">Χωρίς όνομα</string>
     <string name="description">Αιτία αγοράς</string>
+    <string name="adjustment_reason">Αιτία</string>
     <string name="date">Ημερομηνία</string>
     <string name="frequency">Συχνότητα</string>
     <string name="charge_day">Ημέρα φόρτισης</string>

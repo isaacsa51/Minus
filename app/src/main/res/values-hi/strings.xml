@@ -92,6 +92,8 @@
     <string name="widget_description">अपने खर्चों को जल्दी से देखें और नए खर्च जोड़ें</string>
     <string name="total_expenses">कुल खर्च</string>
     <string name="new_expense">नया खर्च</string>
+    <string name="income_added">आय जोड़ी गई</string>
+    <string name="deducted_budget">घटाया गया बजट</string>
     <string name="daily_average">रोज़ाना का औसत</string>
     <string name="expenses_history">खर्चों का इतिहास</string>
     <string name="single_expense">एक खर्च</string>
@@ -493,6 +495,7 @@
     <string name="without_date">बिना तारीख के</string>
     <string name="no_name">कोई नाम नहीं</string>
     <string name="description">खरीदने का कारण</string>
+    <string name="adjustment_reason">कारण</string>
     <string name="date">तारीख</string>
     <string name="frequency">आवृत्ति</string>
     <string name="charge_day">चार्ज का दिन</string>
