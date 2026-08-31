@@ -92,6 +92,8 @@
     <string name="widget_description">지출 내역을 빠르게 확인하고 새 항목을 추가하세요</string>
     <string name="total_expenses">총 지출</string>
     <string name="new_expense">새 지출</string>
+    <string name="income_added">수입 추가됨</string>
+    <string name="deducted_budget">공제된 예산</string>
     <string name="daily_average">일일 평균</string>
     <string name="expenses_history">지출 내역</string>
     <string name="single_expense">단일 지출</string>
@@ -495,6 +497,7 @@
     <string name="without_date">날짜 제외</string>
     <string name="no_name">이름 없음</string>
     <string name="description">지출 사유</string>
+    <string name="adjustment_reason">사유</string>
     <string name="date">날짜</string>
     <string name="frequency">빈도</string>
     <string name="charge_day">청구일</string>

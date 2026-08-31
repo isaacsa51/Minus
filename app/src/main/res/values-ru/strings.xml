@@ -94,6 +94,8 @@
     <string name="widget_description">Quick view of your expenses and add new ones</string>
     <string name="total_expenses">Total Expenses</string>
     <string name="new_expense">New Expense</string>
+    <string name="income_added">Доход добавлен</string>
+    <string name="deducted_budget">Вычтенный бюджет</string>
     <string name="daily_average">Daily average</string>
     <string name="expenses_history">Expenses history</string>
     <string name="single_expense">Single expense</string>
@@ -502,6 +504,7 @@
     <string name="no_name">No name</string>
     <string name="no_name_income">Неуказанный доход</string>
     <string name="description">Description</string>
+    <string name="adjustment_reason">Причина</string>
     <string name="date">Date</string>
     <string name="frequency">Frequency</string>
     <string name="charge_day">Charge day</string>

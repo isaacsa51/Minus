@@ -92,6 +92,8 @@
     <string name="widget_description">Visualizzazione rapida delle tue spese e aggiungerne di nuove</string>
     <string name="total_expenses">Totale Spese</string>
     <string name="new_expense">Nuova Spesa</string>
+    <string name="income_added">Reddito aggiunto</string>
+    <string name="deducted_budget">Budget detratto</string>
     <string name="daily_average">Media giornaliera</string>
     <string name="expenses_history">Cronologia spese</string>
     <string name="single_expense">Singola spesa</string>
@@ -496,6 +498,7 @@
     <string name="without_date">Senza data</string>
     <string name="no_name">Nessun nome</string>
     <string name="description">Descrizione</string>
+    <string name="adjustment_reason">Motivo</string>
     <string name="date">Data</string>
     <string name="frequency">Frequenza</string>
     <string name="charge_day">Giorno di ricarica</string>

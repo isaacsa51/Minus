@@ -92,6 +92,8 @@
     <string name="widget_description">経費のクイックビューと新しい経費の追加</string>
     <string name="total_expenses">経費合計</string>
     <string name="new_expense">新しい費用</string>
+    <string name="income_added">収入が追加されました</string>
+    <string name="deducted_budget">差し引かれた予算</string>
     <string name="daily_average">毎日の平均</string>
     <string name="expenses_history">経費履歴</string>
     <string name="single_expense">単一費用</string>
@@ -494,6 +496,7 @@
     <string name="without_date">日付なし</string>
     <string name="no_name">名前がありません</string>
     <string name="description">購入理由</string>
+    <string name="adjustment_reason">理由</string>
     <string name="date">日付</string>
     <string name="frequency">利息支払回数</string>
     <string name="charge_day">充電日</string>
