@@ -422,11 +422,11 @@
     <string name="rollover_dialog_period_finished_title">周期完成</string>
     <string name="rollover_dialog_question">剩余的钱你想如何规划？</string>
     <string name="rollover_dialog_split_equally_title">平均分配</string>
-    <string name="rollover_dialog_split_equally_desc">为接下来的日子添加 %1$s 预算</string>
+    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">累积至明天</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">添加 %1$s 至明天的预算</string>
-    <string name="rollover_dialog_view_analytics_title">查看分析数据</string>
-    <string name="rollover_dialog_view_analytics_desc">查看已完成周期的摘要信息</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
+    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">周期完成</string>
     <string name="finished_period_header_no_spends">嗯？这个周期你竟然一毛不拔</string>

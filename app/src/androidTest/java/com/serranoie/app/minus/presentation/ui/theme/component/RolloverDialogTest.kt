@@ -2,7 +2,6 @@ package com.serranoie.app.minus.presentation.ui.theme.component
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -67,7 +66,7 @@ class RolloverDialogTest {
         renderDialog(onViewAnalytics = null)
 
         val label = composeTestRule.activity.getString(R.string.rollover_dialog_view_analytics_title)
-        composeTestRule.onNodeWithText(label).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(label).assertDoesNotExist()
     }
 
     @Test

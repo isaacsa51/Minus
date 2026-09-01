@@ -183,6 +183,9 @@ android {
         getByName("main") {
             kotlin.srcDir(layout.buildDirectory.dir("generated/source/changelog"))
         }
+        getByName("androidTest") {
+            assets.srcDir(files("$projectDir/schemas"))
+        }
     }
 
     packaging {
@@ -253,6 +256,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.google.truth)
     androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.androidx.room.testing)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 

@@ -420,11 +420,11 @@
     <string name="rollover_dialog_period_finished_title">Η περίοδος ολοκληρώθηκε</string>
     <string name="rollover_dialog_question">Τι θέλετε να κάνετε με τα υπόλοιπα χρήματα?</string>
     <string name="rollover_dialog_split_equally_title">Διαχωρισμός ισομερώς</string>
-    <string name="rollover_dialog_split_equally_desc">Προσθήκη %1$s στον προϋπολογισμό για τις επόμενες ημέρες</string>
+    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">Μεταφέρετε στο αύριο</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Προσθήκη %1$s στον αυριανό προϋπολογισμό</string>
-    <string name="rollover_dialog_view_analytics_title">Προβολή αναλυτικών στοιχείων</string>
-    <string name="rollover_dialog_view_analytics_desc">Επανεξέταση της περίληψης της τελικής περιόδου</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
+    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Η περίοδος ολοκληρώθηκε</string>
     <string name="finished_period_header_no_spends">Ε; Δεν ξοδέψατε τίποτα αυτήν την περίοδο</string>

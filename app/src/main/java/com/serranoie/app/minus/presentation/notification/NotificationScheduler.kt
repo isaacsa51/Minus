@@ -288,7 +288,8 @@ class NotificationScheduler @Inject constructor(
         return "${RecurrentExpenseNotificationWorker.WORK_NAME}_$stableId"
     }
 
-    private fun nextOccurrenceDateTime(
+    // `internal` (rather than `private`) so the pure occurrence math can be unit-tested directly.
+    internal fun nextOccurrenceDateTime(
         transaction: Transaction,
         now: LocalDateTime,
         notificationTime: Pair<Int, Int>,
@@ -340,7 +341,7 @@ class NotificationScheduler @Inject constructor(
         return triggerDateTime
     }
 
-    private fun nextSteppedOccurrence(
+    internal fun nextSteppedOccurrence(
         startDate: LocalDate,
         today: LocalDate,
         stepDays: Long
@@ -351,7 +352,7 @@ class NotificationScheduler @Inject constructor(
         return startDate.plusDays(steps * stepDays)
     }
 
-    private fun nextMonthlyOccurrence(
+    internal fun nextMonthlyOccurrence(
         startDate: LocalDate,
         today: LocalDate,
         subscriptionDay: Int,

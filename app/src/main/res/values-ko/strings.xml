@@ -422,11 +422,11 @@
     <string name="rollover_dialog_period_finished_title">기간 종료</string>
     <string name="rollover_dialog_question">남은 금액으로 무엇을 하시겠습니까?</string>
     <string name="rollover_dialog_split_equally_title">균등하게 분할합니다.</string>
-    <string name="rollover_dialog_split_equally_desc">다음 며칠 동안 예산에 %1$s를 추가합니다.</string>
+    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">내일로 이월</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">내일 예산에 %1$s 추가</string>
-    <string name="rollover_dialog_view_analytics_title">분석 정보를 확인합니다.</string>
-    <string name="rollover_dialog_view_analytics_desc">완료된 기간의 요약을 검토합니다.</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
+    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">기간 종료</string>
     <string name="finished_period_header_no_spends">어라? 이번 기간에는 지출이 없네요</string>
