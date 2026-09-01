@@ -420,11 +420,11 @@
     <string name="rollover_dialog_period_finished_title">अवधि खत्म हो गई</string>
     <string name="rollover_dialog_question">आप बचे हुए पैसे का क्या करना चाहते हैं?</string>
     <string name="rollover_dialog_split_equally_title">बराबर बांटें</string>
-    <string name="rollover_dialog_split_equally_desc">अगले दिनों के बजट में %1$s जोड़ें</string>
+    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">कल के लिए ले जाएं</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">कल के बजट में %1$s जोड़ें</string>
-    <string name="rollover_dialog_view_analytics_title">एनालिटिक्स देखें</string>
-    <string name="rollover_dialog_view_analytics_desc">खत्म हुई अवधि का सारांश देखें</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
+    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">अवधि समाप्त</string>
     <string name="finished_period_header_no_spends">अरे? आपने इस अवधि में कुछ भी खर्च नहीं किया</string>

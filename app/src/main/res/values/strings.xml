@@ -522,11 +522,11 @@
     <string name="rollover_dialog_period_finished_title">Period finished</string>
     <string name="rollover_dialog_question">What do you want to do with the remaining money?</string>
     <string name="rollover_dialog_split_equally_title">Split equally</string>
-    <string name="rollover_dialog_split_equally_desc">Add %1$s to the budget for the next days</string>
+    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">Carry to tomorrow</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add %1$s to tomorrow\'s budget</string>
-    <string name="rollover_dialog_view_analytics_title">View analytics</string>
-    <string name="rollover_dialog_view_analytics_desc">Review the summary of the finished period</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
+    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
 
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Period finished</string>

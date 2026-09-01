@@ -423,11 +423,11 @@
     <string name="rollover_dialog_period_finished_title">Período terminado</string>
     <string name="rollover_dialog_question">O que você quer fazer com o dinheiro restante?</string>
     <string name="rollover_dialog_split_equally_title">Dividir igualmente</string>
-    <string name="rollover_dialog_split_equally_desc">Adicione %1$s ao orçamento para os próximos dias</string>
+    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">Carregue para amanhã</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Adicione %1$s ao orçamento de amanhã</string>
-    <string name="rollover_dialog_view_analytics_title">Visualizar análise</string>
-    <string name="rollover_dialog_view_analytics_desc">Revisar o resumo do período finalizado</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
+    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Período terminado</string>
     <string name="finished_period_header_no_spends">Hã? Você não passou nada neste período</string>

@@ -423,11 +423,11 @@
     <string name="rollover_dialog_period_finished_title">Периодът приключи</string>
     <string name="rollover_dialog_question">Какво искаш да направиш с оставащите пари?</string>
     <string name="rollover_dialog_split_equally_title">Раздели поравно</string>
-    <string name="rollover_dialog_split_equally_desc">Добави %1$s към бюджета за следващите дни</string>
+    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">Прехвърли за утре</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Добави %1$s към бюджета за утре</string>
-    <string name="rollover_dialog_view_analytics_title">Преглед на анализите</string>
-    <string name="rollover_dialog_view_analytics_desc">Преглед на резюмето за изминалия период</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
+    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Периодът приключи</string>
     <string name="finished_period_header_no_spends">Хм? Не сте похарчили нищо през този период</string>

@@ -49,7 +49,7 @@ fun ButtonRow(
 
 
 
-@Preview(name = "ButtonRow")
+@Preview(name = "ButtonRow", showBackground = true)
 @Composable
 private fun PreviewButtonRow() {
 	MinusTheme {

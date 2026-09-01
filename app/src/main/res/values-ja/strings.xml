@@ -421,11 +421,11 @@
     <string name="rollover_dialog_period_finished_title">生理が終了しました</string>
     <string name="rollover_dialog_question">残りのお金で何をしたいですか。</string>
     <string name="rollover_dialog_split_equally_title">均等に分割</string>
-    <string name="rollover_dialog_split_equally_desc">%1$s を予算に追加します。</string>
+    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">明日まで運んでください</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">明日の予算に %1$s を追加</string>
-    <string name="rollover_dialog_view_analytics_title">分析結果を表示</string>
-    <string name="rollover_dialog_view_analytics_desc">完成した期間の概要を確認する</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
+    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">生理が終了しました</string>
     <string name="finished_period_header_no_spends">はあ？この期間は何も使っていません。</string>
