@@ -16,7 +16,7 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.CategoriesChartCard
 import com.serranoie.app.minus.presentation.ui.theme.component.charts.SpendsChart
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard

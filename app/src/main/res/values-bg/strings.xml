@@ -183,6 +183,10 @@
     <string name="budget_pill_label_per_weekly">На седмица</string>
     <string name="budget_pill_label_per_biweekly">Двуседмично</string>
     <string name="budget_pill_label_per_monthly">На месец</string>
+    <string name="budget_pill_next_daily">За утре %1$s</string>
+    <string name="budget_pill_next_weekly">За следващата седмица %1$s</string>
+    <string name="budget_pill_next_biweekly">За следващите две седмици %1$s</string>
+    <string name="budget_pill_next_monthly">За следващия месец %1$s</string>
     <string name="budget_pill_label_daily_exceeded">Дневната сума е надвишена</string>
     <string name="budget_pill_label_weekly_exceeded">Седмичната сума е надвишена</string>
     <string name="budget_pill_label_biweekly_exceeded">Двуседмичната сума е надвишена</string>
@@ -378,9 +382,9 @@
     <string name="budget_pill_exhausted_daily_label">Дневно</string>
     <string name="budget_pill_exhausted_weekly_label">Седмично</string>
     <string name="budget_pill_exhausted_biweekly_label">Двуседмично</string>
-    <string name="budget_pill_exhausted_single">Бюджетът за %1$s е изчерпан</string>
-    <string name="budget_pill_exhausted_double">Бюджет %1$s и %2$s е изчерпан</string>
-    <string name="budget_pill_exhausted_triple">Бюджет %1$s, %2$s и %3$s е изчерпан</string>
+    <string name="budget_pill_exhausted_single">Бюджетът за %1$s е изразходван</string>
+    <string name="budget_pill_exhausted_double">Бюджет %1$s и %2$s е изразходван</string>
+    <string name="budget_pill_exhausted_triple">Бюджет %1$s, %2$s и %3$s е изразходван</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">Изразходвано</string>
     <string name="spend_budget_card_available_percent_format">Налични: %1$s%%</string>

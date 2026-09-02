@@ -180,6 +180,10 @@
     <string name="budget_pill_label_per_weekly">주간</string>
     <string name="budget_pill_label_per_biweekly">2주 단위</string>
     <string name="budget_pill_label_per_monthly">월간</string>
+    <string name="budget_pill_next_daily">내일은 %1$s</string>
+    <string name="budget_pill_next_weekly">다음 주는 %1$s</string>
+    <string name="budget_pill_next_biweekly">다음 2주는 %1$s</string>
+    <string name="budget_pill_next_monthly">다음 달은 %1$s</string>
     <string name="budget_pill_label_daily_exceeded">일일 예산 초과</string>
     <string name="budget_pill_label_weekly_exceeded">주간 예산 초과</string>
     <string name="budget_pill_label_biweekly_exceeded">2주 예산 초과</string>
@@ -377,9 +381,9 @@
     <string name="budget_pill_exhausted_daily_label">일일</string>
     <string name="budget_pill_exhausted_weekly_label">주간</string>
     <string name="budget_pill_exhausted_biweekly_label">2주 단위</string>
-    <string name="budget_pill_exhausted_single">%1$s 예산 소진됨</string>
-    <string name="budget_pill_exhausted_double">%1$s 및 %2$s 예산 소진됨</string>
-    <string name="budget_pill_exhausted_triple">%1$s, %2$s 및 %3$s 예산 소진됨</string>
+    <string name="budget_pill_exhausted_single">%1$s 예산 모두 사용</string>
+    <string name="budget_pill_exhausted_double">%1$s 및 %2$s 예산 모두 사용</string>
+    <string name="budget_pill_exhausted_triple">%1$s, %2$s 및 %3$s 예산 모두 사용</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">지출액</string>
     <string name="spend_budget_card_available_percent_format">사용 가능: %1$s%%</string>

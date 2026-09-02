@@ -6,6 +6,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeNextBlockAllocations
 import org.junit.Test
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -272,5 +273,25 @@ class BudgetCalculatorTest {
         )
         assertThat(state.dailyAllocation).isEqualTo(expected.dailyAllocation)
         assertThat(state.isTodayOverDailyAllocation).isEqualTo(expected.isTodayOverDailyAllocation)
+    }
+
+    @Test
+    fun `next-period allocations match the shared next-block helper`() {
+        val state = calculator.calculate(
+            settings(splitMode = BudgetSplitMode.STATIC),
+            listOf(txn("300.00", date = midPeriod)),
+            midPeriod,
+        )
+
+        val expected = computeNextBlockAllocations(
+            totalBudget = BigDecimal("1000.00"),
+            totalSpentInPeriod = BigDecimal("300.00"),
+            totalDays = 30,
+            daysRemaining = 16,
+        )
+        assertThat(state.nextDailyAllocation).isEqualTo(expected.dailyAllocation)
+        assertThat(state.nextWeeklyAllocation).isEqualTo(expected.weeklyAllocation)
+        assertThat(state.nextBiweeklyAllocation).isEqualTo(expected.biweeklyAllocation)
+        assertThat(state.nextMonthlyAllocation).isEqualTo(expected.monthlyAllocation)
     }
 }

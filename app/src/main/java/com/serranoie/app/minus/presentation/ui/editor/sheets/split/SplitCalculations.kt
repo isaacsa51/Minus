@@ -130,3 +130,57 @@ internal fun blocksRemaining(daysRemaining: Int, blockDays: Int): Int {
     val blocks = (daysRemaining + blockDays - 1) / blockDays
     return blocks.coerceAtLeast(1)
 }
+
+data class NextBlockAllocations(
+    val dailyAllocation: BigDecimal,
+    val weeklyAllocation: BigDecimal,
+    val biweeklyAllocation: BigDecimal,
+    val monthlyAllocation: BigDecimal,
+) {
+    fun forPeriod(period: BudgetPeriod): BigDecimal = when (period) {
+        BudgetPeriod.DAILY -> dailyAllocation
+        BudgetPeriod.WEEKLY -> weeklyAllocation
+        BudgetPeriod.BIWEEKLY -> biweeklyAllocation
+        BudgetPeriod.MONTHLY -> monthlyAllocation
+    }
+
+    companion object {
+        val ZERO = NextBlockAllocations(
+            BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
+        )
+    }
+}
+
+fun computeNextBlockAllocations(
+    totalBudget: BigDecimal,
+    totalSpentInPeriod: BigDecimal,
+    totalDays: Int,
+    daysRemaining: Int,
+): NextBlockAllocations {
+    val remaining = totalBudget.subtract(totalSpentInPeriod)
+    if (remaining <= BigDecimal.ZERO || totalDays <= 0 || daysRemaining <= 0) {
+        return NextBlockAllocations.ZERO
+    }
+
+    val daysElapsed = (totalDays - daysRemaining).coerceIn(0, totalDays - 1)
+    val lastDayOffset = totalDays - 1
+
+    fun nextBlock(blockDays: Int): BigDecimal {
+        val currentBlockIndex = daysElapsed / blockDays
+        val currentBlockEndOffset = currentBlockIndex * blockDays + blockDays - 1
+        val daysAfterCurrentBlock = lastDayOffset - currentBlockEndOffset
+        if (daysAfterCurrentBlock <= 0) return BigDecimal.ZERO
+        return remaining.divide(
+            BigDecimal(blocksRemaining(daysAfterCurrentBlock, blockDays)),
+            2,
+            RoundingMode.HALF_UP,
+        )
+    }
+
+    return NextBlockAllocations(
+        dailyAllocation = nextBlock(1),
+        weeklyAllocation = nextBlock(7),
+        biweeklyAllocation = nextBlock(14),
+        monthlyAllocation = nextBlock(30),
+    )
+}

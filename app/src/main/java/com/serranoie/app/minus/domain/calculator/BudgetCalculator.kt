@@ -6,6 +6,7 @@ import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeNextBlockAllocations
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.splitBudget
 import logcat.logcat
 import java.math.BigDecimal
@@ -126,6 +127,13 @@ class BudgetCalculator @Inject constructor() {
             )
         }
 
+        val nextAllocations = computeNextBlockAllocations(
+            totalBudget = settings.totalBudget,
+            totalSpentInPeriod = totalSpentInPeriod,
+            totalDays = totalDaysInPeriod,
+            daysRemaining = daysRemainingClamped,
+        )
+
         return BudgetState(
             remainingToday = remainingToday,
             totalSpentToday = spentToday,
@@ -140,6 +148,11 @@ class BudgetCalculator @Inject constructor() {
             biweeklyAllocation = biweekly,
             monthlyAllocation = monthly,
             isTodayOverDailyAllocation = isOverDaily,
+            nextDailyAllocation = nextAllocations.dailyAllocation,
+            nextWeeklyAllocation = nextAllocations.weeklyAllocation,
+            nextBiweeklyAllocation = nextAllocations.biweeklyAllocation,
+            nextMonthlyAllocation = nextAllocations.monthlyAllocation,
+            periodTotalDays = totalDaysInPeriod,
         ).also {
             logcat { "BudgetState result: $it" }
         }

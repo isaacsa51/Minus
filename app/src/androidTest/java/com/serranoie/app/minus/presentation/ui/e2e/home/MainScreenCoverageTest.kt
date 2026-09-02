@@ -45,7 +45,7 @@ import com.serranoie.app.minus.presentation.ui.home.MainScreenUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.BottomSheetScrollState
 import com.serranoie.app.minus.presentation.ui.theme.component.LocalBottomSheetScrollState
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState

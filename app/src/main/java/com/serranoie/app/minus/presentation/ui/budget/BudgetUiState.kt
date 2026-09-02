@@ -38,6 +38,7 @@ data class BudgetUiState(
     val creditOwed: BigDecimal = BigDecimal.ZERO,
     val debtAdjustedBalance: BigDecimal = BigDecimal.ZERO,
     val calculationPreview: String? = null,
+    val numpadDraftAmount: BigDecimal? = null,
 ) {
     companion object {
         val INITIAL = BudgetUiState()

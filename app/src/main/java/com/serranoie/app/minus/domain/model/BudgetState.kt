@@ -20,6 +20,11 @@ data class BudgetState(
     val biweeklyAllocation: BigDecimal = BigDecimal.ZERO,
     val monthlyAllocation: BigDecimal = BigDecimal.ZERO,
     val isTodayOverDailyAllocation: Boolean = false,
+    val nextDailyAllocation: BigDecimal = BigDecimal.ZERO,
+    val nextWeeklyAllocation: BigDecimal = BigDecimal.ZERO,
+    val nextBiweeklyAllocation: BigDecimal = BigDecimal.ZERO,
+    val nextMonthlyAllocation: BigDecimal = BigDecimal.ZERO,
+    val periodTotalDays: Int = 0,
 ) {
     companion object {
         val EMPTY = BudgetState(
@@ -39,5 +44,12 @@ data class BudgetState(
         BudgetPeriod.WEEKLY -> weeklyAllocation
         BudgetPeriod.BIWEEKLY -> biweeklyAllocation
         BudgetPeriod.MONTHLY -> monthlyAllocation
+    }
+
+    fun nextAllocationFor(period: BudgetPeriod): BigDecimal = when (period) {
+        BudgetPeriod.DAILY -> nextDailyAllocation
+        BudgetPeriod.WEEKLY -> nextWeeklyAllocation
+        BudgetPeriod.BIWEEKLY -> nextBiweeklyAllocation
+        BudgetPeriod.MONTHLY -> nextMonthlyAllocation
     }
 }

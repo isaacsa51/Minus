@@ -182,10 +182,14 @@
     <string name="budget_pill_label_per_weekly">Por semana</string>
     <string name="budget_pill_label_per_biweekly">Bienal</string>
     <string name="budget_pill_label_per_monthly">Por mês</string>
+    <string name="budget_pill_next_daily">Para amanhã %1$s</string>
+    <string name="budget_pill_next_weekly">Para a próxima semana %1$s</string>
+    <string name="budget_pill_next_biweekly">Para a próxima quinzena %1$s</string>
+    <string name="budget_pill_next_monthly">Para o próximo mês %1$s</string>
     <string name="budget_pill_label_daily_exceeded">Valor diário excedido</string>
-    <string name="budget_pill_label_weekly_exceeded">Valor Semanal Excedido</string>
+    <string name="budget_pill_label_weekly_exceeded">Valor semanal excedido</string>
     <string name="budget_pill_label_biweekly_exceeded">Quantia bisemanal excedida</string>
-    <string name="budget_pill_label_monthly_exceeded">Valor Mensal Excedido</string>
+    <string name="budget_pill_label_monthly_exceeded">Valor mensal excedido</string>
     <string name="budget_pill_sub_exceeded_single">Valor de %1$s excedido</string>
     <string name="budget_pill_sub_exceeded_double">Excedido o valor de %1$s e %2$s</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s e %3$s valor excedido</string>
@@ -378,9 +382,9 @@
     <string name="budget_pill_exhausted_daily_label">Diariamente</string>
     <string name="budget_pill_exhausted_weekly_label">Semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">Bienal</string>
-    <string name="budget_pill_exhausted_single">Orçamento %1$s esgotado</string>
-    <string name="budget_pill_exhausted_double">Orçamento %1$s e %2$s esgotado</string>
-    <string name="budget_pill_exhausted_triple">Orçamento %1$s, %2$s e %3$s esgotado</string>
+    <string name="budget_pill_exhausted_single">Orçamento %1$s gasto</string>
+    <string name="budget_pill_exhausted_double">Orçamento %1$s e %2$s gasto</string>
+    <string name="budget_pill_exhausted_triple">Orçamento %1$s, %2$s e %3$s gasto</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">Gasto</string>
     <string name="spend_budget_card_available_percent_format">Disponível: %1$s%%</string>

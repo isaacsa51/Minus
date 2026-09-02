@@ -193,6 +193,60 @@ class BudgetViewModelTest {
     }
 
     @Test
+    fun when_plain_amount_is_typed_then_numpad_draft_amount_is_the_positive_value() = runTest {
+        val viewModel = newViewModel()
+        viewModel.uiState.test {
+            awaitCondition { it.numpadInput == "" }
+            viewModel.processIntent(BudgetNumpadIntent.NumberTapped("5"))
+            viewModel.processIntent(BudgetNumpadIntent.NumberTapped("0"))
+            val state = awaitCondition { it.numpadInput == "50" }
+            assertThat(state.numpadDraftAmount).isEqualTo(BigDecimal("50"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun when_amount_is_prefixed_with_plus_then_numpad_draft_amount_is_negative_income() = runTest {
+        val viewModel = newViewModel()
+        viewModel.uiState.test {
+            awaitCondition { it.numpadInput == "" }
+            viewModel.processIntent(BudgetNumpadIntent.OperatorTapped('+'))
+            viewModel.processIntent(BudgetNumpadIntent.NumberTapped("5"))
+            viewModel.processIntent(BudgetNumpadIntent.NumberTapped("0"))
+            val state = awaitCondition { it.numpadInput == "+50" }
+            assertThat(state.numpadDraftAmount).isEqualTo(BigDecimal("-50"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun when_amount_is_prefixed_with_minus_then_numpad_draft_amount_is_a_positive_decrease() = runTest {
+        val viewModel = newViewModel()
+        viewModel.uiState.test {
+            awaitCondition { it.numpadInput == "" }
+            viewModel.processIntent(BudgetNumpadIntent.OperatorTapped('-'))
+            viewModel.processIntent(BudgetNumpadIntent.NumberTapped("5"))
+            viewModel.processIntent(BudgetNumpadIntent.NumberTapped("0"))
+            val state = awaitCondition { it.numpadInput == "-50" }
+            assertThat(state.numpadDraftAmount).isEqualTo(BigDecimal("50"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun when_input_ends_with_an_operator_then_numpad_draft_amount_is_null() = runTest {
+        val viewModel = newViewModel()
+        viewModel.uiState.test {
+            awaitCondition { it.numpadInput == "" }
+            viewModel.processIntent(BudgetNumpadIntent.NumberTapped("5"))
+            viewModel.processIntent(BudgetNumpadIntent.OperatorTapped('+'))
+            val state = awaitCondition { it.numpadInput == "5+" }
+            assertThat(state.numpadDraftAmount).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun when_equals_is_tapped_on_valid_expression_then_input_becomes_evaluation_result() = runTest {
         val viewModel = newViewModel()
         viewModel.uiState.test {

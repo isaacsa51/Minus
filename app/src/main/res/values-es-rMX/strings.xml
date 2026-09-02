@@ -182,6 +182,10 @@
     <string name="budget_pill_label_per_weekly">Por semana</string>
     <string name="budget_pill_label_per_biweekly">Por quincena</string>
     <string name="budget_pill_label_per_monthly">Por mes</string>
+    <string name="budget_pill_next_daily">Para mañana %1$s</string>
+    <string name="budget_pill_next_weekly">Para la próxima semana %1$s</string>
+    <string name="budget_pill_next_biweekly">Para la próxima quincena %1$s</string>
+    <string name="budget_pill_next_monthly">Para el próximo mes %1$s</string>
     <string name="budget_pill_label_daily_exceeded">Monto diario excedido</string>
     <string name="budget_pill_label_weekly_exceeded">Monto semanal excedido</string>
     <string name="budget_pill_label_biweekly_exceeded">Monto quincenal excedido</string>
@@ -379,9 +383,9 @@
     <string name="budget_pill_exhausted_daily_label">diario</string>
     <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
-    <string name="budget_pill_exhausted_single">Presupuesto %1$s agotado</string>
-    <string name="budget_pill_exhausted_double">Presupuesto %1$s y %2$s agotado</string>
-    <string name="budget_pill_exhausted_triple">Presupuesto %1$s, %2$s y %3$s agotado</string>
+    <string name="budget_pill_exhausted_single">Presupuesto %1$s gastado</string>
+    <string name="budget_pill_exhausted_double">Presupuesto %1$s y %2$s gastado</string>
+    <string name="budget_pill_exhausted_triple">Presupuesto %1$s, %2$s y %3$s gastado</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">Gastado</string>
     <string name="spend_budget_card_available_percent_format">Disponible: %1$s%%</string>

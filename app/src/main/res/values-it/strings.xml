@@ -182,10 +182,14 @@
     <string name="budget_pill_label_per_weekly">Per settimana</string>
     <string name="budget_pill_label_per_biweekly">Biodimanale</string>
     <string name="budget_pill_label_per_monthly">Al mese</string>
-    <string name="budget_pill_label_daily_exceeded">Importo Giornaliero Superato</string>
-    <string name="budget_pill_label_weekly_exceeded">Importo Settimanale Superato</string>
-    <string name="budget_pill_label_biweekly_exceeded">Importo Settimanale Superato</string>
-    <string name="budget_pill_label_monthly_exceeded">Importo Mensile Superato</string>
+    <string name="budget_pill_next_daily">Per domani %1$s</string>
+    <string name="budget_pill_next_weekly">Per la prossima settimana %1$s</string>
+    <string name="budget_pill_next_biweekly">Per le prossime due settimane %1$s</string>
+    <string name="budget_pill_next_monthly">Per il prossimo mese %1$s</string>
+    <string name="budget_pill_label_daily_exceeded">Importo giornaliero superato</string>
+    <string name="budget_pill_label_weekly_exceeded">Importo settimanale superato</string>
+    <string name="budget_pill_label_biweekly_exceeded">Importo settimanale superato</string>
+    <string name="budget_pill_label_monthly_exceeded">Importo mensile superato</string>
     <string name="budget_pill_sub_exceeded_single">%1$s importo superato</string>
     <string name="budget_pill_sub_exceeded_double">%1$s e %2$s importo superato</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s e %3$s superato</string>
@@ -378,9 +382,9 @@
     <string name="budget_pill_exhausted_daily_label">Giornaliero</string>
     <string name="budget_pill_exhausted_weekly_label">Settimanale</string>
     <string name="budget_pill_exhausted_biweekly_label">Biodimanale</string>
-    <string name="budget_pill_exhausted_single">%1$s budget esaurito</string>
-    <string name="budget_pill_exhausted_double">%1$s e %2$s budget esauriti</string>
-    <string name="budget_pill_exhausted_triple">%1$s, %2$s e %3$s budget esaurito</string>
+    <string name="budget_pill_exhausted_single">%1$s budget speso</string>
+    <string name="budget_pill_exhausted_double">%1$s e %2$s budget spesi</string>
+    <string name="budget_pill_exhausted_triple">%1$s, %2$s e %3$s budget speso</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">Speso</string>
     <string name="spend_budget_card_available_percent_format">Disponibile: %1$s%%</string>

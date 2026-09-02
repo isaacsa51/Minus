@@ -180,6 +180,10 @@
     <string name="budget_pill_label_per_weekly">每周</string>
     <string name="budget_pill_label_per_biweekly">每半个月</string>
     <string name="budget_pill_label_per_monthly">每月</string>
+    <string name="budget_pill_next_daily">明天可用 %1$s</string>
+    <string name="budget_pill_next_weekly">下周可用 %1$s</string>
+    <string name="budget_pill_next_biweekly">下个半月可用 %1$s</string>
+    <string name="budget_pill_next_monthly">下个月可用 %1$s</string>
     <string name="budget_pill_label_daily_exceeded">超出每日金额</string>
     <string name="budget_pill_label_weekly_exceeded">超出每周金额</string>
     <string name="budget_pill_label_biweekly_exceeded">超出每半个月金额</string>
@@ -377,9 +381,9 @@
     <string name="budget_pill_exhausted_daily_label">每天</string>
     <string name="budget_pill_exhausted_weekly_label">每周</string>
     <string name="budget_pill_exhausted_biweekly_label">每半个月</string>
-    <string name="budget_pill_exhausted_single">%1$s 预算耗尽</string>
-    <string name="budget_pill_exhausted_double">%1$s 和 %2$s 预算耗尽</string>
-    <string name="budget_pill_exhausted_triple">%1$s、%2$s 和 %3$s 预算耗尽</string>
+    <string name="budget_pill_exhausted_single">%1$s 预算已用完</string>
+    <string name="budget_pill_exhausted_double">%1$s 和 %2$s 预算已用完</string>
+    <string name="budget_pill_exhausted_triple">%1$s、%2$s 和 %3$s 预算已用完</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">支出</string>
     <string name="spend_budget_card_available_percent_format">可用：%1$s%%</string>
