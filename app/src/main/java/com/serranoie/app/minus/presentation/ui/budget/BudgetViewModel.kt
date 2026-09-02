@@ -177,7 +177,8 @@ class BudgetViewModel @Inject constructor(
             pendingExpensesForNextPeriod = queuedTransactions,
             creditOwed = creditOwed,
             debtAdjustedBalance = debtAdjustedBalance,
-            calculationPreview = calculateCalculationPreview(numpadInput, settings?.currencyCode ?: "USD")
+            calculationPreview = calculateCalculationPreview(numpadInput, settings?.currencyCode ?: "USD"),
+            numpadDraftAmount = parseNumpadDraftAmount(numpadInput),
         )
     }.catch { error ->
         logcat(TAG) { "Error in uiState pipeline: ${error.asLog()}" }
@@ -656,6 +657,12 @@ class BudgetViewModel @Inject constructor(
         } else {
             context.getString(R.string.budget_pill_calc_subtracted, formattedAmount)
         }
+    }
+
+    private fun parseNumpadDraftAmount(input: String): BigDecimal? {
+        val evaluated = budgetExpressionEvaluator.evaluate(input) ?: return null
+        val magnitude = evaluated.toBigDecimalOrNull()?.abs()?.takeIf { it.signum() != 0 } ?: return null
+        return if (input.startsWith("+")) magnitude.negate() else magnitude
     }
 
     private fun validateNumpadInput(input: String): Boolean {

@@ -180,6 +180,10 @@
     <string name="budget_pill_label_per_weekly">週ごと</string>
     <string name="budget_pill_label_per_biweekly">隔週</string>
     <string name="budget_pill_label_per_monthly">1 ヶ月あたり</string>
+    <string name="budget_pill_next_daily">明日は %1$s</string>
+    <string name="budget_pill_next_weekly">翌週は %1$s</string>
+    <string name="budget_pill_next_biweekly">翌隔週は %1$s</string>
+    <string name="budget_pill_next_monthly">翌月は %1$s</string>
     <string name="budget_pill_label_daily_exceeded">毎日の金額を超えました</string>
     <string name="budget_pill_label_weekly_exceeded">週間金額を超えました</string>
     <string name="budget_pill_label_biweekly_exceeded">週間金額を超えました</string>
@@ -376,9 +380,9 @@
     <string name="budget_pill_exhausted_daily_label">毎日</string>
     <string name="budget_pill_exhausted_weekly_label">週単位</string>
     <string name="budget_pill_exhausted_biweekly_label">隔週</string>
-    <string name="budget_pill_exhausted_single">%1$s の予算が使い果たされました</string>
-    <string name="budget_pill_exhausted_double">%1$s と %2$s の予算が使い果たされました</string>
-    <string name="budget_pill_exhausted_triple">%1$s、 %2$s 、 %3$s の予算が使い果たされました</string>
+    <string name="budget_pill_exhausted_single">%1$s の予算を使い切りました</string>
+    <string name="budget_pill_exhausted_double">%1$s と %2$s の予算を使い切りました</string>
+    <string name="budget_pill_exhausted_triple">%1$s、 %2$s 、 %3$s の予算を使い切りました</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">使用済み：</string>
     <string name="spend_budget_card_available_percent_format">利用可能: %1$s%%</string>

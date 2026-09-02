@@ -180,13 +180,17 @@
     <string name="budget_pill_label_per_weekly">Ανά εβδομάδα</string>
     <string name="budget_pill_label_per_biweekly">Ανά δύο εβδομάδες</string>
     <string name="budget_pill_label_per_monthly">Ανά μήνα</string>
-    <string name="budget_pill_label_daily_exceeded">Υπέρβαση Του Ημερήσιου Ποσού</string>
-    <string name="budget_pill_label_weekly_exceeded">Υπέρβαση Εβδομαδιαίας Ποσότητας</string>
-    <string name="budget_pill_label_biweekly_exceeded">Υπέρβαση Δεκαεξαδικής Εβδομάδας</string>
-    <string name="budget_pill_label_monthly_exceeded">Υπέρβαση Μηνιαίου Ποσού</string>
-    <string name="budget_pill_sub_exceeded_single">Ποσό %1$s Υπέρβαση</string>
-    <string name="budget_pill_sub_exceeded_double">%1$s και %2$s ποσό Υπέρβαση</string>
-    <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s και %3$s ποσό Υπέρβαση</string>
+    <string name="budget_pill_next_daily">Για αύριο %1$s</string>
+    <string name="budget_pill_next_weekly">Για την επόμενη εβδομάδα %1$s</string>
+    <string name="budget_pill_next_biweekly">Για το επόμενο δεκαπενθήμερο %1$s</string>
+    <string name="budget_pill_next_monthly">Για τον επόμενο μήνα %1$s</string>
+    <string name="budget_pill_label_daily_exceeded">Υπέρβαση του ημερήσιου ποσού</string>
+    <string name="budget_pill_label_weekly_exceeded">Υπέρβαση εβδομαδιαίας ποσότητας</string>
+    <string name="budget_pill_label_biweekly_exceeded">Υπέρβαση δεκαεξαδικής εβδομάδας</string>
+    <string name="budget_pill_label_monthly_exceeded">Υπέρβαση μηνιαίου ποσού</string>
+    <string name="budget_pill_sub_exceeded_single">Ποσό %1$s υπέρβαση</string>
+    <string name="budget_pill_sub_exceeded_double">%1$s και %2$s ποσό υπέρβαση</string>
+    <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s και %3$s ποσό υπέρβαση</string>
     <string name="day_total_format">Σύνολο: %1$s</string>
     <string name="onboarding_welcome_title">Καλώς ήλθατε στο Minus</string>
     <string name="onboarding_welcome_subtitle">Γεια σας και να καλωσορίσετε, ας αρχίσουμε να σώζουμε μαζί.</string>
@@ -375,9 +379,9 @@
     <string name="budget_pill_exhausted_daily_label">Καθημερινά</string>
     <string name="budget_pill_exhausted_weekly_label">Εβδομαδιαία</string>
     <string name="budget_pill_exhausted_biweekly_label">Ανά δύο εβδομάδες</string>
-    <string name="budget_pill_exhausted_single">Ο προϋπολογισμός %1$s εξαντλήθηκε</string>
-    <string name="budget_pill_exhausted_double">Ο προϋπολογισμός %1$s και %2$s εξαντλήθηκε</string>
-    <string name="budget_pill_exhausted_triple">%1$s, %2$s και %3$s προϋπολογισμός εξαντλημένος</string>
+    <string name="budget_pill_exhausted_single">Ο προϋπολογισμός %1$s δαπανήθηκε</string>
+    <string name="budget_pill_exhausted_double">Ο προϋπολογισμός %1$s και %2$s δαπανήθηκε</string>
+    <string name="budget_pill_exhausted_triple">%1$s, %2$s και %3$s προϋπολογισμός δαπανημένος</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">Δαπανήθηκε</string>
     <string name="spend_budget_card_available_percent_format">Διαθέσιμο: %1$s%%</string>

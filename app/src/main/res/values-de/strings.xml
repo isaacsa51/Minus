@@ -183,13 +183,17 @@
     <string name="budget_pill_label_per_weekly">Per week</string>
     <string name="budget_pill_label_per_biweekly">alle zwei Wochen</string>
     <string name="budget_pill_label_per_monthly">Per month</string>
-    <string name="budget_pill_label_daily_exceeded">Daily Amount Exceeded</string>
-    <string name="budget_pill_label_weekly_exceeded">Weekly Amount Exceeded</string>
-    <string name="budget_pill_label_biweekly_exceeded">Biweekly Amount Exceeded</string>
-    <string name="budget_pill_label_monthly_exceeded">Monthly Amount Exceeded</string>
-    <string name="budget_pill_sub_exceeded_single">%1$s amount Exceeded</string>
-    <string name="budget_pill_sub_exceeded_double">%1$s and %2$s amount Exceeded</string>
-    <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s and %3$s amount Exceeded</string>
+    <string name="budget_pill_next_daily">Für morgen %1$s</string>
+    <string name="budget_pill_next_weekly">Für nächste Woche %1$s</string>
+    <string name="budget_pill_next_biweekly">Für die nächsten zwei Wochen %1$s</string>
+    <string name="budget_pill_next_monthly">Für nächsten Monat %1$s</string>
+    <string name="budget_pill_label_daily_exceeded">Daily Amount exceeded</string>
+    <string name="budget_pill_label_weekly_exceeded">Weekly Amount exceeded</string>
+    <string name="budget_pill_label_biweekly_exceeded">Biweekly Amount exceeded</string>
+    <string name="budget_pill_label_monthly_exceeded">Monthly Amount exceeded</string>
+    <string name="budget_pill_sub_exceeded_single">%1$s amount exceeded</string>
+    <string name="budget_pill_sub_exceeded_double">%1$s and %2$s amount exceeded</string>
+    <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s and %3$s amount exceeded</string>
     <string name="day_total_format">Total: %1$s</string>
     <string name="onboarding_welcome_title">Welcome to Minus</string>
     <string name="onboarding_welcome_subtitle">Hi and welcome, lets start saving together.</string>
@@ -380,9 +384,9 @@
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Wöchentlich</string>
     <string name="budget_pill_exhausted_biweekly_label">alle zwei Wochen</string>
-    <string name="budget_pill_exhausted_single">%1$s budget exhausted</string>
-    <string name="budget_pill_exhausted_double">%1$s and %2$s budget exhausted</string>
-    <string name="budget_pill_exhausted_triple">%1$s, %2$s and %3$s budget exhausted</string>
+    <string name="budget_pill_exhausted_single">%1$s budget spent</string>
+    <string name="budget_pill_exhausted_double">%1$s and %2$s budget spent</string>
+    <string name="budget_pill_exhausted_triple">%1$s, %2$s and %3$s budget spent</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">Spent</string>
     <string name="spend_budget_card_available_percent_format">Available: %1$s%%</string>

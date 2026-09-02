@@ -8,6 +8,7 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeDynamicAllocations
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.computeNextBlockAllocations
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.splitBudget
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -180,6 +181,14 @@ class BudgetStateCalculator @Inject constructor(
             )
         }
 
+        val totalSpentInPeriod = totalExpensesInPeriod.add(recurringDueToday)
+        val nextAllocations = computeNextBlockAllocations(
+            totalBudget = effectiveTotalBudget,
+            totalSpentInPeriod = totalSpentInPeriod,
+            totalDays = originalTotalDays,
+            daysRemaining = daysRemaining.coerceAtLeast(0),
+        )
+
         return BudgetState(
             remainingToday = remainingToday,
             totalSpentToday = spentToday,
@@ -188,7 +197,7 @@ class BudgetStateCalculator @Inject constructor(
             progress = progress,
             isOverBudget = remainingBudget < BigDecimal.ZERO,
             totalBudget = effectiveTotalBudget,
-            totalSpentInPeriod = totalExpensesInPeriod.add(recurringDueToday),
+            totalSpentInPeriod = totalSpentInPeriod,
             totalSpentThisWeek = totalSpentThisWeek,
             totalSpentThisBiweek = totalSpentThisBiweek,
             totalSpentThisMonth = totalSpentThisMonth,
@@ -197,6 +206,11 @@ class BudgetStateCalculator @Inject constructor(
             biweeklyAllocation = allocations.biweekly,
             monthlyAllocation = allocations.monthly,
             isTodayOverDailyAllocation = allocations.isOverDaily,
+            nextDailyAllocation = nextAllocations.dailyAllocation,
+            nextWeeklyAllocation = nextAllocations.weeklyAllocation,
+            nextBiweeklyAllocation = nextAllocations.biweeklyAllocation,
+            nextMonthlyAllocation = nextAllocations.monthlyAllocation,
+            periodTotalDays = originalTotalDays,
         )
     }
 

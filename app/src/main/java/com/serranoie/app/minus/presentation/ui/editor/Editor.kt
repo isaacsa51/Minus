@@ -6,6 +6,8 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -100,13 +102,14 @@ import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTextField
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
+import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
@@ -179,6 +182,19 @@ fun Editor(
     val configuration = LocalConfiguration.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    val budgetPillBounce = remember { Animatable(1f) }
+    val activeTransactionCount = uiState.transactions.count { !it.isDeleted }
+    val lastTransactionCount = remember { mutableStateOf(activeTransactionCount) }
+    LaunchedEffect(activeTransactionCount) {
+        val added = activeTransactionCount == lastTransactionCount.value + 1
+        lastTransactionCount.value = activeTransactionCount
+        if (added) {
+            budgetPillBounce.animateTo(1.1f, tween(durationMillis = 90, easing = FastOutSlowInEasing))
+            budgetPillBounce.animateTo(1f, tween(durationMillis = 140, easing = FastOutSlowInEasing))
+            view.strongHapticFeedback()
+        }
+    }
+
     val isSquareScreen =
         configuration.screenWidthDp.toFloat() / configuration.screenHeightDp.toFloat() > 0.8f
     val topBarHeight = if (isSquareScreen) 54.dp else 66.dp
@@ -231,6 +247,7 @@ fun Editor(
                 centerRemainingAmount = animState == AnimState.EDITING,
                 splitMode = uiState.budgetSettings?.splitMode ?: BudgetSplitMode.STATIC,
                 calculationPreview = uiState.calculationPreview,
+                draftAmount = uiState.numpadDraftAmount,
                 onOpenBudgetSheet = {
                     view.weakHapticFeedback()
                     onShowBudgetPeriodSheet()
@@ -238,6 +255,10 @@ fun Editor(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
+                    .graphicsLayer {
+                        scaleX = budgetPillBounce.value
+                        scaleY = budgetPillBounce.value
+                    }
                     .animateContentSize(animationSpec = tween(200))
                     .padding(end = 8.dp)
                     .then(budgetPillHintAnchorModifier)
@@ -1014,7 +1035,8 @@ fun EditorPreview_Editing() {
                 ),
                 transactions = emptyList(),
                 numpadInput = "250",
-                isNumpadValid = true
+                isNumpadValid = true,
+                numpadDraftAmount = BigDecimal("250")
             ),
             animState = AnimState.EDITING,
             onFocus = {},
@@ -1058,6 +1080,7 @@ private fun EditorPreview_Editing_WithCredit() {
                 transactions = emptyList(),
                 numpadInput = "250",
                 isNumpadValid = true,
+                numpadDraftAmount = BigDecimal("250"),
                 isCreditEnabled = true,
                 isRecurrentEnabled = true
             ),

@@ -1,6 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,7 +14,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetPill
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetPill
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
@@ -199,6 +201,161 @@ class BudgetPillScreenshotTest {
                         currencyCode = "USD",
                         splitMode = BudgetSplitMode.DYNAMIC,
                         onOpenBudgetSheet = { },
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun budgetPillDailyExceededWithProjection() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    BudgetPill(
+                        budgetState = BudgetState(
+                            remainingToday = BigDecimal("-10.00"),
+                            totalSpentToday = BigDecimal("50.00"),
+                            dailyBudget = BigDecimal("40.00"),
+                            daysRemaining = 3,
+                            progress = 0.42f,
+                            isOverBudget = false,
+                            totalBudget = BigDecimal("120.00"),
+                            totalSpentInPeriod = BigDecimal("50.00"),
+                            nextDailyAllocation = BigDecimal("35.00"),
+                        ),
+                        budgetSettings = BudgetSettings(
+                            totalBudget = BigDecimal("120.00"),
+                            period = BudgetPeriod.DAILY,
+                            startDate = LocalDate.now(),
+                            currencyCode = "USD",
+                        ),
+                        viewPeriod = BudgetPeriod.DAILY,
+                        currencyCode = "USD",
+                        onOpenBudgetSheet = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun budgetPillWeeklyExceededWithProjection() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    BudgetPill(
+                        budgetState = BudgetState(
+                            remainingToday = BigDecimal("-500.00"),
+                            totalSpentToday = BigDecimal("600.00"),
+                            dailyBudget = BigDecimal("47.62"),
+                            daysRemaining = 14,
+                            progress = 0.6f,
+                            isOverBudget = false,
+                            totalBudget = BigDecimal("1000.00"),
+                            totalSpentInPeriod = BigDecimal("600.00"),
+                            totalSpentThisWeek = BigDecimal("600.00"),
+                            dailyAllocation = BigDecimal("40.00"),
+                            weeklyAllocation = BigDecimal("333.33"),
+                            biweeklyAllocation = BigDecimal("466.67"),
+                            isTodayOverDailyAllocation = true,
+                            nextWeeklyAllocation = BigDecimal("200.00"),
+                        ),
+                        budgetSettings = BudgetSettings(
+                            totalBudget = BigDecimal("1000.00"),
+                            period = BudgetPeriod.BIWEEKLY,
+                            startDate = LocalDate.now(),
+                            currencyCode = "USD",
+                            splitMode = BudgetSplitMode.DYNAMIC,
+                        ),
+                        viewPeriod = BudgetPeriod.WEEKLY,
+                        currencyCode = "USD",
+                        splitMode = BudgetSplitMode.DYNAMIC,
+                        onOpenBudgetSheet = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun budgetPillDraftCountsDownCenteredAmount() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    BudgetPill(
+                        budgetState = BudgetState(
+                            remainingToday = BigDecimal("40.00"),
+                            totalSpentToday = BigDecimal("0.00"),
+                            dailyBudget = BigDecimal("40.00"),
+                            daysRemaining = 3,
+                            progress = 0f,
+                            isOverBudget = false,
+                            totalBudget = BigDecimal("120.00"),
+                            totalSpentInPeriod = BigDecimal("0.00"),
+                            periodTotalDays = 3,
+                        ),
+                        budgetSettings = BudgetSettings(
+                            totalBudget = BigDecimal("120.00"),
+                            period = BudgetPeriod.DAILY,
+                            startDate = LocalDate.now(),
+                            currencyCode = "USD",
+                        ),
+                        viewPeriod = BudgetPeriod.DAILY,
+                        currencyCode = "USD",
+                        centerRemainingAmount = true,
+                        draftAmount = BigDecimal("10"),
+                        onOpenBudgetSheet = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun budgetPillDraftPushesOverDailyAllocation() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    BudgetPill(
+                        budgetState = BudgetState(
+                            remainingToday = BigDecimal("30.00"),
+                            totalSpentToday = BigDecimal("10.00"),
+                            dailyBudget = BigDecimal("40.00"),
+                            daysRemaining = 3,
+                            progress = 0.08f,
+                            isOverBudget = false,
+                            totalBudget = BigDecimal("120.00"),
+                            totalSpentInPeriod = BigDecimal("10.00"),
+                            periodTotalDays = 3,
+                        ),
+                        budgetSettings = BudgetSettings(
+                            totalBudget = BigDecimal("120.00"),
+                            period = BudgetPeriod.DAILY,
+                            startDate = LocalDate.now(),
+                            currencyCode = "USD",
+                        ),
+                        viewPeriod = BudgetPeriod.DAILY,
+                        currencyCode = "USD",
+                        centerRemainingAmount = true,
+                        draftAmount = BigDecimal("45"),
+                        onOpenBudgetSheet = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
                     )
                 }
             }

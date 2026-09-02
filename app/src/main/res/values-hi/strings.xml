@@ -180,6 +180,10 @@
     <string name="budget_pill_label_per_weekly">हर हफ़्ते</string>
     <string name="budget_pill_label_per_biweekly">दो हफ़्ते में</string>
     <string name="budget_pill_label_per_monthly">हर महीने</string>
+    <string name="budget_pill_next_daily">कल के लिए %1$s</string>
+    <string name="budget_pill_next_weekly">अगले हफ़्ते के लिए %1$s</string>
+    <string name="budget_pill_next_biweekly">अगले दो हफ़्तों के लिए %1$s</string>
+    <string name="budget_pill_next_monthly">अगले महीने के लिए %1$s</string>
     <string name="budget_pill_label_daily_exceeded">रोज़ाना की सीमा से ज़्यादा रकम</string>
     <string name="budget_pill_label_weekly_exceeded">हफ़्ते की सीमा से ज़्यादा रकम</string>
     <string name="budget_pill_label_biweekly_exceeded">दो हफ़्ते की सीमा से ज़्यादा रकम</string>
@@ -375,9 +379,9 @@
     <string name="budget_pill_exhausted_daily_label">रोज़ाना</string>
     <string name="budget_pill_exhausted_weekly_label">हफ़्तेवार</string>
     <string name="budget_pill_exhausted_biweekly_label">हर दो हफ़्ते में</string>
-    <string name="budget_pill_exhausted_single">%1$s का बजट खत्म हो गया है</string>
-    <string name="budget_pill_exhausted_double">%1$s और %2$s का बजट खत्म हो गया है</string>
-    <string name="budget_pill_exhausted_triple">%1$s, %2$s और %3$s का बजट खत्म हो गया है</string>
+    <string name="budget_pill_exhausted_single">%1$s का बजट खर्च हो गया है</string>
+    <string name="budget_pill_exhausted_double">%1$s और %2$s का बजट खर्च हो गया है</string>
+    <string name="budget_pill_exhausted_triple">%1$s, %2$s और %3$s का बजट खर्च हो गया है</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">खर्च किया गया</string>
     <string name="spend_budget_card_available_percent_format">उपलब्ध: %1$s%%</string>
