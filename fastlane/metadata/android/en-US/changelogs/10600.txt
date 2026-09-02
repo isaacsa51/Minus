@@ -1,0 +1,8 @@
+- feat: add next-period budget allocation projections
+- feat: change rollover dialog UI
+- fix: hide result text when adding an income
+- feat: implement AMOLED dark theme option
+- feat: added Costa Rica Colon currency
+- feat: added new shape and data into analytics regarding changes in the middle of the period
+- fix: handle negative(incomes) values on graph by ignoring them
+- fix: centralize expression evaluation
