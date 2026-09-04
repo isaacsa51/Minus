@@ -38,7 +38,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
@@ -56,8 +55,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditMode
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
-import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
-import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import com.serranoie.app.minus.presentation.util.handleHardwareNumpadKeyEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -96,7 +93,6 @@ fun TransactionEditScreen(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     modifier: Modifier = Modifier
 ) {
-    val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
     val scope = rememberCoroutineScope()
 
     var editedAmount by remember { mutableStateOf(transaction.amount.toString()) }
@@ -136,10 +132,6 @@ fun TransactionEditScreen(
         configuration.keyboard == android.content.res.Configuration.KEYBOARD_QWERTY
     val screenHeight = configuration.screenHeightDp.dp
     val targetNumpadHeight = if (hasHardKeyboard) 200.dp else screenHeight * 0.48f
-
-    val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
-        fontWeight = FontWeight.W500
-    )
 
     val editorState = remember(editedAmount) {
         EditorState(
@@ -306,20 +298,14 @@ fun TransactionEditScreen(
             )
         }
 
-        Box(
+        EditAmountDisplay(
+            rawAmount = editedAmount,
+            currencyCode = currencyCode,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(16.dp),
-            contentAlignment = Alignment.TopEnd
-        ) {
-            EditAmountDisplay(
-                rawAmount = editedAmount,
-                currencyFormat = currencyFormat,
-                style = baseTextStyle,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
+                .padding(start = 16.dp, end = 16.dp),
+        )
 
         Surface(
             modifier = Modifier
