@@ -8,12 +8,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import java.math.BigDecimal
-import java.text.NumberFormat
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.tooling.preview.Preview
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
+import java.math.BigDecimal
+import java.text.NumberFormat
 
 @Composable
 internal fun EditAmountDisplay(
@@ -21,11 +21,13 @@ internal fun EditAmountDisplay(
     currencyFormat: NumberFormat,
     style: TextStyle,
     modifier: Modifier = Modifier,
+    isIncome: Boolean = false,
 ) {
-    val formattedAmount = remember(rawAmount) {
+    val formattedAmount = remember(rawAmount, isIncome) {
         try {
             val value = rawAmount.toBigDecimalOrNull() ?: BigDecimal.ZERO
-            currencyFormat.format(value)
+            val formatted = currencyFormat.format(value.abs())
+            if (isIncome) "+$formatted" else formatted
         } catch (e: Exception) {
             rawAmount
         }
@@ -34,7 +36,7 @@ internal fun EditAmountDisplay(
     Text(
         text = formattedAmount,
         style = style,
-        color = MaterialTheme.colorScheme.onSurface,
+        color = if (isIncome) colorGood else MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.End,
         modifier = modifier.fillMaxWidth()
     )

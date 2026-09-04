@@ -182,12 +182,12 @@ internal fun AdaptiveSingleLineText(
             style = style.copy(fontSize = adaptiveFontSize),
             color = color,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            overflow = TextOverflow.Clip,
             textAlign = textAlign,
-            modifier = (if (fillWidth) Modifier
-                .fillMaxWidth()
+            modifier = (if (fillWidth) Modifier.fillMaxWidth() else Modifier)
                 .basicMarquee()
-                .wrapContentHeight() else Modifier).align(Alignment.Center),
+                .wrapContentHeight()
+                .align(Alignment.Center),
         )
     }
 }

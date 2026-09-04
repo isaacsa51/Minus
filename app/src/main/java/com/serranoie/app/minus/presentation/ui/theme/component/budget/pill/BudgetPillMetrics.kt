@@ -80,7 +80,9 @@ internal fun calculateBudgetMetrics(
         BudgetSplitMode.STATIC -> staticRemaining.signum() == -1
     }
 
-    val progress = if (periodBudget.signum() == 1) {
+    val progress = if (isOverBudget || isOverSubPeriod) {
+        1f
+    } else if (periodBudget.signum() == 1) {
         periodSpent.divide(periodBudget, 2, RoundingMode.HALF_UP).toFloat().coerceIn(0f, 1f)
     } else 0f
 
@@ -106,7 +108,7 @@ internal fun calculateBudgetMetrics(
 internal fun resolveExhaustedMessage(
     state: BudgetState?, period: BudgetPeriod, splitMode: BudgetSplitMode
 ): String? {
-    if (state == null) return null
+    if (state == null || state.isOverBudget) return null
 
     val dailyRem = state.dailyBudget.subtract(state.totalSpentToday)
     val isDailyExhausted = dailyRem.signum() <= 0

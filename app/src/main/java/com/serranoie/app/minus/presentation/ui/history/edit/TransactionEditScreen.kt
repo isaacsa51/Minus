@@ -1,5 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.history.edit
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,14 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CreditCard
-import androidx.compose.material3.ElevatedToggleButton
+import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
-import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,11 +38,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
@@ -94,6 +92,8 @@ fun TransactionEditScreen(
         newSubscriptionDay: Int?,
         newIsCredit: Boolean
     ) -> Unit = { _, _, _, _, _, _, _, _ -> },
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
@@ -248,19 +248,8 @@ fun TransactionEditScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            RecurrenceToggleButton(
-                isRecurrent = isRecurrent,
-                onToggle = {
-                    scope.launch {
-                        delay(180.milliseconds)
-                        showRecurrentBottomSheet = true
-                    }
-                },
-                modifier = Modifier.weight(1f),
-            )
-
             if (isCreditQuickToggleEnabled) {
-                ElevatedToggleButton(
+                TransactionEditToggleButton(
                     checked = isCredit,
                     onCheckedChange = { checked ->
                         if (checked && creditCardCutoffDay == null) {
@@ -269,19 +258,42 @@ fun TransactionEditScreen(
                             isCredit = checked
                         }
                     },
-                    modifier = Modifier.height(40.dp),
-                    colors = ToggleButtonDefaults.elevatedToggleButtonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
-                            alpha = 0.25f
-                        ),
-                        checkedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        contentColor = MaterialTheme.colorScheme.tertiary,
-                        checkedContentColor = MaterialTheme.colorScheme.tertiary
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.CreditCard,
-                        contentDescription = stringResource(R.string.settings_feature_credit_toggle_title)
+                    icon = Icons.Rounded.CreditCard,
+                    contentDescription = "Credit card payment",
+                    position = TransactionEditTogglePosition.LEADING,
+                )
+
+                TransactionEditToggleButton(
+                    checked = isRecurrent,
+                    onCheckedChange = {
+                        scope.launch {
+                            delay(180.milliseconds)
+                            showRecurrentBottomSheet = true
+                        }
+                    },
+                    icon = Icons.Rounded.EventRepeat,
+                    contentDescription = "Recurrent payment",
+                    position = TransactionEditTogglePosition.TRAILING,
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+            } else {
+                // A `weight` modifier passed as a parameter into TransactionEditToggleButton
+                // never reaches Row: TooltipBox interposes its own unweighted Box above the
+                // button, so the ParentData is attached too deep to be read. Hosting the button
+                // inside a directly-weighted Box here is what makes it actually stretch.
+                Box(modifier = Modifier.weight(1f)) {
+                    TransactionEditToggleButton(
+                        checked = isRecurrent,
+                        onCheckedChange = {
+                            scope.launch {
+                                delay(180.milliseconds)
+                                showRecurrentBottomSheet = true
+                            }
+                        },
+                        icon = Icons.Rounded.EventRepeat,
+                        contentDescription = "Recurrent payment",
+                        position = TransactionEditTogglePosition.STANDALONE,
                     )
                 }
             }
@@ -516,7 +528,7 @@ fun TransactionEditScreenRecurringPreview() {
             budgetStartDate = LocalDate.now().minusDays(15),
             budgetEndDate = LocalDate.now().plusDays(15),
             currencyCode = "USD",
-            isCreditQuickToggleEnabled = true,
+            isCreditQuickToggleEnabled = false,
             onCancel = {},
             onSave = { _, _, _, _, _, _, _, _ -> }
         )

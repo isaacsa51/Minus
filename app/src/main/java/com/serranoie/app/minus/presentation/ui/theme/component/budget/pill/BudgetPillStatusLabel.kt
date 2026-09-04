@@ -114,8 +114,10 @@ internal fun StatusLabel(
                 },
                 color = textColor,
                 minFontSize = if (bigVariant) 14.sp else 12.sp,
-                modifier = if (wrapContent) Modifier.wrapContentWidth() else Modifier.weight(1f),
-                textAlign = if (bigVariant) TextAlign.Center else TextAlign.Start,
+                modifier = if (wrapContent) Modifier
+                    .wrapContentWidth()
+                else Modifier.weight(1f),
+                textAlign = if (centreContent) TextAlign.Center else TextAlign.Start,
                 fillWidth = !wrapContent,
             )
         }

@@ -196,10 +196,11 @@ class HistoryViewModel @Inject constructor(
 
     private fun saveEditedTransaction(transaction: Transaction) {
         viewModelScope.launch {
-            val success = budgetTransactionHandler.editTransaction(transaction)
-            if (success) {
+            val result = budgetTransactionHandler.editTransaction(transaction)
+            if (result.isSuccess) {
                 _editingTransaction.value = null
             } else {
+                logcat(TAG) { "saveEditedTransaction failed for id=${transaction.id}: ${result.exceptionOrNull()}" }
                 _effects.emit(
                     HistoryUiEffect.ShowSnackbar(
                         context.getString(R.string.history_snackbar_save_transaction_failed)

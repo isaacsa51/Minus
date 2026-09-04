@@ -212,7 +212,7 @@ class HistoryViewModelTest {
     @Test
     fun `a successful edit clears the editing transaction`() = runTest {
         val t = txn(3L)
-        coEvery { budgetTransactionHandler.editTransaction(t) } returns true
+        coEvery { budgetTransactionHandler.editTransaction(t) } returns Result.success(Unit)
         val vm = newViewModel()
 
         vm.uiState.test {
@@ -228,7 +228,7 @@ class HistoryViewModelTest {
     @Test
     fun `a failed edit surfaces a snackbar and keeps the editing transaction`() = runTest {
         val t = txn(4L)
-        coEvery { budgetTransactionHandler.editTransaction(t) } returns false
+        coEvery { budgetTransactionHandler.editTransaction(t) } returns Result.failure(RuntimeException("boom"))
         val vm = newViewModel()
 
         vm.effects.test {

@@ -117,4 +117,34 @@ class BudgetTransactionHandlerTest {
             budgetRepository.markRecurrentOccurrencePaid(template.id, LocalDate.of(2026, 2, 15))
         }
     }
+
+    @Test
+    fun `editing an income transaction with negative amount succeeds`() = runTest {
+        val incomeTransaction = Transaction(
+            id = 5L,
+            amount = BigDecimal("-5.50"),
+            comment = "Salary adjustment",
+            date = LocalDateTime.now(),
+        )
+
+        val result = handler.editTransaction(incomeTransaction)
+
+        assertThat(result.isSuccess).isTrue()
+        coVerify { budgetRepository.updateTransaction(any()) }
+    }
+
+    @Test
+    fun `editing a transaction with zero amount fails`() = runTest {
+        val zeroTransaction = Transaction(
+            id = 6L,
+            amount = BigDecimal("0.00"),
+            comment = "Zero test",
+            date = LocalDateTime.now(),
+        )
+
+        val result = handler.editTransaction(zeroTransaction)
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
+    }
 }

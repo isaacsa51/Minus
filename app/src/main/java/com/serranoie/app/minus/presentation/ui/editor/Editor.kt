@@ -111,6 +111,7 @@ import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performUIHaptic
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -189,8 +190,14 @@ fun Editor(
         val added = activeTransactionCount == lastTransactionCount.value + 1
         lastTransactionCount.value = activeTransactionCount
         if (added) {
-            budgetPillBounce.animateTo(1.1f, tween(durationMillis = 90, easing = FastOutSlowInEasing))
-            budgetPillBounce.animateTo(1f, tween(durationMillis = 140, easing = FastOutSlowInEasing))
+            budgetPillBounce.animateTo(
+                1.1f,
+                tween(durationMillis = 90, easing = FastOutSlowInEasing)
+            )
+            budgetPillBounce.animateTo(
+                1f,
+                tween(durationMillis = 140, easing = FastOutSlowInEasing)
+            )
             view.strongHapticFeedback()
         }
     }
@@ -308,7 +315,10 @@ fun Editor(
                                 ) {
                                     ToggleButton(
                                         checked = uiState.isCreditEnabled,
-                                        onCheckedChange = onCreditToggle,
+                                        onCheckedChange = {
+                                            performUIHaptic(view)
+                                            onCreditToggle(it)
+                                        },
                                         shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
                                         modifier = Modifier
                                             .fillMaxHeight()
@@ -320,7 +330,9 @@ fun Editor(
                                                 ) else m
                                             },
                                         colors = ToggleButtonDefaults.toggleButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
+                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
+                                                alpha = 0.65f
+                                            ),
                                             checkedContainerColor = MaterialTheme.colorScheme.tertiary,
                                             contentColor = MaterialTheme.colorScheme.tertiary,
                                             checkedContentColor = MaterialTheme.colorScheme.onTertiary
@@ -350,7 +362,10 @@ fun Editor(
                                 ) {
                                     ToggleButton(
                                         checked = uiState.isRecurrentEnabled,
-                                        onCheckedChange = onRecurrentToggle,
+                                        onCheckedChange = { checked ->
+                                            performUIHaptic(view)
+                                            onRecurrentToggle(checked)
+                                        },
                                         shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
                                         modifier = Modifier
                                             .fillMaxHeight()
@@ -362,7 +377,9 @@ fun Editor(
                                                 ) else m
                                             },
                                         colors = ToggleButtonDefaults.toggleButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
+                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
+                                                alpha = 0.65f
+                                            ),
                                             checkedContainerColor = MaterialTheme.colorScheme.tertiary,
                                             contentColor = MaterialTheme.colorScheme.tertiary,
                                             checkedContentColor = MaterialTheme.colorScheme.onTertiary
@@ -393,7 +410,10 @@ fun Editor(
                             ) {
                                 ToggleButton(
                                     checked = uiState.isRecurrentEnabled,
-                                    onCheckedChange = onRecurrentToggle,
+                                    onCheckedChange = { checked ->
+                                        performUIHaptic(view)
+                                        onRecurrentToggle(checked)
+                                    },
                                     shapes = ToggleButtonDefaults.shapes(),
                                     modifier = Modifier
                                         .fillMaxHeight()
@@ -405,7 +425,9 @@ fun Editor(
                                             ) else m
                                         },
                                     colors = ToggleButtonDefaults.toggleButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
+                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(
+                                            alpha = 0.65f
+                                        ),
                                         checkedContainerColor = MaterialTheme.colorScheme.tertiary,
                                         contentColor = MaterialTheme.colorScheme.tertiary,
                                         checkedContentColor = MaterialTheme.colorScheme.onTertiary
@@ -589,7 +611,7 @@ private fun EditingContent(
 
     val isSimpleSignEntry = remember(input) {
         (input.startsWith("+") || input.startsWith("-")) &&
-            input.substring(1).none { it in "+-×÷" }
+                input.substring(1).none { it in "+-×÷" }
     }
 
     val calculationResult = remember(input, hasExpressionOperators) {
@@ -722,48 +744,49 @@ private fun EditingContent(
             }
         }
 
-    val annotatedCalculationResult = remember(calculationResult, currencyCode, symbolStyle, isSimpleSignEntry) {
-        if (calculationResult == null || isSimpleSignEntry) return@remember null
-        val supportedCurrency = SupportedCurrency.findByCode(currencyCode)
-        val currencySymbol = supportedCurrency?.symbol ?: "$"
-        val isSymbolAtEnd = supportedCurrency?.symbolPosition == SymbolPosition.END
+    val annotatedCalculationResult =
+        remember(calculationResult, currencyCode, symbolStyle, isSimpleSignEntry) {
+            if (calculationResult == null || isSimpleSignEntry) return@remember null
+            val supportedCurrency = SupportedCurrency.findByCode(currencyCode)
+            val currencySymbol = supportedCurrency?.symbol ?: "$"
+            val isSymbolAtEnd = supportedCurrency?.symbolPosition == SymbolPosition.END
 
-        val isNegative = calculationResult.startsWith("-")
-        val sign = if (isNegative) "-" else ""
-        val absValue = if (isNegative) calculationResult.substring(1) else calculationResult
+            val isNegative = calculationResult.startsWith("-")
+            val sign = if (isNegative) "-" else ""
+            val absValue = if (isNegative) calculationResult.substring(1) else calculationResult
 
-        AnnotatedString.Builder().apply {
-            append("= ")
-            append(sign)
-            if (isSymbolAtEnd) {
-                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                append(absValue)
-                pop()
-                pushStyle(
-                    symbolStyle.copy(
-                        fontSize = CalcResultMaxFontSize * EditorSymbolScale,
-                        fontWeight = FontWeight.Bold,
-                        baselineShift = BaselineShift(0f)
+            AnnotatedString.Builder().apply {
+                append("= ")
+                append(sign)
+                if (isSymbolAtEnd) {
+                    pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                    append(absValue)
+                    pop()
+                    pushStyle(
+                        symbolStyle.copy(
+                            fontSize = CalcResultMaxFontSize * EditorSymbolScale,
+                            fontWeight = FontWeight.Bold,
+                            baselineShift = BaselineShift(0f)
+                        )
                     )
-                )
-                append(currencySymbol)
-                pop()
-            } else {
-                pushStyle(
-                    symbolStyle.copy(
-                        fontSize = CalcResultMaxFontSize * EditorSymbolScale,
-                        fontWeight = FontWeight.Bold,
-                        baselineShift = BaselineShift(0f)
+                    append(currencySymbol)
+                    pop()
+                } else {
+                    pushStyle(
+                        symbolStyle.copy(
+                            fontSize = CalcResultMaxFontSize * EditorSymbolScale,
+                            fontWeight = FontWeight.Bold,
+                            baselineShift = BaselineShift(0f)
+                        )
                     )
-                )
-                append(currencySymbol)
-                pop()
-                pushStyle(SpanStyle(fontWeight = FontWeight.Light))
-                append(absValue)
-                pop()
-            }
-        }.toAnnotatedString()
-    }
+                    append(currencySymbol)
+                    pop()
+                    pushStyle(SpanStyle(fontWeight = FontWeight.Light))
+                    append(absValue)
+                    pop()
+                }
+            }.toAnnotatedString()
+        }
 
     val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
         fontWeight = FontWeight.W500,
