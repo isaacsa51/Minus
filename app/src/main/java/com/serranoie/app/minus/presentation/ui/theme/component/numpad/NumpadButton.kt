@@ -53,6 +53,7 @@ import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.colorOnButton
 import com.serranoie.app.minus.presentation.ui.theme.displaySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.roundness
+import com.serranoie.app.minus.presentation.ui.theme.safeVariableWidth
 
 enum class NumpadButtonType { DEFAULT, PRIMARY, SECONDARY, TERTIARY, DELETE, OPERATOR }
 
@@ -175,7 +176,7 @@ private fun TextStyle.interpolateToEmphasized(
                 resId = R.font.google_sans_flex,
                 variationSettings = FontVariation.Settings(
                     FontVariation.weight(animatedWeight.toInt()),
-                    FontVariation.width(animatedWidth),
+                    FontVariation.width(safeVariableWidth(animatedWidth)),
                     roundness(if (isRounded) 100f else 0f)
                 )
             )

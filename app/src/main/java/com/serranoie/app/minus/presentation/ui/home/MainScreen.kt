@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.home
 
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,7 +22,6 @@ import logcat.logcat
 
 private const val TAG = "ISAAC:MainScreen"
 
-@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun MainScreen(
     onNavigateToAnalytics: () -> Unit = {},
@@ -103,7 +101,11 @@ fun MainScreen(
                 context.packageName,
                 0,
             )
-            @Suppress("DEPRECATION") info.longVersionCode.toInt()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                info.longVersionCode.toInt()
+            } else {
+                @Suppress("DEPRECATION") info.versionCode
+            }
         },
     ) {
         TutorialBox(
