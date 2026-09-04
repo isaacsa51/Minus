@@ -3,19 +3,22 @@ package com.serranoie.app.minus.presentation.ui.e2e.history
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextClearance
-import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
@@ -70,6 +73,9 @@ class TransactionEditE2ETests {
 
     private fun setEditContent(
         transaction: Transaction,
+        isCreditQuickToggleEnabled: Boolean = false,
+        creditCardCutoffDay: Int? = null,
+        onUpdateCreditCutoffDay: (Int) -> Unit = {},
         onCancel: () -> Unit = {},
         onSave: (
             newAmount: BigDecimal,
@@ -89,6 +95,9 @@ class TransactionEditE2ETests {
                     budgetStartDate = periodStart,
                     budgetEndDate = periodEnd,
                     currencyCode = "USD",
+                    isCreditQuickToggleEnabled = isCreditQuickToggleEnabled,
+                    creditCardCutoffDay = creditCardCutoffDay,
+                    onUpdateCreditCutoffDay = onUpdateCreditCutoffDay,
                     onCancel = onCancel,
                     onSave = onSave,
                     modifier = Modifier.fillMaxSize(),
@@ -113,9 +122,20 @@ class TransactionEditE2ETests {
 
     private fun acceptLabel(): String = composeTestRule.activity.getString(R.string.accept)
 
+    // Content descriptions mirror the Material 3 toggle buttons shared with Editor.kt.
+    private val recurrentToggleDesc = "Recurrent payment"
+    private val creditToggleDesc = "Credit card payment"
+
     private fun tapApply() {
         composeTestRule.onAllNodesWithContentDescription("Editor action").onLast()
             .performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    /** Taps the recurrence toggle and waits for the delayed config bottom sheet to settle. */
+    private fun tapRecurrentToggle() {
+        composeTestRule.onNodeWithContentDescription(recurrentToggleDesc).performClick()
+        composeTestRule.mainClock.advanceTimeBy(400)
         composeTestRule.waitForIdle()
     }
 
@@ -256,11 +276,7 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        val recurrentLabel = composeTestRule.activity.getString(R.string.recurrent_toggle_label)
-        composeTestRule.onNodeWithText(recurrentLabel).performClick()
-
-        composeTestRule.mainClock.advanceTimeBy(400)
-        composeTestRule.waitForIdle()
+        tapRecurrentToggle()
 
         val configureTitle = composeTestRule.activity.getString(R.string.configure_recurrence)
         composeTestRule.onNodeWithText(configureTitle).assertIsDisplayed()
@@ -283,10 +299,7 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        val recurrentLabel = composeTestRule.activity.getString(R.string.recurrent_toggle_label)
-        composeTestRule.onNodeWithText(recurrentLabel).performClick()
-        composeTestRule.mainClock.advanceTimeBy(400)
-        composeTestRule.waitForIdle()
+        tapRecurrentToggle()
 
         val monthlyLabel = composeTestRule.activity.getString(R.string.recurrent_frequency_monthly)
         composeTestRule.onNodeWithText(monthlyLabel).performClick()
@@ -331,10 +344,7 @@ class TransactionEditE2ETests {
             composeTestRule.activity.getString(R.string.edit_recurrent_expense_title)
         composeTestRule.onNodeWithText(recurrentTitle).assertIsDisplayed()
 
-        val recurrentLabel = composeTestRule.activity.getString(R.string.recurrent_toggle_label)
-        composeTestRule.onNodeWithText(recurrentLabel).performClick()
-        composeTestRule.mainClock.advanceTimeBy(400)
-        composeTestRule.waitForIdle()
+        tapRecurrentToggle()
 
         val monthlyLabel = composeTestRule.activity.getString(R.string.recurrent_frequency_monthly)
         composeTestRule.onAllNodesWithText(monthlyLabel).onLast().assertIsDisplayed()
@@ -379,10 +389,7 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        val recurrentLabel = composeTestRule.activity.getString(R.string.recurrent_toggle_label)
-        composeTestRule.onNodeWithText(recurrentLabel).performClick()
-        composeTestRule.mainClock.advanceTimeBy(400)
-        composeTestRule.waitForIdle()
+        tapRecurrentToggle()
 
         val nextDayDesc = composeTestRule.activity.getString(R.string.next_day)
         composeTestRule.onNodeWithContentDescription(nextDayDesc).performClick()
@@ -513,5 +520,211 @@ class TransactionEditE2ETests {
         tapApply()
 
         Truth.assertThat(captured).isNotNull()
+    }
+
+    @Test
+    fun when_amount_edited_via_numpad_then_on_save_has_new_amount() {
+        val tx = sampleTransaction(amount = "5")
+        var captured: SavePayload? = null
+
+        setEditContent(
+            transaction = tx,
+            onSave = { amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit ->
+                captured =
+                    SavePayload(amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit)
+            },
+        )
+
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        // "5" -> tap "0" on the numpad -> "50"
+        composeTestRule.onNodeWithText("0").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(300)
+        composeTestRule.waitForIdle()
+
+        tapApply()
+
+        Truth.assertThat(captured).isNotNull()
+        Truth.assertThat(captured!!.amount).isEqualTo(BigDecimal("50"))
+    }
+
+    @Test
+    fun when_amount_cleared_then_numpad_delete_button_triggers_cancel() {
+        val tx = sampleTransaction(amount = "5")
+        var cancelCount = 0
+
+        setEditContent(
+            transaction = tx,
+            onCancel = { cancelCount += 1 },
+        )
+
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        // Backspace "5" -> "0"; the primary action button now morphs into the delete button.
+        composeTestRule.onAllNodesWithContentDescription("Editor action").onFirst().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(400)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodesWithContentDescription("Editor action").onLast().performClick()
+        composeTestRule.waitForIdle()
+
+        Truth.assertThat(cancelCount).isEqualTo(1)
+    }
+
+    @Test
+    fun when_weekly_frequency_selected_then_on_save_has_weekly_and_null_subscription_day() {
+        val tx = sampleTransaction()
+        var captured: SavePayload? = null
+
+        setEditContent(
+            transaction = tx,
+            onSave = { amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit ->
+                captured =
+                    SavePayload(amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit)
+            },
+        )
+
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        tapRecurrentToggle()
+
+        val weeklyLabel = composeTestRule.activity.getString(R.string.recurrent_frequency_weekly)
+        composeTestRule.onNodeWithText(weeklyLabel).performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(saveLabel()).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(400)
+        composeTestRule.waitForIdle()
+
+        tapApply()
+
+        Truth.assertThat(captured).isNotNull()
+        Truth.assertThat(captured!!.isRecurrent).isTrue()
+        Truth.assertThat(captured!!.frequency).isEqualTo(RecurrentFrequency.WEEKLY)
+        Truth.assertThat(captured!!.subscriptionDay).isNull()
+    }
+
+    @Test
+    fun when_recurrence_switched_off_in_sheet_then_on_save_is_not_recurrent() {
+        val tx = sampleTransaction(
+            isRecurrent = true,
+            frequency = RecurrentFrequency.MONTHLY,
+            subscriptionDay = 15,
+        )
+        var captured: SavePayload? = null
+
+        setEditContent(
+            transaction = tx,
+            onSave = { amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit ->
+                captured =
+                    SavePayload(amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit)
+            },
+        )
+
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        tapRecurrentToggle()
+
+        // Flip the recurrence switch off inside the configuration sheet.
+        composeTestRule
+            .onNode(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
+            .performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(saveLabel()).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(400)
+        composeTestRule.waitForIdle()
+
+        tapApply()
+
+        Truth.assertThat(captured).isNotNull()
+        Truth.assertThat(captured!!.isRecurrent).isFalse()
+        Truth.assertThat(captured!!.frequency).isNull()
+        Truth.assertThat(captured!!.subscriptionDay).isNull()
+    }
+
+    @Test
+    fun when_credit_quick_toggle_enabled_and_tapped_then_on_save_has_credit_true() {
+        val tx = sampleTransaction()
+        var captured: SavePayload? = null
+
+        setEditContent(
+            transaction = tx,
+            isCreditQuickToggleEnabled = true,
+            creditCardCutoffDay = 15,
+            onSave = { amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit ->
+                captured =
+                    SavePayload(amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit)
+            },
+        )
+
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithContentDescription(creditToggleDesc).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(300)
+        composeTestRule.waitForIdle()
+
+        tapApply()
+
+        Truth.assertThat(captured).isNotNull()
+        Truth.assertThat(captured!!.isCredit).isTrue()
+    }
+
+    @Test
+    fun when_credit_toggle_tapped_without_cutoff_day_then_dialog_shown_and_confirm_sets_credit() {
+        val tx = sampleTransaction()
+        var captured: SavePayload? = null
+        var updatedCutoffDay: Int? = null
+
+        setEditContent(
+            transaction = tx,
+            isCreditQuickToggleEnabled = true,
+            creditCardCutoffDay = null,
+            onUpdateCreditCutoffDay = { updatedCutoffDay = it },
+            onSave = { amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit ->
+                captured =
+                    SavePayload(amount, comment, dateTime, isRecurrent, frequency, endDate, subDay, isCredit)
+            },
+        )
+
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithContentDescription(creditToggleDesc).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(300)
+        composeTestRule.waitForIdle()
+
+        val cutoffTitle =
+            composeTestRule.activity.getString(R.string.credit_cutoff_dialog_title)
+        composeTestRule.onNodeWithText(cutoffTitle).assertIsDisplayed()
+
+        composeTestRule.onNodeWithText(saveLabel()).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(300)
+        composeTestRule.waitForIdle()
+
+        Truth.assertThat(updatedCutoffDay).isEqualTo(15)
+
+        tapApply()
+
+        Truth.assertThat(captured).isNotNull()
+        Truth.assertThat(captured!!.isCredit).isTrue()
     }
 }

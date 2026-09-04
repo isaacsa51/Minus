@@ -4,6 +4,7 @@ import android.content.Context
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
@@ -86,6 +87,9 @@ class BudgetViewModelTest {
         every { budgetRepository.getPaidRecurrentOccurrences() } returns paidOccurrencesFlow
         every { observeCurrentPeriodBoundaryUseCase() } returns boundaryFlow
         every { observeCurrentPeriodRolloverUseCase() } returns rolloverFlow
+        every { context.getString(R.string.expense_queued_for_next_period) } returns "Gasto en cola para el proximo periodo"
+        every { context.getString(R.string.history_snackbar_delete_transaction_failed) } returns "Could not delete transaction"
+        every { context.getString(R.string.history_snackbar_restore_transaction_failed) } returns "Could not restore transaction"
     }
 
     @After
@@ -455,7 +459,7 @@ class BudgetViewModelTest {
     @Test
     fun when_edit_transaction_tapped_intent_is_processed_then_handler_is_called_with_updated_transaction() =
         runTest {
-            coEvery { transactionHandler.editTransaction(any()) } returns true
+            coEvery { transactionHandler.editTransaction(any()) } returns Result.success(Unit)
             val viewModel = newViewModel()
             val transaction = sampleTransaction()
             viewModel.processIntent(BudgetTransactionIntent.EditTransactionTapped(transaction))

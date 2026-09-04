@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -62,9 +63,9 @@ fun NumpadButton(
     text: String? = null,
     icon: ImageVector? = null,
     onClick: () -> Unit = {},
-    onLongClick: () -> Unit = {},
+    onLongClick: (() -> Unit)? = null,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val baseTextStyle =
         MaterialTheme.typography.displaySmallCondensed.copy(fontWeight = FontWeight.W600)
@@ -103,6 +104,21 @@ fun NumpadButton(
         NumpadButtonType.OPERATOR -> MaterialTheme.colorScheme.secondary
     }
 
+    val clickableModifier = if (onLongClick != null) {
+        Modifier.combinedClickable(
+            interactionSource = interactionSource,
+            indication = ripple(),
+            onClick = onClick,
+            onLongClick = onLongClick,
+        )
+    } else {
+        Modifier.clickable(
+            interactionSource = interactionSource,
+            indication = ripple(),
+            onClick = onClick,
+        )
+    }
+
     Surface(
         tonalElevation = 10.dp, modifier = modifier
             .fillMaxSize()
@@ -112,12 +128,8 @@ fun NumpadButton(
             modifier = Modifier
                 .background(color = color)
                 .fillMaxSize()
-                .combinedClickable(
-                    interactionSource = interactionSource,
-                    indication = ripple(),
-                    onClick = onClick,
-                    onLongClick = onLongClick,
-                ), contentAlignment = Alignment.Center
+                .then(clickableModifier),
+            contentAlignment = Alignment.Center
         ) {
             if (text != null) {
                 Text(

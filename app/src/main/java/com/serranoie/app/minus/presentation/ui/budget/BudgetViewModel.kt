@@ -94,6 +94,7 @@ class BudgetViewModel @Inject constructor(
             delegate = transactionHandler,
             resolveActivePeriodId = ::resolveActivePeriodId,
         ),
+        context = context,
     )
 
     private val periodActionsController = PeriodActionsController(NoopPeriodActions)
@@ -579,11 +580,11 @@ class BudgetViewModel @Inject constructor(
                 }
 
                 TransactionAction.DeleteFailed -> {
-                    _effects.emit(BudgetUiEffect.ShowMessage("Could not delete transaction"))
+                    _effects.emit(BudgetUiEffect.ShowMessage(context.getString(R.string.history_snackbar_delete_transaction_failed)))
                 }
 
                 TransactionAction.RestoreFailed -> {
-                    _effects.emit(BudgetUiEffect.ShowMessage("Could not restore transaction"))
+                    _effects.emit(BudgetUiEffect.ShowMessage(context.getString(R.string.history_snackbar_restore_transaction_failed)))
                 }
             }
         }
@@ -719,15 +720,14 @@ private class TransactionHandlerImpl(
         fallbackComment = fallbackComment,
     )
 
-    override suspend fun delete(transaction: Transaction): kotlin.Result<Unit> =
+    override suspend fun delete(transaction: Transaction): Result<Unit> =
         delegate.deleteTransaction(transaction)
 
-    override suspend fun restore(transaction: Transaction): kotlin.Result<Unit> =
+    override suspend fun restore(transaction: Transaction): Result<Unit> =
         delegate.restoreTransaction(transaction)
 
-    override suspend fun edit(transaction: Transaction) {
+    override suspend fun edit(transaction: Transaction): Result<Unit> =
         delegate.editTransaction(transaction)
-    }
 }
 
 private object NoopPeriodActions : PeriodActions {

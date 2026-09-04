@@ -70,12 +70,23 @@ fun ExpenseItem(
             .fillMaxWidth()
             .then(if (!disableAnimations) Modifier.animateContentSize(animationSpec = tween(durationMillis = 200)) else Modifier)
     ) {
+        val containerModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+            with(sharedTransitionScope) {
+                Modifier.sharedBounds(
+                    rememberSharedContentState(key = "container_${transaction.id}"),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                )
+            }
+        } else Modifier
+
         CustomPaddedListItem(
             onClick = onClick,
             position = position,
             background = containerColor,
             contentColor = MaterialTheme.colorScheme.onSurface,
-            customShape = customShape
+            customShape = customShape,
+            modifier = containerModifier,
         ) {
             AnimatedContent(
                 targetState = isExpanded,

@@ -1,11 +1,18 @@
 package com.serranoie.app.minus.presentation.ui.history
 
+import android.content.res.Resources
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +20,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +45,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.dialogs.DeleteRecurrentExpenseDialog
 import com.serranoie.app.minus.presentation.ui.history.dialogs.TransactionEditDialog
+import com.serranoie.app.minus.presentation.ui.history.edit.TransactionEditScreen
 import com.serranoie.app.minus.presentation.ui.history.sections.budgetDisplaySection
 import com.serranoie.app.minus.presentation.ui.history.sections.currentPeriodRecurrentSection
 import com.serranoie.app.minus.presentation.ui.history.sections.futureRecurrentSection
@@ -43,6 +54,7 @@ import com.serranoie.app.minus.presentation.ui.history.sections.pastTransactionD
 import com.serranoie.app.minus.presentation.ui.history.sections.transactionDateSections
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransactionsView
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
+import java.text.NumberFormat
 import java.time.LocalDate
 
 enum class RecurrentPaymentsViewMode {
@@ -126,6 +138,188 @@ fun History(
         }
     }
 
+    val activeEditingTransaction = uiState.editingTransaction ?: uiState.recurrentToEdit
+
+    if (sharedTransitionScope != null) {
+        AnimatedContent(
+            targetState = activeEditingTransaction,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(200)) togetherWith fadeOut(animationSpec = tween(200))
+            },
+            label = "TransactionEditTransition",
+        ) { targetEditingTransaction ->
+            if (targetEditingTransaction == null) {
+                HistoryListContent(
+                    uiState = uiState,
+                    modifier = modifier,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = this@AnimatedContent,
+                    scrollState = scrollState,
+                    currencyCode = currencyCode,
+                    currencyFormat = currencyFormat,
+                    resources = resources,
+                    readOnly = readOnly,
+                    disableAnimations = disableAnimations,
+                    onCollapseDragDelta = onCollapseDragDelta,
+                    onQueueDeleteWithUndo = onQueueDeleteWithUndo,
+                    onCancelPendingDelete = onCancelPendingDelete,
+                    onShowInfoSnackbar = onShowInfoSnackbar,
+                    onProcessIntent = onProcessIntent,
+                )
+            } else {
+                BackHandler {
+                    if (uiState.editingTransaction != null) {
+                        onProcessIntent(HistoryUiIntent.SetEditingTransaction(null))
+                    } else if (uiState.recurrentToEdit != null) {
+                        onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null))
+                    }
+                }
+
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .then(
+                            with(sharedTransitionScope) {
+                                Modifier.sharedBounds(
+                                    rememberSharedContentState(key = "container_${targetEditingTransaction.id}"),
+                                    animatedVisibilityScope = this@AnimatedContent,
+                                    resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                                )
+                            }
+                        ),
+                    color = MaterialTheme.colorScheme.surface,
+                ) {
+                    TransactionEditScreen(
+                        transaction = targetEditingTransaction,
+                        budgetStartDate = uiState.budgetSettings?.startDate ?: LocalDate.now().minusDays(30),
+                        budgetEndDate = uiState.budgetSettings?.getPeriodEndDate() ?: LocalDate.now(),
+                        currencyCode = currencyCode,
+                        tags = uiState.tags,
+                        isCreditQuickToggleEnabled = uiState.isCreditQuickToggleEnabled,
+                        creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
+                        onUpdateCreditCutoffDay = { day -> onProcessIntent(HistoryUiIntent.UpdateCreditCutoffDay(day)) },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = this@AnimatedContent,
+                        onCancel = {
+                            if (uiState.editingTransaction != null) {
+                                onProcessIntent(HistoryUiIntent.SetEditingTransaction(null))
+                            } else if (uiState.recurrentToEdit != null) {
+                                onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null))
+                            }
+                        },
+                        onSave = { newAmount, newComment, newDateTime, newIsRecurrent, newFrequency, newEndDate, newSubscriptionDay, newIsCredit ->
+                            val updatedTransaction = targetEditingTransaction.copy(
+                                id = targetEditingTransaction.sourceTransactionId ?: targetEditingTransaction.id,
+                                amount = newAmount,
+                                comment = newComment,
+                                date = newDateTime,
+                                isRecurrent = newIsRecurrent,
+                                recurrentFrequency = newFrequency,
+                                recurrentEndDate = newEndDate?.atStartOfDay(),
+                                subscriptionDay = newSubscriptionDay,
+                                isCredit = newIsCredit,
+                                sourceTransactionId = null,
+                            )
+                            onProcessIntent(HistoryUiIntent.SaveEditedTransaction(updatedTransaction))
+                            onShowInfoSnackbar(
+                                resources.getString(
+                                    R.string.expense_modified_format,
+                                    updatedTransaction.comment.ifEmpty { resources.getString(R.string.generic_expense) }
+                                )
+                            )
+                            if (uiState.editingTransaction != null) {
+                                onProcessIntent(HistoryUiIntent.SetEditingTransaction(null))
+                            } else if (uiState.recurrentToEdit != null) {
+                                onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null))
+                            }
+                        },
+                    )
+                }
+            }
+        }
+    } else {
+        HistoryListContent(
+            uiState = uiState,
+            modifier = modifier,
+            sharedTransitionScope = null,
+            animatedVisibilityScope = animatedVisibilityScope,
+            scrollState = scrollState,
+            currencyCode = currencyCode,
+            currencyFormat = currencyFormat,
+            resources = resources,
+            readOnly = readOnly,
+            disableAnimations = disableAnimations,
+            onCollapseDragDelta = onCollapseDragDelta,
+            onQueueDeleteWithUndo = onQueueDeleteWithUndo,
+            onCancelPendingDelete = onCancelPendingDelete,
+            onShowInfoSnackbar = onShowInfoSnackbar,
+            onProcessIntent = onProcessIntent,
+        )
+
+        TransactionEditDialog(
+            transaction = uiState.editingTransaction,
+            budgetStartDate = uiState.budgetSettings?.startDate ?: LocalDate.now().minusDays(30),
+            budgetEndDate = uiState.budgetSettings?.getPeriodEndDate() ?: LocalDate.now(),
+            currencyCode = currencyCode,
+            tags = uiState.tags,
+            isCreditQuickToggleEnabled = uiState.isCreditQuickToggleEnabled,
+            creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
+            onUpdateCreditCutoffDay = { day -> onProcessIntent(HistoryUiIntent.UpdateCreditCutoffDay(day)) },
+            onCancel = { onProcessIntent(HistoryUiIntent.SetEditingTransaction(null)) },
+            onSave = { expense ->
+                onProcessIntent(HistoryUiIntent.SaveEditedTransaction(expense))
+                onShowInfoSnackbar(
+                    resources.getString(
+                        R.string.expense_modified_format,
+                        expense.comment.ifEmpty { resources.getString(R.string.generic_expense) }
+                    )
+                )
+                onProcessIntent(HistoryUiIntent.SetEditingTransaction(null))
+            },
+        )
+
+        TransactionEditDialog(
+            transaction = uiState.recurrentToEdit,
+            budgetStartDate = uiState.budgetSettings?.startDate ?: LocalDate.now().minusDays(30),
+            budgetEndDate = uiState.budgetSettings?.getPeriodEndDate() ?: LocalDate.now(),
+            currencyCode = currencyCode,
+            tags = uiState.tags,
+            onCancel = { onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null)) },
+            onSave = { expense ->
+                onProcessIntent(HistoryUiIntent.SaveEditedTransaction(expense))
+                onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null))
+            },
+        )
+    }
+
+    DeleteRecurrentExpenseDialog(
+        transaction = uiState.recurrentToDelete.takeIf { uiState.showDeleteRecurrentDialog },
+        onDismiss = { onProcessIntent(HistoryUiIntent.DismissDeleteRecurrentDialog) },
+        onConfirm = { expense ->
+            onProcessIntent(HistoryUiIntent.ConfirmDeleteRecurrent(expense))
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@Composable
+private fun HistoryListContent(
+    uiState: HistoryUiState,
+    modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope?,
+    animatedVisibilityScope: AnimatedVisibilityScope?,
+    scrollState: LazyListState,
+    currencyCode: String,
+    currencyFormat: NumberFormat,
+    resources: Resources,
+    readOnly: Boolean,
+    disableAnimations: Boolean,
+    onCollapseDragDelta: ((Float) -> Unit)?,
+    onQueueDeleteWithUndo: (transaction: Transaction, message: String, onUndo: () -> Unit) -> Unit,
+    onCancelPendingDelete: () -> Unit,
+    onShowInfoSnackbar: (message: String) -> Unit,
+    onProcessIntent: (HistoryUiIntent) -> Unit,
+) {
     val currentOnCollapseDragDelta = rememberUpdatedState(onCollapseDragDelta)
     val density = LocalDensity.current
     val threshold = remember(density) { with(density) { 128.dp.toPx() } }
@@ -353,47 +547,4 @@ fun History(
             )
         }
     }
-
-    TransactionEditDialog(
-        transaction = uiState.editingTransaction,
-        budgetStartDate = uiState.budgetSettings?.startDate ?: LocalDate.now().minusDays(30),
-        budgetEndDate = uiState.budgetSettings?.getPeriodEndDate() ?: LocalDate.now(),
-        currencyCode = currencyCode,
-        tags = uiState.tags,
-        isCreditQuickToggleEnabled = uiState.isCreditQuickToggleEnabled,
-        creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
-        onUpdateCreditCutoffDay = { day -> onProcessIntent(HistoryUiIntent.UpdateCreditCutoffDay(day)) },
-        onCancel = { onProcessIntent(HistoryUiIntent.SetEditingTransaction(null)) },
-        onSave = { expense ->
-            onProcessIntent(HistoryUiIntent.SaveEditedTransaction(expense))
-            onShowInfoSnackbar(
-                resources.getString(
-                    R.string.expense_modified_format,
-                    expense.comment.ifEmpty { resources.getString(R.string.generic_expense) }
-                )
-            )
-            onProcessIntent(HistoryUiIntent.SetEditingTransaction(null))
-        },
-    )
-
-    DeleteRecurrentExpenseDialog(
-        transaction = uiState.recurrentToDelete.takeIf { uiState.showDeleteRecurrentDialog },
-        onDismiss = { onProcessIntent(HistoryUiIntent.DismissDeleteRecurrentDialog) },
-        onConfirm = { expense ->
-            onProcessIntent(HistoryUiIntent.ConfirmDeleteRecurrent(expense))
-        },
-    )
-
-    TransactionEditDialog(
-        transaction = uiState.recurrentToEdit,
-        budgetStartDate = uiState.budgetSettings?.startDate ?: LocalDate.now().minusDays(30),
-        budgetEndDate = uiState.budgetSettings?.getPeriodEndDate() ?: LocalDate.now(),
-        currencyCode = currencyCode,
-        tags = uiState.tags,
-        onCancel = { onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null)) },
-        onSave = { expense ->
-            onProcessIntent(HistoryUiIntent.SaveEditedTransaction(expense))
-            onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null))
-        },
-    )
 }

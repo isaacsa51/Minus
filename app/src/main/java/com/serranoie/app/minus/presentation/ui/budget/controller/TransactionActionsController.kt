@@ -1,5 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.budget.controller
 
+import android.content.Context
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
@@ -7,12 +9,17 @@ import com.serranoie.app.minus.presentation.ui.budget.ApplyTransactionResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
 
 class TransactionActionsController(
     private val handler: TransactionHandler,
+    private val context: Context,
 ) {
+    companion object {
+        private const val TAG = "TransactionActionsController"
+    }
 
     private val _categories = MutableStateFlow<List<String>>(emptyList())
     val categories: StateFlow<List<String>> = _categories.asStateFlow()
@@ -65,7 +72,7 @@ class TransactionActionsController(
                 TransactionAction.ClearInput,
                 TransactionAction.ClearEditorFlags,
                 TransactionAction.TransactionQueuedForNextPeriod,
-                TransactionAction.ShowMessage("Gasto en cola para el proximo periodo"),
+                TransactionAction.ShowMessage(context.getString(R.string.expense_queued_for_next_period)),
             )
 
             is ApplyTransactionResult.Added -> listOf(
@@ -74,9 +81,12 @@ class TransactionActionsController(
                 TransactionAction.TransactionAdded,
             )
 
-            is ApplyTransactionResult.Failed -> listOf(
-                TransactionAction.ShowMessage("Could not save transaction"),
-            )
+            is ApplyTransactionResult.Failed -> {
+                logcat(TAG) { "Could not save transaction: ${result.cause}" }
+                listOf(
+                    TransactionAction.ShowMessage(context.getString(R.string.history_snackbar_save_transaction_failed)),
+                )
+            }
         }
     }
 
@@ -125,8 +135,12 @@ class TransactionActionsController(
         }
     }
 
-    suspend fun edit(transaction: Transaction) {
-        handler.edit(transaction)
+    suspend fun edit(transaction: Transaction): Result<Unit> {
+        val result = handler.edit(transaction)
+        if (result.isFailure) {
+            logcat(TAG) { "Failed to edit transaction id=${transaction.id}: ${result.exceptionOrNull()}" }
+        }
+        return result
     }
 }
 
@@ -152,7 +166,7 @@ interface TransactionHandler {
         fallbackComment: String,
     ): Boolean
 
-    suspend fun delete(transaction: Transaction): kotlin.Result<Unit>
-    suspend fun restore(transaction: Transaction): kotlin.Result<Unit>
-    suspend fun edit(transaction: Transaction)
+    suspend fun delete(transaction: Transaction): Result<Unit>
+    suspend fun restore(transaction: Transaction): Result<Unit>
+    suspend fun edit(transaction: Transaction): Result<Unit>
 }

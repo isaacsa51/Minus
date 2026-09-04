@@ -140,6 +140,8 @@
     <string name="history_snackbar_save_transaction_failed">Could not save transaction</string>
     <string name="history_snackbar_delete_recurrent_failed">Could not delete recurring payment</string>
     <string name="history_snackbar_mark_paid_failed">Could not mark transaction as paid</string>
+    <string name="history_snackbar_restore_transaction_failed">Could not restore transaction</string>
+    <string name="expense_queued_for_next_period">Expense queued for next period</string>
 
     <string name="add_new_category">Category</string>
     <string name="add_new_category_action">Add New Category</string>

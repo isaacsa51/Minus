@@ -13,6 +13,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.longClick
@@ -80,6 +81,7 @@ class MainScreenCoverageTest {
         dailyBudget: BigDecimal = BigDecimal("500.00"),
         remainingToday: BigDecimal = BigDecimal("500.00"),
         daysRemaining: Int = 1,
+        isOverBudget: Boolean = totalSpentInPeriod > totalBudget,
     ) = BudgetState(
         remainingToday = remainingToday,
         totalSpentToday = totalSpentToday,
@@ -93,7 +95,7 @@ class MainScreenCoverageTest {
         } else {
             0f
         },
-        isOverBudget = remainingToday < BigDecimal.ZERO,
+        isOverBudget = isOverBudget,
         totalBudget = totalBudget,
         totalSpentInPeriod = totalSpentInPeriod,
     )
@@ -279,14 +281,15 @@ class MainScreenCoverageTest {
         composeTestRule.onAllNodesWithContentDescription("Editor action").onLast()
 
     @Test
-    fun when_remaining_today_is_negative_then_budget_pill_shows_over_budget_label() {
+    fun when_period_budget_is_exceeded_then_budget_pill_shows_over_budget_label() {
         setBudgetPillContent(
             budgetState = sampleBudgetState(
                 totalBudget = BigDecimal("1500.00"),
-                totalSpentInPeriod = BigDecimal("150.00"),
+                totalSpentInPeriod = BigDecimal("1600.00"),
                 totalSpentToday = BigDecimal("150.00"),
                 dailyBudget = BigDecimal("100.00"),
                 remainingToday = BigDecimal("-50.00"),
+                isOverBudget = true,
             ),
             budgetSettings = sampleBudgetSettings(
                 totalBudget = BigDecimal("1500.00"),
@@ -303,12 +306,41 @@ class MainScreenCoverageTest {
     }
 
     @Test
+    fun when_daily_allocation_exceeded_but_period_budget_ok_then_pill_shows_daily_exceeded_label() {
+        setBudgetPillContent(
+            budgetState = sampleBudgetState(
+                totalBudget = BigDecimal("1500.00"),
+                totalSpentInPeriod = BigDecimal("150.00"),
+                totalSpentToday = BigDecimal("150.00"),
+                dailyBudget = BigDecimal("100.00"),
+                remainingToday = BigDecimal("-50.00"),
+                isOverBudget = false,
+            ),
+            budgetSettings = sampleBudgetSettings(
+                totalBudget = BigDecimal("1500.00"),
+                period = BudgetPeriod.DAILY,
+            ),
+            viewPeriod = BudgetPeriod.DAILY,
+        )
+
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(600)
+
+        val overBudgetLabel = composeTestRule.activity.getString(R.string.budget_pill_over_budget)
+        val dailyExceededLabel =
+            composeTestRule.activity.getString(R.string.budget_pill_label_daily_exceeded)
+        composeTestRule.onAllNodesWithText(dailyExceededLabel).onLast().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText(overBudgetLabel).assertCountEquals(0)
+    }
+
+    @Test
     fun when_remaining_today_is_negative_then_budget_pill_does_not_show_remaining_amount() {
         setBudgetPillContent(
             budgetState = sampleBudgetState(
                 totalSpentToday = BigDecimal("150.00"),
                 dailyBudget = BigDecimal("100.00"),
                 remainingToday = BigDecimal("-50.00"),
+                isOverBudget = true,
             ),
             budgetSettings = sampleBudgetSettings(),
         )

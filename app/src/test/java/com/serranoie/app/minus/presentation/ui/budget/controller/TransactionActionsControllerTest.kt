@@ -1,12 +1,16 @@
 package com.serranoie.app.minus.presentation.ui.budget.controller
 
+import android.content.Context
 import com.google.common.truth.Truth.assertThat
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.budget.ApplyTransactionResult
 import com.serranoie.app.minus.presentation.ui.budget.controller.TransactionActionsController.TransactionAction
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.math.BigDecimal
@@ -14,11 +18,16 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class TransactionActionsControllerTest {
+    private val context: Context = mockk {
+        every { getString(R.string.expense_queued_for_next_period) } returns "Expense queued for next period"
+        every { getString(R.string.history_snackbar_save_transaction_failed) } returns "Could not save transaction"
+    }
+
     private class FakeHandler : TransactionHandler {
         var applyResult: ApplyTransactionResult = ApplyTransactionResult.InvalidInput
         var applyRecurrentResult: Boolean = false
-        var deleteResult: kotlin.Result<Unit> = kotlin.Result.success(Unit)
-        var restoreResult: kotlin.Result<Unit> = kotlin.Result.success(Unit)
+        var deleteResult: Result<Unit> = Result.success(Unit)
+        var restoreResult: Result<Unit> = Result.success(Unit)
         var editCalls: MutableList<Transaction> = mutableListOf()
 
         override suspend fun apply(
@@ -42,15 +51,16 @@ class TransactionActionsControllerTest {
             fallbackComment: String,
         ): Boolean = applyRecurrentResult
 
-        override suspend fun delete(transaction: Transaction): kotlin.Result<Unit> = deleteResult
-        override suspend fun restore(transaction: Transaction): kotlin.Result<Unit> = restoreResult
-        override suspend fun edit(transaction: Transaction) {
+        override suspend fun delete(transaction: Transaction): Result<Unit> = deleteResult
+        override suspend fun restore(transaction: Transaction): Result<Unit> = restoreResult
+        override suspend fun edit(transaction: Transaction): Result<Unit> {
             editCalls.add(transaction)
+            return Result.success(Unit)
         }
     }
 
     private fun newController(handler: FakeHandler = FakeHandler()) =
-        TransactionActionsController(handler)
+        TransactionActionsController(handler = handler, context = context)
 
     private fun sampleTransaction() = Transaction(
         id = 1L,
@@ -130,7 +140,7 @@ class TransactionActionsControllerTest {
             TransactionAction.ClearInput,
             TransactionAction.ClearEditorFlags,
             TransactionAction.TransactionQueuedForNextPeriod,
-            TransactionAction.ShowMessage("Gasto en cola para el proximo periodo"),
+            TransactionAction.ShowMessage("Expense queued for next period"),
         )
     }
 
@@ -163,6 +173,29 @@ class TransactionActionsControllerTest {
                 amount = amount,
                 comment = "Subscription",
             ),
+        )
+    }
+
+    @Test
+    fun `when_handler_returns_failed_then_show_message_action_is_emitted`() = runTest {
+        val controller = newController(
+            FakeHandler().apply {
+                applyResult = ApplyTransactionResult.Failed(RuntimeException("Database error"))
+            }
+        )
+
+        val actions = controller.apply(
+            input = "12.34",
+            isCalculation = false,
+            isRecurrentEnabled = false,
+            isCreditEnabled = false,
+            comment = "Coffee",
+            budgetSettings = sampleSettings(),
+            resolveActivePeriodId = { 1L },
+        )
+
+        assertThat(actions).containsExactly(
+            TransactionAction.ShowMessage("Could not save transaction"),
         )
     }
 
@@ -209,7 +242,7 @@ class TransactionActionsControllerTest {
     @Test
     fun `when_handler_reports_delete_success_then_no_actions_are_emitted`() = runTest {
         val controller = newController(
-            FakeHandler().apply { deleteResult = kotlin.Result.success(Unit) }
+            FakeHandler().apply { deleteResult = Result.success(Unit) }
         )
 
         val actions = controller.delete(sampleTransaction())
@@ -220,7 +253,7 @@ class TransactionActionsControllerTest {
     @Test
     fun `when_handler_reports_delete_failure_then_delete_failed_action_is_emitted`() = runTest {
         val controller = newController(
-            FakeHandler().apply { deleteResult = kotlin.Result.failure(RuntimeException("boom")) }
+            FakeHandler().apply { deleteResult = Result.failure(RuntimeException("boom")) }
         )
 
         val actions = controller.delete(sampleTransaction())
@@ -231,7 +264,7 @@ class TransactionActionsControllerTest {
     @Test
     fun `when_handler_reports_restore_success_then_no_actions_are_emitted`() = runTest {
         val controller = newController(
-            FakeHandler().apply { restoreResult = kotlin.Result.success(Unit) }
+            FakeHandler().apply { restoreResult = Result.success(Unit) }
         )
 
         val actions = controller.restore(sampleTransaction())
@@ -242,7 +275,7 @@ class TransactionActionsControllerTest {
     @Test
     fun `when_handler_reports_restore_failure_then_restore_failed_action_is_emitted`() = runTest {
         val controller = newController(
-            FakeHandler().apply { restoreResult = kotlin.Result.failure(RuntimeException("boom")) }
+            FakeHandler().apply { restoreResult = Result.failure(RuntimeException("boom")) }
         )
 
         val actions = controller.restore(sampleTransaction())

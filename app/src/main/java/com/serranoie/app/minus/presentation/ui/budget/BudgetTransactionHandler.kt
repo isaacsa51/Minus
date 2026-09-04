@@ -30,7 +30,7 @@ sealed interface ApplyTransactionResult {
     ) : ApplyTransactionResult
 
     data object InvalidInput : ApplyTransactionResult
-    data object Failed : ApplyTransactionResult
+    data class Failed(val cause: Throwable? = null) : ApplyTransactionResult
 }
 
 class BudgetTransactionHandler @Inject constructor(
@@ -125,7 +125,7 @@ class BudgetTransactionHandler @Inject constructor(
             throw e
         } catch (e: Exception) {
             errorLogRecorder.record("BudgetTransactionHandler.applyTransaction", e)
-            ApplyTransactionResult.Failed
+            ApplyTransactionResult.Failed(e)
         }
     }
 
@@ -246,10 +246,12 @@ class BudgetTransactionHandler @Inject constructor(
         }.onFailure { errorLogRecorder.record("BudgetTransactionHandler.restoreTransaction id=${transaction.id}", it) }
     }
 
-    suspend fun editTransaction(updatedTransaction: Transaction): Boolean {
-        if (updatedTransaction.amount < BigDecimal.ZERO) return false
+    suspend fun editTransaction(updatedTransaction: Transaction): Result<Unit> {
+        if (updatedTransaction.amount.compareTo(BigDecimal.ZERO) == 0) {
+            return Result.failure(IllegalArgumentException("Amount cannot be zero"))
+        }
 
-        return try {
+        return runCatching {
             val resolvedTransaction = if (updatedTransaction.comment.isNotBlank()) {
                 val categoryId =
                     budgetRepository.findOrCreateCategory(updatedTransaction.comment.trim()).id
@@ -263,13 +265,7 @@ class BudgetTransactionHandler @Inject constructor(
             } else {
                 notificationScheduler.cancelRecurrentExpenseNotification(resolvedTransaction)
             }
-            true
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            errorLogRecorder.record("BudgetTransactionHandler.editTransaction id=${updatedTransaction.id}", e)
-            false
-        }
+        }.onFailure { errorLogRecorder.record("BudgetTransactionHandler.editTransaction id=${updatedTransaction.id}", it) }
     }
 
     private fun validateNumpadInput(input: String): Boolean {
