@@ -270,10 +270,6 @@ fun TransactionEditScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
             } else {
-                // A `weight` modifier passed as a parameter into TransactionEditToggleButton
-                // never reaches Row: TooltipBox interposes its own unweighted Box above the
-                // button, so the ParentData is attached too deep to be read. Hosting the button
-                // inside a directly-weighted Box here is what makes it actually stretch.
                 Box(modifier = Modifier.weight(1f)) {
                     TransactionEditToggleButton(
                         checked = isRecurrent,

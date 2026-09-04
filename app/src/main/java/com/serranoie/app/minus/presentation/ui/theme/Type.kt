@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme
 
+import android.os.Build
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -16,6 +17,11 @@ fun roundness(value: Float): FontVariation.Setting {
     return FontVariation.Setting("ROND", value)
 }
 
+// Version code guard since on API 27 fonts with custom width render incorrectly
+internal fun safeVariableWidth(width: Float): Float {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) width else 100f
+}
+
 @OptIn(ExperimentalTextApi::class)
 fun googleSansFlex(
     weight: Int = 400,
@@ -26,7 +32,7 @@ fun googleSansFlex(
         resId = R.font.google_sans_flex,
         variationSettings = FontVariation.Settings(
             FontVariation.weight(weight),
-            FontVariation.width(width),
+            FontVariation.width(safeVariableWidth(width)),
             roundness(if (isRounded) 100f else 0f)
         )
     )
