@@ -2,6 +2,7 @@ package com.serranoie.app.minus.wearsync
 
 import logcat.logcat
 import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.sync.contract.ExpensePayload
 import kotlinx.coroutines.sync.Mutex
@@ -15,7 +16,8 @@ import javax.inject.Singleton
 
 @Singleton
 class WearExpenseIngestor @Inject constructor(
-    private val repository: BudgetRepository
+    private val repository: BudgetRepository,
+    private val settingsRepository: SettingsRepository,
 ) {
 
     companion object {
@@ -48,11 +50,20 @@ class WearExpenseIngestor @Inject constructor(
             repository.findOrCreateCategory(payload.comment.trim()).id
         } else null
 
+        // The watch has no notion of the phone's budget periods and never sends a
+        // periodId, so resolve the phone's active period here. Without this the
+        // row is stored with periodId = 0L: it shows in the current period via the
+        // date-window fallback, but once the period rolls over
+        // filterPeriodTransactions() / splitPeriodTransactions() drop it from
+        // every period view (it was never assigned to a period, and its date is
+        // now before the new period start).
+        val periodId = payload.periodId ?: settingsRepository.getCurrentPeriodId()
+
         val tx = Transaction.create(
             amount = amount,
             comment = payload.comment,
             date = date,
-            periodId = payload.periodId ?: 0L,
+            periodId = periodId,
             clientGeneratedId = payload.clientGeneratedId,
             categoryId = categoryId
         )
