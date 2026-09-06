@@ -1,0 +1,180 @@
+name: Build Minus Watch APK (manual)
+
+# Manual builder for the STANDALONE Wear OS APK (:wear module — the app that
+# runs ON the watch). Produces Minus-Watch-v<x>.apk, signed with the same
+# release key as :app.
+#
+# The normal path is release.yml: every `v*` tag builds and attaches all three
+# APKs (Minus, Minus-WearOS, Minus-Watch) via the Fastfile. This workflow is the
+# out-of-band tool for:
+#   - Backfilling Minus-Watch onto a version that shipped before this existed.
+#   - Re-running just the wear build for a tag without re-running the full release.
+#
+# Run modes ("Run workflow"):
+#   - Tag given   -> build from that tag commit; upload onto its Release if one
+#                    exists.
+#   - Tag empty   -> build from the branch/ref you selected, versioned from
+#                    version.properties; upload as a workflow artifact and, if a
+#                    Release v<version> already exists, attach it there too.
+# Never creates a Release — that stays release.yml's job.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Tag to build (e.g. v1.6.0). Leave empty to build from the selected branch/ref using version.properties.'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wear-manual-${{ github.event.inputs.version_tag || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  wear-apk:
+    name: Build signed standalone Wear OS APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Resolve build target
+        id: target
+        run: |
+          INPUT_TAG="${{ github.event.inputs.version_tag }}"
+          if [ -n "$INPUT_TAG" ]; then
+            MODE=tag;  TAG="$INPUT_TAG";  CHECKOUT="$INPUT_TAG"
+          else
+            MODE=ref;  TAG="";            CHECKOUT="${{ github.ref }}"
+          fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "checkout_ref=$CHECKOUT" >> "$GITHUB_OUTPUT"
+          echo "Build mode: $MODE (checkout: $CHECKOUT, release tag: ${TAG:-<none>})"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.target.outputs.checkout_ref }}
+
+      - name: Verify tag is reachable from master
+        if: steps.target.outputs.mode == 'tag'
+        run: |
+          DEFAULT_BRANCH=${{ github.event.repository.default_branch }}
+          git fetch origin "$DEFAULT_BRANCH"
+          if ! git merge-base --is-ancestor \
+               "${{ steps.target.outputs.tag }}" \
+               "origin/$DEFAULT_BRANCH"; then
+            echo "::error::Tag ${{ steps.target.outputs.tag }} no es alcanzable desde origin/$DEFAULT_BRANCH"
+            exit 1
+          fi
+
+      - name: Verify HEAD matches tag
+        if: steps.target.outputs.mode == 'tag'
+        run: |
+          # Use ^{commit} to dereference annotated tags — otherwise
+          # rev-parse returns the tag object hash, not the commit hash.
+          HEAD_SHA=$(git rev-parse HEAD)
+          TAG_SHA=$(git rev-parse "${{ steps.target.outputs.tag }}^{commit}")
+          if [ "$HEAD_SHA" != "$TAG_SHA" ]; then
+            echo "::error::HEAD ($HEAD_SHA) ≠ tag commit ($TAG_SHA)"
+            exit 1
+          fi
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Validate release signing secrets
+        env:
+          MINUS_RELEASE_KEYSTORE_BASE64: ${{ secrets.MINUS_RELEASE_KEYSTORE_BASE64 }}
+          MINUS_RELEASE_STORE_PASSWORD: ${{ secrets.MINUS_RELEASE_STORE_PASSWORD }}
+          MINUS_RELEASE_KEY_ALIAS: ${{ secrets.MINUS_RELEASE_KEY_ALIAS }}
+          MINUS_RELEASE_KEY_PASSWORD: ${{ secrets.MINUS_RELEASE_KEY_PASSWORD }}
+        run: |
+          test -n "$MINUS_RELEASE_KEYSTORE_BASE64"
+          test -n "$MINUS_RELEASE_STORE_PASSWORD"
+          test -n "$MINUS_RELEASE_KEY_ALIAS"
+          test -n "$MINUS_RELEASE_KEY_PASSWORD"
+
+      - name: Decode release keystore
+        env:
+          MINUS_RELEASE_KEYSTORE_BASE64: ${{ secrets.MINUS_RELEASE_KEYSTORE_BASE64 }}
+        run: |
+          echo "$MINUS_RELEASE_KEYSTORE_BASE64" | base64 --decode > release-keystore.jks
+
+      - name: Write keystore.properties for CI build
+        env:
+          MINUS_RELEASE_STORE_PASSWORD: ${{ secrets.MINUS_RELEASE_STORE_PASSWORD }}
+          MINUS_RELEASE_KEY_ALIAS: ${{ secrets.MINUS_RELEASE_KEY_ALIAS }}
+          MINUS_RELEASE_KEY_PASSWORD: ${{ secrets.MINUS_RELEASE_KEY_PASSWORD }}
+        run: |
+          cat > keystore.properties << EOF
+          storeFile=${{ github.workspace }}/release-keystore.jks
+          storePassword=${MINUS_RELEASE_STORE_PASSWORD}
+          keyAlias=${MINUS_RELEASE_KEY_ALIAS}
+          keyPassword=${MINUS_RELEASE_KEY_PASSWORD}
+          EOF
+
+      - name: Run Detekt (wear)
+        run: ./gradlew :wear:detekt
+
+      - name: Build signed standalone Wear OS APK
+        run: ./gradlew :wear:assembleRelease
+
+      - name: Locate the APK
+        id: apk
+        run: |
+          SRC=$(find wear/build/outputs/apk/release -name '*.apk' | head -n1)
+          if [ -z "$SRC" ]; then
+            echo "::error::No APK produced by :wear:assembleRelease"
+            exit 1
+          fi
+          VERSION_NAME=$(grep -E '^VERSION_NAME=' version.properties | cut -d'=' -f2 | tr -d '[:space:]')
+          echo "path=$SRC" >> "$GITHUB_OUTPUT"
+          echo "name=$(basename "$SRC")" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "Built $(basename "$SRC")"
+
+      - name: Verify APK is signed with the release key
+        run: |
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          BUILD_TOOLS=$(ls -d "$SDK"/build-tools/* 2>/dev/null | sort -V | tail -n1)
+          if [ -n "$BUILD_TOOLS" ] && [ -x "$BUILD_TOOLS/apksigner" ]; then
+            "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "${{ steps.apk.outputs.path }}"
+          else
+            echo "::warning::apksigner not found on runner; skipping signature verification"
+          fi
+
+      - name: Upload APK as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.apk.outputs.name }}
+          path: ${{ steps.apk.outputs.path }}
+          if-no-files-found: error
+
+      - name: Attach APK to an existing GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODE: ${{ steps.target.outputs.mode }}
+          TAG: ${{ steps.target.outputs.tag }}
+          VERSION: ${{ steps.apk.outputs.version }}
+          APK: ${{ steps.apk.outputs.path }}
+        run: |
+          if [ "$MODE" = "tag" ]; then REL="$TAG"; else REL="v$VERSION"; fi
+          if gh release view "$REL" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $REL exists — uploading $(basename "$APK") onto it"
+            gh release upload "$REL" "$APK" --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            echo "::notice::No published release $REL. The signed APK is available as the workflow artifact '$(basename "$APK")'. This workflow never creates releases — that is release.yml's job."
+          fi

@@ -177,25 +177,37 @@ platform :android do
     gradle(task: ":app:assembleWearRelease")
     gradle(task: ":app:assembleFossRelease")
 
+    # Standalone Wear OS APK from the :wear module — the app that runs ON the
+    # watch (com.google.android.wearable.standalone=true). Signed with the same
+    # release key as :app (shared applicationId). Its Gradle output is
+    # Minus-Watch-v<x>.apk, distinct from :app's wear-flavor Minus-WearOS-v<x>.apk,
+    # so both attach to the same Release without a filename collision.
+    gradle(task: ":wear:assembleRelease")
+
     apk_paths = Dir[
       File.expand_path("../app/build/outputs/apk/{wear,foss}/release/*.apk", __dir__)
     ].select { |path| File.exist?(path) }
+    apk_paths += Dir[
+      File.expand_path("../wear/build/outputs/apk/release/*.apk", __dir__)
+    ].select { |path| File.exist?(path) }
     UI.user_error!("No se encontraron APKs generados por Gradle") if apk_paths.empty?
 
-    # Check if release already exists to allow CI re-runs
+    repo = ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus")
+
+    # Create the Release if missing; otherwise refresh its assets. Either path
+    # leaves the tagged release carrying all three signed APKs, and CI re-runs
+    # stay idempotent.
     begin
       sh(
         "gh", "release", "create", version_tag, *apk_paths,
-        "--repo", ENV.fetch("GITHUB_REPOSITORY", "isaacsa51/Minus"),
+        "--repo", repo,
         "--title", "Minus #{version_tag}",
         "--generate-notes"
       )
     rescue => e
-      if e.to_s.include?("already exists")
-        UI.important("Release #{version_tag} already exists on GitHub. Skipping creation.")
-      else
-        raise e
-      end
+      raise e unless e.to_s.include?("already exists")
+      UI.important("Release #{version_tag} already exists on GitHub — refreshing assets.")
+      sh("gh", "release", "upload", version_tag, *apk_paths, "--repo", repo, "--clobber")
     end
   end
 
