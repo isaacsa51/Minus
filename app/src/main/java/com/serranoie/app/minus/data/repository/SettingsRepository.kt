@@ -64,6 +64,8 @@ interface SettingsRepository {
 
     suspend fun setCategoryGridModeEnabled(enabled: Boolean)
 
+    suspend fun setExtraNoteEnabled(enabled: Boolean)
+
     suspend fun setTutorialBoxCompleted(completed: Boolean)
 
     suspend fun setAnalyticsTutorialCompleted(completed: Boolean)

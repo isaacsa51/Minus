@@ -29,6 +29,7 @@ import com.serranoie.app.minus.presentation.ui.settings.SettingsScreen
 import com.serranoie.app.minus.presentation.ui.settings.SettingsViewModel
 import com.serranoie.app.minus.presentation.ui.settings.appearance.AppearanceOptionsScreen
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportScreen
+import com.serranoie.app.minus.presentation.ui.settings.features.FeatureLabScreen
 import logcat.logcat
 
 private const val TAG = "ISAAC:AppNavGraph"
@@ -150,9 +151,27 @@ fun AppNavGraph(
                 onNavigateToAppearance = {
                     navController.navigate(Screen.Appearance.route)
                 },
+                onNavigateToFeatureLab = {
+                    navController.navigate(Screen.FeatureLab.route)
+                },
                 onNavigateBack = {
                     navController.popBackStack()
                 },
+            )
+        }
+
+        composable(Screen.FeatureLab.route) {
+            val viewModel: SettingsViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            FeatureLabScreen(
+                state = uiState,
+                onCreditQuickToggle = viewModel::onCreditQuickToggleFeatureToggle,
+                onShowPastTransactionsToggle = viewModel::onShowPastTransactionsToggle,
+                onCategoryPickerDirectPopupToggle = viewModel::onCategoryPickerDirectPopupFeatureToggle,
+                onCategoryGridModeToggle = viewModel::onCategoryGridModeToggle,
+                onExtraNoteToggle = viewModel::onExtraNoteToggle,
+                onBack = { navController.popBackStack() },
             )
         }
 

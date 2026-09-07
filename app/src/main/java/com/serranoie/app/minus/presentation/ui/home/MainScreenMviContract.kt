@@ -70,6 +70,7 @@ data class MainScreenUiState(
     val showCreditQuickToggleFeature: Boolean = false,
     val directCategoryPopupEnabled: Boolean = false,
     val categoryGridModeEnabled: Boolean = false,
+    val extraNoteEnabled: Boolean = false,
 )
 
 data class MainScreenActions(
@@ -86,6 +87,7 @@ data class MainScreenFeatureFlags(
     val showCreditQuickToggleFeature: Boolean,
     val directCategoryPopupEnabled: Boolean,
     val categoryGridModeEnabled: Boolean,
+    val extraNoteEnabled: Boolean,
 )
 
 data class MainScreenBudgetPeriodState(

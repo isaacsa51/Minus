@@ -78,6 +78,66 @@ class EditorScreenshotTest {
 	}
 
 	@Test
+	fun editorEditingWithExtraNoteInline() {
+		Locale.setDefault(Locale.US)
+
+		paparazzi.snapshot {
+			MinusTheme {
+				Editor(
+					uiState = sampleBudgetUiState().copy(
+						numpadInput = "24.50",
+						isNumpadValid = true,
+						animState = AnimState.EDITING,
+						currentComment = "Commute",
+						currentNote = "Airport taxi",
+						tags = listOf("commute", "work"),
+					),
+					animState = AnimState.EDITING,
+					onFocus = {},
+					onOpenHistory = {},
+					onOpenSettings = {},
+					onCommentClick = {},
+					onCommentUpdate = {},
+					onNoteUpdate = {},
+					onDeleteTag = {},
+					extraNoteEnabled = true,
+					modifier = Modifier.fillMaxSize(),
+				)
+			}
+		}
+	}
+
+	@Test
+	fun editorEditingExtraNoteLabelsWithChips() {
+		Locale.setDefault(Locale.US)
+
+		paparazzi.snapshot {
+			MinusTheme {
+				Editor(
+					uiState = sampleBudgetUiState().copy(
+						numpadInput = "24.50",
+						isNumpadValid = true,
+						animState = AnimState.EDITING,
+						currentComment = "",
+						currentNote = "",
+						tags = listOf("commute", "work"),
+					),
+					animState = AnimState.EDITING,
+					onFocus = {},
+					onOpenHistory = {},
+					onOpenSettings = {},
+					onCommentClick = {},
+					onCommentUpdate = {},
+					onNoteUpdate = {},
+					onDeleteTag = {},
+					extraNoteEnabled = true,
+					modifier = Modifier.fillMaxSize(),
+				)
+			}
+		}
+	}
+
+	@Test
 	fun editorEditingCalculationExpression() {
 		Locale.setDefault(Locale.US)
 

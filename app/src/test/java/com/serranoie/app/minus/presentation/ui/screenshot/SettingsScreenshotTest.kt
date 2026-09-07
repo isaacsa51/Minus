@@ -29,7 +29,6 @@ class SettingsScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 SettingsPreview(
-                    isCreditQuickToggleFeatureEnabled = false,
                     recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
                     notificationHour = 19,
                     notificationMinute = 0,
@@ -49,7 +48,6 @@ class SettingsScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 SettingsPreview(
-                    isCreditQuickToggleFeatureEnabled = true,
                     recurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
                     notificationHour = 20,
                     notificationMinute = 30,
@@ -64,7 +62,6 @@ class SettingsScreenshotTest {
 
     @Composable
     private fun SettingsPreview(
-        isCreditQuickToggleFeatureEnabled: Boolean,
         recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
         notificationHour: Int,
         notificationMinute: Int,
@@ -76,14 +73,12 @@ class SettingsScreenshotTest {
         MinusTheme {
             Settings(
                 modifier = Modifier.fillMaxSize(),
-                isCreditQuickToggleFeatureEnabled = isCreditQuickToggleFeatureEnabled,
                 recurrentPaymentsViewMode = recurrentPaymentsViewMode,
                 notificationHour = notificationHour,
                 notificationMinute = notificationMinute,
                 recurrentNotificationHour = recurrentNotificationHour,
                 recurrentNotificationMinute = recurrentNotificationMinute,
                 exactAlarmEnabled = exactAlarmEnabled,
-                onCreditQuickToggleFeatureToggle = {},
                 onRecurrentPaymentsViewModeChange = {},
                 onNotificationTimeChange = { _, _ -> },
                 onRecurrentNotificationTimeChange = { _, _ -> },

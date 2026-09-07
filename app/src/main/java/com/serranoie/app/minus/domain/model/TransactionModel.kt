@@ -8,6 +8,7 @@ data class Transaction(
     val id: Long = 0,
     val amount: BigDecimal,
     val comment: String = "",
+    val note: String = "",
     val date: LocalDateTime?,
     val createdAt: Long = System.currentTimeMillis(),
     val clientGeneratedId: String? = null,
@@ -27,6 +28,7 @@ data class Transaction(
         fun create(
             amount: BigDecimal,
             comment: String = "",
+            note: String = "",
             date: LocalDateTime?,
             periodId: Long = 0L,
             clientGeneratedId: String? = null,
@@ -42,6 +44,7 @@ data class Transaction(
             id = 0,
             amount = amount,
             comment = comment,
+            note = note,
             date = date,
             periodId = periodId,
             clientGeneratedId = clientGeneratedId,

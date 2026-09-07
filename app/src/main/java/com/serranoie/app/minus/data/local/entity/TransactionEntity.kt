@@ -19,6 +19,8 @@ data class TransactionEntity(
     val id: Long = 0,
     val amount: String,
     val comment: String,
+    @ColumnInfo(defaultValue = "''")
+    val note: String = "",
     val date: Long,
     val createdAt: Long = System.currentTimeMillis(),
     val clientGeneratedId: String? = null,
@@ -37,6 +39,7 @@ data class TransactionEntity(
         fun fromDomain(
             amount: String,
             comment: String,
+            note: String = "",
             date: LocalDateTime,
             isRecurrent: Boolean = false,
             recurrentFrequency: String? = null,
@@ -50,6 +53,7 @@ data class TransactionEntity(
             id = 0,
             amount = amount,
             comment = comment,
+            note = note,
             date = date.toEpochSecond(ZoneOffset.UTC) * 1000,
             isRecurrent = isRecurrent,
             recurrentFrequency = recurrentFrequency,

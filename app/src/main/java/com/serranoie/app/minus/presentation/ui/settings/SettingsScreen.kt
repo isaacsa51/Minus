@@ -20,6 +20,7 @@ fun SettingsScreen(
     onNavigateToBugReport: () -> Unit,
     onNavigateToChangelog: () -> Unit = {},
     onNavigateToAppearance: () -> Unit = {},
+    onNavigateToFeatureLab: () -> Unit = {},
     onNavigateBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -74,13 +75,6 @@ fun SettingsScreen(
 
     Settings(
         isCensored = uiState.isCensored,
-        isCreditQuickToggleFeatureEnabled = uiState.isCreditQuickToggleEnabled,
-        showPastTransactions = uiState.showPastTransactions,
-        isCategoryPickerDirectPopupEnabled = uiState.isCategoryPickerDirectPopupEnabled,
-        isCategoryGridModeEnabled = uiState.isCategoryGridModeEnabled,
-        onCategoryPickerDirectPopupFeatureToggle = viewModel::onCategoryPickerDirectPopupFeatureToggle,
-        onCategoryGridModeToggle = viewModel::onCategoryGridModeToggle,
-        onShowPastTransactionsToggle = viewModel::onShowPastTransactionsToggle,
         recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
         notificationHour = uiState.notificationHour,
         notificationMinute = uiState.notificationMinute,
@@ -89,7 +83,7 @@ fun SettingsScreen(
         exactAlarmEnabled = uiState.exactAlarmEnabled,
         notificationPermissionGranted = uiState.notificationPermissionGranted,
         onCensorModeToggle = viewModel::onCensorModeToggle,
-        onCreditQuickToggleFeatureToggle = viewModel::onCreditQuickToggleFeatureToggle,
+        onNavigateToFeatureLab = onNavigateToFeatureLab,
         onRecurrentPaymentsViewModeChange = viewModel::onRecurrentPaymentsViewModeChange,
         onNotificationTimeChange = viewModel::onNotificationTimeChange,
         onRecurrentNotificationTimeChange = viewModel::onRecurrentNotificationTimeChange,

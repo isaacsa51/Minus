@@ -44,6 +44,7 @@ class MainScreenViewModel @Inject constructor(
             showCreditQuickToggleFeature = settings.isCreditQuickToggleEnabled,
             directCategoryPopupEnabled = settings.categoryPickerDirectPopupEnabled,
             categoryGridModeEnabled = settings.categoryGridModeEnabled,
+            extraNoteEnabled = settings.extraNoteEnabled,
             tutorialStage = settings.firstLaunchTutorialStage,
             selectedViewPeriod = settings.budgetSplitViewPeriod ?: local.selectedViewPeriod,
             pendingDeleteTransaction = local.pendingDeleteTransaction,

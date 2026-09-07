@@ -329,6 +329,7 @@ class HistoryViewModel @Inject constructor(
             currentPeriodId = currentPeriodId,
             currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             isCreditQuickToggleEnabled = userSettings?.isCreditQuickToggleEnabled ?: false,
+            isExtraNoteEnabled = userSettings?.extraNoteEnabled ?: false,
             showPastTransactionsSetting = userSettings?.showPastTransactions ?: true,
             tags = categories.map { it.name },
             transactions = transactions,

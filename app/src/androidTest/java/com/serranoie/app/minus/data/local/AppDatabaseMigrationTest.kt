@@ -117,11 +117,41 @@ class AppDatabaseMigrationTest {
     }
 
     @Test
+    fun migrate17To18_addsNoteColumns_withEmptyStringDefault_andPreservesExistingRows() {
+        helper.createDatabase(testDb, 17).apply {
+            execSQL(
+                "INSERT INTO transactions " +
+                    "(amount, comment, date, createdAt, periodId, isRecurrent, isCredit, isCreditPaid, isAdjustment) " +
+                    "VALUES ('10.00', 'Coffee', 0, 0, 1, 0, 0, 0, 0)"
+            )
+            execSQL(
+                "INSERT INTO queued_transactions " +
+                    "(amount, comment, date, createdAt, isCredit, isCreditPaid, isAdjustment) " +
+                    "VALUES ('5.00', 'Snack', 0, 0, 0, 0, 0)"
+            )
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(testDb, 18, true)
+
+        assertThat(db.columnNames("transactions")).contains("note")
+        assertThat(db.columnNames("queued_transactions")).contains("note")
+        db.query("SELECT note FROM transactions WHERE comment = 'Coffee'").use { c ->
+            assertThat(c.moveToFirst()).isTrue()
+            assertThat(c.getString(0)).isEqualTo("")
+        }
+        db.query("SELECT note FROM queued_transactions WHERE comment = 'Snack'").use { c ->
+            assertThat(c.moveToFirst()).isTrue()
+            assertThat(c.getString(0)).isEqualTo("")
+        }
+    }
+
+    @Test
     fun migrateAllFrom13_runsTheWholeChain_andValidatesTheCurrentSchema() {
         helper.createDatabase(testDb, 13).close()
 
         helper.runMigrationsAndValidate(
-            testDb, 17, true,
+            testDb, 18, true,
             MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
         )
     }

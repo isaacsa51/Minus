@@ -46,6 +46,7 @@ class TransactionActionsController(
         isRecurrentEnabled: Boolean,
         isCreditEnabled: Boolean,
         comment: String,
+        note: String = "",
         budgetSettings: BudgetSettings?,
         resolveActivePeriodId: suspend () -> Long,
     ): List<TransactionAction> {
@@ -55,6 +56,7 @@ class TransactionActionsController(
             isRecurrentEnabled = isRecurrentEnabled,
             isCreditEnabled = isCreditEnabled,
             comment = comment,
+            note = note,
             budgetSettings = budgetSettings,
             resolveActivePeriodId = resolveActivePeriodId,
         )
@@ -151,6 +153,7 @@ interface TransactionHandler {
         isRecurrentEnabled: Boolean,
         isCreditEnabled: Boolean,
         comment: String,
+        note: String = "",
         budgetSettings: BudgetSettings?,
         resolveActivePeriodId: suspend () -> Long,
     ): ApplyTransactionResult

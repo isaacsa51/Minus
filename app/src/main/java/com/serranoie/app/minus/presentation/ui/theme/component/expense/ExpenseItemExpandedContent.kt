@@ -78,9 +78,14 @@ fun ExpenseItemExpandedContent(
     val descriptionLabel = stringResource(R.string.description)
     val adjustmentReasonLabel = stringResource(R.string.adjustment_reason)
 
+    val noteLabel = stringResource(R.string.extra_note_label)
+
     val details = buildList {
         val reasonLabel = if (isSlanted) adjustmentReasonLabel else descriptionLabel
         add(reasonLabel to transaction.comment.ifEmpty { stringResource(if (isIncome) R.string.no_name_income else R.string.no_name) })
+        if (transaction.note.isNotBlank()) {
+            add(noteLabel to transaction.note)
+        }
         add(dateLabel to transactionDateText)
 
         if (transaction.isCredit && creditCardCutoffDay != null) {
