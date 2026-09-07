@@ -133,6 +133,8 @@
     <string name="add_new_category">类别</string>
     <string name="add_new_category_action">添加新类别</string>
     <string name="delete_category">删除分类</string>
+    <string name="add_extra_note">附加备注</string>
+    <string name="extra_note_label">备注</string>
     <string name="budget_validation_major_zero">预算必须比 0 多</string>
     <string name="budget_no_date_defined">未设定结束日期</string>
     <string name="budget_no_days_defined">未设定天数</string>
@@ -280,6 +282,16 @@
     <string name="settings_category_picker_direct_popup_description">点击类别区域时打开包含已保存类别的建议弹窗。关闭时，建议弹窗仅在你输入时出现。</string>
     <string name="settings_category_grid_mode_switch_label">显示为列表（实验性）</string>
     <string name="settings_category_grid_mode_description">点击类别标签后会以网格视图展开已保存类别，而不是进入內联编辑模式。开启该选项时也会关闭数字键盘计算器。</string>
+    <string name="settings_feature_extra_note_title">每笔交易的附加备注</string>
+    <string name="settings_feature_extra_note_subtitle">点击查看详情</string>
+    <string name="settings_feature_extra_note_description">在添加或编辑交易时，在类别旁边添加一个可选的"附加备注"字段。用它来记录仅凭类别无法体现的细节，例如"通勤"里的钱具体花在了什么地方。</string>
+    <string name="settings_feature_extra_note_switch_label">启用附加备注</string>
+    <string name="settings_feature_lab_title">附加功能</string>
+    <string name="settings_feature_lab_subtitle">可以开启的可选实验性功能</string>
+    <string name="settings_feature_lab_header">这里的每项功能都是可选的，默认关闭；部分为实验性功能，可能在后续更新中发生变化。只开启你需要的功能，点击某项功能即可查看它具体会改变什么。</string>
+    <string name="settings_feature_category_direct_popup_title">点击时显示类别建议</string>
+    <string name="settings_feature_category_grid_title">类别列表模式</string>
+    <string name="settings_feature_show_past_transactions_switch_label">加载过去的周期</string>
     <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
     <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">定期支出视图</string>

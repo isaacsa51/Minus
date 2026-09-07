@@ -135,6 +135,8 @@
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавяне на нова категория</string>
     <string name="delete_category">Изтриване на категория</string>
+    <string name="add_extra_note">Допълнителна бележка</string>
+    <string name="extra_note_label">Бележка</string>
     <string name="budget_validation_major_zero">Бюджетът трябва да е по-голям от 0</string>
     <string name="budget_no_date_defined">Не е зададена крайна дата</string>
     <string name="budget_no_days_defined">Не са зададени дни</string>
@@ -282,6 +284,16 @@
     <string name="settings_category_picker_direct_popup_description">Отваряне на изскачащ прозорец с предложения за всички запазени категории веднага след натискане върху полето за категория. Когато е изключено, предложенията се появяват едва след като започнете да пишете.</string>
     <string name="settings_category_grid_mode_switch_label">Показване като списък (Експериментално)</string>
     <string name="settings_category_grid_mode_description">Натиснете етикета на категорията, за да отворите мрежа със запазените категории, вместо да влизате в режим за директно редактиране. Също така изключва режима за изчисления на цифровата клавиатура, докато е включено.</string>
+    <string name="settings_feature_extra_note_title">Допълнителна бележка за трансакция</string>
+    <string name="settings_feature_extra_note_subtitle">Натиснете за повече подробности</string>
+    <string name="settings_feature_extra_note_description">Добавя незадължително поле "Допълнителна бележка" до категорията при добавяне или редактиране на трансакция. Използвайте го, за да запомните подробност, която само категорията не улавя — например за какво точно са похарчени парите в "Пътуване".</string>
+    <string name="settings_feature_extra_note_switch_label">Активиране на допълнителна бележка</string>
+    <string name="settings_feature_lab_title">Допълнителни функции</string>
+    <string name="settings_feature_lab_subtitle">Незадължителни и експериментални функции, които можете да включите</string>
+    <string name="settings_feature_lab_header">Всяка функция тук е незадължителна и е изключена по подразбиране; някои са експериментални и може да се променят в бъдеща актуализация. Включвайте само това, което ви трябва, и натиснете дадена функция, за да видите какво точно променя.</string>
+    <string name="settings_feature_category_direct_popup_title">Предложения за категории при натискане</string>
+    <string name="settings_feature_category_grid_title">Режим на списък с категории</string>
+    <string name="settings_feature_show_past_transactions_switch_label">Зареждане на минали периоди</string>
     <string name="settings_feature_show_past_transactions_title">Показване на минали трансакции</string>
     <string name="settings_feature_show_past_transactions_subtitle">Зареждане на трансакции от минали периоди</string>
     <string name="settings_recurrent_payments_view_mode_title">Режим на преглед на повтарящите се плащания</string>

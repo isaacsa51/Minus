@@ -279,6 +279,16 @@
     <string name="settings_category_picker_direct_popup_description">Ανοίξτε τις προτάσεις με όλες τις αποθηκευμένες κατηγορίες μόλις πατήσετε το πεδίο κατηγορίας. Όταν είναι απενεργοποιημένο, οι προτάσεις εμφανίζονται μόνο αφού αρχίσετε να πληκτρολογείτε.</string>
     <string name="settings_category_grid_mode_switch_label">Εμφάνιση ως λίστα (Πειραματικό)</string>
     <string name="settings_category_grid_mode_description">Πατήστε την ετικέτα κατηγορίας για άνοιγμα ένα πλέγμα των αποθηκευμένων κατηγοριών σας, αντί να εισέλθετε σε λειτουργία ενσωματωμένης επεξεργασίας. Απενεργοποιεί επίσης τη λειτουργία υπολογισμού του αριθμητικού πληκτρολογίου όσο είναι ενεργοποιημένη.</string>
+    <string name="settings_feature_extra_note_title">Επιπλέον σημείωση ανά συναλλαγή</string>
+    <string name="settings_feature_extra_note_subtitle">Πατήστε για να δείτε περισσότερες λεπτομέρειες</string>
+    <string name="settings_feature_extra_note_description">Προσθέτει ένα προαιρετικό πεδίο "Επιπλέον σημείωση" δίπλα στην κατηγορία κατά την προσθήκη ή επεξεργασία μιας συναλλαγής. Χρησιμοποιήστε το για να θυμάστε μια λεπτομέρεια που δεν αποτυπώνει από μόνη της η κατηγορία — για παράδειγμα, σε τι ακριβώς ξοδεύτηκαν τα χρήματα της κατηγορίας "Μετακινήσεις".</string>
+    <string name="settings_feature_extra_note_switch_label">Ενεργοποίηση επιπλέον σημείωσης</string>
+    <string name="settings_feature_lab_title">Επιπλέον λειτουργίες</string>
+    <string name="settings_feature_lab_subtitle">Προαιρετικές και πειραματικές λειτουργίες που μπορείτε να ενεργοποιήσετε</string>
+    <string name="settings_feature_lab_header">Κάθε λειτουργία εδώ είναι προαιρετική και απενεργοποιημένη από προεπιλογή· ορισμένες είναι πειραματικές και ενδέχεται να αλλάξουν σε μελλοντική ενημέρωση. Ενεργοποιήστε μόνο ό,τι χρειάζεστε και πατήστε σε μια λειτουργία για να δείτε ακριβώς τι αλλάζει.</string>
+    <string name="settings_feature_category_direct_popup_title">Προτάσεις κατηγοριών με το πάτημα</string>
+    <string name="settings_feature_category_grid_title">Λειτουργία λίστας κατηγοριών</string>
+    <string name="settings_feature_show_past_transactions_switch_label">Φόρτωση προηγούμενων περιόδων</string>
     <string name="settings_feature_show_past_transactions_title">Εμφάνιση προηγούμενων συναλλαγών</string>
     <string name="settings_feature_show_past_transactions_subtitle">Φόρτωση συναλλαγών από προηγούμενες περιόδους</string>
     <string name="settings_recurrent_payments_view_mode_title">Λειτουργία επαναλαμβανόμενης προβολής πληρωμών</string>
@@ -592,6 +602,8 @@
     <string name="rollover_preview_add_to_first_day">Σας έχουν μείνει %1$s αχρησιμοποίητα. Όταν λήξει αυτή η περίοδος, θα προστεθεί στην πρώτη ημέρα του επόμενου προϋπολογισμού σας.</string>
     <string name="expand_numpad">Ανάπτυξη αριθμητικού πληκτρολογίου</string>
     <string name="delete_category">Διαγραφή κατηγορίας</string>
+    <string name="add_extra_note">Επιπλέον σημείωση</string>
+    <string name="extra_note_label">Σημείωση</string>
     <string name="budget_graph_view_mode_cumulative">Τάση</string>
     <string name="budget_graph_view_mode_categories">Κατηγορίες</string>
     <string name="settings_widgets_pin_not_supported">Η συσκευή σας δεν υποστηρίζει την προσθήκη γραφικών στοιχείων με αυτόν τον τρόπο. Πατήστε παρατεταμένα στην αρχική οθόνη σας και αναζητήστε το Minus.</string>

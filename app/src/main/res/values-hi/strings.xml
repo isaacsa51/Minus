@@ -279,6 +279,16 @@
     <string name="settings_category_picker_direct_popup_description">कैटेगरी फ़ील्ड पर टैप करते ही अपनी सभी सेव की गई कैटेगरी के साथ सुझावों वाला पॉपअप खोलें। बंद होने पर, सुझाव तभी दिखते हैं जब आप टाइप करना शुरू करते हैं।</string>
     <string name="settings_category_grid_mode_switch_label">लिस्ट के तौर पर दिखाएं (एक्सपेरिमेंटल)</string>
     <string name="settings_category_grid_mode_description">इनलाइन एडिट मोड में जाने के बजाय, अपनी सेव की गई कैटेगरी का ग्रिड खोलने के लिए कैटेगरी टैग पर टैप करें। इसके चालू होने पर नंपैड का कैलकुलेशन मोड भी बंद हो जाता है।</string>
+    <string name="settings_feature_extra_note_title">हर ट्रांज़ैक्शन के लिए अतिरिक्त नोट</string>
+    <string name="settings_feature_extra_note_subtitle">ज़्यादा जानकारी के लिए टैप करें</string>
+    <string name="settings_feature_extra_note_description">ट्रांज़ैक्शन जोड़ते या एडिट करते समय कैटेगरी के बगल में एक वैकल्पिक "अतिरिक्त नोट" फ़ील्ड जोड़ता है. इससे आप वह जानकारी याद रख सकते हैं जो अकेले कैटेगरी से पता नहीं चलती — जैसे "आना-जाना" में खर्च हुआ पैसा असल में किस चीज़ पर गया.</string>
+    <string name="settings_feature_extra_note_switch_label">अतिरिक्त नोट चालू करें</string>
+    <string name="settings_feature_lab_title">अतिरिक्त फ़ीचर</string>
+    <string name="settings_feature_lab_subtitle">वैकल्पिक और एक्सपेरिमेंटल फ़ीचर जिन्हें आप चालू कर सकते हैं</string>
+    <string name="settings_feature_lab_header">यहाँ हर फ़ीचर वैकल्पिक है और डिफ़ॉल्ट रूप से बंद है; कुछ एक्सपेरिमेंटल हैं और आगे किसी अपडेट में बदल सकते हैं. सिर्फ़ वही चालू करें जिसकी ज़रूरत हो, और किसी फ़ीचर पर टैप करके देखें कि वह असल में क्या बदलता है.</string>
+    <string name="settings_feature_category_direct_popup_title">टैप करने पर कैटेगरी सुझाव</string>
+    <string name="settings_feature_category_grid_title">कैटेगरी लिस्ट मोड</string>
+    <string name="settings_feature_show_past_transactions_switch_label">पिछले समय के पीरियड लोड करें</string>
     <string name="settings_feature_show_past_transactions_title">पिछले ट्रांज़ैक्शन दिखाएं</string>
     <string name="settings_feature_show_past_transactions_subtitle">पिछले समय के ट्रांज़ैक्शन लोड करें</string>
     <string name="settings_recurrent_payments_view_mode_title">बार-बार होने वाले पेमेंट का व्यू मोड</string>
@@ -592,6 +602,8 @@
     <string name="rollover_preview_add_to_first_day">आपके पास %1$s बिना खर्च किए बचे हैं। जब यह अवधि खत्म हो जाएगी, तो यह रकम आपके अगले बजट के पहले दिन में जोड़ दी जाएगी।</string>
     <string name="expand_numpad">नंपैड को बड़ा करें</string>
     <string name="delete_category">कैटेगरी मिटाएं</string>
+    <string name="add_extra_note">अतिरिक्त नोट</string>
+    <string name="extra_note_label">नोट</string>
     <string name="budget_graph_view_mode_cumulative">ट्रेंड</string>
     <string name="budget_graph_view_mode_categories">कैटेगरी</string>
     <string name="settings_widgets_pin_not_supported">आपका डिवाइस इस तरह से विजेट जोड़ने का समर्थन नहीं करता है। अपनी होम स्क्रीन को देर तक दबाएं और इसके बजाय Minus खोजें।</string>

@@ -2,17 +2,20 @@
 
 package com.serranoie.app.minus.presentation.ui.settings.features
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ViewList
+import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Sell
@@ -21,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
@@ -38,9 +42,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.glance.layout.Column
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.settings.SettingsUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.SelectableInfoPaddedItem
@@ -69,12 +75,31 @@ fun FeatureLabScreen(
                 .padding(innerPadding),
         ) {
             item {
-                Text(
-                    text = stringResource(R.string.settings_feature_lab_header),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                )
+                Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.Help,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.settings_what_is_this_for),
+                            style = MaterialTheme.typography.bodySmallCondensed,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+
+
+                    Text(
+                        text = stringResource(R.string.settings_feature_lab_header),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                    )
+                }
             }
 
             item {
@@ -197,7 +222,7 @@ private fun FeatureLabTopBar(
     onBack: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
-    MediumTopAppBar(
+    LargeTopAppBar(
         title = {
             Text(
                 text = stringResource(R.string.settings_feature_lab_title),

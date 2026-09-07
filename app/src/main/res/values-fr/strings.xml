@@ -135,6 +135,8 @@
     <string name="add_new_category">Catégorie</string>
     <string name="add_new_category_action">Ajouter une nouvelle catégorie</string>
     <string name="delete_category">Supprimer la catégorie</string>
+    <string name="add_extra_note">Note supplémentaire</string>
+    <string name="extra_note_label">Note</string>
     <string name="budget_validation_major_zero">Le budget doit être supérieur à 0</string>
     <string name="budget_no_date_defined">Aucune date de fin définie</string>
     <string name="budget_no_days_defined">Aucun jour défini</string>
@@ -283,6 +285,16 @@
     <string name="settings_category_picker_direct_popup_description">Dès que vous appuyez sur le champ de catégorie, une fenêtre contextuelle de suggestions s\'ouvre avec toutes vos catégories enregistrées. Si cette option est désactivée, les suggestions n\'apparaissent qu\'après avoir commencé à saisir du texte.</string>
     <string name="settings_category_grid_mode_switch_label">Afficher sous forme de liste</string>
     <string name="settings_category_grid_mode_description">Touchez l\'étiquette de catégorie pour ouvrir une grille de vos catégories enregistrées, au lieu d\'accéder au mode d\'édition en ligne. Désactive également le mode de calcul du pavé numérique lorsque cette option est activée.</string>
+    <string name="settings_feature_extra_note_title">Note supplémentaire par transaction</string>
+    <string name="settings_feature_extra_note_subtitle">Appuyez pour voir plus de détails</string>
+    <string name="settings_feature_extra_note_description">Ajoute un champ facultatif "Note supplémentaire" à côté de la catégorie lors de l\'ajout ou de la modification d\'une transaction. Utilisez-le pour noter un détail que la catégorie seule ne capture pas, comme ce pour quoi l\'argent de "Trajet" a réellement été dépensé.</string>
+    <string name="settings_feature_extra_note_switch_label">Activer la note supplémentaire</string>
+    <string name="settings_feature_lab_title">Fonctionnalités supplémentaires</string>
+    <string name="settings_feature_lab_subtitle">Fonctionnalités facultatives et expérimentales que vous pouvez activer</string>
+    <string name="settings_feature_lab_header">Chaque fonctionnalité ici est facultative et désactivée par défaut ; certaines sont expérimentales et peuvent changer dans une mise à jour ultérieure. N\'activez que ce dont vous avez besoin et appuyez sur une fonctionnalité pour voir exactement ce qu\'elle change.</string>
+    <string name="settings_feature_category_direct_popup_title">Suggestions de catégories au toucher</string>
+    <string name="settings_feature_category_grid_title">Mode liste des catégories</string>
+    <string name="settings_feature_show_past_transactions_switch_label">Charger les périodes précédentes</string>
     <string name="settings_feature_show_past_transactions_title">Afficher les transactions passées</string>
     <string name="settings_feature_show_past_transactions_subtitle">Charger les transactions des périodes précédentes</string>
     <string name="settings_recurrent_payments_view_mode_title">Mode d\'affichage des paiements récurrents</string>

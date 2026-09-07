@@ -286,6 +286,16 @@
     <string name="settings_category_picker_direct_popup_description">Open the suggestions popup with all your saved categories as soon as you tap the category field. When off, suggestions only appear after you start typing.</string>
     <string name="settings_category_grid_mode_switch_label">Show as a list (Experimental)</string>
     <string name="settings_category_grid_mode_description">Tap the category tag to open a grid of your saved categories, instead of entering inline edit mode. Also turns off the numpad\'s calculation mode while this is on.</string>
+    <string name="settings_feature_extra_note_title">Дополнительная заметка к транзакции</string>
+    <string name="settings_feature_extra_note_subtitle">Нажмите, чтобы узнать подробности</string>
+    <string name="settings_feature_extra_note_description">Добавляет необязательное поле "Дополнительная заметка" рядом с категорией при добавлении или изменении транзакции. Используйте его, чтобы запомнить деталь, которую не передаёт одна лишь категория, — например, на что именно были потрачены деньги в категории "Дорога".</string>
+    <string name="settings_feature_extra_note_switch_label">Включить дополнительную заметку</string>
+    <string name="settings_feature_lab_title">Дополнительные функции</string>
+    <string name="settings_feature_lab_subtitle">Дополнительные и экспериментальные функции, которые можно включить</string>
+    <string name="settings_feature_lab_header">Каждая функция здесь необязательна и по умолчанию отключена; некоторые из них экспериментальные и могут измениться в будущем обновлении. Включайте только то, что нужно, и нажмите на функцию, чтобы увидеть, что именно она меняет.</string>
+    <string name="settings_feature_category_direct_popup_title">Подсказки категорий по нажатию</string>
+    <string name="settings_feature_category_grid_title">Режим списка категорий</string>
+    <string name="settings_feature_show_past_transactions_switch_label">Загрузить прошлые периоды</string>
     <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
     <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">Recurrent payments view mode</string>
@@ -598,6 +608,8 @@
     <string name="budget_pill_calc_added">Будет добавлено: %1$s</string>
     <string name="expand_numpad">Развернуть цифровую клавиатуру</string>
     <string name="delete_category">Удалить категорию</string>
+    <string name="add_extra_note">Дополнительная заметка</string>
+    <string name="extra_note_label">Заметка</string>
     <string name="budget_graph_view_mode_cumulative">Тренд</string>
     <string name="budget_graph_view_mode_categories">Категории</string>
     <string name="settings_widgets_pin_not_supported">Ваше устройство не поддерживает добавление виджетов таким способом. Нажмите и удерживайте главный экран и найдите Minus.</string>

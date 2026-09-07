@@ -126,18 +126,6 @@ fun History(
     val currencyCode = uiState.budgetSettings?.currencyCode ?: "USD"
     val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
 
-    LaunchedEffect(uiState.groupedCurrentTransactions.keys, readOnly) {
-        val sortedDates = uiState.groupedCurrentTransactions.keys.filterNotNull().sortedDescending()
-        val current = uiState.expandedDates
-        if (current.isEmpty()) {
-            onProcessIntent(
-                HistoryUiIntent.ToggleExpandedDate(
-                    sortedDates.firstOrNull() ?: return@LaunchedEffect
-                )
-            )
-        }
-    }
-
     val activeEditingTransaction = uiState.editingTransaction ?: uiState.recurrentToEdit
 
     if (sharedTransitionScope != null) {
