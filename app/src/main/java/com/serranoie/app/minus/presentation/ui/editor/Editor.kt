@@ -102,8 +102,7 @@ import com.serranoie.app.minus.presentation.ui.editor.category.EditableCategoryT
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.RecurrentExpenseDialog
-import com.serranoie.app.minus.presentation.ui.editor.note.ExtraNoteChip
-import com.serranoie.app.minus.presentation.ui.editor.note.ExtraNoteSheet
+import com.serranoie.app.minus.presentation.ui.editor.note.EditableNoteTag
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
@@ -215,15 +214,6 @@ fun Editor(
     val topBarHeight = if (isSquareScreen) 54.dp else 66.dp
 
     val editorFocusController = remember { FocusController() }
-
-    var showNoteSheet by remember { mutableStateOf(false) }
-    if (showNoteSheet) {
-        ExtraNoteSheet(
-            initialNote = uiState.currentNote,
-            onDismiss = { showNoteSheet = false },
-            onSave = onNoteUpdate,
-        )
-    }
 
     if (uiState.showRecurrentDialog) {
         RecurrentExpenseDialog(
@@ -537,7 +527,7 @@ fun Editor(
                     currentNote = uiState.currentNote,
                     extraNoteEnabled = extraNoteEnabled,
                     onCommentUpdate = onCommentUpdate,
-                    onNoteClick = { showNoteSheet = true },
+                    onNoteUpdate = onNoteUpdate,
                     onDeleteTag = onDeleteTag,
                     onCategoryEditingChanged = onCategoryEditingChanged,
                     editorFocusController = editorFocusController,
@@ -613,7 +603,7 @@ private fun EditingContent(
     currentNote: String = "",
     extraNoteEnabled: Boolean = false,
     onCommentUpdate: (String) -> Unit,
-    onNoteClick: () -> Unit = {},
+    onNoteUpdate: (String) -> Unit = {},
     onDeleteTag: (String) -> Unit,
     onCategoryEditingChanged: (Boolean) -> Unit = {},
     editorFocusController: FocusController,
@@ -919,6 +909,8 @@ private fun EditingContent(
             }
 
             if (categoryGridModeEnabled) {
+                var isInlineNoteEditing by remember { mutableStateOf(false) }
+                var isInlineCategoryEditing by remember { mutableStateOf(false) }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -926,37 +918,50 @@ private fun EditingContent(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (extraNoteEnabled) {
-                        ExtraNoteChip(
-                            note = currentNote,
-                            onClick = onNoteClick,
+                    if (extraNoteEnabled && !isInlineCategoryEditing) {
+                        EditableNoteTag(
+                            currentNote = currentNote,
+                            onNoteUpdate = onNoteUpdate,
+                            editorFocusController = editorFocusController,
+                            extendWidth = toolbarWidth,
                             onlyIcon = false,
+                            onEdit = { editing ->
+                                isInlineNoteEditing = editing
+                                onCategoryEditingChanged(editing || isInlineCategoryEditing)
+                            },
                         )
-                        Spacer(Modifier.width(8.dp))
                     }
-                    EditableCategoryTag(
-                        currentComment = currentComment,
-                        tags = tags,
-                        onCommentUpdate = onCommentUpdate,
-                        editorFocusController = editorFocusController,
-                        modifier = Modifier.let { m ->
-                            if (tutorialBoxState != null) m.markForTutorial(
-                                tutorialBoxState,
-                                index = 3
-                            ) else m
-                        },
-                        extendWidth = toolbarWidth,
-                        onlyIcon = false,
-                        onEdit = onCategoryEditingChanged,
-                        onDeleteTag = onDeleteTag,
-                        directCategoryPopupEnabled = directCategoryPopupEnabled,
-                        categoryGridModeEnabled = categoryGridModeEnabled,
-                        isCategoryGridVisible = isCategoryGridVisible,
-                        isCalculation = isCalculation,
-                        onShowCategoryGrid = onShowCategoryGrid,
-                        onHideCategoryGrid = onHideCategoryGrid,
-                        onDisableCalculationMode = onDisableCalculationMode,
-                    )
+                    if (!isInlineNoteEditing) {
+                        if (extraNoteEnabled && !isInlineCategoryEditing) {
+                            Spacer(Modifier.width(8.dp))
+                        }
+                        EditableCategoryTag(
+                            currentComment = currentComment,
+                            tags = tags,
+                            onCommentUpdate = onCommentUpdate,
+                            editorFocusController = editorFocusController,
+                            modifier = Modifier.let { m ->
+                                if (tutorialBoxState != null) m.markForTutorial(
+                                    tutorialBoxState,
+                                    index = 3
+                                ) else m
+                            },
+                            extendWidth = toolbarWidth,
+                            onlyIcon = false,
+                            onEdit = { editing ->
+                                isInlineCategoryEditing = editing
+                                onCategoryEditingChanged(editing || isInlineNoteEditing)
+                            },
+                            onDeleteTag = onDeleteTag,
+                            directCategoryPopupEnabled = directCategoryPopupEnabled,
+                            categoryGridModeEnabled = categoryGridModeEnabled,
+                            isCategoryGridVisible = isCategoryGridVisible,
+                            isCalculation = isCalculation,
+                            onShowCategoryGrid = onShowCategoryGrid,
+                            onHideCategoryGrid = onHideCategoryGrid,
+                            onDisableCalculationMode = onDisableCalculationMode,
+                        )
+                    }
                 }
             } else {
                 CategoryToolbar(
@@ -965,7 +970,7 @@ private fun EditingContent(
                     stage = EditStage.EDIT_SPENT,
                     onCommentUpdate = onCommentUpdate,
                     currentNote = currentNote,
-                    onNoteClick = onNoteClick,
+                    onNoteUpdate = onNoteUpdate,
                     extraNoteEnabled = extraNoteEnabled,
                     onDeleteTag = onDeleteTag,
                     onEditingChanged = onCategoryEditingChanged,

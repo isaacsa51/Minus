@@ -48,7 +48,6 @@ import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalcul
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
-import com.serranoie.app.minus.presentation.ui.editor.note.ExtraNoteSheet
 import com.serranoie.app.minus.presentation.ui.history.edit.dialogs.EditDatePickerDialog
 import com.serranoie.app.minus.presentation.ui.history.edit.dialogs.EditTimePickerDialog
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -124,7 +123,6 @@ fun TransactionEditScreen(
     var showTimePicker by remember { mutableStateOf(false) }
     var showRecurrentBottomSheet by remember { mutableStateOf(false) }
     var showCreditCutoffDialog by remember { mutableStateOf(false) }
-    var showNoteSheet by remember { mutableStateOf(false) }
 
     val focusController = remember { FocusController() }
     val focusRequester = remember { FocusRequester() }
@@ -321,7 +319,7 @@ fun TransactionEditScreen(
                 stage = EditStage.EDIT_SPENT,
                 onCommentUpdate = { editedComment = it },
                 currentNote = editedNote,
-                onNoteClick = { showNoteSheet = true },
+                onNoteUpdate = { editedNote = it },
                 extraNoteEnabled = isExtraNoteEnabled,
                 editorFocusController = focusController,
                 onEditingChanged = { isCategoryEditorFocused = it },
@@ -475,14 +473,6 @@ fun TransactionEditScreen(
                 isCredit = true
                 showCreditCutoffDialog = false
             }
-        )
-    }
-
-    if (showNoteSheet) {
-        ExtraNoteSheet(
-            initialNote = editedNote,
-            onDismiss = { showNoteSheet = false },
-            onSave = { editedNote = it },
         )
     }
 }

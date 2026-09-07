@@ -4,8 +4,10 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutQuad
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.horizontalScroll
@@ -58,7 +60,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupPositionProvider
-import com.serranoie.app.minus.presentation.ui.editor.note.ExtraNoteChip
+import com.serranoie.app.minus.presentation.ui.editor.note.EditableNoteTag
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 
@@ -84,7 +86,7 @@ fun CategoryToolbar(
     onCommentUpdate: (String) -> Unit,
     editorFocusController: FocusController,
     currentNote: String = "",
-    onNoteClick: () -> Unit = {},
+    onNoteUpdate: (String) -> Unit = {},
     extraNoteEnabled: Boolean = false,
     onDeleteTag: (String) -> Unit = {},
     directCategoryPopupEnabled: Boolean = false,
@@ -102,7 +104,9 @@ fun CategoryToolbar(
     val scrollState = rememberScrollState()
 
     var showAddComment by remember { mutableStateOf(stage == EditStage.EDIT_SPENT) }
-    var isEdit by remember { mutableStateOf(false) }
+    var isCategoryEdit by remember { mutableStateOf(false) }
+    var isNoteEdit by remember { mutableStateOf(false) }
+    val isEdit = isCategoryEdit || isNoteEdit
 
     LaunchedEffect(stage, isEdit) {
         showAddComment = stage == EditStage.EDIT_SPENT || isEdit
@@ -128,7 +132,7 @@ fun CategoryToolbar(
         ) {
             tags.take(5).reversed().filter { it != currentComment }.forEach { tag ->
                 AnimatedVisibility(
-                    visible = showAddComment,
+                    visible = showAddComment && !isNoteEdit,
                     enter = fadeIn(
                         tween(
                             durationMillis = 150,
@@ -152,78 +156,52 @@ fun CategoryToolbar(
                         )
                     ) { with(localDensity) { 24.dp.toPx().toInt() } },
                 ) {
-                    CategoryTag(value = tag, onClick = {
-                        onCommentUpdate(tag)
-                    }, onDelete = {
-                        onDeleteTag(tag)
-                    })
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CategoryTag(value = tag, onClick = {
+                            onCommentUpdate(tag)
+                        }, onDelete = {
+                            onDeleteTag(tag)
+                        })
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-
-            if (tags.isNotEmpty()) {
-                Spacer(modifier = Modifier.width(8.dp))
             }
 
             AnimatedVisibility(
-                visible = showAddComment && extraNoteEnabled,
-                enter = fadeIn(
-                    tween(
-                        durationMillis = 150,
-                        easing = EaseInOutQuad,
-                    )
-                ) + slideInHorizontally(
-                    tween(
-                        durationMillis = 150,
-                        easing = EaseInOutQuad,
-                    )
-                ) { with(localDensity) { 30.dp.toPx().toInt() } },
-                exit = fadeOut(
-                    tween(
-                        durationMillis = 150,
-                        easing = EaseInOutQuad,
-                    )
-                ) + slideOutHorizontally(
-                    tween(
-                        durationMillis = 150,
-                        easing = EaseInOutQuad,
-                    )
-                ) { with(localDensity) { 30.dp.toPx().toInt() } },
+                visible = showAddComment && extraNoteEnabled && !isCategoryEdit,
+                enter = fadeIn(tween(durationMillis = 220, easing = EaseInOutQuad)) +
+                    expandHorizontally(tween(durationMillis = 220, easing = EaseInOutQuad)),
+                exit = fadeOut(tween(durationMillis = 220, easing = EaseInOutQuad)) +
+                    shrinkHorizontally(tween(durationMillis = 220, easing = EaseInOutQuad)),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    ExtraNoteChip(
-                        note = currentNote,
-                        onClick = onNoteClick,
+                    EditableNoteTag(
+                        currentNote = currentNote,
+                        onNoteUpdate = onNoteUpdate,
+                        editorFocusController = editorFocusController,
+                        extendWidth = toolbarWidth,
                         onlyIcon = false,
+                        onEdit = { editing ->
+                            isNoteEdit = editing
+                            onEditingChanged(editing || isCategoryEdit)
+                        },
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    AnimatedVisibility(
+                        visible = !isNoteEdit,
+                        enter = expandHorizontally(tween(durationMillis = 220, easing = EaseInOutQuad)),
+                        exit = shrinkHorizontally(tween(durationMillis = 220, easing = EaseInOutQuad)),
+                    ) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
                 }
             }
 
             AnimatedVisibility(
-                visible = showAddComment,
-                enter = fadeIn(
-                    tween(
-                        durationMillis = 150,
-                        easing = EaseInOutQuad,
-                    )
-                ) + slideInHorizontally(
-                    tween(
-                        durationMillis = 150,
-                        easing = EaseInOutQuad,
-                    )
-                ) { with(localDensity) { 30.dp.toPx().toInt() } },
-                exit = fadeOut(
-                    tween(
-                        durationMillis = 150,
-                        easing = EaseInOutQuad,
-                    )
-                ) + slideOutHorizontally(
-                    tween(
-                        durationMillis = 150,
-                        easing = EaseInOutQuad,
-                    )
-                ) { with(localDensity) { 30.dp.toPx().toInt() } },
+                visible = showAddComment && !isNoteEdit,
+                enter = fadeIn(tween(durationMillis = 220, easing = EaseInOutQuad)) +
+                    expandHorizontally(tween(durationMillis = 220, easing = EaseInOutQuad)),
+                exit = fadeOut(tween(durationMillis = 220, easing = EaseInOutQuad)) +
+                    shrinkHorizontally(tween(durationMillis = 220, easing = EaseInOutQuad)),
             ) {
                 EditableCategoryTag(
                     currentComment = currentComment,
@@ -233,8 +211,8 @@ fun CategoryToolbar(
                     extendWidth = toolbarWidth,
                     onlyIcon = false,
                     onEdit = { editing ->
-                        isEdit = editing
-                        onEditingChanged(editing)
+                        isCategoryEdit = editing
+                        onEditingChanged(editing || isNoteEdit)
                     },
                     onDeleteTag = onDeleteTag,
                     directCategoryPopupEnabled = directCategoryPopupEnabled,
@@ -263,7 +241,6 @@ internal data class DropdownMenuPositionProvider(
         popupContentSize: IntSize
     ): IntOffset {
         val topBarHeightPx = with(density) { topBarHeight.roundToPx() }
-        // The content offset specified using the dropdown offset parameter.
         val contentOffsetX = with(density) { contentOffset.x.roundToPx() }
         val contentOffsetY = with(density) { contentOffset.y.roundToPx() }
 
