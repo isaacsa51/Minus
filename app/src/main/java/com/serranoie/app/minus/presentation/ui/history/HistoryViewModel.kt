@@ -47,7 +47,7 @@ class HistoryViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
-    private val _expandedDates = MutableStateFlow(emptySet<LocalDate>())
+    private val _expandedDates = MutableStateFlow<Set<LocalDate>?>(null)
     private val _editingTransaction = MutableStateFlow<Transaction?>(null)
     private val _recurrentToDelete = MutableStateFlow<Transaction?>(null)
     private val _recurrentToEdit = MutableStateFlow<Transaction?>(null)
@@ -80,7 +80,7 @@ class HistoryViewModel @Inject constructor(
         )
     ) { array ->
         UIInputs(
-            expandedDates = array[0] as Set<LocalDate>,
+            expandedDates = array[0] as Set<LocalDate>?,
             editingTransaction = array[1] as Transaction?,
             recurrentToDelete = array[2] as Transaction?,
             recurrentToEdit = array[3] as Transaction?,
@@ -243,12 +243,8 @@ class HistoryViewModel @Inject constructor(
 
     private fun toggleExpandedDate(date: LocalDate) {
         _expandedDates.update { expanded ->
-            val currentExpanded = if (expanded.isEmpty()) {
-                uiState.value.expandedDates
-            } else {
-                expanded
-            }
-            if (currentExpanded.contains(date)) currentExpanded - date else currentExpanded + date
+            val base = expanded ?: uiState.value.expandedDates
+            if (base.contains(date)) base - date else base + date
         }
     }
 
@@ -316,12 +312,8 @@ class HistoryViewModel @Inject constructor(
         val remainingBudget = budgetState?.remainingToday ?: BigDecimal.ZERO
         val debtAdjustedBalance = remainingBudget.subtract(creditOwed)
 
-        // Auto-expand first date group on initial load
-        val autoExpanded = if (inputs.expandedDates.isEmpty()) {
-            groupedCurrent.keys.filterNotNull().sortedDescending().take(1).toSet()
-        } else {
-            inputs.expandedDates
-        }
+        val autoExpanded = inputs.expandedDates
+            ?: groupedCurrent.keys.filterNotNull().sortedDescending().take(1).toSet()
 
         return HistoryUiState(
             budgetSettings = budgetSettings,
@@ -357,7 +349,7 @@ class HistoryViewModel @Inject constructor(
     }
 
     private data class UIInputs(
-        val expandedDates: Set<LocalDate>,
+        val expandedDates: Set<LocalDate>?,
         val editingTransaction: Transaction?,
         val recurrentToDelete: Transaction?,
         val recurrentToEdit: Transaction?,

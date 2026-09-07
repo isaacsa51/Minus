@@ -280,6 +280,16 @@
     <string name="settings_category_picker_direct_popup_description">カテゴリフィールドをタップするとすぐに、保存されているすべてのカテゴリの候補ポップアップを開きます。 オフの場合、入力を開始した後にのみ候補が表示されます。</string>
     <string name="settings_category_grid_mode_switch_label">リストとして表示 (実験的)</string>
     <string name="settings_category_grid_mode_description">カテゴリ タグをタップすると、インライン編集モードではなく、保存したカテゴリのグリッドが開きます。 また、これがオンの間、numpadの計算モードをオフにします。</string>
+    <string name="settings_feature_extra_note_title">取引ごとの追加メモ</string>
+    <string name="settings_feature_extra_note_subtitle">タップして詳細を表示</string>
+    <string name="settings_feature_extra_note_description">取引を追加または編集するときに、カテゴリの横に任意の「追加メモ」欄を表示します。カテゴリだけでは分からない詳細を記録するのに使えます。たとえば「通勤」のお金が具体的に何に使われたかなどです。</string>
+    <string name="settings_feature_extra_note_switch_label">追加メモを有効にする</string>
+    <string name="settings_feature_lab_title">追加機能</string>
+    <string name="settings_feature_lab_subtitle">オンにできる任意の実験的な機能</string>
+    <string name="settings_feature_lab_header">ここにある機能はすべて任意で、初期状態ではオフです。一部は実験的な機能で、今後のアップデートで変更されることがあります。必要なものだけをオンにし、各機能をタップすると変更内容を詳しく確認できます。</string>
+    <string name="settings_feature_category_direct_popup_title">タップでカテゴリ候補を表示</string>
+    <string name="settings_feature_category_grid_title">カテゴリ一覧モード</string>
+    <string name="settings_feature_show_past_transactions_switch_label">過去の期間を読み込む</string>
     <string name="settings_feature_show_past_transactions_title">過去の取引を表示</string>
     <string name="settings_feature_show_past_transactions_subtitle">過去の期間の取引を読み込む</string>
     <string name="settings_recurrent_payments_view_mode_title">反復支払い表示モード</string>
@@ -591,6 +601,8 @@
     <string name="rollover_preview_split_equally">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算期間の各日に割り当てられます。</string>
     <string name="rollover_preview_add_to_first_day">%1$s が未使用のまま残っています。この期間が終了すると、その金額は次回の予算の初日に繰り越されます。</string>
     <string name="delete_category">カテゴリを削除</string>
+    <string name="add_extra_note">追加メモ</string>
+    <string name="extra_note_label">メモ</string>
     <string name="budget_graph_view_mode_cumulative">トレンド</string>
     <string name="budget_graph_view_mode_categories">カテゴリ</string>
     <string name="settings_widgets_pin_not_supported">お使いのデバイスはこの方法でのウィジェット追加に対応していません。ホーム画面を長押ししてMinusを探してください。</string>

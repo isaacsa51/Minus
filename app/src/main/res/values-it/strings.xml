@@ -282,6 +282,16 @@
     <string name="settings_category_picker_direct_popup_description">Aprire il popup dei suggerimenti con tutte le categorie salvate non appena si tocca il campo categoria. Quando è spento, i suggerimenti appaiono solo dopo aver iniziato a digitare.</string>
     <string name="settings_category_grid_mode_switch_label">Mostra come elenco (sperimentale)</string>
     <string name="settings_category_grid_mode_description">Toccare il tag categoria per aprire una griglia delle categorie salvate, invece di entrare in modalità di modifica in linea. Disattiva anche la modalità di calcolo del numpad mentre è acceso.</string>
+    <string name="settings_feature_extra_note_title">Nota aggiuntiva per transazione</string>
+    <string name="settings_feature_extra_note_subtitle">Tocca per vedere maggiori dettagli</string>
+    <string name="settings_feature_extra_note_description">Aggiunge un campo facoltativo "Nota aggiuntiva" accanto alla categoria quando aggiungi o modifichi una transazione. Usalo per ricordare un dettaglio che la categoria da sola non cattura, ad esempio per cosa sono stati spesi esattamente i soldi in "Spostamenti".</string>
+    <string name="settings_feature_extra_note_switch_label">Abilita nota aggiuntiva</string>
+    <string name="settings_feature_lab_title">Funzioni aggiuntive</string>
+    <string name="settings_feature_lab_subtitle">Funzioni facoltative e sperimentali che puoi attivare</string>
+    <string name="settings_feature_lab_header">Ogni funzione qui è facoltativa e disattivata per impostazione predefinita; alcune sono sperimentali e potrebbero cambiare in un aggiornamento futuro. Attiva solo ciò che ti serve e tocca una funzione per vedere esattamente cosa cambia.</string>
+    <string name="settings_feature_category_direct_popup_title">Suggerimenti di categoria al tocco</string>
+    <string name="settings_feature_category_grid_title">Modalità elenco categorie</string>
+    <string name="settings_feature_show_past_transactions_switch_label">Carica periodi passati</string>
     <string name="settings_feature_show_past_transactions_title">Mostra transazioni passate</string>
     <string name="settings_feature_show_past_transactions_subtitle">Carica le transazioni dei periodi passati</string>
     <string name="settings_recurrent_payments_view_mode_title">Modalità visualizzazione pagamenti ricorrenti</string>
@@ -592,6 +602,8 @@
     <string name="no_name_income">Entrata senza nome</string>
     <string name="expand_numpad">Espandi tastierino numerico</string>
     <string name="delete_category">Elimina categoria</string>
+    <string name="add_extra_note">Nota aggiuntiva</string>
+    <string name="extra_note_label">Nota</string>
     <string name="budget_graph_view_mode_cumulative">Andamento</string>
     <string name="budget_graph_view_mode_categories">Categorie</string>
     <string name="settings_widgets_pin_not_supported">Il tuo dispositivo non supporta l\'aggiunta di widget in questo modo. Tieni premuto sulla schermata home e cerca Minus.</string>
