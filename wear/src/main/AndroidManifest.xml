@@ -49,21 +49,10 @@
             android:enabled="true"
             android:exported="true"
             android:permission="com.google.android.gms.permission.BIND_LISTENER">
-            <!--
-                Filtered MESSAGE_RECEIVED registration (not the legacy catch-all
-                BIND_LISTENER action). Covers /expense/* (ack, snapshot response)
-                and /budget/* (state response) from the phone.
-            -->
             <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-                <data
-                    android:scheme="wear"
-                    android:host="*"
-                    android:pathPrefix="/expense" />
-                <data
-                    android:scheme="wear"
-                    android:host="*"
-                    android:pathPrefix="/budget" />
+                <action
+                    android:name="com.google.android.gms.wearable.BIND_LISTENER"
+                    tools:ignore="WearableBindListener" />
             </intent-filter>
         </service>
     </application>

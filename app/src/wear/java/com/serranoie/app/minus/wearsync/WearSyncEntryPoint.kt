@@ -10,4 +10,5 @@ import dagger.hilt.components.SingletonComponent
 interface WearSyncEntryPoint {
     fun budgetRepository(): BudgetRepository
     fun wearExpenseIngestor(): WearExpenseIngestor
+    fun wearBudgetStateProvider(): WearBudgetStateProvider
 }

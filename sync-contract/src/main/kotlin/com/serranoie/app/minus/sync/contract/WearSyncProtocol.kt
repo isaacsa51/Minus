@@ -8,6 +8,8 @@ object WearPaths {
     const val EXPENSE_ACK = "/expense/ack"
     const val EXPENSE_SNAPSHOT = "/expense/snapshot"
     const val EXPENSE_SNAPSHOT_RESPONSE = "/expense/snapshot/response"
+    const val BUDGET_STATE_REQUEST = "/budget/state/request"
+    const val BUDGET_STATE_RESPONSE = "/budget/state/response"
 }
 
 object WearJson {
@@ -55,4 +57,31 @@ data class SnapshotExpenseItem(
 @Serializable
 data class SnapshotResponsePayload(
     val items: List<SnapshotExpenseItem>
+)
+
+@Serializable
+data class BudgetStateRequestPayload(
+    val since: Long = 0L
+)
+
+@Serializable
+data class BudgetStatePayload(
+    val hasBudget: Boolean,
+    val currencyCode: String = "USD",
+    val currencySymbol: String = "$",
+    val symbolAtEnd: Boolean = false,
+    val period: String = "MONTHLY",
+    val periodStartEpochDay: Long = 0L,
+    val periodEndEpochDay: Long = 0L,
+    val daysRemaining: Int = 0,
+    val periodTotalDays: Int = 0,
+    val totalBudget: String = "0",
+    val spentInPeriod: String = "0",
+    val remainingInPeriod: String = "0",
+    val spentToday: String = "0",
+    val remainingToday: String = "0",
+    val dailyBudget: String = "0",
+    val progress: Float = 0f,
+    val isOverBudget: Boolean = false,
+    val generatedAtMillis: Long = 0L
 )

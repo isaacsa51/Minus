@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">Minus Wear</string>
+
+    <!-- Period overview screen -->
+    <string name="overview_syncing">Syncing with phone…</string>
+    <string name="overview_no_budget">No budget set on the phone yet</string>
+    <string name="overview_add_expense">Add expense</string>
+
+    <string name="overview_left_today">left today</string>
+    <string name="overview_over_budget">over budget</string>
+
+    <string name="overview_budget_title_daily">Daily budget</string>
+    <string name="overview_budget_title_weekly">Weekly budget</string>
+    <string name="overview_budget_title_biweekly">Biweekly budget</string>
+    <string name="overview_budget_title_monthly">Monthly budget</string>
+    <string name="overview_budget_title_generic">Budget</string>
+
+    <string name="overview_ends_today">ends today</string>
+    <plurals name="overview_days_left">
+        <item quantity="one">%d day left</item>
+        <item quantity="other">%d days left</item>
+    </plurals>
+
+    <!-- Expense entry (numpad + category) -->
+    <string name="numpad_clear_amount">Clear amount</string>
+    <string name="category_save">Save</string>
+    <string name="category_none_yet">No categories yet</string>
+    <string name="category_input_hint">Type category</string>
 </resources>

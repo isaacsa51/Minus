@@ -18,7 +18,11 @@ class WearSyncRepository(
 
         if (retryable.isEmpty()) {
             val snapshotRequested = syncManager.requestSnapshot()
-            logcat { "syncPendingExpenses: no retryable expenses, snapshotRequested=$snapshotRequested" }
+            val budgetStateRequested = syncManager.requestBudgetState()
+            logcat {
+                "syncPendingExpenses: no retryable expenses, snapshotRequested=$snapshotRequested, " +
+                    "budgetStateRequested=$budgetStateRequested"
+            }
             return true
         }
 
@@ -36,7 +40,11 @@ class WearSyncRepository(
         }
 
         val snapshotRequested = syncManager.requestSnapshot()
-        logcat { "syncPendingExpenses: snapshotRequested=$snapshotRequested, anyFailure=$anyFailure" }
+        val budgetStateRequested = syncManager.requestBudgetState()
+        logcat {
+            "syncPendingExpenses: snapshotRequested=$snapshotRequested, " +
+                "budgetStateRequested=$budgetStateRequested, anyFailure=$anyFailure"
+        }
         return !anyFailure
     }
 }

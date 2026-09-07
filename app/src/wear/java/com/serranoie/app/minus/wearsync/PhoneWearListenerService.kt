@@ -1,11 +1,11 @@
 package com.serranoie.app.minus.wearsync
 
 import com.google.android.gms.wearable.MessageEvent
-import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import logcat.logcat
 import com.serranoie.app.minus.sync.contract.AckPayload
 import com.serranoie.app.minus.sync.contract.AckStatus
+import com.serranoie.app.minus.sync.contract.BudgetStatePayload
 import com.serranoie.app.minus.sync.contract.ExpensePayload
 import com.serranoie.app.minus.sync.contract.SnapshotExpenseItem
 import com.serranoie.app.minus.sync.contract.SnapshotRequestPayload
@@ -17,13 +17,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.encodeToString
 import java.time.ZoneOffset
 
 class PhoneWearListenerService : WearableListenerService() {
 
     companion object {
+        private const val BUDGET_STATE_TIMEOUT_MS = 5_000L
     }
 
     override fun onCreate() {
@@ -43,6 +44,7 @@ class PhoneWearListenerService : WearableListenerService() {
         when (messageEvent.path) {
             WearPaths.EXPENSE_ADD -> handleExpenseAdd(messageEvent)
             WearPaths.EXPENSE_SNAPSHOT -> handleSnapshotRequest(messageEvent)
+            WearPaths.BUDGET_STATE_REQUEST -> handleBudgetStateRequest(messageEvent)
             else -> {
                 logcat { "onMessageReceived: unhandled path=${messageEvent.path}" }
                 super.onMessageReceived(messageEvent)
@@ -81,6 +83,31 @@ class PhoneWearListenerService : WearableListenerService() {
         }
     }
 
+    private fun handleBudgetStateRequest(messageEvent: MessageEvent) {
+        val node = messageEvent.sourceNodeId
+        scope.launch {
+            logcat { "handleBudgetStateRequest: building state for node=$node" }
+            val provider = EntryPointAccessors.fromApplication(
+                applicationContext,
+                WearSyncEntryPoint::class.java
+            ).wearBudgetStateProvider()
+
+            val built = runCatching {
+                withTimeoutOrNull(BUDGET_STATE_TIMEOUT_MS) { provider.currentState() }
+            }.onFailure {
+                logcat { "handleBudgetStateRequest: provider threw: ${it.message}" }
+            }.getOrNull()
+            if (built == null) {
+                logcat { "handleBudgetStateRequest: state build failed/timed out, sending empty" }
+            }
+            val payload = built ?: BudgetStatePayload(hasBudget = false)
+
+            val bytes = WearJson.json.encodeToString(payload).encodeToByteArray()
+            val ok = sendToWatch(applicationContext, node, WearPaths.BUDGET_STATE_RESPONSE, bytes)
+            logcat { "handleBudgetStateRequest: response sent (hasBudget=${payload.hasBudget}, ok=$ok)" }
+        }
+    }
+
     private fun handleSnapshotRequest(messageEvent: MessageEvent) {
         val request = runCatching {
             WearJson.json.decodeFromString<SnapshotRequestPayload>(messageEvent.data.decodeToString())
@@ -106,20 +133,12 @@ class PhoneWearListenerService : WearableListenerService() {
                 .encodeToString(response)
                 .encodeToByteArray()
 
-            runCatching {
-                Wearable.getMessageClient(applicationContext)
-                    .sendMessage(messageEvent.sourceNodeId, WearPaths.EXPENSE_SNAPSHOT_RESPONSE, bytes)
-                    .await()
-            }
+            sendToWatch(applicationContext, messageEvent.sourceNodeId, WearPaths.EXPENSE_SNAPSHOT_RESPONSE, bytes)
         }
     }
 
     private suspend fun sendAck(nodeId: String, ackPayload: AckPayload) {
         val bytes = WearJson.json.encodeToString(ackPayload).encodeToByteArray()
-        runCatching {
-            Wearable.getMessageClient(applicationContext)
-                .sendMessage(nodeId, WearPaths.EXPENSE_ACK, bytes)
-                .await()
-        }
+        sendToWatch(applicationContext, nodeId, WearPaths.EXPENSE_ACK, bytes)
     }
 }
