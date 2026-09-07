@@ -1,0 +1,7 @@
+- feat: new feature settings screen
+- feat: can add extra transaction nots
+- feat: add period overview screen and budget state sync for Wear OS
+- fix: update wear message listener intent filter and resolve active period for ingested expenses
+- fix: add API compatibility guards for font width variations and version code
+- feat: format correctly editor on edit screen
+- feat: support income editing, shared element transitions on edit screen
