@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -25,6 +26,7 @@ import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import com.serranoie.app.wear.minus.R
 import com.serranoie.app.wear.minus.presentation.theme.MinusTheme
 import com.serranoie.app.wear.minus.presentation.theme.component.CustomPaddedListItem
 import com.serranoie.app.wear.minus.presentation.theme.component.PaddedListGroup
@@ -45,7 +47,7 @@ internal fun CategoryDecEntryScreen(
 		ScreenScaffold(
 			scrollState = listState, timeText = null, edgeButton = {
 				EdgeButton(onClick = onSave) {
-					Text("Save")
+					Text(stringResource(R.string.category_save))
 				}
 			}) {
 			TransformingLazyColumn(
@@ -83,7 +85,7 @@ internal fun CategoryDecEntryScreen(
 							}
 						}
 					} else {
-						Text(text = "No categories yet", fontSize = 10.sp)
+						Text(text = stringResource(R.string.category_none_yet), fontSize = 10.sp)
 					}
 				}
 			}
@@ -112,7 +114,7 @@ private fun ManualCategoryInput(
 		decorationBox = { innerTextField ->
 			if (value.isBlank()) {
 				Text(
-					text = "Type category",
+					text = stringResource(R.string.category_input_hint),
 					style = MaterialTheme.typography.labelSmall,
 					color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
 				)

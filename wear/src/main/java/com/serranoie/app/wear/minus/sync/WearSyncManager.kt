@@ -6,6 +6,7 @@ import logcat.asLog
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Wearable
 import com.serranoie.app.wear.minus.data.PendingExpense
+import com.serranoie.app.minus.sync.contract.BudgetStateRequestPayload
 import com.serranoie.app.minus.sync.contract.ExpensePayload
 import com.serranoie.app.minus.sync.contract.SnapshotRequestPayload
 import com.serranoie.app.minus.sync.contract.WearJson
@@ -69,6 +70,29 @@ class WearSyncManager(private val context: Context) {
                 logcat { "requestSnapshot: sent to node=${node.id}" }
             }.onFailure { e ->
                 logcat { "requestSnapshot: failed for node=${node.id}\n${e.asLog()}" }
+            }
+        }
+        return sentAny
+    }
+
+    suspend fun requestBudgetState(): Boolean {
+        val bytes = WearJson.json.encodeToString(BudgetStateRequestPayload()).encodeToByteArray()
+        val nodes = getPhoneReceiverNodes()
+        logcat { "requestBudgetState: receiverNodes=${nodes.size}" }
+        if (nodes.isEmpty()) {
+            logcat { "requestBudgetState: no receiver nodes for capability minus_phone_receiver" }
+            return false
+        }
+
+        var sentAny = false
+        for (node in nodes) {
+            runCatching {
+                messageClient.sendMessage(node.id, WearPaths.BUDGET_STATE_REQUEST, bytes).await()
+            }.onSuccess {
+                sentAny = true
+                logcat { "requestBudgetState: sent to node=${node.id}" }
+            }.onFailure { e ->
+                logcat { "requestBudgetState: failed for node=${node.id}\n${e.asLog()}" }
             }
         }
         return sentAny

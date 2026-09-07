@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import logcat.logcat
+import com.serranoie.app.minus.sync.contract.WearJson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
-import com.serranoie.app.minus.sync.contract.WearJson
+import logcat.logcat
 
 private val Context.pendingExpenseDataStore by preferencesDataStore(name = "wear_pending_expenses")
 
@@ -19,6 +19,8 @@ class PendingExpenseStore(private val context: Context) {
 
     companion object {
         private const val ACK_TIMEOUT_MS = 20_000L
+
+        private const val MAX_SEND_RETRIES = 50
     }
 
     val allExpenses: Flow<List<PendingExpense>> = context.pendingExpenseDataStore.data.map { prefs ->
@@ -42,9 +44,12 @@ class PendingExpenseStore(private val context: Context) {
         }
     }
 
-    suspend fun markSynced(clientGeneratedId: String) {
-        mutate(clientGeneratedId) {
-            it.copy(syncState = SyncState.SYNCED, lastAttemptAt = System.currentTimeMillis())
+    suspend fun remove(clientGeneratedId: String) {
+        val current = getAllOnce()
+        val next = current.filterNot { it.clientGeneratedId == clientGeneratedId }
+        if (next.size != current.size) {
+            writeAll(next)
+            logcat { "remove: id=$clientGeneratedId, remaining=${next.size}" }
         }
     }
 
@@ -61,6 +66,7 @@ class PendingExpenseStore(private val context: Context) {
     suspend fun getRetryable(limit: Int = 30): List<PendingExpense> {
         val now = System.currentTimeMillis()
         val list = getAllOnce()
+            .filter { it.retryCount < MAX_SEND_RETRIES }
             .filter {
                 it.syncState == SyncState.PENDING ||
                     it.syncState == SyncState.FAILED_RETRYABLE ||

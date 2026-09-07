@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +29,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TextButton
 import androidx.wear.compose.material3.TextButtonDefaults
+import com.serranoie.app.wear.minus.R
 import com.serranoie.app.wear.minus.presentation.theme.MinusTheme
 import java.math.BigDecimal
 import java.text.NumberFormat
@@ -163,7 +165,7 @@ private fun DeleteKey(
 	FilledIconButton(
 		onClick = onClick,
 		onLongClick = onLongClick,
-		onLongClickLabel = "Clear amount",
+		onLongClickLabel = stringResource(R.string.numpad_clear_amount),
 		colors = IconButtonDefaults.filledIconButtonColors(
 			containerColor = MaterialTheme.colorScheme.tertiaryContainer,
 			contentColor = MaterialTheme.colorScheme.tertiary
