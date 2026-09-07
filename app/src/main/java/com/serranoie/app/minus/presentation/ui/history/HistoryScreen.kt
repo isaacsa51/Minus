@@ -196,6 +196,7 @@ fun History(
                         currencyCode = currencyCode,
                         tags = uiState.tags,
                         isCreditQuickToggleEnabled = uiState.isCreditQuickToggleEnabled,
+                        isExtraNoteEnabled = uiState.isExtraNoteEnabled,
                         creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
                         onUpdateCreditCutoffDay = { day -> onProcessIntent(HistoryUiIntent.UpdateCreditCutoffDay(day)) },
                         sharedTransitionScope = sharedTransitionScope,
@@ -207,11 +208,12 @@ fun History(
                                 onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null))
                             }
                         },
-                        onSave = { newAmount, newComment, newDateTime, newIsRecurrent, newFrequency, newEndDate, newSubscriptionDay, newIsCredit ->
+                        onSave = { newAmount, newComment, newNote, newDateTime, newIsRecurrent, newFrequency, newEndDate, newSubscriptionDay, newIsCredit ->
                             val updatedTransaction = targetEditingTransaction.copy(
                                 id = targetEditingTransaction.sourceTransactionId ?: targetEditingTransaction.id,
                                 amount = newAmount,
                                 comment = newComment,
+                                note = newNote,
                                 date = newDateTime,
                                 isRecurrent = newIsRecurrent,
                                 recurrentFrequency = newFrequency,
@@ -263,6 +265,7 @@ fun History(
             currencyCode = currencyCode,
             tags = uiState.tags,
             isCreditQuickToggleEnabled = uiState.isCreditQuickToggleEnabled,
+            isExtraNoteEnabled = uiState.isExtraNoteEnabled,
             creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
             onUpdateCreditCutoffDay = { day -> onProcessIntent(HistoryUiIntent.UpdateCreditCutoffDay(day)) },
             onCancel = { onProcessIntent(HistoryUiIntent.SetEditingTransaction(null)) },
@@ -284,6 +287,7 @@ fun History(
             budgetEndDate = uiState.budgetSettings?.getPeriodEndDate() ?: LocalDate.now(),
             currencyCode = currencyCode,
             tags = uiState.tags,
+            isExtraNoteEnabled = uiState.isExtraNoteEnabled,
             onCancel = { onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null)) },
             onSave = { expense ->
                 onProcessIntent(HistoryUiIntent.SaveEditedTransaction(expense))

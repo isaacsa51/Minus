@@ -140,6 +140,7 @@ fun MainScreenContent(
     val showCreditQuickToggleFeature = mainScreenState.showCreditQuickToggleFeature
     val directCategoryPopupEnabled = mainScreenState.directCategoryPopupEnabled
     val categoryGridModeEnabled = mainScreenState.categoryGridModeEnabled
+    val extraNoteEnabled = mainScreenState.extraNoteEnabled
     val showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet
     val forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup
     val selectedViewPeriod = mainScreenState.selectedViewPeriod
@@ -292,11 +293,13 @@ fun MainScreenContent(
                         showCreditQuickToggleFeature,
                         directCategoryPopupEnabled,
                         categoryGridModeEnabled,
+                        extraNoteEnabled,
                     ) {
                         MainScreenFeatureFlags(
                             showCreditQuickToggleFeature = showCreditQuickToggleFeature,
                             directCategoryPopupEnabled = directCategoryPopupEnabled,
                             categoryGridModeEnabled = categoryGridModeEnabled,
+                            extraNoteEnabled = extraNoteEnabled,
                         )
                     }
 
@@ -356,11 +359,13 @@ fun MainScreenContent(
                         showCreditQuickToggleFeature,
                         directCategoryPopupEnabled,
                         categoryGridModeEnabled,
+                        extraNoteEnabled,
                     ) {
                         MainScreenFeatureFlags(
                             showCreditQuickToggleFeature = showCreditQuickToggleFeature,
                             directCategoryPopupEnabled = directCategoryPopupEnabled,
                             categoryGridModeEnabled = categoryGridModeEnabled,
+                            extraNoteEnabled = extraNoteEnabled,
                         )
                     }
 
@@ -1384,6 +1389,13 @@ private fun MainScreenEditorSection(
                 ),
             )
         },
+        onNoteUpdate = { note ->
+            actions.onProcessIntent(
+                MainScreenUiIntent.ProcessBudgetEditorIntent(
+                    BudgetEditorIntent.NoteUpdated(note),
+                ),
+            )
+        },
         onDeleteTag = { tag ->
             actions.onProcessIntent(
                 MainScreenUiIntent.ProcessBudgetEditorIntent(
@@ -1406,6 +1418,7 @@ private fun MainScreenEditorSection(
             )
         },
         showCreditQuickToggleFeature = featureFlags.showCreditQuickToggleFeature,
+        extraNoteEnabled = featureFlags.extraNoteEnabled,
         directCategoryPopupEnabled = featureFlags.directCategoryPopupEnabled,
         categoryGridModeEnabled = featureFlags.categoryGridModeEnabled,
         isCategoryGridVisible = showCategoryGrid,

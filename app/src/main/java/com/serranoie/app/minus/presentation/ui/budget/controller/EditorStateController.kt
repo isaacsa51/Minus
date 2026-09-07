@@ -17,6 +17,7 @@ class EditorStateController {
         data class EditModeChanged(val mode: EditMode) : EditorChange
         data class AnimStateChanged(val state: AnimState) : EditorChange
         data class CommentChanged(val comment: String) : EditorChange
+        data class NoteChanged(val note: String) : EditorChange
         data class LockSwipeableChanged(val locked: Boolean) : EditorChange
         data class LockDraggableChanged(val locked: Boolean) : EditorChange
         data class RecurrentEnabledChanged(val enabled: Boolean) : EditorChange
@@ -35,6 +36,7 @@ class EditorStateController {
         is EditorIntent.SetEditMode -> setEditMode(intent.mode)
         is EditorIntent.SetAnimState -> setAnimState(intent.state)
         is EditorIntent.CommentUpdated -> setComment(intent.comment)
+        is EditorIntent.NoteUpdated -> setNote(intent.note)
         is EditorIntent.SetLockSwipeable -> setLockSwipeable(intent.locked)
         is EditorIntent.SetLockDraggable -> setLockDraggable(intent.locked)
         is EditorIntent.SetRecurrentEnabled -> setRecurrentEnabled(intent.enabled)
@@ -57,6 +59,11 @@ class EditorStateController {
     private fun setComment(comment: String): List<EditorChange> {
         _state.value = _state.value.copy(currentComment = comment)
         return listOf(EditorChange.CommentChanged(comment))
+    }
+
+    private fun setNote(note: String): List<EditorChange> {
+        _state.value = _state.value.copy(currentNote = note)
+        return listOf(EditorChange.NoteChanged(note))
     }
 
     private fun setLockSwipeable(locked: Boolean): List<EditorChange> {
@@ -187,6 +194,7 @@ data class EditorLocalState(
     val editMode: EditMode = EditMode.ADD,
     val animState: AnimState = AnimState.IDLE,
     val currentComment: String = "",
+    val currentNote: String = "",
     val lockSwipeable: Boolean = false,
     val lockDraggable: Boolean = false,
     val isRecurrentEnabled: Boolean = false,
@@ -202,6 +210,7 @@ sealed interface EditorIntent {
     data class SetEditMode(val mode: EditMode) : EditorIntent
     data class SetAnimState(val state: AnimState) : EditorIntent
     data class CommentUpdated(val comment: String) : EditorIntent
+    data class NoteUpdated(val note: String) : EditorIntent
     data class SetLockSwipeable(val locked: Boolean) : EditorIntent
     data class SetLockDraggable(val locked: Boolean) : EditorIntent
     data class SetRecurrentEnabled(val enabled: Boolean) : EditorIntent

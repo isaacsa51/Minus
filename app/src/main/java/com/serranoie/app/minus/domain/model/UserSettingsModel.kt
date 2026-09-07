@@ -23,6 +23,7 @@ data class UserSettings(
     val isCreditQuickToggleEnabled: Boolean = false,
     val categoryPickerDirectPopupEnabled: Boolean = false,
     val categoryGridModeEnabled: Boolean = false,
+    val extraNoteEnabled: Boolean = false,
     val tutorialBoxCompleted: Boolean = false,
     val firstLaunchTutorialStage: FirstLaunchTutorialStage = FirstLaunchTutorialStage.COMPLETED,
     val analyticsTutorialCompleted: Boolean = false,

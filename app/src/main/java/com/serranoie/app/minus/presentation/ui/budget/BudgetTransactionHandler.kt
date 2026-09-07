@@ -51,6 +51,7 @@ class BudgetTransactionHandler @Inject constructor(
         isRecurrentEnabled: Boolean,
         isCreditEnabled: Boolean,
         comment: String,
+        note: String = "",
         budgetSettings: BudgetSettings?,
         resolveActivePeriodId: suspend () -> Long,
     ): ApplyTransactionResult {
@@ -99,6 +100,7 @@ class BudgetTransactionHandler @Inject constructor(
                 val pendingTransaction = Transaction.create(
                     amount = amount,
                     comment = comment,
+                    note = note.trim(),
                     date = LocalDateTime.now(),
                     periodId = 0L,
                     categoryId = categoryId,
@@ -113,6 +115,7 @@ class BudgetTransactionHandler @Inject constructor(
             val transaction = Transaction.create(
                 amount = amount,
                 comment = comment,
+                note = note.trim(),
                 date = LocalDateTime.now(),
                 periodId = activePeriodId,
                 categoryId = categoryId,

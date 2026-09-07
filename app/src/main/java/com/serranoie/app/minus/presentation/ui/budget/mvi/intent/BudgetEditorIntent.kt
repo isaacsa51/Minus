@@ -13,6 +13,7 @@ sealed interface BudgetEditorIntent : BudgetUiIntent {
     data class SetEditMode(val mode: EditMode) : BudgetEditorIntent
     data class SetAnimState(val state: AnimState) : BudgetEditorIntent
     data class CommentUpdated(val comment: String) : BudgetEditorIntent
+    data class NoteUpdated(val note: String) : BudgetEditorIntent
     data class DeleteTag(val tag: String) : BudgetEditorIntent
     data class SetRecurrentEnabled(val enabled: Boolean) : BudgetEditorIntent
     data class SetCreditEnabled(val enabled: Boolean) : BudgetEditorIntent

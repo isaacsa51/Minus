@@ -161,6 +161,7 @@ class BudgetViewModel @Inject constructor(
             editMode = editorState.editMode,
             animState = if (numpadInput.isNotEmpty()) AnimState.EDITING else AnimState.IDLE,
             currentComment = editorState.currentComment,
+            currentNote = editorState.currentNote,
             tags = categories.map { it.name },
             isFirstLaunch = settings == null,
             isRecurrentEnabled = editorState.isRecurrentEnabled,
@@ -409,6 +410,11 @@ class BudgetViewModel @Inject constructor(
                 hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
+            is BudgetEditorIntent.NoteUpdated -> editorStateController.process(
+                EditorIntent.NoteUpdated(intent.note),
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
+            )
+
             is BudgetEditorIntent.SetRecurrentEnabled -> editorStateController.process(
                 EditorIntent.SetRecurrentEnabled(intent.enabled),
                 hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
@@ -471,6 +477,7 @@ class BudgetViewModel @Inject constructor(
                 isRecurrentEnabled = uiState.value.isRecurrentEnabled,
                 isCreditEnabled = uiState.value.isCreditEnabled,
                 comment = uiState.value.currentComment,
+                note = uiState.value.currentNote,
                 budgetSettings = uiState.value.budgetSettings,
                 resolveActivePeriodId = ::resolveActivePeriodId,
             )
@@ -599,6 +606,10 @@ class BudgetViewModel @Inject constructor(
                 hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
             editorStateController.process(
+                EditorIntent.NoteUpdated(""),
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
+            )
+            editorStateController.process(
                 EditorIntent.SetCreditEnabled(false),
                 hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null
             )
@@ -688,6 +699,7 @@ private class TransactionHandlerImpl(
         isRecurrentEnabled: Boolean,
         isCreditEnabled: Boolean,
         comment: String,
+        note: String,
         budgetSettings: BudgetSettings?,
         resolveActivePeriodId: suspend () -> Long,
     ): ApplyTransactionResult = delegate.applyTransaction(
@@ -696,6 +708,7 @@ private class TransactionHandlerImpl(
         isRecurrentEnabled = isRecurrentEnabled,
         isCreditEnabled = isCreditEnabled,
         comment = comment,
+        note = note,
         budgetSettings = budgetSettings,
         resolveActivePeriodId = this.resolveActivePeriodId,
     )

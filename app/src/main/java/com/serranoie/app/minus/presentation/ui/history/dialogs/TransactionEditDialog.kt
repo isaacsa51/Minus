@@ -23,6 +23,7 @@ internal fun TransactionEditDialog(
     currencyCode: String,
     tags: List<String> = emptyList(),
     isCreditQuickToggleEnabled: Boolean = false,
+    isExtraNoteEnabled: Boolean = false,
     creditCardCutoffDay: Int? = null,
     onUpdateCreditCutoffDay: (Int) -> Unit = {},
     onCancel: () -> Unit,
@@ -49,14 +50,16 @@ internal fun TransactionEditDialog(
                 currencyCode = currencyCode,
                 tags = tags,
                 isCreditQuickToggleEnabled = isCreditQuickToggleEnabled,
+                isExtraNoteEnabled = isExtraNoteEnabled,
                 creditCardCutoffDay = creditCardCutoffDay,
                 onUpdateCreditCutoffDay = onUpdateCreditCutoffDay,
                 onCancel = onCancel,
-                onSave = { newAmount, newComment, newDateTime, newIsRecurrent, newFrequency, newEndDate, newSubscriptionDay, newIsCredit ->
+                onSave = { newAmount, newComment, newNote, newDateTime, newIsRecurrent, newFrequency, newEndDate, newSubscriptionDay, newIsCredit ->
                     val updatedTransaction = transaction.copy(
                         id = transaction.sourceTransactionId ?: transaction.id,
                         amount = newAmount,
                         comment = newComment,
+                        note = newNote,
                         date = newDateTime,
                         isRecurrent = newIsRecurrent,
                         recurrentFrequency = newFrequency,

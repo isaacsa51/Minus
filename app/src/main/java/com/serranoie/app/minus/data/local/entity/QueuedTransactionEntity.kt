@@ -10,6 +10,8 @@ data class QueuedTransactionEntity(
     val id: Long = 0,
     val amount: String,
     val comment: String,
+    @ColumnInfo(defaultValue = "''")
+    val note: String = "",
     val date: Long,
     val createdAt: Long = System.currentTimeMillis(),
     val categoryId: Long? = null,

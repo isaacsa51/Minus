@@ -284,7 +284,7 @@ class BudgetViewModelTest {
     @Test
     fun when_dismiss_recurrent_dialog_intent_is_processed_then_dialog_is_hidden() = runTest {
         coEvery {
-            transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any())
+            transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
         } returns ApplyTransactionResult.ShowRecurrentDialog(
             normalizedInput = "12.34",
             amount = BigDecimal("12.34"),
@@ -344,7 +344,7 @@ class BudgetViewModelTest {
     @Test
     fun when_apply_intent_results_in_added_then_numpad_input_and_comment_are_cleared() = runTest {
         coEvery {
-            transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any())
+            transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
         } returns ApplyTransactionResult.Added(normalizedInput = "12.34")
         
         val viewModel = newViewModel()
@@ -364,7 +364,7 @@ class BudgetViewModelTest {
     fun when_apply_intent_results_in_show_recurrent_dialog_then_dialog_and_pending_values_are_set() =
         runTest {
             coEvery {
-                transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any())
+                transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
             } returns ApplyTransactionResult.ShowRecurrentDialog(
                 normalizedInput = "12.34",
                 amount = BigDecimal("12.34"),
@@ -384,7 +384,7 @@ class BudgetViewModelTest {
     fun when_apply_intent_results_in_queued_for_next_period_then_show_message_effect_is_emitted() =
         runTest {
             coEvery {
-                transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any())
+                transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
             } returns ApplyTransactionResult.QueuedForNextPeriod(normalizedInput = "12.34")
             val viewModel = newViewModel()
 

@@ -48,6 +48,7 @@ import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalcul
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
+import com.serranoie.app.minus.presentation.ui.editor.note.ExtraNoteSheet
 import com.serranoie.app.minus.presentation.ui.history.edit.dialogs.EditDatePickerDialog
 import com.serranoie.app.minus.presentation.ui.history.edit.dialogs.EditTimePickerDialog
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -76,19 +77,21 @@ fun TransactionEditScreen(
     currencyCode: String = "USD",
     tags: List<String> = emptyList(),
     isCreditQuickToggleEnabled: Boolean = false,
+    isExtraNoteEnabled: Boolean = false,
     creditCardCutoffDay: Int? = null,
     onUpdateCreditCutoffDay: (Int) -> Unit = {},
     onCancel: () -> Unit = {},
     onSave: (
         newAmount: BigDecimal,
         newComment: String,
+        newNote: String,
         newDateTime: LocalDateTime,
         newIsRecurrent: Boolean,
         newFrequency: RecurrentFrequency?,
         newEndDate: LocalDate?,
         newSubscriptionDay: Int?,
         newIsCredit: Boolean
-    ) -> Unit = { _, _, _, _, _, _, _, _ -> },
+    ) -> Unit = { _, _, _, _, _, _, _, _, _ -> },
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     modifier: Modifier = Modifier
@@ -97,6 +100,7 @@ fun TransactionEditScreen(
 
     var editedAmount by remember { mutableStateOf(transaction.amount.toString()) }
     var editedComment by remember { mutableStateOf(transaction.comment) }
+    var editedNote by remember { mutableStateOf(transaction.note) }
     var editedDate by remember {
         mutableStateOf(transaction.date?.toLocalDate() ?: LocalDate.now())
     }
@@ -120,6 +124,7 @@ fun TransactionEditScreen(
     var showTimePicker by remember { mutableStateOf(false) }
     var showRecurrentBottomSheet by remember { mutableStateOf(false) }
     var showCreditCutoffDialog by remember { mutableStateOf(false) }
+    var showNoteSheet by remember { mutableStateOf(false) }
 
     val focusController = remember { FocusController() }
     val focusRequester = remember { FocusRequester() }
@@ -207,6 +212,7 @@ fun TransactionEditScreen(
                             onSave(
                                 newAmount,
                                 editedComment,
+                                editedNote.trim(),
                                 editedDate.atTime(editedTime),
                                 isRecurrent,
                                 if (isRecurrent) selectedFrequency else null,
@@ -314,6 +320,9 @@ fun TransactionEditScreen(
                 currentComment = editedComment,
                 stage = EditStage.EDIT_SPENT,
                 onCommentUpdate = { editedComment = it },
+                currentNote = editedNote,
+                onNoteClick = { showNoteSheet = true },
+                extraNoteEnabled = isExtraNoteEnabled,
                 editorFocusController = focusController,
                 onEditingChanged = { isCategoryEditorFocused = it },
                 modifier = Modifier
@@ -368,6 +377,7 @@ fun TransactionEditScreen(
                 onSave(
                     newAmount,
                     editedComment,
+                    editedNote.trim(),
                     editedDate.atTime(editedTime),
                     isRecurrent,
                     frequency,
@@ -467,6 +477,14 @@ fun TransactionEditScreen(
             }
         )
     }
+
+    if (showNoteSheet) {
+        ExtraNoteSheet(
+            initialNote = editedNote,
+            onDismiss = { showNoteSheet = false },
+            onSave = { editedNote = it },
+        )
+    }
 }
 
 @Preview(showBackground = true, device = "id:pixel_5")
@@ -486,7 +504,7 @@ fun TransactionEditScreenPreview() {
             currencyCode = "USD",
             isCreditQuickToggleEnabled = true,
             onCancel = {},
-            onSave = { _, _, _, _, _, _, _, _ -> }
+            onSave = { _, _, _, _, _, _, _, _, _ -> }
         )
     }
 }
@@ -512,7 +530,7 @@ fun TransactionEditScreenRecurringPreview() {
             currencyCode = "USD",
             isCreditQuickToggleEnabled = false,
             onCancel = {},
-            onSave = { _, _, _, _, _, _, _, _ -> }
+            onSave = { _, _, _, _, _, _, _, _, _ -> }
         )
     }
 }

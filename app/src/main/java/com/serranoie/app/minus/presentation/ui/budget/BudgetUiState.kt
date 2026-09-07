@@ -20,6 +20,7 @@ data class BudgetUiState(
     val editMode: EditMode = EditMode.ADD,
     val animState: AnimState = AnimState.IDLE,
     val currentComment: String = "",
+    val currentNote: String = "",
     val tags: List<String> = emptyList(),
     val isFirstLaunch: Boolean = true,
     val isRecurrentEnabled: Boolean = false,

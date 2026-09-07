@@ -36,6 +36,7 @@ class TransactionActionsControllerTest {
             isRecurrentEnabled: Boolean,
             isCreditEnabled: Boolean,
             comment: String,
+            note: String,
             budgetSettings: BudgetSettings?,
             resolveActivePeriodId: suspend () -> Long,
         ): ApplyTransactionResult = applyResult

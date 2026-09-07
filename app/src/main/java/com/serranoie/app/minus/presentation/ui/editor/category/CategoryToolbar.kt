@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupPositionProvider
+import com.serranoie.app.minus.presentation.ui.editor.note.ExtraNoteChip
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 
@@ -82,6 +83,9 @@ fun CategoryToolbar(
     stage: EditStage,
     onCommentUpdate: (String) -> Unit,
     editorFocusController: FocusController,
+    currentNote: String = "",
+    onNoteClick: () -> Unit = {},
+    extraNoteEnabled: Boolean = false,
     onDeleteTag: (String) -> Unit = {},
     directCategoryPopupEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
@@ -162,6 +166,41 @@ fun CategoryToolbar(
             }
 
             AnimatedVisibility(
+                visible = showAddComment && extraNoteEnabled,
+                enter = fadeIn(
+                    tween(
+                        durationMillis = 150,
+                        easing = EaseInOutQuad,
+                    )
+                ) + slideInHorizontally(
+                    tween(
+                        durationMillis = 150,
+                        easing = EaseInOutQuad,
+                    )
+                ) { with(localDensity) { 30.dp.toPx().toInt() } },
+                exit = fadeOut(
+                    tween(
+                        durationMillis = 150,
+                        easing = EaseInOutQuad,
+                    )
+                ) + slideOutHorizontally(
+                    tween(
+                        durationMillis = 150,
+                        easing = EaseInOutQuad,
+                    )
+                ) { with(localDensity) { 30.dp.toPx().toInt() } },
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    ExtraNoteChip(
+                        note = currentNote,
+                        onClick = onNoteClick,
+                        onlyIcon = false,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+            }
+
+            AnimatedVisibility(
                 visible = showAddComment,
                 enter = fadeIn(
                     tween(
@@ -192,7 +231,7 @@ fun CategoryToolbar(
                     onCommentUpdate = onCommentUpdate,
                     editorFocusController = editorFocusController,
                     extendWidth = toolbarWidth,
-                    onlyIcon = tags.isNotEmpty(),
+                    onlyIcon = false,
                     onEdit = { editing ->
                         isEdit = editing
                         onEditingChanged(editing)

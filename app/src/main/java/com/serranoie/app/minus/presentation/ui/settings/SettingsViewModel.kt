@@ -58,6 +58,7 @@ data class SettingsUiState(
     val showPastTransactions: Boolean = true,
     val isCategoryPickerDirectPopupEnabled: Boolean = false,
     val isCategoryGridModeEnabled: Boolean = false,
+    val isExtraNoteEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val notificationHour: Int = 9,
     val notificationMinute: Int = 0,
@@ -117,6 +118,7 @@ class SettingsViewModel @Inject constructor(
             showPastTransactions = settings.showPastTransactions,
             isCategoryPickerDirectPopupEnabled = settings.categoryPickerDirectPopupEnabled,
             isCategoryGridModeEnabled = settings.categoryGridModeEnabled,
+            isExtraNoteEnabled = settings.extraNoteEnabled,
             currentLanguage = settings.language,
             recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
             notificationHour = settings.notificationHour,
@@ -293,6 +295,13 @@ class SettingsViewModel @Inject constructor(
         val newValue = !uiState.value.isCategoryGridModeEnabled
         viewModelScope.launch {
             settingsRepository.setCategoryGridModeEnabled(newValue)
+        }
+    }
+
+    fun onExtraNoteToggle() {
+        val newValue = !uiState.value.isExtraNoteEnabled
+        viewModelScope.launch {
+            settingsRepository.setExtraNoteEnabled(newValue)
         }
     }
 

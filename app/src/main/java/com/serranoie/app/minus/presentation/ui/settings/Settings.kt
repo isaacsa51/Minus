@@ -51,7 +51,6 @@ import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Backup
 import androidx.compose.material.icons.rounded.BugReport
-import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.HelpOutline
@@ -60,9 +59,8 @@ import androidx.compose.material.icons.rounded.Publish
 import androidx.compose.material.icons.rounded.QuestionMark
 import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.Savings
-import androidx.compose.material.icons.rounded.Sell
+import androidx.compose.material.icons.rounded.Science
 import androidx.compose.material.icons.rounded.TipsAndUpdates
-import androidx.compose.material.icons.rounded.YoutubeSearchedFor
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -121,10 +119,8 @@ import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
-import com.serranoie.app.minus.presentation.ui.theme.component.PaddedExpandableList
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
-import com.serranoie.app.minus.presentation.ui.theme.component.SelectableInfoPaddedItem
 import com.serranoie.app.minus.presentation.ui.theme.component.SelectablePaddedItem
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.Utils
@@ -140,8 +136,6 @@ import java.util.Locale
 fun Settings(
     modifier: Modifier = Modifier,
     isCensored: Boolean = false,
-    isCreditQuickToggleFeatureEnabled: Boolean,
-    showPastTransactions: Boolean = true,
     recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
     notificationHour: Int,
     notificationMinute: Int,
@@ -150,12 +144,7 @@ fun Settings(
     exactAlarmEnabled: Boolean,
     notificationPermissionGranted: Boolean,
     onCensorModeToggle: () -> Unit = {},
-    onCreditQuickToggleFeatureToggle: () -> Unit,
-    onShowPastTransactionsToggle: () -> Unit = {},
-    isCategoryPickerDirectPopupEnabled: Boolean = false,
-    isCategoryGridModeEnabled: Boolean = false,
-    onCategoryPickerDirectPopupFeatureToggle: () -> Unit = {},
-    onCategoryGridModeToggle: () -> Unit = {},
+    onNavigateToFeatureLab: () -> Unit = {},
     onRecurrentPaymentsViewModeChange: (RecurrentPaymentsViewMode) -> Unit,
     onNotificationTimeChange: (Int, Int) -> Unit,
     onRecurrentNotificationTimeChange: (Int, Int) -> Unit,
@@ -178,8 +167,6 @@ fun Settings(
     var showRecurrentNotificationTimePicker by remember { mutableStateOf(false) }
     var showWidgetsSheet by remember { mutableStateOf(false) }
     val widgetsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var isCreditFeatureExpanded by remember { mutableStateOf(false) }
-    var isCategoryFeatureExpanded by remember { mutableStateOf(false) }
     var isSavingsExpanded by remember { mutableStateOf(false) }
     val dismissRecurrentPaymentsViewModeDialog = { showRecurrentPaymentsViewModeDialog = false }
     val dismissNotificationTimePicker = { showNotificationTimePicker = false }
@@ -361,188 +348,38 @@ fun Settings(
                 PaddedListGroup(
                     title = stringResource(R.string.settings_section_features)
                 ) {
-                    PaddedExpandableList(
-                        isExpanded = isCreditFeatureExpanded,
-                        onToggleExpanded = { isCreditFeatureExpanded = !isCreditFeatureExpanded },
-                        modifier = Modifier
-                            .testTag("SettingsCreditQuickToggleFeatureItem"),
-                        headerLabel = stringResource(R.string.settings_feature_credit_toggle_title),
-                        containerPosition = PaddedListItemPosition.First,
-                        headerVerticalPadding = 20.dp,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Rounded.CreditCard,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
+                    CustomPaddedListItem(
+                        onClick = {
+                            onNavigateToFeatureLab()
+                            view.weakHapticFeedback()
                         },
-                        expandedContent = {
-                            SelectableInfoPaddedItem(
-                                isActive = isCreditQuickToggleFeatureEnabled,
-                                onClick = onCreditQuickToggleFeatureToggle,
-                                position = PaddedListItemPosition.Middle,
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.settings_what_is_this_for),
-                                        style = MaterialTheme.typography.labelSmallCondensed,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Text(
-                                    text = stringResource(R.string.settings_feature_credit_toggle_details),
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.settings_feature_credit_toggle_switch_label),
-                                        style = MaterialTheme.typography.bodyMediumEmphasized,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Switch(
-                                        checked = isCreditQuickToggleFeatureEnabled,
-                                        onCheckedChange = { onCreditQuickToggleFeatureToggle() },
-                                        modifier = Modifier.testTag("SettingsCreditQuickToggleFeatureSwitch")
-                                    )
-                                }
-                            }
-                        })
-
-                    SelectablePaddedItem(
-                        label = stringResource(R.string.settings_feature_show_past_transactions_title),
-                        subtitle = stringResource(R.string.settings_feature_show_past_transactions_subtitle),
-                        isActive = showPastTransactions,
-                        onClick = onShowPastTransactionsToggle,
-                        position = PaddedListItemPosition.Middle,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Rounded.YoutubeSearchedFor,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                        position = PaddedListItemPosition.First,
+                        modifier = Modifier.testTag("SettingsFeatureLabItem")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Science,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_feature_lab_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
-                        },
-                        trailingContent = {
-                            Switch(
-                                checked = showPastTransactions,
-                                onCheckedChange = { onShowPastTransactionsToggle() },
+                            Text(
+                                text = stringResource(R.string.settings_feature_lab_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                    )
-
-                    PaddedExpandableList(
-                        isExpanded = isCategoryFeatureExpanded,
-                        onToggleExpanded = {
-                            isCategoryFeatureExpanded = !isCategoryFeatureExpanded
-                        },
-                        headerLabel = stringResource(R.string.settings_category_behavior_title),
-                        containerPosition = PaddedListItemPosition.Middle,
-                        headerSubtitle = stringResource(R.string.settings_category_behavior_subtitle),
-                        headerVerticalPadding = 20.dp,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Rounded.Sell,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        expandedContent = {
-                            SelectableInfoPaddedItem(
-                                isActive = isCategoryPickerDirectPopupEnabled,
-                                onClick = onCategoryPickerDirectPopupFeatureToggle,
-                                position = PaddedListItemPosition.Middle,
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.settings_what_is_this_for),
-                                        style = MaterialTheme.typography.labelSmallCondensed,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Text(
-                                    text = stringResource(R.string.settings_category_picker_direct_popup_description),
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.settings_category_picker_direct_popup_switch_label),
-                                        style = MaterialTheme.typography.bodyMediumEmphasized,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Switch(
-                                        checked = isCategoryPickerDirectPopupEnabled,
-                                        onCheckedChange = { onCategoryPickerDirectPopupFeatureToggle() },
-                                    )
-                                }
-                            }
-                            SelectableInfoPaddedItem(
-                                isActive = isCategoryGridModeEnabled,
-                                onClick = onCategoryGridModeToggle,
-                                position = PaddedListItemPosition.Middle,
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.settings_what_is_this_for),
-                                        style = MaterialTheme.typography.labelSmallCondensed,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-
-                                Text(
-                                    text = stringResource(R.string.settings_category_grid_mode_description),
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.settings_category_grid_mode_switch_label),
-                                        style = MaterialTheme.typography.bodyMediumEmphasized,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Switch(
-                                        checked = isCategoryGridModeEnabled,
-                                        onCheckedChange = { onCategoryGridModeToggle() },
-                                    )
-                                }
-                            }
-                        })
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
 
                     CustomPaddedListItem(
                         onClick = {
@@ -1248,7 +1085,6 @@ private fun formatNotificationTime(
 private fun PreviewSettings() {
     MinusTheme {
         Settings(
-            isCreditQuickToggleFeatureEnabled = false,
             recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
             notificationHour = 9,
             notificationMinute = 0,
@@ -1256,7 +1092,6 @@ private fun PreviewSettings() {
             recurrentNotificationMinute = 0,
             exactAlarmEnabled = true,
             notificationPermissionGranted = true,
-            onCreditQuickToggleFeatureToggle = {},
             onRecurrentPaymentsViewModeChange = {},
             onNotificationTimeChange = { _, _ -> },
             onRecurrentNotificationTimeChange = { _, _ -> },

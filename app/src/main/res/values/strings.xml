@@ -146,6 +146,11 @@
     <string name="add_new_category">Category</string>
     <string name="add_new_category_action">Add New Category</string>
     <string name="delete_category">Delete Category</string>
+    <string name="add_extra_note">Extra note</string>
+    <string name="extra_note_label">Note</string>
+    <string name="extra_note_sheet_title">Extra note</string>
+    <string name="extra_note_sheet_subtitle">A detail the category alone doesn\'t capture — like what the money was actually spent on.</string>
+    <string name="extra_note_sheet_hint">Write a note for this transaction</string>
 
     <string name="budget_validation_major_zero">Budget must be greater than 0</string>
     <string name="budget_no_date_defined">No end date defined</string>
@@ -362,6 +367,16 @@
     <string name="settings_category_picker_direct_popup_description">Open the suggestions popup with all your saved categories as soon as you tap the category field. When off, suggestions only appear after you start typing.</string>
     <string name="settings_category_grid_mode_switch_label">Show as a list (Experimental)</string>
     <string name="settings_category_grid_mode_description">Tap the category tag to open a grid of your saved categories, instead of entering inline edit mode. Also turns off the numpad\'s calculation mode while this is on.</string>
+    <string name="settings_feature_extra_note_title">Extra note per transaction</string>
+    <string name="settings_feature_extra_note_subtitle">Tap to see more details</string>
+    <string name="settings_feature_extra_note_description">Adds an optional "Extra note" field next to the category when adding or editing a transaction. Use it to remember a detail the category alone doesn\'t capture — like what exactly the money in "Commute" was spent on.</string>
+    <string name="settings_feature_extra_note_switch_label">Enable extra note</string>
+    <string name="settings_feature_lab_title">Feature lab</string>
+    <string name="settings_feature_lab_subtitle">Optional and experimental features you can turn on</string>
+    <string name="settings_feature_lab_header">Turn on only what you need. Each feature explains what it changes.</string>
+    <string name="settings_feature_category_direct_popup_title">Category suggestions on tap</string>
+    <string name="settings_feature_category_grid_title">Category list mode</string>
+    <string name="settings_feature_show_past_transactions_switch_label">Load past periods</string>
     <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
     <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
     <string name="settings_recurrent_payments_view_mode_title">Recurrent payments view mode</string>

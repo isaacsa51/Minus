@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +31,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -57,9 +59,11 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -98,6 +102,8 @@ import com.serranoie.app.minus.presentation.ui.editor.category.EditableCategoryT
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.RecurrentExpenseDialog
+import com.serranoie.app.minus.presentation.ui.editor.note.ExtraNoteChip
+import com.serranoie.app.minus.presentation.ui.editor.note.ExtraNoteSheet
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
@@ -154,11 +160,13 @@ fun Editor(
     onFinishBudgetEarly: () -> Unit = {},
     onSaveBudget: (BudgetSettings) -> Unit = {},
     onCommentUpdate: (String) -> Unit = {},
+    onNoteUpdate: (String) -> Unit = {},
     onDeleteTag: (String) -> Unit = {},
     onCategoryEditingChanged: (Boolean) -> Unit = {},
     onRecurrentToggle: (Boolean) -> Unit = {},
     onCreditToggle: (Boolean) -> Unit = {},
     showCreditQuickToggleFeature: Boolean = false,
+    extraNoteEnabled: Boolean = false,
     directCategoryPopupEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
     isCategoryGridVisible: Boolean = false,
@@ -207,6 +215,15 @@ fun Editor(
     val topBarHeight = if (isSquareScreen) 54.dp else 66.dp
 
     val editorFocusController = remember { FocusController() }
+
+    var showNoteSheet by remember { mutableStateOf(false) }
+    if (showNoteSheet) {
+        ExtraNoteSheet(
+            initialNote = uiState.currentNote,
+            onDismiss = { showNoteSheet = false },
+            onSave = onNoteUpdate,
+        )
+    }
 
     if (uiState.showRecurrentDialog) {
         RecurrentExpenseDialog(
@@ -517,7 +534,10 @@ fun Editor(
                     currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
                     tags = uiState.tags,
                     currentComment = uiState.currentComment,
+                    currentNote = uiState.currentNote,
+                    extraNoteEnabled = extraNoteEnabled,
                     onCommentUpdate = onCommentUpdate,
+                    onNoteClick = { showNoteSheet = true },
                     onDeleteTag = onDeleteTag,
                     onCategoryEditingChanged = onCategoryEditingChanged,
                     editorFocusController = editorFocusController,
@@ -590,7 +610,10 @@ private fun EditingContent(
     currencyCode: String,
     tags: List<String>,
     currentComment: String,
+    currentNote: String = "",
+    extraNoteEnabled: Boolean = false,
     onCommentUpdate: (String) -> Unit,
+    onNoteClick: () -> Unit = {},
     onDeleteTag: (String) -> Unit,
     onCategoryEditingChanged: (Boolean) -> Unit = {},
     editorFocusController: FocusController,
@@ -901,7 +924,16 @@ private fun EditingContent(
                         .fillMaxWidth()
                         .padding(start = 24.dp, end = 24.dp, bottom = 26.dp),
                     horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    if (extraNoteEnabled) {
+                        ExtraNoteChip(
+                            note = currentNote,
+                            onClick = onNoteClick,
+                            onlyIcon = false,
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    }
                     EditableCategoryTag(
                         currentComment = currentComment,
                         tags = tags,
@@ -932,6 +964,9 @@ private fun EditingContent(
                     currentComment = currentComment,
                     stage = EditStage.EDIT_SPENT,
                     onCommentUpdate = onCommentUpdate,
+                    currentNote = currentNote,
+                    onNoteClick = onNoteClick,
+                    extraNoteEnabled = extraNoteEnabled,
                     onDeleteTag = onDeleteTag,
                     onEditingChanged = onCategoryEditingChanged,
                     editorFocusController = editorFocusController,
