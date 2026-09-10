@@ -34,6 +34,7 @@ class MinusCsvRoundTripTest {
         id: Long = 1L,
         amount: String = "10.00",
         comment: String = "Coffee",
+        note: String = "",
         date: LocalDateTime = LocalDateTime.of(2026, 3, 10, 9, 30),
         isRecurrent: Boolean = false,
         frequency: RecurrentFrequency? = null,
@@ -46,6 +47,7 @@ class MinusCsvRoundTripTest {
         id = id,
         amount = BigDecimal(amount),
         comment = comment,
+        note = note,
         date = date,
         periodId = periodId,
         isRecurrent = isRecurrent,
@@ -70,6 +72,25 @@ class MinusCsvRoundTripTest {
         assertThat(row.isRecurrent).isFalse()
         assertThat(row.isCredit).isFalse()
         assertThat(row.isCreditPaid).isFalse()
+    }
+
+    @Test
+    fun `the extra note survives the round trip, including commas and quotes`() {
+        val note = """Split with Sam, "reimburse" later & settle up"""
+        val original = tx(id = 7L, comment = "Taxi", note = note)
+
+        val row = roundTrip(transactions = listOf(original)).rows.single()
+
+        assertThat(row.note).isEqualTo(note)
+        assertThat(row.comment).isEqualTo("Taxi")
+        assertThat(row.toDomainTransaction().note).isEqualTo(note)
+    }
+
+    @Test
+    fun `a transaction without a note comes back with an empty note`() {
+        val row = roundTrip(transactions = listOf(tx(id = 1L))).rows.single()
+
+        assertThat(row.note).isEmpty()
     }
 
     @Test
