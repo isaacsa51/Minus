@@ -62,12 +62,14 @@ class MinusCsvServiceTest {
         id: Long,
         amount: String = "10.00",
         comment: String = "Coffee",
+        note: String = "",
         date: LocalDateTime = LocalDateTime.of(2026, 3, 10, 9, 30),
         periodId: Long = 7L,
     ) = Transaction(
         id = id,
         amount = BigDecimal(amount),
         comment = comment,
+        note = note,
         date = date,
         periodId = periodId,
     )
@@ -124,6 +126,16 @@ class MinusCsvServiceTest {
 
         coVerify(exactly = 1) { repository.findOrCreateCategory("Coffee") }
         coVerify(exactly = 1) { repository.findOrCreateCategory("Rent") }
+    }
+
+    @Test
+    fun `the extra note is carried onto each imported transaction`() = runTest {
+        service.importTransactions(
+            csvOf(listOf(tx(id = 5L, comment = "Taxi", note = "Split with Sam"), tx(id = 0L, comment = "Rent")))
+        )
+
+        assertThat(upsertedTransactions.captured.single().note).isEqualTo("Split with Sam")
+        assertThat(addedTransactions.single().note).isEmpty()
     }
 
     @Test

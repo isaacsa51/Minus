@@ -30,17 +30,18 @@ class MinusCsvExporter {
                     val s = meta.budgetSettings
                     printer.printRecord(
                         MinusCsvContract.MARKER_META,
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
+                        "", // amount
+                        "", // comment
+                        "", // note
+                        "", // is_recurrent
+                        "", // frequency
+                        "", // end_date
+                        "", // sub_day
+                        "", // id
+                        "", // is_credit
+                        "", // is_credit_paid
+                        "", // period_id
+                        "", // created_at
                         s.totalBudget.toPlainString(),
                         s.period.name,
                         s.startDate.format(dateFormatter),
@@ -61,14 +62,15 @@ class MinusCsvExporter {
                     printer.printRecord(
                         MinusCsvContract.MARKER_ARCHIVED,
                         archive.spentAmount.toPlainString(),
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
+                        "", // comment
+                        "", // note
+                        "", // is_recurrent
+                        "", // frequency
+                        "", // end_date
+                        "", // sub_day
+                        "", // id
+                        "", // is_credit
+                        "", // is_credit_paid
                         archive.periodId.toString(),
                         archive.createdAt.toString(),
                         archive.totalBudget.toPlainString(),
@@ -97,6 +99,7 @@ class MinusCsvExporter {
                         txDate.format(dateTimeFormatter),
                         tx.amount.toPlainString(),
                         tx.comment,
+                        tx.note,
                         if (tx.isRecurrent) "1" else "0",
                         frequency,
                         endDate,

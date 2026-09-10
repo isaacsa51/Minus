@@ -6,6 +6,7 @@ object MinusCsvContract {
     const val COL_DATE = "date"
     const val COL_AMOUNT = "amount"
     const val COL_COMMENT = "comment"
+    const val COL_NOTE = "note"
     const val COL_IS_RECURRENT = "is_recurrent"
     const val COL_FREQUENCY = "frequency"
     const val COL_END_DATE = "end_date"
@@ -37,6 +38,7 @@ object MinusCsvContract {
         COL_DATE,
         COL_AMOUNT,
         COL_COMMENT,
+        COL_NOTE,
         COL_IS_RECURRENT,
         COL_FREQUENCY,
         COL_END_DATE,

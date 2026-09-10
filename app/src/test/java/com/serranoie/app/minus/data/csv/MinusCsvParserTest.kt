@@ -30,6 +30,34 @@ class MinusCsvParserTest {
     }
 
     @Test
+    fun parse_readsNoteColumn() {
+        val csv = """
+            date,amount,comment,note,is_recurrent,frequency,end_date,sub_day,id,is_credit,is_credit_paid,period_id
+            2026-03-10 09:30,10.50,Taxi,Split with Sam,0,,,,1,0,0,7
+        """.trimIndent()
+
+        val rows = parser.parse(ByteArrayInputStream(csv.toByteArray(StandardCharsets.UTF_8))).rows
+
+        assertEquals(1, rows.size)
+        assertEquals("Taxi", rows[0].comment)
+        assertEquals("Split with Sam", rows[0].note)
+    }
+
+    @Test
+    fun parse_legacyHeaderWithoutNote_leavesNoteEmpty() {
+        val csv = """
+            date,amount,comment,is_recurrent,frequency,end_date,sub_day,id,is_credit,is_credit_paid,period_id
+            2026-03-10 09:30,10.50,Coffee,0,,,,1,0,0,7
+        """.trimIndent()
+
+        val rows = parser.parse(ByteArrayInputStream(csv.toByteArray(StandardCharsets.UTF_8))).rows
+
+        assertEquals(1, rows.size)
+        assertEquals("Coffee", rows[0].comment)
+        assertEquals("", rows[0].note)
+    }
+
+    @Test
     fun parse_invalidAmount_discardsRow() {
         val csv = """
             date,amount,comment,is_recurrent,frequency,end_date,sub_day,id,is_credit,is_credit_paid,period_id,budget_total,budget_period,budget_start_date,budget_end_date,currency_code,days_in_period,rollover_enabled,rollover_carry_forward,remaining_budget_strategy,current_period_started_at_millis,current_period_id,credit_card_cutoff_day,split_mode
