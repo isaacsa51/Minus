@@ -41,7 +41,7 @@ class SettingsRepositoryImplTest {
 
         assertThat(settings.onboardingCompleted).isFalse()
         assertThat(settings.themeMode).isEqualTo(ThemeMode.SYSTEM)
-        assertThat(settings.language).isEqualTo("en")
+        assertThat(settings.language).isEqualTo("system")
         assertThat(settings.notificationHour).isEqualTo(UserSettings.DEFAULT_NOTIFICATION_HOUR)
         assertThat(settings.recurrentNotificationHour)
             .isEqualTo(UserSettings.DEFAULT_RECURRENT_NOTIFICATION_HOUR)

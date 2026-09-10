@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget.pill
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -42,7 +43,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
@@ -682,4 +685,55 @@ private fun PreviewBudgetPillSmallHeight() {
         }
     }
 }
+
+@Preview(showBackground = true, locale = "bg", device = "id:4in WVGA (Nexus S)")
+@Preview(showBackground = true, locale = "bg", device = "id:4in WVGA (Nexus S)",
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+    wallpaper = Wallpapers.GREEN_DOMINATED_EXAMPLE
+)
+@Composable
+private fun PreviewBudgetPillWeeklyExceededWithProjection() {
+    MinusTheme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp)
+        ) {
+            BudgetPill(
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal("-500.00"),
+                    totalSpentToday = BigDecimal("600.00"),
+                    dailyBudget = BigDecimal("47.62"),
+                    daysRemaining = 14,
+                    progress = 0.6f,
+                    isOverBudget = false,
+                    totalBudget = BigDecimal("1000.00"),
+                    totalSpentInPeriod = BigDecimal("600.00"),
+                    totalSpentThisWeek = BigDecimal("600.00"),
+                    dailyAllocation = BigDecimal("40.00"),
+                    weeklyAllocation = BigDecimal("333.33"),
+                    biweeklyAllocation = BigDecimal("466.67"),
+                    isTodayOverDailyAllocation = true,
+                    nextWeeklyAllocation = BigDecimal("200.00"),
+                ),
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("1000.00"),
+                    period = BudgetPeriod.BIWEEKLY,
+                    startDate = LocalDate.now(),
+                    currencyCode = "MXN",
+                    splitMode = BudgetSplitMode.DYNAMIC,
+                ),
+                viewPeriod = BudgetPeriod.WEEKLY,
+                currencyCode = "MXN",
+                splitMode = BudgetSplitMode.DYNAMIC,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                onOpenBudgetSheet = { },
+            )
+        }
+    }
+}
+
 
