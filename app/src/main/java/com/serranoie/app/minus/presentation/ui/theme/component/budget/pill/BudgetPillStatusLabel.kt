@@ -128,13 +128,16 @@ internal fun StatusLabel(
             ) + fadeIn(animationSpec = tween(300))
         ) {
             if (hasProjection) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.basicMarquee(),
+                ) {
                     Text(
                         text = "${projectionLabel.orEmpty()} ",
                         style = secondaryStyle,
                         color = textColor,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = TextOverflow.Clip,
                     )
                     SegmentedAmountText(
                         text = projectionAmount,

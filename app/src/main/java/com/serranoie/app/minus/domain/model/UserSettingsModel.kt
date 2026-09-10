@@ -17,7 +17,7 @@ data class UserSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val typographyMode: TypographyMode = TypographyMode.EXPRESSIVE,
     val contrastMode: ContrastMode = ContrastMode.NORMAL,
-    val language: String = "en",
+    val language: String = "system",
     val colorScheme: AppColorScheme = AppColorScheme.BRAND,
     val dynamicColorEnabled: Boolean = false,
     val isCreditQuickToggleEnabled: Boolean = false,

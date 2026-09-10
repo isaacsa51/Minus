@@ -229,7 +229,11 @@ class SettingsViewModel @Inject constructor(
     fun onLanguageChange(language: String) {
         viewModelScope.launch {
             settingsRepository.setLanguage(language)
-            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(language)
+            val appLocale: LocaleListCompat = if (language == "system") {
+                LocaleListCompat.getEmptyLocaleList()
+            } else {
+                LocaleListCompat.forLanguageTags(language)
+            }
             AppCompatDelegate.setApplicationLocales(appLocale)
         }
     }

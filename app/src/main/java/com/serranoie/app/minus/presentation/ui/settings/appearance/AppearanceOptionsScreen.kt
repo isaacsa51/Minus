@@ -613,6 +613,7 @@ private fun LanguageSection(
     onLanguageChange: (String) -> Unit
 ) {
     val languages = listOf(
+        "system" to stringResource(R.string.settings_theme_system),
         "en" to stringResource(R.string.settings_language_en),
         "de" to stringResource(R.string.settings_language_de),
         "el" to stringResource(R.string.settings_language_el),
@@ -630,7 +631,7 @@ private fun LanguageSection(
 
     var isExpanded by remember { mutableStateOf(false) }
     val currentLabel = languages.find { it.first == currentLanguage }?.second
-        ?: stringResource(R.string.settings_language_en)
+        ?: stringResource(R.string.settings_theme_system)
 
     PaddedExpandableList(
         isExpanded = isExpanded,

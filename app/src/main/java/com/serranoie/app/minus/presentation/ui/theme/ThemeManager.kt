@@ -1,6 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.theme
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.appTheme
@@ -21,5 +23,14 @@ class ThemeManager @Inject constructor() {
         context.isAmoledEnabled = settings.isAmoledEnabled
         context.appColorScheme = settings.colorScheme
         context.dynamicColorEnabled = settings.dynamicColorEnabled
+        val appLocale = if (settings.language == "system") {
+            LocaleListCompat.getEmptyLocaleList()
+        } else {
+            LocaleListCompat.forLanguageTags(settings.language)
+        }
+        if (AppCompatDelegate.getApplicationLocales() != appLocale) {
+            AppCompatDelegate.setApplicationLocales(appLocale)
+        }
     }
 }
+

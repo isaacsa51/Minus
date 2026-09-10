@@ -159,7 +159,7 @@ class SettingsRepositoryImpl @Inject constructor(
                     ?: ContrastMode.NORMAL,
                 colorScheme = preferences[COLOR_SCHEME]?.toAppColorScheme()
                     ?: com.serranoie.app.minus.domain.model.AppColorScheme.BRAND,
-                language = preferences[LANGUAGE] ?: "en",
+                language = preferences[LANGUAGE] ?: "system",
                 dynamicColorEnabled = preferences[DYNAMIC_COLOR] ?: false,
                 isRoundedFontEnabled = preferences[ROUNDED_FONT] ?: true,
                 isAmoledEnabled = preferences[AMOLED] ?: false,
