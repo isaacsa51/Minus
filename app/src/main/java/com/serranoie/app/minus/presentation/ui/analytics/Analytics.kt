@@ -1,6 +1,10 @@
 package com.serranoie.app.minus.presentation.ui.analytics
 
+import android.widget.Toast
 import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.fragment.app.FragmentActivity
+import com.serranoie.app.minus.presentation.util.BiometricPromptHelper
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -34,6 +38,7 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +49,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
@@ -164,6 +170,8 @@ data class AnalyticsActions(
     val onHistoricalPeriodSelected: (Long) -> Unit = {},
     val onTutorialCompleted: (Boolean) -> Unit = {},
     val onGranularityChanged: (GraphGranularity) -> Unit = {},
+    val onUpdateTransaction: (Transaction) -> Unit = {},
+    val onDeleteTransaction: (Transaction) -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -185,6 +193,23 @@ fun Analytics(
     var historyExpandedDates by remember { mutableStateOf(setOf<LocalDate>()) }
     var showCreditSheet by remember { mutableStateOf(false) }
     var showPastPeriodsSheet by remember { mutableStateOf(false) }
+    var isPastPeriodUnlocked by remember { mutableStateOf(false) }
+    var localEditingTransaction by remember { mutableStateOf<Transaction?>(null) }
+    var showPastPeriodConfirmDialog by remember { mutableStateOf(false) }
+    var pendingTransactionIntent by remember { mutableStateOf<HistoryUiIntent?>(null) }
+
+    LaunchedEffect(state.isHistoricalView) {
+        if (!state.isHistoricalView) {
+            isPastPeriodUnlocked = false
+            localEditingTransaction = null
+        }
+    }
+
+    val biometricPromptTitle = stringResource(R.string.biometric_prompt_title)
+    val biometricPromptSubtitle = stringResource(R.string.biometric_prompt_subtitle)
+    val unlockedMessage = stringResource(R.string.past_period_unlocked_message)
+    val negativeButtonText = stringResource(android.R.string.cancel)
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val hasSpends = state.spends.isNotEmpty()
@@ -517,6 +542,48 @@ fun Analytics(
                 }
             }
 
+            var expandedTransactionId by remember { mutableStateOf<Long?>(null) }
+            val processHistoryIntent: (HistoryUiIntent) -> Unit = { intent ->
+                when (intent) {
+                    is HistoryUiIntent.ToggleExpandedDate -> {
+                        historyExpandedDates = if (historyExpandedDates.contains(intent.date)) {
+                            historyExpandedDates - intent.date
+                        } else {
+                            historyExpandedDates + intent.date
+                        }
+                    }
+                    is HistoryUiIntent.ToggleExpandedTransaction -> {
+                        expandedTransactionId = if (expandedTransactionId == intent.transactionId) null else intent.transactionId
+                    }
+                    is HistoryUiIntent.SetEditingTransaction -> {
+                        if (state.isHistoricalView && !isPastPeriodUnlocked && intent.transaction != null) {
+                            pendingTransactionIntent = intent
+                            showPastPeriodConfirmDialog = true
+                        } else {
+                            localEditingTransaction = intent.transaction
+                        }
+                    }
+                    is HistoryUiIntent.DeleteTransaction -> {
+                        if (state.isHistoricalView && !isPastPeriodUnlocked) {
+                            pendingTransactionIntent = intent
+                            showPastPeriodConfirmDialog = true
+                        } else {
+                            actions.onDeleteTransaction(intent.transaction)
+                        }
+                    }
+                    is HistoryUiIntent.SaveEditedTransaction -> {
+                        if (state.isHistoricalView && !isPastPeriodUnlocked) {
+                            pendingTransactionIntent = intent
+                            showPastPeriodConfirmDialog = true
+                        } else {
+                            actions.onUpdateTransaction(intent.transaction)
+                            localEditingTransaction = null
+                        }
+                    }
+                    else -> {}
+                }
+            }
+
             History(
                 uiState = HistoryUiState(
                     transactions = state.transactions,
@@ -527,16 +594,104 @@ fun Analytics(
                     creditOwed = state.creditOwed,
                     debtAdjustedBalance = state.debtAdjustedBalance,
                     expandedDates = historyExpandedDates,
-                ), readOnly = true, onProcessIntent = { intent ->
-                    if (intent is HistoryUiIntent.ToggleExpandedDate) {
-                        historyExpandedDates = if (historyExpandedDates.contains(intent.date)) {
-                            historyExpandedDates - intent.date
+                    expandedTransactionId = expandedTransactionId,
+                    editingTransaction = localEditingTransaction,
+                ),
+                readOnly = false,
+                onProcessIntent = processHistoryIntent,
+            )
+        }
+    }
+
+    if (showPastPeriodConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showPastPeriodConfirmDialog = false
+                pendingTransactionIntent = null
+            },
+            title = {
+                Text(
+                    stringResource(R.string.past_period_edit_confirm_title),
+                    style = MaterialTheme.typography.titleLargeEmphasized,
+                )
+            },
+            text = {
+                Text(
+                    stringResource(R.string.past_period_edit_confirm_message),
+                    style = MaterialTheme.typography.bodyMediumCondensed,
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showPastPeriodConfirmDialog = false
+                        val act = context as? FragmentActivity
+                        if (act != null) {
+                            BiometricPromptHelper.authenticate(
+                                activity = act,
+                                title = biometricPromptTitle,
+                                subtitle = biometricPromptSubtitle,
+                                negativeButtonText = negativeButtonText,
+                                onSuccess = {
+                                    isPastPeriodUnlocked = true
+                                    Toast.makeText(context, unlockedMessage, Toast.LENGTH_SHORT).show()
+                                    pendingTransactionIntent?.let { intent ->
+                                        when (intent) {
+                                            is HistoryUiIntent.SetEditingTransaction -> {
+                                                localEditingTransaction = intent.transaction
+                                            }
+                                            is HistoryUiIntent.DeleteTransaction -> {
+                                                actions.onDeleteTransaction(intent.transaction)
+                                            }
+                                            is HistoryUiIntent.SaveEditedTransaction -> {
+                                                actions.onUpdateTransaction(intent.transaction)
+                                                localEditingTransaction = null
+                                            }
+                                            else -> {}
+                                        }
+                                        pendingTransactionIntent = null
+                                    }
+                                },
+                                onError = { err ->
+                                    Toast.makeText(context, err, Toast.LENGTH_SHORT).show()
+                                    pendingTransactionIntent = null
+                                }
+                            )
                         } else {
-                            historyExpandedDates + intent.date
+                            isPastPeriodUnlocked = true
+                            pendingTransactionIntent?.let { intent ->
+                                when (intent) {
+                                    is HistoryUiIntent.SetEditingTransaction -> {
+                                        localEditingTransaction = intent.transaction
+                                    }
+                                    is HistoryUiIntent.DeleteTransaction -> {
+                                        actions.onDeleteTransaction(intent.transaction)
+                                    }
+                                    is HistoryUiIntent.SaveEditedTransaction -> {
+                                        actions.onUpdateTransaction(intent.transaction)
+                                        localEditingTransaction = null
+                                    }
+                                    else -> {}
+                                }
+                                pendingTransactionIntent = null
+                            }
                         }
                     }
-                })
-        }
+                ) {
+                    Text(stringResource(R.string.dialog_yes))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showPastPeriodConfirmDialog = false
+                        pendingTransactionIntent = null
+                    }
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 
     if (showPastPeriodsSheet) {

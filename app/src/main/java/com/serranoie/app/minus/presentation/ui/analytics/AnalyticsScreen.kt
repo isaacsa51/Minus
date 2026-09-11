@@ -65,6 +65,12 @@ fun AnalyticsScreen(
             },
             onGranularityChanged = { granularity ->
                 viewModel.onGranularityChanged(granularity)
+            },
+            onUpdateTransaction = { tx ->
+                viewModel.updateTransaction(tx)
+            },
+            onDeleteTransaction = { tx ->
+                viewModel.deleteTransaction(tx)
             }
         ),
         activityResultRegistryOwner = activityResultRegistryOwner,

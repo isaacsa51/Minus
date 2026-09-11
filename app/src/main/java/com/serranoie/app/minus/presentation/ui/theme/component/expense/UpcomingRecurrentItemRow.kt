@@ -99,7 +99,7 @@ fun UpcomingRecurrentItemRow(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .animateContentSize(animationSpec = tween(durationMillis = 200))
+            .animateContentSize(animationSpec = tween(durationMillis = 150))
     ) {
         CustomPaddedListItem(
             onClick = onClick,
@@ -111,7 +111,7 @@ fun UpcomingRecurrentItemRow(
             AnimatedContent(
                 targetState = isExpanded,
                 transitionSpec = {
-                    (fadeIn(animationSpec = tween(150, delayMillis = 50)) togetherWith
+                    (fadeIn(animationSpec = tween(150)) togetherWith
                             fadeOut(animationSpec = tween(50)))
                 },
                 label = "header_content",

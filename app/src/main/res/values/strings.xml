@@ -691,6 +691,13 @@
     <string name="past_periods_estimated_divider">Estimated periods below</string>
     <string name="past_periods_status_saved">Saved %1$s</string>
     <string name="past_periods_saved_label">Money Saved</string>
+    <string name="unlock_past_period" translatable="false">Unlock to Edit</string>
+    <string name="biometric_prompt_title" translatable="false">Unlock Past Period</string>
+    <string name="biometric_prompt_subtitle" translatable="false">Authenticate with your fingerprint to modify previous expenses</string>
+    <string name="past_period_unlocked_message" translatable="false">Past period editing unlocked successfully</string>
+    <string name="past_period_edit_confirm_title" translatable="false">Modify Past Period Expense?</string>
+    <string name="past_period_edit_confirm_message" translatable="false">Are you sure you want to edit or delete this expense from a past period? Biometric authentication will be required.</string>
+    <string name="dialog_yes" translatable="false">Yes</string>
 
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Spending Trends</string>
