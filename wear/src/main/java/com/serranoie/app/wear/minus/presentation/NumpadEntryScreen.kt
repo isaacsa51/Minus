@@ -32,173 +32,170 @@ import androidx.wear.compose.material3.TextButtonDefaults
 import com.serranoie.app.wear.minus.R
 import com.serranoie.app.wear.minus.presentation.theme.MinusTheme
 import java.math.BigDecimal
-import java.text.NumberFormat
-import java.util.Locale
 
 @Composable
 internal fun NumpadEntryScreen(
-	amount: String,
-	onDigit: (String) -> Unit,
-	onDot: () -> Unit,
-	onBackspace: () -> Unit,
-	onClear: () -> Unit,
-	onContinue: () -> Unit
+    amount: String,
+    currencySymbol: String,
+    symbolAtEnd: Boolean,
+    onDigit: (String) -> Unit,
+    onDot: () -> Unit,
+    onBackspace: () -> Unit,
+    onClear: () -> Unit,
+    onContinue: () -> Unit
 ) {
-	val listState = rememberTransformingLazyColumnState()
-	val canContinue = amountToBigDecimalOrZero(amount) > BigDecimal.ZERO
+    val listState = rememberTransformingLazyColumnState()
+    val canContinue = amountToBigDecimalOrZero(amount) > BigDecimal.ZERO
 
-	AppScaffold(timeText = {}) {
-		ScreenScaffold(
-			scrollState = listState, timeText = null, edgeButton = {
-				EdgeButton(onClick = onContinue, enabled = canContinue) {
-					Text(text = "+")
-				}
-			}) {
-			TransformingLazyColumn(
-				state = listState,
-				modifier = Modifier.fillMaxSize(),
-				contentPadding = PaddingValues(top = 14.dp, bottom = 65.dp),
-				verticalArrangement = Arrangement.spacedBy(4.dp),
-				horizontalAlignment = Alignment.CenterHorizontally
-			) {
-				item {
-					Text(
-						text = visualTransformationAsCurrency(amount),
-						style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Black),
-						color = MaterialTheme.colorScheme.primary
-					)
-				}
+    AppScaffold(timeText = {}) {
+        ScreenScaffold(
+            scrollState = listState, timeText = null, edgeButton = {
+                EdgeButton(onClick = onContinue, enabled = canContinue) {
+                    Text(text = "+")
+                }
+            }) {
+            TransformingLazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(top = 14.dp, bottom = 65.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item {
+                    Text(
+                        text = formatMoney(currencySymbol, symbolAtEnd, amount),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Black),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
 
-				items(listOf("1" to "2" to "3", "4" to "5" to "6", "7" to "8" to "9")) { row ->
-					val (leftPair, right) = row
-					val (left, middle) = leftPair
-					KeypadRow(modifier = Modifier.fillMaxWidth(), left = { slot ->
-						NumberKey(
-							text = left, modifier = slot
-						) { onDigit(left) }
-					}, middle = { slot ->
-						NumberKey(text = middle, modifier = slot) {
-							onDigit(
-								middle
-							)
-						}
-					}, right = { slot ->
-						NumberKey(
-							text = right, modifier = slot
-						) { onDigit(right) }
-					})
-				}
+                items(listOf("1" to "2" to "3", "4" to "5" to "6", "7" to "8" to "9")) { row ->
+                    val (leftPair, right) = row
+                    val (left, middle) = leftPair
+                    KeypadRow(modifier = Modifier.fillMaxWidth(), left = { slot ->
+                        NumberKey(
+                            text = left, modifier = slot
+                        ) { onDigit(left) }
+                    }, middle = { slot ->
+                        NumberKey(text = middle, modifier = slot) {
+                            onDigit(
+                                middle
+                            )
+                        }
+                    }, right = { slot ->
+                        NumberKey(
+                            text = right, modifier = slot
+                        ) { onDigit(right) }
+                    })
+                }
 
-				item {
-					KeypadRow(
-						modifier = Modifier.fillMaxWidth(),
-						left = { slot -> NumberKey(text = ".", modifier = slot) { onDot() } },
-						middle = { slot ->
-							NumberKey(
-								text = "0", modifier = slot
-							) { onDigit("0") }
-						},
-						right = { slot ->
-							DeleteKey(
-								modifier = slot,
-								onClick = onBackspace,
-								onLongClick = onClear
-							)
-						},
-					)
-				}
-			}
-		}
-	}
+                item {
+                    KeypadRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        left = { slot -> NumberKey(text = ".", modifier = slot) { onDot() } },
+                        middle = { slot ->
+                            NumberKey(
+                                text = "0", modifier = slot
+                            ) { onDigit("0") }
+                        },
+                        right = { slot ->
+                            DeleteKey(
+                                modifier = slot,
+                                onClick = onBackspace,
+                                onLongClick = onClear
+                            )
+                        },
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun KeypadRow(
-	left: @Composable (Modifier) -> Unit,
-	middle: @Composable (Modifier) -> Unit,
-	right: @Composable (Modifier) -> Unit,
-	modifier: Modifier
+    left: @Composable (Modifier) -> Unit,
+    middle: @Composable (Modifier) -> Unit,
+    right: @Composable (Modifier) -> Unit,
+    modifier: Modifier
 ) {
-	Row(
-		horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally),
-		modifier = modifier.padding(horizontal = 16.dp)
-	) {
-		val slotModifier = Modifier.weight(1f)
-		left(slotModifier)
-		middle(slotModifier)
-		right(slotModifier)
-	}
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally),
+        modifier = modifier.padding(horizontal = 16.dp)
+    ) {
+        val slotModifier = Modifier.weight(1f)
+        left(slotModifier)
+        middle(slotModifier)
+        right(slotModifier)
+    }
 }
 
 @Composable
 private fun NumberKey(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-	TextButton(
-		onClick = onClick,
-		modifier = modifier
+    TextButton(
+        onClick = onClick,
+        modifier = modifier
 			.height(32.dp)
 			.width(32.dp),
-		colors = TextButtonDefaults.textButtonColors(
-			containerColor = MaterialTheme.colorScheme.surfaceContainer,
-			contentColor = MaterialTheme.colorScheme.onSurface
-		),
-		shapes = TextButtonDefaults.animatedShapes(),
-	) {
-		Box(
-			modifier = Modifier.fillMaxSize(),
-			contentAlignment = Alignment.Center
-		) {
-			Text(
-				text = text,
-				textAlign = TextAlign.Center,
-				style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-			)
-		}
-	}
+        colors = TextButtonDefaults.textButtonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        shapes = TextButtonDefaults.animatedShapes(),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
+        }
+    }
 }
 
 @Composable
 private fun DeleteKey(
-	modifier: Modifier = Modifier,
-	onClick: () -> Unit,
-	onLongClick: () -> Unit
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
 ) {
-	FilledIconButton(
-		onClick = onClick,
-		onLongClick = onLongClick,
-		onLongClickLabel = stringResource(R.string.numpad_clear_amount),
-		colors = IconButtonDefaults.filledIconButtonColors(
-			containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-			contentColor = MaterialTheme.colorScheme.tertiary
-		),
-		shapes = IconButtonDefaults.animatedShapes(),
-		modifier = modifier
+    FilledIconButton(
+        onClick = onClick,
+        onLongClick = onLongClick,
+        onLongClickLabel = stringResource(R.string.numpad_clear_amount),
+        colors = IconButtonDefaults.filledIconButtonColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.tertiary
+        ),
+        shapes = IconButtonDefaults.animatedShapes(),
+        modifier = modifier
 			.height(32.dp)
 			.width(32.dp)
-	) {
-		Text(text = "⌫", style = MaterialTheme.typography.titleMedium)
-	}
-}
-
-private fun visualTransformationAsCurrency(rawAmount: String): String {
-	val amount = amountToBigDecimalOrZero(rawAmount)
-	return NumberFormat.getCurrencyInstance(Locale.US).format(amount)
+    ) {
+        Text(text = "⌫", style = MaterialTheme.typography.titleMedium)
+    }
 }
 
 private fun amountToBigDecimalOrZero(rawAmount: String): BigDecimal {
-	if (rawAmount.isBlank()) return BigDecimal.ZERO
-	return rawAmount.toBigDecimalOrNull() ?: BigDecimal.ZERO
+    if (rawAmount.isBlank()) return BigDecimal.ZERO
+    return rawAmount.toBigDecimalOrNull() ?: BigDecimal.ZERO
 }
 
 @Preview(device = "id:wearos_small_round", showSystemUi = false)
 @Composable
 private fun NumpadEntryScreenPreview() {
-	MinusTheme {
-		NumpadEntryScreen(
-			amount = "12,500.00",
-			onDigit = {},
-			onDot = {},
-			onBackspace = {},
-			onClear = {},
-			onContinue = {})
-	}
+    MinusTheme {
+        NumpadEntryScreen(
+            amount = "12500.00",
+            currencySymbol = "MAD",
+            symbolAtEnd = false,
+            onDigit = {},
+            onDot = {},
+            onBackspace = {},
+            onClear = {},
+            onContinue = {})
+    }
 }
