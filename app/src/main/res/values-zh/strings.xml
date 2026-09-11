@@ -614,4 +614,11 @@
     <string name="widget_complete_budget_description">追踪支出、总预算及剩余天数——支持快速添加新支出</string>
     <string name="budget_pill_calc_added">将添加 %1$s</string>
     <string name="budget_graph_view_mode_cumulative">趋势</string>
+    <string name="unlock_past_period">解锁以编辑</string>
+    <string name="biometric_prompt_title">解锁上一周期</string>
+    <string name="biometric_prompt_subtitle">使用指纹验证来修改先前的支出</string>
+    <string name="past_period_unlocked_message">已成功解锁上一周期的编辑权限</string>
+    <string name="past_period_edit_confirm_title">修改上一周期的支出？</string>
+    <string name="past_period_edit_confirm_message">您确定要编辑或删除上一周期的这笔支出吗？这需要生物识别验证。</string>
+    <string name="dialog_yes">是</string>
 </resources>

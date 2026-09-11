@@ -615,4 +615,11 @@
     <string name="widget_month_heatmap_title">Monats-Heatmap</string>
     <string name="widget_complete_budget_description">Behalten Sie Ausgaben, Gesamtbudget und verbleibende Tage im Blick – mit Schnellfunktion zum Hinzufügen neuer Ausgaben.</string>
     <string name="budget_graph_view_mode_cumulative">Tendenz</string>
+    <string name="unlock_past_period">Zum Bearbeiten entsperren</string>
+    <string name="biometric_prompt_title">Vergangenen Zeitraum entsperren</string>
+    <string name="biometric_prompt_subtitle">Authentifizieren Sie sich mit Ihrem Fingerabdruck, um vorherige Ausgaben zu ändern</string>
+    <string name="past_period_unlocked_message">Bearbeitung des vergangenen Zeitraums erfolgreich entsperrt</string>
+    <string name="past_period_edit_confirm_title">Ausgabe aus vergangenem Zeitraum ändern?</string>
+    <string name="past_period_edit_confirm_message">Sind Sie sicher, dass Sie diese Ausgabe aus einem vergangenen Zeitraum bearbeiten oder löschen möchten? Biometrische Authentifizierung ist erforderlich.</string>
+    <string name="dialog_yes">Ja</string>
 </resources>

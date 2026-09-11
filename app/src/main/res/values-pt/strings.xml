@@ -615,4 +615,11 @@
     <string name="widget_min_max_spent_title">Gasto Mín/Máx</string>
     <string name="widget_month_heatmap_title">Mapa de calor mensal</string>
     <string name="widget_complete_budget_description">Acompanhe gastos, orçamento total e dias restantes — com adição rápida para uma nova despesa</string>
+    <string name="unlock_past_period">Desbloquear para editar</string>
+    <string name="biometric_prompt_title">Desbloquear período anterior</string>
+    <string name="biometric_prompt_subtitle">Autentique-se com sua impressão digital para modificar despesas anteriores</string>
+    <string name="past_period_unlocked_message">Edição do período anterior desbloqueada com sucesso</string>
+    <string name="past_period_edit_confirm_title">Modificar despesa de período anterior?</string>
+    <string name="past_period_edit_confirm_message">Tem certeza de que deseja editar ou excluir esta despesa de um período anterior? A autenticação biométrica será necessária.</string>
+    <string name="dialog_yes">Sim</string>
 </resources>

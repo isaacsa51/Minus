@@ -616,4 +616,11 @@
     <string name="widget_min_max_spent_title">최소/최대 지출</string>
     <string name="widget_month_heatmap_title">월간 히트맵</string>
     <string name="widget_complete_budget_description">지출, 총 예산 및 남은 일수 추적 — 새 지출 빠른 추가 기능 포함</string>
+    <string name="unlock_past_period">편집 잠금 해제</string>
+    <string name="biometric_prompt_title">이전 기간 잠금 해제</string>
+    <string name="biometric_prompt_subtitle">지문 인증으로 이전 지출을 수정하세요</string>
+    <string name="past_period_unlocked_message">이전 기간 편집 잠금이 성공적으로 해제되었습니다</string>
+    <string name="past_period_edit_confirm_title">이전 기간 지출을 수정하시겠습니까?</string>
+    <string name="past_period_edit_confirm_message">이전 기간의 지출을 수정하거나 삭제하시겠습니까? 생체 인식 인증이 필요합니다.</string>
+    <string name="dialog_yes">예</string>
 </resources>

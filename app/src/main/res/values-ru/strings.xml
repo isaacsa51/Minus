@@ -621,4 +621,11 @@
     <string name="widget_min_max_spent_title">Мин/Макс расходы</string>
     <string name="widget_month_heatmap_title">Месячная тепловая карта</string>
     <string name="widget_complete_budget_description">Отслеживайте расходы, общий бюджет и оставшиеся дни — с быстрым добавлением нового расхода</string>
+    <string name="unlock_past_period">Разблокировать для правки</string>
+    <string name="biometric_prompt_title">Разблокировать прошлый период</string>
+    <string name="biometric_prompt_subtitle">Подтвердите личность по отпечатку пальца для изменения прошлых расходов</string>
+    <string name="past_period_unlocked_message">Редактирование прошлого периода успешно разблокировано</string>
+    <string name="past_period_edit_confirm_title">Изменить расход за прошлый период?</string>
+    <string name="past_period_edit_confirm_message">Вы уверены, что хотите изменить или удалить этот расход из прошлого периода? Потребуется биометрическая аутентификация.</string>
+    <string name="dialog_yes">Да</string>
 </resources>

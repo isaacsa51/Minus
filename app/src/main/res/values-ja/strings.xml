@@ -615,4 +615,11 @@
     <string name="widget_month_heatmap_title">月間ヒートマップ</string>
     <string name="widget_complete_budget_description">支出、総予算、残り日数を追跡 — 新しい支出をすぐに追加可能</string>
     <string name="expand_numpad">テンキーを展開</string>
+    <string name="unlock_past_period">編集のロックを解除</string>
+    <string name="biometric_prompt_title">過去の期間のロック解除</string>
+    <string name="biometric_prompt_subtitle">指紋認証で過去の支出を修正します</string>
+    <string name="past_period_unlocked_message">過去の期間の編集が正常にロック解除されました</string>
+    <string name="past_period_edit_confirm_title">過去の期間の支出を修正しますか？</string>
+    <string name="past_period_edit_confirm_message">過去の期間の支出を編集または削除してもよろしいですか？ 生体認証が必要です。</string>
+    <string name="dialog_yes">はい</string>
 </resources>

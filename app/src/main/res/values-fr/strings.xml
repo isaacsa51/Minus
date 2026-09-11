@@ -615,4 +615,11 @@
     <string name="widget_month_heatmap_title">Carte thermique mensuelle</string>
     <string name="widget_complete_budget_description">Suivez vos dépenses, le budget total et les jours restants — avec une fonction d\'ajout rapide pour une nouvelle dépense.</string>
     <string name="budget_graph_view_mode_cumulative">Tendance</string>
+    <string name="unlock_past_period">Déverrouiller pour modifier</string>
+    <string name="biometric_prompt_title">Déverrouiller la période précédente</string>
+    <string name="biometric_prompt_subtitle">Authentifiez-vous avec votre empreinte digitale pour modifier les dépenses précédentes</string>
+    <string name="past_period_unlocked_message">Modification de la période précédente déverrouillée avec succès</string>
+    <string name="past_period_edit_confirm_title">Modifier la dépense d\'une période précédente?</string>
+    <string name="past_period_edit_confirm_message">Êtes-vous sûr de vouloir modifier ou supprimer cette dépense d\'une période précédente? Une authentification biométrique sera requise.</string>
+    <string name="dialog_yes">Oui</string>
 </resources>
