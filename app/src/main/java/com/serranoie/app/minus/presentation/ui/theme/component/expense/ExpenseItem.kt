@@ -68,7 +68,6 @@ fun ExpenseItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .then(if (!disableAnimations) Modifier.animateContentSize(animationSpec = tween(durationMillis = 150)) else Modifier)
     ) {
         val containerModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
             with(sharedTransitionScope) {
