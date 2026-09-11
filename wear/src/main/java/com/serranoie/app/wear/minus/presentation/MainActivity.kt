@@ -175,6 +175,8 @@ private fun WearCalculatorContent(
 
             EntryStep.AMOUNT -> NumpadEntryScreen(
                 amount = amountState.value,
+                currencySymbol = overviewState.currencySymbol,
+                symbolAtEnd = overviewState.symbolAtEnd,
                 onDigit = { key -> appendDigit(amountState, key) },
                 onDot = { appendDot(amountState) },
                 onBackspace = { amountState.value = amountState.value.dropLast(1) },
@@ -190,6 +192,8 @@ private fun WearCalculatorContent(
 
             EntryStep.CATEGORY -> CategoryDecEntryScreen(
                 amount = amountState.value,
+                currencySymbol = overviewState.currencySymbol,
+                symbolAtEnd = overviewState.symbolAtEnd,
                 categories = categories,
                 selectedCategory = commentState.value,
                 onCategoryTap = { selected -> commentState.value = selected },

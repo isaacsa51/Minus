@@ -62,6 +62,8 @@ internal data class PeriodOverviewUiState(
 	val periodEndText: String = "",
 	val period: BudgetPeriodKind = BudgetPeriodKind.UNKNOWN,
 	val daysRemaining: Int = 0,
+	val currencySymbol: String = "$",
+	val symbolAtEnd: Boolean = false,
 )
 
 @Composable
@@ -275,6 +277,8 @@ internal fun BudgetStatePayload?.toOverviewUiState(): PeriodOverviewUiState {
 		periodEndText = formatDay(periodEndEpochDay),
 		period = budgetPeriodKind(period),
 		daysRemaining = daysRemaining,
+		currencySymbol = currencySymbol,
+		symbolAtEnd = symbolAtEnd,
 	)
 }
 
@@ -295,7 +299,7 @@ private fun formatDay(epochDay: Long): String {
 	return LocalDate.ofEpochDay(epochDay).format(dateFormatter)
 }
 
-private fun formatMoney(symbol: String, symbolAtEnd: Boolean, rawAmount: String): String {
+internal fun formatMoney(symbol: String, symbolAtEnd: Boolean, rawAmount: String): String {
 	val amount = rawAmount.toBigDecimalOrNull() ?: BigDecimal.ZERO
 	val negative = amount.signum() < 0
 	val magnitude = amount.abs().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
