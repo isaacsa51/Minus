@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.presentation.ui.analytics
 
-import android.widget.Toast
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.fragment.app.FragmentActivity
 import com.serranoie.app.minus.presentation.util.BiometricPromptHelper
@@ -114,6 +113,7 @@ import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
 import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
+import com.serranoie.app.minus.presentation.util.Utils.toToast
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.combineColors
 import kotlinx.coroutines.delay
@@ -634,7 +634,7 @@ fun Analytics(
                                 negativeButtonText = negativeButtonText,
                                 onSuccess = {
                                     isPastPeriodUnlocked = true
-                                    Toast.makeText(context, unlockedMessage, Toast.LENGTH_SHORT).show()
+                                    unlockedMessage.toToast(context)
                                     pendingTransactionIntent?.let { intent ->
                                         when (intent) {
                                             is HistoryUiIntent.SetEditingTransaction -> {
@@ -652,8 +652,8 @@ fun Analytics(
                                         pendingTransactionIntent = null
                                     }
                                 },
-                                onError = { err ->
-                                    Toast.makeText(context, err, Toast.LENGTH_SHORT).show()
+                                onError = { err: String ->
+                                    err.toToast(context)
                                     pendingTransactionIntent = null
                                 }
                             )
