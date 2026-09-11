@@ -68,7 +68,7 @@ fun ExpenseItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .then(if (!disableAnimations) Modifier.animateContentSize(animationSpec = tween(durationMillis = 200)) else Modifier)
+            .then(if (!disableAnimations) Modifier.animateContentSize(animationSpec = tween(durationMillis = 150)) else Modifier)
     ) {
         val containerModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
             with(sharedTransitionScope) {
@@ -91,7 +91,7 @@ fun ExpenseItem(
             AnimatedContent(
                 targetState = isExpanded,
                 transitionSpec = {
-                    fadeIn(tween(200, delayMillis = 100)) togetherWith fadeOut(tween(100))
+                    fadeIn(tween(150)) togetherWith fadeOut(tween(75))
                 },
                 label = "expense_item_header",
                 modifier = Modifier.weight(1f)

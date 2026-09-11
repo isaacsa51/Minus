@@ -575,6 +575,18 @@ class AnalyticsViewModel @Inject constructor(
         _granularity.value = granularity
     }
 
+    fun updateTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            budgetRepository.updateTransaction(transaction)
+        }
+    }
+
+    fun deleteTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            budgetRepository.deleteTransaction(transaction)
+        }
+    }
+
     fun consumeEffect() {
         _effects.value = null
     }
