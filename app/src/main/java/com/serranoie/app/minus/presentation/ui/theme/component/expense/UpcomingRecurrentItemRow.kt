@@ -99,7 +99,6 @@ fun UpcomingRecurrentItemRow(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .animateContentSize(animationSpec = tween(durationMillis = 150))
     ) {
         CustomPaddedListItem(
             onClick = onClick,
