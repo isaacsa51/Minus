@@ -615,4 +615,11 @@
     <string name="widget_month_heatmap_title">Месечна топлинна карта</string>
     <string name="widget_complete_budget_description">Проследявайте разходите, общия бюджет и оставащите дни — с бързо добавяне за нов разход</string>
     <string name="budget_graph_view_mode_cumulative">Тенденция</string>
+    <string name="unlock_past_period">Отключване за редактиране</string>
+    <string name="biometric_prompt_title">Отключване на минал период</string>
+    <string name="biometric_prompt_subtitle">Удостоверете се с пръстов отпечатък, за да промените предишни разходи</string>
+    <string name="past_period_unlocked_message">Редактирането на миналия период е успешно отключено</string>
+    <string name="past_period_edit_confirm_title">Промяна на разход от минал период?</string>
+    <string name="past_period_edit_confirm_message">Сигурни ли сте, че искате да редактирате или изтриете този разход от минал период? Ще е необходима биометрична автентификация.</string>
+    <string name="dialog_yes">Да</string>
 </resources>

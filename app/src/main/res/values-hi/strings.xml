@@ -615,4 +615,11 @@
     <string name="widget_min_max_spent_title">न्यूनतम/अधिकतम खर्च</string>
     <string name="widget_month_heatmap_title">महीने का हीटमैप</string>
     <string name="widget_complete_budget_description">खर्च, कुल बजट और बचे हुए दिनों को ट्रैक करें — नए खर्च के लिए क्विक-एड के साथ</string>
+    <string name="unlock_past_period">संपादित करने के लिए अनलॉक करें</string>
+    <string name="biometric_prompt_title">पिछली अवधि अनलॉक करें</string>
+    <string name="biometric_prompt_subtitle">पिछले खर्चों को संशोधित करने के लिए अपने फिंगरप्रिंट से प्रमाणित करें</string>
+    <string name="past_period_unlocked_message">पिछली अवधि का संपादन सफलतापूर्वक अनलॉक किया गया</string>
+    <string name="past_period_edit_confirm_title">क्या पिछली अवधि का खर्च संशोधित करें?</string>
+    <string name="past_period_edit_confirm_message">क्या आप वाकई पिछली अवधि के इस खर्च को संपादित या हटाना चाहते हैं? बायोमेट्रिक प्रमाणीकरण आवश्यक होगा।</string>
+    <string name="dialog_yes">हाँ</string>
 </resources>

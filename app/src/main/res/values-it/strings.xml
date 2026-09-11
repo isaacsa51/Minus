@@ -615,4 +615,11 @@
     <string name="widget_min_max_spent_title">Spesa Min/Max</string>
     <string name="widget_month_heatmap_title">Mappa termica mensile</string>
     <string name="widget_complete_budget_description">Monitora le spese, il budget totale e i giorni rimasti — con aggiunta rapida per una nuova spesa</string>
+    <string name="unlock_past_period">Sblocca per modificare</string>
+    <string name="biometric_prompt_title">Sblocca periodo precedente</string>
+    <string name="biometric_prompt_subtitle">Autenticati con la tua impronta digitale per modificare le spese precedenti</string>
+    <string name="past_period_unlocked_message">Modifica del periodo precedente sbloccata con successo</string>
+    <string name="past_period_edit_confirm_title">Modificare la spesa del periodo precedente?</string>
+    <string name="past_period_edit_confirm_message">Sei sicuro di voler modificare o eliminare questa spesa da un periodo precedente? Sarà richiesta l\'autenticazione biometrica.</string>
+    <string name="dialog_yes">Sì</string>
 </resources>

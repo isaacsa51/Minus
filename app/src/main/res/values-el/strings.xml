@@ -615,4 +615,11 @@
     <string name="widget_min_max_spent_title">Ελάχιστα/Μέγιστα δαπανηθέντα</string>
     <string name="widget_month_heatmap_title">Μηνιαίος χάρτης θερμότητας</string>
     <string name="widget_complete_budget_description">Παρακολουθήστε τις δαπάνες, το συνολικό προϋπολογισμό και τις ημέρες που απομένουν — με γρήγορη προσθήκη για νέα έξοδα</string>
+    <string name="unlock_past_period">Ξεκλείδωμα για επεξεργασία</string>
+    <string name="biometric_prompt_title">Ξεκλείδωμα προηγούμενης περιόδου</string>
+    <string name="biometric_prompt_subtitle">Επαληθεύστε με το δακτυλικό σας αποτύπωμα για να τροποποιήσετε προηγούμενα έξοδα</string>
+    <string name="past_period_unlocked_message">Η επεξεργασία της προηγούμενης περιόδου ξεκλειδώθηκε επιτυχώς</string>
+    <string name="past_period_edit_confirm_title">Τροποποίηση εξόδου προηγούμενης περιόδου;</string>
+    <string name="past_period_edit_confirm_message">Είστε σίγουροι ότι θέλετε να επεξεργαστείτε ή να διαγράψετε αυτό το έξοδο από προηγούμενη περίοδο; Θα απαιτηθεί βιομετρικός έλεγχος ταυτότητας.</string>
+    <string name="dialog_yes">Ναι</string>
 </resources>
