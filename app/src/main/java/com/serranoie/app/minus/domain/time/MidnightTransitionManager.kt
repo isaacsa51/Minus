@@ -14,6 +14,7 @@ const val PENDING_ROLLOVER_AMOUNT_KEY_NAME = "pending_rollover_amount"
 const val PENDING_ROLLOVER_STRATEGY_KEY_NAME = "pending_rollover_strategy"
 const val CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY_NAME = "current_period_rollover_amount"
 const val CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY_NAME = "current_period_rollover_carry_forward"
+const val LAST_DAILY_SURPLUS_CHECK_DATE_KEY_NAME = "last_daily_surplus_check_date_millis"
 
 val MIDNIGHT_TRANSITION_OCCURRED_KEY = booleanPreferencesKey(MIDNIGHT_TRANSITION_OCCURRED_KEY_NAME)
 val LAST_PERIOD_END_KEY = longPreferencesKey(LAST_PERIOD_END_KEY_NAME)
@@ -34,9 +35,23 @@ class MidnightTransitionManager @Inject constructor(
     val midnightTransitionData: StateFlow<MidnightTransitionData?> =
         midnightPeriodChecker.midnightTransitionData
     val needsBudgetSetup: StateFlow<Boolean> = midnightPeriodChecker.needsBudgetSetup
+    val dailySurplusData: StateFlow<DailySurplusData?> = midnightPeriodChecker.dailySurplusData
+    val shouldShowDailySurplusDialog: StateFlow<Boolean> =
+        midnightPeriodChecker.shouldShowDailySurplusDialog
 
     suspend fun handleAppStart() {
         midnightPeriodChecker.handleEndingPeriod()
+        if (!midnightPeriodChecker.shouldShowTransitionDialog.value) {
+            midnightPeriodChecker.checkDailySurplus()
+        }
+    }
+
+    fun onDailySurplusDialogDismissed() {
+        midnightPeriodChecker.onDailySurplusDialogDismissed()
+    }
+
+    suspend fun onDailySurplusAddToToday() {
+        midnightPeriodChecker.onDailySurplusAddToToday()
     }
 
     fun onTransitionDialogConfirmed() {

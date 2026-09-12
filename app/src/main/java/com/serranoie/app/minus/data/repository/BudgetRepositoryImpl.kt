@@ -147,7 +147,9 @@ class BudgetRepositoryImpl @Inject constructor(
                 BudgetSplitMode.valueOf(this.splitMode)
             } catch (_: Exception) {
                 BudgetSplitMode.STATIC
-            }
+            },
+            dailyCarryForwardDate = this.dailyCarryForwardDate?.let { LocalDate.ofEpochDay(it / 86400000) },
+            dailyCarryForwardAmount = this.dailyCarryForwardAmount?.let { BigDecimal(it) },
         )
         logcat { "toDomain: entity=$this -> domain=$domain" }
         return domain
@@ -167,7 +169,9 @@ class BudgetRepositoryImpl @Inject constructor(
             rollOverLimit = this.rollOverLimit?.toPlainString(),
             remainingBudgetStrategy = this.remainingBudgetStrategy.name,
             creditCardCutoffDay = this.creditCardCutoffDay,
-            splitMode = this.splitMode.name
+            splitMode = this.splitMode.name,
+            dailyCarryForwardDate = this.dailyCarryForwardDate?.toEpochDay()?.times(86400000),
+            dailyCarryForwardAmount = this.dailyCarryForwardAmount?.toPlainString(),
         )
         logcat { "toEntity: domain=$this -> entity=$entity" }
         return entity

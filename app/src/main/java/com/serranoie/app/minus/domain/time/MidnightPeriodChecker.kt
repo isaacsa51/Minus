@@ -3,7 +3,10 @@ package com.serranoie.app.minus.domain.time
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,10 +30,17 @@ data class MidnightTransitionData(
     val shouldNavigateToAnalyticsOnly: Boolean = false,
 )
 
+data class DailySurplusData(
+    val date: LocalDate,
+    val surplusAmount: BigDecimal,
+    val currencyCode: String,
+)
+
 @Singleton
 class MidnightPeriodChecker @Inject constructor(
     private val budgetRepository: BudgetRepository,
     private val settingsRepository: SettingsRepository,
+    private val budgetStateCalculator: BudgetStateCalculator,
 ) {
     data class EndingPeriodState(
         val shouldHandleEndingPeriod: Boolean,
@@ -48,6 +58,12 @@ class MidnightPeriodChecker @Inject constructor(
 
     private val _needsBudgetSetup = MutableStateFlow(false)
     val needsBudgetSetup: StateFlow<Boolean> = _needsBudgetSetup.asStateFlow()
+
+    private val _dailySurplusData = MutableStateFlow<DailySurplusData?>(null)
+    val dailySurplusData: StateFlow<DailySurplusData?> = _dailySurplusData.asStateFlow()
+
+    private val _shouldShowDailySurplusDialog = MutableStateFlow(false)
+    val shouldShowDailySurplusDialog: StateFlow<Boolean> = _shouldShowDailySurplusDialog.asStateFlow()
 
     suspend fun handleEndingPeriod() {
         val endingPeriodState = resolveEndingPeriodState()
@@ -286,5 +302,113 @@ class MidnightPeriodChecker @Inject constructor(
         remainingAmount: BigDecimal,
     ) {
         settingsRepository.setPendingRollover(remainingAmount, strategy)
+    }
+
+    /**
+     * Within an ongoing period (not period-end, see [handleEndingPeriod]), Dynamic split mode
+     * silently folds yesterday's underspend into today's recomputed average with no user
+     * involvement at all - regardless of [RemainingBudgetStrategy]. This surfaces that surplus
+     * once per day transition when the user asked to always be consulted.
+     */
+    suspend fun checkDailySurplus() {
+        val settings = budgetRepository.getBudgetSettingsSync() ?: return
+        if (settings.splitMode != BudgetSplitMode.DYNAMIC) return
+        if (settings.remainingBudgetStrategy != RemainingBudgetStrategy.ASK_ALWAYS) return
+
+        val today = LocalDate.now()
+        val lastCheckedMillis = settingsRepository.getLastDailySurplusCheckDate()
+        if (lastCheckedMillis == null) {
+            settingsRepository.setLastDailySurplusCheckDate(today.toStartOfDayMillis())
+            return
+        }
+
+        val lastChecked = Instant.ofEpochMilli(lastCheckedMillis)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+        if (!lastChecked.isBefore(today)) return
+
+        val yesterday = today.minusDays(1)
+        val yesterdayInPeriod = !yesterday.isBefore(settings.startDate) &&
+            !yesterday.isAfter(settings.getPeriodEndDate())
+        if (lastChecked != yesterday || !yesterdayInPeriod) {
+            // App wasn't opened yesterday, or yesterday predates this period - nothing to
+            // meaningfully compare against, just resync the checkpoint.
+            settingsRepository.setLastDailySurplusCheckDate(today.toStartOfDayMillis())
+            return
+        }
+
+        // Reconstruct the allotment as it stood at the START of yesterday (spend through the
+        // day before only) - NOT including yesterday's own spend, which would bias it toward
+        // whatever the user already spent that day.
+        val allTransactions = budgetRepository.getTransactions().first()
+        val throughDayBeforeYesterday = allTransactions.filter { tx ->
+            val txDate = tx.date?.toLocalDate()
+            !tx.isDeleted && txDate != null && txDate.isBefore(yesterday)
+        }
+        val yesterdayState = budgetStateCalculator.calculateBudgetState(
+            settings = settings,
+            transactions = throughDayBeforeYesterday,
+            currentDate = yesterday,
+        )
+        val spentYesterday = allTransactions
+            .filter {
+                !it.isDeleted && it.date?.toLocalDate() == yesterday && !it.isRecurrent &&
+                    it.amount > BigDecimal.ZERO && !it.isAdjustment
+            }
+            .sumOf { it.amount }
+        val surplus = yesterdayState.dailyBudget.subtract(spentYesterday)
+
+        settingsRepository.setLastDailySurplusCheckDate(today.toStartOfDayMillis())
+
+        if (surplus > MIN_SURPLUS_THRESHOLD) {
+            _dailySurplusData.value = DailySurplusData(
+                date = yesterday,
+                surplusAmount = surplus,
+                currencyCode = settings.currencyCode,
+            )
+            _shouldShowDailySurplusDialog.value = true
+            logcat { "Daily surplus of $surplus detected for $yesterday, asking user" }
+        }
+    }
+
+    fun onDailySurplusDialogDismissed() {
+        // Also covers "spread across remaining days": Dynamic's live recompute already does
+        // this automatically, so there is nothing to persist for that choice.
+        _shouldShowDailySurplusDialog.value = false
+        _dailySurplusData.value = null
+    }
+
+    suspend fun onDailySurplusAddToToday() {
+        val data = _dailySurplusData.value ?: return
+        val settings = budgetRepository.getBudgetSettingsSync()
+        if (settings == null) {
+            onDailySurplusDialogDismissed()
+            return
+        }
+
+        val periodId = settingsRepository.getCurrentPeriodId()
+        budgetRepository.addTransaction(
+            Transaction.create(
+                amount = data.surplusAmount,
+                date = data.date.atTime(23, 59),
+                periodId = periodId,
+                isAdjustment = true,
+            ),
+        )
+        budgetRepository.saveBudgetSettings(
+            settings.copy(
+                dailyCarryForwardDate = LocalDate.now(),
+                dailyCarryForwardAmount = data.surplusAmount,
+            ),
+        )
+        logcat { "Daily surplus of ${data.surplusAmount} added to today" }
+        onDailySurplusDialogDismissed()
+    }
+
+    private fun LocalDate.toStartOfDayMillis(): Long =
+        atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+    private companion object {
+        val MIN_SURPLUS_THRESHOLD: BigDecimal = BigDecimal("0.01")
     }
 }

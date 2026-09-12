@@ -163,6 +163,37 @@ class BudgetStateCalculatorTest {
     }
 
     @Test
+    fun `dailyCarryForward is added to remainingToday only on its target date`() {
+        val withoutCarry = settings(
+            totalBudget = BigDecimal("2000"),
+            start = LocalDate.of(2026, 7, 1),
+            end = LocalDate.of(2026, 7, 20),
+            splitMode = BudgetSplitMode.DYNAMIC,
+        )
+        val withCarry = withoutCarry.copy(
+            dailyCarryForwardDate = LocalDate.of(2026, 7, 11),
+            dailyCarryForwardAmount = BigDecimal("50.00"),
+        )
+
+        val baselineOnTargetDay = calculator.calculateBudgetState(
+            settings = withoutCarry, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 11),
+        )
+        val onTargetDay = calculator.calculateBudgetState(
+            settings = withCarry, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 11),
+        )
+        val baselineDayAfter = calculator.calculateBudgetState(
+            settings = withoutCarry, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 12),
+        )
+        val dayAfter = calculator.calculateBudgetState(
+            settings = withCarry, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 12),
+        )
+
+        assertThat(onTargetDay.remainingToday)
+            .isEqualTo(baselineOnTargetDay.remainingToday.add(BigDecimal("50.00")))
+        assertThat(dayAfter.remainingToday).isEqualTo(baselineDayAfter.remainingToday)
+    }
+
+    @Test
     fun `static and dynamic produce different daily budgets for the same data`() {
         val s = settings(
             totalBudget = BigDecimal("2000"),

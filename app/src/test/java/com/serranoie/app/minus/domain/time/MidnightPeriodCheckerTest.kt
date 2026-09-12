@@ -3,11 +3,14 @@ package com.serranoie.app.minus.domain.time
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
+import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -22,7 +25,8 @@ class MidnightPeriodCheckerTest {
 
     private val budgetRepository: BudgetRepository = mockk(relaxed = true)
     private val settingsRepository: SettingsRepository = mockk(relaxed = true)
-    private val checker = MidnightPeriodChecker(budgetRepository, settingsRepository)
+    private val budgetStateCalculator = BudgetStateCalculator(RecurringExpenseCalculator())
+    private val checker = MidnightPeriodChecker(budgetRepository, settingsRepository, budgetStateCalculator)
 
     private fun settingsEndingOn(
         endDate: LocalDate,
@@ -422,5 +426,125 @@ class MidnightPeriodCheckerTest {
         assertThat(checker.shouldShowTransitionDialog.value).isFalse()
         assertThat(checker.midnightTransitionData.value).isNull()
         coVerify(exactly = 0) { settingsRepository.setPendingRollover(any(), any()) }
+    }
+
+    private fun dynamicAskAlwaysSettings(
+        start: LocalDate,
+        end: LocalDate,
+        totalBudget: BigDecimal = BigDecimal("1000.00"),
+    ): BudgetSettings = BudgetSettings(
+        totalBudget = totalBudget,
+        period = BudgetPeriod.MONTHLY,
+        startDate = start,
+        endDate = end,
+        currencyCode = "USD",
+        remainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
+        splitMode = BudgetSplitMode.DYNAMIC,
+    )
+
+    private fun LocalDate.toMillis(): Long =
+        atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+    @Test
+    fun `checkDailySurplus - first ever check just records the checkpoint without asking`() = runTest {
+        val today = LocalDate.now()
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns dynamicAskAlwaysSettings(
+            start = today.minusDays(10), end = today.plusDays(10),
+        )
+        coEvery { settingsRepository.getLastDailySurplusCheckDate() } returns null
+
+        checker.checkDailySurplus()
+
+        coVerify { settingsRepository.setLastDailySurplusCheckDate(any()) }
+        assertThat(checker.shouldShowDailySurplusDialog.value).isFalse()
+    }
+
+    @Test
+    fun `checkDailySurplus - underspending yesterday shows the dialog with the exact surplus`() = runTest {
+        val today = LocalDate.now()
+        val yesterday = today.minusDays(1)
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns dynamicAskAlwaysSettings(
+            start = today.minusDays(10), end = today.plusDays(10),
+        )
+        coEvery { settingsRepository.getLastDailySurplusCheckDate() } returns yesterday.toMillis()
+        coEvery { budgetRepository.getTransactions() } returns flowOf(
+            listOf(Transaction.create(amount = BigDecimal("30.00"), date = yesterday.atTime(10, 0)))
+        )
+
+        checker.checkDailySurplus()
+
+        assertThat(checker.shouldShowDailySurplusDialog.value).isTrue()
+        val data = checker.dailySurplusData.value
+        assertThat(data).isNotNull()
+        assertThat(data!!.date).isEqualTo(yesterday)
+        // daysRemaining from yesterday = 12, so baseline dailyBudget = 1000/12 = 83.33
+        assertThat(data.surplusAmount).isEqualTo(BigDecimal("53.33"))
+        coVerify { settingsRepository.setLastDailySurplusCheckDate(any()) }
+    }
+
+    @Test
+    fun `checkDailySurplus - fully spending yesterdays allotment does not show the dialog`() = runTest {
+        val today = LocalDate.now()
+        val yesterday = today.minusDays(1)
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns dynamicAskAlwaysSettings(
+            start = today.minusDays(10), end = today.plusDays(10),
+        )
+        coEvery { settingsRepository.getLastDailySurplusCheckDate() } returns yesterday.toMillis()
+        coEvery { budgetRepository.getTransactions() } returns flowOf(
+            listOf(Transaction.create(amount = BigDecimal("83.33"), date = yesterday.atTime(10, 0)))
+        )
+
+        checker.checkDailySurplus()
+
+        assertThat(checker.shouldShowDailySurplusDialog.value).isFalse()
+    }
+
+    @Test
+    fun `checkDailySurplus - is a no-op for STATIC split mode`() = runTest {
+        val today = LocalDate.now()
+        val yesterday = today.minusDays(1)
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns dynamicAskAlwaysSettings(
+            start = today.minusDays(10), end = today.plusDays(10),
+        ).copy(splitMode = BudgetSplitMode.STATIC)
+        coEvery { settingsRepository.getLastDailySurplusCheckDate() } returns yesterday.toMillis()
+        coEvery { budgetRepository.getTransactions() } returns flowOf(
+            listOf(Transaction.create(amount = BigDecimal("30.00"), date = yesterday.atTime(10, 0)))
+        )
+
+        checker.checkDailySurplus()
+
+        assertThat(checker.shouldShowDailySurplusDialog.value).isFalse()
+        coVerify(exactly = 0) { settingsRepository.setLastDailySurplusCheckDate(any()) }
+    }
+
+    @Test
+    fun `onDailySurplusAddToToday inserts a yesterday-dated adjustment and sets todays carry-forward`() = runTest {
+        val today = LocalDate.now()
+        val yesterday = today.minusDays(1)
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns dynamicAskAlwaysSettings(
+            start = today.minusDays(10), end = today.plusDays(10),
+        )
+        coEvery { settingsRepository.getLastDailySurplusCheckDate() } returns yesterday.toMillis()
+        coEvery { budgetRepository.getTransactions() } returns flowOf(
+            listOf(Transaction.create(amount = BigDecimal("30.00"), date = yesterday.atTime(10, 0)))
+        )
+        coEvery { settingsRepository.getCurrentPeriodId() } returns 42L
+        checker.checkDailySurplus()
+        val surplus = checker.dailySurplusData.value!!.surplusAmount
+
+        checker.onDailySurplusAddToToday()
+
+        coVerify {
+            budgetRepository.addTransaction(
+                match { it.isAdjustment && it.amount == surplus && it.date?.toLocalDate() == yesterday },
+            )
+        }
+        coVerify {
+            budgetRepository.saveBudgetSettings(
+                match { it.dailyCarryForwardDate == today && it.dailyCarryForwardAmount == surplus },
+            )
+        }
+        assertThat(checker.shouldShowDailySurplusDialog.value).isFalse()
+        assertThat(checker.dailySurplusData.value).isNull()
     }
 }

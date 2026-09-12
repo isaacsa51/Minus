@@ -72,6 +72,14 @@ class BudgetStateCalculator @Inject constructor(
             BigDecimal.ZERO
         }
 
+        val dailyCarryForward = if (
+            settings.dailyCarryForwardDate != null && currentDate.isEqual(settings.dailyCarryForwardDate)
+        ) {
+            settings.dailyCarryForwardAmount ?: BigDecimal.ZERO
+        } else {
+            BigDecimal.ZERO
+        }
+
         val rolloverAmount = if (settings.rollOverCarryForward) {
             settings.rollOverLimit ?: BigDecimal.ZERO
         } else {
@@ -129,7 +137,8 @@ class BudgetStateCalculator @Inject constructor(
             transactions, settings.startDate, currentDate, 30
         )
 
-        val remainingToday = originalDailyBudget.add(carryForFirstDay).add(incomeToday).subtract(spentToday)
+        val remainingToday = originalDailyBudget.add(carryForFirstDay).add(dailyCarryForward)
+            .add(incomeToday).subtract(spentToday)
 
         val progress = if (effectiveTotalBudget > BigDecimal.ZERO) {
             totalExpensesInPeriod.divide(effectiveTotalBudget, 4, RoundingMode.HALF_UP)

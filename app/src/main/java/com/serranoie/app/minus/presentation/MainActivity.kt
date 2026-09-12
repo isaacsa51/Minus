@@ -44,6 +44,7 @@ import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.permission.PermissionHandler
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.ThemeManager
+import com.serranoie.app.minus.presentation.ui.theme.component.DailySurplusDialog
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
 import com.serranoie.app.minus.presentation.util.CensorManager
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
@@ -283,6 +284,28 @@ class MainActivity : AppCompatActivity() {
                                         },
                                     )
                                 }
+                            }
+
+                            val shouldShowDailySurplusDialog by midnightTransitionManager.shouldShowDailySurplusDialog.collectAsStateWithLifecycle()
+                            val dailySurplusData by midnightTransitionManager.dailySurplusData.collectAsStateWithLifecycle()
+
+                            if (shouldShowDailySurplusDialog && dailySurplusData != null) {
+                                val data = dailySurplusData!!
+                                DailySurplusDialog(
+                                    surplusAmount = data.surplusAmount,
+                                    currencyCode = data.currencyCode,
+                                    onAddToToday = {
+                                        lifecycleScope.launch {
+                                            midnightTransitionManager.onDailySurplusAddToToday()
+                                        }
+                                    },
+                                    onSpread = {
+                                        midnightTransitionManager.onDailySurplusDialogDismissed()
+                                    },
+                                    onDismiss = {
+                                        midnightTransitionManager.onDailySurplusDialogDismissed()
+                                    },
+                                )
                             }
 
                             val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()

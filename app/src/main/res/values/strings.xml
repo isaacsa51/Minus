@@ -547,6 +547,14 @@
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
 
+    <!-- Daily Surplus Dialog (component local) -->
+    <string name="daily_surplus_dialog_title">Yesterday\'s surplus</string>
+    <string name="daily_surplus_dialog_question">You had %1$s left over from yesterday\'s budget. What do you want to do with it?</string>
+    <string name="daily_surplus_add_to_today_title">Add to today</string>
+    <string name="daily_surplus_add_to_today_desc">Add the full %1$s to today\'s budget only</string>
+    <string name="daily_surplus_spread_title">Spread across remaining days</string>
+    <string name="daily_surplus_spread_desc">Let %1$s stay spread evenly across the rest of this period</string>
+
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Period finished</string>
     <string name="finished_period_header_no_spends">Huh? You didn\'t spend anything this period</string>

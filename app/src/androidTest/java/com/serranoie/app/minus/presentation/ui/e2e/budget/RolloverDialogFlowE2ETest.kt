@@ -17,11 +17,13 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
+import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.time.MidnightPeriodChecker
 import com.serranoie.app.minus.domain.time.MidnightTransitionManager
 import com.serranoie.app.minus.domain.time.TimeProvider
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.ui.budget.BudgetPeriodManager
+import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
@@ -48,7 +50,9 @@ class RolloverDialogFlowE2ETest {
     private val timeProvider: TimeProvider = mockk(relaxed = true)
     private val notificationScheduler: NotificationScheduler = mockk(relaxed = true)
 
-    private val checker = MidnightPeriodChecker(budgetRepository, settingsRepository)
+    private val checker = MidnightPeriodChecker(
+        budgetRepository, settingsRepository, BudgetStateCalculator(RecurringExpenseCalculator()),
+    )
     private val transitionManager = MidnightTransitionManager(checker)
     private lateinit var periodManager: BudgetPeriodManager
 

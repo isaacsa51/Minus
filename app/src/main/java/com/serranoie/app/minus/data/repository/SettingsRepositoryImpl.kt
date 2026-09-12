@@ -19,6 +19,7 @@ import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY_NAME
 import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY_NAME
+import com.serranoie.app.minus.domain.time.LAST_DAILY_SURPLUS_CHECK_DATE_KEY_NAME
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_AMOUNT_KEY_NAME
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_STRATEGY_KEY_NAME
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
@@ -113,6 +114,8 @@ private val MIDNIGHT_TRANSITION_OCCURRED =
     booleanPreferencesKey("midnight_transition_occurred")
 private val LAST_PERIOD_END =
     longPreferencesKey("last_period_end_millis")
+private val LAST_DAILY_SURPLUS_CHECK_DATE =
+    longPreferencesKey(LAST_DAILY_SURPLUS_CHECK_DATE_KEY_NAME)
 private val REMAINING_FROM_LAST_PERIOD =
     stringPreferencesKey("remaining_from_last_period")
 private val PENDING_ROLLOVER_AMOUNT = stringPreferencesKey(PENDING_ROLLOVER_AMOUNT_KEY_NAME)
@@ -536,6 +539,14 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs.remove(LAST_PERIOD_END)
             prefs.remove(REMAINING_FROM_LAST_PERIOD)
         }
+    }
+
+    override suspend fun getLastDailySurplusCheckDate(): Long? {
+        return dataStore.data.first()[LAST_DAILY_SURPLUS_CHECK_DATE]
+    }
+
+    override suspend fun setLastDailySurplusCheckDate(dateMillis: Long) {
+        dataStore.edit { it[LAST_DAILY_SURPLUS_CHECK_DATE] = dateMillis }
     }
 
     private fun String.toThemeMode(): ThemeMode {
