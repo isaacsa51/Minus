@@ -185,7 +185,7 @@ private fun RolloverDialogContent(
                     )
                     Text(
                         text = formattedSpent,
-                        style = MaterialTheme.typography.titleMediumEmphasized,
+                        style = MaterialTheme.typography.titleLargeEmphasized,
                         color = colorOnEditor,
                         maxLines = 1
                     )
@@ -209,7 +209,7 @@ private fun RolloverDialogContent(
                     )
                     Text(
                         text = formattedRemaining,
-                        style = MaterialTheme.typography.titleMediumEmphasized,
+                        style = MaterialTheme.typography.headlineSmallEmphasized,
                         color = MaterialTheme.colorScheme.tertiary,
                         maxLines = 1
                     )
@@ -271,7 +271,7 @@ private fun RolloverDialogContent(
 }
 
 @Composable
-internal fun RolloverActionRow(
+private fun RolloverActionRow(
     icon: ImageVector,
     title: String,
     description: String,

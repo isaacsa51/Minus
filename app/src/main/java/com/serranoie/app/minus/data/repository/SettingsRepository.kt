@@ -113,8 +113,4 @@ interface SettingsRepository {
     suspend fun resetLastSeenVersionCode()
 
     suspend fun clearLastPeriodSnapshot()
-
-    suspend fun getLastDailySurplusCheckDate(): Long?
-
-    suspend fun setLastDailySurplusCheckDate(dateMillis: Long)
 }

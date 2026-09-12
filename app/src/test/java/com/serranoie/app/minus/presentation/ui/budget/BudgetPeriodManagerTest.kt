@@ -5,7 +5,6 @@ import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
-import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
@@ -33,9 +32,7 @@ class BudgetPeriodManagerTest {
     private val timeProvider: TimeProvider = mockk(relaxed = true)
     private val notificationScheduler: NotificationScheduler = mockk(relaxed = true)
 
-    private val midnightPeriodChecker = MidnightPeriodChecker(
-        budgetRepository, settingsRepository, BudgetStateCalculator(RecurringExpenseCalculator()),
-    )
+    private val midnightPeriodChecker = MidnightPeriodChecker(budgetRepository, settingsRepository)
 
     private lateinit var periodManager: BudgetPeriodManager
 
