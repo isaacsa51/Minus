@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,9 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
-import androidx.wear.compose.foundation.lazy.items
-import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.FilledIconButton
@@ -44,7 +44,7 @@ internal fun NumpadEntryScreen(
     onClear: () -> Unit,
     onContinue: () -> Unit
 ) {
-    val listState = rememberTransformingLazyColumnState()
+    val listState = rememberLazyListState()
     val canContinue = amountToBigDecimalOrZero(amount) > BigDecimal.ZERO
 
     AppScaffold(timeText = {}) {
@@ -54,7 +54,7 @@ internal fun NumpadEntryScreen(
                     Text(text = "+")
                 }
             }) {
-            TransformingLazyColumn(
+            LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(top = 14.dp, bottom = 65.dp),
@@ -141,7 +141,6 @@ private fun NumberKey(text: String, modifier: Modifier = Modifier, onClick: () -
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        shapes = TextButtonDefaults.animatedShapes(),
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -170,7 +169,6 @@ private fun DeleteKey(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
             contentColor = MaterialTheme.colorScheme.tertiary
         ),
-        shapes = IconButtonDefaults.animatedShapes(),
         modifier = modifier
 			.height(32.dp)
 			.width(32.dp)

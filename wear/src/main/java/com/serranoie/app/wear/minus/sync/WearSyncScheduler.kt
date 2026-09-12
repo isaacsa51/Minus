@@ -11,6 +11,7 @@ import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 
 object WearSyncScheduler {
+    const val MANUAL_SYNC_WORK_NAME = "wear_immediate_sync"
     private const val PERIODIC_WORK_NAME = "wear_periodic_expense_sync"
 
     fun enqueueImmediate(context: Context) {
@@ -23,7 +24,7 @@ object WearSyncScheduler {
             .build()
 
         WorkManager.getInstance(context)
-            .enqueueUniqueWork("wear_immediate_sync", ExistingWorkPolicy.REPLACE, request)
+            .enqueueUniqueWork(MANUAL_SYNC_WORK_NAME, ExistingWorkPolicy.REPLACE, request)
     }
 
     fun ensurePeriodic(context: Context) {
