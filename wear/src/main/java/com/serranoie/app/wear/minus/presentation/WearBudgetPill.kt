@@ -1,7 +1,5 @@
 package com.serranoie.app.wear.minus.presentation
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,12 +34,6 @@ internal fun WearBudgetPill(
     modifier: Modifier = Modifier,
 ) {
     val target = if (isOverBudget) 1f else progress.coerceIn(0f, 1f)
-    val animatedFill by animateFloatAsState(
-        targetValue = target,
-        animationSpec = tween(durationMillis = 500),
-        label = "budgetPillFill",
-    )
-
     val statusColor = budgetStatusColor(target)
     val fillColor = lerp(statusColor, Color.Black, 0.32f)
     val trackColor = fillColor.copy(alpha = 0.20f)
@@ -59,7 +50,7 @@ internal fun WearBudgetPill(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .fillMaxHeight()
-                .fillMaxWidth(animatedFill)
+                .fillMaxWidth(target)
                 .clip(RoundedCornerShape(topEndPercent = 100, bottomEndPercent = 100))
                 .background(fillColor),
         )

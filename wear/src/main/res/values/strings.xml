@@ -5,6 +5,7 @@
     <string name="overview_syncing">Syncing with phone…</string>
     <string name="overview_no_budget">No budget set on the phone yet</string>
     <string name="overview_add_expense">Add expense</string>
+    <string name="overview_manual_sync">Sync now</string>
 
     <string name="overview_left_today">left today</string>
     <string name="overview_over_budget">over budget</string>

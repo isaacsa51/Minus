@@ -14,9 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.wear.tooling.preview.devices.WearDevices
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.Wearable
 import com.serranoie.app.wear.minus.data.BudgetStateStore
@@ -105,13 +108,19 @@ private fun WearCalculatorApp(
     onRefreshOverview: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val categories by categoryStore.categories.collectAsState(initial = emptyList())
     val budgetPayload by budgetStateStore.budgetState.collectAsState(initial = null)
     val overviewState = budgetPayload.toOverviewUiState()
+    val syncWorkInfos by remember {
+        WorkManager.getInstance(context).getWorkInfosForUniqueWorkFlow(WearSyncScheduler.MANUAL_SYNC_WORK_NAME)
+    }.collectAsState(initial = emptyList())
+    val isSyncing = syncWorkInfos.any { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
 
     WearCalculatorContent(
         categories = categories,
         overviewState = overviewState,
+        isSyncing = isSyncing,
         onRefreshOverview = onRefreshOverview,
         onRequestSuggestionsRefresh = { onEnqueueAndSync() },
         onConfirmEntry = { amount, comment ->
@@ -141,6 +150,7 @@ private enum class EntryStep { OVERVIEW, AMOUNT, CATEGORY }
 private fun WearCalculatorContent(
     categories: List<String>,
     overviewState: PeriodOverviewUiState,
+    isSyncing: Boolean,
     onRefreshOverview: () -> Unit,
     onRequestSuggestionsRefresh: () -> Unit,
     onConfirmEntry: (amount: String, comment: String) -> Unit
@@ -171,6 +181,8 @@ private fun WearCalculatorContent(
                     commentState.value = ""
                     step.value = EntryStep.AMOUNT
                 },
+                onManualSync = onRefreshOverview,
+                isSyncing = isSyncing,
             )
 
             EntryStep.AMOUNT -> NumpadEntryScreen(
@@ -226,6 +238,7 @@ private fun WearCalculatorContentPreview() {
             period = BudgetPeriodKind.MONTHLY,
             daysRemaining = 12,
         ),
+        isSyncing = false,
         onRefreshOverview = {},
         onRequestSuggestionsRefresh = {},
         onConfirmEntry = { _, _ -> })
