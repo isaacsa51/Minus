@@ -437,10 +437,13 @@
     <string name="rollover_dialog_question">남은 금액으로 무엇을 하시겠습니까?</string>
     <string name="rollover_dialog_split_equally_title">균등하게 분할합니다.</string>
     <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">내일로 이월</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">오늘에 추가</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">%1$s 전액을 오늘 예산에만 추가합니다</string>
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="unresolved_surplus_title">대기 중인 잔여 금액</string>
+    <string name="rollover_dialog_pending_label">이전 기간에서</string>
+    <string name="unresolved_surplus_tap_to_manage">탭하여 관리</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">기간 종료</string>
     <string name="finished_period_header_no_spends">어라? 이번 기간에는 지출이 없네요</string>
@@ -494,13 +497,13 @@
     <string name="currency_selected">선택됨</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">예산 잔액</string>
-    <string name="strategy_dialog_description" formatted="false">매일 종료 시점에 예산 잔액을 어떻게 배분할지 선택할 수 있습니다. 예를 들어 일일 예산이 500이고 어제 400을 지출했다면, 남은 100을 나머지 날짜에 분산하거나 오늘 600(일일 예산 + 이전 기간의 잔여 예산)을 지출할 수 있습니다.</string>
+    <string name="strategy_dialog_description" formatted="false">기간이 종료될 때 남은 예산을 어떻게 분배할지 선택할 수 있습니다.\n\n예를 들어 기간이 100의 잔여 예산으로 종료되면, 다음 기간의 날짜에 균등하게 분배하거나, 다음 기간의 첫날에 전부 추가하거나, 매번 발생할 때마다 결정할 수 있습니다.</string>
     <string name="strategy_ask_always">항상 확인</string>
     <string name="strategy_ask_always_desc">기간이 종료될 때 잔여 예산을 어떻게 처리할지 확인합니다.</string>
     <string name="strategy_split_equally">모든 날짜에 분산</string>
     <string name="strategy_split_equally_desc">잔여 예산이 새 기간의 모든 날짜에 동일하게 분할됩니다.</string>
-    <string name="strategy_add_to_first_day">첫날에 추가</string>
-    <string name="strategy_add_to_first_day_desc">모든 잔여 예산이 새 기간의 첫날에 추가됩니다.</string>
+    <string name="strategy_add_to_first_day">오늘에 추가</string>
+    <string name="strategy_add_to_first_day_desc">모든 잔여 예산은 오늘 예산에만 추가됩니다</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">분할 모드</string>
     <string name="split_mode_dialog_title">예산을 어떻게 분할할까요?</string>

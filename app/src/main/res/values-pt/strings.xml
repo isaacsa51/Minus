@@ -438,10 +438,13 @@
     <string name="rollover_dialog_question">O que você quer fazer com o dinheiro restante?</string>
     <string name="rollover_dialog_split_equally_title">Dividir igualmente</string>
     <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">Carregue para amanhã</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">Adicionar a hoje</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Adicione o valor total de %1$s apenas ao orçamento de hoje</string>
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="unresolved_surplus_title">Excedente pendente</string>
+    <string name="rollover_dialog_pending_label">De um período anterior</string>
+    <string name="unresolved_surplus_tap_to_manage">Toque para gerenciar</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Período terminado</string>
     <string name="finished_period_header_no_spends">Hã? Você não passou nada neste período</string>
@@ -495,13 +498,13 @@
     <string name="currency_selected">Selecionado</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">Excesso de orçamento</string>
-    <string name="strategy_dialog_description" formatted="false">Pode escolher como distribuir o seu saldo de orçamento ao final de cada dia.\n\nPor exemplo, tem um orçamento de 500 por dia, e ontem gastou 400: pode espalhar os 100 pelos dias restantes, ou gastar 600 hoje (orçamento diário + excedente do período anterior).</string>
+    <string name="strategy_dialog_description" formatted="false">Pode escolher como distribuir o orçamento restante quando o seu período termina.\n\nPor exemplo, o seu período termina com um excedente de 100: pode distribuí-lo igualmente pelos dias do seu próximo período, adicioná-lo todo ao primeiro dia do seu próximo período, ou decidir cada vez que isso acontece.</string>
     <string name="strategy_ask_always">Perguntar-me sempre</string>
     <string name="strategy_ask_always_desc">No final do período, vamos perguntar o que fazer com o excedente</string>
     <string name="strategy_split_equally">Espalhe por todos os dias</string>
     <string name="strategy_split_equally_desc">O excedente é dividido igualmente entre todos os dias do novo período</string>
-    <string name="strategy_add_to_first_day">Adicionar ao primeiro dia</string>
-    <string name="strategy_add_to_first_day_desc">Todo o excedente é adicionado ao primeiro dia do novo período</string>
+    <string name="strategy_add_to_first_day">Adicionar a hoje</string>
+    <string name="strategy_add_to_first_day_desc">Todo o excedente é adicionado apenas ao orçamento de hoje</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">Modo dividido</string>
     <string name="split_mode_dialog_title">Como devemos dividir o seu orçamento?</string>

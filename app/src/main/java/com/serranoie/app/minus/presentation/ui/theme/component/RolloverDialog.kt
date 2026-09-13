@@ -211,7 +211,7 @@ private fun RolloverDialogContent(
                     )
                     Text(
                         text = formattedRemaining,
-                        style = MaterialTheme.typography.headlineSmallEmphasized,
+                        style = MaterialTheme.typography.titleLargeEmphasized,
                         color = MaterialTheme.colorScheme.tertiary,
                         maxLines = 1
                     )

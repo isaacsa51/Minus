@@ -438,10 +438,13 @@
     <string name="rollover_dialog_question">Che cosa vuoi fare con i soldi restanti?</string>
     <string name="rollover_dialog_split_equally_title">Dividi ugualmente</string>
     <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">Portati a domani</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">Aggiungi a oggi</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Aggiungi l\'intero importo di %1$s solo al budget di oggi</string>
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="unresolved_surplus_title">Eccedenza in sospeso</string>
+    <string name="rollover_dialog_pending_label">Da un periodo precedente</string>
+    <string name="unresolved_surplus_tap_to_manage">Tocca per gestire</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Periodo terminato</string>
     <string name="finished_period_header_no_spends">Huh? Non hai speso nulla in questo periodo</string>
@@ -495,13 +498,13 @@
     <string name="currency_selected">Selezionato</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">Eccedenza di bilancio</string>
-    <string name="strategy_dialog_description" formatted="false">È possibile scegliere come distribuire il saldo di bilancio alla fine di ogni giorno.\n\nPer esempio, hai un budget di 500 al giorno, e ieri hai speso 400: puoi spargere i 100 tra i restanti giorni, o spendere 600 oggi (budget giornaliero + surplus del periodo precedente).</string>
+    <string name="strategy_dialog_description" formatted="false">Puoi scegliere come distribuire il budget rimanente quando termina il tuo periodo.\n\nAd esempio, il tuo periodo termina con un\'eccedenza di 100: puoi distribuirla equamente tra i giorni del tuo prossimo periodo, aggiungerla interamente al primo giorno del tuo prossimo periodo, oppure decidere ogni volta che accade.</string>
     <string name="strategy_ask_always">Chiedimi sempre</string>
     <string name="strategy_ask_always_desc">Alla fine del periodo vi chiederemo cosa fare con l\'eccedenza</string>
     <string name="strategy_split_equally">Diffusione in tutti i giorni</string>
     <string name="strategy_split_equally_desc">L\'eccedenza è divisa equamente tra tutti i giorni del nuovo periodo</string>
-    <string name="strategy_add_to_first_day">Aggiungi al primo giorno</string>
-    <string name="strategy_add_to_first_day_desc">Tutte le eccedenze sono aggiunte al primo giorno del nuovo periodo</string>
+    <string name="strategy_add_to_first_day">Aggiungi a oggi</string>
+    <string name="strategy_add_to_first_day_desc">Tutta l\'eccedenza viene aggiunta solo al budget di oggi</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">Modalità di divisione</string>
     <string name="split_mode_dialog_title">Come dovremmo dividere il vostro bilancio?</string>

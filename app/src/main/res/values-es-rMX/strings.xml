@@ -439,10 +439,13 @@
     <string name="rollover_dialog_question">¿Qué quieres hacer con el dinero restante?</string>
     <string name="rollover_dialog_split_equally_title">Dividir en partes iguales</string>
     <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">Llevar a mañana</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">Agregar a hoy</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Agrega el total de %1$s solo al presupuesto de hoy</string>
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="unresolved_surplus_title">Sobrante pendiente</string>
+    <string name="rollover_dialog_pending_label">De un período anterior</string>
+    <string name="unresolved_surplus_tap_to_manage">Toca para gestionar</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Periodo terminado</string>
     <string name="finished_period_header_no_spends">¿Eh? No gastaste nada este período</string>
@@ -496,13 +499,13 @@
     <string name="currency_selected">Seleccionado</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">Sobrante del presupuesto</string>
-    <string name="strategy_dialog_description" formatted="false">Puedes elegir como distribuir el balance del presupuesto al final de cada día.\n\nPor ejemplo, tienes un presupuesto de 500 al día, y ayer gastaste 400: puedes repartir 100 en los días que queda, o gastar 600 (presupuesto por día + sobrante del periodo anterior) hoy.</string>
+    <string name="strategy_dialog_description" formatted="false">Puedes elegir cómo distribuir el presupuesto sobrante cuando termina tu período.\n\nPor ejemplo, tu período termina con 100 de sobrante: puedes repartirlo equitativamente entre los días de tu siguiente período, agregarlo todo al primer día de tu siguiente período, o decidir cada vez que ocurra.</string>
     <string name="strategy_ask_always">Preguntarme siempre</string>
     <string name="strategy_ask_always_desc">Al final del período te preguntaremos qué hacer con el sobrante</string>
     <string name="strategy_split_equally">Repartir entre todos los días</string>
     <string name="strategy_split_equally_desc">El sobrante se divide equitativamente entre todos los días del nuevo período</string>
-    <string name="strategy_add_to_first_day">Agregar al primer día</string>
-    <string name="strategy_add_to_first_day_desc">Todo el sobrante se suma al primer día del nuevo período</string>
+    <string name="strategy_add_to_first_day">Agregar a hoy</string>
+    <string name="strategy_add_to_first_day_desc">Todo el sobrante se agrega solo al presupuesto de hoy</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">Dividir modo</string>
     <string name="split_mode_dialog_title">¿Cómo deberíamos dividir tu presupuesto?</string>

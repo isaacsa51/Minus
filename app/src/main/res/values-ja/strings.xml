@@ -436,10 +436,13 @@
     <string name="rollover_dialog_question">残りのお金で何をしたいですか。</string>
     <string name="rollover_dialog_split_equally_title">均等に分割</string>
     <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">明日まで運んでください</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">今日に追加</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">%1$s の全額を今日の予算にのみ追加します</string>
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="unresolved_surplus_title">未処理の余剰金</string>
+    <string name="rollover_dialog_pending_label">前の期間から</string>
+    <string name="unresolved_surplus_tap_to_manage">タップして管理</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">生理が終了しました</string>
     <string name="finished_period_header_no_spends">はあ？この期間は何も使っていません。</string>
@@ -493,13 +496,13 @@
     <string name="currency_selected">選択済み</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">予算余剰額</string>
-    <string name="strategy_dialog_description" formatted="false">毎日の終わりに予算残高を配分する方法を選択できます。\n\nたとえば、1日あたり500の予算があります。 そして昨日あなたは400を費やしました:あなたは残りの日に100を広げるか、今日600を費やすことができます(毎日の予算+前の期間から黒字)。</string>
+    <string name="strategy_dialog_description" formatted="false">期間が終了したときに、残った予算をどのように配分するかを選択できます。\n\n例えば、期間が100の余剰で終了した場合、次の期間の日々に均等に分配する、次の期間の初日にすべて追加する、または発生するたびに決定する、のいずれかを選べます。</string>
     <string name="strategy_ask_always">常に確認する</string>
     <string name="strategy_ask_always_desc">期間の終わりに、余剰金をどうするかを尋ねます。</string>
     <string name="strategy_split_equally">すべての日に広がってください</string>
     <string name="strategy_split_equally_desc">余剰は新時代のすべての日で等しく割られます</string>
-    <string name="strategy_add_to_first_day">最初の日に追加</string>
-    <string name="strategy_add_to_first_day_desc">すべての余剰は、新しい期間の最初の日に追加されます</string>
+    <string name="strategy_add_to_first_day">今日に追加</string>
+    <string name="strategy_add_to_first_day_desc">余剰はすべて今日の予算にのみ追加されます</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">分割モード</string>
     <string name="split_mode_dialog_title">予算はどのように分けましょうか。</string>

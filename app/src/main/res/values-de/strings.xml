@@ -442,10 +442,13 @@
     <string name="rollover_dialog_question">Was möchtest du mit dem verbleibenden Geld tun?</string>
     <string name="rollover_dialog_split_equally_title">Gleichmäßig teilen</string>
     <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">Bis morgen</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">Zu heute hinzufügen</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Füge den vollen Betrag %1$s nur dem heutigen Budget hinzu</string>
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="unresolved_surplus_title">Pending extra money</string>
+    <string name="rollover_dialog_pending_label">From a previous period</string>
+    <string name="unresolved_surplus_tap_to_manage">Tap to manage</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Zeitraum beendet</string>
     <string name="finished_period_header_no_spends">Huh? You didn\'t spend anything this period</string>
@@ -499,13 +502,13 @@
     <string name="currency_selected">Selected</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">Budget surplus</string>
-    <string name="strategy_dialog_description" formatted="false">You can choose how to distribute your budget balance at the end of each day.\n\nFor example, you have a budget of 500 per day, and yesterday you spent 400: you can spread the 100 across the remaining days, or spend 600 today (daily budget + surplus from previous period).</string>
+    <string name="strategy_dialog_description" formatted="false">Du kannst wählen, wie ein übrig gebliebenes Budget am Ende deines Zeitraums verteilt wird.\n\nZum Beispiel: Dein Zeitraum endet mit 100 übrig – du kannst den Betrag gleichmäßig auf die Tage deines nächsten Zeitraums verteilen, ihn komplett dem ersten Tag deines nächsten Zeitraums hinzufügen oder jedes Mal neu entscheiden, wenn es passiert.</string>
     <string name="strategy_ask_always">Ask me always</string>
     <string name="strategy_ask_always_desc">At the end of the period we will ask you what to do with the surplus</string>
     <string name="strategy_split_equally">Spread across all days</string>
     <string name="strategy_split_equally_desc">The surplus is divided equally among all days of the new period</string>
-    <string name="strategy_add_to_first_day">Add to first day</string>
-    <string name="strategy_add_to_first_day_desc">All surplus is added to the first day of the new period</string>
+    <string name="strategy_add_to_first_day">Zu heute hinzufügen</string>
+    <string name="strategy_add_to_first_day_desc">Der gesamte Überschuss wird nur dem heutigen Budget hinzugefügt</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">Split mode</string>
     <string name="split_mode_dialog_title">How should we split your budget?</string>

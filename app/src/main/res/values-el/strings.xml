@@ -435,10 +435,13 @@
     <string name="rollover_dialog_question">Τι θέλετε να κάνετε με τα υπόλοιπα χρήματα?</string>
     <string name="rollover_dialog_split_equally_title">Διαχωρισμός ισομερώς</string>
     <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">Μεταφέρετε στο αύριο</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">Προσθήκη σήμερα</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Προσθέστε ολόκληρο το ποσό %1$s μόνο στον προϋπολογισμό της σημερινής ημέρας</string>
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="unresolved_surplus_title">Εκκρεμές πλεόνασμα</string>
+    <string name="rollover_dialog_pending_label">Από προηγούμενη περίοδο</string>
+    <string name="unresolved_surplus_tap_to_manage">Πατήστε για διαχείριση</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Η περίοδος ολοκληρώθηκε</string>
     <string name="finished_period_header_no_spends">Ε; Δεν ξοδέψατε τίποτα αυτήν την περίοδο</string>
@@ -492,13 +495,13 @@
     <string name="currency_selected">Επιλεγμένο</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">Δημοσιονομικό πλεόνασμα</string>
-    <string name="strategy_dialog_description" formatted="false">Μπορείτε να επιλέξετε πώς να διανείμετε το υπόλοιπο του προϋπολογισμού σας στο τέλος κάθε ημέρας.\n\nΓια παράδειγμα, έχετε προϋπολογισμό 500 ανά ημέρα, και χθες περάσατε 400: μπορείτε να εξαπλωθεί το 100 στις υπόλοιπες ημέρες, ή να περάσετε 600 σήμερα (ημερήσιος προϋπολογισμός + πλεόνασμα από την προηγούμενη περίοδο).</string>
+    <string name="strategy_dialog_description" formatted="false">Μπορείτε να επιλέξετε πώς θα διανεμηθεί το τυχόν υπόλοιπο προϋπολογισμού όταν λήξει η περίοδός σας.\n\nΓια παράδειγμα, η περίοδός σας λήγει με υπόλοιπο 100: μπορείτε να το κατανείμετε ομοιόμορφα στις ημέρες της επόμενης περιόδου σας, να το προσθέσετε όλο στην πρώτη ημέρα της επόμενης περιόδου σας, ή να αποφασίζετε κάθε φορά που συμβαίνει.</string>
     <string name="strategy_ask_always">Ερώτηση πάντα</string>
     <string name="strategy_ask_always_desc">Στο τέλος της περιόδου θα σας ρωτήσουμε τι να κάνετε με το πλεόνασμα</string>
     <string name="strategy_split_equally">Διαδώστε όλες τις ημέρες</string>
     <string name="strategy_split_equally_desc">Το πλεόνασμα κατανέμεται ισομερώς σε όλες τις ημέρες της νέας περιόδου</string>
-    <string name="strategy_add_to_first_day">Προσθήκη στην πρώτη ημέρα</string>
-    <string name="strategy_add_to_first_day_desc">Όλα τα πλεονάσματα προστίθενται στην πρώτη ημέρα της νέας περιόδου</string>
+    <string name="strategy_add_to_first_day">Προσθήκη σήμερα</string>
+    <string name="strategy_add_to_first_day_desc">Όλο το πλεόνασμα προστίθεται μόνο στον προϋπολογισμό της σημερινής ημέρας</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">Λειτουργία διαχωρισμού</string>
     <string name="split_mode_dialog_title">Πώς θα πρέπει να χωρίσει τον προϋπολογισμό σας?</string>

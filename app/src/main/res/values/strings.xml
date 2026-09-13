@@ -548,6 +548,7 @@
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
     <string name="unresolved_surplus_title">Pending extra money</string>
     <string name="rollover_dialog_pending_label">From a previous period</string>
+    <string name="unresolved_surplus_tap_to_manage">Tap to manage</string>
 
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Period finished</string>

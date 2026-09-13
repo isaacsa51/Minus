@@ -341,7 +341,7 @@ fun BudgetPill(
                             )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = "${stringResource(R.string.remaining)}: ",
+                                    text = "${stringResource(R.string.unresolved_surplus_tap_to_manage)}: ",
                                     style = MaterialTheme.typography.labelSmallEmphasized,
                                     maxLines = 1,
                                 )

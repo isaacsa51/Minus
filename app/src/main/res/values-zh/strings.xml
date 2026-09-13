@@ -439,10 +439,13 @@
     <string name="rollover_dialog_question">剩余的钱你想如何规划？</string>
     <string name="rollover_dialog_split_equally_title">平均分配</string>
     <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">累积至明天</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">添加到今天</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">将 %1$s 全部添加到今天的预算中</string>
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="unresolved_surplus_title">待处理的结余</string>
+    <string name="rollover_dialog_pending_label">来自上一周期</string>
+    <string name="unresolved_surplus_tap_to_manage">点击管理</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">周期完成</string>
     <string name="finished_period_header_no_spends">嗯？这个周期你竟然一毛不拔</string>
@@ -496,13 +499,13 @@
     <string name="currency_selected">已选择</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">预算结余</string>
-    <string name="strategy_dialog_description" formatted="false">你可以选择一天结束时如何分配你的预算余额。\n\n比如你每天有 500 的预算但昨天只花了 400，剩下的 100 就可以在剩余的日子里平分或直接加入今天的预算变成 600（每日预算 + 上一周期结余）。</string>
+    <string name="strategy_dialog_description" formatted="false">你可以选择在周期结束时如何分配剩余的预算。\n\n例如，你的周期结束时结余 100：你可以将其平均分配到下一周期的每一天，全部添加到下一周期的第一天，或者每次发生时再决定。</string>
     <string name="strategy_ask_always">总是询问</string>
     <string name="strategy_ask_always_desc">周期结束时我们会询问你如何处理结余</string>
     <string name="strategy_split_equally">平均分配</string>
     <string name="strategy_split_equally_desc">结余将平均分配至新周期内的所有日期</string>
-    <string name="strategy_add_to_first_day">添加至首日</string>
-    <string name="strategy_add_to_first_day_desc">结余将添加至新周期的首日</string>
+    <string name="strategy_add_to_first_day">添加到今天</string>
+    <string name="strategy_add_to_first_day_desc">所有结余都只添加到今天的预算中</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">拆分模式</string>
     <string name="split_mode_dialog_title">你想如何拆分你的预算？</string>

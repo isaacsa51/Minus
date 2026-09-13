@@ -435,10 +435,13 @@
     <string name="rollover_dialog_question">आप बचे हुए पैसे का क्या करना चाहते हैं?</string>
     <string name="rollover_dialog_split_equally_title">बराबर बांटें</string>
     <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">कल के लिए ले जाएं</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Add the full %1$s to the first day of your next budget only</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">आज में जोड़ें</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">पूरी %1$s राशि केवल आज के बजट में जोड़ें</string>
     <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
     <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="unresolved_surplus_title">लंबित अतिरिक्त राशि</string>
+    <string name="rollover_dialog_pending_label">पिछली अवधि से</string>
+    <string name="unresolved_surplus_tap_to_manage">प्रबंधित करने के लिए टैप करें</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">अवधि समाप्त</string>
     <string name="finished_period_header_no_spends">अरे? आपने इस अवधि में कुछ भी खर्च नहीं किया</string>
@@ -492,13 +495,13 @@
     <string name="currency_selected">चुनी गई</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">बजट में बची हुई रकम</string>
-    <string name="strategy_dialog_description" formatted="false">आप चुन सकते हैं कि हर दिन के आखिर में अपने बजट बैलेंस को कैसे बांटना है। उदाहरण के लिए, आपका रोज़ का बजट 500 है और कल आपने 400 खर्च किए: तो आप बचे हुए 100 को बाकी दिनों में बांट सकते हैं, या आज 600 खर्च कर सकते हैं (रोज़ का बजट + पिछली अवधि से बची हुई रकम)।</string>
+    <string name="strategy_dialog_description" formatted="false">आप चुन सकते हैं कि आपकी अवधि खत्म होने पर बचे हुए बजट को कैसे बांटा जाए।\n\nउदाहरण के लिए, आपकी अवधि 100 बचे होने के साथ खत्म होती है: आप इसे अपनी अगली अवधि के दिनों में समान रूप से बांट सकते हैं, इसे पूरी तरह अपनी अगली अवधि के पहले दिन में जोड़ सकते हैं, या हर बार ऐसा होने पर फैसला कर सकते हैं।</string>
     <string name="strategy_ask_always">हमेशा मुझसे पूछें</string>
     <string name="strategy_ask_always_desc">अवधि के आखिर में हम आपसे पूछेंगे कि बची हुई रकम का क्या करना है</string>
     <string name="strategy_split_equally">सभी दिनों में बांटें</string>
     <string name="strategy_split_equally_desc">बची हुई रकम को नई अवधि के सभी दिनों में बराबर-बराबर बांट दिया जाता है</string>
-    <string name="strategy_add_to_first_day">पहले दिन में जोड़ें</string>
-    <string name="strategy_add_to_first_day_desc">सारी बची हुई रकम नई अवधि के पहले दिन में जोड़ दी जाती है</string>
+    <string name="strategy_add_to_first_day">आज में जोड़ें</string>
+    <string name="strategy_add_to_first_day_desc">सारी बची हुई रकम केवल आज के बजट में जोड़ दी जाती है</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">बांटने का तरीका</string>
     <string name="split_mode_dialog_title">हम आपके बजट को कैसे बांटें?</string>
