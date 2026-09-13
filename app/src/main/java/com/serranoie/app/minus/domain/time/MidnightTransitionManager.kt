@@ -3,7 +3,10 @@ package com.serranoie.app.minus.domain.time
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import java.math.BigDecimal
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,6 +37,8 @@ class MidnightTransitionManager @Inject constructor(
     val midnightTransitionData: StateFlow<MidnightTransitionData?> =
         midnightPeriodChecker.midnightTransitionData
     val needsBudgetSetup: StateFlow<Boolean> = midnightPeriodChecker.needsBudgetSetup
+    val pendingRollover: Flow<Pair<BigDecimal, RemainingBudgetStrategy?>> =
+        midnightPeriodChecker.pendingRollover
 
     suspend fun handleAppStart() {
         midnightPeriodChecker.handleEndingPeriod()
@@ -51,11 +56,11 @@ class MidnightTransitionManager @Inject constructor(
         midnightPeriodChecker.onBudgetSetupHandled()
     }
 
-    suspend fun rollRemainingSplitEqually() {
-        midnightPeriodChecker.rollRemainingSplitEqually()
+    suspend fun resolveUnresolvedSurplus(strategy: RemainingBudgetStrategy?) {
+        midnightPeriodChecker.resolveUnresolvedSurplus(strategy)
     }
 
-    suspend fun rollRemainingToFirstDay() {
-        midnightPeriodChecker.rollRemainingToFirstDay()
+    suspend fun reopenUnresolvedSurplusDialog() {
+        midnightPeriodChecker.reopenUnresolvedSurplusDialog()
     }
 }

@@ -18,5 +18,6 @@ data class BudgetSettingsEntity(
     val rollOverLimit: String? = null,
     val remainingBudgetStrategy: String = "ASK_ALWAYS",
     val creditCardCutoffDay: Int? = null,
-    val splitMode: String = "STATIC"
+    val splitMode: String = "DYNAMIC",
+    val rollOverAppliedDate: Long? = null,
 )

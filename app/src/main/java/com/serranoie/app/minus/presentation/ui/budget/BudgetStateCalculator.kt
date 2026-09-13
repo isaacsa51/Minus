@@ -64,15 +64,16 @@ class BudgetStateCalculator @Inject constructor(
             .filter { it.amount > BigDecimal.ZERO && it.isAdjustment }
             .sumOf { it.amount }
 
-        val carryForFirstDay = if (
-            settings.rollOverCarryForward && currentDate.isEqual(settings.startDate)
-        ) {
+        val rolloverAppliedToday = settings.rollOverCarryForward &&
+            currentDate.isEqual(settings.rollOverAppliedDate ?: settings.startDate)
+
+        val carryForFirstDay = if (rolloverAppliedToday) {
             settings.rollOverLimit ?: BigDecimal.ZERO
         } else {
             BigDecimal.ZERO
         }
 
-        val rolloverAmount = if (settings.rollOverCarryForward) {
+        val rolloverAmount = if (rolloverAppliedToday) {
             settings.rollOverLimit ?: BigDecimal.ZERO
         } else {
             BigDecimal.ZERO
@@ -89,6 +90,7 @@ class BudgetStateCalculator @Inject constructor(
                     BigDecimal.ZERO
                 } else {
                     val remaining = effectiveTotalBudget.subtract(totalExpensesInPeriod)
+                        .subtract(carryForFirstDay)
                     if (remaining <= BigDecimal.ZERO) {
                         BigDecimal.ZERO
                     } else {

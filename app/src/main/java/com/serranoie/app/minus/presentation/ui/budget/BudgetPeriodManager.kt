@@ -84,7 +84,7 @@ class BudgetPeriodManager @Inject constructor(
         val (pendingRolloverAmount, pendingRolloverStrategy) = settingsRepository.getPendingRollover()
 
         val shouldApplyPendingRollover =
-            isNewPeriodBoundary && pendingRolloverAmount > BigDecimal.ZERO
+            isNewPeriodBoundary && pendingRolloverAmount > BigDecimal.ZERO && pendingRolloverStrategy != null
         val appliedRolloverAmount =
             if (shouldApplyPendingRollover) pendingRolloverAmount else BigDecimal.ZERO
         val appliedCarryForward =

@@ -4,6 +4,7 @@ import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +26,7 @@ data class MidnightTransitionData(
     val totalSpent: BigDecimal,
     val currencyCode: String,
     val shouldNavigateToAnalyticsOnly: Boolean = false,
+    val isPersistedReopen: Boolean = false,
 )
 
 @Singleton
@@ -106,6 +108,7 @@ class MidnightPeriodChecker @Inject constructor(
 
         when (settings.remainingBudgetStrategy) {
             RemainingBudgetStrategy.ASK_ALWAYS -> {
+                settingsRepository.markSurplusUnresolved(endingPeriodState.remainingAmount)
                 _midnightTransitionData.value = MidnightTransitionData(
                     periodStartDate = periodStartDate,
                     periodEndDate = lastPeriodEndDate,
@@ -229,6 +232,7 @@ class MidnightPeriodChecker @Inject constructor(
 
         when (settings.remainingBudgetStrategy) {
             RemainingBudgetStrategy.ASK_ALWAYS -> {
+                settingsRepository.markSurplusUnresolved(remainingAmount)
                 _midnightTransitionData.value = MidnightTransitionData(
                     periodStartDate = settings.startDate,
                     periodEndDate = LocalDate.now(),
@@ -252,22 +256,70 @@ class MidnightPeriodChecker @Inject constructor(
         }
     }
 
-    suspend fun rollRemainingSplitEqually() {
-        val data = _midnightTransitionData.value ?: return
-        enqueuePendingRollover(
-            strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
-            remainingAmount = data.remainingAmount,
-        )
+    val pendingRollover: Flow<Pair<BigDecimal, RemainingBudgetStrategy?>> =
+        settingsRepository.observePendingRollover()
+
+    suspend fun resolveUnresolvedSurplus(strategy: RemainingBudgetStrategy?) {
+        val (pendingAmount, _) = settingsRepository.getPendingRollover()
+        if (pendingAmount <= BigDecimal.ZERO) {
+            onTransitionDialogConfirmed()
+            return
+        }
+
+        val currentSettings = budgetRepository.getBudgetSettingsSync()
+        val periodIsActive = currentSettings != null &&
+            !LocalDate.now().isAfter(currentSettings.getPeriodEndDate())
+
+        when {
+            periodIsActive -> currentSettings?.let { settings ->
+                when (strategy) {
+                    RemainingBudgetStrategy.SPLIT_EQUALLY -> budgetRepository.saveBudgetSettings(
+                        settings.copy(totalBudget = settings.totalBudget.add(pendingAmount)),
+                    )
+
+                    RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> budgetRepository.saveBudgetSettings(
+                        settings.copy(
+                            rollOverCarryForward = true,
+                            rollOverLimit = pendingAmount,
+                            rollOverAppliedDate = LocalDate.now(),
+                        ),
+                    )
+
+                    null, RemainingBudgetStrategy.ASK_ALWAYS -> Unit
+                }
+                settingsRepository.clearPendingRollover()
+                logcat { "Resolved unresolved surplus immediately: amount=$pendingAmount strategy=$strategy" }
+            }
+
+            strategy != null && strategy != RemainingBudgetStrategy.ASK_ALWAYS -> {
+                settingsRepository.setPendingRollover(pendingAmount, strategy)
+                logcat { "Queued unresolved surplus for next period boundary: amount=$pendingAmount strategy=$strategy" }
+            }
+
+            else -> {
+                settingsRepository.clearPendingRollover()
+                logcat { "Discarded unresolved surplus: amount=$pendingAmount" }
+            }
+        }
         onTransitionDialogConfirmed()
     }
 
-    suspend fun rollRemainingToFirstDay() {
-        val data = _midnightTransitionData.value ?: return
-        enqueuePendingRollover(
-            strategy = RemainingBudgetStrategy.ADD_TO_FIRST_DAY,
-            remainingAmount = data.remainingAmount,
+    suspend fun reopenUnresolvedSurplusDialog() {
+        val (pendingAmount, strategy) = settingsRepository.getPendingRollover()
+        if (pendingAmount <= BigDecimal.ZERO || strategy != null) return
+
+        val currencyCode = budgetRepository.getBudgetSettingsSync()?.currencyCode ?: "USD"
+        val today = LocalDate.now()
+        _midnightTransitionData.value = MidnightTransitionData(
+            periodStartDate = today,
+            periodEndDate = today,
+            totalBudget = BigDecimal.ZERO,
+            remainingAmount = pendingAmount,
+            totalSpent = BigDecimal.ZERO,
+            currencyCode = currencyCode,
+            isPersistedReopen = true,
         )
-        onTransitionDialogConfirmed()
+        _shouldShowTransitionDialog.value = true
     }
 
     private suspend fun persistLastPeriodSnapshot(

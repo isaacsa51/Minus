@@ -288,4 +288,58 @@ class BudgetStateCalculatorTest {
 
         assertThat(result.totalSpentToday).isEqualTo(BigDecimal("15.00"))
     }
+
+    @Test
+    fun `rollOverLimit via rollOverAppliedDate is added to remainingToday only on its target date, not on startDate`() {
+        val withoutRollover = settings(
+            totalBudget = BigDecimal("2000"),
+            start = LocalDate.of(2026, 7, 1),
+            end = LocalDate.of(2026, 7, 20),
+            splitMode = BudgetSplitMode.DYNAMIC,
+        )
+        val withRollover = withoutRollover.copy(
+            rollOverCarryForward = true,
+            rollOverLimit = BigDecimal("100.00"),
+            rollOverAppliedDate = LocalDate.of(2026, 7, 11),
+        )
+
+        val baselineOnAppliedDate = calculator.calculateBudgetState(
+            settings = withoutRollover, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 11),
+        )
+        val onAppliedDate = calculator.calculateBudgetState(
+            settings = withRollover, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 11),
+        )
+        val onStartDate = calculator.calculateBudgetState(
+            settings = withRollover, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 1),
+        )
+        val baselineOnStartDate = calculator.calculateBudgetState(
+            settings = withoutRollover, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 1),
+        )
+
+        assertThat(onAppliedDate.remainingToday)
+            .isEqualTo(baselineOnAppliedDate.remainingToday.add(BigDecimal("100.00")))
+        assertThat(onStartDate.remainingToday).isEqualTo(baselineOnStartDate.remainingToday)
+    }
+
+    @Test
+    fun `rollOverAppliedDate falls back to startDate when not set, matching the previous behavior`() {
+        val settingsWithRollover = settings(
+            totalBudget = BigDecimal("2000"),
+            start = LocalDate.of(2026, 7, 1),
+            end = LocalDate.of(2026, 7, 20),
+            splitMode = BudgetSplitMode.STATIC,
+            carryForward = true,
+            rolloverLimit = BigDecimal("50.00"),
+        )
+
+        val onStartDate = calculator.calculateBudgetState(
+            settings = settingsWithRollover, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 1),
+        )
+        val onOtherDay = calculator.calculateBudgetState(
+            settings = settingsWithRollover, transactions = emptyList(), currentDate = LocalDate.of(2026, 7, 2),
+        )
+
+        assertThat(onStartDate.remainingToday).isEqualTo(onStartDate.dailyBudget.add(BigDecimal("50.00")))
+        assertThat(onOtherDay.remainingToday).isEqualTo(onOtherDay.dailyBudget)
+    }
 }

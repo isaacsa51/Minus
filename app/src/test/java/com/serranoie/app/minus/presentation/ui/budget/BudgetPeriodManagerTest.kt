@@ -366,6 +366,31 @@ class BudgetPeriodManagerTest {
         }
 
     @Test
+    fun `an undecided pending surplus survives a period boundary untouched, instead of being silently cleared`() =
+        runTest {
+            val today = LocalDate.now()
+            val oldSettings = budget(
+                strategy = RemainingBudgetStrategy.ASK_ALWAYS,
+                startDate = today.minusDays(20),
+                endDate = today.plusDays(10),
+            )
+            coEvery { budgetRepository.getBudgetSettingsSync() } returns oldSettings
+            coEvery { budgetRepository.getTransactions() } returns flowOf(emptyList())
+            userSettings = userSettings.copy(currentPeriodId = 42L, currentPeriodStartedAt = 1L)
+            pendingRollover = BigDecimal("150.00") to null // known surplus, still undecided
+
+            val newSettings = budget(
+                strategy = RemainingBudgetStrategy.ASK_ALWAYS,
+                startDate = today,
+                endDate = today.plusDays(27),
+            )
+            periodManager.persistBudgetSettings(newSettings, forceNewPeriodBoundary = true)
+
+            assertThat(pendingRollover.first).isEqualTo(BigDecimal("150.00"))
+            assertThat(pendingRollover.second).isNull()
+        }
+
+    @Test
     fun `archiving a period includes a recurring charge projected from before it started, matching what reopening it would show`() =
         runTest {
             val today = LocalDate.now()

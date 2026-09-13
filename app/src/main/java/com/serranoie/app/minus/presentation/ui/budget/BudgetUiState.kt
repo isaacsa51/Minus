@@ -40,6 +40,8 @@ data class BudgetUiState(
     val debtAdjustedBalance: BigDecimal = BigDecimal.ZERO,
     val calculationPreview: String? = null,
     val numpadDraftAmount: BigDecimal? = null,
+    val hasUnresolvedRolloverSurplus: Boolean = false,
+    val unresolvedSurplusAmount: BigDecimal? = null,
 ) {
     companion object {
         val INITIAL = BudgetUiState()

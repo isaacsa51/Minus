@@ -25,10 +25,11 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
         ArchivedBudgetEntity::class,
         PaidRecurrentOccurrenceEntity::class
     ],
-    version = 18,
+    version = 19,
     autoMigrations = [
         AutoMigration(from = 16, to = 17),
-        AutoMigration(from = 17, to = 18)
+        AutoMigration(from = 17, to = 18),
+        AutoMigration(from = 18, to = 19)
     ],
     exportSchema = true
 )

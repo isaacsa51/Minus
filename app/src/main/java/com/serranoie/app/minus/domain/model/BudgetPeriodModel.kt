@@ -157,6 +157,7 @@ data class BudgetSettings(
     val remainingBudgetStrategy: RemainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
     val creditCardCutoffDay: Int? = null,
     val splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
+    val rollOverAppliedDate: LocalDate? = null,
 ) {
     fun getDaysForPeriod(): Int {
         return when (period) {

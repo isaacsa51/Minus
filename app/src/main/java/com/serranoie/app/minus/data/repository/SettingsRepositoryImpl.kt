@@ -474,6 +474,22 @@ class SettingsRepositoryImpl @Inject constructor(
         return amount to strategy
     }
 
+    override fun observePendingRollover(): Flow<Pair<BigDecimal, RemainingBudgetStrategy?>> {
+        return dataStore.data.map { prefs ->
+            val amount = prefs[PENDING_ROLLOVER_AMOUNT]?.toBigDecimalOrNull() ?: BigDecimal.ZERO
+            val strategy = prefs[PENDING_ROLLOVER_STRATEGY]?.let {
+                runCatching { RemainingBudgetStrategy.valueOf(it) }.getOrNull()
+            }
+            amount to strategy
+        }
+    }
+
+    override suspend fun markSurplusUnresolved(amount: BigDecimal) {
+        dataStore.edit { preferences ->
+            preferences[PENDING_ROLLOVER_AMOUNT] = amount.toPlainString()
+        }
+    }
+
     override suspend fun setSavingsPreferences(prefs: SavingsPreferences) {
         dataStore.edit { preferences ->
             preferences[SAVINGS_PRESET] = prefs.preset.name

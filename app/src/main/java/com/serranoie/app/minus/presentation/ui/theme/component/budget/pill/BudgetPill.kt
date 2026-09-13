@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.theme.component.budget.pill
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -30,13 +31,18 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -65,15 +71,14 @@ import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import com.serranoie.app.minus.presentation.util.harmonizeWithColor
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil
 import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
+import kotlinx.coroutines.delay
 import java.math.BigDecimal
 import java.time.LocalDate
 
 /**
- * The compact budget "pill": a circular-ended card with a progress fill, the amount left in
- * the current view period, and a status label. Supporting code lives alongside in the same
- * package — population in [BudgetPillMetrics], the animated sub-composables in
- * [BudgetPillAmountText] and [BudgetPillStatusLabel].
+ * The compact budget "pill": a circular-ended card with a progress fill, the amount left in the current view period, and a status label.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -88,6 +93,9 @@ fun BudgetPill(
     splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
     calculationPreview: String? = null,
     draftAmount: BigDecimal? = null,
+    hasUnresolvedSurplus: Boolean = false,
+    unresolvedSurplusAmount: BigDecimal? = null,
+    onUnresolvedSurplusClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
@@ -235,6 +243,46 @@ fun BudgetPill(
         label = "centeredAmountScale"
     )
 
+    val showSurplusFace = hasUnresolvedSurplus && unresolvedSurplusAmount != null
+    val surplusAmountText = unresolvedSurplusAmount?.let { currencyFormat.format(it) }
+    var showingSurplusMessage by remember { mutableStateOf(false) }
+    LaunchedEffect(showSurplusFace) {
+        if (!showSurplusFace) {
+            showingSurplusMessage = false
+            return@LaunchedEffect
+        }
+        while (true) {
+            delay(4000)
+            showingSurplusMessage = !showingSurplusMessage
+        }
+    }
+    val isShowingSurplusFace = showSurplusFace && showingSurplusMessage
+
+    val view = LocalView.current
+    LaunchedEffect(isShowingSurplusFace) {
+        if (isShowingSurplusFace) {
+            HapticUtil.performMicroHaptic(view)
+        }
+    }
+
+    val surplusPalette = remember(notGood, primaryColor, isDarkTheme) {
+        toPaletteWithTheme(harmonizeWithColor(notGood, primaryColor), isDarkTheme)
+    }
+    val animatedContainerColor by animateColorAsState(
+        targetValue = if (isShowingSurplusFace) {
+            surplusPalette.container.copy(alpha = 0.6f)
+        } else {
+            harmonizedColor.container.copy(alpha = 0.6f)
+        },
+        animationSpec = tween(220),
+        label = "pillContainerColor",
+    )
+    val animatedContentColor by animateColorAsState(
+        targetValue = if (isShowingSurplusFace) surplusPalette.onContainer else harmonizedColor.onContainer,
+        animationSpec = tween(220),
+        label = "pillContentColor",
+    )
+
     Column(
         modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -243,14 +291,21 @@ fun BudgetPill(
                 .fillMaxHeight()
                 .heightIn(min = 50.dp),
             shape = CircleShape, colors = CardDefaults.cardColors(
-                containerColor = harmonizedColor.container.copy(alpha = 0.6f),
-                contentColor = harmonizedColor.onContainer,
-            ), onClick = onOpenBudgetSheet
+                containerColor = animatedContainerColor,
+                contentColor = animatedContentColor,
+            ),
+            onClick = {
+                if (isShowingSurplusFace) {
+                    onUnresolvedSurplusClick()
+                } else {
+                    onOpenBudgetSheet()
+                }
+            }
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
-                if (!bigVariant) {
+                if (!bigVariant && !isShowingSurplusFace) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
@@ -262,114 +317,158 @@ fun BudgetPill(
                 }
 
                 AnimatedContent(
-                    targetState = shouldCenterRemainingAmount,
+                    targetState = isShowingSurplusFace,
                     modifier = Modifier.fillMaxSize(),
                     transitionSpec = {
-                        val fadeSpec = tween<Float>(180)
-                        if (targetState) {
-                            (slideInHorizontally(animationSpec = tween(220)) { it / 5 } + fadeIn(
-                                fadeSpec
-                            )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { -it / 5 } + fadeOut(
-                                tween(120)
-                            ))
-                        } else {
-                            (slideInHorizontally(animationSpec = tween(220)) { -it / 5 } + fadeIn(
-                                fadeSpec
-                            )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { it / 5 } + fadeOut(
-                                tween(120)
-                            ))
-                        }
+                        fadeIn(tween(220)) togetherWith fadeOut(tween(160))
                     },
-                    label = "budgetPillContent",
-                ) { centerAmount ->
-                    val textColor = LocalContentColor.current
-                    if (centerAmount) {
-                        Box(
+                    label = "budgetPillSurplusToggle",
+                ) { showSurplus ->
+                    if (showSurplus && surplusAmountText != null) {
+                        Column(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(horizontal = 18.dp),
-                            contentAlignment = Alignment.Center,
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            val baseAmountModifier = Modifier
-                                .fillMaxWidth()
-                                .graphicsLayer {
-                                    if (!isNoBudget && calculationPreview == null) {
-                                        scaleX = centeredAmountScale
-                                        scaleY = centeredAmountScale
-                                    }
-                                }
-                            when {
-                                calculationPreview != null -> AdaptiveSingleLineText(
-                                    text = calculationPreview,
-                                    annotatedText = annotatedCalculationPreview,
-                                    style = MaterialTheme.typography.titleMediumCondensed,
-                                    color = textColor,
-                                    minFontSize = 16.sp,
-                                    modifier = baseAmountModifier,
-                                    textAlign = TextAlign.Center,
+                            AdaptiveSingleLineText(
+                                text = stringResource(R.string.unresolved_surplus_title),
+                                style = MaterialTheme.typography.titleMediumEmphasized,
+                                minFontSize = 14.sp,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "${stringResource(R.string.remaining)}: ",
+                                    style = MaterialTheme.typography.labelSmallEmphasized,
+                                    maxLines = 1,
                                 )
-
-                                isNoBudget -> AdaptiveSingleLineText(
-                                    text = stringResource(R.string.budget_pill_no_budget_action),
-                                    style = MaterialTheme.typography.titleMediumCondensed,
-                                    color = textColor,
-                                    minFontSize = 16.sp,
-                                    modifier = baseAmountModifier.censor(),
-                                    textAlign = TextAlign.Center,
-                                )
-
-                                else -> SegmentedAmountText(
-                                    text = amountText,
-                                    style = MaterialTheme.typography.titleMediumCondensed,
-                                    color = textColor,
-                                    minFontSize = 16.sp,
+                                SegmentedAmountText(
+                                    text = surplusAmountText,
+                                    style = MaterialTheme.typography.labelSmallEmphasized,
+                                    color = LocalContentColor.current,
+                                    minFontSize = 12.sp,
                                     currencySymbol = currencySymbol,
                                     symbolAtEnd = symbolAtEnd,
-                                    modifier = baseAmountModifier,
-                                    textAlign = TextAlign.Center,
+                                    textAlign = TextAlign.Start,
+                                    fillWidth = false,
                                 )
                             }
                         }
                     } else {
-                        val isCentered =
-                            metrics.isCurrentPeriodOverBudget || metrics.isOverCurrentSubPeriod || bigVariant
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = if (isCentered) 0.dp else 18.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = if (isCentered) Arrangement.Center else Arrangement.spacedBy(
-                                8.dp
-                            )
-                        ) {
-                            StatusLabel(
-                                budgetState = budgetState,
-                                budgetPeriod = viewPeriod,
-                                isOverBudget = metrics.isCurrentPeriodOverBudget,
-                                isOverSubPeriodAllocation = metrics.isOverCurrentSubPeriod,
-                                exhaustedMessage = exhaustedMessage,
-                                projectionLabel = projectionLabel,
-                                projectionAmount = projectionAmount,
-                                currencySymbol = currencySymbol,
-                                symbolAtEnd = symbolAtEnd,
-                                bigVariant = bigVariant,
-                                splitMode = splitMode,
-                                wrapContent = true,
-                                modifier = if (isCentered) Modifier.padding(horizontal = 32.dp) else Modifier.wrapContentWidth(),
-                            )
-
-                            if (!metrics.isCurrentPeriodOverBudget && !metrics.isOverCurrentSubPeriod && !bigVariant) {
-                                AdaptiveSingleLineText(
-                                    text = amountText,
-                                    annotatedText = annotatedAmount,
-                                    style = MaterialTheme.typography.titleMediumCondensed,
-                                    color = textColor,
-                                    minFontSize = 16.sp,
+                        AnimatedContent(
+                            targetState = shouldCenterRemainingAmount,
+                            modifier = Modifier.fillMaxSize(),
+                            transitionSpec = {
+                                val fadeSpec = tween<Float>(180)
+                                if (targetState) {
+                                    (slideInHorizontally(animationSpec = tween(220)) { it / 5 } + fadeIn(
+                                        fadeSpec
+                                    )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { -it / 5 } + fadeOut(
+                                        tween(120)
+                                    ))
+                                } else {
+                                    (slideInHorizontally(animationSpec = tween(220)) { -it / 5 } + fadeIn(
+                                        fadeSpec
+                                    )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { it / 5 } + fadeOut(
+                                        tween(120)
+                                    ))
+                                }
+                            },
+                            label = "budgetPillContent",
+                        ) { centerAmount ->
+                            val textColor = LocalContentColor.current
+                            if (centerAmount) {
+                                Box(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .censor(),
-                                    textAlign = TextAlign.End
-                                )
+                                        .fillMaxSize()
+                                        .padding(horizontal = 18.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    val baseAmountModifier = Modifier
+                                        .fillMaxWidth()
+                                        .graphicsLayer {
+                                            if (!isNoBudget && calculationPreview == null) {
+                                                scaleX = centeredAmountScale
+                                                scaleY = centeredAmountScale
+                                            }
+                                        }
+                                    when {
+                                        calculationPreview != null -> AdaptiveSingleLineText(
+                                            text = calculationPreview,
+                                            annotatedText = annotatedCalculationPreview,
+                                            style = MaterialTheme.typography.titleMediumCondensed,
+                                            color = textColor,
+                                            minFontSize = 16.sp,
+                                            modifier = baseAmountModifier,
+                                            textAlign = TextAlign.Center,
+                                        )
+
+                                        isNoBudget -> AdaptiveSingleLineText(
+                                            text = stringResource(R.string.budget_pill_no_budget_action),
+                                            style = MaterialTheme.typography.titleMediumCondensed,
+                                            color = textColor,
+                                            minFontSize = 16.sp,
+                                            modifier = baseAmountModifier.censor(),
+                                            textAlign = TextAlign.Center,
+                                        )
+
+                                        else -> SegmentedAmountText(
+                                            text = amountText,
+                                            style = MaterialTheme.typography.titleMediumCondensed,
+                                            color = textColor,
+                                            minFontSize = 16.sp,
+                                            currencySymbol = currencySymbol,
+                                            symbolAtEnd = symbolAtEnd,
+                                            modifier = baseAmountModifier,
+                                            textAlign = TextAlign.Center,
+                                        )
+                                    }
+                                }
+                            } else {
+                                val isCentered =
+                                    metrics.isCurrentPeriodOverBudget || metrics.isOverCurrentSubPeriod || bigVariant
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = if (isCentered) 0.dp else 18.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = if (isCentered) Arrangement.Center else Arrangement.spacedBy(
+                                        8.dp
+                                    )
+                                ) {
+                                    StatusLabel(
+                                        budgetState = budgetState,
+                                        budgetPeriod = viewPeriod,
+                                        isOverBudget = metrics.isCurrentPeriodOverBudget,
+                                        isOverSubPeriodAllocation = metrics.isOverCurrentSubPeriod,
+                                        exhaustedMessage = exhaustedMessage,
+                                        projectionLabel = projectionLabel,
+                                        projectionAmount = projectionAmount,
+                                        currencySymbol = currencySymbol,
+                                        symbolAtEnd = symbolAtEnd,
+                                        bigVariant = bigVariant,
+                                        splitMode = splitMode,
+                                        wrapContent = true,
+                                        modifier = if (isCentered) Modifier.padding(horizontal = 32.dp) else Modifier.wrapContentWidth(),
+                                    )
+
+                                    if (!metrics.isCurrentPeriodOverBudget && !metrics.isOverCurrentSubPeriod && !bigVariant) {
+                                        AdaptiveSingleLineText(
+                                            text = amountText,
+                                            annotatedText = annotatedAmount,
+                                            style = MaterialTheme.typography.titleMediumCondensed,
+                                            color = textColor,
+                                            minFontSize = 16.sp,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .censor(),
+                                            textAlign = TextAlign.End
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

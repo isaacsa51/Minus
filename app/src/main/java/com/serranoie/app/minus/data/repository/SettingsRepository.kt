@@ -1,12 +1,16 @@
 package com.serranoie.app.minus.data.repository
 
+import com.serranoie.app.minus.domain.model.AppColorScheme
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.ContrastMode
+import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
+import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.model.UserSettings
+import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
@@ -46,7 +50,7 @@ interface SettingsRepository {
 
     suspend fun setContrastMode(mode: ContrastMode)
 
-    suspend fun setAppColorScheme(colorScheme: com.serranoie.app.minus.domain.model.AppColorScheme)
+    suspend fun setAppColorScheme(colorScheme: AppColorScheme)
 
     suspend fun setLanguage(language: String)
 
@@ -72,11 +76,11 @@ interface SettingsRepository {
 
     suspend fun setAnalyticsSpendsTutorialCompleted(completed: Boolean)
 
-    suspend fun setPeriodMappingMode(mode: com.serranoie.app.minus.domain.model.PeriodMappingMode)
+    suspend fun setPeriodMappingMode(mode: PeriodMappingMode)
 
-    suspend fun setFirstLaunchTutorialStage(stage: com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage)
+    suspend fun setFirstLaunchTutorialStage(stage: FirstLaunchTutorialStage)
 
-    suspend fun setRecurrentPaymentsViewMode(mode: com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode)
+    suspend fun setRecurrentPaymentsViewMode(mode: RecurrentPaymentsViewMode)
 
     suspend fun setBudgetSplitViewPeriod(period: BudgetPeriod)
 
@@ -94,7 +98,11 @@ interface SettingsRepository {
 
     suspend fun getRemainingFromLastPeriod(): BigDecimal
 
-    suspend fun getPendingRollover(): Pair<BigDecimal, com.serranoie.app.minus.domain.model.RemainingBudgetStrategy?>
+    suspend fun getPendingRollover(): Pair<BigDecimal, RemainingBudgetStrategy?>
+
+    fun observePendingRollover(): Flow<Pair<BigDecimal, RemainingBudgetStrategy?>>
+
+    suspend fun markSurplusUnresolved(amount: BigDecimal)
 
     suspend fun setSavingsPreferences(prefs: SavingsPreferences)
 

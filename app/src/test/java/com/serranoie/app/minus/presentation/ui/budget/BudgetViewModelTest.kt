@@ -9,7 +9,9 @@ import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
+import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.time.MidnightTransitionManager
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.FinishBudgetEarlyUseCase
 import com.serranoie.app.minus.domain.usecase.GetCurrentPeriodIdUseCase
@@ -68,6 +70,7 @@ class BudgetViewModelTest {
     private val clearEarlyFinishStateUseCase: ClearEarlyFinishStateUseCase = mockk(relaxed = true)
     private val markOnboardingCompletedUseCase: MarkOnboardingCompletedUseCase =
         mockk(relaxed = true)
+    private val midnightTransitionManager: MidnightTransitionManager = mockk(relaxed = true)
 
     private val settingsFlow = MutableStateFlow<BudgetSettings?>(null)
     private val transactionsFlow = MutableStateFlow<List<Transaction>>(emptyList())
@@ -76,6 +79,8 @@ class BudgetViewModelTest {
     private val categoriesFlow = MutableStateFlow<List<com.serranoie.app.minus.domain.model.Category>>(emptyList())
     private val queuedTransactionsFlow = MutableStateFlow<List<Transaction>>(emptyList())
     private val paidOccurrencesFlow = MutableStateFlow<Set<PaidRecurrentOccurrence>>(emptySet())
+    private val pendingRolloverFlow =
+        MutableStateFlow(BigDecimal.ZERO to (null as RemainingBudgetStrategy?))
 
     @Before
     fun setUp() {
@@ -87,6 +92,7 @@ class BudgetViewModelTest {
         every { budgetRepository.getPaidRecurrentOccurrences() } returns paidOccurrencesFlow
         every { observeCurrentPeriodBoundaryUseCase() } returns boundaryFlow
         every { observeCurrentPeriodRolloverUseCase() } returns rolloverFlow
+        every { midnightTransitionManager.pendingRollover } returns pendingRolloverFlow
         every { context.getString(R.string.expense_queued_for_next_period) } returns "Gasto en cola para el proximo periodo"
         every { context.getString(R.string.history_snackbar_delete_transaction_failed) } returns "Could not delete transaction"
         every { context.getString(R.string.history_snackbar_restore_transaction_failed) } returns "Could not restore transaction"
@@ -114,6 +120,7 @@ class BudgetViewModelTest {
         finishBudgetEarlyUseCase = finishBudgetEarlyUseCase,
         clearEarlyFinishStateUseCase = clearEarlyFinishStateUseCase,
         markOnboardingCompletedUseCase = markOnboardingCompletedUseCase,
+        midnightTransitionManager = midnightTransitionManager,
     )
 
     private fun sampleSettings() = BudgetSettings(

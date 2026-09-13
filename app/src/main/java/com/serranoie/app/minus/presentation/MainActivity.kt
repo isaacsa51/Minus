@@ -23,6 +23,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -31,10 +32,12 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.data.wearable.WearableService
 import com.serranoie.app.minus.domain.model.AppColorScheme
 import com.serranoie.app.minus.domain.model.ContrastMode
+import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.time.MidnightTransitionManager
@@ -244,40 +247,40 @@ class MainActivity : AppCompatActivity() {
                                         }
                                     }
                                 } else {
-                                    val periodLabel = "${data.periodStartDate.dayOfMonth} ${
-                                        data.periodStartDate.month.name.lowercase().take(3)
-                                    } - ${data.periodEndDate.dayOfMonth} ${
-                                        data.periodEndDate.month.name.lowercase().take(3)
-                                    }"
+                                    val periodLabel = if (data.isPersistedReopen) {
+                                        stringResource(R.string.rollover_dialog_pending_label)
+                                    } else {
+                                        "${data.periodStartDate.dayOfMonth} ${
+                                            data.periodStartDate.month.name.lowercase().take(3)
+                                        } - ${data.periodEndDate.dayOfMonth} ${
+                                            data.periodEndDate.month.name.lowercase().take(3)
+                                        }"
+                                    }
+
+                                    fun resolveAndMaybeNavigate(strategy: RemainingBudgetStrategy?) {
+                                        lifecycleScope.launch {
+                                            midnightTransitionManager.resolveUnresolvedSurplus(strategy)
+                                            if (!data.isPersistedReopen) {
+                                                navController.navigate(Screen.Analytics.route) {
+                                                    popUpTo(Screen.Main.route) { inclusive = false }
+                                                    launchSingleTop = true
+                                                }
+                                            }
+                                        }
+                                    }
+
                                     RolloverDialog(
                                         remainingAmount = data.remainingAmount,
                                         currencyCode = data.currencyCode,
                                         periodLabel = periodLabel,
-                                        spentAmount = data.totalSpent,
+                                        spentAmount = if (data.isPersistedReopen) null else data.totalSpent,
                                         onSplitEqually = {
-                                            lifecycleScope.launch {
-                                                midnightTransitionManager.rollRemainingSplitEqually()
-                                                navController.navigate(Screen.Analytics.route) {
-                                                    popUpTo(Screen.Main.route) { inclusive = false }
-                                                    launchSingleTop = true
-                                                }
-                                            }
+                                            resolveAndMaybeNavigate(RemainingBudgetStrategy.SPLIT_EQUALLY)
                                         },
                                         onCarryToNextDay = {
-                                            lifecycleScope.launch {
-                                                midnightTransitionManager.rollRemainingToFirstDay()
-                                                navController.navigate(Screen.Analytics.route) {
-                                                    popUpTo(Screen.Main.route) { inclusive = false }
-                                                    launchSingleTop = true
-                                                }
-                                            }
+                                            resolveAndMaybeNavigate(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
                                         },
-                                        onViewAnalytics = {
-                                            midnightTransitionManager.onTransitionDialogConfirmed()
-                                            navController.navigate(Screen.Analytics.route) {
-                                                popUpTo(Screen.Main.route) { inclusive = false }
-                                            }
-                                        },
+                                        onViewAnalytics = { resolveAndMaybeNavigate(null) },
                                         onDismiss = {
                                             midnightTransitionManager.onTransitionDialogDismissed()
                                         },

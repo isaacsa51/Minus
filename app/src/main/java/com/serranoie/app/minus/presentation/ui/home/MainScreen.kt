@@ -199,6 +199,7 @@ fun MainScreen(
                         },
                         onNavigateToAnalytics = onNavigateToAnalytics,
                         onNavigateToSettings = onNavigateToSettings,
+                        onUnresolvedSurplusBannerClick = budgetViewModel::onUnresolvedSurplusBannerClicked,
                         onPeriodSelected = { period ->
                             mainScreenViewModel.processIntent(
                                 MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage

@@ -81,6 +81,7 @@ data class MainScreenActions(
     val onNavigateToWallet: () -> Unit = {},
     val onPeriodSelected: (BudgetPeriod) -> Unit = {},
     val onShowSnackbar: (String) -> Unit = {},
+    val onUnresolvedSurplusBannerClick: () -> Unit = {},
 )
 
 data class MainScreenFeatureFlags(

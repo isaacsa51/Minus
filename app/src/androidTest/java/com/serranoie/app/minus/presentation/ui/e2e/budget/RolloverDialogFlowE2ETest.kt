@@ -90,11 +90,15 @@ class RolloverDialogFlowE2ETest {
         )
 
         coEvery { settingsRepository.getPendingRollover() } answers { pendingRollover }
+        every { settingsRepository.observePendingRollover() } answers { flowOf(pendingRollover) }
         coEvery { settingsRepository.setPendingRollover(any(), any()) } answers {
             pendingRollover = firstArg<BigDecimal>() to secondArg()
         }
         coEvery { settingsRepository.clearPendingRollover() } answers {
             pendingRollover = BigDecimal.ZERO to null
+        }
+        coEvery { settingsRepository.markSurplusUnresolved(any()) } answers {
+            pendingRollover = firstArg<BigDecimal>() to null
         }
         coEvery { settingsRepository.getSettings() } answers { userSettings }
         coEvery { settingsRepository.setPeriodEndAlreadyHandled(any()) } answers {
@@ -148,14 +152,20 @@ class RolloverDialogFlowE2ETest {
                         remainingAmount = d.remainingAmount,
                         currencyCode = d.currencyCode,
                         periodLabel = "${d.periodStartDate} - ${d.periodEndDate}",
-                        spentAmount = d.totalSpent,
+                        spentAmount = if (d.isPersistedReopen) null else d.totalSpent,
                         onSplitEqually = {
-                            scope.launch { transitionManager.rollRemainingSplitEqually() }
+                            scope.launch {
+                                transitionManager.resolveUnresolvedSurplus(RemainingBudgetStrategy.SPLIT_EQUALLY)
+                            }
                         },
                         onCarryToNextDay = {
-                            scope.launch { transitionManager.rollRemainingToFirstDay() }
+                            scope.launch {
+                                transitionManager.resolveUnresolvedSurplus(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
+                            }
                         },
-                        onViewAnalytics = { transitionManager.onTransitionDialogConfirmed() },
+                        onViewAnalytics = {
+                            scope.launch { transitionManager.resolveUnresolvedSurplus(null) }
+                        },
                         onDismiss = { transitionManager.onTransitionDialogDismissed() },
                     )
                 }
@@ -255,14 +265,77 @@ class RolloverDialogFlowE2ETest {
     }
 
     @Test
-    fun cancelling_the_dialog_queues_nothing_and_dismisses_the_dialog() {
+    fun cancelling_the_dialog_leaves_the_surplus_persisted_as_unresolved_instead_of_discarding_it() {
         launchRolloverFlow()
 
         tapAndAwaitDismiss(R.string.cancel)
 
-        assertThat(pendingRollover.first).isEqualTo(BigDecimal.ZERO)
+        assertThat(pendingRollover.first).isEqualTo(surplus)
+        assertThat(pendingRollover.second).isNull()
         assertThat(transitionManager.midnightTransitionData.value).isNull()
+    }
 
-        assertThat(startNextPeriod(newIncome = baseBudget).totalBudget).isEqualTo(baseBudget)
+    @Test
+    fun after_cancelling_a_later_app_foreground_still_reports_the_surplus_as_unresolved() {
+        launchRolloverFlow()
+        tapAndAwaitDismiss(R.string.cancel)
+
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns monthlySettings(
+            startDate = LocalDate.now(),
+            endDate = LocalDate.now().plusDays(29),
+        )
+        coEvery { settingsRepository.observeBudgetEndDate() } returns flowOf(
+            LocalDate.now().plusDays(29).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        )
+        runBlocking { transitionManager.handleAppStart() }
+
+        assertThat(pendingRollover.first).isEqualTo(surplus)
+        assertThat(pendingRollover.second).isNull()
+    }
+
+    @Test
+    fun resolving_the_surplus_later_from_a_reopened_dialog_applies_it_to_the_already_active_period() {
+        runBlocking { transitionManager.handleAppStart() }
+        transitionManager.onTransitionDialogDismissed()
+
+        val activeSettings = monthlySettings(
+            startDate = LocalDate.now(),
+            endDate = LocalDate.now().plusDays(29),
+        )
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns activeSettings
+        val saved = mutableListOf<BudgetSettings>()
+        coEvery { budgetRepository.saveBudgetSettings(any()) } answers { saved.add(firstArg()) }
+
+        runBlocking { transitionManager.reopenUnresolvedSurplusDialog() }
+        composeTestRule.setContent {
+            MinusTheme {
+                val show by transitionManager.shouldShowTransitionDialog.collectAsState()
+                val data by transitionManager.midnightTransitionData.collectAsState()
+                val scope = rememberCoroutineScope()
+                val d = data
+                if (show && d != null) {
+                    RolloverDialog(
+                        remainingAmount = d.remainingAmount,
+                        currencyCode = d.currencyCode,
+                        periodLabel = "",
+                        spentAmount = null,
+                        onSplitEqually = {
+                            scope.launch {
+                                transitionManager.resolveUnresolvedSurplus(RemainingBudgetStrategy.SPLIT_EQUALLY)
+                            }
+                        },
+                        onCarryToNextDay = {},
+                        onViewAnalytics = null,
+                        onDismiss = {},
+                    )
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        tapAndAwaitDismiss(R.string.rollover_dialog_split_equally_title)
+
+        assertThat(saved.single().totalBudget).isEqualTo(activeSettings.totalBudget.add(surplus))
+        assertThat(pendingRollover.first).isEqualTo(BigDecimal.ZERO)
     }
 }

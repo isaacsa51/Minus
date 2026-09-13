@@ -145,6 +145,7 @@ fun Editor(
     onOpenSettings: () -> Unit,
     onOpenAnalytics: () -> Unit = {},
     onOpenWallet: () -> Unit = {},
+    onUnresolvedSurplusBannerClick: () -> Unit = {},
     openWalletOnStart: Boolean = false,
     showBudgetPeriodSheet: Boolean = false,
     forceBudgetPeriodSheetSetup: Boolean = false,
@@ -262,9 +263,15 @@ fun Editor(
                 splitMode = uiState.budgetSettings?.splitMode ?: BudgetSplitMode.STATIC,
                 calculationPreview = uiState.calculationPreview,
                 draftAmount = uiState.numpadDraftAmount,
+                hasUnresolvedSurplus = uiState.hasUnresolvedRolloverSurplus,
+                unresolvedSurplusAmount = uiState.unresolvedSurplusAmount,
                 onOpenBudgetSheet = {
                     view.weakHapticFeedback()
                     onShowBudgetPeriodSheet()
+                },
+                onUnresolvedSurplusClick = {
+                    view.weakHapticFeedback()
+                    onUnresolvedSurplusBannerClick()
                 },
                 modifier = Modifier
                     .weight(1f)

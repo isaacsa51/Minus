@@ -1354,6 +1354,7 @@ private fun MainScreenEditorSection(
         onOpenHistory = {},
         onOpenSettings = onNavigateToSettings,
         onOpenAnalytics = onNavigateToAnalytics,
+        onUnresolvedSurplusBannerClick = actions.onUnresolvedSurplusBannerClick,
         onOpenWallet = {
             val noBudget =
                 budgetUiState.budgetSettings == null || budgetUiState.budgetSettings.endDate == null

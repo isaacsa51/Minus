@@ -232,7 +232,7 @@ class MidnightPeriodCheckerTest {
     }
 
     @Test
-    fun `when a period ends with ASK_ALWAYS then the dialog is shown and nothing is queued`() = runTest {
+    fun `when a period ends with ASK_ALWAYS then the dialog is shown, nothing is queued, and the surplus is marked unresolved`() = runTest {
         arrangeNaturalEndAskAlways()
 
         checker.handleEndingPeriod()
@@ -243,6 +243,7 @@ class MidnightPeriodCheckerTest {
         assertThat(data!!.shouldNavigateToAnalyticsOnly).isFalse()
         assertThat(data.remainingAmount).isEqualTo(BigDecimal("300.00"))
         coVerify(exactly = 0) { settingsRepository.setPendingRollover(any(), any()) }
+        coVerify { settingsRepository.markSurplusUnresolved(BigDecimal("300.00")) }
     }
 
     @Test
@@ -309,12 +310,12 @@ class MidnightPeriodCheckerTest {
     }
 
     @Test
-    fun `rollRemainingSplitEqually queues the surplus with SPLIT_EQUALLY and closes the dialog`() = runTest {
+    fun `resolveUnresolvedSurplus queues SPLIT_EQUALLY for next boundary when no new period is active yet`() = runTest {
         arrangeNaturalEndAskAlways()
         checker.handleEndingPeriod()
-        assertThat(checker.midnightTransitionData.value).isNotNull()
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
 
-        checker.rollRemainingSplitEqually()
+        checker.resolveUnresolvedSurplus(RemainingBudgetStrategy.SPLIT_EQUALLY)
 
         coVerify {
             settingsRepository.setPendingRollover(
@@ -322,16 +323,18 @@ class MidnightPeriodCheckerTest {
                 RemainingBudgetStrategy.SPLIT_EQUALLY,
             )
         }
+        coVerify(exactly = 0) { settingsRepository.clearPendingRollover() }
         assertThat(checker.shouldShowTransitionDialog.value).isFalse()
         assertThat(checker.midnightTransitionData.value).isNull()
     }
 
     @Test
-    fun `rollRemainingToFirstDay queues the surplus with ADD_TO_FIRST_DAY and closes the dialog`() = runTest {
+    fun `resolveUnresolvedSurplus queues ADD_TO_FIRST_DAY for next boundary when no new period is active yet`() = runTest {
         arrangeNaturalEndAskAlways()
         checker.handleEndingPeriod()
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
 
-        checker.rollRemainingToFirstDay()
+        checker.resolveUnresolvedSurplus(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
 
         coVerify {
             settingsRepository.setPendingRollover(
@@ -344,15 +347,107 @@ class MidnightPeriodCheckerTest {
     }
 
     @Test
-    fun `dismissing the dialog discards the surplus and never queues a rollover`() = runTest {
+    fun `resolveUnresolvedSurplus applies SPLIT_EQUALLY immediately when a new period is already active`() = runTest {
+        val activeSettings = settingsEndingOn(LocalDate.now().plusDays(10))
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns activeSettings
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+
+        checker.resolveUnresolvedSurplus(RemainingBudgetStrategy.SPLIT_EQUALLY)
+
+        coVerify {
+            budgetRepository.saveBudgetSettings(
+                match { it.totalBudget == BigDecimal("1300.00") },
+            )
+        }
+        coVerify(exactly = 0) { settingsRepository.setPendingRollover(any(), any()) }
+        coVerify { settingsRepository.clearPendingRollover() }
+    }
+
+    @Test
+    fun `resolveUnresolvedSurplus applies ADD_TO_FIRST_DAY immediately, dated today, when a new period is already active`() = runTest {
+        val activeSettings = settingsEndingOn(LocalDate.now().plusDays(10))
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns activeSettings
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+
+        checker.resolveUnresolvedSurplus(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
+
+        coVerify {
+            budgetRepository.saveBudgetSettings(
+                match {
+                    it.rollOverCarryForward &&
+                        it.rollOverLimit == BigDecimal("300.00") &&
+                        it.rollOverAppliedDate == LocalDate.now()
+                },
+            )
+        }
+        coVerify { settingsRepository.clearPendingRollover() }
+    }
+
+    @Test
+    fun `resolveUnresolvedSurplus with a null strategy discards without touching settings`() = runTest {
+        val activeSettings = settingsEndingOn(LocalDate.now().plusDays(10))
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns activeSettings
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+
+        checker.resolveUnresolvedSurplus(null)
+
+        coVerify(exactly = 0) { budgetRepository.saveBudgetSettings(any()) }
+        coVerify { settingsRepository.clearPendingRollover() }
+    }
+
+    @Test
+    fun `resolveUnresolvedSurplus is a no-op when there is nothing pending`() = runTest {
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal.ZERO to null)
+
+        checker.resolveUnresolvedSurplus(RemainingBudgetStrategy.SPLIT_EQUALLY)
+
+        coVerify(exactly = 0) { settingsRepository.setPendingRollover(any(), any()) }
+        coVerify(exactly = 0) { budgetRepository.saveBudgetSettings(any()) }
+    }
+
+    @Test
+    fun `dismissing the dialog leaves the surplus persisted as unresolved, not discarded`() = runTest {
         arrangeNaturalEndAskAlways()
         checker.handleEndingPeriod()
 
         checker.onTransitionDialogDismissed()
 
-        coVerify(exactly = 0) { settingsRepository.setPendingRollover(any(), any()) }
+        coVerify { settingsRepository.markSurplusUnresolved(BigDecimal("300.00")) }
+        coVerify(exactly = 0) { settingsRepository.clearPendingRollover() }
         assertThat(checker.shouldShowTransitionDialog.value).isFalse()
-        assertThat(checker.midnightTransitionData.value).isNull()
+    }
+
+    @Test
+    fun `reopenUnresolvedSurplusDialog re-shows the dialog leanly from the persisted amount`() = runTest {
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns settingsEndingOn(LocalDate.now().plusDays(10))
+
+        checker.reopenUnresolvedSurplusDialog()
+
+        assertThat(checker.shouldShowTransitionDialog.value).isTrue()
+        val data = checker.midnightTransitionData.value
+        assertThat(data).isNotNull()
+        assertThat(data!!.remainingAmount).isEqualTo(BigDecimal("300.00"))
+        assertThat(data.isPersistedReopen).isTrue()
+    }
+
+    @Test
+    fun `reopenUnresolvedSurplusDialog does nothing when there is nothing pending`() = runTest {
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal.ZERO to null)
+
+        checker.reopenUnresolvedSurplusDialog()
+
+        assertThat(checker.shouldShowTransitionDialog.value).isFalse()
+    }
+
+    @Test
+    fun `reopenUnresolvedSurplusDialog does nothing once a strategy has already been decided`() = runTest {
+        coEvery { settingsRepository.getPendingRollover() } returns
+            (BigDecimal("300.00") to RemainingBudgetStrategy.SPLIT_EQUALLY)
+
+        checker.reopenUnresolvedSurplusDialog()
+
+        assertThat(checker.shouldShowTransitionDialog.value).isFalse()
     }
 
     @Test
@@ -365,15 +460,6 @@ class MidnightPeriodCheckerTest {
         coVerify(exactly = 0) { settingsRepository.setPendingRollover(any(), any()) }
         assertThat(checker.shouldShowTransitionDialog.value).isFalse()
         assertThat(checker.midnightTransitionData.value).isNull()
-    }
-
-    @Test
-    fun `rollover choice handlers are no-ops when there is no pending transition`() = runTest {
-        checker.rollRemainingSplitEqually()
-        checker.rollRemainingToFirstDay()
-
-        coVerify(exactly = 0) { settingsRepository.setPendingRollover(any(), any()) }
-        assertThat(checker.shouldShowTransitionDialog.value).isFalse()
     }
 
     @Test

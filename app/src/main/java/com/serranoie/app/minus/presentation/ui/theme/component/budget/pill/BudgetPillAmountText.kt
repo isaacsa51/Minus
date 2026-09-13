@@ -113,10 +113,16 @@ internal fun SegmentedAmountText(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (sign.isNotEmpty()) {
-                Text(sign, style = glyphStyle, color = color, maxLines = 1)
+                Text(sign, style = glyphStyle, color = color, maxLines = 1, modifier = Modifier.alignByBaseline())
             }
             if (currencySymbol.isNotEmpty() && !symbolAtEnd) {
-                Text(currencySymbol, style = symbolTextStyle, color = color, maxLines = 1)
+                Text(
+                    currencySymbol,
+                    style = symbolTextStyle,
+                    color = color,
+                    maxLines = 1,
+                    modifier = Modifier.alignByBaseline(),
+                )
             }
 
             val chars = body.toCharArray()
@@ -125,6 +131,7 @@ internal fun SegmentedAmountText(
                     AnimatedContent(
                         targetState = ch,
                         contentAlignment = Alignment.Center,
+                        modifier = Modifier.alignByBaseline(),
                         transitionSpec = {
                             (fadeIn(tween(200)) +
                                 scaleIn(initialScale = 0.6f, animationSpec = tween(200))) togetherWith
@@ -145,7 +152,13 @@ internal fun SegmentedAmountText(
             }
 
             if (currencySymbol.isNotEmpty() && symbolAtEnd) {
-                Text(currencySymbol, style = symbolTextStyle, color = color, maxLines = 1)
+                Text(
+                    currencySymbol,
+                    style = symbolTextStyle,
+                    color = color,
+                    maxLines = 1,
+                    modifier = Modifier.alignByBaseline(),
+                )
             }
         }
     }

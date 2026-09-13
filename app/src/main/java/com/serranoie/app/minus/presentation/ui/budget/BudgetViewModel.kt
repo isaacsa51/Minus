@@ -10,8 +10,10 @@ import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.CreditCard
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.calculatePaymentDueDate
+import com.serranoie.app.minus.domain.time.MidnightTransitionManager
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.FinishBudgetEarlyUseCase
 import com.serranoie.app.minus.domain.usecase.GetCurrentPeriodIdUseCase
@@ -83,6 +85,7 @@ class BudgetViewModel @Inject constructor(
     private val finishBudgetEarlyUseCase: FinishBudgetEarlyUseCase,
     private val clearEarlyFinishStateUseCase: ClearEarlyFinishStateUseCase,
     private val markOnboardingCompletedUseCase: MarkOnboardingCompletedUseCase,
+    private val midnightTransitionManager: MidnightTransitionManager,
 ) : ViewModel() {
 
     private val numpadController = NumpadController(budgetExpressionEvaluator)
@@ -115,7 +118,8 @@ class BudgetViewModel @Inject constructor(
         numpadController.dragProgress,
         editorStateController.state,
         budgetRepository.getActiveCategories(),
-        budgetRepository.getPaidRecurrentOccurrences()
+        budgetRepository.getPaidRecurrentOccurrences(),
+        midnightTransitionManager.pendingRollover,
     ) { params ->
         val settings = params[0] as BudgetSettings?
         val transactions = params[1] as List<Transaction>
@@ -129,6 +133,9 @@ class BudgetViewModel @Inject constructor(
         val categories = params[9] as List<Category>
         @Suppress("UNCHECKED_CAST")
         val paidOccurrences = params[10] as Set<PaidRecurrentOccurrence>
+        @Suppress("UNCHECKED_CAST")
+        val pendingRolloverPair = params[11] as Pair<BigDecimal, RemainingBudgetStrategy?>
+        val (pendingSurplusAmount, pendingSurplusStrategy) = pendingRolloverPair
 
         val settingsWithRollover = settings?.copy(
             rollOverLimit = if (rolloverAmount > BigDecimal.ZERO) rolloverAmount else null,
@@ -181,6 +188,10 @@ class BudgetViewModel @Inject constructor(
             debtAdjustedBalance = debtAdjustedBalance,
             calculationPreview = calculateCalculationPreview(numpadInput, settings?.currencyCode ?: "USD"),
             numpadDraftAmount = parseNumpadDraftAmount(numpadInput),
+            hasUnresolvedRolloverSurplus = pendingSurplusAmount > BigDecimal.ZERO && pendingSurplusStrategy == null,
+            unresolvedSurplusAmount = pendingSurplusAmount.takeIf {
+                it > BigDecimal.ZERO && pendingSurplusStrategy == null
+            },
         )
     }.catch { error ->
         logcat(TAG) { "Error in uiState pipeline: ${error.asLog()}" }
@@ -273,6 +284,10 @@ class BudgetViewModel @Inject constructor(
                 viewModelScope.launch { finishBudgetEarlyUseCase() }
             }
         }
+    }
+
+    fun onUnresolvedSurplusBannerClicked() {
+        viewModelScope.launch { midnightTransitionManager.reopenUnresolvedSurplusDialog() }
     }
 
     fun clearEarlyFinishState() {

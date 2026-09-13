@@ -1,6 +1,8 @@
 package com.serranoie.app.minus.presentation.util.haptic
 
 import android.content.Context
+import android.os.Build
+import android.os.VibrationAttributes
 import android.os.Vibrator
 import android.view.HapticFeedbackConstants
 import android.view.View
@@ -52,7 +54,7 @@ object HapticUtil {
 
     fun performSliderHaptic(view: View) {
         if (!isAppHapticsEnabled.value) return
-        if (android.os.Build.VERSION.SDK_INT >= 34) {
+        if (Build.VERSION.SDK_INT >= 34) {
             view.performHapticFeedback(HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
         } else {
             view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
@@ -65,13 +67,13 @@ object HapticUtil {
      */
     fun performVirtualKeyHaptic(view: View) {
         if (!isAppHapticsEnabled.value) return
-        view.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
     }
 
     fun performCustomHaptic(view: View, strength: Float) {
         if (!isAppHapticsEnabled.value) return
 
-        val vibrator = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vibratorManager =
                 view.context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
             vibratorManager.defaultVibrator
@@ -81,7 +83,7 @@ object HapticUtil {
         }
 
         // Use Primitives (API 30+) for the most consistent, crisp feedback with scaling
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             try {
                 if (vibrator.areAllPrimitivesSupported(android.os.VibrationEffect.Composition.PRIMITIVE_CLICK)) {
                     val effect = android.os.VibrationEffect.startComposition()
@@ -92,7 +94,7 @@ object HapticUtil {
                         .compose()
 
                     val attrs =
-                        android.os.VibrationAttributes.createForUsage(android.os.VibrationAttributes.USAGE_TOUCH)
+                        VibrationAttributes.createForUsage(VibrationAttributes.USAGE_TOUCH)
                     vibrator.vibrate(effect, attrs)
                     return
                 }
@@ -102,7 +104,7 @@ object HapticUtil {
         }
 
         // Fallback for API 26-29 or devices without primitive support
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val hasAmplitudeControl = vibrator.hasAmplitudeControl()
 
             if (hasAmplitudeControl) {
@@ -116,14 +118,14 @@ object HapticUtil {
             } else {
                 // No amplitude control: differentiate by strength
                 if (strength < 0.5f) {
-                    view.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
+                    view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                 } else {
-                    view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+                    view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 }
             }
         } else {
             // Pre-Oreo
-            view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         }
     }
 }

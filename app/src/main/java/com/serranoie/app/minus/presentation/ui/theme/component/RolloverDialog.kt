@@ -59,7 +59,7 @@ fun RolloverDialog(
     remainingAmount: BigDecimal,
     currencyCode: String,
     periodLabel: String,
-    spentAmount: BigDecimal,
+    spentAmount: BigDecimal?,
     onSplitEqually: () -> Unit,
     onCarryToNextDay: () -> Unit,
     onDismiss: () -> Unit,
@@ -98,7 +98,7 @@ private fun RolloverDialogContent(
     remainingAmount: BigDecimal,
     currencyCode: String,
     periodLabel: String,
-    spentAmount: BigDecimal,
+    spentAmount: BigDecimal?,
     onSplitEqually: () -> Unit,
     onCarryToNextDay: () -> Unit,
     onDismiss: () -> Unit,
@@ -106,7 +106,7 @@ private fun RolloverDialogContent(
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
     val formattedRemaining = currencyFormat.format(remainingAmount)
-    val formattedSpent = currencyFormat.format(spentAmount)
+    val formattedSpent = spentAmount?.let { currencyFormat.format(it) }
     val locale = LocalLocale.current.platformLocale
 
     val scrollState = rememberScrollState()
@@ -173,29 +173,31 @@ private fun RolloverDialogContent(
                     .background(colorOnEditor.copy(alpha = 0.05f))
                     .padding(20.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.total_spent),
-                        style = MaterialTheme.typography.labelMediumCondensed,
-                        color = colorOnEditor.copy(alpha = 0.6f)
-                    )
-                    Text(
-                        text = formattedSpent,
-                        style = MaterialTheme.typography.titleLargeEmphasized,
-                        color = colorOnEditor,
-                        maxLines = 1
-                    )
+                if (formattedSpent != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.total_spent),
+                            style = MaterialTheme.typography.labelMediumCondensed,
+                            color = colorOnEditor.copy(alpha = 0.6f)
+                        )
+                        Text(
+                            text = formattedSpent,
+                            style = MaterialTheme.typography.titleLargeEmphasized,
+                            color = colorOnEditor,
+                            maxLines = 1
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    HorizontalDivider(color = colorOnEditor.copy(alpha = 0.1f))
+
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                HorizontalDivider(color = colorOnEditor.copy(alpha = 0.1f))
-
-                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
