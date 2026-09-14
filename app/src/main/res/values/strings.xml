@@ -537,6 +537,21 @@
     <string name="recurrent_ticket_frequency_biweekly">Biweekly</string>
     <string name="recurrent_ticket_frequency_monthly">Monthly</string>
 
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">Subscriptions</string>
+    <string name="subscriptions_analytics_card_label">Recurring</string>
+    <string name="subscriptions_monthly_commitment_label">Monthly commitment</string>
+    <string name="subscriptions_active_count">%1$d active</string>
+    <string name="subscriptions_due_soon_header">Due soon</string>
+    <string name="subscriptions_upcoming_header">Upcoming</string>
+    <string name="subscriptions_due_today_label">Due today</string>
+    <string name="subscriptions_mark_as_paid">Mark as paid</string>
+    <string name="subscriptions_skip_this_cycle">Skip this cycle</string>
+    <string name="subscriptions_empty_title">No subscriptions yet</string>
+    <string name="subscriptions_empty_body">Mark an expense as recurring and it shows up here with its due date and time left.</string>
+    <string name="subscriptions_snackbar_confirm_failed">Could not confirm this payment</string>
+    <string name="subscriptions_snackbar_skip_failed">Could not skip this cycle</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">Period finished</string>
     <string name="rollover_dialog_question">What do you want to do with the remaining money?</string>

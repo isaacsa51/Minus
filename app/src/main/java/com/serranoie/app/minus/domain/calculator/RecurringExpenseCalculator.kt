@@ -4,11 +4,29 @@ import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 class RecurringExpenseCalculator @Inject constructor() {
+
+    /**
+     * Normalizes each transaction's amount to a monthly equivalent (weekly *~4.33,
+     * biweekly *~2.17, monthly *1) and sums them — used for a "monthly commitment" total
+     * across subscriptions on different billing cycles.
+     */
+    fun calculateMonthlyEquivalent(recurrentTransactions: List<Transaction>): BigDecimal {
+        return recurrentTransactions.sumOf { transaction ->
+            val frequency = transaction.recurrentFrequency ?: return@sumOf BigDecimal.ZERO
+            val multiplier = when (frequency) {
+                RecurrentFrequency.WEEKLY -> WEEKLY_TO_MONTHLY_MULTIPLIER
+                RecurrentFrequency.BIWEEKLY -> BIWEEKLY_TO_MONTHLY_MULTIPLIER
+                RecurrentFrequency.MONTHLY -> BigDecimal.ONE
+            }
+            transaction.amount.multiply(multiplier)
+        }.setScale(2, RoundingMode.HALF_UP)
+    }
 
     fun calculateRecurringDueToday(
         transactions: List<Transaction>,
@@ -51,5 +69,10 @@ class RecurringExpenseCalculator @Inject constructor() {
                 today.dayOfMonth == billingDay
             }
         }
+    }
+
+    private companion object {
+        val WEEKLY_TO_MONTHLY_MULTIPLIER: BigDecimal = BigDecimal("4.33")
+        val BIWEEKLY_TO_MONTHLY_MULTIPLIER: BigDecimal = BigDecimal("2.17")
     }
 }

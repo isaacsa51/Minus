@@ -13,6 +13,7 @@ fun AnalyticsScreen(
     activityResultRegistryOwner: ActivityResultRegistryOwner?,
     onNavigateToMainWithWallet: () -> Unit,
     onNavigateToMain: () -> Unit,
+    onNavigateToSubscriptions: () -> Unit = {},
     viewModel: AnalyticsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -48,6 +49,7 @@ fun AnalyticsScreen(
             onClose = {
                 viewModel.onClose()
             },
+            onNavigateToSubscriptions = onNavigateToSubscriptions,
             onMarkCreditPaid = {
                 viewModel.onMarkCreditPaid()
             },

@@ -93,6 +93,23 @@ class RecurringExpenseCalculatorTest {
         assertEquals(BigDecimal("15.00"), result)
     }
 
+    @Test
+    fun calculateMonthlyEquivalent_normalizesEachFrequencyToAMonthlyAmount() {
+        val weekly = recurrentTransaction(LocalDate.of(2026, 1, 1), RecurrentFrequency.WEEKLY, amount = BigDecimal("10.00"))
+        val biweekly = recurrentTransaction(LocalDate.of(2026, 1, 1), RecurrentFrequency.BIWEEKLY, amount = BigDecimal("20.00"))
+        val monthly = recurrentTransaction(LocalDate.of(2026, 1, 1), RecurrentFrequency.MONTHLY, amount = BigDecimal("15.00"))
+
+        val result = calculator.calculateMonthlyEquivalent(listOf(weekly, biweekly, monthly))
+
+        // 10 * 4.33 + 20 * 2.17 + 15 * 1 = 43.30 + 43.40 + 15.00 = 101.70
+        assertEquals(BigDecimal("101.70"), result)
+    }
+
+    @Test
+    fun calculateMonthlyEquivalent_emptyListReturnsZero() {
+        assertEquals(BigDecimal("0.00"), calculator.calculateMonthlyEquivalent(emptyList()))
+    }
+
     private fun recurrentTransaction(
         startDate: LocalDate,
         frequency: RecurrentFrequency,

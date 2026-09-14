@@ -30,6 +30,7 @@ import com.serranoie.app.minus.presentation.ui.settings.SettingsViewModel
 import com.serranoie.app.minus.presentation.ui.settings.appearance.AppearanceOptionsScreen
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportScreen
 import com.serranoie.app.minus.presentation.ui.settings.features.FeatureLabScreen
+import com.serranoie.app.minus.presentation.ui.subscriptions.SubscriptionsScreen
 import logcat.logcat
 
 private const val TAG = "ISAAC:AppNavGraph"
@@ -96,6 +97,15 @@ fun AppNavGraph(
                         popUpTo(0) { inclusive = true }
                     }
                 },
+                onNavigateToSubscriptions = {
+                    navController.navigate(Screen.Subscriptions.route)
+                },
+            )
+        }
+
+        composable(Screen.Subscriptions.route) {
+            SubscriptionsScreen(
+                onBack = { navController.popBackStack() },
             )
         }
 

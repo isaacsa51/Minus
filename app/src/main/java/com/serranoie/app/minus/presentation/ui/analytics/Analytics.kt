@@ -101,6 +101,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.budget.CreditTran
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.DeductedBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.IncomeAddedCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.MinMaxSpentCard
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.RecurringSummaryCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendsCountCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.graphs.BudgetGraph
@@ -163,6 +164,7 @@ data class AnalyticsState(
 data class AnalyticsActions(
     val onCreateNewPeriod: () -> Unit = {},
     val onClose: () -> Unit = {},
+    val onNavigateToSubscriptions: () -> Unit = {},
     val onExportCSV: () -> Unit = {},
     val onMarkCreditPaid: () -> Unit = {},
     val onPayTransactionClick: (Long) -> Unit = {},
@@ -456,6 +458,7 @@ fun Analytics(
                                 showHistorySheet = true
                                 view.weakHapticFeedback()
                             },
+                            onShowSubscriptions = actions.onNavigateToSubscriptions,
                             onShowCreditDetails = { showCreditSheet = true },
                             onCategoryClick = { categoryName, categorySpends ->
                                 selectedCategory = state.toCategoryAnalyticsState(
@@ -800,6 +803,7 @@ private fun AnalyticsResponsiveLayout(
     state: AnalyticsState,
     categories: List<Category>,
     onShowHistory: () -> Unit,
+    onShowSubscriptions: () -> Unit,
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
     onDayClick: (LocalDate) -> Unit,
@@ -811,6 +815,7 @@ private fun AnalyticsResponsiveLayout(
             state = state,
             categories = categories,
             onShowHistory = onShowHistory,
+            onShowSubscriptions = onShowSubscriptions,
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
             onDayClick = onDayClick,
@@ -822,6 +827,7 @@ private fun AnalyticsResponsiveLayout(
             state = state,
             categories = categories,
             onShowHistory = onShowHistory,
+            onShowSubscriptions = onShowSubscriptions,
             onShowCreditDetails = onShowCreditDetails,
             onCategoryClick = onCategoryClick,
             onDayClick = onDayClick,
@@ -836,6 +842,7 @@ private fun AnalyticsCompactLayout(
     state: AnalyticsState,
     categories: List<Category>,
     onShowHistory: () -> Unit,
+    onShowSubscriptions: () -> Unit,
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
     onDayClick: (LocalDate) -> Unit,
@@ -950,6 +957,14 @@ private fun AnalyticsCompactLayout(
                 )
             }
         }
+        if (state.recurringInPeriod.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            RecurringSummaryCard(
+                activeCount = state.recurringInPeriod.size,
+                onClick = onShowSubscriptions,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+        }
         if (state.incomes.isNotEmpty()) {
             Spacer(modifier = Modifier.height(16.dp))
             IncomeAddedCard(
@@ -990,6 +1005,7 @@ private fun AnalyticsTabletLayout(
     state: AnalyticsState,
     categories: List<Category>,
     onShowHistory: () -> Unit,
+    onShowSubscriptions: () -> Unit,
     onShowCreditDetails: () -> Unit,
     onCategoryClick: (String, List<Transaction>) -> Unit,
     onDayClick: (LocalDate) -> Unit,
@@ -1103,6 +1119,13 @@ private fun AnalyticsTabletLayout(
                     modifier = Modifier.weight(1f),
                 )
             }
+        }
+        if (state.recurringInPeriod.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            RecurringSummaryCard(
+                activeCount = state.recurringInPeriod.size,
+                onClick = onShowSubscriptions,
+            )
         }
         if (state.incomes.isNotEmpty()) {
             Spacer(modifier = Modifier.height(16.dp))
