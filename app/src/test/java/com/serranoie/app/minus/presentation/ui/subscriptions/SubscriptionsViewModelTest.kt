@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.usecase.GetCurrentPeriodIdUseCase
@@ -15,7 +16,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -35,7 +35,10 @@ class SubscriptionsViewModelTest {
     private val budgetRepository: BudgetRepository = mockk(relaxed = true)
     private val budgetTransactionHandler: BudgetTransactionHandler = mockk()
     private val getCurrentPeriodIdUseCase: GetCurrentPeriodIdUseCase = mockk()
-    private val recurringExpenseCalculator: RecurringExpenseCalculator = mockk()
+    // Real instance: it's pure frequency math, already covered by RecurringExpenseCalculatorTest,
+    // and using it here (rather than stubbing every method) lets the due-today/window logic
+    // exercise genuine calculator behavior instead of drifting from it.
+    private val recurringExpenseCalculator = RecurringExpenseCalculator()
     private val errorLogRecorder: ErrorLogRecorder = mockk(relaxed = true)
     private val context: Context = mockk(relaxed = true)
 
@@ -45,7 +48,6 @@ class SubscriptionsViewModelTest {
         every { budgetRepository.getTransactions() } returns flowOf(emptyList())
         every { budgetRepository.getPaidRecurrentOccurrences() } returns flowOf(emptySet())
         every { budgetRepository.getBudgetSettings() } returns flowOf(null)
-        every { recurringExpenseCalculator.calculateMonthlyEquivalent(any()) } returns BigDecimal.ZERO
         every { context.getString(any()) } returns "error"
         coEvery { getCurrentPeriodIdUseCase.invoke() } returns 1L
     }
@@ -69,6 +71,7 @@ class SubscriptionsViewModelTest {
         startDate: LocalDate,
         frequency: RecurrentFrequency,
         recurrentEndDate: LocalDate? = null,
+        subscriptionDay: Int? = null,
         amount: BigDecimal = BigDecimal("10.00"),
     ) = Transaction(
         id = id,
@@ -78,6 +81,7 @@ class SubscriptionsViewModelTest {
         isRecurrent = true,
         recurrentFrequency = frequency,
         recurrentEndDate = recurrentEndDate?.atStartOfDay(),
+        subscriptionDay = subscriptionDay,
     )
 
     private suspend fun <T> ReceiveTurbine<T>.awaitCondition(predicate: (T) -> Boolean): T {
@@ -133,6 +137,47 @@ class SubscriptionsViewModelTest {
     }
 
     @Test
+    fun `a subscription due exactly today is surfaced in dueSoon with a zero-day next charge`() = runTest {
+        val today = LocalDate.now()
+        val t = recurrentTransaction(
+            startDate = today.minusMonths(3),
+            frequency = RecurrentFrequency.MONTHLY,
+            subscriptionDay = today.dayOfMonth,
+        )
+        every { budgetRepository.getTransactions() } returns flowOf(listOf(t))
+
+        val vm = newViewModel()
+        vm.uiState.test {
+            val state = awaitCondition { !it.isLoading }
+            assertThat(state.dueSoon.map { it.transaction.id }).containsExactly(t.id)
+            assertThat(state.dueSoon.single().nextChargeDate).isEqualTo(today)
+            assertThat(state.daysUntilNextCharge).isEqualTo(0L)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `a subscription already marked paid for today is not surfaced again`() = runTest {
+        val today = LocalDate.now()
+        val t = recurrentTransaction(
+            id = 9L,
+            startDate = today.minusMonths(3),
+            frequency = RecurrentFrequency.MONTHLY,
+            subscriptionDay = today.dayOfMonth,
+        )
+        every { budgetRepository.getTransactions() } returns flowOf(listOf(t))
+        every { budgetRepository.getPaidRecurrentOccurrences() } returns
+            flowOf(setOf(PaidRecurrentOccurrence(9L, today)))
+
+        val vm = newViewModel()
+        vm.uiState.test {
+            val state = awaitCondition { !it.isLoading }
+            assertThat(state.dueSoon).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `a subscription past its end date is excluded from the active count and total`() = runTest {
         val today = LocalDate.now()
         val active = recurrentTransaction(id = 1L, startDate = today.minusDays(4), frequency = RecurrentFrequency.WEEKLY)
@@ -148,7 +193,9 @@ class SubscriptionsViewModelTest {
         vm.uiState.test {
             val state = awaitCondition { !it.isLoading }
             assertThat(state.activeCount).isEqualTo(1)
-            verify { recurringExpenseCalculator.calculateMonthlyEquivalent(listOf(active)) }
+            // Weekly $10.00 normalized to a monthly equivalent (*4.33); the expired
+            // transaction must not contribute to this total.
+            assertThat(state.monthlyTotal).isEqualTo(BigDecimal("43.30"))
             cancelAndIgnoreRemainingEvents()
         }
     }

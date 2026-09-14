@@ -23,7 +23,10 @@ class SubscriptionsScreenshotTest {
         maxPercentDifference = 10.0,
     )
 
-    private val today = LocalDate.of(2026, 1, 15)
+    // Subscriptions renders relative-date text off the real clock (matching how
+    // UpcomingRecurrentItemRow already behaves elsewhere), so fixture dates are
+    // built from LocalDate.now() rather than a fixed calendar date.
+    private val today: LocalDate get() = LocalDate.now()
 
     private fun populatedState() = SubscriptionsUiState(
         isLoading = false,
@@ -32,34 +35,58 @@ class SubscriptionsScreenshotTest {
                 transaction = Transaction(
                     id = 1L,
                     amount = BigDecimal("16.99"),
-                    comment = "Video streaming",
+                    comment = "Netflix",
                     date = today.minusMonths(2).atStartOfDay(),
                     isRecurrent = true,
                     recurrentFrequency = RecurrentFrequency.MONTHLY,
                 ),
-                nextChargeDate = today.plusDays(2),
+                nextChargeDate = today,
                 isInCurrentPeriod = true,
             ),
             UpcomingRecurrentItem(
                 transaction = Transaction(
                     id = 2L,
                     amount = BigDecimal("9.99"),
-                    comment = "Weekly app",
+                    comment = "Spotify",
                     date = today.minusDays(4).atStartOfDay(),
                     isRecurrent = true,
                     recurrentFrequency = RecurrentFrequency.WEEKLY,
                 ),
-                nextChargeDate = today.plusDays(3),
+                nextChargeDate = today.plusDays(2),
+                isInCurrentPeriod = true,
+            ),
+            UpcomingRecurrentItem(
+                transaction = Transaction(
+                    id = 3L,
+                    amount = BigDecimal("7.99"),
+                    comment = "Cloud storage",
+                    date = today.minusDays(9).atStartOfDay(),
+                    isRecurrent = true,
+                    recurrentFrequency = RecurrentFrequency.BIWEEKLY,
+                ),
+                nextChargeDate = today.plusDays(5),
                 isInCurrentPeriod = true,
             ),
         ),
         upcoming = listOf(
             UpcomingRecurrentItem(
                 transaction = Transaction(
-                    id = 3L,
+                    id = 4L,
                     amount = BigDecimal("49.99"),
                     comment = "Gym membership",
                     date = today.minusMonths(3).atStartOfDay(),
+                    isRecurrent = true,
+                    recurrentFrequency = RecurrentFrequency.MONTHLY,
+                ),
+                nextChargeDate = today.plusDays(12),
+                isInCurrentPeriod = false,
+            ),
+            UpcomingRecurrentItem(
+                transaction = Transaction(
+                    id = 5L,
+                    amount = BigDecimal("34.00"),
+                    comment = "Phone plan",
+                    date = today.minusMonths(4).atStartOfDay(),
                     isRecurrent = true,
                     recurrentFrequency = RecurrentFrequency.MONTHLY,
                 ),
@@ -67,9 +94,25 @@ class SubscriptionsScreenshotTest {
                 isInCurrentPeriod = false,
             ),
         ),
-        monthlyTotal = BigDecimal("76.98"),
-        activeCount = 3,
+        monthlyTotal = BigDecimal("84.96"),
+        activeCount = 5,
         currencyCode = "USD",
+        daysUntilNextCharge = 0L,
+        calendarMonthStart = today.withDayOfMonth(1),
+        chargesByDay = buildMap {
+            put(today, listOf(Transaction(id = 1L, amount = BigDecimal("16.99"), comment = "Netflix", date = today.atStartOfDay())))
+            put(today.plusDays(2), listOf(Transaction(id = 2L, amount = BigDecimal("9.99"), comment = "Spotify", date = today.atStartOfDay())))
+            if (today.plusDays(5).month == today.month) {
+                put(
+                    today.plusDays(5),
+                    listOf(
+                        Transaction(id = 3L, amount = BigDecimal("7.99"), comment = "Cloud storage", date = today.atStartOfDay()),
+                        Transaction(id = 4L, amount = BigDecimal("49.99"), comment = "Gym membership", date = today.atStartOfDay()),
+                        Transaction(id = 5L, amount = BigDecimal("34.00"), comment = "Phone plan", date = today.atStartOfDay()),
+                    ),
+                )
+            }
+        },
     )
 
     @Test

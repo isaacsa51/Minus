@@ -22,9 +22,9 @@ class SubscriptionsE2ETest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val today = LocalDate.of(2026, 1, 15)
+    private val today = LocalDate.now()
 
-    private val dueSoonItem = UpcomingRecurrentItem(
+    private val dueTodayItem = UpcomingRecurrentItem(
         transaction = Transaction(
             id = 1L,
             amount = BigDecimal("16.99"),
@@ -33,20 +33,33 @@ class SubscriptionsE2ETest {
             isRecurrent = true,
             recurrentFrequency = RecurrentFrequency.MONTHLY,
         ),
+        nextChargeDate = today,
+        isInCurrentPeriod = true,
+    )
+
+    private val dueSoonItem = UpcomingRecurrentItem(
+        transaction = Transaction(
+            id = 2L,
+            amount = BigDecimal("9.99"),
+            comment = "Spotify",
+            date = today.minusDays(4).atStartOfDay(),
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.WEEKLY,
+        ),
         nextChargeDate = today.plusDays(2),
         isInCurrentPeriod = true,
     )
 
     private val upcomingItem = UpcomingRecurrentItem(
         transaction = Transaction(
-            id = 2L,
+            id = 3L,
             amount = BigDecimal("49.99"),
             comment = "Gym membership",
             date = today.minusMonths(3).atStartOfDay(),
             isRecurrent = true,
             recurrentFrequency = RecurrentFrequency.MONTHLY,
         ),
-        nextChargeDate = today.plusDays(18),
+        nextChargeDate = today.plusDays(12),
         isInCurrentPeriod = false,
     )
 
@@ -72,42 +85,47 @@ class SubscriptionsE2ETest {
     }
 
     @Test
-    fun when_a_due_soon_row_is_expanded_then_confirm_and_skip_actions_appear() {
+    fun when_a_subscription_is_due_today_then_its_confirm_and_skip_actions_are_visible() {
         setSubscriptionsContent(
             state = SubscriptionsUiState(
                 isLoading = false,
-                dueSoon = listOf(dueSoonItem),
+                dueSoon = listOf(dueTodayItem),
                 activeCount = 1,
                 currencyCode = "USD",
+                daysUntilNextCharge = 0L,
             ),
         )
 
-        composeTestRule.onNodeWithText("Netflix").performClick()
-        composeTestRule.waitForIdle()
-
-        val markAsPaidLabel = composeTestRule.activity.getString(R.string.mark_as_paid)
+        val dueTodayLabel = composeTestRule.activity.getString(R.string.subscriptions_due_today_label)
+        val markAsPaidLabel = composeTestRule.activity.getString(R.string.subscriptions_mark_as_paid)
         val skipLabel = composeTestRule.activity.getString(R.string.subscriptions_skip_this_cycle)
+
+        composeTestRule.onNodeWithText("Netflix").assertExists()
+        composeTestRule.onNodeWithText(dueTodayLabel).assertExists()
         composeTestRule.onNodeWithText(markAsPaidLabel).assertExists()
         composeTestRule.onNodeWithText(skipLabel).assertExists()
     }
 
     @Test
-    fun when_an_upcoming_row_is_expanded_then_only_the_confirm_action_appears() {
+    fun when_a_subscription_is_not_due_today_then_it_has_no_confirm_or_skip_actions() {
         setSubscriptionsContent(
             state = SubscriptionsUiState(
                 isLoading = false,
+                dueSoon = listOf(dueSoonItem),
                 upcoming = listOf(upcomingItem),
-                activeCount = 1,
+                activeCount = 2,
                 currencyCode = "USD",
+                daysUntilNextCharge = 2L,
             ),
         )
 
-        composeTestRule.onNodeWithText("Gym membership").performClick()
-        composeTestRule.waitForIdle()
+        val markAsPaidLabel = composeTestRule.activity.getString(R.string.subscriptions_mark_as_paid)
+        val skipLabel = composeTestRule.activity.getString(R.string.subscriptions_skip_this_cycle)
 
-        val markAsPaidLabel = composeTestRule.activity.getString(R.string.mark_as_paid)
-        composeTestRule.onNodeWithText(markAsPaidLabel).assertExists()
+        composeTestRule.onNodeWithText("Spotify").assertExists()
         composeTestRule.onNodeWithText("Gym membership").assertExists()
+        composeTestRule.onNodeWithText(markAsPaidLabel).assertDoesNotExist()
+        composeTestRule.onNodeWithText(skipLabel).assertDoesNotExist()
     }
 
     @Test
@@ -118,9 +136,10 @@ class SubscriptionsE2ETest {
         setSubscriptionsContent(
             state = SubscriptionsUiState(
                 isLoading = false,
-                dueSoon = listOf(dueSoonItem),
+                dueSoon = listOf(dueTodayItem),
                 activeCount = 1,
                 currencyCode = "USD",
+                daysUntilNextCharge = 0L,
             ),
             actions = SubscriptionsActions(
                 onConfirmPaid = { transaction, date ->
@@ -130,13 +149,11 @@ class SubscriptionsE2ETest {
             ),
         )
 
-        composeTestRule.onNodeWithText("Netflix").performClick()
-        composeTestRule.waitForIdle()
-        val markAsPaidLabel = composeTestRule.activity.getString(R.string.mark_as_paid)
+        val markAsPaidLabel = composeTestRule.activity.getString(R.string.subscriptions_mark_as_paid)
         composeTestRule.onNodeWithText(markAsPaidLabel).performClick()
 
-        assert(confirmedTransactionId == dueSoonItem.transaction.id)
-        assert(confirmedDate == dueSoonItem.nextChargeDate)
+        assert(confirmedTransactionId == dueTodayItem.transaction.id)
+        assert(confirmedDate == dueTodayItem.nextChargeDate)
     }
 
     @Test
@@ -147,9 +164,10 @@ class SubscriptionsE2ETest {
         setSubscriptionsContent(
             state = SubscriptionsUiState(
                 isLoading = false,
-                dueSoon = listOf(dueSoonItem),
+                dueSoon = listOf(dueTodayItem),
                 activeCount = 1,
                 currencyCode = "USD",
+                daysUntilNextCharge = 0L,
             ),
             actions = SubscriptionsActions(
                 onSkip = { transaction, date ->
@@ -159,12 +177,10 @@ class SubscriptionsE2ETest {
             ),
         )
 
-        composeTestRule.onNodeWithText("Netflix").performClick()
-        composeTestRule.waitForIdle()
         val skipLabel = composeTestRule.activity.getString(R.string.subscriptions_skip_this_cycle)
         composeTestRule.onNodeWithText(skipLabel).performClick()
 
-        assert(skippedTransactionId == dueSoonItem.transaction.id)
-        assert(skippedDate == dueSoonItem.nextChargeDate)
+        assert(skippedTransactionId == dueTodayItem.transaction.id)
+        assert(skippedDate == dueTodayItem.nextChargeDate)
     }
 }

@@ -52,7 +52,6 @@ fun ExpenseItemExpandedContent(
     readOnly: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onSkip: (() -> Unit)? = null,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     creditCardCutoffDay: Int? = null,
@@ -210,22 +209,6 @@ fun ExpenseItemExpandedContent(
             ) {
                 Text(
                     text = stringResource(R.string.mark_as_paid),
-                    style = MaterialTheme.typography.labelSmallEmphasized,
-                )
-            }
-        }
-
-        if (onSkip != null) {
-            Button(
-                onClick = onSkip,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = stringResource(R.string.subscriptions_skip_this_cycle),
                     style = MaterialTheme.typography.labelSmallEmphasized,
                 )
             }

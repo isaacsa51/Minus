@@ -541,7 +541,9 @@
     <string name="subscriptions_title">Subscriptions</string>
     <string name="subscriptions_analytics_card_label">Recurring</string>
     <string name="subscriptions_monthly_commitment_label">Monthly commitment</string>
-    <string name="subscriptions_active_count">%1$d active</string>
+    <string name="subscriptions_per_month_suffix">/mo</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d active · next up %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d active</string>
     <string name="subscriptions_due_soon_header">Due soon</string>
     <string name="subscriptions_upcoming_header">Upcoming</string>
     <string name="subscriptions_due_today_label">Due today</string>
