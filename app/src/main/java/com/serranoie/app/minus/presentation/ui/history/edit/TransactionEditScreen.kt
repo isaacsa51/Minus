@@ -339,7 +339,7 @@ fun TransactionEditScreen(
                 .height(targetNumpadHeight),
             editorState = editorState,
             showThousandsShortcut = remember(currencyCode) {
-                SupportedCurrency.findByCode(currencyCode)?.hasDecimals == false
+                SupportedCurrency.findByCode(currencyCode)?.shouldShowThousandsShortcut == true
             },
             onNumberInput = { digit ->
                 editedAmount = if (editedAmount == "0") {

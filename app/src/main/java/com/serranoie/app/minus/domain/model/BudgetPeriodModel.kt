@@ -53,6 +53,9 @@ data class SupportedCurrency(
 
     val hasDecimals: Boolean get() = SupportedCurrencyData.BY_CODE[code]?.hasDecimals ?: true
 
+    val shouldShowThousandsShortcut: Boolean
+        get() = SupportedCurrencyData.BY_CODE[code]?.shouldShowThousandsShortcut ?: !hasDecimals
+
     companion object {
         val ALL = listOf(
             SupportedCurrency("USD", "$"),
@@ -205,11 +208,22 @@ data class SupportedCurrencyData(
     val symbolPosition: SymbolPosition = SymbolPosition.START,
     val defaultFractionDigits: Int,
 ) {
-    // ISO 4217 lists these with minor units, but they aren't used in everyday transactions.
     val hasDecimals: Boolean get() = defaultFractionDigits > 0 && code !in NO_PRACTICAL_DECIMALS
+
+    val shouldShowThousandsShortcut: Boolean
+        get() = !hasDecimals || code in THOUSANDS_SHORTCUT_CURRENCIES
 
     companion object {
         private val NO_PRACTICAL_DECIMALS = setOf("IDR")
+
+        private val THOUSANDS_SHORTCUT_CURRENCIES = setOf(
+            "INR", // Indian Rupee
+            "ARS", // Argentine Peso
+            "IDR", // Indonesian Rupiah
+            "COP", // Colombian Peso
+            "PKR", // Pakistani Rupee
+            "VND", // Vietnamese Dong
+        )
 
         private val SUPPORTED_CODES: List<Pair<String, SymbolPosition>> = listOf(
             "USD" to SymbolPosition.START,

@@ -1251,7 +1251,7 @@ private fun MainScreenNumpadSection(
         numberHintAnchorModifier = Modifier,
         applyHintAnchorModifier = Modifier,
         showThousandsShortcut = remember(budgetUiState.budgetSettings?.currencyCode) {
-            SupportedCurrency.findByCode(budgetUiState.budgetSettings?.currencyCode ?: "USD")?.hasDecimals == false
+            SupportedCurrency.findByCode(budgetUiState.budgetSettings?.currencyCode ?: "USD")?.shouldShowThousandsShortcut == true
         },
         onNumberInput = { digit ->
             actions.onProcessIntent(
