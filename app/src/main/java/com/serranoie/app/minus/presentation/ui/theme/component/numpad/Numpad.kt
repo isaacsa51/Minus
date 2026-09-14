@@ -241,7 +241,6 @@ fun Numpad(
                                     onThousandsInput()
                                     debugProgress = 0
                                 },
-                                onEqualsInput = onEqualsInput,
                                 numberHintAnchorModifier = numberHintAnchorModifier,
                                 onNumberPressedForTutorial = onNumberPressedForTutorial
                             )
@@ -456,7 +455,6 @@ private fun NumberGrid(
     onNumberInput: (Int) -> Unit,
     onDotInput: () -> Unit,
     onThousandsInput: () -> Unit,
-    onEqualsInput: () -> Unit,
     numberHintAnchorModifier: Modifier,
     onNumberPressedForTutorial: (() -> Unit)?
 ) {
@@ -484,35 +482,19 @@ private fun NumberGrid(
             }
         }
 
-        val showDot = effectiveDragProgress > 0.01f || isCalculation
-        val thousandsButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
+        val dotButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
             NumpadButton(
                 modifier = Modifier.padding(BUTTON_GAP),
-                type = NumpadButtonType.DEFAULT,
+                type = NumpadButtonType.OPERATOR,
+                text = getFloatDivider(),
                 interactionSource = interactionSource,
-                animateTextSize = false,
                 onClick = {
-                    onThousandsInput()
-                    onNumberPressedForTutorial?.invoke()
+                    onDotInput()
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 }
-            ) { color, style -> ThousandsButtonLabel(color, style) }
+            )
         }
-        val equalsOrDotButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
-            val showEquals = isCalculation || effectiveDragProgress > 0.5f
-            AnimatedContent(targetState = showEquals, label = "LastButtonSwap") { equals ->
-                NumpadButton(
-                    modifier = Modifier.fillMaxSize().padding(BUTTON_GAP),
-                    type = NumpadButtonType.OPERATOR,
-                    text = if (equals) "=" else getFloatDivider(),
-                    interactionSource = interactionSource,
-                    onClick = {
-                        if (equals) onEqualsInput() else onDotInput()
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    }
-                )
-            }
-        }
+
         val zeroButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
             NumpadButton(
                 modifier = Modifier.padding(BUTTON_GAP),
@@ -526,66 +508,29 @@ private fun NumberGrid(
                 }
             )
         }
-        if (showDot) {
-            if (showThousandsShortcut) {
-                ExpandableRow(
-                    itemCount = 3,
-                    baseWeights = listOf(
-                        effectiveDragProgress.coerceAtLeast(0.01f),
-                        1f,
-                        1f
-                    ),
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                ) { index, interactionSource ->
-                    when (index) {
-                        0 -> NumpadButton(
-                            modifier = Modifier.padding(BUTTON_GAP).graphicsLayer(alpha = effectiveDragProgress),
-                            type = NumpadButtonType.OPERATOR,
-                            text = getFloatDivider(),
-                            interactionSource = interactionSource,
-                            onClick = {
-                                onDotInput()
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            }
-                        )
-                        1 -> zeroButton(interactionSource)
-                        2 -> thousandsButton(interactionSource)
-                    }
+
+        val thousandsButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
+            NumpadButton(
+                modifier = Modifier.padding(BUTTON_GAP),
+                type = NumpadButtonType.DEFAULT,
+                interactionSource = interactionSource,
+                animateTextSize = false,
+                onClick = {
+                    onThousandsInput()
+                    onNumberPressedForTutorial?.invoke()
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 }
-            } else {
-                ExpandableRow(
-                    itemCount = 3,
-                    baseWeights = listOf(
-                        effectiveDragProgress.coerceAtLeast(0.01f),
-                        3f - (2f * effectiveDragProgress),
-                        1.5f - (0.5f * effectiveDragProgress)
-                    ),
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                ) { index, interactionSource ->
-                    when (index) {
-                        0 -> NumpadButton(
-                            modifier = Modifier.padding(BUTTON_GAP).graphicsLayer(alpha = effectiveDragProgress),
-                            type = NumpadButtonType.OPERATOR,
-                            text = getFloatDivider(),
-                            interactionSource = interactionSource,
-                            onClick = {
-                                onDotInput()
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            }
-                        )
-                        1 -> zeroButton(interactionSource)
-                        2 -> equalsOrDotButton(interactionSource)
-                    }
-                }
-            }
-        } else if (showThousandsShortcut) {
+            ) { color, style -> ThousandsButtonLabel(color, style) }
+        }
+
+        if (showThousandsShortcut) {
             ExpandableRow(
                 itemCount = 3,
                 baseWeights = listOf(1.5f, 1.5f, 1.5f),
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) { index, interactionSource ->
                 when (index) {
-                    0 -> equalsOrDotButton(interactionSource)
+                    0 -> dotButton(interactionSource)
                     1 -> zeroButton(interactionSource)
                     2 -> thousandsButton(interactionSource)
                 }
@@ -593,12 +538,12 @@ private fun NumberGrid(
         } else {
             ExpandableRow(
                 itemCount = 2,
-                baseWeights = listOf(3f, 1.5f),
+                baseWeights = listOf(1.5f, 3f),
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) { index, interactionSource ->
                 when (index) {
-                    0 -> zeroButton(interactionSource)
-                    1 -> equalsOrDotButton(interactionSource)
+                    0 -> dotButton(interactionSource)
+                    1 -> zeroButton(interactionSource)
                 }
             }
         }
@@ -641,7 +586,7 @@ private fun RowScope.ActionButtonsColumn(
                     }
         }
 
-        val showEqualsInColumn4 = showThousandsShortcut && (effectiveDragProgress > 0.01f || isCalculation)
+        val showEqualsInColumn4 = effectiveDragProgress > 0.01f || isCalculation
         val checkWeight = if (showEqualsInColumn4) 3f - (1f * effectiveDragProgress) else 3f
 
         AnimatedContent(

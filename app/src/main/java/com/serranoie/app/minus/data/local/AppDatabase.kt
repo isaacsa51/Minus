@@ -25,7 +25,7 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
         ArchivedBudgetEntity::class,
         PaidRecurrentOccurrenceEntity::class
     ],
-    version = 19,
+    version = 20,
     autoMigrations = [
         AutoMigration(from = 16, to = 17),
         AutoMigration(from = 17, to = 18),

@@ -26,8 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
@@ -83,14 +85,22 @@ internal fun SegmentedAmountText(
             text = widthProbe,
             style = style,
         )
+        val baseStyle = style.copy(
+            fontSize = fontSize,
+            platformStyle = PlatformTextStyle(includeFontPadding = false),
+            lineHeightStyle = LineHeightStyle(
+                alignment = LineHeightStyle.Alignment.Center,
+                trim = LineHeightStyle.Trim.Both
+            )
+        )
         val bodyStyle = if (splitStyling) {
-            style.copy(fontSize = fontSize, fontWeight = FontWeight.Light)
+            baseStyle.copy(fontWeight = FontWeight.Light)
         } else {
-            style.copy(fontSize = fontSize)
+            baseStyle
         }
         val glyphStyle = bodyStyle.copy(letterSpacing = 0.sp, fontFeatureSettings = "tnum")
         val symbolTextStyle = if (splitStyling) {
-            style.copy(
+            baseStyle.copy(
                 fontSize = fontSize * 0.75f,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 0.sp,
@@ -130,13 +140,13 @@ internal fun SegmentedAmountText(
                 key(chars.size - index) {
                     AnimatedContent(
                         targetState = ch,
-                        contentAlignment = Alignment.Center,
+                        contentAlignment = Alignment.BottomCenter,
                         modifier = Modifier.alignByBaseline(),
                         transitionSpec = {
                             (fadeIn(tween(200)) +
-                                scaleIn(initialScale = 0.6f, animationSpec = tween(200))) togetherWith
+                                scaleIn(initialScale = 0.92f, animationSpec = tween(200))) togetherWith
                                 (fadeOut(tween(140)) +
-                                    scaleOut(targetScale = 0.6f, animationSpec = tween(140))) using
+                                    scaleOut(targetScale = 0.92f, animationSpec = tween(140))) using
                                 SizeTransform(clip = false)
                         },
                         label = "amountGlyph",
@@ -192,7 +202,14 @@ internal fun AdaptiveSingleLineText(
 
         Text(
             text = annotatedText ?: AnnotatedString(text),
-            style = style.copy(fontSize = adaptiveFontSize),
+            style = style.copy(
+                fontSize = adaptiveFontSize,
+                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                lineHeightStyle = LineHeightStyle(
+                    alignment = LineHeightStyle.Alignment.Center,
+                    trim = LineHeightStyle.Trim.Both
+                )
+            ),
             color = color,
             maxLines = 1,
             overflow = TextOverflow.Clip,

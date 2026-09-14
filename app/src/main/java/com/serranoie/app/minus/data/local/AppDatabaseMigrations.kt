@@ -122,4 +122,64 @@ object AppDatabaseMigrations {
             )
         }
     }
+
+    val MIGRATION_19_20: Migration = object : Migration(19, 20) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `budget_settings_new` (
+                    `id` INTEGER NOT NULL, 
+                    `totalBudget` TEXT NOT NULL, 
+                    `period` TEXT NOT NULL, 
+                    `startDate` INTEGER NOT NULL, 
+                    `endDate` INTEGER, 
+                    `currencyCode` TEXT NOT NULL, 
+                    `daysInPeriod` INTEGER NOT NULL, 
+                    `rollOverEnabled` INTEGER NOT NULL, 
+                    `rollOverCarryForward` INTEGER NOT NULL, 
+                    `rollOverLimit` TEXT, 
+                    `remainingBudgetStrategy` TEXT NOT NULL, 
+                    `creditCardCutoffDay` INTEGER, 
+                    `splitMode` TEXT NOT NULL, 
+                    `rollOverAppliedDate` INTEGER, 
+                    PRIMARY KEY(`id`)
+                )
+                """.trimIndent()
+            )
+
+            val cursor = db.query("PRAGMA table_info(budget_settings)")
+            var hasDailyDate = false
+            var hasRollOverAppliedDate = false
+            while (cursor.moveToNext()) {
+                val columnName = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                if (columnName == "dailyCarryForwardDate") hasDailyDate = true
+                if (columnName == "rollOverAppliedDate") hasRollOverAppliedDate = true
+            }
+            cursor.close()
+
+            val rollOverSource = when {
+                hasRollOverAppliedDate -> "rollOverAppliedDate"
+                hasDailyDate -> "dailyCarryForwardDate"
+                else -> "NULL"
+            }
+
+            db.execSQL(
+                """
+                INSERT INTO budget_settings_new (
+                    id, totalBudget, period, startDate, endDate, currencyCode, 
+                    daysInPeriod, rollOverEnabled, rollOverCarryForward, rollOverLimit, 
+                    remainingBudgetStrategy, creditCardCutoffDay, splitMode, rollOverAppliedDate
+                )
+                SELECT 
+                    id, totalBudget, period, startDate, endDate, currencyCode, 
+                    daysInPeriod, rollOverEnabled, rollOverCarryForward, rollOverLimit, 
+                    remainingBudgetStrategy, creditCardCutoffDay, splitMode, $rollOverSource
+                FROM budget_settings
+                """.trimIndent()
+            )
+
+            db.execSQL("DROP TABLE budget_settings")
+            db.execSQL("ALTER TABLE budget_settings_new RENAME TO budget_settings")
+        }
+    }
 }
