@@ -70,8 +70,8 @@ import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
-import com.serranoie.app.minus.presentation.util.harmonizeWithColor
 import com.serranoie.app.minus.presentation.util.haptic.HapticUtil
+import com.serranoie.app.minus.presentation.util.harmonizeWithColor
 import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
 import kotlinx.coroutines.delay
 import java.math.BigDecimal
@@ -108,7 +108,8 @@ fun BudgetPill(
 
     val exhaustedMessage = resolveExhaustedMessage(budgetState, viewPeriod, splitMode)
 
-    val isNoBudget = budgetState == null
+    val periodExpired = budgetSettings?.let { LocalDate.now().isAfter(it.getPeriodEndDate()) } ?: false
+    val isNoBudget = budgetState == null || (hasUnresolvedSurplus && periodExpired)
 
     val currency = remember(currencyCode) { SupportedCurrency.findByCode(currencyCode) }
     val currencySymbol = currency?.symbol ?: ""
