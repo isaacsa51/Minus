@@ -80,7 +80,7 @@ class BudgetViewModelTest {
     private val queuedTransactionsFlow = MutableStateFlow<List<Transaction>>(emptyList())
     private val paidOccurrencesFlow = MutableStateFlow<Set<PaidRecurrentOccurrence>>(emptySet())
     private val pendingRolloverFlow =
-        MutableStateFlow(BigDecimal.ZERO to (null as RemainingBudgetStrategy?))
+        MutableStateFlow(BigDecimal.ZERO to null as RemainingBudgetStrategy?)
 
     @Before
     fun setUp() {

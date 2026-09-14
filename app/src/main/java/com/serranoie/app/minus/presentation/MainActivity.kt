@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -31,6 +32,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.repository.SettingsRepository
@@ -228,93 +230,103 @@ class MainActivity : AppCompatActivity() {
                                 },
                             )
 
-                            val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()
-                            val midnightTransitionData by midnightTransitionManager.midnightTransitionData.collectAsStateWithLifecycle()
-
-                            if (shouldShowMidnightDialog && midnightTransitionData != null) {
-                                val data = midnightTransitionData!!
-                                if (data.shouldNavigateToAnalyticsOnly) {
-                                    LaunchedEffect(
-                                        data.periodEndDate,
-                                        data.remainingAmount,
-                                        data.totalBudget,
-                                        data.totalSpent,
-                                    ) {
-                                        midnightTransitionManager.onTransitionDialogConfirmed()
-                                        navController.navigate(Screen.Analytics.route) {
-                                            popUpTo(Screen.Main.route) { inclusive = false }
-                                            launchSingleTop = true
-                                        }
-                                    }
-                                } else {
-                                    val periodLabel = if (data.isPersistedReopen) {
-                                        stringResource(R.string.rollover_dialog_pending_label)
-                                    } else {
-                                        "${data.periodStartDate.dayOfMonth} ${
-                                            data.periodStartDate.month.name.lowercase().take(3)
-                                        } - ${data.periodEndDate.dayOfMonth} ${
-                                            data.periodEndDate.month.name.lowercase().take(3)
-                                        }"
-                                    }
-
-                                    fun resolveAndMaybeNavigate(strategy: RemainingBudgetStrategy?) {
-                                        lifecycleScope.launch {
-                                            midnightTransitionManager.resolveUnresolvedSurplus(strategy)
-                                            if (!data.isPersistedReopen) {
-                                                navController.navigate(Screen.Analytics.route) {
-                                                    popUpTo(Screen.Main.route) { inclusive = false }
-                                                    launchSingleTop = true
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    RolloverDialog(
-                                        remainingAmount = data.remainingAmount,
-                                        currencyCode = data.currencyCode,
-                                        periodLabel = periodLabel,
-                                        spentAmount = if (data.isPersistedReopen) null else data.totalSpent,
-                                        onSplitEqually = {
-                                            resolveAndMaybeNavigate(RemainingBudgetStrategy.SPLIT_EQUALLY)
-                                        },
-                                        onCarryToNextDay = {
-                                            resolveAndMaybeNavigate(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
-                                        },
-                                        onViewAnalytics = { resolveAndMaybeNavigate(null) },
-                                        onDismiss = {
-                                            midnightTransitionManager.onTransitionDialogDismissed()
-                                        },
-                                    )
-                                }
-                            }
-
-                            val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()
-                            LaunchedEffect(needsBudgetSetup, onboardingComplete.value) {
-                                if (needsBudgetSetup && onboardingComplete.value) {
-                                    midnightTransitionManager.onBudgetSetupHandled()
-
-                                    val hasBudget = settingsRepository.observeBudgetEndDate().first() != null
-                                    navController.navigate(
-                                        Screen.Main.createRoute(
-                                            openWallet = true,
-                                            forceWalletSetup = !hasBudget,
-                                        ),
-                                    ) {
-                                        popUpTo(Screen.Main.route) { inclusive = true }
-                                        launchSingleTop = true
-                                    }
-                                } else if (needsBudgetSetup && !onboardingComplete.value) {
-                                    logcat {
-                                        "needsBudgetSetup detected but onboarding NOT complete -> suppressing wallet setup navigation until onboarding finishes"
-                                    }
-                                }
-                            }
+                            MidnightRolloverDialogHost(navController)
+                            HandleBudgetSetupNavigation(navController)
                         }
                     }
                 }
 
                 LaunchedEffect(Unit) {
                     isDone.value = true
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun MidnightRolloverDialogHost(navController: NavHostController) {
+        val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()
+        val midnightTransitionData by midnightTransitionManager.midnightTransitionData.collectAsStateWithLifecycle()
+
+        if (!shouldShowMidnightDialog || midnightTransitionData == null) return
+        val data = midnightTransitionData!!
+
+        if (data.shouldNavigateToAnalyticsOnly) {
+            LaunchedEffect(
+                data.periodEndDate,
+                data.remainingAmount,
+                data.totalBudget,
+                data.totalSpent,
+            ) {
+                midnightTransitionManager.onTransitionDialogConfirmed()
+                navController.navigate(Screen.Analytics.route) {
+                    popUpTo(Screen.Main.route) { inclusive = false }
+                    launchSingleTop = true
+                }
+            }
+            return
+        }
+
+        val periodLabel = if (data.isPersistedReopen) {
+            stringResource(R.string.rollover_dialog_pending_label)
+        } else {
+            "${data.periodStartDate.dayOfMonth} ${
+                data.periodStartDate.month.name.lowercase().take(3)
+            } - ${data.periodEndDate.dayOfMonth} ${
+                data.periodEndDate.month.name.lowercase().take(3)
+            }"
+        }
+
+        fun resolveAndMaybeNavigate(strategy: RemainingBudgetStrategy?) {
+            lifecycleScope.launch {
+                midnightTransitionManager.resolveUnresolvedSurplus(strategy)
+                if (!data.isPersistedReopen) {
+                    navController.navigate(Screen.Analytics.route) {
+                        popUpTo(Screen.Main.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            }
+        }
+
+        RolloverDialog(
+            remainingAmount = data.remainingAmount,
+            currencyCode = data.currencyCode,
+            periodLabel = periodLabel,
+            spentAmount = if (data.isPersistedReopen) null else data.totalSpent,
+            onSplitEqually = {
+                resolveAndMaybeNavigate(RemainingBudgetStrategy.SPLIT_EQUALLY)
+            },
+            onCarryToNextDay = {
+                resolveAndMaybeNavigate(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
+            },
+            onViewAnalytics = { resolveAndMaybeNavigate(null) },
+            onDismiss = {
+                midnightTransitionManager.onTransitionDialogDismissed()
+            },
+        )
+    }
+
+    @Composable
+    private fun HandleBudgetSetupNavigation(navController: NavHostController) {
+        val needsBudgetSetup by midnightTransitionManager.needsBudgetSetup.collectAsStateWithLifecycle()
+        LaunchedEffect(needsBudgetSetup, onboardingComplete.value) {
+            if (needsBudgetSetup && onboardingComplete.value) {
+                midnightTransitionManager.onBudgetSetupHandled()
+
+                val hasBudget = settingsRepository.observeBudgetEndDate().first() != null
+                navController.navigate(
+                    Screen.Main.createRoute(
+                        openWallet = true,
+                        forceWalletSetup = !hasBudget,
+                    ),
+                ) {
+                    popUpTo(Screen.Main.route) { inclusive = true }
+                    launchSingleTop = true
+                }
+            } else if (needsBudgetSetup && !onboardingComplete.value) {
+                logcat {
+                    "needsBudgetSetup detected but onboarding NOT complete -> suppressing wallet setup navigation until onboarding finishes"
                 }
             }
         }

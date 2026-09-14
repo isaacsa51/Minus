@@ -367,15 +367,15 @@ fun BudgetPill(
                                 if (targetState) {
                                     (slideInHorizontally(animationSpec = tween(220)) { it / 5 } + fadeIn(
                                         fadeSpec
-                                    )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { -it / 5 } + fadeOut(
+                                    )) togetherWith slideOutHorizontally(animationSpec = tween(180)) { -it / 5 } + fadeOut(
                                         tween(120)
-                                    ))
+                                    )
                                 } else {
                                     (slideInHorizontally(animationSpec = tween(220)) { -it / 5 } + fadeIn(
                                         fadeSpec
-                                    )) togetherWith (slideOutHorizontally(animationSpec = tween(180)) { it / 5 } + fadeOut(
+                                    )) togetherWith slideOutHorizontally(animationSpec = tween(180)) { it / 5 } + fadeOut(
                                         tween(120)
-                                    ))
+                                    )
                                 }
                             },
                             label = "budgetPillContent",
