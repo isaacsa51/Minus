@@ -10,6 +10,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
@@ -33,14 +35,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -80,6 +85,8 @@ fun Numpad(
     editorState: EditorState,
     onNumberInput: (Int) -> Unit = {},
     onDotInput: () -> Unit = {},
+    onThousandsInput: () -> Unit = {},
+    showThousandsShortcut: Boolean = false,
     onEqualsInput: () -> Unit = {},
     onBackspace: () -> Unit = {},
     onBackspaceLongPress: () -> Unit = {},
@@ -221,6 +228,7 @@ fun Numpad(
                             NumberGrid(
                                 effectiveDragProgress = effectiveDragProgress,
                                 isCalculation = isCalculation,
+                                showThousandsShortcut = showThousandsShortcut,
                                 onNumberInput = {
                                     onNumberInput(it)
                                     debugProgress = 0
@@ -228,6 +236,10 @@ fun Numpad(
                                 onDotInput = {
                                     onDotInput()
                                     debugProgress = (debugProgress + 1).coerceAtMost(TEST_NOTIFICATION_TAP_COUNT)
+                                },
+                                onThousandsInput = {
+                                    onThousandsInput()
+                                    debugProgress = 0
                                 },
                                 onEqualsInput = onEqualsInput,
                                 numberHintAnchorModifier = numberHintAnchorModifier,
@@ -240,6 +252,8 @@ fun Numpad(
                 ActionButtonsColumn(
                     editorState = editorState,
                     isCalculation = isCalculation,
+                    effectiveDragProgress = effectiveDragProgress,
+                    showThousandsShortcut = showThousandsShortcut,
                     onBackspace = {
                         onBackspace()
                         debugProgress = 0
@@ -256,6 +270,7 @@ fun Numpad(
                             onApply()
                         }
                     },
+                    onEqualsInput = onEqualsInput,
                     applyHintAnchorModifier = applyHintAnchorModifier
                 )
             }
@@ -400,12 +415,47 @@ private fun ColumnScope.OperatorRow(
     }
 }
 
+private val ThousandsOffsetFirstY = (-5).dp
+private val ThousandsOffsetThirdY = 5.dp
+
+@Composable
+private fun ThousandsButtonLabel(color: Color, style: TextStyle) {
+    val scaledStyle = style.copy(fontSize = style.fontSize * 0.75f)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(horizontal = 8.dp)
+    ) {
+        Text(
+            text = "0",
+            color = color,
+            style = scaledStyle,
+            maxLines = 1,
+            modifier = Modifier.offset(y = ThousandsOffsetFirstY)
+        )
+        Text(
+            text = "0",
+            color = color,
+            style = scaledStyle,
+            maxLines = 1
+        )
+        Text(
+            text = "0",
+            color = color,
+            style = scaledStyle,
+            maxLines = 1,
+            modifier = Modifier.offset(y = ThousandsOffsetThirdY)
+        )
+    }
+}
+
 @Composable
 private fun NumberGrid(
     effectiveDragProgress: Float,
     isCalculation: Boolean,
+    showThousandsShortcut: Boolean,
     onNumberInput: (Int) -> Unit,
     onDotInput: () -> Unit,
+    onThousandsInput: () -> Unit,
     onEqualsInput: () -> Unit,
     numberHintAnchorModifier: Modifier,
     onNumberPressedForTutorial: (() -> Unit)?
@@ -435,53 +485,109 @@ private fun NumberGrid(
         }
 
         val showDot = effectiveDragProgress > 0.01f || isCalculation
+        val thousandsButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
+            NumpadButton(
+                modifier = Modifier.padding(BUTTON_GAP),
+                type = NumpadButtonType.DEFAULT,
+                interactionSource = interactionSource,
+                animateTextSize = false,
+                onClick = {
+                    onThousandsInput()
+                    onNumberPressedForTutorial?.invoke()
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                }
+            ) { color, style -> ThousandsButtonLabel(color, style) }
+        }
+        val equalsOrDotButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
+            val showEquals = isCalculation || effectiveDragProgress > 0.5f
+            AnimatedContent(targetState = showEquals, label = "LastButtonSwap") { equals ->
+                NumpadButton(
+                    modifier = Modifier.fillMaxSize().padding(BUTTON_GAP),
+                    type = NumpadButtonType.OPERATOR,
+                    text = if (equals) "=" else getFloatDivider(),
+                    interactionSource = interactionSource,
+                    onClick = {
+                        if (equals) onEqualsInput() else onDotInput()
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                )
+            }
+        }
+        val zeroButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
+            NumpadButton(
+                modifier = Modifier.padding(BUTTON_GAP),
+                type = NumpadButtonType.DEFAULT,
+                text = "0",
+                interactionSource = interactionSource,
+                onClick = {
+                    onNumberInput(0)
+                    onNumberPressedForTutorial?.invoke()
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                }
+            )
+        }
         if (showDot) {
+            if (showThousandsShortcut) {
+                ExpandableRow(
+                    itemCount = 3,
+                    baseWeights = listOf(
+                        effectiveDragProgress.coerceAtLeast(0.01f),
+                        1f,
+                        1f
+                    ),
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                ) { index, interactionSource ->
+                    when (index) {
+                        0 -> NumpadButton(
+                            modifier = Modifier.padding(BUTTON_GAP).graphicsLayer(alpha = effectiveDragProgress),
+                            type = NumpadButtonType.OPERATOR,
+                            text = getFloatDivider(),
+                            interactionSource = interactionSource,
+                            onClick = {
+                                onDotInput()
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            }
+                        )
+                        1 -> zeroButton(interactionSource)
+                        2 -> thousandsButton(interactionSource)
+                    }
+                }
+            } else {
+                ExpandableRow(
+                    itemCount = 3,
+                    baseWeights = listOf(
+                        effectiveDragProgress.coerceAtLeast(0.01f),
+                        3f - (2f * effectiveDragProgress),
+                        1.5f - (0.5f * effectiveDragProgress)
+                    ),
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                ) { index, interactionSource ->
+                    when (index) {
+                        0 -> NumpadButton(
+                            modifier = Modifier.padding(BUTTON_GAP).graphicsLayer(alpha = effectiveDragProgress),
+                            type = NumpadButtonType.OPERATOR,
+                            text = getFloatDivider(),
+                            interactionSource = interactionSource,
+                            onClick = {
+                                onDotInput()
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            }
+                        )
+                        1 -> zeroButton(interactionSource)
+                        2 -> equalsOrDotButton(interactionSource)
+                    }
+                }
+            }
+        } else if (showThousandsShortcut) {
             ExpandableRow(
                 itemCount = 3,
-                baseWeights = listOf(
-                    effectiveDragProgress.coerceAtLeast(0.01f),
-                    3f - (2f * effectiveDragProgress),
-                    1.5f - (0.5f * effectiveDragProgress)
-                ),
+                baseWeights = listOf(1.5f, 1.5f, 1.5f),
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) { index, interactionSource ->
                 when (index) {
-                    0 -> NumpadButton(
-                        modifier = Modifier.padding(BUTTON_GAP).graphicsLayer(alpha = effectiveDragProgress),
-                        type = NumpadButtonType.OPERATOR,
-                        text = getFloatDivider(),
-                        interactionSource = interactionSource,
-                        onClick = {
-                            onDotInput()
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        }
-                    )
-                    1 -> NumpadButton(
-                        modifier = Modifier.padding(BUTTON_GAP),
-                        type = NumpadButtonType.DEFAULT,
-                        text = "0",
-                        interactionSource = interactionSource,
-                        onClick = {
-                            onNumberInput(0)
-                            onNumberPressedForTutorial?.invoke()
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        }
-                    )
-                    2 -> {
-                        val showEquals = isCalculation || effectiveDragProgress > 0.5f
-                        AnimatedContent(targetState = showEquals, label = "LastButtonSwap") { equals ->
-                            NumpadButton(
-                                modifier = Modifier.fillMaxSize().padding(BUTTON_GAP),
-                                type = NumpadButtonType.OPERATOR,
-                                text = if (equals) "=" else getFloatDivider(),
-                                interactionSource = interactionSource,
-                                onClick = {
-                                    if (equals) onEqualsInput() else onDotInput()
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                }
-                            )
-                        }
-                    }
+                    0 -> equalsOrDotButton(interactionSource)
+                    1 -> zeroButton(interactionSource)
+                    2 -> thousandsButton(interactionSource)
                 }
             }
         } else {
@@ -491,32 +597,8 @@ private fun NumberGrid(
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) { index, interactionSource ->
                 when (index) {
-                    0 -> NumpadButton(
-                        modifier = Modifier.padding(BUTTON_GAP),
-                        type = NumpadButtonType.DEFAULT,
-                        text = "0",
-                        interactionSource = interactionSource,
-                        onClick = {
-                            onNumberInput(0)
-                            onNumberPressedForTutorial?.invoke()
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        }
-                    )
-                    1 -> {
-                        val showEquals = isCalculation || effectiveDragProgress > 0.5f
-                        AnimatedContent(targetState = showEquals, label = "LastButtonSwap") { equals ->
-                            NumpadButton(
-                                modifier = Modifier.fillMaxSize().padding(BUTTON_GAP),
-                                type = NumpadButtonType.OPERATOR,
-                                text = if (equals) "=" else getFloatDivider(),
-                                interactionSource = interactionSource,
-                                onClick = {
-                                    if (equals) onEqualsInput() else onDotInput()
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                }
-                            )
-                        }
-                    }
+                    0 -> zeroButton(interactionSource)
+                    1 -> equalsOrDotButton(interactionSource)
                 }
             }
         }
@@ -527,10 +609,13 @@ private fun NumberGrid(
 private fun RowScope.ActionButtonsColumn(
     editorState: EditorState,
     isCalculation: Boolean,
+    effectiveDragProgress: Float = 0f,
+    showThousandsShortcut: Boolean = false,
     onBackspace: () -> Unit,
     onBackspaceLongPress: () -> Unit,
     onDelete: () -> Unit,
     onApply: () -> Unit,
+    onEqualsInput: () -> Unit = {},
     applyHintAnchorModifier: Modifier
 ) {
     val haptic = LocalHapticFeedback.current
@@ -556,8 +641,11 @@ private fun RowScope.ActionButtonsColumn(
                     }
         }
 
+        val showEqualsInColumn4 = showThousandsShortcut && (effectiveDragProgress > 0.01f || isCalculation)
+        val checkWeight = if (showEqualsInColumn4) 3f - (1f * effectiveDragProgress) else 3f
+
         AnimatedContent(
-            modifier = Modifier.weight(3f),
+            modifier = Modifier.weight(checkWeight),
             targetState = targetIsDelete,
             label = "Delete or Apply"
         ) { isDelete ->
@@ -571,12 +659,31 @@ private fun RowScope.ActionButtonsColumn(
                 }
             )
         }
+
+        if (showEqualsInColumn4) {
+            val equalsWeight = 1f * effectiveDragProgress
+            if (equalsWeight > 0.01f) {
+                NumpadButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(equalsWeight)
+                        .padding(BUTTON_GAP)
+                        .graphicsLayer(alpha = effectiveDragProgress),
+                    type = NumpadButtonType.OPERATOR,
+                    text = "=",
+                    onClick = {
+                        onEqualsInput()
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                )
+            }
+        }
     }
 }
 
 @Preview
 @Composable
-fun NumpadPreview() {
+private fun NumpadPreview() {
     MinusTheme {
         Numpad(
             editorState = EditorState(
@@ -592,9 +699,28 @@ fun NumpadPreview() {
     }
 }
 
+@Preview(name = "Numpad - Thousands Shortcut")
+@Composable
+private fun NumpadPreviewThousandsShortcut() {
+    MinusTheme {
+        Numpad(
+            editorState = EditorState(
+                mode = EditMode.ADD,
+                rawSpentValue = "123",
+                stage = EditStage.EDIT_SPENT,
+                currentSpent = "123",
+                currentComment = "",
+                editedTransaction = null
+            ),
+            isCalculation = false,
+            showThousandsShortcut = true
+        )
+    }
+}
+
 @Preview(name = "Numpad - Calculation ON")
 @Composable
-fun NumpadPreviewCalculationMode() {
+private fun NumpadPreviewCalculationMode() {
     MinusTheme {
         Numpad(
             editorState = EditorState(
@@ -606,6 +732,25 @@ fun NumpadPreviewCalculationMode() {
                 editedTransaction = null
             ),
             isCalculation = true
+        )
+    }
+}
+
+@Preview(name = "Numpad - Thousands + Calculation ON")
+@Composable
+private fun NumpadPreviewThousandsCalculation() {
+    MinusTheme {
+        Numpad(
+            editorState = EditorState(
+                mode = EditMode.ADD,
+                rawSpentValue = "123",
+                stage = EditStage.EDIT_SPENT,
+                currentSpent = "123",
+                currentComment = "",
+                editedTransaction = null
+            ),
+            isCalculation = true,
+            showThousandsShortcut = true
         )
     }
 }

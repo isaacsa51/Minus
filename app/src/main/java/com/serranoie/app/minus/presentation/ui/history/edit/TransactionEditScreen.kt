@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
@@ -337,12 +338,18 @@ fun TransactionEditScreen(
                 .padding(bottom = LocalWindowInsets.current.calculateBottomPadding())
                 .height(targetNumpadHeight),
             editorState = editorState,
+            showThousandsShortcut = remember(currencyCode) {
+                SupportedCurrency.findByCode(currencyCode)?.hasDecimals == false
+            },
             onNumberInput = { digit ->
                 editedAmount = if (editedAmount == "0") {
                     digit.toString()
                 } else {
                     editedAmount + digit.toString()
                 }
+            },
+            onThousandsInput = {
+                editedAmount = if (editedAmount == "0") "000" else editedAmount + "000"
             },
             onDotInput = {
                 val lastChar = editedAmount.lastOrNull()

@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -66,6 +67,8 @@ fun NumpadButton(
     onClick: () -> Unit = {},
     onLongClick: (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    animateTextSize: Boolean = true,
+    content: (@Composable (contentColor: Color, textStyle: TextStyle) -> Unit)? = null,
 ) {
     val isPressed by interactionSource.collectIsPressedAsState()
     val baseTextStyle =
@@ -132,12 +135,24 @@ fun NumpadButton(
                 .then(clickableModifier),
             contentAlignment = Alignment.Center
         ) {
+            if (content != null) {
+                content(
+                    contentColor,
+                    baseTextStyle.interpolateToEmphasized(
+                        emphasizedStyle = emphasizedTextStyle,
+                        progress = pressProgress,
+                        animateSize = animateTextSize
+                    )
+                )
+            }
             if (text != null) {
                 Text(
                     text = text,
                     color = contentColor,
                     style = baseTextStyle.interpolateToEmphasized(
-                        emphasizedStyle = emphasizedTextStyle, progress = pressProgress
+                        emphasizedStyle = emphasizedTextStyle,
+                        progress = pressProgress,
+                        animateSize = animateTextSize
                     ),
                     maxLines = 1,
                 )
@@ -157,17 +172,14 @@ fun NumpadButton(
 @OptIn(ExperimentalTextApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TextStyle.interpolateToEmphasized(
-    emphasizedStyle: TextStyle, progress: Float
+    emphasizedStyle: TextStyle, progress: Float, animateSize: Boolean = true
 ): TextStyle {
-    val clampedProgress = progress.coerceIn(0f, 1f)
+    val clampedProgress = if (animateSize) progress.coerceIn(0f, 1f) else 0f
     val animatedWeight = lerp(400f, 600f, clampedProgress)
     val animatedWidth = lerp(100f, 125f, clampedProgress)
     val animatedFontSize = lerp(fontSize.value, emphasizedStyle.fontSize.value, clampedProgress).sp
-    val animatedLineHeight =
-        lerp(lineHeight.value, emphasizedStyle.lineHeight.value, clampedProgress).sp
-    val animatedLetterSpacing = lerp(
-        letterSpacing.value, emphasizedStyle.letterSpacing.value, clampedProgress
-    ).sp
+    val animatedLineHeight = lerp(lineHeight.value, emphasizedStyle.lineHeight.value, clampedProgress).sp
+    val animatedLetterSpacing = lerp(letterSpacing.value, emphasizedStyle.letterSpacing.value, clampedProgress).sp
 
     val isRounded = LocalContext.current.isRoundedFontEnabled
     val animatedFontFamily = remember(animatedWeight, animatedWidth, isRounded) {

@@ -90,6 +90,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
+import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
@@ -1249,6 +1250,9 @@ private fun MainScreenNumpadSection(
         hasHardKeyboard = hasHardKeyboard,
         numberHintAnchorModifier = Modifier,
         applyHintAnchorModifier = Modifier,
+        showThousandsShortcut = remember(budgetUiState.budgetSettings?.currencyCode) {
+            SupportedCurrency.findByCode(budgetUiState.budgetSettings?.currencyCode ?: "USD")?.hasDecimals == false
+        },
         onNumberInput = { digit ->
             actions.onProcessIntent(
                 MainScreenUiIntent.ProcessBudgetNumpadIntent(
@@ -1263,6 +1267,14 @@ private fun MainScreenNumpadSection(
                     BudgetNumpadIntent.DotTapped,
                 ),
             )
+        },
+        onThousandsInput = {
+            actions.onProcessIntent(
+                MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                    BudgetNumpadIntent.NumberTapped("000"),
+                ),
+            )
+            actions.onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
         },
         onBackspace = {
             actions.onProcessIntent(

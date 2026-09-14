@@ -205,9 +205,12 @@ data class SupportedCurrencyData(
     val symbolPosition: SymbolPosition = SymbolPosition.START,
     val defaultFractionDigits: Int,
 ) {
-    val hasDecimals: Boolean get() = defaultFractionDigits > 0
+    // ISO 4217 lists these with minor units, but they aren't used in everyday transactions.
+    val hasDecimals: Boolean get() = defaultFractionDigits > 0 && code !in NO_PRACTICAL_DECIMALS
 
     companion object {
+        private val NO_PRACTICAL_DECIMALS = setOf("IDR")
+
         private val SUPPORTED_CODES: List<Pair<String, SymbolPosition>> = listOf(
             "USD" to SymbolPosition.START,
             "MXN" to SymbolPosition.START,

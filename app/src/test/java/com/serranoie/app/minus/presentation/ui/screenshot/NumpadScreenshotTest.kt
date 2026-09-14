@@ -44,6 +44,28 @@ class NumpadScreenshotTest {
     }
 
     @Test
+    fun numpadThousandsShortcut() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                Numpad(
+                    modifier = Modifier,
+                    editorState = EditorState(
+                        mode = EditMode.ADD,
+                        rawSpentValue = "42",
+                        stage = EditStage.IDLE,
+                        currentSpent = "42",
+                        currentComment = "",
+                        editedTransaction = null,
+                    ),
+                    isCalculation = false,
+                    showThousandsShortcut = true,
+                )
+            }
+        }
+    }
+
+    @Test
     fun numpadCalculationMode() {
         Locale.setDefault(Locale.US)
         paparazzi.snapshot {
