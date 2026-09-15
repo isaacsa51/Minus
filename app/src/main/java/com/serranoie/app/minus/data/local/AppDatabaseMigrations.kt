@@ -182,4 +182,12 @@ object AppDatabaseMigrations {
             db.execSQL("ALTER TABLE budget_settings_new RENAME TO budget_settings")
         }
     }
+
+    val MIGRATION_20_21: Migration = object : Migration(20, 21) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "ALTER TABLE paid_recurrent_occurrences ADD COLUMN status TEXT NOT NULL DEFAULT 'PAID'"
+            )
+        }
+    }
 }

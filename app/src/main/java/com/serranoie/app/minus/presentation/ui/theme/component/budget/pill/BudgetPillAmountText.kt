@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.LocalContentColor
@@ -131,7 +132,7 @@ internal fun SegmentedAmountText(
                     style = symbolTextStyle,
                     color = color,
                     maxLines = 1,
-                    modifier = Modifier.alignByBaseline(),
+                    modifier = Modifier.alignByBaseline().padding(end = 1.dp),
                 )
             }
 

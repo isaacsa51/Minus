@@ -4,6 +4,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
+import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import kotlinx.coroutines.flow.Flow
@@ -70,7 +71,11 @@ interface BudgetRepository {
 
     fun getPaidRecurrentOccurrences(): Flow<Set<PaidRecurrentOccurrence>>
 
-    suspend fun markRecurrentOccurrencePaid(transactionId: Long, occurrenceDate: LocalDate)
+    suspend fun markRecurrentOccurrencePaid(
+        transactionId: Long,
+        occurrenceDate: LocalDate,
+        status: RecurrentOccurrenceStatus = RecurrentOccurrenceStatus.PAID,
+    )
 
     suspend fun getPaidOccurrenceDatesFor(transactionId: Long): Set<LocalDate>
 

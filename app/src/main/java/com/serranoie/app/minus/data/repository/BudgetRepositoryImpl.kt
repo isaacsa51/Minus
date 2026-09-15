@@ -23,6 +23,7 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
@@ -402,16 +403,23 @@ class BudgetRepositoryImpl @Inject constructor(
                 PaidRecurrentOccurrence(
                     transactionId = it.transactionId,
                     occurrenceDate = LocalDate.ofEpochDay(it.occurrenceDateEpochDay),
+                    status = runCatching { RecurrentOccurrenceStatus.valueOf(it.status) }
+                        .getOrDefault(RecurrentOccurrenceStatus.PAID),
                 )
             }.toSet()
         }
     }
 
-    override suspend fun markRecurrentOccurrencePaid(transactionId: Long, occurrenceDate: LocalDate) {
+    override suspend fun markRecurrentOccurrencePaid(
+        transactionId: Long,
+        occurrenceDate: LocalDate,
+        status: RecurrentOccurrenceStatus,
+    ) {
         paidRecurrentOccurrenceDao.markPaid(
             PaidRecurrentOccurrenceEntity(
                 transactionId = transactionId,
                 occurrenceDateEpochDay = occurrenceDate.toEpochDay(),
+                status = status.name,
             )
         )
     }

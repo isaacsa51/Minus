@@ -5,6 +5,8 @@ import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.subscriptions.ChargeStatus
+import com.serranoie.app.minus.presentation.ui.subscriptions.DayCharge
 import com.serranoie.app.minus.presentation.ui.subscriptions.Subscriptions
 import com.serranoie.app.minus.presentation.ui.subscriptions.SubscriptionsUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -98,21 +100,35 @@ class SubscriptionsScreenshotTest {
         activeCount = 5,
         currencyCode = "USD",
         daysUntilNextCharge = 0L,
-        calendarMonthStart = today.withDayOfMonth(1),
+        periodStart = today.withDayOfMonth(1),
+        periodEnd = today.withDayOfMonth(today.lengthOfMonth()),
         chargesByDay = buildMap {
-            put(today, listOf(Transaction(id = 1L, amount = BigDecimal("16.99"), comment = "Netflix", date = today.atStartOfDay())))
-            put(today.plusDays(2), listOf(Transaction(id = 2L, amount = BigDecimal("9.99"), comment = "Spotify", date = today.atStartOfDay())))
+            put(
+                today,
+                listOf(DayCharge(Transaction(id = 1L, amount = BigDecimal("16.99"), comment = "Netflix", date = today.atStartOfDay()), ChargeStatus.PENDING)),
+            )
+            put(
+                today.plusDays(2),
+                listOf(DayCharge(Transaction(id = 2L, amount = BigDecimal("9.99"), comment = "Spotify", date = today.atStartOfDay()), ChargeStatus.PENDING)),
+            )
             if (today.plusDays(5).month == today.month) {
                 put(
                     today.plusDays(5),
                     listOf(
-                        Transaction(id = 3L, amount = BigDecimal("7.99"), comment = "Cloud storage", date = today.atStartOfDay()),
-                        Transaction(id = 4L, amount = BigDecimal("49.99"), comment = "Gym membership", date = today.atStartOfDay()),
-                        Transaction(id = 5L, amount = BigDecimal("34.00"), comment = "Phone plan", date = today.atStartOfDay()),
+                        DayCharge(Transaction(id = 3L, amount = BigDecimal("7.99"), comment = "Cloud storage", date = today.atStartOfDay()), ChargeStatus.PAID),
+                        DayCharge(Transaction(id = 4L, amount = BigDecimal("49.99"), comment = "Gym membership", date = today.atStartOfDay()), ChargeStatus.SKIPPED),
+                        DayCharge(Transaction(id = 5L, amount = BigDecimal("34.00"), comment = "Phone plan", date = today.atStartOfDay()), ChargeStatus.PENDING),
                     ),
                 )
             }
         },
+        periodBudgetTotal = BigDecimal("300.00"),
+        periodCommittedTotal = BigDecimal("84.96"),
+        monthlyTotalByFrequency = mapOf(
+            RecurrentFrequency.MONTHLY to BigDecimal("83.99"),
+            RecurrentFrequency.WEEKLY to BigDecimal("43.30"),
+            RecurrentFrequency.BIWEEKLY to BigDecimal("17.31"),
+        ),
     )
 
     @Test

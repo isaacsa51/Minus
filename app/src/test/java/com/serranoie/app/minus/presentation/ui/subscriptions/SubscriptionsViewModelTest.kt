@@ -8,6 +8,7 @@ import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.usecase.GetCurrentPeriodIdUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetTransactionHandler
@@ -240,14 +241,14 @@ class SubscriptionsViewModelTest {
         val vm = newViewModel()
         vm.onSkip(t, occurrenceDate)
 
-        coVerify { budgetRepository.markRecurrentOccurrencePaid(t.id, occurrenceDate) }
+        coVerify { budgetRepository.markRecurrentOccurrencePaid(t.id, occurrenceDate, RecurrentOccurrenceStatus.SKIPPED) }
         coVerify(exactly = 0) { budgetTransactionHandler.markRecurrentOccurrencePaid(any(), any()) }
     }
 
     @Test
     fun `a failed skip call surfaces a snackbar effect`() = runTest {
         val t = recurrentTransaction(startDate = LocalDate.now().minusMonths(1), frequency = RecurrentFrequency.MONTHLY)
-        coEvery { budgetRepository.markRecurrentOccurrencePaid(any(), any()) } throws RuntimeException("nope")
+        coEvery { budgetRepository.markRecurrentOccurrencePaid(any(), any(), any()) } throws RuntimeException("nope")
 
         val vm = newViewModel()
         vm.effects.test {

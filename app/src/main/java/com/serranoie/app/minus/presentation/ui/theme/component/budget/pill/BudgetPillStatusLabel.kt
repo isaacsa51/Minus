@@ -19,9 +19,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
@@ -31,8 +34,10 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.presentation.isRoundedFontEnabled
 import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
+import com.serranoie.app.minus.presentation.ui.theme.googleSansFlex
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 
 /**
@@ -59,7 +64,17 @@ internal fun StatusLabel(
     val textColor = LocalContentColor.current
     val hasProjection = projectionAmount != null
     val secondaryVisible = hasProjection || exhaustedMessage != null
-    val secondaryStyle = MaterialTheme.typography.labelSmallEmphasized.copy(letterSpacing = 0.sp)
+
+    val context = LocalContext.current
+    val isRounded = remember(context) { context.isRoundedFontEnabled }
+    val secondaryStyle = remember(isRounded) {
+        TextStyle(
+            fontFamily = googleSansFlex(weight = 600, width = 125f, isRounded = isRounded),
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            letterSpacing = 0.sp,
+        )
+    }
 
     val label = when {
         isOverBudget -> stringResource(R.string.budget_pill_over_budget)

@@ -68,7 +68,29 @@ enum class RecurrentFrequency {
     MONTHLY
 }
 
+enum class RecurrentOccurrenceStatus {
+    PAID,
+    SKIPPED,
+}
+
+/**
+ * Equality/hashCode intentionally ignore [status] and key only on
+ * ([transactionId], [occurrenceDate]) — every existing `paidOccurrences.contains(...)` /
+ * `!paidOccurrences.contains(...)` check across the app (RecurringExpenseCalculator,
+ * HistoryCalculations, etc.) means "has this occurrence been resolved at all", regardless of
+ * paid vs. skipped, and those checks construct a bare two-arg instance to test membership.
+ * Making status part of equality would silently break every one of those call sites.
+ */
 data class PaidRecurrentOccurrence(
     val transactionId: Long,
     val occurrenceDate: LocalDate,
-)
+    val status: RecurrentOccurrenceStatus = RecurrentOccurrenceStatus.PAID,
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PaidRecurrentOccurrence) return false
+        return transactionId == other.transactionId && occurrenceDate == other.occurrenceDate
+    }
+
+    override fun hashCode(): Int = 31 * transactionId.hashCode() + occurrenceDate.hashCode()
+}

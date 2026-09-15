@@ -15,6 +15,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,6 +53,7 @@ fun ExpenseItemExpandedContent(
     readOnly: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    onSkip: (() -> Unit)? = null,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     creditCardCutoffDay: Int? = null,
@@ -199,18 +201,35 @@ fun ExpenseItemExpandedContent(
         Spacer(modifier = Modifier.height(4.dp))
 
         if (transaction.isRecurrent) {
-            Button(
-                onClick = onMarkAsPaid,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                ),
+            Row(
                 modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(
-                    text = stringResource(R.string.mark_as_paid),
-                    style = MaterialTheme.typography.labelSmallEmphasized,
-                )
+                Button(
+                    onClick = onMarkAsPaid,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary,
+                    ),
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        text = stringResource(R.string.mark_as_paid),
+                        style = MaterialTheme.typography.labelSmallEmphasized,
+                    )
+                }
+
+                if (onSkip != null) {
+                    OutlinedButton(
+                        onClick = onSkip,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.subscriptions_skip_this_cycle),
+                            style = MaterialTheme.typography.labelSmallEmphasized,
+                        )
+                    }
+                }
             }
         }
 

@@ -548,11 +548,21 @@
     <string name="subscriptions_upcoming_header">Upcoming</string>
     <string name="subscriptions_due_today_label">Due today</string>
     <string name="subscriptions_mark_as_paid">Mark as paid</string>
-    <string name="subscriptions_skip_this_cycle">Skip this cycle</string>
+    <string name="subscriptions_skip_this_cycle">Skip on this period</string>
     <string name="subscriptions_empty_title">No subscriptions yet</string>
     <string name="subscriptions_empty_body">Mark an expense as recurring and it shows up here with its due date and time left.</string>
     <string name="subscriptions_snackbar_confirm_failed">Could not confirm this payment</string>
-    <string name="subscriptions_snackbar_skip_failed">Could not skip this cycle</string>
+    <string name="subscriptions_snackbar_skip_failed">Could not skip this payment</string>
+    <string name="subscriptions_status_paid">Paid</string>
+    <string name="subscriptions_status_skipped">Skipped</string>
+    <string name="subscriptions_status_missed">Missed</string>
+    <string name="subscriptions_budget_committed">%1$s of your %2$s budget this period</string>
+    <string name="subscriptions_snackbar_edit_failed">Could not save this change</string>
+    <string name="subscriptions_snackbar_delete_failed">Could not delete this subscription</string>
+    <string name="subscriptions_frequency_breakdown_title">By billing frequency</string>
+    <string name="subscriptions_view_mode_whole_period">Whole period</string>
+    <string name="subscriptions_view_mode_weekly">Weekly</string>
+    <string name="subscriptions_view_mode_category">Category</string>
 
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">Period finished</string>
