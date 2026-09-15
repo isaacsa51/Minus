@@ -555,7 +555,6 @@
     <string name="subscriptions_snackbar_skip_failed">Could not skip this payment</string>
     <string name="subscriptions_status_paid">Paid</string>
     <string name="subscriptions_status_skipped">Skipped</string>
-    <string name="subscriptions_status_missed">Missed</string>
     <string name="subscriptions_budget_committed">%1$s of your %2$s budget this period</string>
     <string name="subscriptions_snackbar_edit_failed">Could not save this change</string>
     <string name="subscriptions_snackbar_delete_failed">Could not delete this subscription</string>

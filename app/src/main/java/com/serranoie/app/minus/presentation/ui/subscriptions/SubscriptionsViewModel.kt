@@ -39,13 +39,13 @@ private const val DUE_SOON_WINDOW_DAYS = 7L
 /**
  * Display status for a single calendar-day occurrence. Distinct from
  * [RecurrentOccurrenceStatus] (which is only ever PAID/SKIPPED, an explicit user action
- * recorded in the database): PENDING/MISSED are derived at read time by comparing the
- * occurrence date to "today", not stored anywhere.
+ * recorded in the database): PENDING is derived at read time by comparing the occurrence date
+ * to "today", not stored anywhere. A past occurrence with no recorded action defaults to PAID —
+ * subscriptions auto-charge, so silence means it went through, not that it was missed.
  */
 enum class ChargeStatus {
     PAID,
     SKIPPED,
-    MISSED,
     PENDING,
 }
 
@@ -220,7 +220,7 @@ class SubscriptionsViewModel @Inject constructor(
                     val status = when (recordedStatusByOccurrence[transaction.id to date]) {
                         RecurrentOccurrenceStatus.PAID -> ChargeStatus.PAID
                         RecurrentOccurrenceStatus.SKIPPED -> ChargeStatus.SKIPPED
-                        null -> if (date.isBefore(today)) ChargeStatus.MISSED else ChargeStatus.PENDING
+                        null -> if (date.isBefore(today)) ChargeStatus.PAID else ChargeStatus.PENDING
                     }
                     date to DayCharge(transaction, status)
                 }

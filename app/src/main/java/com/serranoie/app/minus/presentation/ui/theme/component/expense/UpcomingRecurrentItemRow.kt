@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
@@ -138,12 +140,33 @@ fun UpcomingRecurrentItemRow(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val isIncome = transaction.amount < java.math.BigDecimal.ZERO
+                        val displayName = transaction.comment.ifEmpty {
+                            stringResource(if (isIncome) R.string.expense_item_unnamed_income else R.string.expense_item_unnamed_expense)
+                        }
+                        // Only the plain "due today" case gets the badge treatment — the credit
+                        // cutoff variant folds "today" into a longer compound sentence, which
+                        // wouldn't read well squeezed into a short pill.
+                        val isDueTodayBadge = daysUntil == 0L && !(transaction.isCredit && creditCardCutoffDay != null)
+
+                        SubscriptionAvatar(
+                            label = displayName.first().uppercaseChar().toString(),
+                            transactionId = transaction.id,
+                            modifier = Modifier.then(
+                                if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                                    with(sharedTransitionScope) {
+                                        Modifier.sharedElement(
+                                            rememberSharedContentState(key = "avatar_${transaction.id}"),
+                                            animatedVisibilityScope = animatedVisibilityScope
+                                        )
+                                    }
+                                } else Modifier
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = transaction.comment.ifEmpty {
-                                        stringResource(if (isIncome) R.string.expense_item_unnamed_income else R.string.expense_item_unnamed_expense)
-                                    },
+                                    text = displayName,
                                     style = MaterialTheme.typography.titleMediumCondensed.copy(
                                         fontStyle = if (transaction.isCredit) FontStyle.Italic else FontStyle.Normal
                                     ),
@@ -181,11 +204,16 @@ fun UpcomingRecurrentItemRow(
                                     }
                                 }
                             }
-                            Text(
-                                text = daysText,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f * alpha)
-                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            if (isDueTodayBadge) {
+                                StatusBadge(text = daysText, color = colorNotGood)
+                            } else {
+                                Text(
+                                    text = daysText,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f * alpha)
+                                )
+                            }
                         }
 
                         Text(
@@ -221,7 +249,7 @@ fun UpcomingRecurrentItemRow(
     }
 }
 
-@Preview
+@Preview(name = "In 3 days")
 @Composable
 private fun UpcomingRecurrentItemRowPreview() {
     MinusTheme {
@@ -236,6 +264,34 @@ private fun UpcomingRecurrentItemRowPreview() {
                     isRecurrent = true,
                 ),
                 nextChargeDate = LocalDate.now().plusDays(3),
+                isInCurrentPeriod = true
+            ),
+            currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
+            position = PaddedListItemPosition.Single,
+            isOutOfPeriod = false,
+            onClick = {},
+            sharedTransitionScope = null,
+            animatedVisibilityScope = null,
+        )
+    }
+}
+
+/** [daysUntil] == 0 — the plain (non credit-cutoff) path that earns the "Today" badge. */
+@Preview(name = "Due today")
+@Composable
+private fun UpcomingRecurrentItemRowDueTodayPreview() {
+    MinusTheme {
+        UpcomingRecurrentItemRow(
+            item = UpcomingRecurrentItem(
+                transaction = Transaction(
+                    id = 2L,
+                    amount = java.math.BigDecimal("9.99"),
+                    comment = "Spotify",
+                    date = LocalDateTime.now(),
+                    isDeleted = false,
+                    isRecurrent = true,
+                ),
+                nextChargeDate = LocalDate.now(),
                 isInCurrentPeriod = true
             ),
             currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),

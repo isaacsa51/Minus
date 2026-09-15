@@ -6,14 +6,13 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.TotalBudgetCard
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.ZoneId
 import java.util.Date
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -39,7 +38,7 @@ internal fun LazyListScope.budgetDisplaySection(
             "BudgetDisplay input budget=$budget budgetStateTotal=${budgetState?.totalBudget} budgetSettingsTotal=${budgetSettings?.totalBudget} rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward}"
         }
 
-        BudgetDisplay(
+        TotalBudgetCard(
             budget = budget,
             budgetState = budgetState,
             budgetSettings = budgetSettings,

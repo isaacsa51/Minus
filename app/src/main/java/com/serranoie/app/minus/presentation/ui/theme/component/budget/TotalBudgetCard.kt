@@ -63,7 +63,7 @@ import java.util.Calendar
 import java.util.Date
 
 @Composable
-fun BudgetDisplay(
+fun TotalBudgetCard(
     budget: BigDecimal,
     budgetState: BudgetState?,
     budgetSettings: BudgetSettings?,
@@ -427,13 +427,13 @@ private fun PreviewArrow() {
 
 @Preview(device = "spec:width=800px,height=500px,dpi=320")
 @Composable
-private fun BudgetDisplayPreview_OverBudget() {
+private fun BudgetDisplayPreview_OverTotalBudget() {
     MinusTheme {
         val startDate = Date()
         val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 3) }.time
         val actualFinishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -1) }.time
 
-        BudgetDisplay(
+        TotalBudgetCard(
             budget = BigDecimal("300.00"),
             budgetState = BudgetState(
                 remainingToday = BigDecimal("-15.30"),
@@ -462,12 +462,12 @@ private fun BudgetDisplayPreview_OverBudget() {
 
 @Preview(device = "spec:width=800px,height=500px,dpi=320")
 @Composable
-private fun BudgetDisplayPreview_RolloverSplit() {
+private fun TotalBudgetCardPreview_RolloverSplit() {
     MinusTheme {
         val startDate = Date()
         val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 0) }.time
 
-        BudgetDisplay(
+        TotalBudgetCard(
             budget = BigDecimal("1333.50"),
             budgetState = BudgetState(
                 remainingToday = BigDecimal("1533.50"),
@@ -494,12 +494,12 @@ private fun BudgetDisplayPreview_RolloverSplit() {
 
 @Preview(device = "spec:width=800px,height=500px")
 @Composable
-private fun BudgetDisplayPreview_NullState() {
+private fun TotalBudgetCardPreview_NullState() {
     MinusTheme {
         val startDate = Date()
         val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 15) }.time
 
-        BudgetDisplay(
+        TotalBudgetCard(
             budget = BigDecimal.ZERO,
             budgetState = null,
             budgetSettings = null,
@@ -512,12 +512,12 @@ private fun BudgetDisplayPreview_NullState() {
 
 @Preview(device = "spec:width=800px,height=500px")
 @Composable
-private fun BudgetDisplayPreview_DebtAdjusted() {
+private fun TotalBudgetCardPreview_DebtAdjusted() {
     MinusTheme {
         val startDate = Date()
         val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 7) }.time
 
-        BudgetDisplay(
+        TotalBudgetCard(
             budget = BigDecimal("500.00"),
             budgetState = BudgetState(
                 remainingToday = BigDecimal("120.50"),
@@ -545,12 +545,12 @@ private fun BudgetDisplayPreview_DebtAdjusted() {
 
 @Preview(device = "spec:width=800px,height=500px")
 @Composable
-private fun BudgetDisplayPreview_LongCurrency() {
+private fun TotalBudgetCardPreview_LongCurrency() {
     MinusTheme {
         val startDate = Date()
         val finishDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 7) }.time
 
-        BudgetDisplay(
+        TotalBudgetCard(
             budget = BigDecimal("10830.65"),
             budgetState = null,
             budgetSettings = null,

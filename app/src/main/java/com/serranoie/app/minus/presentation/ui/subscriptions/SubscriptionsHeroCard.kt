@@ -16,8 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import java.math.BigDecimal
@@ -79,5 +81,56 @@ internal fun SubscriptionsHeroCard(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Comfortably under budget")
+@Composable
+private fun SubscriptionsHeroCardPreview() {
+    MinusTheme {
+        SubscriptionsHeroCard(
+            monthlyTotal = BigDecimal("76.97"),
+            activeCount = 3,
+            daysUntilNextCharge = 2L,
+            currencyFormatted = "$76.97",
+            periodBudgetTotal = BigDecimal("200.00"),
+            periodCommittedTotal = BigDecimal("76.97"),
+            budgetFormatted = "$200.00",
+            modifier = Modifier.padding(16.dp),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Over budget")
+@Composable
+private fun SubscriptionsHeroCardOverBudgetPreview() {
+    MinusTheme {
+        SubscriptionsHeroCard(
+            monthlyTotal = BigDecimal("249.99"),
+            activeCount = 9,
+            daysUntilNextCharge = 0L,
+            currencyFormatted = "$249.99",
+            periodBudgetTotal = BigDecimal("200.00"),
+            periodCommittedTotal = BigDecimal("238.50"),
+            budgetFormatted = "$200.00",
+            modifier = Modifier.padding(16.dp),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "No budget configured")
+@Composable
+private fun SubscriptionsHeroCardNoBudgetPreview() {
+    MinusTheme {
+        SubscriptionsHeroCard(
+            monthlyTotal = BigDecimal("12.99"),
+            activeCount = 1,
+            daysUntilNextCharge = null,
+            currencyFormatted = "$12.99",
+            periodBudgetTotal = BigDecimal.ZERO,
+            periodCommittedTotal = BigDecimal.ZERO,
+            budgetFormatted = "$0.00",
+            modifier = Modifier.padding(16.dp),
+        )
     }
 }

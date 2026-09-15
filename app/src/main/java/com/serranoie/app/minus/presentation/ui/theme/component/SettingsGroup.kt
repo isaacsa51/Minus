@@ -547,6 +547,8 @@ fun CustomPaddedListItem(
  * @param isExpanded Whether the item is currently expanded
  * @param onToggleExpanded Callback when the item is clicked to toggle expansion
  * @param position The position of this item in the list (affects corner rounding)
+ * @param background The background color for the item
+ * @param borderStroke Optional border, e.g. to flag the item as needing attention
  * @param defaultContent The content to show when collapsed
  * @param expandedContent The content to show when expanded
  */
@@ -556,6 +558,8 @@ fun CustomPaddedExpandableItem(
     onToggleExpanded: () -> Unit,
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
     modifier: Modifier = Modifier,
+    background: Color = MaterialTheme.colorScheme.surfaceContainer,
+    borderStroke: BorderStroke? = null,
     defaultContent: @Composable RowScope.() -> Unit,
     expandedContent: @Composable ColumnScope.() -> Unit
 ) {
@@ -574,7 +578,8 @@ fun CustomPaddedExpandableItem(
 
     Surface(
         shape = shape,
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = background,
+        border = borderStroke,
         modifier = modifier
             .fillMaxWidth()
             .clip(shape)

@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,7 +11,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.TotalBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.CountDaysChip
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +39,7 @@ class BudgetDisplayScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 Box(modifier = Modifier.padding(16.dp)) {
-                    BudgetDisplay(
+                    TotalBudgetCard(
                         budget = BigDecimal("500.00"),
                         budgetState = BudgetState(
                             remainingToday = BigDecimal("45.50"),
@@ -74,7 +73,7 @@ class BudgetDisplayScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 Box(modifier = Modifier.padding(16.dp)) {
-                    BudgetDisplay(
+                    TotalBudgetCard(
                         budget = BigDecimal("300.00"),
                         budgetState = BudgetState(
                             remainingToday = BigDecimal("-15.30"),

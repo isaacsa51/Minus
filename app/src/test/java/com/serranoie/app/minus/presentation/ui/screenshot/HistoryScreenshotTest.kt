@@ -25,7 +25,7 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.TotalBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseItem
@@ -142,7 +142,7 @@ class HistoryScreenshotTest {
 			verticalArrangement = Arrangement.spacedBy(2.dp),
 		) {
 			item {
-				BudgetDisplay(
+				TotalBudgetCard(
 					budget = state.totalBudget,
 					budgetState = state,
 					budgetSettings = settings,

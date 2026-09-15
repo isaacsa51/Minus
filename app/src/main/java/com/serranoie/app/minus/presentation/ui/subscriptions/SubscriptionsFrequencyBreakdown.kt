@@ -22,11 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.BarSegment
 import com.serranoie.app.minus.presentation.ui.theme.component.LinearSavingBar
+import com.serranoie.app.minus.presentation.ui.theme.component.expense.subscriptionPalette
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import java.math.BigDecimal
@@ -106,5 +109,36 @@ internal fun SubscriptionsFrequencyBreakdown(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Two frequencies")
+@Composable
+private fun SubscriptionsFrequencyBreakdownTwoPreview() {
+    MinusTheme {
+        SubscriptionsFrequencyBreakdown(
+            monthlyTotalByFrequency = mapOf(
+                RecurrentFrequency.MONTHLY to BigDecimal("66.98"),
+                RecurrentFrequency.WEEKLY to BigDecimal("43.30"),
+            ),
+            currencyFormat = NumberFormat.getCurrencyInstance(),
+            modifier = Modifier.padding(16.dp),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "All frequencies")
+@Composable
+private fun SubscriptionsFrequencyBreakdownAllPreview() {
+    MinusTheme {
+        SubscriptionsFrequencyBreakdown(
+            monthlyTotalByFrequency = mapOf(
+                RecurrentFrequency.MONTHLY to BigDecimal("120.50"),
+                RecurrentFrequency.BIWEEKLY to BigDecimal("38.00"),
+                RecurrentFrequency.WEEKLY to BigDecimal("19.96"),
+            ),
+            currencyFormat = NumberFormat.getCurrencyInstance(),
+            modifier = Modifier.padding(16.dp),
+        )
     }
 }

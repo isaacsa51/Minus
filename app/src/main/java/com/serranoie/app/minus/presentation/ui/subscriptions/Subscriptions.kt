@@ -55,9 +55,12 @@ import java.time.LocalDate
  * category graph ([SubscriptionsCategoryGraph]), the frequency breakdown
  * ([SubscriptionsFrequencyBreakdown]), the hero card ([SubscriptionsHeroCard]), the view-mode
  * toggle ([SubscriptionsViewModeToggle]), the day-details sheet ([SubscriptionDayDetailsSheet]),
- * [DueTodayCard], and [SubscriptionsEmptyState] — plus the shared [subscriptionPalette] /
- * [RecurringItemIndicator] (`SubscriptionColors.kt`) and [frequencyText] (`SubscriptionFormatting.kt`)
- * helpers they all draw on. Everything lives in the same package, so none of it needs importing here.
+ * [DueTodayCard], and [SubscriptionsEmptyState] — plus the shared [frequencyText]
+ * (`SubscriptionFormatting.kt`) helper they all draw on (everything lives in the same package, so
+ * none of it needs importing here). The avatar/palette/badge helpers
+ * ([com.serranoie.app.minus.presentation.ui.theme.component.expense.SubscriptionAvatar] and
+ * friends, in `RecurringItemVisuals.kt`) live with [UpcomingRecurrentItemRow] instead, since
+ * they're shared with the recurring-item rows used outside this screen too (e.g. History).
  */
 data class SubscriptionsActions(
     val onBack: () -> Unit = {},
@@ -367,7 +370,7 @@ private fun SubscriptionsPreview() {
                 periodEnd = monthEnd,
                 chargesByDay = mapOf(
                     today to listOf(DayCharge(dueTodayItem.transaction, ChargeStatus.PENDING)),
-                    today.minusDays(3) to listOf(DayCharge(soonItem.transaction, ChargeStatus.MISSED)),
+                    today.minusDays(3) to listOf(DayCharge(soonItem.transaction, ChargeStatus.PAID)),
                     today.plusDays(2) to listOf(DayCharge(soonItem.transaction, ChargeStatus.PENDING)),
                     today.plusDays(12) to listOf(
                         DayCharge(upcomingItem.transaction, ChargeStatus.PAID),

@@ -24,12 +24,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarState
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysOfWeek
 import com.serranoie.app.minus.presentation.ui.theme.component.date.MonthHeader
+import com.serranoie.app.minus.presentation.ui.theme.component.expense.subscriptionPalette
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.font.format.toDate
+import java.math.BigDecimal
 import java.time.LocalDate
 
 /**
@@ -74,8 +80,11 @@ internal fun SubscriptionsCalendarSection(
                 Row(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    var day = week.startDate
                     for (dayOfWeekColumn in 0 until 7) {
+                        // A fresh val per column — capturing a shared `var` here would let every
+                        // cell's onClick lambda read whichever date the loop last landed on,
+                        // instead of the date that cell actually displayed.
+                        val day = week.startDate.plusDays(dayOfWeekColumn.toLong())
                         val isFirstColumn = dayOfWeekColumn == 0
                         val isLastColumn = dayOfWeekColumn == 6
                         Box(
@@ -99,7 +108,6 @@ internal fun SubscriptionsCalendarSection(
                                 )
                             }
                         }
-                        day = day.plusDays(1)
                     }
                 }
             }
@@ -187,7 +195,7 @@ private fun CalendarDayCell(
             Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                 charges.take(2).forEach { charge ->
                     val dotAlpha = when (charge.status) {
-                        ChargeStatus.SKIPPED, ChargeStatus.MISSED -> 0.45f
+                        ChargeStatus.SKIPPED -> 0.45f
                         ChargeStatus.PAID, ChargeStatus.PENDING -> 1f
                     }
                     Box(
@@ -208,5 +216,54 @@ private fun CalendarDayCell(
                 }
             }
         }
+    }
+}
+
+private fun previewDayCharge(id: Long, name: String, status: ChargeStatus) = DayCharge(
+    transaction = Transaction(
+        id = id,
+        amount = BigDecimal("9.99"),
+        comment = name,
+        date = LocalDate.now().atStartOfDay(),
+        isRecurrent = true,
+        recurrentFrequency = RecurrentFrequency.MONTHLY,
+    ),
+    status = status,
+)
+
+@Preview(showBackground = true, name = "Busy month")
+@Composable
+private fun SubscriptionsCalendarSectionPreview() {
+    val today = LocalDate.now()
+    MinusTheme {
+        SubscriptionsCalendarSection(
+            periodStart = today.withDayOfMonth(1),
+            periodEnd = today.withDayOfMonth(today.lengthOfMonth()),
+            chargesByDay = mapOf(
+                today to listOf(previewDayCharge(1, "Netflix", ChargeStatus.PENDING)),
+                today.minusDays(3) to listOf(previewDayCharge(2, "Spotify", ChargeStatus.PAID)),
+                today.minusDays(7) to listOf(previewDayCharge(3, "iCloud+", ChargeStatus.PAID)),
+                today.plusDays(5) to listOf(
+                    previewDayCharge(4, "Gym", ChargeStatus.PENDING),
+                    previewDayCharge(5, "YouTube Premium", ChargeStatus.PENDING),
+                    previewDayCharge(6, "Disney+", ChargeStatus.SKIPPED),
+                ),
+            ),
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Empty period")
+@Composable
+private fun SubscriptionsCalendarSectionEmptyPreview() {
+    val today = LocalDate.now()
+    MinusTheme {
+        SubscriptionsCalendarSection(
+            periodStart = today.withDayOfMonth(1),
+            periodEnd = today.withDayOfMonth(today.lengthOfMonth()),
+            chargesByDay = emptyMap(),
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }

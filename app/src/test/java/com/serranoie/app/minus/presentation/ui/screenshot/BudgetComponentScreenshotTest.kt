@@ -14,7 +14,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.TotalBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
 import org.junit.Rule
@@ -39,7 +39,7 @@ class BudgetComponentScreenshotTest {
 
 		paparazzi.snapshot {
 			MinusTheme {
-				BudgetDisplay(
+				TotalBudgetCard(
 					budget = BigDecimal("500.00"),
 					budgetState = BudgetState(
 						remainingToday = BigDecimal("45.50"),
@@ -73,7 +73,7 @@ class BudgetComponentScreenshotTest {
 
 		paparazzi.snapshot {
 			MinusTheme {
-				BudgetDisplay(
+				TotalBudgetCard(
 					budget = BigDecimal("300.00"),
 					budgetState = BudgetState(
 						remainingToday = BigDecimal("-15.30"),

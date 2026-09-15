@@ -9,22 +9,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.expense.subscriptionPalette
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDate
 
-private data class SubscriptionBar(val transactionId: Long, val label: String, val amount: BigDecimal)
+private data class SubscriptionBar(
+    val transactionId: Long,
+    val label: String,
+    val amount: BigDecimal
+)
 
 /**
  * "Category" view of the same [chargesByDay] the calendar renders — one bar per subscription,
@@ -62,7 +71,8 @@ internal fun SubscriptionsCategoryGraph(
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             bars.forEach { bar ->
-                val heightFraction = (bar.amount.toDouble() / maxAmount.toDouble()).toFloat().coerceIn(0.08f, 1f)
+                val heightFraction =
+                    (bar.amount.toDouble() / maxAmount.toDouble()).toFloat().coerceIn(0.08f, 1f)
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -83,7 +93,7 @@ internal fun SubscriptionsCategoryGraph(
                             .fillMaxHeight(heightFraction)
                             .background(
                                 subscriptionPalette(bar.transactionId).main,
-                                RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp),
+                                MaterialTheme.shapes.small,
                             ),
                     )
                 }
@@ -94,7 +104,7 @@ internal fun SubscriptionsCategoryGraph(
             bars.forEach { bar ->
                 Text(
                     text = bar.label,
-                    style = MaterialTheme.typography.labelSmallCondensed,
+                    style = MaterialTheme.typography.labelSmallCondensed.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
@@ -103,5 +113,62 @@ internal fun SubscriptionsCategoryGraph(
                 )
             }
         }
+    }
+}
+
+private fun previewCharge(id: Long, name: String, amount: String, status: ChargeStatus) = DayCharge(
+    transaction = Transaction(
+        id = id,
+        amount = BigDecimal(amount),
+        comment = name,
+        date = LocalDate.now().atStartOfDay(),
+        isRecurrent = true,
+        recurrentFrequency = RecurrentFrequency.MONTHLY,
+    ),
+    status = status,
+)
+
+@Preview(showBackground = true, name = "Few subscriptions")
+@Composable
+private fun SubscriptionsCategoryGraphPreview() {
+    val today = LocalDate.now()
+    MinusTheme {
+        SubscriptionsCategoryGraph(
+            chargesByDay = mapOf(
+                today to listOf(
+                    previewCharge(1, "Netflix", "16.99", ChargeStatus.PENDING),
+                    previewCharge(2, "Spotify", "9.99", ChargeStatus.PAID),
+                    previewCharge(3, "Gym", "49.99", ChargeStatus.PENDING),
+                ),
+            ),
+            currencyFormat = NumberFormat.getCurrencyInstance(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Many subscriptions")
+@Composable
+private fun SubscriptionsCategoryGraphManyPreview() {
+    val today = LocalDate.now()
+    MinusTheme {
+        SubscriptionsCategoryGraph(
+            chargesByDay = mapOf(
+                today to listOf(
+                    previewCharge(1, "Netflix", "16.99", ChargeStatus.PENDING),
+                    previewCharge(2, "Spotify", "9.99", ChargeStatus.PAID),
+                    previewCharge(3, "Gym membership", "49.99", ChargeStatus.PENDING),
+                    previewCharge(4, "iCloud+", "2.99", ChargeStatus.PAID),
+                    previewCharge(5, "YouTube Premium", "13.99", ChargeStatus.PENDING),
+                    previewCharge(6, "Disney+", "7.99", ChargeStatus.PAID),
+                ),
+            ),
+            currencyFormat = NumberFormat.getCurrencyInstance(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp),
+        )
     }
 }

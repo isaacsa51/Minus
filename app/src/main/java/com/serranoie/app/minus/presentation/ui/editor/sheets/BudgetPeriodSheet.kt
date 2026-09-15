@@ -103,8 +103,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
-import com.serranoie.app.minus.presentation.ui.theme.colorGood
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.BudgetDisplay
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.TotalBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
@@ -403,7 +402,7 @@ private fun ViewBudgetContent(
                         .fillMaxHeight(),
                 contentAlignment = Alignment.Center,
             ) {
-                BudgetDisplay(
+                TotalBudgetCard(
                     budget = totalBudget,
                     budgetState = budgetState,
                     budgetSettings = budgetSettings,

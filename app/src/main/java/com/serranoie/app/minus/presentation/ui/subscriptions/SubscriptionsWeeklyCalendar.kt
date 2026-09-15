@@ -35,13 +35,19 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarState
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysOfWeek
+import com.serranoie.app.minus.presentation.ui.theme.component.expense.subscriptionPalette
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.font.format.toDate
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -147,8 +153,11 @@ internal fun SubscriptionsWeeklyCalendar(
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min),
         ) {
-            var day = week.startDate
             for (dayOfWeekColumn in 0 until 7) {
+                // A fresh val per column — capturing a shared `var` here would let every cell's
+                // onClick lambda read whichever date the loop last landed on, instead of the
+                // date that cell actually displayed.
+                val day = week.startDate.plusDays(dayOfWeekColumn.toLong())
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -164,7 +173,6 @@ internal fun SubscriptionsWeeklyCalendar(
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
-                day = day.plusDays(1)
             }
         }
     }
@@ -203,7 +211,7 @@ private fun SubscriptionsWeeklyDayCell(
         )
         charges.forEach { charge ->
             val alpha = when (charge.status) {
-                ChargeStatus.SKIPPED, ChargeStatus.MISSED -> 0.5f
+                ChargeStatus.SKIPPED -> 0.5f
                 ChargeStatus.PAID, ChargeStatus.PENDING -> 1f
             }
             val palette = subscriptionPalette(charge.transaction.id)
@@ -219,5 +227,59 @@ private fun SubscriptionsWeeklyDayCell(
                     .padding(horizontal = 2.dp, vertical = 1.dp),
             )
         }
+    }
+}
+
+private fun previewWeeklyCharge(id: Long, name: String, status: ChargeStatus) = DayCharge(
+    transaction = Transaction(
+        id = id,
+        amount = BigDecimal("9.99"),
+        comment = name,
+        date = LocalDate.now().atStartOfDay(),
+        isRecurrent = true,
+        recurrentFrequency = RecurrentFrequency.MONTHLY,
+    ),
+    status = status,
+)
+
+/** Current week, mid-month period (so the pagination dots for adjacent weeks are visible). */
+@Preview(showBackground = true, name = "Busy week")
+@Composable
+private fun SubscriptionsWeeklyCalendarPreview() {
+    val today = LocalDate.now()
+    MinusTheme {
+        SubscriptionsWeeklyCalendar(
+            periodStart = today.withDayOfMonth(1),
+            periodEnd = today.withDayOfMonth(today.lengthOfMonth()),
+            chargesByDay = mapOf(
+                today to listOf(previewWeeklyCharge(1, "Netflix", ChargeStatus.PENDING)),
+                today.plusDays(1) to listOf(
+                    previewWeeklyCharge(2, "Gym membership", ChargeStatus.PENDING),
+                    previewWeeklyCharge(3, "iCloud+", ChargeStatus.PAID),
+                ),
+                today.minusDays(1) to listOf(previewWeeklyCharge(4, "Disney+", ChargeStatus.PAID)),
+                today.plusDays(3) to listOf(previewWeeklyCharge(5, "Spotify", ChargeStatus.SKIPPED)),
+            ),
+            onDayClick = {},
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+/** A quiet week with a single charge and no adjacent-week pagination (period == this one week). */
+@Preview(showBackground = true, name = "Quiet week")
+@Composable
+private fun SubscriptionsWeeklyCalendarQuietPreview() {
+    val today = LocalDate.now()
+    MinusTheme {
+        SubscriptionsWeeklyCalendar(
+            periodStart = today.minusDays(3),
+            periodEnd = today.plusDays(3),
+            chargesByDay = mapOf(
+                today to listOf(previewWeeklyCharge(1, "Netflix", ChargeStatus.PENDING)),
+            ),
+            onDayClick = {},
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
