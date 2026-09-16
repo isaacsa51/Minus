@@ -194,6 +194,31 @@ class HistoryViewModelTest {
     }
 
     @Test
+    fun `deleting several transactions in quick succession deletes all of them, not just the last`() = runTest {
+        val t1 = txn(1L)
+        val t2 = txn(2L)
+        val t3 = txn(3L)
+        coEvery { budgetTransactionHandler.deleteTransaction(any()) } returns Result.success(Unit)
+        val vm = newViewModel()
+
+        vm.uiState.test {
+            vm.processIntent(HistoryUiIntent.DeleteTransaction(t1))
+            advanceTimeBy(100.milliseconds)
+            vm.processIntent(HistoryUiIntent.DeleteTransaction(t2))
+            advanceTimeBy(100.milliseconds)
+            vm.processIntent(HistoryUiIntent.DeleteTransaction(t3))
+
+            advanceTimeBy(700.milliseconds)
+            awaitCondition { it.pendingRemovedTransactions.isEmpty() }
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify { budgetTransactionHandler.deleteTransaction(t1) }
+        coVerify { budgetTransactionHandler.deleteTransaction(t2) }
+        coVerify { budgetTransactionHandler.deleteTransaction(t3) }
+    }
+
+    @Test
     fun `a failed delete surfaces a snackbar`() = runTest {
         val t = txn(2L)
         coEvery { budgetTransactionHandler.deleteTransaction(t) } returns

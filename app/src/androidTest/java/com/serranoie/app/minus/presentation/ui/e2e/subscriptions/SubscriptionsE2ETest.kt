@@ -1,9 +1,12 @@
 package com.serranoie.app.minus.presentation.ui.e2e.subscriptions
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.lifecycle.Lifecycle
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
@@ -76,6 +79,10 @@ class SubscriptionsE2ETest {
         composeTestRule.waitForIdle()
     }
 
+    private fun scrollToText(text: String) {
+        composeTestRule.onNodeWithTag("SubscriptionsScreen").performScrollToNode(hasText(text))
+    }
+
     @Test
     fun when_no_active_subscriptions_then_empty_state_is_shown() {
         setSubscriptionsContent(state = SubscriptionsUiState(isLoading = false))
@@ -96,13 +103,14 @@ class SubscriptionsE2ETest {
             ),
         )
 
-        val dueTodayLabel = composeTestRule.activity.getString(R.string.subscriptions_due_today_label)
-        val markAsPaidLabel = composeTestRule.activity.getString(R.string.subscriptions_mark_as_paid)
-        val skipLabel = composeTestRule.activity.getString(R.string.subscriptions_skip_this_cycle)
+        val todayLabel = composeTestRule.activity.getString(R.string.upcoming_recurrent_today)
+        val markPaidLabel = composeTestRule.activity.getString(R.string.subscriptions_item_mark_paid_short)
+        val skipLabel = composeTestRule.activity.getString(R.string.subscriptions_item_skip_short)
 
+        scrollToText("Netflix")
         composeTestRule.onNodeWithText("Netflix").assertExists()
-        composeTestRule.onNodeWithText(dueTodayLabel).assertExists()
-        composeTestRule.onNodeWithText(markAsPaidLabel).assertExists()
+        composeTestRule.onNodeWithText(todayLabel).assertExists()
+        composeTestRule.onNodeWithText(markPaidLabel).assertExists()
         composeTestRule.onNodeWithText(skipLabel).assertExists()
     }
 
@@ -122,7 +130,9 @@ class SubscriptionsE2ETest {
         val markAsPaidLabel = composeTestRule.activity.getString(R.string.subscriptions_mark_as_paid)
         val skipLabel = composeTestRule.activity.getString(R.string.subscriptions_skip_this_cycle)
 
+        scrollToText("Spotify")
         composeTestRule.onNodeWithText("Spotify").assertExists()
+        scrollToText("Gym membership")
         composeTestRule.onNodeWithText("Gym membership").assertExists()
         composeTestRule.onNodeWithText(markAsPaidLabel).assertDoesNotExist()
         composeTestRule.onNodeWithText(skipLabel).assertDoesNotExist()
@@ -149,8 +159,9 @@ class SubscriptionsE2ETest {
             ),
         )
 
-        val markAsPaidLabel = composeTestRule.activity.getString(R.string.subscriptions_mark_as_paid)
-        composeTestRule.onNodeWithText(markAsPaidLabel).performClick()
+        val markPaidLabel = composeTestRule.activity.getString(R.string.subscriptions_item_mark_paid_short)
+        scrollToText(markPaidLabel)
+        composeTestRule.onNodeWithText(markPaidLabel).performClick()
 
         assert(confirmedTransactionId == dueTodayItem.transaction.id)
         assert(confirmedDate == dueTodayItem.nextChargeDate)
@@ -177,7 +188,8 @@ class SubscriptionsE2ETest {
             ),
         )
 
-        val skipLabel = composeTestRule.activity.getString(R.string.subscriptions_skip_this_cycle)
+        val skipLabel = composeTestRule.activity.getString(R.string.subscriptions_item_skip_short)
+        scrollToText(skipLabel)
         composeTestRule.onNodeWithText(skipLabel).performClick()
 
         assert(skippedTransactionId == dueTodayItem.transaction.id)

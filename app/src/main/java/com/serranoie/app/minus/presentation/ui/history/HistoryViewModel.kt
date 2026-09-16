@@ -62,7 +62,7 @@ class HistoryViewModel @Inject constructor(
     private val _effects = MutableSharedFlow<HistoryUiEffect>()
     val effects: SharedFlow<HistoryUiEffect> = _effects.asSharedFlow()
 
-    private var autoDismissJob: Job? = null
+    private val deleteJobs = mutableMapOf<Long, Job>()
 
     private val uiInputs = combine(
         listOf(
@@ -177,12 +177,13 @@ class HistoryViewModel @Inject constructor(
     }
 
     private fun deleteTransaction(transaction: Transaction) {
-        autoDismissJob?.cancel()
+        deleteJobs[transaction.id]?.cancel()
         _pendingRemovedTransactions.update { it + (transaction.id to transaction) }
-        autoDismissJob = viewModelScope.launch {
+        deleteJobs[transaction.id] = viewModelScope.launch {
             delay(EXIT_ANIMATION_DURATION_MS)
             val result = budgetTransactionHandler.deleteTransaction(transaction)
             _pendingRemovedTransactions.update { it - transaction.id }
+            deleteJobs -= transaction.id
             if (result.isFailure) {
                 logcat(TAG) { "deleteTransaction failed for id=${transaction.id}: ${result.exceptionOrNull()}" }
                 _effects.emit(
@@ -368,6 +369,6 @@ class HistoryViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        autoDismissJob?.cancel()
+        deleteJobs.values.forEach { it.cancel() }
     }
 }
