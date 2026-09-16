@@ -430,6 +430,45 @@
     <string name="recurrent_ticket_frequency_weekly">हर हफ़्ते</string>
     <string name="recurrent_ticket_frequency_biweekly">हर दो हफ़्ते में</string>
     <string name="recurrent_ticket_frequency_monthly">हर महीने</string>
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">सब्सक्रिप्शन</string>
+    <string name="subscriptions_analytics_card_label">रिकरिंग</string>
+    <string name="subscriptions_monthly_commitment_label">महीने की प्रतिबद्धता</string>
+    <string name="subscriptions_per_month_suffix">/माह</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d एक्टिव · अगला %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d एक्टिव</string>
+    <string name="subscriptions_due_soon_header">जल्द ड्यू</string>
+    <string name="subscriptions_upcoming_header">आने वाले</string>
+    <string name="subscriptions_due_today_label">आज ड्यू है</string>
+    <string name="subscriptions_mark_as_paid">पेड के रूप में मार्क करें</string>
+    <string name="subscriptions_skip_this_cycle">इस पीरियड के लिए स्किप करें</string>
+    <string name="subscriptions_empty_title">अभी तक कोई सब्सक्रिप्शन नहीं</string>
+    <string name="subscriptions_empty_body">किसी खर्च को रिकरिंग के तौर पर मार्क करें और यह यहाँ अपनी ड्यू डेट और बचे हुए समय के साथ दिखेगा।</string>
+    <string name="subscriptions_snackbar_confirm_failed">यह पेमेंट कन्फर्म नहीं हो पाया</string>
+    <string name="subscriptions_snackbar_skip_failed">यह पेमेंट स्किप नहीं हो पाया</string>
+    <string name="subscriptions_status_paid">पेड</string>
+    <string name="subscriptions_status_skipped">स्किप किया गया</string>
+    <string name="subscriptions_budget_committed">इस पीरियड में आपके बजट का %1$s</string>
+    <string name="subscriptions_snackbar_edit_failed">यह बदलाव सेव नहीं हो पाया</string>
+    <string name="subscriptions_snackbar_delete_failed">यह सब्सक्रिप्शन डिलीट नहीं हो पाया</string>
+    <string name="subscriptions_frequency_breakdown_title">बिलिंग फ़्रीक्वेंसी के हिसाब से</string>
+    <string name="subscriptions_view_mode_whole_period">पूरा पीरियड</string>
+    <string name="subscriptions_view_mode_weekly">हफ़्ते के हिसाब से</string>
+    <string name="subscriptions_view_mode_category">कैटेगरी</string>
+    <string name="subscriptions_weekly_week_badge">हफ़्ता %d</string>
+    <string name="subscriptions_weekly_category_distribution_title">कैटेगरी के हिसाब से बंटवारा</string>
+    <string name="subscriptions_weekly_total_suffix">कुल %s</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">इस हफ़्ते %d बिल शेड्यूल है</item>
+        <item quantity="other">इस हफ़्ते %d बिल शेड्यूल हैं</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">पेड मार्क करें</string>
+    <string name="subscriptions_item_skip_short">स्किप करें</string>
+    <string name="subscriptions_item_due_in_days">%1$d दिनों में (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">%1$d हफ़्तों में (%2$s)</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">अवधि खत्म हो गई</string>
     <string name="rollover_dialog_question">आप बचे हुए पैसे का क्या करना चाहते हैं?</string>

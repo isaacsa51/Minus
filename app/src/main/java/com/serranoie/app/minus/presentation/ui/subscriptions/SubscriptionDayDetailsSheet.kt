@@ -130,12 +130,6 @@ private fun chargeRowShape(position: PaddedListItemPosition): Shape = when (posi
     PaddedListItemPosition.Middle -> RoundedCornerShape(8.dp)
 }
 
-/**
- * Own, self-contained [SharedTransitionLayout] per row: the avatar/name/amount are marked as
- * shared elements between the collapsed and expanded [AnimatedContent] states so they hold
- * steady (no crossfade blink) while only the badge/frequency line and the detail block actually
- * fade, instead of the whole row popping between two disconnected layouts.
- */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun SubscriptionDayChargeRow(

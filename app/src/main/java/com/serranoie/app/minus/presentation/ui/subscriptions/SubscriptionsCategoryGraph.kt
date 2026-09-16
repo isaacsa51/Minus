@@ -1,5 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.subscriptions
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,12 +11,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -63,16 +72,39 @@ internal fun SubscriptionsCategoryGraph(
 
     val maxAmount = remember(bars) { bars.maxOf { it.amount } }
 
+    var animateIn by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { animateIn = true }
+
+    val gridColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+
     Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .drawBehind {
+                    val gridLines = 3
+                    val strokeWidth = 1.dp.toPx()
+                    for (i in 0..gridLines) {
+                        val y = size.height * i / gridLines
+                        drawLine(
+                            color = gridColor,
+                            start = Offset(0f, y),
+                            end = Offset(size.width, y),
+                            strokeWidth = strokeWidth,
+                        )
+                    }
+                },
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            bars.forEach { bar ->
+            bars.forEachIndexed { index, bar ->
                 val heightFraction =
                     (bar.amount.toDouble() / maxAmount.toDouble()).toFloat().coerceIn(0.08f, 1f)
+                val animatedHeightFraction by animateFloatAsState(
+                    targetValue = if (animateIn) heightFraction else 0f,
+                    animationSpec = tween(durationMillis = 450, delayMillis = index * 60),
+                    label = "categoryBarHeight",
+                )
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -90,7 +122,7 @@ internal fun SubscriptionsCategoryGraph(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
-                            .fillMaxHeight(heightFraction)
+                            .fillMaxHeight(animatedHeightFraction)
                             .background(
                                 subscriptionPalette(bar.transactionId).main,
                                 MaterialTheme.shapes.small,
@@ -99,6 +131,7 @@ internal fun SubscriptionsCategoryGraph(
                 }
             }
         }
+        HorizontalDivider(color = gridColor)
         Spacer(modifier = Modifier.height(6.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             bars.forEach { bar ->

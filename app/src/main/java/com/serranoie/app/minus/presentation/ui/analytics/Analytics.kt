@@ -117,6 +117,7 @@ import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.toToast
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.combineColors
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performUIHaptic
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -555,9 +556,12 @@ fun Analytics(
                             historyExpandedDates + intent.date
                         }
                     }
+
                     is HistoryUiIntent.ToggleExpandedTransaction -> {
-                        expandedTransactionId = if (expandedTransactionId == intent.transactionId) null else intent.transactionId
+                        expandedTransactionId =
+                            if (expandedTransactionId == intent.transactionId) null else intent.transactionId
                     }
+
                     is HistoryUiIntent.SetEditingTransaction -> {
                         if (state.isHistoricalView && !isPastPeriodUnlocked && intent.transaction != null) {
                             pendingTransactionIntent = intent
@@ -566,6 +570,7 @@ fun Analytics(
                             localEditingTransaction = intent.transaction
                         }
                     }
+
                     is HistoryUiIntent.DeleteTransaction -> {
                         if (state.isHistoricalView && !isPastPeriodUnlocked) {
                             pendingTransactionIntent = intent
@@ -574,6 +579,7 @@ fun Analytics(
                             actions.onDeleteTransaction(intent.transaction)
                         }
                     }
+
                     is HistoryUiIntent.SaveEditedTransaction -> {
                         if (state.isHistoricalView && !isPastPeriodUnlocked) {
                             pendingTransactionIntent = intent
@@ -583,6 +589,7 @@ fun Analytics(
                             localEditingTransaction = null
                         }
                     }
+
                     else -> {}
                 }
             }
@@ -643,13 +650,16 @@ fun Analytics(
                                             is HistoryUiIntent.SetEditingTransaction -> {
                                                 localEditingTransaction = intent.transaction
                                             }
+
                                             is HistoryUiIntent.DeleteTransaction -> {
                                                 actions.onDeleteTransaction(intent.transaction)
                                             }
+
                                             is HistoryUiIntent.SaveEditedTransaction -> {
                                                 actions.onUpdateTransaction(intent.transaction)
                                                 localEditingTransaction = null
                                             }
+
                                             else -> {}
                                         }
                                         pendingTransactionIntent = null
@@ -667,13 +677,16 @@ fun Analytics(
                                     is HistoryUiIntent.SetEditingTransaction -> {
                                         localEditingTransaction = intent.transaction
                                     }
+
                                     is HistoryUiIntent.DeleteTransaction -> {
                                         actions.onDeleteTransaction(intent.transaction)
                                     }
+
                                     is HistoryUiIntent.SaveEditedTransaction -> {
                                         actions.onUpdateTransaction(intent.transaction)
                                         localEditingTransaction = null
                                     }
+
                                     else -> {}
                                 }
                                 pendingTransactionIntent = null
@@ -721,7 +734,7 @@ fun Analytics(
             onDismissRequest = { showCreditSheet = false },
             sheetState = sheetState,
         ) {
-           CreditTransactionsBottomSheet(
+            CreditTransactionsBottomSheet(
                 transactions = state.creditTransactions,
                 totalOwed = state.creditOwed,
                 currency = state.currencyCode,
@@ -849,6 +862,7 @@ private fun AnalyticsCompactLayout(
     bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
     markIfInOrder: Modifier.(Int) -> Modifier,
 ) {
+    val view = LocalView.current
     Column {
         Row(
             Modifier
@@ -961,7 +975,10 @@ private fun AnalyticsCompactLayout(
             Spacer(modifier = Modifier.height(16.dp))
             RecurringSummaryCard(
                 activeCount = state.recurringInPeriod.size,
-                onClick = onShowSubscriptions,
+                onClick = {
+                    onShowSubscriptions()
+                    performUIHaptic(view)
+                },
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
@@ -1012,6 +1029,7 @@ private fun AnalyticsTabletLayout(
     bringIntoViewRequesters: Map<Int, BringIntoViewRequester>,
     markIfInOrder: Modifier.(Int) -> Modifier,
 ) {
+    val view = LocalView.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -1124,7 +1142,10 @@ private fun AnalyticsTabletLayout(
             Spacer(modifier = Modifier.height(16.dp))
             RecurringSummaryCard(
                 activeCount = state.recurringInPeriod.size,
-                onClick = onShowSubscriptions,
+                onClick = {
+                    onShowSubscriptions()
+                    performUIHaptic(view)
+                },
             )
         }
         if (state.incomes.isNotEmpty()) {

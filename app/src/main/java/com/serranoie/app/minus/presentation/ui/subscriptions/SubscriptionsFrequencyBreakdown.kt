@@ -38,9 +38,7 @@ import java.text.NumberFormat
 /**
  * Small breakdown of the monthly-equivalent commitment by billing frequency (reuses
  * [subscriptionPalette]'s hue-rotation, keyed by [RecurrentFrequency.ordinal] instead of a
- * transaction id, so each frequency gets its own stable, theme-aware color). Only worth
- * showing once there's more than one frequency in play — a single-bucket bar would just
- * restate the "Monthly commitment" figure above it.
+ * transaction id, so each frequency gets its own stable, theme-aware color).
  */
 @Composable
 internal fun SubscriptionsFrequencyBreakdown(

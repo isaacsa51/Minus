@@ -432,6 +432,45 @@
     <string name="recurrent_ticket_frequency_weekly">주간</string>
     <string name="recurrent_ticket_frequency_biweekly">격주</string>
     <string name="recurrent_ticket_frequency_monthly">월간</string>
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">구독</string>
+    <string name="subscriptions_analytics_card_label">정기 결제</string>
+    <string name="subscriptions_monthly_commitment_label">월 정기 지출</string>
+    <string name="subscriptions_per_month_suffix">/월</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d개 활성 · 다음 %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d개 활성</string>
+    <string name="subscriptions_due_soon_header">곧 결제 예정</string>
+    <string name="subscriptions_upcoming_header">예정된 결제</string>
+    <string name="subscriptions_due_today_label">오늘 결제 예정</string>
+    <string name="subscriptions_mark_as_paid">결제 완료로 표시</string>
+    <string name="subscriptions_skip_this_cycle">이번 기간 건너뛰기</string>
+    <string name="subscriptions_empty_title">아직 구독이 없습니다</string>
+    <string name="subscriptions_empty_body">지출을 정기 결제로 표시하면 결제일과 남은 시간과 함께 여기에 표시됩니다.</string>
+    <string name="subscriptions_snackbar_confirm_failed">이 결제를 확인하지 못했습니다</string>
+    <string name="subscriptions_snackbar_skip_failed">이 결제를 건너뛰지 못했습니다</string>
+    <string name="subscriptions_status_paid">결제 완료</string>
+    <string name="subscriptions_status_skipped">건너뜀</string>
+    <string name="subscriptions_budget_committed">이번 기간 예산의 %1$s</string>
+    <string name="subscriptions_snackbar_edit_failed">변경 사항을 저장하지 못했습니다</string>
+    <string name="subscriptions_snackbar_delete_failed">이 구독을 삭제하지 못했습니다</string>
+    <string name="subscriptions_frequency_breakdown_title">결제 주기별</string>
+    <string name="subscriptions_view_mode_whole_period">전체 기간</string>
+    <string name="subscriptions_view_mode_weekly">주간</string>
+    <string name="subscriptions_view_mode_category">카테고리</string>
+    <string name="subscriptions_weekly_week_badge">%d주차</string>
+    <string name="subscriptions_weekly_category_distribution_title">카테고리별 분포</string>
+    <string name="subscriptions_weekly_total_suffix">총 %s</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">이번 주 예정된 청구 %d건</item>
+        <item quantity="other">이번 주 예정된 청구 %d건</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">결제 완료</string>
+    <string name="subscriptions_item_skip_short">건너뛰기</string>
+    <string name="subscriptions_item_due_in_days">%1$d일 후 (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">%1$d주 후 (%2$s)</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">기간 종료</string>
     <string name="rollover_dialog_question">남은 금액으로 무엇을 하시겠습니까?</string>

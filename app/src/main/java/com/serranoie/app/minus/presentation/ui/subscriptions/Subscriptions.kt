@@ -1,9 +1,15 @@
 package com.serranoie.app.minus.presentation.ui.subscriptions
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,27 +47,12 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.dialogs.DeleteRecurrentExpenseDialog
 import com.serranoie.app.minus.presentation.ui.history.dialogs.TransactionEditDialog
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
-import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableUpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 import java.time.LocalDate
 
-/**
- * This screen's composables are split across several files in this package: the calendar
- * ([SubscriptionsCalendarSection]), the paginated weekly view ([SubscriptionsWeeklyCalendar]), the
- * category graph ([SubscriptionsCategoryGraph]), the frequency breakdown
- * ([SubscriptionsFrequencyBreakdown]), the hero card ([SubscriptionsHeroCard]), the view-mode
- * toggle ([SubscriptionsViewModeToggle]), the day-details sheet ([SubscriptionDayDetailsSheet]),
- * [DueTodayCard], and [SubscriptionsEmptyState] — plus the shared [frequencyText]
- * (`SubscriptionFormatting.kt`) helper they all draw on (everything lives in the same package, so
- * none of it needs importing here). The avatar/palette/badge helpers
- * ([com.serranoie.app.minus.presentation.ui.theme.component.expense.SubscriptionAvatar] and
- * friends, in `RecurringItemVisuals.kt`) live with [UpcomingRecurrentItemRow] instead, since
- * they're shared with the recurring-item rows used outside this screen too (e.g. History).
- */
 data class SubscriptionsActions(
     val onBack: () -> Unit = {},
     val onConfirmPaid: (Transaction, LocalDate) -> Unit = { _, _ -> },
@@ -164,35 +155,45 @@ fun Subscriptions(
             }
 
             item("calendar") {
-                when (viewMode) {
-                    SubscriptionsViewMode.WHOLE_PERIOD -> SubscriptionsCalendarSection(
-                        periodStart = state.periodStart,
-                        periodEnd = state.periodEnd,
-                        chargesByDay = state.chargesByDay,
-                        onDayClick = { selectedDay = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
+                AnimatedContent(
+                    targetState = viewMode,
+                    transitionSpec = {
+                        (fadeIn(tween(250)) + scaleIn(initialScale = 0.94f, animationSpec = tween(250))) togetherWith
+                            (fadeOut(tween(150)) + scaleOut(targetScale = 0.94f, animationSpec = tween(150)))
+                    },
+                    label = "subscriptionsViewModeTransition",
+                ) { animatedViewMode ->
+                    when (animatedViewMode) {
+                        SubscriptionsViewMode.WHOLE_PERIOD -> SubscriptionsCalendarSection(
+                            periodStart = state.periodStart,
+                            periodEnd = state.periodEnd,
+                            chargesByDay = state.chargesByDay,
+                            onDayClick = { selectedDay = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
 
-                    SubscriptionsViewMode.WEEKLY -> SubscriptionsWeeklyCalendar(
-                        periodStart = state.periodStart,
-                        periodEnd = state.periodEnd,
-                        chargesByDay = state.chargesByDay,
-                        onDayClick = { selectedDay = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
+                        SubscriptionsViewMode.WEEKLY -> SubscriptionsWeeklyCalendar(
+                            periodStart = state.periodStart,
+                            periodEnd = state.periodEnd,
+                            chargesByDay = state.chargesByDay,
+                            currencyFormat = currencyFormat,
+                            onDayClick = { selectedDay = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
 
-                    SubscriptionsViewMode.CATEGORY -> SubscriptionsCategoryGraph(
-                        chargesByDay = state.chargesByDay,
-                        currencyFormat = currencyFormat,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .height(220.dp),
-                    )
+                        SubscriptionsViewMode.CATEGORY -> SubscriptionsCategoryGraph(
+                            chargesByDay = state.chargesByDay,
+                            currencyFormat = currencyFormat,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .height(220.dp),
+                        )
+                    }
                 }
             }
 
@@ -221,30 +222,24 @@ fun Subscriptions(
                             currencyFormat = currencyFormat,
                             onConfirmPaid = { actions.onConfirmPaid(item.transaction, item.nextChargeDate) },
                             onSkip = { actions.onSkip(item.transaction, item.nextChargeDate) },
+                            onEdit = { actions.onEditRequested(item.transaction) },
+                            onDelete = { actions.onDeleteRequested(item.transaction) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 4.dp),
                         )
                     } else {
-                        Box(
+                        SubscriptionItem(
+                            item = item,
+                            currencyFormat = currencyFormat,
+                            onMarkAsPaid = { actions.onConfirmPaid(item.transaction, item.nextChargeDate) },
+                            onSkip = { actions.onSkip(item.transaction, item.nextChargeDate) },
+                            onEdit = { actions.onEditRequested(item.transaction) },
+                            onDelete = { actions.onDeleteRequested(item.transaction) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 6.dp),
-                        ) {
-                            SwipeableUpcomingRecurrentItem(
-                                item = item,
-                                currencyFormat = currencyFormat,
-                                position = PaddedListItemPosition.Single,
-                                isExpanded = expandedTransactionId == item.transaction.id,
-                                onDelete = { actions.onDeleteRequested(item.transaction) },
-                                onEdit = { actions.onEditRequested(item.transaction) },
-                                onMarkAsPaid = { actions.onConfirmPaid(item.transaction, item.nextChargeDate) },
-                                onSkip = { actions.onSkip(item.transaction, item.nextChargeDate) },
-                                onClick = { actions.onToggleExpanded(item.transaction.id) },
-                                sharedTransitionScope = sharedTransitionScope,
-                                animatedVisibilityScope = animatedVisibilityScope,
-                            )
-                        }
+                        )
                     }
                 }
             }
@@ -257,26 +252,17 @@ fun Subscriptions(
                     items = state.upcoming,
                     key = { _, item -> "upcoming-${item.transaction.id}" },
                 ) { _, item ->
-                    Box(
+                    SubscriptionItem(
+                        item = item,
+                        currencyFormat = currencyFormat,
+                        onMarkAsPaid = { actions.onConfirmPaid(item.transaction, item.nextChargeDate) },
+                        onSkip = { actions.onSkip(item.transaction, item.nextChargeDate) },
+                        onEdit = { actions.onEditRequested(item.transaction) },
+                        onDelete = { actions.onDeleteRequested(item.transaction) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 6.dp),
-                    ) {
-                        SwipeableUpcomingRecurrentItem(
-                            item = item,
-                            currencyFormat = currencyFormat,
-                            position = PaddedListItemPosition.Single,
-                            isOutOfPeriod = true,
-                            isExpanded = expandedTransactionId == item.transaction.id,
-                            onDelete = { actions.onDeleteRequested(item.transaction) },
-                            onEdit = { actions.onEditRequested(item.transaction) },
-                            onMarkAsPaid = { actions.onConfirmPaid(item.transaction, item.nextChargeDate) },
-                            onSkip = { actions.onSkip(item.transaction, item.nextChargeDate) },
-                            onClick = { actions.onToggleExpanded(item.transaction.id) },
-                            sharedTransitionScope = sharedTransitionScope,
-                            animatedVisibilityScope = animatedVisibilityScope,
-                        )
-                    }
+                    )
                 }
                 item("upcoming-total") {
                     DayTotalItem(

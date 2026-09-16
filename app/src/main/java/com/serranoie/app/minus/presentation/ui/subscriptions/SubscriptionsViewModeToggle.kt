@@ -14,12 +14,14 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performUIHaptic
 
 internal enum class SubscriptionsViewMode { WHOLE_PERIOD, WEEKLY, CATEGORY }
 
@@ -31,11 +33,15 @@ internal fun SubscriptionsViewModeToggle(
     modifier: Modifier = Modifier,
 ) {
     val modes = SubscriptionsViewMode.entries
+    val view = LocalView.current
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
         modes.forEachIndexed { index, mode ->
             ToggleButton(
                 checked = selected == mode,
-                onCheckedChange = { onSelected(mode) },
+                onCheckedChange = {
+                    onSelected(mode)
+                    performUIHaptic(view)
+                },
                 modifier = Modifier
                     .weight(1f)
                     .height(38.dp),

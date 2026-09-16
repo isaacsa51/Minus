@@ -431,6 +431,45 @@
     <string name="recurrent_ticket_frequency_weekly">毎週</string>
     <string name="recurrent_ticket_frequency_biweekly">隔週</string>
     <string name="recurrent_ticket_frequency_monthly">月ごと</string>
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">サブスクリプション</string>
+    <string name="subscriptions_analytics_card_label">定期支払い</string>
+    <string name="subscriptions_monthly_commitment_label">月々の支払い</string>
+    <string name="subscriptions_per_month_suffix">/月</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d件アクティブ · 次回 %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d件アクティブ</string>
+    <string name="subscriptions_due_soon_header">まもなく支払い</string>
+    <string name="subscriptions_upcoming_header">今後の予定</string>
+    <string name="subscriptions_due_today_label">本日支払い</string>
+    <string name="subscriptions_mark_as_paid">支払い済みにする</string>
+    <string name="subscriptions_skip_this_cycle">この期間はスキップ</string>
+    <string name="subscriptions_empty_title">サブスクリプションはまだありません</string>
+    <string name="subscriptions_empty_body">支出を定期支払いとしてマークすると、支払い日と残り時間とともにここに表示されます。</string>
+    <string name="subscriptions_snackbar_confirm_failed">この支払いを確認できませんでした</string>
+    <string name="subscriptions_snackbar_skip_failed">この支払いをスキップできませんでした</string>
+    <string name="subscriptions_status_paid">支払い済み</string>
+    <string name="subscriptions_status_skipped">スキップ済み</string>
+    <string name="subscriptions_budget_committed">この期間の予算の%1$s</string>
+    <string name="subscriptions_snackbar_edit_failed">この変更を保存できませんでした</string>
+    <string name="subscriptions_snackbar_delete_failed">このサブスクリプションを削除できませんでした</string>
+    <string name="subscriptions_frequency_breakdown_title">請求頻度別</string>
+    <string name="subscriptions_view_mode_whole_period">全期間</string>
+    <string name="subscriptions_view_mode_weekly">週単位</string>
+    <string name="subscriptions_view_mode_category">カテゴリ</string>
+    <string name="subscriptions_weekly_week_badge">第%d週</string>
+    <string name="subscriptions_weekly_category_distribution_title">カテゴリ別内訳</string>
+    <string name="subscriptions_weekly_total_suffix">合計%s</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">今週予定の請求 %d件</item>
+        <item quantity="other">今週予定の請求 %d件</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">支払い済みにする</string>
+    <string name="subscriptions_item_skip_short">スキップ</string>
+    <string name="subscriptions_item_due_in_days">%1$d日後 (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">%1$d週間後 (%2$s)</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">生理が終了しました</string>
     <string name="rollover_dialog_question">残りのお金で何をしたいですか。</string>

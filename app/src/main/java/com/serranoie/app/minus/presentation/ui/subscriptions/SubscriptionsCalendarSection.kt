@@ -38,11 +38,6 @@ import com.serranoie.app.minus.presentation.util.font.format.toDate
 import java.math.BigDecimal
 import java.time.LocalDate
 
-/**
- * Mirrors [com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarHeatmap]'s
- * week generation: builds the months spanning [periodStart]..[periodEnd] but only renders the
- * weeks that actually overlap that range, instead of a fixed single calendar month.
- */
 @Composable
 internal fun SubscriptionsCalendarSection(
     periodStart: LocalDate,
@@ -81,9 +76,6 @@ internal fun SubscriptionsCalendarSection(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     for (dayOfWeekColumn in 0 until 7) {
-                        // A fresh val per column — capturing a shared `var` here would let every
-                        // cell's onClick lambda read whichever date the loop last landed on,
-                        // instead of the date that cell actually displayed.
                         val day = week.startDate.plusDays(dayOfWeekColumn.toLong())
                         val isFirstColumn = dayOfWeekColumn == 0
                         val isLastColumn = dayOfWeekColumn == 6
@@ -115,12 +107,6 @@ internal fun SubscriptionsCalendarSection(
     }
 }
 
-/**
- * Day cells default to [MaterialTheme.shapes.small], but the four corner cells of the rendered
- * grid (whichever day actually lands there — a short first/last week can leave a corner slot
- * blank) swap in [MaterialTheme.shapes.extraLarge] for just that one corner, so the whole grid
- * reads as a single rounded card instead of a sheet of uniform tiles.
- */
 @Composable
 private fun calendarDayCellShape(
     topLeftRadius: Boolean,

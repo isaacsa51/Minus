@@ -143,26 +143,8 @@ fun UpcomingRecurrentItemRow(
                         val displayName = transaction.comment.ifEmpty {
                             stringResource(if (isIncome) R.string.expense_item_unnamed_income else R.string.expense_item_unnamed_expense)
                         }
-                        // Only the plain "due today" case gets the badge treatment — the credit
-                        // cutoff variant folds "today" into a longer compound sentence, which
-                        // wouldn't read well squeezed into a short pill.
                         val isDueTodayBadge = daysUntil == 0L && !(transaction.isCredit && creditCardCutoffDay != null)
 
-                        SubscriptionAvatar(
-                            label = displayName.first().uppercaseChar().toString(),
-                            transactionId = transaction.id,
-                            modifier = Modifier.then(
-                                if (sharedTransitionScope != null && animatedVisibilityScope != null) {
-                                    with(sharedTransitionScope) {
-                                        Modifier.sharedElement(
-                                            rememberSharedContentState(key = "avatar_${transaction.id}"),
-                                            animatedVisibilityScope = animatedVisibilityScope
-                                        )
-                                    }
-                                } else Modifier
-                            )
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
@@ -249,7 +231,7 @@ fun UpcomingRecurrentItemRow(
     }
 }
 
-@Preview(name = "In 3 days")
+@Preview(name = "In 3 days", showBackground = true)
 @Composable
 private fun UpcomingRecurrentItemRowPreview() {
     MinusTheme {
@@ -277,7 +259,7 @@ private fun UpcomingRecurrentItemRowPreview() {
 }
 
 /** [daysUntil] == 0 — the plain (non credit-cutoff) path that earns the "Today" badge. */
-@Preview(name = "Due today")
+@Preview(name = "Due today", showBackground = true)
 @Composable
 private fun UpcomingRecurrentItemRowDueTodayPreview() {
     MinusTheme {

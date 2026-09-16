@@ -438,6 +438,47 @@
     <string name="recurrent_ticket_frequency_weekly">Weekly</string>
     <string name="recurrent_ticket_frequency_biweekly">Biweekly</string>
     <string name="recurrent_ticket_frequency_monthly">Monthly</string>
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">Подписки</string>
+    <string name="subscriptions_analytics_card_label">Регулярные</string>
+    <string name="subscriptions_monthly_commitment_label">Ежемесячные обязательства</string>
+    <string name="subscriptions_per_month_suffix">/мес</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d активно · далее %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d активно</string>
+    <string name="subscriptions_due_soon_header">Скоро списание</string>
+    <string name="subscriptions_upcoming_header">Предстоящие</string>
+    <string name="subscriptions_due_today_label">Списание сегодня</string>
+    <string name="subscriptions_mark_as_paid">Отметить как оплачено</string>
+    <string name="subscriptions_skip_this_cycle">Пропустить в этом периоде</string>
+    <string name="subscriptions_empty_title">Пока нет подписок</string>
+    <string name="subscriptions_empty_body">Отметьте расход как повторяющийся, и он появится здесь с датой списания и оставшимся временем.</string>
+    <string name="subscriptions_snackbar_confirm_failed">Не удалось подтвердить этот платёж</string>
+    <string name="subscriptions_snackbar_skip_failed">Не удалось пропустить этот платёж</string>
+    <string name="subscriptions_status_paid">Оплачено</string>
+    <string name="subscriptions_status_skipped">Пропущено</string>
+    <string name="subscriptions_budget_committed">%1$s вашего бюджета за этот период</string>
+    <string name="subscriptions_snackbar_edit_failed">Не удалось сохранить это изменение</string>
+    <string name="subscriptions_snackbar_delete_failed">Не удалось удалить эту подписку</string>
+    <string name="subscriptions_frequency_breakdown_title">По периодичности списания</string>
+    <string name="subscriptions_view_mode_whole_period">Весь период</string>
+    <string name="subscriptions_view_mode_weekly">Еженедельно</string>
+    <string name="subscriptions_view_mode_category">Категория</string>
+    <string name="subscriptions_weekly_week_badge">Неделя %d</string>
+    <string name="subscriptions_weekly_category_distribution_title">Распределение по категориям</string>
+    <string name="subscriptions_weekly_total_suffix">всего %s</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">%d платёж запланирован на этой неделе</item>
+        <item quantity="few">%d платежа запланировано на этой неделе</item>
+        <item quantity="many">%d платежей запланировано на этой неделе</item>
+        <item quantity="other">%d платежа запланировано на этой неделе</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">Оплачено</string>
+    <string name="subscriptions_item_skip_short">Пропустить</string>
+    <string name="subscriptions_item_due_in_days">Через %1$d дней (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">Через %1$d недель (%2$s)</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">Period finished</string>
     <string name="rollover_dialog_question">What do you want to do with the remaining money?</string>

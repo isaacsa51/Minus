@@ -430,6 +430,45 @@
     <string name="recurrent_ticket_frequency_weekly">Εβδομαδιαία</string>
     <string name="recurrent_ticket_frequency_biweekly">Ανά δύο εβδομάδες</string>
     <string name="recurrent_ticket_frequency_monthly">Μηνιαία</string>
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">Συνδρομές</string>
+    <string name="subscriptions_analytics_card_label">Επαναλαμβανόμενα</string>
+    <string name="subscriptions_monthly_commitment_label">Μηνιαία δέσμευση</string>
+    <string name="subscriptions_per_month_suffix">/μήνα</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d ενεργές · επόμενη %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d ενεργές</string>
+    <string name="subscriptions_due_soon_header">Λήγουν σύντομα</string>
+    <string name="subscriptions_upcoming_header">Προσεχείς</string>
+    <string name="subscriptions_due_today_label">Λήγει σήμερα</string>
+    <string name="subscriptions_mark_as_paid">Επισήμανση ως πληρωμένο</string>
+    <string name="subscriptions_skip_this_cycle">Παράλειψη για αυτήν την περίοδο</string>
+    <string name="subscriptions_empty_title">Δεν υπάρχουν ακόμη συνδρομές</string>
+    <string name="subscriptions_empty_body">Επισημάνετε ένα έξοδο ως επαναλαμβανόμενο και θα εμφανιστεί εδώ με την ημερομηνία λήξης και τον χρόνο που απομένει.</string>
+    <string name="subscriptions_snackbar_confirm_failed">Δεν ήταν δυνατή η επιβεβαίωση αυτής της πληρωμής</string>
+    <string name="subscriptions_snackbar_skip_failed">Δεν ήταν δυνατή η παράλειψη αυτής της πληρωμής</string>
+    <string name="subscriptions_status_paid">Πληρωμένο</string>
+    <string name="subscriptions_status_skipped">Παραλείφθηκε</string>
+    <string name="subscriptions_budget_committed">%1$s του προϋπολογισμού σας για αυτήν την περίοδο</string>
+    <string name="subscriptions_snackbar_edit_failed">Δεν ήταν δυνατή η αποθήκευση αυτής της αλλαγής</string>
+    <string name="subscriptions_snackbar_delete_failed">Δεν ήταν δυνατή η διαγραφή αυτής της συνδρομής</string>
+    <string name="subscriptions_frequency_breakdown_title">Ανά συχνότητα χρέωσης</string>
+    <string name="subscriptions_view_mode_whole_period">Ολόκληρη περίοδος</string>
+    <string name="subscriptions_view_mode_weekly">Εβδομαδιαία</string>
+    <string name="subscriptions_view_mode_category">Κατηγορία</string>
+    <string name="subscriptions_weekly_week_badge">Εβδομάδα %d</string>
+    <string name="subscriptions_weekly_category_distribution_title">Κατανομή ανά κατηγορία</string>
+    <string name="subscriptions_weekly_total_suffix">σύνολο %s</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">%d λογαριασμός προγραμματισμένος αυτή την εβδομάδα</item>
+        <item quantity="other">%d λογαριασμοί προγραμματισμένοι αυτή την εβδομάδα</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">Πληρώθηκε</string>
+    <string name="subscriptions_item_skip_short">Παράλειψη</string>
+    <string name="subscriptions_item_due_in_days">Σε %1$d ημέρες (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">Σε %1$d εβδομάδες (%2$s)</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">Η περίοδος ολοκληρώθηκε</string>
     <string name="rollover_dialog_question">Τι θέλετε να κάνετε με τα υπόλοιπα χρήματα?</string>

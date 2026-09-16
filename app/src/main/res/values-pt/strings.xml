@@ -433,6 +433,45 @@
     <string name="recurrent_ticket_frequency_weekly">Semanalmente</string>
     <string name="recurrent_ticket_frequency_biweekly">Bienal</string>
     <string name="recurrent_ticket_frequency_monthly">Mensual</string>
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">Assinaturas</string>
+    <string name="subscriptions_analytics_card_label">Recorrente</string>
+    <string name="subscriptions_monthly_commitment_label">Compromisso mensal</string>
+    <string name="subscriptions_per_month_suffix">/mês</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d ativas · próxima %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d ativas</string>
+    <string name="subscriptions_due_soon_header">Vencendo em breve</string>
+    <string name="subscriptions_upcoming_header">Próximas</string>
+    <string name="subscriptions_due_today_label">Vence hoje</string>
+    <string name="subscriptions_mark_as_paid">Marcar como pago</string>
+    <string name="subscriptions_skip_this_cycle">Pular neste período</string>
+    <string name="subscriptions_empty_title">Ainda não há assinaturas</string>
+    <string name="subscriptions_empty_body">Marque uma despesa como recorrente e ela aparecerá aqui com a data de vencimento e o tempo restante.</string>
+    <string name="subscriptions_snackbar_confirm_failed">Não foi possível confirmar este pagamento</string>
+    <string name="subscriptions_snackbar_skip_failed">Não foi possível pular este pagamento</string>
+    <string name="subscriptions_status_paid">Pago</string>
+    <string name="subscriptions_status_skipped">Ignorado</string>
+    <string name="subscriptions_budget_committed">%1$s do seu orçamento neste período</string>
+    <string name="subscriptions_snackbar_edit_failed">Não foi possível salvar esta alteração</string>
+    <string name="subscriptions_snackbar_delete_failed">Não foi possível excluir esta assinatura</string>
+    <string name="subscriptions_frequency_breakdown_title">Por frequência de cobrança</string>
+    <string name="subscriptions_view_mode_whole_period">Período inteiro</string>
+    <string name="subscriptions_view_mode_weekly">Semanalmente</string>
+    <string name="subscriptions_view_mode_category">Categoria</string>
+    <string name="subscriptions_weekly_week_badge">Semana %d</string>
+    <string name="subscriptions_weekly_category_distribution_title">Distribuição por categoria</string>
+    <string name="subscriptions_weekly_total_suffix">total de %s</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">%d conta agendada esta semana</item>
+        <item quantity="other">%d contas agendadas esta semana</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">Marcar pago</string>
+    <string name="subscriptions_item_skip_short">Pular</string>
+    <string name="subscriptions_item_due_in_days">Em %1$d dias (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">Em %1$d semanas (%2$s)</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">Período terminado</string>
     <string name="rollover_dialog_question">O que você quer fazer com o dinheiro restante?</string>

@@ -434,6 +434,45 @@
     <string name="recurrent_ticket_frequency_weekly">每周</string>
     <string name="recurrent_ticket_frequency_biweekly">每半个月</string>
     <string name="recurrent_ticket_frequency_monthly">每月</string>
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">订阅</string>
+    <string name="subscriptions_analytics_card_label">定期扣费</string>
+    <string name="subscriptions_monthly_commitment_label">每月支出</string>
+    <string name="subscriptions_per_month_suffix">/月</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d 个进行中 · 下一个 %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d 个进行中</string>
+    <string name="subscriptions_due_soon_header">即将到期</string>
+    <string name="subscriptions_upcoming_header">即将到来</string>
+    <string name="subscriptions_due_today_label">今天到期</string>
+    <string name="subscriptions_mark_as_paid">标记为已付款</string>
+    <string name="subscriptions_skip_this_cycle">本期跳过</string>
+    <string name="subscriptions_empty_title">暂无订阅</string>
+    <string name="subscriptions_empty_body">将一笔支出标记为定期后，它会显示在这里，包含到期日和剩余时间。</string>
+    <string name="subscriptions_snackbar_confirm_failed">无法确认此笔付款</string>
+    <string name="subscriptions_snackbar_skip_failed">无法跳过此笔付款</string>
+    <string name="subscriptions_status_paid">已付款</string>
+    <string name="subscriptions_status_skipped">已跳过</string>
+    <string name="subscriptions_budget_committed">本期预算的 %1$s</string>
+    <string name="subscriptions_snackbar_edit_failed">无法保存此更改</string>
+    <string name="subscriptions_snackbar_delete_failed">无法删除此订阅</string>
+    <string name="subscriptions_frequency_breakdown_title">按扣费频率</string>
+    <string name="subscriptions_view_mode_whole_period">整个周期</string>
+    <string name="subscriptions_view_mode_weekly">每周</string>
+    <string name="subscriptions_view_mode_category">类别</string>
+    <string name="subscriptions_weekly_week_badge">第 %d 周</string>
+    <string name="subscriptions_weekly_category_distribution_title">类别分布</string>
+    <string name="subscriptions_weekly_total_suffix">共 %s</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">本周有 %d 笔账单到期</item>
+        <item quantity="other">本周有 %d 笔账单到期</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">标记已付款</string>
+    <string name="subscriptions_item_skip_short">跳过</string>
+    <string name="subscriptions_item_due_in_days">%1$d 天后 (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">%1$d 周后 (%2$s)</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">周期完成</string>
     <string name="rollover_dialog_question">剩余的钱你想如何规划？</string>

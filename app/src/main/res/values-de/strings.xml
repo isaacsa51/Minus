@@ -437,6 +437,45 @@
     <string name="recurrent_ticket_frequency_weekly">Wöchentlich</string>
     <string name="recurrent_ticket_frequency_biweekly">alle zwei Wochen</string>
     <string name="recurrent_ticket_frequency_monthly">monatlich</string>
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">Abonnements</string>
+    <string name="subscriptions_analytics_card_label">Wiederkehrend</string>
+    <string name="subscriptions_monthly_commitment_label">Monatliche Verpflichtung</string>
+    <string name="subscriptions_per_month_suffix">/Monat</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d aktiv · als Nächstes %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d aktiv</string>
+    <string name="subscriptions_due_soon_header">Bald fällig</string>
+    <string name="subscriptions_upcoming_header">Anstehend</string>
+    <string name="subscriptions_due_today_label">Heute fällig</string>
+    <string name="subscriptions_mark_as_paid">Als bezahlt markieren</string>
+    <string name="subscriptions_skip_this_cycle">Für diesen Zeitraum überspringen</string>
+    <string name="subscriptions_empty_title">Noch keine Abonnements</string>
+    <string name="subscriptions_empty_body">Markiere eine Ausgabe als wiederkehrend, und sie erscheint hier mit Fälligkeitsdatum und verbleibender Zeit.</string>
+    <string name="subscriptions_snackbar_confirm_failed">Diese Zahlung konnte nicht bestätigt werden</string>
+    <string name="subscriptions_snackbar_skip_failed">Diese Zahlung konnte nicht übersprungen werden</string>
+    <string name="subscriptions_status_paid">Bezahlt</string>
+    <string name="subscriptions_status_skipped">Übersprungen</string>
+    <string name="subscriptions_budget_committed">%1$s deines Budgets in diesem Zeitraum</string>
+    <string name="subscriptions_snackbar_edit_failed">Diese Änderung konnte nicht gespeichert werden</string>
+    <string name="subscriptions_snackbar_delete_failed">Dieses Abonnement konnte nicht gelöscht werden</string>
+    <string name="subscriptions_frequency_breakdown_title">Nach Abrechnungshäufigkeit</string>
+    <string name="subscriptions_view_mode_whole_period">Gesamter Zeitraum</string>
+    <string name="subscriptions_view_mode_weekly">Wöchentlich</string>
+    <string name="subscriptions_view_mode_category">Kategorie</string>
+    <string name="subscriptions_weekly_week_badge">Woche %d</string>
+    <string name="subscriptions_weekly_category_distribution_title">Kategorieverteilung</string>
+    <string name="subscriptions_weekly_total_suffix">%s insgesamt</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">%d Rechnung diese Woche fällig</item>
+        <item quantity="other">%d Rechnungen diese Woche fällig</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">Bezahlt markieren</string>
+    <string name="subscriptions_item_skip_short">Überspringen</string>
+    <string name="subscriptions_item_due_in_days">In %1$d Tagen (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">In %1$d Wochen (%2$s)</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">Zeitraum beendet</string>
     <string name="rollover_dialog_question">Was möchtest du mit dem verbleibenden Geld tun?</string>

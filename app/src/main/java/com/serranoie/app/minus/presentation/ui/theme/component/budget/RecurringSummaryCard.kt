@@ -42,8 +42,8 @@ fun RecurringSummaryCard(
             .heightIn(min = 56.dp),
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ),
         onClick = onClick
     ) {
@@ -66,7 +66,7 @@ fun RecurringSummaryCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = stringResource(R.string.subscriptions_analytics_card_label),
+                    text = stringResource(R.string.recurrent_expense),
                     modifier = Modifier
                         .fillMaxWidth()
                         .basicMarquee(),

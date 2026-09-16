@@ -555,13 +555,26 @@
     <string name="subscriptions_snackbar_skip_failed">Could not skip this payment</string>
     <string name="subscriptions_status_paid">Paid</string>
     <string name="subscriptions_status_skipped">Skipped</string>
-    <string name="subscriptions_budget_committed">%1$s of your %2$s budget this period</string>
+    <string name="subscriptions_budget_committed">%1$s of your budget this period</string>
     <string name="subscriptions_snackbar_edit_failed">Could not save this change</string>
     <string name="subscriptions_snackbar_delete_failed">Could not delete this subscription</string>
     <string name="subscriptions_frequency_breakdown_title">By billing frequency</string>
     <string name="subscriptions_view_mode_whole_period">Whole period</string>
     <string name="subscriptions_view_mode_weekly">Weekly</string>
     <string name="subscriptions_view_mode_category">Category</string>
+    <string name="subscriptions_weekly_week_badge">Week %d</string>
+    <string name="subscriptions_weekly_category_distribution_title">Category Distribution</string>
+    <string name="subscriptions_weekly_total_suffix">%s total</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">%d bill scheduled this week</item>
+        <item quantity="other">%d bills scheduled this week</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">Mark Paid</string>
+    <string name="subscriptions_item_skip_short">Skip</string>
+    <string name="subscriptions_item_due_in_days">In %1$d days (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">In %1$d weeks (%2$s)</string>
 
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">Period finished</string>

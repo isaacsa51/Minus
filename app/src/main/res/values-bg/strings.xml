@@ -435,6 +435,45 @@
     <string name="recurrent_ticket_frequency_weekly">Седмично</string>
     <string name="recurrent_ticket_frequency_biweekly">Двуседмично</string>
     <string name="recurrent_ticket_frequency_monthly">Месечно</string>
+    <!-- Subscriptions screen -->
+    <string name="subscriptions_title">Абонаменти</string>
+    <string name="subscriptions_analytics_card_label">Периодични</string>
+    <string name="subscriptions_monthly_commitment_label">Месечен ангажимент</string>
+    <string name="subscriptions_per_month_suffix">/мес</string>
+    <string name="subscriptions_hero_subtitle_with_next">%1$d активни · следващ %2$s</string>
+    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d активни</string>
+    <string name="subscriptions_due_soon_header">Предстоящи скоро</string>
+    <string name="subscriptions_upcoming_header">Предстоящи</string>
+    <string name="subscriptions_due_today_label">Дължи се днес</string>
+    <string name="subscriptions_mark_as_paid">Маркирай като платено</string>
+    <string name="subscriptions_skip_this_cycle">Пропусни този период</string>
+    <string name="subscriptions_empty_title">Все още няма абонаменти</string>
+    <string name="subscriptions_empty_body">Маркирайте разход като периодичен и той ще се появи тук с датата на падеж и оставащото време.</string>
+    <string name="subscriptions_snackbar_confirm_failed">Плащането не можа да бъде потвърдено</string>
+    <string name="subscriptions_snackbar_skip_failed">Плащането не можа да бъде пропуснато</string>
+    <string name="subscriptions_status_paid">Платено</string>
+    <string name="subscriptions_status_skipped">Пропуснато</string>
+    <string name="subscriptions_budget_committed">%1$s от бюджета ви за този период</string>
+    <string name="subscriptions_snackbar_edit_failed">Промяната не можа да бъде запазена</string>
+    <string name="subscriptions_snackbar_delete_failed">Абонаментът не можа да бъде изтрит</string>
+    <string name="subscriptions_frequency_breakdown_title">По периодичност на таксуване</string>
+    <string name="subscriptions_view_mode_whole_period">Целия период</string>
+    <string name="subscriptions_view_mode_weekly">Седмично</string>
+    <string name="subscriptions_view_mode_category">Категория</string>
+    <string name="subscriptions_weekly_week_badge">Седмица %d</string>
+    <string name="subscriptions_weekly_category_distribution_title">Разпределение по категории</string>
+    <string name="subscriptions_weekly_total_suffix">общо %s</string>
+
+    <plurals name="subscriptions_weekly_bills_scheduled">
+        <item quantity="one">%d сметка е насрочена тази седмица</item>
+        <item quantity="other">%d сметки са насрочени тази седмица</item>
+    </plurals>
+
+    <string name="subscriptions_item_mark_paid_short">Маркирай платено</string>
+    <string name="subscriptions_item_skip_short">Пропусни</string>
+    <string name="subscriptions_item_due_in_days">След %1$d дни (%2$s)</string>
+    <string name="subscriptions_item_due_in_weeks">След %1$d седмици (%2$s)</string>
+
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">Периодът приключи</string>
     <string name="rollover_dialog_question">Какво искаш да направиш с оставащите пари?</string>

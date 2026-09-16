@@ -71,7 +71,7 @@ internal fun SubscriptionAvatar(
     label: String,
     transactionId: Long,
     modifier: Modifier = Modifier,
-    size: Dp = 36.dp,
+    size: Dp = 42.dp,
 ) {
     val palette = subscriptionPalette(transactionId)
     Box(
@@ -89,7 +89,6 @@ internal fun SubscriptionAvatar(
     }
 }
 
-/** Small rounded, tinted pill for a short status word (e.g. "Paid", "Due today"). */
 @Composable
 internal fun StatusBadge(text: String, color: Color, modifier: Modifier = Modifier) {
     Box(

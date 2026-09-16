@@ -58,7 +58,7 @@ internal fun SubscriptionsHeroCard(
                 )
                 Text(
                     text = stringResource(R.string.subscriptions_per_month_suffix),
-                    style = MaterialTheme.typography.bodyMediumCondensed,
+                    style = MaterialTheme.typography.bodyMediumCondensed.copy(fontWeight = FontWeight.Black),
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f),
                     modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
                 )
@@ -66,8 +66,14 @@ internal fun SubscriptionsHeroCard(
             Spacer(modifier = Modifier.height(2.dp))
 
             if (periodBudgetTotal > BigDecimal.ZERO) {
-                val ratio = (periodCommittedTotal.toDouble() / periodBudgetTotal.toDouble()).coerceIn(0.0, 1.0)
-                val percentFormat = remember { NumberFormat.getPercentInstance().apply { maximumFractionDigits = 0 } }
+                val ratio =
+                    (periodCommittedTotal.toDouble() / periodBudgetTotal.toDouble()).coerceIn(
+                        0.0,
+                        1.0
+                    )
+                val percentFormat = remember {
+                    NumberFormat.getPercentInstance().apply { maximumFractionDigits = 0 }
+                }
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(

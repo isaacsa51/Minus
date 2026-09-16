@@ -36,13 +36,6 @@ import javax.inject.Inject
 
 private const val DUE_SOON_WINDOW_DAYS = 7L
 
-/**
- * Display status for a single calendar-day occurrence. Distinct from
- * [RecurrentOccurrenceStatus] (which is only ever PAID/SKIPPED, an explicit user action
- * recorded in the database): PENDING is derived at read time by comparing the occurrence date
- * to "today", not stored anywhere. A past occurrence with no recorded action defaults to PAID —
- * subscriptions auto-charge, so silence means it went through, not that it was missed.
- */
 enum class ChargeStatus {
     PAID,
     SKIPPED,
@@ -94,8 +87,6 @@ class SubscriptionsViewModel @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            // This combine() drives the whole screen — fall back to a safe, empty state
-            // instead of crashing the StateFlow's upstream collection.
             errorLogRecorder.record("SubscriptionsViewModel.uiState combine", e)
             SubscriptionsUiState(isLoading = false)
         }
@@ -126,7 +117,8 @@ class SubscriptionsViewModel @Inject constructor(
         )
 
     fun onToggleExpanded(transactionId: Long) {
-        _expandedTransactionId.value = if (_expandedTransactionId.value == transactionId) null else transactionId
+        _expandedTransactionId.value =
+            if (_expandedTransactionId.value == transactionId) null else transactionId
     }
 
     fun onEditRequested(transaction: Transaction) {
@@ -178,20 +170,23 @@ class SubscriptionsViewModel @Inject constructor(
         val today = LocalDate.now()
         val activeRecurrent = transactions.filter { transaction ->
             transaction.isRecurrent && !transaction.isDeleted &&
-                (transaction.recurrentEndDate == null || !transaction.recurrentEndDate.toLocalDate().isBefore(today))
+                    (transaction.recurrentEndDate == null || !transaction.recurrentEndDate.toLocalDate()
+                        .isBefore(today))
         }
 
-        // buildUpcomingRecurrentItems only ever returns strictly-future charge dates, so a
-        // transaction due exactly today needs its own check — that's the confirm/skip moment.
         val dueTodayIds = activeRecurrent.filter { transaction ->
             recurringExpenseCalculator.isRecurringDueToday(transaction, today) &&
-                !paidOccurrences.contains(PaidRecurrentOccurrence(transaction.id, today))
+                    !paidOccurrences.contains(PaidRecurrentOccurrence(transaction.id, today))
         }.map { it.id }.toSet()
 
         val dueToday = activeRecurrent
             .filter { it.id in dueTodayIds }
             .map { transaction ->
-                UpcomingRecurrentItem(transaction = transaction, nextChargeDate = today, isInCurrentPeriod = true)
+                UpcomingRecurrentItem(
+                    transaction = transaction,
+                    nextChargeDate = today,
+                    isInCurrentPeriod = true
+                )
             }
 
         val (upcomingInWindow, upcoming) = buildUpcomingRecurrentItems(
@@ -209,10 +204,8 @@ class SubscriptionsViewModel @Inject constructor(
         val periodStart = settings?.startDate ?: today.withDayOfMonth(1)
         val periodEnd = settings?.getPeriodEndDate() ?: today.withDayOfMonth(today.lengthOfMonth())
 
-        // paidOccurrences equality ignores status (see PaidRecurrentOccurrence's kdoc), so it
-        // can't be queried with a bare Set.contains — index it by (id, date) to read the
-        // recorded PAID/SKIPPED status per occurrence.
-        val recordedStatusByOccurrence = paidOccurrences.associate { (it.transactionId to it.occurrenceDate) to it.status }
+        val recordedStatusByOccurrence =
+            paidOccurrences.associate { (it.transactionId to it.occurrenceDate) to it.status }
 
         val chargesByDay = activeRecurrent
             .flatMap { transaction ->
@@ -248,11 +241,6 @@ class SubscriptionsViewModel @Inject constructor(
         )
     }
 
-    /**
-     * All charge dates for [transaction] that fall within [periodStart]..[periodEnd], past or
-     * future — unlike [buildUpcomingRecurrentItems] this isn't capped at "today", since a
-     * calendar needs to show the whole period.
-     */
     private fun chargeDatesInPeriod(
         transaction: Transaction,
         periodStart: LocalDate,
@@ -289,7 +277,10 @@ class SubscriptionsViewModel @Inject constructor(
                 date = occurrenceDate.atTime(transaction.date?.toLocalTime() ?: LocalTime.MIDNIGHT),
                 sourceTransactionId = transaction.sourceTransactionId ?: transaction.id,
             )
-            budgetTransactionHandler.markRecurrentOccurrencePaid(occurrenceTransaction, activePeriodId)
+            budgetTransactionHandler.markRecurrentOccurrencePaid(
+                occurrenceTransaction,
+                activePeriodId
+            )
                 .onFailure {
                     _effects.value = SubscriptionsUiEffect.ShowSnackbar(
                         context.getString(R.string.subscriptions_snackbar_confirm_failed)
@@ -302,7 +293,11 @@ class SubscriptionsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val realId = transaction.sourceTransactionId ?: transaction.id
-                budgetRepository.markRecurrentOccurrencePaid(realId, occurrenceDate, RecurrentOccurrenceStatus.SKIPPED)
+                budgetRepository.markRecurrentOccurrencePaid(
+                    realId,
+                    occurrenceDate,
+                    RecurrentOccurrenceStatus.SKIPPED
+                )
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
