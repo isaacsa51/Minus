@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.local.AppDatabase
-import com.serranoie.app.minus.domain.calculator.BudgetCalculator
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
@@ -48,7 +47,6 @@ class BudgetRepositoryImplTest {
             categoryDao = database.categoryDao(),
             queuedTransactionDao = database.queuedTransactionDao(),
             paidRecurrentOccurrenceDao = database.paidRecurrentOccurrenceDao(),
-            budgetCalculator = BudgetCalculator(),
         )
     }
 

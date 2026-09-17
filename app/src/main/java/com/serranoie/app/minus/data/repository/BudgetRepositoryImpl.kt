@@ -14,7 +14,6 @@ import com.serranoie.app.minus.data.local.entity.CategoryEntity
 import com.serranoie.app.minus.data.local.entity.PaidRecurrentOccurrenceEntity
 import com.serranoie.app.minus.data.local.entity.QueuedTransactionEntity
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
-import com.serranoie.app.minus.domain.calculator.BudgetCalculator
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
@@ -45,7 +44,6 @@ class BudgetRepositoryImpl @Inject constructor(
     private val categoryDao: CategoryDao,
     private val queuedTransactionDao: QueuedTransactionDao,
     private val paidRecurrentOccurrenceDao: PaidRecurrentOccurrenceDao,
-    private val budgetCalculator: BudgetCalculator
 ) : BudgetRepository {
     private fun TransactionEntity.toDomain(): Transaction = Transaction(
         id = this.id,
@@ -320,22 +318,6 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun getTransactionById(transactionId: Long): Transaction? {
         return transactionDao.getTransactionById(transactionId)?.toDomain()
-    }
-
-    override fun calculateBudgetState(
-        settings: BudgetSettings,
-        currentDate: LocalDate
-    ): Flow<BudgetState> {
-        val periodEnd = when (settings.period) {
-            BudgetPeriod.DAILY -> settings.startDate
-            BudgetPeriod.WEEKLY -> settings.startDate.plusWeeks(1)
-            BudgetPeriod.BIWEEKLY -> settings.startDate.plusWeeks(2)
-            BudgetPeriod.MONTHLY -> settings.startDate.plusMonths(1)
-        }
-
-        return getTransactionsForPeriod(settings.startDate, periodEnd).map { transactions ->
-            budgetCalculator.calculate(settings, transactions, currentDate)
-        }
     }
 
     override fun getActiveCategories(): Flow<List<Category>> {

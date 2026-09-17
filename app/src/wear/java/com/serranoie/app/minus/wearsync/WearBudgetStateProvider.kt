@@ -38,6 +38,7 @@ class WearBudgetStateProvider @Inject constructor(
             transactions = periodTransactions,
             currentDate = LocalDate.now(),
             paidOccurrences = paidOccurrences,
+            allTransactions = allTransactions,
         )
 
         val currency = SupportedCurrency.findByCode(settings.currencyCode)

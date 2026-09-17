@@ -374,12 +374,14 @@ class MidnightPeriodCheckerTest {
         coVerify {
             budgetRepository.saveBudgetSettings(
                 match {
-                    it.rollOverCarryForward &&
+                    it.totalBudget == BigDecimal("1300.00") &&
+                        it.rollOverCarryForward &&
                         it.rollOverLimit == BigDecimal("300.00") &&
                         it.rollOverAppliedDate == LocalDate.now()
                 },
             )
         }
+        coVerify { settingsRepository.setCurrentPeriodRollover(BigDecimal("300.00"), true) }
         coVerify { settingsRepository.clearPendingRollover() }
     }
 

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.serranoie.app.minus.domain.usecase.BackfillOrphanedPeriodsUseCase
+import com.serranoie.app.minus.domain.usecase.FoldCarryIntoTotalBudgetUseCase
 import com.serranoie.app.minus.wearsync.PhoneWearMessageListener
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +26,9 @@ class MinusApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var backfillOrphanedPeriodsUseCase: BackfillOrphanedPeriodsUseCase
 
+    @Inject
+    lateinit var foldCarryIntoTotalBudgetUseCase: FoldCarryIntoTotalBudgetUseCase
+
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
@@ -38,6 +42,7 @@ class MinusApplication : Application(), Configuration.Provider {
 
         CoroutineScope(Dispatchers.IO).launch {
             backfillOrphanedPeriodsUseCase()
+            foldCarryIntoTotalBudgetUseCase()
         }
 
 //        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {

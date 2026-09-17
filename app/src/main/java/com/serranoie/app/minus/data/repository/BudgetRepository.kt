@@ -49,8 +49,6 @@ interface BudgetRepository {
 
     suspend fun getTransactionById(transactionId: Long): Transaction?
 
-    fun calculateBudgetState(settings: BudgetSettings, currentDate: LocalDate): Flow<BudgetState>
-
     fun getActiveCategories(): Flow<List<Category>>
 
     fun getAllCategories(): Flow<List<Category>>

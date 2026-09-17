@@ -4,11 +4,13 @@ import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.Instant
@@ -188,7 +190,7 @@ class MidnightPeriodChecker @Inject constructor(
         val remaining = if (transitionOccurred) {
             settingsRepository.getRemainingFromLastPeriod()
         } else {
-            computeRemainingFromCurrentPeriod()
+            computeRemainingFromCurrentPeriod(userSettings.currentPeriodId)
         }
 
         return EndingPeriodState(
@@ -199,18 +201,30 @@ class MidnightPeriodChecker @Inject constructor(
         )
     }
 
-    private suspend fun computeRemainingFromCurrentPeriod(): BigDecimal {
+    private suspend fun computeRemainingFromCurrentPeriod(periodId: Long): BigDecimal {
         val settings = budgetRepository.getBudgetSettingsSync() ?: return BigDecimal.ZERO
-        val periodEnd = settings.getPeriodEndDate()
-        val transactions = budgetRepository.getTransactions().first()
-        val periodTransactions = transactions.filter { transaction ->
-            val txDate = transaction.date?.toLocalDate()
-            txDate != null && !txDate.isBefore(settings.startDate) && !txDate.isAfter(periodEnd)
-        }
-        val totalSpent = periodTransactions
-            .filter { !it.isDeleted }
-            .sumOf { it.amount }
-        return settings.totalBudget.subtract(totalSpent)
+        return settings.totalBudget.subtract(
+            periodSpent(periodId, settings, settings.getPeriodEndDate())
+        )
+    }
+
+    suspend fun periodSpent(
+        periodId: Long,
+        settings: BudgetSettings,
+        periodEnd: LocalDate
+    ): BigDecimal {
+        val transactions = budgetRepository.getTransactions().firstOrNull() ?: emptyList()
+        val paidOccurrences =
+            budgetRepository.getPaidRecurrentOccurrences().firstOrNull() ?: emptySet()
+        val (paidRecurring, _, oneTimeSpends) = splitRecurringAndOneTime(
+            allTransactions = transactions,
+            filteredTransactions = transactions.filter { it.periodId == periodId && !it.isDeleted },
+            periodStart = settings.startDate,
+            periodEnd = periodEnd,
+            today = periodEnd,
+            paidOccurrences = paidOccurrences,
+        )
+        return (oneTimeSpends + paidRecurring).distinctBy { it.id }.sumOf { it.amount }
     }
 
     fun onTransitionDialogConfirmed() {
@@ -268,22 +282,34 @@ class MidnightPeriodChecker @Inject constructor(
 
         val currentSettings = budgetRepository.getBudgetSettingsSync()
         val periodIsActive = currentSettings != null &&
+            !settingsRepository.getSettings().periodEndAlreadyHandled &&
             !LocalDate.now().isAfter(currentSettings.getPeriodEndDate())
 
         when {
             periodIsActive -> currentSettings?.let { settings ->
                 when (strategy) {
-                    RemainingBudgetStrategy.SPLIT_EQUALLY -> budgetRepository.saveBudgetSettings(
-                        settings.copy(totalBudget = settings.totalBudget.add(pendingAmount)),
-                    )
+                    RemainingBudgetStrategy.SPLIT_EQUALLY -> {
+                        budgetRepository.saveBudgetSettings(
+                            settings.copy(
+                                totalBudget = settings.totalBudget.add(pendingAmount),
+                                rollOverCarryForward = false,
+                                rollOverLimit = pendingAmount,
+                            ),
+                        )
+                        settingsRepository.setCurrentPeriodRollover(pendingAmount, false)
+                    }
 
-                    RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> budgetRepository.saveBudgetSettings(
-                        settings.copy(
-                            rollOverCarryForward = true,
-                            rollOverLimit = pendingAmount,
-                            rollOverAppliedDate = LocalDate.now(),
-                        ),
-                    )
+                    RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> {
+                        budgetRepository.saveBudgetSettings(
+                            settings.copy(
+                                totalBudget = settings.totalBudget.add(pendingAmount),
+                                rollOverCarryForward = true,
+                                rollOverLimit = pendingAmount,
+                                rollOverAppliedDate = LocalDate.now(),
+                            ),
+                        )
+                        settingsRepository.setCurrentPeriodRollover(pendingAmount, true)
+                    }
 
                     null, RemainingBudgetStrategy.ASK_ALWAYS -> Unit
                 }

@@ -282,7 +282,9 @@ class HistoryViewModel @Inject constructor(
                 currentPeriodId = currentPeriodId,
                 currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             )
-            budgetStateCalculator.calculateBudgetState(s, periodTransactions, today, paidOccurrences)
+            budgetStateCalculator.calculateBudgetState(
+                s, periodTransactions, today, paidOccurrences, transactions
+            )
         }
 
         val (upcomingInPeriod, futureOutOfPeriod) = buildUpcomingRecurrentItems(

@@ -6,7 +6,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.local.AppDatabase
 import com.serranoie.app.minus.data.repository.BudgetRepositoryImpl
-import com.serranoie.app.minus.domain.calculator.BudgetCalculator
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.usecase.AddTransactionUseCase
@@ -43,7 +42,6 @@ class MarkRecurrentOccurrencePaidIntegrationTest {
             categoryDao = database.categoryDao(),
             queuedTransactionDao = database.queuedTransactionDao(),
             paidRecurrentOccurrenceDao = database.paidRecurrentOccurrenceDao(),
-            budgetCalculator = BudgetCalculator(),
         )
         handler = BudgetTransactionHandler(
             budgetRepository = repository,

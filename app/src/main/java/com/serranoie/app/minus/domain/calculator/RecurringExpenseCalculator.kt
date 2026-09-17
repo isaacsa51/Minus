@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.domain.calculator
 
-import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import java.math.BigDecimal
@@ -26,18 +25,6 @@ class RecurringExpenseCalculator @Inject constructor() {
             }
             transaction.amount.multiply(multiplier)
         }.setScale(2, RoundingMode.HALF_UP)
-    }
-
-    fun calculateRecurringDueToday(
-        transactions: List<Transaction>,
-        today: LocalDate,
-        paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
-    ): BigDecimal {
-        val recurrentTransactions = transactions.filter { it.isRecurrent && !it.isDeleted }
-        return recurrentTransactions.filter { transaction ->
-            isRecurringDueToday(transaction, today) &&
-                !paidOccurrences.contains(PaidRecurrentOccurrence(transaction.id, today))
-        }.sumOf { it.amount }
     }
 
     fun isRecurringDueToday(transaction: Transaction, today: LocalDate): Boolean {

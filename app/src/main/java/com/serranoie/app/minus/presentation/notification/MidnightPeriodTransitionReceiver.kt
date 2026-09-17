@@ -5,13 +5,13 @@ import android.content.Context
 import android.content.Intent
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.time.MidnightPeriodChecker
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import logcat.asLog
 import logcat.logcat
@@ -31,6 +31,7 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
         fun budgetRepository(): BudgetRepository
         fun settingsRepository(): SettingsRepository
         fun notificationHelper(): NotificationHelper
+        fun midnightPeriodChecker(): MidnightPeriodChecker
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -48,6 +49,7 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
                 val budgetRepository = entryPoint.budgetRepository()
                 val settingsRepository = entryPoint.settingsRepository()
                 val notificationHelper = entryPoint.notificationHelper()
+                val midnightPeriodChecker = entryPoint.midnightPeriodChecker()
 
                 val settings = budgetRepository.getBudgetSettingsSync() ?: run {
                     logcat { "No budget settings found, skipping" }
@@ -74,15 +76,9 @@ class MidnightPeriodTransitionReceiver : BroadcastReceiver() {
 
                 logcat { "Period has ended! Period end: $periodEnd, Today: $today" }
 
-                val transactions = budgetRepository.getTransactions().first()
-                val periodTransactions = transactions.filter { transaction ->
-                    val txDate = transaction.date?.toLocalDate()
-                    txDate != null && !txDate.isBefore(settings.startDate) && !txDate.isAfter(periodEnd)
-                }
-                val totalSpent = periodTransactions
-                    .filter { !it.isDeleted }
-                    .sumOf { it.amount }
-                val remaining = settings.totalBudget.subtract(totalSpent)
+                val remaining = settings.totalBudget.subtract(
+                    midnightPeriodChecker.periodSpent(userSettings.currentPeriodId, settings, periodEnd)
+                )
 
                 notificationHelper.showPeriodEndNotification(
                     remainingBudget = remaining.toPlainString(),

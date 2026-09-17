@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.domain.calculator
 
-import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import org.junit.Assert.assertEquals
@@ -31,66 +30,6 @@ class RecurringExpenseCalculatorTest {
 
         assertTrue(calculator.isRecurringDueToday(tx, LocalDate.of(2026, 2, 10)))
         assertFalse(calculator.isRecurringDueToday(tx, LocalDate.of(2026, 2, 9)))
-    }
-
-    @Test
-    fun calculateRecurringDueToday_sumsOnlyDueRecurringTransactions() {
-        val today = LocalDate.of(2026, 3, 15)
-        val dueWeekly = recurrentTransaction(today.minusDays(14), RecurrentFrequency.WEEKLY, amount = BigDecimal("5.00"))
-        val dueMonthly = recurrentTransaction(today.minusMonths(1), RecurrentFrequency.MONTHLY, subscriptionDay = 15, amount = BigDecimal("7.50"))
-        val notDue = recurrentTransaction(today.minusDays(1), RecurrentFrequency.WEEKLY, amount = BigDecimal("20.00"))
-
-        val result = calculator.calculateRecurringDueToday(listOf(dueWeekly, dueMonthly, notDue), today)
-
-        assertEquals(BigDecimal("12.50"), result)
-    }
-
-    @Test
-    fun calculateRecurringDueToday_excludesAnOccurrenceAlreadyMarkedPaidForToday() {
-        val today = LocalDate.of(2026, 3, 15)
-        val dueToday = recurrentTransaction(
-            LocalDate.of(2026, 3, 1), RecurrentFrequency.MONTHLY, subscriptionDay = 15, amount = BigDecimal("15.00")
-        ).let { it.copy(id = 7L) }
-
-        val result = calculator.calculateRecurringDueToday(
-            transactions = listOf(dueToday),
-            today = today,
-            paidOccurrences = setOf(PaidRecurrentOccurrence(transactionId = 7L, occurrenceDate = today)),
-        )
-
-        assertEquals(BigDecimal.ZERO, result)
-    }
-
-    @Test
-    fun calculateRecurringDueToday_stillCountsAnUnpaidOccurrence() {
-        val today = LocalDate.of(2026, 3, 15)
-        val dueToday = recurrentTransaction(
-            LocalDate.of(2026, 3, 1), RecurrentFrequency.MONTHLY, subscriptionDay = 15, amount = BigDecimal("15.00")
-        ).let { it.copy(id = 7L) }
-
-        val result = calculator.calculateRecurringDueToday(
-            transactions = listOf(dueToday),
-            today = today,
-            paidOccurrences = emptySet(),
-        )
-
-        assertEquals(BigDecimal("15.00"), result)
-    }
-
-    @Test
-    fun calculateRecurringDueToday_apaidOccurrenceOnADifferentDateDoesNotSuppressTodaysDue() {
-        val today = LocalDate.of(2026, 3, 15)
-        val dueToday = recurrentTransaction(
-            LocalDate.of(2026, 3, 1), RecurrentFrequency.MONTHLY, subscriptionDay = 15, amount = BigDecimal("15.00")
-        ).let { it.copy(id = 7L) }
-
-        val result = calculator.calculateRecurringDueToday(
-            transactions = listOf(dueToday),
-            today = today,
-            paidOccurrences = setOf(PaidRecurrentOccurrence(transactionId = 7L, occurrenceDate = LocalDate.of(2026, 2, 15))),
-        )
-
-        assertEquals(BigDecimal("15.00"), result)
     }
 
     @Test

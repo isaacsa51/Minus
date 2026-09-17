@@ -283,7 +283,9 @@ class AnalyticsViewModel @Inject constructor(
         val budgetState = budgetStateCalculator.calculateBudgetState(
             settings = budgetSettings,
             transactions = transactions,
-            currentDate = archive.endDate
+            currentDate = archive.endDate,
+            paidOccurrences = paidOccurrences,
+            allTransactions = allTransactions,
         )
 
         val previousTransactions = findPreviousPeriodTransactions(
@@ -385,7 +387,9 @@ class AnalyticsViewModel @Inject constructor(
         val displayBudgetState = budgetStateCalculator.calculateBudgetState(
             settings = settings,
             transactions = transactions,
-            currentDate = today
+            currentDate = today,
+            paidOccurrences = paidOccurrences,
+            allTransactions = allTransactions,
         )
 
         val earlyFinishActive = userSettings.earlyFinishActive

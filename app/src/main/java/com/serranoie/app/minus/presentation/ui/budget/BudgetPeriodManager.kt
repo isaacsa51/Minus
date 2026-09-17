@@ -7,8 +7,8 @@ import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.time.MidnightPeriodChecker
 import com.serranoie.app.minus.domain.time.TimeProvider
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
-import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -40,8 +40,8 @@ class BudgetPeriodManager @Inject constructor(
         notificationScheduler.rescheduleRecurrentExpenseNotifications()
     }
 
-    suspend fun finishBudgetEarly() {
-        val settings = budgetRepository.getBudgetSettingsSync() ?: return
+    suspend fun finishBudgetEarly() = withContext(NonCancellable) {
+        val settings = budgetRepository.getBudgetSettingsSync() ?: return@withContext
         val originalEndDate = settings.getPeriodEndDate()
         val now = LocalDate.now()
 
@@ -52,74 +52,87 @@ class BudgetPeriodManager @Inject constructor(
                 .toEpochMilli()
         )
 
-        val remainingAmount = computeRemainingAmount(settings, now)
+        settingsRepository.setPeriodEndAlreadyHandled(true)
+
+        val periodId = settingsRepository.getSettings().currentPeriodId
+        val remainingAmount = settings.totalBudget.subtract(
+            midnightPeriodChecker.periodSpent(periodId, settings, now)
+        )
         midnightPeriodChecker.handleEarlyFinish(settings, remainingAmount)
     }
 
-    private suspend fun computeRemainingAmount(settings: BudgetSettings, today: LocalDate): BigDecimal {
-        val transactions = budgetRepository.getTransactions().firstOrNull() ?: emptyList()
-        val totalSpent = transactions
-            .filter { tx ->
-                val txDate = tx.date?.toLocalDate()
-                !tx.isDeleted && txDate != null && !txDate.isBefore(settings.startDate) && !txDate.isAfter(today)
-            }
-            .sumOf { it.amount }
-        return settings.totalBudget.subtract(totalSpent)
-    }
-
     suspend fun clearEarlyFinishState() {
-        settingsRepository.clearEarlyFinish()
+        val s = settingsRepository.getSettings()
+        settingsRepository.setEarlyFinishActive(
+            false,
+            s.earlyFinishActualDate,
+            s.earlyFinishOriginalEndDate
+        )
     }
 
     suspend fun persistBudgetSettings(
         settings: BudgetSettings,
         forceNewPeriodBoundary: Boolean,
-    ): PeriodBoundaryResult {
+    ): PeriodBoundaryResult = withContext(NonCancellable) {
         val userSettings = settingsRepository.getSettings()
         val previousSettings = budgetRepository.getBudgetSettingsSync()
 
-        val isNewPeriodBoundary =
-            forceNewPeriodBoundary || previousSettings == null || previousSettings.startDate != settings.startDate
+        val previousPeriodOver = previousSettings != null && (
+                userSettings.earlyFinishActive ||
+                        userSettings.periodEndAlreadyHandled ||
+                        LocalDate.now().isAfter(previousSettings.getPeriodEndDate())
+                )
+        val isNewPeriodBoundary = forceNewPeriodBoundary || previousSettings == null ||
+                (previousPeriodOver && previousSettings.startDate != settings.startDate)
 
         val (pendingRolloverAmount, pendingRolloverStrategy) = settingsRepository.getPendingRollover()
 
-        val shouldApplyPendingRollover =
-            isNewPeriodBoundary && pendingRolloverAmount > BigDecimal.ZERO && pendingRolloverStrategy != null
-        val appliedRolloverAmount =
-            if (shouldApplyPendingRollover) pendingRolloverAmount else BigDecimal.ZERO
-        val appliedCarryForward =
-            shouldApplyPendingRollover && pendingRolloverStrategy == RemainingBudgetStrategy.ADD_TO_FIRST_DAY
-
-        val effectiveSettings = if (shouldApplyPendingRollover && pendingRolloverStrategy != null) {
-            when (pendingRolloverStrategy) {
-                RemainingBudgetStrategy.SPLIT_EQUALLY -> settings.copy(
-                    totalBudget = settings.totalBudget.add(pendingRolloverAmount),
-                    rollOverCarryForward = false,
-                    rollOverLimit = pendingRolloverAmount,
-                )
-
-                RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> settings.copy(
-                    rollOverCarryForward = true,
-                    rollOverLimit = pendingRolloverAmount,
-                )
-
-                RemainingBudgetStrategy.ASK_ALWAYS -> settings
-            }
-        } else {
-            settings
-        }
-
         val previousPeriodId = userSettings.currentPeriodId
-
-        if (isNewPeriodBoundary && previousSettings != null && previousPeriodId != 0L) {
-            val actualEndDate = if (userSettings.earlyFinishActive && userSettings.earlyFinishActualDate > 0L) {
-                Instant.ofEpochMilli(userSettings.earlyFinishActualDate)
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate()
+        val archivedSpent =
+            if (isNewPeriodBoundary && previousSettings != null && previousPeriodId != 0L) {
+                val actualEndDate = if (userSettings.earlyFinishActualDate > 0L) {
+                    Instant.ofEpochMilli(userSettings.earlyFinishActualDate)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                } else {
+                    null
+                }
+                archivePeriod(previousPeriodId, previousSettings, actualEndDate, settings.startDate)
             } else {
                 null
             }
-            archivePeriod(previousPeriodId, previousSettings, actualEndDate)
+
+        val rolloverAmount = when {
+            !isNewPeriodBoundary || pendingRolloverStrategy == null -> BigDecimal.ZERO
+            archivedSpent != null && previousSettings != null ->
+                previousSettings.totalBudget.subtract(archivedSpent)
+
+            else -> pendingRolloverAmount
+        }
+        val shouldApplyPendingRollover = rolloverAmount > BigDecimal.ZERO
+        val appliedRolloverAmount = if (shouldApplyPendingRollover) rolloverAmount else BigDecimal.ZERO
+        val appliedCarryForward =
+            shouldApplyPendingRollover && pendingRolloverStrategy == RemainingBudgetStrategy.ADD_TO_FIRST_DAY
+
+        val effectiveSettings = if (shouldApplyPendingRollover) {
+            when (pendingRolloverStrategy) {
+                RemainingBudgetStrategy.SPLIT_EQUALLY -> settings.copy(
+                    totalBudget = settings.totalBudget.add(rolloverAmount),
+                    rollOverCarryForward = false,
+                    rollOverLimit = rolloverAmount,
+                )
+
+                RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> settings.copy(
+                    totalBudget = settings.totalBudget.add(rolloverAmount),
+                    rollOverCarryForward = true,
+                    rollOverLimit = rolloverAmount,
+                    rollOverAppliedDate = maxOf(settings.startDate, LocalDate.now()),
+                )
+
+                null, RemainingBudgetStrategy.ASK_ALWAYS -> settings
+            }
+        } else {
+            settings
         }
 
         budgetRepository.saveBudgetSettings(effectiveSettings)
@@ -144,15 +157,15 @@ class BudgetPeriodManager @Inject constructor(
 
         settingsRepository.setBudgetEndDate(millis)
         settingsRepository.setCurrentPeriod(periodId, periodStartMillis)
-        settingsRepository.setCurrentPeriodRollover(appliedRolloverAmount, appliedCarryForward)
 
-        if (shouldApplyPendingRollover) {
+        if (isNewPeriodBoundary && pendingRolloverStrategy != null) {
             settingsRepository.clearPendingRollover()
         }
         if (isNewPeriodBoundary) {
+            settingsRepository.setCurrentPeriodRollover(appliedRolloverAmount, appliedCarryForward)
             settingsRepository.clearLastPeriodSnapshot()
             settingsRepository.setPeriodEndAlreadyHandled(false)
-            clearEarlyFinishState()
+            settingsRepository.clearEarlyFinish()
         }
 
         if (isNewPeriodBoundary) {
@@ -160,28 +173,20 @@ class BudgetPeriodManager @Inject constructor(
         }
 
         notificationScheduler.schedulePeriodEndNotification(periodEndDate)
-        return PeriodBoundaryResult(periodStartMillis = periodStartMillis, periodId = periodId)
+        PeriodBoundaryResult(periodStartMillis = periodStartMillis, periodId = periodId)
     }
 
-    private suspend fun archivePeriod(periodId: Long, settings: BudgetSettings, actualEndDate: LocalDate?) {
-        val transactions = budgetRepository.getTransactions().firstOrNull() ?: emptyList()
-        val periodTransactions = transactions.filter {
-            it.periodId == periodId && !it.isDeleted
-        }
-        val archivedSettings = if (actualEndDate != null) settings.copy(endDate = actualEndDate) else settings
-        val periodEnd = archivedSettings.getPeriodEndDate()
-        val paidOccurrences = budgetRepository.getPaidRecurrentOccurrences().firstOrNull() ?: emptySet()
-
-        val (paidRecurring, _, oneTimeSpends) = splitRecurringAndOneTime(
-            allTransactions = transactions,
-            filteredTransactions = periodTransactions,
-            periodStart = archivedSettings.startDate,
-            periodEnd = periodEnd,
-            today = periodEnd,
-            paidOccurrences = paidOccurrences,
-        )
-        val totalSpent = (oneTimeSpends + paidRecurring).distinctBy { it.id }.sumOf { it.amount }
-
+    private suspend fun archivePeriod(
+        periodId: Long,
+        settings: BudgetSettings,
+        actualEndDate: LocalDate?,
+        nextStartDate: LocalDate
+    ): BigDecimal {
+        val endDate = minOf(actualEndDate ?: settings.getPeriodEndDate(), nextStartDate.minusDays(1))
+            .coerceAtLeast(settings.startDate)
+        val archivedSettings = settings.copy(endDate = endDate)
+        val totalSpent = midnightPeriodChecker.periodSpent(periodId, archivedSettings, endDate)
         budgetRepository.archiveCurrentPeriod(periodId, archivedSettings, totalSpent)
+        return totalSpent
     }
 }

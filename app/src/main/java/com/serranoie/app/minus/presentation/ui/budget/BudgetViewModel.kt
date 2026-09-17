@@ -149,7 +149,9 @@ class BudgetViewModel @Inject constructor(
                 currentPeriodId = currentPeriodId,
                 currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             )
-            budgetStateCalculator.calculateBudgetState(s, periodTransactions, LocalDate.now(), paidOccurrences)
+            budgetStateCalculator.calculateBudgetState(
+                s, periodTransactions, LocalDate.now(), paidOccurrences, transactions
+            )
         }
 
         val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }.sumOf { it.amount }

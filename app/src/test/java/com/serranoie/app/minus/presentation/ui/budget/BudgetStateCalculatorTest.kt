@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
 import com.google.common.truth.Truth.assertThat
-import com.serranoie.app.minus.domain.calculator.RecurringExpenseCalculator
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -14,7 +13,7 @@ import java.time.LocalDate
 
 class BudgetStateCalculatorTest {
 
-    private val calculator = BudgetStateCalculator(RecurringExpenseCalculator())
+    private val calculator = BudgetStateCalculator()
 
     private fun settings(
         totalBudget: BigDecimal,
@@ -203,7 +202,7 @@ class BudgetStateCalculatorTest {
             id = 1L,
             amount = BigDecimal("15.00"),
             comment = "Netflix",
-            date = LocalDate.of(2026, 3, 1).atStartOfDay(),
+            date = LocalDate.of(2026, 2, 15).atStartOfDay(),
             periodId = 5L,
             isRecurrent = true,
             recurrentFrequency = RecurrentFrequency.MONTHLY,
@@ -240,7 +239,7 @@ class BudgetStateCalculatorTest {
             id = 1L,
             amount = BigDecimal("15.00"),
             comment = "Netflix",
-            date = LocalDate.of(2026, 3, 1).atStartOfDay(),
+            date = LocalDate.of(2026, 2, 15).atStartOfDay(),
             periodId = 5L,
             isRecurrent = true,
             recurrentFrequency = RecurrentFrequency.MONTHLY,
@@ -268,7 +267,7 @@ class BudgetStateCalculatorTest {
             id = 1L,
             amount = BigDecimal("15.00"),
             comment = "Netflix",
-            date = LocalDate.of(2026, 3, 1).atStartOfDay(),
+            date = LocalDate.of(2026, 2, 15).atStartOfDay(),
             periodId = 5L,
             isRecurrent = true,
             recurrentFrequency = RecurrentFrequency.MONTHLY,
@@ -298,6 +297,7 @@ class BudgetStateCalculatorTest {
             splitMode = BudgetSplitMode.DYNAMIC,
         )
         val withRollover = withoutRollover.copy(
+            totalBudget = BigDecimal("2100.00"),
             rollOverCarryForward = true,
             rollOverLimit = BigDecimal("100.00"),
             rollOverAppliedDate = LocalDate.of(2026, 7, 11),
@@ -318,13 +318,14 @@ class BudgetStateCalculatorTest {
 
         assertThat(onAppliedDate.remainingToday)
             .isEqualTo(baselineOnAppliedDate.remainingToday.add(BigDecimal("100.00")))
-        assertThat(onStartDate.remainingToday).isEqualTo(baselineOnStartDate.remainingToday)
+        assertThat(onStartDate.remainingToday).isEqualTo(onStartDate.dailyBudget)
+        assertThat(onStartDate.totalBudget).isEqualTo(baselineOnStartDate.totalBudget.add(BigDecimal("100.00")))
     }
 
     @Test
     fun `rollOverAppliedDate falls back to startDate when not set, matching the previous behavior`() {
         val settingsWithRollover = settings(
-            totalBudget = BigDecimal("2000"),
+            totalBudget = BigDecimal("2050"),
             start = LocalDate.of(2026, 7, 1),
             end = LocalDate.of(2026, 7, 20),
             splitMode = BudgetSplitMode.STATIC,
@@ -341,5 +342,70 @@ class BudgetStateCalculatorTest {
 
         assertThat(onStartDate.remainingToday).isEqualTo(onStartDate.dailyBudget.add(BigDecimal("50.00")))
         assertThat(onOtherDay.remainingToday).isEqualTo(onOtherDay.dailyBudget)
+        assertThat(onOtherDay.dailyBudget).isEqualTo(BigDecimal("100.00"))
+    }
+
+    @Test
+    fun `spending the day-one carry does not put the rest of the period over budget, and an unspent carry stays in the total`() {
+        val carried = settings(
+            totalBudget = BigDecimal("1200"),
+            start = LocalDate.of(2026, 7, 1),
+            end = LocalDate.of(2026, 7, 10),
+            splitMode = BudgetSplitMode.STATIC,
+            carryForward = true,
+            rolloverLimit = BigDecimal("200.00"),
+        )
+        val spentItAll = listOf(transaction(amount = BigDecimal("300.00"), date = LocalDate.of(2026, 7, 1)))
+
+        val dayOne = calculator.calculateBudgetState(carried, spentItAll, LocalDate.of(2026, 7, 1))
+        val dayTwo = calculator.calculateBudgetState(carried, spentItAll, LocalDate.of(2026, 7, 2))
+        val dayTwoUntouched = calculator.calculateBudgetState(carried, emptyList(), LocalDate.of(2026, 7, 2))
+
+        assertThat(dayOne.remainingToday).isEqualTo(BigDecimal("0.00"))
+        assertThat(dayOne.isOverBudget).isFalse()
+        assertThat(dayTwo.dailyBudget).isEqualTo(BigDecimal("100.00"))
+        assertThat(dayTwo.remainingToday).isEqualTo(BigDecimal("100.00"))
+        assertThat(dayTwo.isOverBudget).isFalse()
+        assertThat(dayTwo.totalBudget.subtract(dayTwo.totalSpentInPeriod)).isEqualTo(BigDecimal("900.00"))
+        assertThat(dayTwoUntouched.dailyBudget).isEqualTo(BigDecimal("100.00"))
+        assertThat(dayTwoUntouched.totalBudget.subtract(dayTwoUntouched.totalSpentInPeriod)).isEqualTo(BigDecimal("1200"))
+    }
+
+    @Test
+    fun `an unpaid subscription charge due earlier in the period counts as spent, even when its template belongs to an older period`() {
+        val today = LocalDate.of(2026, 3, 20)
+        val netflix = Transaction(
+            id = 1L,
+            amount = BigDecimal("15.00"),
+            comment = "Netflix",
+            date = LocalDate.of(2026, 1, 15).atStartOfDay(),
+            periodId = 3L,
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.MONTHLY,
+            subscriptionDay = 15,
+        )
+        val coffee = Transaction(
+            id = 2L,
+            amount = BigDecimal("5.00"),
+            comment = "Coffee",
+            date = today.atStartOfDay(),
+            periodId = 5L,
+        )
+
+        val result = calculator.calculateBudgetState(
+            settings = settings(
+                totalBudget = BigDecimal("1000"),
+                start = LocalDate.of(2026, 3, 1),
+                end = LocalDate.of(2026, 3, 31),
+                splitMode = BudgetSplitMode.DYNAMIC,
+            ),
+            transactions = listOf(coffee),
+            currentDate = today,
+            allTransactions = listOf(netflix, coffee),
+        )
+
+        assertThat(result.totalSpentInPeriod).isEqualTo(BigDecimal("20.00"))
+        assertThat(result.totalSpentToday).isEqualTo(BigDecimal("5.00"))
+        assertThat(result.remainingToday).isEqualTo(BigDecimal("76.67"))
     }
 }
