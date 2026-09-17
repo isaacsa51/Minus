@@ -246,9 +246,10 @@ class RolloverDialogFlowE2ETest {
 
         val next = startNextPeriod(newIncome = baseBudget)
 
-        assertThat(next.totalBudget).isEqualTo(baseBudget)
+        assertThat(next.totalBudget).isEqualTo(baseBudget.add(surplus))
         assertThat(next.rollOverCarryForward).isTrue()
         assertThat(next.rollOverLimit).isEqualTo(surplus)
+        assertThat(next.rollOverAppliedDate).isEqualTo(LocalDate.now())
     }
 
     @Test
@@ -297,6 +298,7 @@ class RolloverDialogFlowE2ETest {
     fun resolving_the_surplus_later_from_a_reopened_dialog_applies_it_to_the_already_active_period() {
         runBlocking { transitionManager.handleAppStart() }
         transitionManager.onTransitionDialogDismissed()
+        startNextPeriod(newIncome = baseBudget)
 
         val activeSettings = monthlySettings(
             startDate = LocalDate.now(),
