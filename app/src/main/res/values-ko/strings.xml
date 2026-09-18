@@ -7,7 +7,7 @@
     <string name="tutorial_comment_title">카테고리 추가</string>
     <string name="tutorial_comment_description">카테고리나 간단한 메모를 추가하여 지출 용도를 기록해 보세요.</string>
     <string name="tutorial_budget_pill_title">예산 진행 상황</string>
-    <string name="tutorial_budget_pill_description">탭하여 일간, 주간, 월간 예산 보기로 전환하거나 기간 설정을 변경하세요.</string>
+    <string name="tutorial_budget_pill_description">탭하여 일간, 주간, 월간 예산 보기로 전환하거나 기간 설정을 변경하세요. 길게 누르면 금액이 어떻게 계산되는지 볼 수 있습니다.</string>
     <string name="tutorial_settings_title">설정</string>
     <string name="tutorial_settings_description">설정을 열어 기능을 활성화하거나, 홈 화면 위젯을 설정하거나, 이 튜토리얼을 초기화하세요.</string>
     <string name="tutorial_recurrent_title">정기 결제</string>
@@ -130,6 +130,8 @@
     <string name="history_snackbar_save_transaction_failed">거래를 저장할 수 없습니다</string>
     <string name="history_snackbar_delete_recurrent_failed">반복 지출을 삭제할 수 없습니다</string>
     <string name="history_snackbar_mark_paid_failed">거래를 결제 완료로 표시할 수 없습니다</string>
+    <string name="history_snackbar_restore_transaction_failed">거래를 복원할 수 없습니다</string>
+    <string name="expense_queued_for_next_period">지출이 다음 기간으로 예약되었습니다</string>
     <string name="add_new_category">카테고리</string>
     <string name="add_new_category_action">새 카테고리 추가</string>
     <string name="budget_validation_major_zero">예산은 0보다 커야 합니다.</string>
@@ -191,6 +193,33 @@
     <string name="budget_pill_sub_exceeded_single">%1$s 예산 초과</string>
     <string name="budget_pill_sub_exceeded_double">%1$s 및 %2$s 예산 초과</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s 및 %3$s 예산 초과</string>
+    <string name="budget_formula_title">계산 방법</string>
+    <string name="budget_formula_hold_hint">금액 계산 방법 보기</string>
+    <string name="budget_formula_mode_static">고정 분할</string>
+    <string name="budget_formula_mode_dynamic">동적 분할</string>
+    <string name="budget_formula_caption_surplus_split">지난 기간의 잔여 금액이 예산에 더해집니다</string>
+    <string name="budget_formula_caption_surplus_first_day">지난 기간의 잔여 금액은 첫날에 남습니다</string>
+    <string name="budget_formula_caption_adjustments">이번 기간의 수입과 공제</string>
+    <string name="budget_formula_caption_per_day">기간의 매일에 나누어 배분</string>
+    <string name="budget_formula_caption_per_period">예산: %1$s</string>
+    <string name="budget_formula_caption_remaining_budget">총 예산에서 남은 금액</string>
+    <string name="budget_formula_caption_spread_over_left">기간의 남은 부분에 나누어 배분</string>
+    <string name="budget_formula_caption_left">지출한 금액을 뺀 값</string>
+    <string name="budget_formula_card_tap_hint">탭하여 전체 내역 보기</string>
+    <string name="budget_formula_tip_hold_pill">팁: 홈 화면의 예산 알약을 길게 누르면 언제든지 이 내역을 볼 수 있습니다</string>
+    <string name="budget_formula_tip_tap_card">팁: 기간 시트의 계산된 금액을 탭해도 볼 수 있습니다</string>
+    <plurals name="budget_formula_weeks">
+        <item quantity="other">%d주</item>
+        <item quantity="one">%d주</item>
+    </plurals>
+    <plurals name="budget_formula_biweeks">
+        <item quantity="other">%d × 2주</item>
+        <item quantity="one">%d × 2주</item>
+    </plurals>
+    <plurals name="budget_formula_months">
+        <item quantity="other">%d개월</item>
+        <item quantity="one">%d개월</item>
+    </plurals>
     <string name="day_total_format">합계: %1$s</string>
     <string name="onboarding_welcome_title">Minus에 오신 것을 환영합니다</string>
     <string name="onboarding_welcome_subtitle">안녕하세요! 환영합니다. 함께 저축을 시작해 볼까요?</string>

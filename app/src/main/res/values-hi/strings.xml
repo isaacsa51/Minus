@@ -7,7 +7,7 @@
     <string name="tutorial_comment_title">कैटेगरी जोड़ें</string>
     <string name="tutorial_comment_description">यह याद रखने के लिए कि खर्च किस चीज़ के लिए किया गया था, एक कैटेगरी या छोटा नोट जोड़ें।</string>
     <string name="tutorial_budget_pill_title">बजट की प्रगति</string>
-    <string name="tutorial_budget_pill_description">रोज़ाना, हफ़्तेवार और महीने के बजट व्यू के बीच स्विच करने या समय-सीमा सेट-अप को एडिट करने के लिए टैप करें।</string>
+    <string name="tutorial_budget_pill_description">रोज़ाना, हफ़्तेवार और महीने के बजट व्यू के बीच स्विच करने या समय-सीमा सेट-अप को एडिट करने के लिए टैप करें। रकम का हिसाब कैसे लगता है, यह देखने के लिए इसे दबाकर रखें।</string>
     <string name="tutorial_settings_title">सेटिंग्स</string>
     <string name="tutorial_settings_description">फ़ीचर चालू करने, होम-स्क्रीन विजेट सेट अप करने या इस ट्यूटोरियल को रीसेट करने के लिए सेटिंग्स खोलें।</string>
     <string name="tutorial_recurrent_title">बार-बार होने वाले पेमेंट</string>
@@ -130,6 +130,8 @@
     <string name="history_snackbar_save_transaction_failed">लेन-देन सेव नहीं हो सका</string>
     <string name="history_snackbar_delete_recurrent_failed">बार-बार होने वाला पेमेंट हटाया नहीं जा सका</string>
     <string name="history_snackbar_mark_paid_failed">लेन-देन को भुगतान किया हुआ चिह्नित नहीं किया जा सका</string>
+    <string name="history_snackbar_restore_transaction_failed">लेन-देन को वापस नहीं लाया जा सका</string>
+    <string name="expense_queued_for_next_period">खर्च अगली अवधि के लिए कतार में है</string>
     <string name="add_new_category">कैटेगरी</string>
     <string name="add_new_category_action">नई कैटेगरी जोड़ें</string>
     <string name="budget_validation_major_zero">बजट 0 से ज़्यादा होना चाहिए</string>
@@ -191,6 +193,33 @@
     <string name="budget_pill_sub_exceeded_single">%1$s की रकम सीमा से ज़्यादा है</string>
     <string name="budget_pill_sub_exceeded_double">%1$s और %2$s की रकम सीमा से ज़्यादा है</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s और %3$s की रकम सीमा से ज़्यादा है</string>
+    <string name="budget_formula_title">इसका हिसाब कैसे लगता है</string>
+    <string name="budget_formula_hold_hint">दिखाएँ कि रकम का हिसाब कैसे लगता है</string>
+    <string name="budget_formula_mode_static">स्टैटिक बँटवारा</string>
+    <string name="budget_formula_mode_dynamic">डायनामिक बँटवारा</string>
+    <string name="budget_formula_caption_surplus_split">पिछली अवधि की बची रकम बजट में जुड़ जाती है</string>
+    <string name="budget_formula_caption_surplus_first_day">पिछली अवधि की बची रकम पहले दिन में रहती है</string>
+    <string name="budget_formula_caption_adjustments">इस अवधि की आय और कटौतियाँ</string>
+    <string name="budget_formula_caption_per_day">अवधि के हर दिन में बाँटा गया</string>
+    <string name="budget_formula_caption_per_period">बजट: %1$s</string>
+    <string name="budget_formula_caption_remaining_budget">कुल बजट में से बचा हुआ</string>
+    <string name="budget_formula_caption_spread_over_left">अवधि के बचे हिस्से में बाँटा गया</string>
+    <string name="budget_formula_caption_left">जो आपने खर्च किया, उसे घटाकर</string>
+    <string name="budget_formula_card_tap_hint">पूरा ब्यौरा देखने के लिए टैप करें</string>
+    <string name="budget_formula_tip_hold_pill">सुझाव: यह कभी भी देखने के लिए होम स्क्रीन पर बजट पिल को दबाकर रखें</string>
+    <string name="budget_formula_tip_tap_card">सुझाव: आप अवधि शीट में हिसाब की गई रकम पर भी टैप कर सकते हैं</string>
+    <plurals name="budget_formula_weeks">
+        <item quantity="one">%d हफ़्ता</item>
+        <item quantity="other">%d हफ़्ते</item>
+    </plurals>
+    <plurals name="budget_formula_biweeks">
+        <item quantity="one">%d पखवाड़ा</item>
+        <item quantity="other">%d पखवाड़े</item>
+    </plurals>
+    <plurals name="budget_formula_months">
+        <item quantity="one">%d महीना</item>
+        <item quantity="other">%d महीने</item>
+    </plurals>
     <string name="day_total_format">कुल: %1$s</string>
     <string name="onboarding_welcome_title">Minus में आपका स्वागत है</string>
     <string name="onboarding_welcome_subtitle">नमस्ते और स्वागत है, आइए मिलकर बचत करना शुरू करें।</string>

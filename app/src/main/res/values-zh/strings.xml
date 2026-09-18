@@ -7,7 +7,7 @@
     <string name="tutorial_comment_title">添加一个类别</string>
     <string name="tutorial_comment_description">添加一个类别或简短备注来记录支出去向。</string>
     <string name="tutorial_budget_pill_title">预算进度</string>
-    <string name="tutorial_budget_pill_description">在每天、每周和每月预算视图间点击切换，或编辑周期设置。</string>
+    <string name="tutorial_budget_pill_description">在每天、每周和每月预算视图间点击切换，或编辑周期设置。长按可查看金额的计算方式。</string>
     <string name="tutorial_settings_title">设置</string>
     <string name="tutorial_settings_description">打开设置以启用功能、设定主屏小组件或重新查看该教程。</string>
     <string name="tutorial_recurrent_title">定期付款</string>
@@ -130,6 +130,8 @@
     <string name="history_snackbar_save_transaction_failed">无法保存交易</string>
     <string name="history_snackbar_delete_recurrent_failed">无法删除定期付款</string>
     <string name="history_snackbar_mark_paid_failed">无法将交易标记为已付款</string>
+    <string name="history_snackbar_restore_transaction_failed">无法恢复该交易</string>
+    <string name="expense_queued_for_next_period">支出已排入下一周期</string>
     <string name="add_new_category">类别</string>
     <string name="add_new_category_action">添加新类别</string>
     <string name="delete_category">删除分类</string>
@@ -193,6 +195,33 @@
     <string name="budget_pill_sub_exceeded_single">%1$s 金额超出</string>
     <string name="budget_pill_sub_exceeded_double">%1$s 和 %2$s 金额超出</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s、%2$s 和 %3$s 金额超出</string>
+    <string name="budget_formula_title">计算方式</string>
+    <string name="budget_formula_hold_hint">显示金额的计算方式</string>
+    <string name="budget_formula_mode_static">固定分配</string>
+    <string name="budget_formula_mode_dynamic">动态分配</string>
+    <string name="budget_formula_caption_surplus_split">上一周期的结余计入预算</string>
+    <string name="budget_formula_caption_surplus_first_day">上一周期的结余保留在第一天</string>
+    <string name="budget_formula_caption_adjustments">本周期的收入与扣减</string>
+    <string name="budget_formula_caption_per_day">平均分配到周期内的每一天</string>
+    <string name="budget_formula_caption_per_period">预算：%1$s</string>
+    <string name="budget_formula_caption_remaining_budget">总预算的剩余部分</string>
+    <string name="budget_formula_caption_spread_over_left">分配到周期剩余的时间</string>
+    <string name="budget_formula_caption_left">减去已花费的金额</string>
+    <string name="budget_formula_card_tap_hint">点击查看完整明细</string>
+    <string name="budget_formula_tip_hold_pill">提示：长按主屏幕上的预算胶囊，随时查看此明细</string>
+    <string name="budget_formula_tip_tap_card">提示：也可以点击周期面板中的计算金额</string>
+    <plurals name="budget_formula_weeks">
+        <item quantity="other">%d 周</item>
+        <item quantity="one">%d 周</item>
+    </plurals>
+    <plurals name="budget_formula_biweeks">
+        <item quantity="other">%d 个半月</item>
+        <item quantity="one">%d 个半月</item>
+    </plurals>
+    <plurals name="budget_formula_months">
+        <item quantity="other">%d 个月</item>
+        <item quantity="one">%d 个月</item>
+    </plurals>
     <string name="day_total_format">总计：%1$s</string>
     <string name="onboarding_welcome_title">欢迎使用 Minus</string>
     <string name="onboarding_welcome_subtitle">你好，欢迎，让我们一起存钱吧。</string>

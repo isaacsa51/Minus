@@ -7,7 +7,7 @@
     <string name="tutorial_comment_title">Προσθήκη κατηγορίας</string>
     <string name="tutorial_comment_description">Προσθήκη κατηγορίας ή σύντομης σημείωσης για να θυμάστε για ποίο ήταν το κόστος.</string>
     <string name="tutorial_budget_pill_title">Πρόοδος του προϋπολογισμού</string>
-    <string name="tutorial_budget_pill_description">Πατήστε για εναλλαγή μεταξύ καθημερινών, εβδομαδιαίων και μηνιαίων προβολών προϋπολογισμού ή για να επεξεργαστείτε την περίοδο ρύθμισης.</string>
+    <string name="tutorial_budget_pill_description">Πατήστε για εναλλαγή μεταξύ καθημερινών, εβδομαδιαίων και μηνιαίων προβολών προϋπολογισμού ή για να επεξεργαστείτε την περίοδο ρύθμισης. Κρατήστε το πατημένο για να δείτε πώς υπολογίζεται το ποσό.</string>
     <string name="tutorial_settings_title">Ρυθμίσεις</string>
     <string name="tutorial_settings_description">Ανοίξτε τις ρυθμίσεις για να ενεργοποιήσετε λειτουργίες, ρυθμίστε γραφικά συστατικά αρχικής οθόνης ή επαναφέρετε αυτό το σεμινάριο.</string>
     <string name="tutorial_recurrent_title">Επαναλαμβανόμενες πληρωμές</string>
@@ -130,6 +130,8 @@
     <string name="history_snackbar_save_transaction_failed">Δεν ήταν δυνατή η αποθήκευση της συναλλαγής</string>
     <string name="history_snackbar_delete_recurrent_failed">Δεν ήταν δυνατή η διαγραφή της επαναλαμβανόμενης πληρωμής</string>
     <string name="history_snackbar_mark_paid_failed">Δεν ήταν δυνατή η σήμανση της συναλλαγής ως πληρωμένης</string>
+    <string name="history_snackbar_restore_transaction_failed">Δεν ήταν δυνατή η επαναφορά της συναλλαγής</string>
+    <string name="expense_queued_for_next_period">Το έξοδο προγραμματίστηκε για την επόμενη περίοδο</string>
     <string name="add_new_category">Κατηγορία</string>
     <string name="add_new_category_action">Προσθήκη Νέας Κατηγορίας</string>
     <string name="budget_validation_major_zero">Ο προϋπολογισμός πρέπει να είναι μεγαλύτερος από 0</string>
@@ -191,6 +193,33 @@
     <string name="budget_pill_sub_exceeded_single">Ποσό %1$s υπέρβαση</string>
     <string name="budget_pill_sub_exceeded_double">%1$s και %2$s ποσό υπέρβαση</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s και %3$s ποσό υπέρβαση</string>
+    <string name="budget_formula_title">Πώς υπολογίζεται</string>
+    <string name="budget_formula_hold_hint">Εμφάνιση του τρόπου υπολογισμού του ποσού</string>
+    <string name="budget_formula_mode_static">Στατικός διαμοιρασμός</string>
+    <string name="budget_formula_mode_dynamic">Δυναμικός διαμοιρασμός</string>
+    <string name="budget_formula_caption_surplus_split">Το πλεόνασμα της προηγούμενης περιόδου προστίθεται στον προϋπολογισμό</string>
+    <string name="budget_formula_caption_surplus_first_day">Το πλεόνασμα της προηγούμενης περιόδου μένει στην πρώτη ημέρα</string>
+    <string name="budget_formula_caption_adjustments">Έσοδα και αφαιρέσεις αυτής της περιόδου</string>
+    <string name="budget_formula_caption_per_day">Μοιρασμένο σε κάθε ημέρα της περιόδου</string>
+    <string name="budget_formula_caption_per_period">Προϋπολογισμός: %1$s</string>
+    <string name="budget_formula_caption_remaining_budget">Υπόλοιπο του συνολικού προϋπολογισμού</string>
+    <string name="budget_formula_caption_spread_over_left">Μοιρασμένο στο υπόλοιπο της περιόδου</string>
+    <string name="budget_formula_caption_left">Μείον όσα έχετε ξοδέψει</string>
+    <string name="budget_formula_card_tap_hint">Πατήστε για την πλήρη ανάλυση</string>
+    <string name="budget_formula_tip_hold_pill">Συμβουλή: κρατήστε πατημένη την ένδειξη προϋπολογισμού στην αρχική οθόνη για να το δείτε όποτε θέλετε</string>
+    <string name="budget_formula_tip_tap_card">Συμβουλή: μπορείτε επίσης να πατήσετε το υπολογισμένο ποσό στο φύλλο περιόδου</string>
+    <plurals name="budget_formula_weeks">
+        <item quantity="one">%d εβδομάδα</item>
+        <item quantity="other">%d εβδομάδες</item>
+    </plurals>
+    <plurals name="budget_formula_biweeks">
+        <item quantity="one">%d δεκαπενθήμερο</item>
+        <item quantity="other">%d δεκαπενθήμερα</item>
+    </plurals>
+    <plurals name="budget_formula_months">
+        <item quantity="one">%d μήνας</item>
+        <item quantity="other">%d μήνες</item>
+    </plurals>
     <string name="day_total_format">Σύνολο: %1$s</string>
     <string name="onboarding_welcome_title">Καλώς ήλθατε στο Minus</string>
     <string name="onboarding_welcome_subtitle">Γεια σας και να καλωσορίσετε, ας αρχίσουμε να σώζουμε μαζί.</string>

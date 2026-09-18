@@ -7,7 +7,7 @@
     <string name="tutorial_comment_title">カテゴリを追加</string>
     <string name="tutorial_comment_description">カテゴリまたは短いメモを追加して、支出が何のためだったかを覚えておいてください。</string>
     <string name="tutorial_budget_pill_title">予算の進捗状況</string>
-    <string name="tutorial_budget_pill_description">タップして毎日、毎週、毎月の予算表示を切り替えるか、期間設定を編集します。</string>
+    <string name="tutorial_budget_pill_description">タップして毎日、毎週、毎月の予算表示を切り替えるか、期間設定を編集します。長押しすると金額の計算方法を確認できます。</string>
     <string name="tutorial_settings_title">設定</string>
     <string name="tutorial_settings_description">設定を開いて機能を有効にするか、ホーム画面のウィジェットを設定するか、チュートリアルをリセットしてください。</string>
     <string name="tutorial_recurrent_title">繰り返し支払い</string>
@@ -130,6 +130,8 @@
     <string name="history_snackbar_save_transaction_failed">取引を保存できませんでした</string>
     <string name="history_snackbar_delete_recurrent_failed">定期的な支払いを削除できませんでした</string>
     <string name="history_snackbar_mark_paid_failed">取引を支払い済みにできませんでした</string>
+    <string name="history_snackbar_restore_transaction_failed">取引を復元できませんでした</string>
+    <string name="expense_queued_for_next_period">支出は次の期間に繰り越されます</string>
     <string name="add_new_category">カテゴリ</string>
     <string name="add_new_category_action">新しいカテゴリを追加</string>
     <string name="budget_validation_major_zero">予算は0より大きくなければなりません</string>
@@ -191,6 +193,33 @@
     <string name="budget_pill_sub_exceeded_single">%1$s 金額を超えました</string>
     <string name="budget_pill_sub_exceeded_double">%1$s と %2$s の金額を超えました</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s、 %2$s 、 %3$s の金額を超えました</string>
+    <string name="budget_formula_title">計算方法</string>
+    <string name="budget_formula_hold_hint">金額の計算方法を表示</string>
+    <string name="budget_formula_mode_static">固定分割</string>
+    <string name="budget_formula_mode_dynamic">ダイナミック分割</string>
+    <string name="budget_formula_caption_surplus_split">前の期間の余剰金が予算に加算されます</string>
+    <string name="budget_formula_caption_surplus_first_day">前の期間の余剰金は初日に残ります</string>
+    <string name="budget_formula_caption_adjustments">この期間の収入と控除</string>
+    <string name="budget_formula_caption_per_day">期間の各日に分割</string>
+    <string name="budget_formula_caption_per_period">予算: %1$s</string>
+    <string name="budget_formula_caption_remaining_budget">予算合計の残り</string>
+    <string name="budget_formula_caption_spread_over_left">期間の残りに分割</string>
+    <string name="budget_formula_caption_left">使った金額を差し引く</string>
+    <string name="budget_formula_card_tap_hint">タップして詳しい内訳を表示</string>
+    <string name="budget_formula_tip_hold_pill">ヒント: ホーム画面の予算ピルを長押しすると、いつでもこの内訳を確認できます</string>
+    <string name="budget_formula_tip_tap_card">ヒント: 期間シートの計算額をタップしても確認できます</string>
+    <plurals name="budget_formula_weeks">
+        <item quantity="other">%d 週間</item>
+        <item quantity="one">%d 週間</item>
+    </plurals>
+    <plurals name="budget_formula_biweeks">
+        <item quantity="other">%d × 2週間</item>
+        <item quantity="one">%d × 2週間</item>
+    </plurals>
+    <plurals name="budget_formula_months">
+        <item quantity="other">%d か月</item>
+        <item quantity="one">%d か月</item>
+    </plurals>
     <string name="day_total_format">合計: %1$s</string>
     <string name="onboarding_welcome_title">マイナスへようこそ</string>
     <string name="onboarding_welcome_subtitle">こんにちは、歓迎、一緒に保存を開始しましょう。</string>

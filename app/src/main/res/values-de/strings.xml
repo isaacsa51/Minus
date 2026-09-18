@@ -7,7 +7,7 @@
     <string name="tutorial_comment_title">Kategorie hinzufügen</string>
     <string name="tutorial_comment_description">Füge eine Kategorie oder eine kurze Notiz hinzu, um dich daran zu erinnern, wofür die Ausgaben waren.</string>
     <string name="tutorial_budget_pill_title">Budgetfortschritt</string>
-    <string name="tutorial_budget_pill_description">Tippe, um zwischen täglichen, wöchentlichen und monatlichen Budgetansichten zu wechseln oder um den Zeitraum zu verändern.</string>
+    <string name="tutorial_budget_pill_description">Tippe, um zwischen täglichen, wöchentlichen und monatlichen Budgetansichten zu wechseln oder um den Zeitraum zu verändern. Halte sie gedrückt, um zu sehen, wie der Betrag berechnet wird.</string>
     <string name="tutorial_settings_title">Einstellungen</string>
     <string name="tutorial_settings_description">Öffne die Einstellungen, um Funktionen zu aktivieren, Home-Screen-Widgets einzurichten oder dieses Tutorial zurückzusetzen.</string>
     <string name="tutorial_recurrent_title">Wiederkehrende Zahlungen</string>
@@ -132,6 +132,8 @@
     <string name="history_snackbar_save_transaction_failed">Transaktion konnte nicht gespeichert werden</string>
     <string name="history_snackbar_delete_recurrent_failed">Wiederkehrende Zahlung konnte nicht gelöscht werden</string>
     <string name="history_snackbar_mark_paid_failed">Transaktion konnte nicht als bezahlt markiert werden</string>
+    <string name="history_snackbar_restore_transaction_failed">Transaktion konnte nicht wiederhergestellt werden</string>
+    <string name="expense_queued_for_next_period">Ausgabe für die nächste Periode vorgemerkt</string>
     <string name="add_new_category">Kategorie</string>
     <string name="add_new_category_action">Füge neue Kategorie hinzu</string>
     <string name="delete_category">Kategorie löschen</string>
@@ -196,6 +198,33 @@
     <string name="budget_pill_sub_exceeded_single">%1$s amount exceeded</string>
     <string name="budget_pill_sub_exceeded_double">%1$s and %2$s amount exceeded</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s and %3$s amount exceeded</string>
+    <string name="budget_formula_title">So wird es berechnet</string>
+    <string name="budget_formula_hold_hint">Zeigen, wie der Betrag berechnet wird</string>
+    <string name="budget_formula_mode_static">Statische Aufteilung</string>
+    <string name="budget_formula_mode_dynamic">Dynamische Aufteilung</string>
+    <string name="budget_formula_caption_surplus_split">Der Überschuss der letzten Periode fließt ins Budget</string>
+    <string name="budget_formula_caption_surplus_first_day">Der Überschuss der letzten Periode bleibt beim ersten Tag</string>
+    <string name="budget_formula_caption_adjustments">Einnahmen und Abzüge in dieser Periode</string>
+    <string name="budget_formula_caption_per_day">Auf jeden Tag der Periode verteilt</string>
+    <string name="budget_formula_caption_per_period">Budget: %1$s</string>
+    <string name="budget_formula_caption_remaining_budget">Rest vom Gesamtbudget</string>
+    <string name="budget_formula_caption_spread_over_left">Auf den Rest der Periode verteilt</string>
+    <string name="budget_formula_caption_left">Minus deine Ausgaben</string>
+    <string name="budget_formula_card_tap_hint">Tippe für die vollständige Aufschlüsselung</string>
+    <string name="budget_formula_tip_hold_pill">Tipp: Halte die Budget-Anzeige auf dem Startbildschirm gedrückt, um das jederzeit zu sehen</string>
+    <string name="budget_formula_tip_tap_card">Tipp: Du kannst auch auf den berechneten Betrag im Zeitraum-Sheet tippen</string>
+    <plurals name="budget_formula_weeks">
+        <item quantity="one">%d Woche</item>
+        <item quantity="other">%d Wochen</item>
+    </plurals>
+    <plurals name="budget_formula_biweeks">
+        <item quantity="one">%d Zweiwochenblock</item>
+        <item quantity="other">%d Zweiwochenblöcke</item>
+    </plurals>
+    <plurals name="budget_formula_months">
+        <item quantity="one">%d Monat</item>
+        <item quantity="other">%d Monate</item>
+    </plurals>
     <string name="day_total_format">Total: %1$s</string>
     <string name="onboarding_welcome_title">Welcome to Minus</string>
     <string name="onboarding_welcome_subtitle">Hi and welcome, lets start saving together.</string>

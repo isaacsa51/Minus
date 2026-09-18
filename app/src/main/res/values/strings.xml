@@ -260,7 +260,7 @@
 
     <string name="budget_formula_title">How it\'s calculated</string>
     <string name="budget_formula_hold_hint">Show how the amount is calculated</string>
-    <string name="budget_formula_subtitle">%1$s · %2$s</string>
+    <string name="budget_formula_subtitle" translatable="false">%1$s · %2$s</string>
     <string name="budget_formula_mode_static">Static split</string>
     <string name="budget_formula_mode_dynamic">Dynamic split</string>
     <string name="budget_formula_caption_surplus_split">Last period\'s surplus joins the budget</string>

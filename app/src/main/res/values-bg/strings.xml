@@ -7,7 +7,7 @@
     <string name="tutorial_comment_title">Добави категория</string>
     <string name="tutorial_comment_description">Добавете категория или кратка бележка, за да запомните за какво е бил разходът.</string>
     <string name="tutorial_budget_pill_title">Бюджетен прогрес</string>
-    <string name="tutorial_budget_pill_description">Докоснете, за да превключите между дневен, седмичен и месечен преглед на бюджета.</string>
+    <string name="tutorial_budget_pill_description">Докоснете, за да превключите между дневен, седмичен и месечен преглед на бюджета. Задръжте го, за да видите как се изчислява сумата.</string>
     <string name="tutorial_settings_title">Настройки</string>
     <string name="tutorial_settings_description">Отворете „Настройки“, за да активирате функции, да настроите уиджети за началния екран или да рестартирате този урок.</string>
     <string name="tutorial_recurrent_title">Периодични плащания</string>
@@ -132,6 +132,8 @@
     <string name="history_snackbar_save_transaction_failed">Транзакцията не можа да бъде запазена</string>
     <string name="history_snackbar_delete_recurrent_failed">Повтарящото се плащане не можа да бъде изтрито</string>
     <string name="history_snackbar_mark_paid_failed">Транзакцията не можа да бъде отбелязана като платена</string>
+    <string name="history_snackbar_restore_transaction_failed">Транзакцията не можа да бъде възстановена</string>
+    <string name="expense_queued_for_next_period">Разходът е насрочен за следващия период</string>
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавяне на нова категория</string>
     <string name="delete_category">Изтриване на категория</string>
@@ -196,6 +198,33 @@
     <string name="budget_pill_sub_exceeded_single">Сумата за %1$s е надвишена</string>
     <string name="budget_pill_sub_exceeded_double">Сумите за %1$s и %2$s са надвишени</string>
     <string name="budget_pill_sub_exceeded_triple">Сумите за %1$s, %2$s и %3$s са надвишени</string>
+    <string name="budget_formula_title">Как се изчислява</string>
+    <string name="budget_formula_hold_hint">Покажи как се изчислява сумата</string>
+    <string name="budget_formula_mode_static">Статично разделяне</string>
+    <string name="budget_formula_mode_dynamic">Динамично разделяне</string>
+    <string name="budget_formula_caption_surplus_split">Излишъкът от миналия период се добавя към бюджета</string>
+    <string name="budget_formula_caption_surplus_first_day">Излишъкът от миналия период остава за първия ден</string>
+    <string name="budget_formula_caption_adjustments">Приходи и удръжки за този период</string>
+    <string name="budget_formula_caption_per_day">Разделено на всеки ден от периода</string>
+    <string name="budget_formula_caption_per_period">Бюджет: %1$s</string>
+    <string name="budget_formula_caption_remaining_budget">Остатък от общия бюджет</string>
+    <string name="budget_formula_caption_spread_over_left">Разпределено върху остатъка от периода</string>
+    <string name="budget_formula_caption_left">Минус това, което сте похарчили</string>
+    <string name="budget_formula_card_tap_hint">Докоснете за пълната разбивка</string>
+    <string name="budget_formula_tip_hold_pill">Съвет: задръжте индикатора за бюджета на началния екран, за да видите това по всяко време</string>
+    <string name="budget_formula_tip_tap_card">Съвет: можете също да докоснете изчислената сума в листа за периода</string>
+    <plurals name="budget_formula_weeks">
+        <item quantity="one">%d седмица</item>
+        <item quantity="other">%d седмици</item>
+    </plurals>
+    <plurals name="budget_formula_biweeks">
+        <item quantity="one">%d двуседмичен период</item>
+        <item quantity="other">%d двуседмични периода</item>
+    </plurals>
+    <plurals name="budget_formula_months">
+        <item quantity="one">%d месец</item>
+        <item quantity="other">%d месеца</item>
+    </plurals>
     <string name="day_total_format">Общо: %1$s</string>
     <string name="onboarding_welcome_title">Добре дошли в Минус</string>
     <string name="onboarding_welcome_subtitle">Здравейте и добре дошли, нека започнем да спестяваме заедно.</string>

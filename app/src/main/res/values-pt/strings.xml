@@ -7,7 +7,7 @@
     <string name="tutorial_comment_title">Adicionar uma categoria</string>
     <string name="tutorial_comment_description">Adicione uma categoria ou nota curta para lembrar para que era o gasto.</string>
     <string name="tutorial_budget_pill_title">Progresso do orçamento</string>
-    <string name="tutorial_budget_pill_description">Toque para alternar entre visualizações de orçamento diárias, semanais e mensais, ou para editar a configuração de período.</string>
+    <string name="tutorial_budget_pill_description">Toque para alternar entre visualizações de orçamento diárias, semanais e mensais, ou para editar a configuração de período. Segure-a para ver como o valor é calculado.</string>
     <string name="tutorial_settings_title">Configurações</string>
     <string name="tutorial_settings_description">Abra as configurações para habilitar os recursos, configurar widgets na tela inicial ou redefinir este tutorial.</string>
     <string name="tutorial_recurrent_title">Pagamentos recorrentes</string>
@@ -132,6 +132,8 @@
     <string name="history_snackbar_save_transaction_failed">Não foi possível guardar a transação</string>
     <string name="history_snackbar_delete_recurrent_failed">Não foi possível excluir o pagamento recorrente</string>
     <string name="history_snackbar_mark_paid_failed">Não foi possível marcar a transação como paga</string>
+    <string name="history_snackbar_restore_transaction_failed">Não foi possível restaurar a transação</string>
+    <string name="expense_queued_for_next_period">Despesa agendada para o próximo período</string>
     <string name="add_new_category">categoria</string>
     <string name="add_new_category_action">Adicionar Nova Categoria</string>
     <string name="budget_validation_major_zero">O orçamento deve ser maior que 0</string>
@@ -193,6 +195,33 @@
     <string name="budget_pill_sub_exceeded_single">Valor de %1$s excedido</string>
     <string name="budget_pill_sub_exceeded_double">Excedido o valor de %1$s e %2$s</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s e %3$s valor excedido</string>
+    <string name="budget_formula_title">Como é calculado</string>
+    <string name="budget_formula_hold_hint">Mostrar como o valor é calculado</string>
+    <string name="budget_formula_mode_static">Divisão estática</string>
+    <string name="budget_formula_mode_dynamic">Divisão dinâmica</string>
+    <string name="budget_formula_caption_surplus_split">O excedente do período anterior entra no orçamento</string>
+    <string name="budget_formula_caption_surplus_first_day">O excedente do período anterior fica no primeiro dia</string>
+    <string name="budget_formula_caption_adjustments">Receitas e deduções deste período</string>
+    <string name="budget_formula_caption_per_day">Dividido por cada dia do período</string>
+    <string name="budget_formula_caption_per_period">Orçamento: %1$s</string>
+    <string name="budget_formula_caption_remaining_budget">O que resta do orçamento total</string>
+    <string name="budget_formula_caption_spread_over_left">Dividido pelo que resta do período</string>
+    <string name="budget_formula_caption_left">Menos o que você gastou</string>
+    <string name="budget_formula_card_tap_hint">Toque para ver o detalhamento completo</string>
+    <string name="budget_formula_tip_hold_pill">Dica: segure a pílula do orçamento na tela inicial para ver isto a qualquer momento</string>
+    <string name="budget_formula_tip_tap_card">Dica: você também pode tocar no valor calculado na folha do período</string>
+    <plurals name="budget_formula_weeks">
+        <item quantity="one">%d semana</item>
+        <item quantity="other">%d semanas</item>
+    </plurals>
+    <plurals name="budget_formula_biweeks">
+        <item quantity="one">%d quinzena</item>
+        <item quantity="other">%d quinzenas</item>
+    </plurals>
+    <plurals name="budget_formula_months">
+        <item quantity="one">%d mês</item>
+        <item quantity="other">%d meses</item>
+    </plurals>
     <string name="day_total_format">Total: %1$s</string>
     <string name="onboarding_welcome_title">Bem-vindo ao Minus</string>
     <string name="onboarding_welcome_subtitle">Olá e bem-vindo, vamos começar a economizar juntos.</string>
