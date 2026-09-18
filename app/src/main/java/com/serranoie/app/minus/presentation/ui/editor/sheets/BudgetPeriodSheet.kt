@@ -96,6 +96,8 @@ import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.SupportedCurrencyData
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.CalculatedSplitCard
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaRequest
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaSource
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.SplitModePickerDialog
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.availablePeriodsFor
 import com.serranoie.app.minus.presentation.ui.onboarding.FinishDateSelector
@@ -110,6 +112,7 @@ import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
+import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.font.format.CurrencyAmountInputVisualTransformation
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import logcat.logcat
@@ -123,6 +126,7 @@ import java.util.Date
 import java.util.Locale
 
 const val BUDGET_PERIOD_SHEET_TAG = "BudgetPeriodSheet"
+private const val CALCULATED_SPLIT_CARD_FORMULA_KEY = "calculated_split_card"
 const val BUDGET_PERIOD_EDIT_BUTTON_TAG = "BudgetPeriodSheet.EditButton"
 const val BUDGET_PERIOD_FINISH_EARLY_BUTTON_TAG = "BudgetPeriodSheet.FinishEarlyButton"
 const val BUDGET_PERIOD_APPLY_BUTTON_TAG = "BudgetPeriodSheet.ApplyButton"
@@ -513,18 +517,34 @@ private fun ViewBudgetContent(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            CalculatedSplitCard(
-                periodCache = periodCache,
-                allocation = budgetState?.allocationFor(periodCache) ?: BigDecimal.ZERO,
-                splitMode = budgetSettings?.splitMode ?: BudgetSplitMode.STATIC,
-                currencyFormat = currencyFormat,
-                totalBudget = budgetState?.totalBudget ?: BigDecimal.ZERO,
-                remaining = (budgetState?.totalBudget ?: BigDecimal.ZERO)
-                    .subtract(budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO),
-                totalDays = totalDays,
-                daysRemaining = budgetState?.daysRemaining ?: 0,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            val splitMode = budgetSettings?.splitMode ?: BudgetSplitMode.STATIC
+            BudgetFormulaSource(key = CALCULATED_SPLIT_CARD_FORMULA_KEY) { sharedModifier, showFormula ->
+                val formulaTip = stringResource(R.string.budget_formula_tip_hold_pill)
+                val openFormula = if (showFormula != null && budgetState != null) {
+                    val request = BudgetFormulaRequest(
+                        budgetState, budgetSettings, periodCache, splitMode, currencyCode, tip = formulaTip,
+                    )
+                    fun() {
+                        view.weakHapticFeedback()
+                        showFormula(request)
+                    }
+                } else {
+                    null
+                }
+                CalculatedSplitCard(
+                    periodCache = periodCache,
+                    allocation = budgetState?.allocationFor(periodCache) ?: BigDecimal.ZERO,
+                    splitMode = splitMode,
+                    currencyFormat = currencyFormat,
+                    totalBudget = budgetState?.totalBudget ?: BigDecimal.ZERO,
+                    remaining = (budgetState?.totalBudget ?: BigDecimal.ZERO)
+                        .subtract(budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO),
+                    totalDays = totalDays,
+                    daysRemaining = budgetState?.daysRemaining ?: 0,
+                    modifier = sharedModifier.fillMaxWidth(),
+                    onClick = openFormula,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

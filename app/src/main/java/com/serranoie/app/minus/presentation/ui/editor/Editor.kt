@@ -107,6 +107,7 @@ import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTextField
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaHost
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
@@ -569,34 +570,36 @@ fun Editor(
             logcat {
                 "Opening BudgetPeriodSheet: forceBudgetPeriodSheetSetup=$forceBudgetPeriodSheetSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$forceBudgetPeriodSheetSetup"
             }
-            BudgetPeriodSheet(
-                budgetSettings = uiState.budgetSettings,
-                budgetState = uiState.budgetState,
-                selectedPeriod = selectedViewPeriod,
-                pendingExpensesCount = uiState.pendingExpensesForNextPeriod.size,
-                currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
-                startInEditMode = forceBudgetPeriodSheetSetup,
-                onPeriodSelected = { newPeriod ->
-                    logcat { "BudgetPeriodSheet onPeriodSelected -> newPeriod=$newPeriod" }
-                    onPeriodSelected(newPeriod)
-                },
-                onSaveBudget = { newSettings ->
-                    logcat { "BudgetPeriodSheet onSaveBudget -> $newSettings" }
-                    onSaveBudget(newSettings)
-                    scope.launch { sheetState.hide() }
-                    onHideBudgetPeriodSheet()
-                },
-                onEditBudget = {
-                    onShowBudgetPeriodSheet()
-                    scope.launch { sheetState.hide() }
-                },
-                onFinishEarly = {
-                    onFinishBudgetEarly()
-                    onOpenAnalytics()
-                    scope.launch { sheetState.hide() }
-                    onHideBudgetPeriodSheet()
-                },
-            )
+            BudgetFormulaHost {
+                BudgetPeriodSheet(
+                    budgetSettings = uiState.budgetSettings,
+                    budgetState = uiState.budgetState,
+                    selectedPeriod = selectedViewPeriod,
+                    pendingExpensesCount = uiState.pendingExpensesForNextPeriod.size,
+                    currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+                    startInEditMode = forceBudgetPeriodSheetSetup,
+                    onPeriodSelected = { newPeriod ->
+                        logcat { "BudgetPeriodSheet onPeriodSelected -> newPeriod=$newPeriod" }
+                        onPeriodSelected(newPeriod)
+                    },
+                    onSaveBudget = { newSettings ->
+                        logcat { "BudgetPeriodSheet onSaveBudget -> $newSettings" }
+                        onSaveBudget(newSettings)
+                        scope.launch { sheetState.hide() }
+                        onHideBudgetPeriodSheet()
+                    },
+                    onEditBudget = {
+                        onShowBudgetPeriodSheet()
+                        scope.launch { sheetState.hide() }
+                    },
+                    onFinishEarly = {
+                        onFinishBudgetEarly()
+                        onOpenAnalytics()
+                        scope.launch { sheetState.hide() }
+                        onHideBudgetPeriodSheet()
+                    },
+                )
+            }
         }
     }
 }

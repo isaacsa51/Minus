@@ -6,7 +6,7 @@
     <string name="tutorial_comment_title">Add a category</string>
     <string name="tutorial_comment_description">Add a category or short note to remember what the spend was for.</string>
     <string name="tutorial_budget_pill_title">Budget progress</string>
-    <string name="tutorial_budget_pill_description">Tap to switch between daily, weekly, and monthly budget views, or to edit the period setup.</string>
+    <string name="tutorial_budget_pill_description">Tap to switch between daily, weekly, and monthly budget views, or to edit the period setup. Hold it to see how the amount is calculated.</string>
     <string name="tutorial_settings_title">Settings</string>
     <string name="tutorial_settings_description">Open Settings to enable features, set up home-screen widgets, or reset this tutorial.</string>
     <string name="tutorial_recurrent_title">Recurrent payments</string>
@@ -257,6 +257,35 @@
     <string name="budget_pill_sub_exceeded_single">%1$s amount exceeded</string>
     <string name="budget_pill_sub_exceeded_double">%1$s and %2$s amount exceeded</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s and %3$s amount exceeded</string>
+
+    <string name="budget_formula_title">How it\'s calculated</string>
+    <string name="budget_formula_hold_hint">Show how the amount is calculated</string>
+    <string name="budget_formula_subtitle">%1$s · %2$s</string>
+    <string name="budget_formula_mode_static">Static split</string>
+    <string name="budget_formula_mode_dynamic">Dynamic split</string>
+    <string name="budget_formula_caption_surplus_split">Last period\'s surplus joins the budget</string>
+    <string name="budget_formula_caption_surplus_first_day">Last period\'s surplus stays on the first day</string>
+    <string name="budget_formula_caption_adjustments">Income and deductions this period</string>
+    <string name="budget_formula_caption_per_day">Split across every day of the period</string>
+    <string name="budget_formula_caption_per_period">%1$s budget</string>
+    <string name="budget_formula_caption_remaining_budget">Left of the total budget</string>
+    <string name="budget_formula_caption_spread_over_left">Spread over what\'s left of the period</string>
+    <string name="budget_formula_caption_left">Minus what you\'ve spent</string>
+    <string name="budget_formula_card_tap_hint">Tap for the full breakdown</string>
+    <string name="budget_formula_tip_hold_pill">Tip: hold the budget pill on the home screen to see this anytime</string>
+    <string name="budget_formula_tip_tap_card">Tip: you can also tap the calculated amount in the period sheet</string>
+    <plurals name="budget_formula_weeks">
+        <item quantity="one">%d week</item>
+        <item quantity="other">%d weeks</item>
+    </plurals>
+    <plurals name="budget_formula_biweeks">
+        <item quantity="one">%d biweek</item>
+        <item quantity="other">%d biweeks</item>
+    </plurals>
+    <plurals name="budget_formula_months">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
 
     <string name="day_total_format">Total: %1$s</string>
 

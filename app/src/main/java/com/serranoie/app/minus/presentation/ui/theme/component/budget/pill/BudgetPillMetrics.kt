@@ -17,6 +17,9 @@ internal data class BudgetMetrics(
     val isCurrentPeriodOverBudget: Boolean,
     val isOverCurrentSubPeriod: Boolean,
     val nextPeriodAllocation: BigDecimal? = null,
+    val periodBudget: BigDecimal = BigDecimal.ZERO,
+    val periodSpent: BigDecimal = BigDecimal.ZERO,
+    val spentInPeriod: BigDecimal = BigDecimal.ZERO,
 )
 
 internal fun calculateBudgetMetrics(
@@ -100,7 +103,14 @@ internal fun calculateBudgetMetrics(
         .takeIf { isOverSubPeriod && !isOverBudget && it.signum() == 1 }
 
     return BudgetMetrics(
-        periodRemaining, progress, isOverBudget, isOverSubPeriod, nextPeriodAllocation,
+        periodRemaining = periodRemaining,
+        spendProgress = progress,
+        isCurrentPeriodOverBudget = isOverBudget,
+        isOverCurrentSubPeriod = isOverSubPeriod,
+        nextPeriodAllocation = nextPeriodAllocation,
+        periodBudget = if (splitMode == BudgetSplitMode.DYNAMIC) dynamicAllocation else periodBudget,
+        periodSpent = periodSpent,
+        spentInPeriod = spentInPeriod,
     )
 }
 

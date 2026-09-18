@@ -1,12 +1,17 @@
 package com.serranoie.app.minus.presentation.ui.editor.sheets.split
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +53,7 @@ fun CalculatedSplitCard(
     totalDays: Int = 0,
     daysRemaining: Int = 0,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) {
     val formattedAmount = currencyFormat.format(allocation)
     val periodBlockDays = periodCache.periodBlockDays()
@@ -84,41 +90,67 @@ fun CalculatedSplitCard(
         }
     }
 
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .testTag(BUDGET_PERIOD_CALCULATED_CARD_TAG),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-        ),
-        shape = MaterialTheme.shapes.large,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(R.string.budget_split_calculated_amount),
-                style = MaterialTheme.typography.labelMediumCondensed,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = formattedAmount,
-                style = MaterialTheme.typography.headlineSmallEmphasized,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.censor(),
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = briefText,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f),
-                textAlign = TextAlign.Center,
-            )
+    val cardModifier = modifier
+        .fillMaxWidth()
+        .testTag(BUDGET_PERIOD_CALCULATED_CARD_TAG)
+    val cardColors = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+    )
+    val content: @Composable () -> Unit = {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.budget_split_calculated_amount),
+                    style = MaterialTheme.typography.labelMediumCondensed,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = formattedAmount,
+                    style = MaterialTheme.typography.headlineSmallEmphasized,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.censor(),
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = if (onClick != null) stringResource(R.string.budget_formula_card_tap_hint) else briefText,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f),
+                    textAlign = TextAlign.Center,
+                )
+            }
+            if (onClick != null) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .size(18.dp),
+                )
+            }
         }
+    }
+
+    if (onClick != null) {
+        Card(
+            onClick = onClick,
+            modifier = cardModifier,
+            colors = cardColors,
+            shape = MaterialTheme.shapes.large,
+        ) { content() }
+    } else {
+        Card(
+            modifier = cardModifier,
+            colors = cardColors,
+            shape = MaterialTheme.shapes.large,
+        ) { content() }
     }
 }
 

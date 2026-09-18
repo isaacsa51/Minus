@@ -15,6 +15,7 @@ import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.changelog.ChangelogGate
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaHost
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
 import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
@@ -167,48 +168,50 @@ fun MainScreen(
                 }
             },
         ) {
-            MainScreenContent(
-                mainScreenState = mainScreenState,
-                budgetUiState = budgetUiState,
-                actions =
-                    MainScreenActions(
-                        onProcessIntent = { intent ->
-                            when (intent) {
-                                is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
-                                    budgetViewModel.processIntent(intent.intent)
-                                }
+            BudgetFormulaHost {
+                MainScreenContent(
+                    mainScreenState = mainScreenState,
+                    budgetUiState = budgetUiState,
+                    actions =
+                        MainScreenActions(
+                            onProcessIntent = { intent ->
+                                when (intent) {
+                                    is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
+                                        budgetViewModel.processIntent(intent.intent)
+                                    }
 
-                                is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
-                                    budgetViewModel.processIntent(intent.intent)
-                                }
+                                    is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
+                                        budgetViewModel.processIntent(intent.intent)
+                                    }
 
-                                is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
-                                    budgetViewModel.processIntent(intent.intent)
-                                }
+                                    is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
+                                        budgetViewModel.processIntent(intent.intent)
+                                    }
 
-                                else -> {
-                                    mainScreenViewModel.processIntent(intent, tutorialStage)
+                                    else -> {
+                                        mainScreenViewModel.processIntent(intent, tutorialStage)
+                                    }
                                 }
-                            }
-                        },
-                        onAdvanceTutorial = { expected ->
-                            mainScreenViewModel.processIntent(
-                                MainScreenUiIntent.AdvanceTutorial(expected),
-                                tutorialStage
-                            )
-                        },
-                        onNavigateToAnalytics = onNavigateToAnalytics,
-                        onNavigateToSettings = onNavigateToSettings,
-                        onUnresolvedSurplusBannerClick = budgetViewModel::onUnresolvedSurplusBannerClicked,
-                        onPeriodSelected = { period ->
-                            mainScreenViewModel.processIntent(
-                                MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
-                            )
-                        },
-                    ),
-                openWalletOnStart = openWalletOnStart,
-                tutorialBoxState = tutorialBoxState,
-            )
+                            },
+                            onAdvanceTutorial = { expected ->
+                                mainScreenViewModel.processIntent(
+                                    MainScreenUiIntent.AdvanceTutorial(expected),
+                                    tutorialStage
+                                )
+                            },
+                            onNavigateToAnalytics = onNavigateToAnalytics,
+                            onNavigateToSettings = onNavigateToSettings,
+                            onUnresolvedSurplusBannerClick = budgetViewModel::onUnresolvedSurplusBannerClicked,
+                            onPeriodSelected = { period ->
+                                mainScreenViewModel.processIntent(
+                                    MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
+                                )
+                            },
+                        ),
+                    openWalletOnStart = openWalletOnStart,
+                    tutorialBoxState = tutorialBoxState,
+                )
+            }
         }
     }
 }
