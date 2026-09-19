@@ -634,7 +634,7 @@
     <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Past periods</string>
-    <string name="past_periods_subtitle">Tippe auf einen Zeitraum für die vollständige Aufschlüsselung.</string>
+    <string name="past_periods_subtitle">Tippe auf einen Zeitraum für die vollständige Aufschlüsselung. Lange drücken, um ihn zu löschen.</string>
     <string name="past_periods_empty">No archived periods found</string>
     <string name="past_periods_spent_label">Spent</string>
     <string name="past_periods_limit_label">Limit</string>
@@ -693,5 +693,7 @@
     <string name="past_period_unlocked_message">Bearbeitung des vergangenen Zeitraums erfolgreich entsperrt</string>
     <string name="past_period_edit_confirm_title">Ausgabe aus vergangenem Zeitraum ändern?</string>
     <string name="past_period_edit_confirm_message">Sind Sie sicher, dass Sie diese Ausgabe aus einem vergangenen Zeitraum bearbeiten oder löschen möchten? Biometrische Authentifizierung ist erforderlich.</string>
+    <string name="past_period_delete_confirm_title">Vergangenen Zeitraum löschen?</string>
+    <string name="past_period_delete_confirm_message">Dadurch werden der Zeitraum %1$s – %2$s und seine Ausgaben dauerhaft gelöscht. Abos bleiben erhalten. Biometrische Authentifizierung ist erforderlich.</string>
     <string name="dialog_yes">Ja</string>
 </resources>

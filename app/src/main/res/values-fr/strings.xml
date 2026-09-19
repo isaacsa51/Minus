@@ -632,7 +632,7 @@
     <string name="ticket_recurrent_expense">DÉPENSE RÉCURRENTE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Période passée</string>
-    <string name="past_periods_subtitle">Touchez une période pour voir le détail complet.</string>
+    <string name="past_periods_subtitle">Touchez une période pour voir le détail complet. Appuyez longuement pour la supprimer.</string>
     <string name="past_periods_empty">Aucune période archivée trouvée</string>
     <string name="past_periods_spent_label">Dépensé</string>
     <string name="past_periods_limit_label">Limite</string>
@@ -693,5 +693,7 @@
     <string name="past_period_unlocked_message">Modification de la période précédente déverrouillée avec succès</string>
     <string name="past_period_edit_confirm_title">Modifier la dépense d\'une période précédente?</string>
     <string name="past_period_edit_confirm_message">Êtes-vous sûr de vouloir modifier ou supprimer cette dépense d\'une période précédente? Une authentification biométrique sera requise.</string>
+    <string name="past_period_delete_confirm_title">Supprimer la période passée ?</string>
+    <string name="past_period_delete_confirm_message">Cela supprime définitivement la période %1$s – %2$s et ses dépenses. Les abonnements sont conservés. Une authentification biométrique sera requise.</string>
     <string name="dialog_yes">Oui</string>
 </resources>

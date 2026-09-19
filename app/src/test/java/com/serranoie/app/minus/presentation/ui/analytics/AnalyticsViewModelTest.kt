@@ -10,6 +10,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
@@ -17,6 +18,7 @@ import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCas
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -256,6 +258,72 @@ class AnalyticsViewModelTest {
             val openedState = awaitItem()
             assertThat(openedState.displayState.spends.sumOf { it.amount }).isEqualTo(BigDecimal("120.00"))
         }
+    }
+
+    @Test
+    fun `archived period total in the list is recomputed from live rows, not the stored snapshot`() = runTest {
+        val periodStart = LocalDate.now().minusMonths(2)
+        val periodEnd = LocalDate.now().minusMonths(1).minusDays(1)
+        archivedFlow.value = listOf(
+            ArchivedBudget(
+                periodId = 10L,
+                totalBudget = BigDecimal("1000.00"),
+                spentAmount = BigDecimal("850.00"),
+                startDate = periodStart,
+                endDate = periodEnd,
+                currencyCode = "USD",
+                periodType = BudgetPeriod.MONTHLY
+            )
+        )
+        transactionsFlow.value = listOf(
+            Transaction(id = 1L, amount = BigDecimal("20.00"), date = periodStart.plusDays(1).atTime(9, 0), periodId = 10L),
+            Transaction(id = 2L, amount = BigDecimal("30.00"), date = periodStart.plusDays(2).atTime(9, 0), periodId = 10L),
+            Transaction(id = 3L, amount = BigDecimal("999.00"), date = periodStart.plusDays(3).atTime(9, 0), periodId = 11L),
+        )
+
+        val viewModel = createViewModel()
+        viewModel.uiState.test {
+            skipItems(1)
+            val listed = awaitItem().archivedBudgets.single { it.periodId == 10L }
+            assertThat(listed.spentAmount).isEqualTo(BigDecimal("50.00"))
+
+            transactionsFlow.value = transactionsFlow.value.filter { it.id != 2L }
+            assertThat(awaitItem().archivedBudgets.single { it.periodId == 10L }.spentAmount)
+                .isEqualTo(BigDecimal("20.00"))
+        }
+    }
+
+    @Test
+    fun `deleting a projected recurring charge skips that occurrence instead of deleting the subscription`() = runTest {
+        val occurrenceDate = LocalDate.now().minusMonths(1)
+        val projectedCharge = Transaction(
+            id = 7L * 1_000_000L + occurrenceDate.toEpochDay(),
+            amount = BigDecimal("100.00"),
+            comment = "Netflix",
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.MONTHLY,
+            date = occurrenceDate.atTime(10, 0),
+            sourceTransactionId = 7L,
+        )
+
+        val viewModel = createViewModel()
+        viewModel.deleteTransaction(projectedCharge)
+        runCurrent()
+
+        coVerify { budgetRepository.markRecurrentOccurrencePaid(7L, occurrenceDate, RecurrentOccurrenceStatus.SKIPPED) }
+        coVerify(exactly = 0) { budgetRepository.deleteTransaction(any()) }
+    }
+
+    @Test
+    fun `deleting a one-time expense in a past period removes the row`() = runTest {
+        val expense = Transaction(id = 3L, amount = BigDecimal("20.00"), date = LocalDate.now().minusMonths(1).atTime(9, 0), periodId = 10L)
+
+        val viewModel = createViewModel()
+        viewModel.deleteTransaction(expense)
+        runCurrent()
+
+        coVerify { budgetRepository.deleteTransaction(expense) }
+        coVerify(exactly = 0) { budgetRepository.markRecurrentOccurrencePaid(any(), any(), any()) }
     }
 
     @Test

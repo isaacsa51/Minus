@@ -1,9 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.analytics
 
 import androidx.activity.result.ActivityResultRegistryOwner
-import androidx.fragment.app.FragmentActivity
-import com.serranoie.app.minus.presentation.util.BiometricPromptHelper
-import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -40,6 +37,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialShapes
@@ -75,6 +73,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.fragment.app.FragmentActivity
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
@@ -92,6 +91,7 @@ import com.serranoie.app.minus.presentation.ui.history.History
 import com.serranoie.app.minus.presentation.ui.history.HistoryUiIntent
 import com.serranoie.app.minus.presentation.ui.history.HistoryUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.FinishedPeriodHeader
 import com.serranoie.app.minus.presentation.ui.theme.component.MiddlePeriodHeader
 import com.serranoie.app.minus.presentation.ui.theme.component.SavingsRecommendationCard
@@ -112,6 +112,7 @@ import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
+import com.serranoie.app.minus.presentation.util.BiometricPromptHelper
 import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.toToast
@@ -175,6 +176,7 @@ data class AnalyticsActions(
     val onGranularityChanged: (GraphGranularity) -> Unit = {},
     val onUpdateTransaction: (Transaction) -> Unit = {},
     val onDeleteTransaction: (Transaction) -> Unit = {},
+    val onDeleteArchivedPeriod: (Long) -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -200,6 +202,7 @@ fun Analytics(
     var localEditingTransaction by remember { mutableStateOf<Transaction?>(null) }
     var showPastPeriodConfirmDialog by remember { mutableStateOf(false) }
     var pendingTransactionIntent by remember { mutableStateOf<HistoryUiIntent?>(null) }
+    var pendingPeriodToDelete by remember { mutableStateOf<ArchivedBudget?>(null) }
 
     LaunchedEffect(state.isHistoricalView) {
         if (!state.isHistoricalView) {
@@ -710,6 +713,65 @@ fun Analytics(
         )
     }
 
+    pendingPeriodToDelete?.let { period ->
+        val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+        AlertDialog(
+            onDismissRequest = { pendingPeriodToDelete = null },
+            title = {
+                Text(
+                    stringResource(R.string.past_period_delete_confirm_title),
+                    style = MaterialTheme.typography.titleLargeEmphasized,
+                )
+            },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.past_period_delete_confirm_message,
+                        period.startDate.format(dateFormatter),
+                        period.endDate.format(dateFormatter),
+                    ),
+                    style = MaterialTheme.typography.bodyMediumCondensed,
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        pendingPeriodToDelete = null
+                        val act = context as? FragmentActivity
+                        if (act != null) {
+                            BiometricPromptHelper.authenticate(
+                                activity = act,
+                                title = biometricPromptTitle,
+                                subtitle = biometricPromptSubtitle,
+                                negativeButtonText = negativeButtonText,
+                                onSuccess = { actions.onDeleteArchivedPeriod(period.periodId) },
+                                onError = { err: String -> err.toToast(context) },
+                            )
+                        } else {
+                            actions.onDeleteArchivedPeriod(period.periodId)
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                ) {
+                    Text(
+                        stringResource(R.string.delete),
+                        style = MaterialTheme.typography.labelSmallEmphasized,
+                        color = MaterialTheme.colorScheme.onError
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingPeriodToDelete = null }) {
+                    Text(
+                        stringResource(R.string.cancel),
+                        style = MaterialTheme.typography.labelSmallEmphasized,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        )
+    }
+
     if (showPastPeriodsSheet) {
         ModalBottomSheet(
             onDismissRequest = { showPastPeriodsSheet = false },
@@ -725,6 +787,7 @@ fun Analytics(
                         actions.onHistoricalPeriodSelected(archivedBudget.periodId)
                     }
                 },
+                onPeriodDelete = { pendingPeriodToDelete = it },
             )
         }
     }

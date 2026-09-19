@@ -442,6 +442,9 @@ class BudgetRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteArchivedBudget(periodId: Long) {
-        archivedBudgetDao.deleteById(periodId)
+        appDatabase.withTransaction {
+            transactionDao.deleteOneTimeByPeriodId(periodId)
+            archivedBudgetDao.deleteById(periodId)
+        }
     }
 }

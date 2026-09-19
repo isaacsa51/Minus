@@ -1,10 +1,12 @@
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalFoundationApi::class)
 
 package com.serranoie.app.minus.presentation.ui.analytics.dialogs
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -45,6 +47,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +61,8 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
+import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
+import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.font.calcAdaptiveFont
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
@@ -70,6 +75,7 @@ fun PastPeriodsBottomSheet(
     periods: List<ArchivedBudget>,
     allTransactions: List<Transaction> = emptyList(),
     onPeriodClick: (ArchivedBudget) -> Unit,
+    onPeriodDelete: (ArchivedBudget) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -116,7 +122,8 @@ fun PastPeriodsBottomSheet(
                     ArchivedPeriodCard(
                         period = period,
                         allTransactions = allTransactions,
-                        onClick = { onPeriodClick(period) }
+                        onClick = { onPeriodClick(period) },
+                        onDelete = { onPeriodDelete(period) },
                     )
                 }
             }
@@ -128,27 +135,36 @@ fun PastPeriodsBottomSheet(
 private fun ArchivedPeriodCard(
     period: ArchivedBudget,
     allTransactions: List<Transaction>,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
 ) {
     val isVirtual = period.periodId < 0L
+    val view = LocalView.current
 
     val periodTransactions = remember(period, allTransactions) {
-        val filteredById =
-            allTransactions.filter { it.periodId == period.periodId && !it.isDeleted && period.periodId > 0 }
-        if (filteredById.isNotEmpty()) {
-            filteredById
-        } else {
+        if (isVirtual) {
             allTransactions.filter { tx ->
                 val date = tx.date?.toLocalDate() ?: return@filter false
                 !date.isBefore(period.startDate) && !date.isAfter(period.endDate) && !tx.isDeleted
             }
+        } else {
+            allTransactions.filter { it.periodId == period.periodId && !it.isDeleted }
         }
     }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .combinedClickable(
+                onClick = onClick,
+                onLongClickLabel = stringResource(R.string.delete),
+                onLongClick = if (isVirtual) null else {
+                    {
+                        view.strongHapticFeedback()
+                        onDelete()
+                    }
+                },
+            ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = combineColors(
@@ -218,6 +234,7 @@ private fun ArchivedPeriodCard(
                             style = MaterialTheme.typography.titleLargeEmphasized
                         )
                         Text(
+                            modifier = Modifier.censor().basicMarquee(),
                             text = spentFormatted,
                             style = MaterialTheme.typography.titleLargeEmphasized.copy(
                                 fontSize = adaptiveFontSize,
@@ -255,6 +272,7 @@ private fun ArchivedPeriodCard(
                                 style = MaterialTheme.typography.titleLargeEmphasized
                             )
                             Text(
+                                modifier = Modifier.censor().basicMarquee(),
                                 text = budgetFormatted,
                                 style = MaterialTheme.typography.titleLargeEmphasized.copy(
                                     fontSize = adaptiveFontSize
@@ -518,7 +536,9 @@ private fun StatusChip(period: ArchivedBudget) {
                 modifier = Modifier.size(16.dp)
             )
             Text(
+                modifier = Modifier.censor().basicMarquee(),
                 text = text,
+                maxLines = 1,
                 style = MaterialTheme.typography.labelMediumCondensed,
                 color = color,
                 fontWeight = FontWeight.Bold

@@ -753,7 +753,7 @@
 
     <!-- Past Periods -->
     <string name="past_periods_title">Past periods</string>
-    <string name="past_periods_subtitle">Tap a period to see its full breakdown.</string>
+    <string name="past_periods_subtitle">Tap a period to see its full breakdown. Long-press to delete it.</string>
     <string name="past_periods_empty">No archived periods found</string>
     <string name="past_periods_spent_label">Spent</string>
     <string name="past_periods_limit_label">Limit</string>
@@ -769,6 +769,8 @@
     <string name="past_period_unlocked_message">Past period editing unlocked successfully</string>
     <string name="past_period_edit_confirm_title">Modify Past Period Expense?</string>
     <string name="past_period_edit_confirm_message">Are you sure you want to edit or delete this expense from a past period? Biometric authentication will be required.</string>
+    <string name="past_period_delete_confirm_title">Delete Past Period?</string>
+    <string name="past_period_delete_confirm_message">This permanently deletes the period %1$s – %2$s and its expenses. Subscriptions are kept. Biometric authentication will be required.</string>
     <string name="dialog_yes">Yes</string>
 
     <!-- Analytics Tutorial -->

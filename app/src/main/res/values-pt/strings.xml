@@ -629,7 +629,7 @@
     <string name="ticket_recurrent_expense">EXPÊNCIA DO RECURSO</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Períodos anteriores</string>
-    <string name="past_periods_subtitle">Toque em um período para ver o detalhamento completo.</string>
+    <string name="past_periods_subtitle">Toque em um período para ver o detalhamento completo. Toque e segure para excluí-lo.</string>
     <string name="past_periods_empty">Nenhum período arquivado foi encontrado</string>
     <string name="past_periods_spent_label">Gasto</string>
     <string name="past_periods_limit_label">Limitar</string>
@@ -693,5 +693,7 @@
     <string name="past_period_unlocked_message">Edição do período anterior desbloqueada com sucesso</string>
     <string name="past_period_edit_confirm_title">Modificar despesa de período anterior?</string>
     <string name="past_period_edit_confirm_message">Tem certeza de que deseja editar ou excluir esta despesa de um período anterior? A autenticação biométrica será necessária.</string>
+    <string name="past_period_delete_confirm_title">Excluir período anterior?</string>
+    <string name="past_period_delete_confirm_message">Isso exclui permanentemente o período %1$s – %2$s e suas despesas. As assinaturas são mantidas. Será necessária autenticação biométrica.</string>
     <string name="dialog_yes">Sim</string>
 </resources>

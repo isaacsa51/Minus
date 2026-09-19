@@ -643,7 +643,7 @@
     <string name="ticket_recurrent_expense">RECURRENT EXPENSE</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Прошлые периоды</string>
-    <string name="past_periods_subtitle">Нажмите на период, чтобы увидеть полную разбивку.</string>
+    <string name="past_periods_subtitle">Нажмите на период, чтобы увидеть полную разбивку. Удерживайте, чтобы удалить его.</string>
     <string name="past_periods_empty">Архивных периодов не найдено</string>
     <string name="past_periods_spent_label">Потрачено</string>
     <string name="past_periods_limit_label">Лимит</string>
@@ -707,5 +707,7 @@
     <string name="past_period_unlocked_message">Редактирование прошлого периода успешно разблокировано</string>
     <string name="past_period_edit_confirm_title">Изменить расход за прошлый период?</string>
     <string name="past_period_edit_confirm_message">Вы уверены, что хотите изменить или удалить этот расход из прошлого периода? Потребуется биометрическая аутентификация.</string>
+    <string name="past_period_delete_confirm_title">Удалить прошлый период?</string>
+    <string name="past_period_delete_confirm_message">Период %1$s – %2$s и его расходы будут удалены безвозвратно. Подписки сохраняются. Потребуется биометрическая аутентификация.</string>
     <string name="dialog_yes">Да</string>
 </resources>

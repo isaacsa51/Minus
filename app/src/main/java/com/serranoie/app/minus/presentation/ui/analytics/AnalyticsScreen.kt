@@ -73,7 +73,10 @@ fun AnalyticsScreen(
             },
             onDeleteTransaction = { tx ->
                 viewModel.deleteTransaction(tx)
-            }
+            },
+            onDeleteArchivedPeriod = { periodId ->
+                viewModel.deleteArchivedPeriod(periodId)
+            },
         ),
         activityResultRegistryOwner = activityResultRegistryOwner,
     )

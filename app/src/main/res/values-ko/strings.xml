@@ -628,7 +628,7 @@
     <string name="ticket_recurrent_expense">반복 지출</string>
     <!-- Past Periods -->
     <string name="past_periods_title">지난 기간</string>
-    <string name="past_periods_subtitle">기간을 탭하면 전체 내역을 볼 수 있습니다.</string>
+    <string name="past_periods_subtitle">기간을 탭하면 전체 내역을 볼 수 있습니다. 길게 누르면 삭제됩니다.</string>
     <string name="past_periods_empty">지난 기간 기록이 없습니다</string>
     <string name="past_periods_spent_label">지출액</string>
     <string name="past_periods_limit_label">한도</string>
@@ -694,5 +694,7 @@
     <string name="past_period_unlocked_message">이전 기간 편집 잠금이 성공적으로 해제되었습니다</string>
     <string name="past_period_edit_confirm_title">이전 기간 지출을 수정하시겠습니까?</string>
     <string name="past_period_edit_confirm_message">이전 기간의 지출을 수정하거나 삭제하시겠습니까? 생체 인식 인증이 필요합니다.</string>
+    <string name="past_period_delete_confirm_title">지난 기간을 삭제할까요?</string>
+    <string name="past_period_delete_confirm_message">%1$s – %2$s 기간과 해당 지출이 영구 삭제됩니다. 구독은 유지됩니다. 생체 인증이 필요합니다.</string>
     <string name="dialog_yes">예</string>
 </resources>

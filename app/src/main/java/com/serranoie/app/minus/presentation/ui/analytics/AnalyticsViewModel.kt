@@ -9,6 +9,7 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
+import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
@@ -97,8 +98,9 @@ class AnalyticsViewModel @Inject constructor(
             val paidOccurrences = args[10] as Set<PaidRecurrentOccurrence>
 
             val currentPeriodId = periodBoundary.second
-            val reconstructedArchives = reconstructHistory(transactions, archives, settings, paidOccurrences)
-            val allArchives = (archives + reconstructedArchives).distinctBy { it.periodId }
+            val liveArchives = archives.map { it.withLiveSpentAmount(transactions, paidOccurrences) }
+            val reconstructedArchives = reconstructHistory(transactions, liveArchives, settings, paidOccurrences)
+            val allArchives = (liveArchives + reconstructedArchives).distinctBy { it.periodId }
                 .sortedByDescending { it.startDate }
 
             val displayState = if (selectedPeriodId != null && selectedPeriodId != currentPeriodId) {
@@ -218,16 +220,13 @@ class AnalyticsViewModel @Inject constructor(
                     val date = tx.date?.toLocalDate() ?: return@filter false
                     !date.isBefore(actualStartDate) && !date.isAfter(actualEndDate) && !tx.isDeleted
                 }
-                val (paidRecurring, _, oneTimeSpends) = splitRecurringAndOneTime(
+                val spentAmount = periodSpent(
+                    periodTransactions = periodTransactions,
                     allTransactions = allTransactions,
-                    filteredTransactions = periodTransactions,
-                    periodStart = actualStartDate,
-                    periodEnd = actualEndDate,
-                    today = actualEndDate,
+                    start = actualStartDate,
+                    end = actualEndDate,
                     paidOccurrences = paidOccurrences,
                 )
-                val spentAmount = (oneTimeSpends + paidRecurring).distinctBy { it.id }
-                    .sumOf { it.amount }
 
                 ArchivedBudget(
                     periodId = virtualId,
@@ -316,6 +315,37 @@ class AnalyticsViewModel @Inject constructor(
             graphGranularity = granularity
         )
     }
+
+    private fun periodSpent(
+        periodTransactions: List<Transaction>,
+        allTransactions: List<Transaction>,
+        start: LocalDate,
+        end: LocalDate,
+        paidOccurrences: Set<PaidRecurrentOccurrence>,
+    ): BigDecimal {
+        val (paidRecurring, _, oneTimeSpends) = splitRecurringAndOneTime(
+            allTransactions = allTransactions,
+            filteredTransactions = periodTransactions,
+            periodStart = start,
+            periodEnd = end,
+            today = end,
+            paidOccurrences = paidOccurrences,
+        )
+        return (oneTimeSpends + paidRecurring).distinctBy { it.id }.sumOf { it.amount }
+    }
+
+    private fun ArchivedBudget.withLiveSpentAmount(
+        allTransactions: List<Transaction>,
+        paidOccurrences: Set<PaidRecurrentOccurrence>,
+    ): ArchivedBudget = copy(
+        spentAmount = periodSpent(
+            periodTransactions = findTransactionsForArchive(this, allTransactions, periodId),
+            allTransactions = allTransactions,
+            start = startDate,
+            end = endDate,
+            paidOccurrences = paidOccurrences,
+        )
+    )
 
     private fun findTransactionsForArchive(
         archive: ArchivedBudget,
@@ -587,7 +617,24 @@ class AnalyticsViewModel @Inject constructor(
 
     fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
-            budgetRepository.deleteTransaction(transaction)
+            val templateId = transaction.sourceTransactionId
+            val occurrenceDate = transaction.date?.toLocalDate()
+            if (templateId != null && occurrenceDate != null) {
+                budgetRepository.markRecurrentOccurrencePaid(
+                    templateId,
+                    occurrenceDate,
+                    RecurrentOccurrenceStatus.SKIPPED,
+                )
+            } else {
+                budgetRepository.deleteTransaction(transaction)
+            }
+        }
+    }
+
+    fun deleteArchivedPeriod(periodId: Long) {
+        viewModelScope.launch {
+            budgetRepository.deleteArchivedBudget(periodId)
+            if (_selectedPeriodId.value == periodId) _selectedPeriodId.value = null
         }
     }
 

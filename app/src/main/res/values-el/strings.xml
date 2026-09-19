@@ -626,7 +626,7 @@
     <string name="ticket_recurrent_expense">ΕΠΑΝΑΛΗΠΤΟΜΕΝΑ ΕΞΟΔΑ</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Προηγούμενες περίοδοι</string>
-    <string name="past_periods_subtitle">Πατήστε μια περίοδο για την πλήρη ανάλυσή της.</string>
+    <string name="past_periods_subtitle">Πατήστε μια περίοδο για την πλήρη ανάλυσή της. Πατήστε παρατεταμένα για διαγραφή.</string>
     <string name="past_periods_empty">Δεν βρέθηκαν αρχειοθετημένες περίοδοι</string>
     <string name="past_periods_spent_label">Δαπανήθηκε</string>
     <string name="past_periods_limit_label">Όριο</string>
@@ -693,5 +693,7 @@
     <string name="past_period_unlocked_message">Η επεξεργασία της προηγούμενης περιόδου ξεκλειδώθηκε επιτυχώς</string>
     <string name="past_period_edit_confirm_title">Τροποποίηση εξόδου προηγούμενης περιόδου;</string>
     <string name="past_period_edit_confirm_message">Είστε σίγουροι ότι θέλετε να επεξεργαστείτε ή να διαγράψετε αυτό το έξοδο από προηγούμενη περίοδο; Θα απαιτηθεί βιομετρικός έλεγχος ταυτότητας.</string>
+    <string name="past_period_delete_confirm_title">Διαγραφή προηγούμενης περιόδου;</string>
+    <string name="past_period_delete_confirm_message">Η περίοδος %1$s – %2$s και τα έξοδά της θα διαγραφούν οριστικά. Οι συνδρομές διατηρούνται. Θα απαιτηθεί βιομετρικός έλεγχος ταυτότητας.</string>
     <string name="dialog_yes">Ναι</string>
 </resources>

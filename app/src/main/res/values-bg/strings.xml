@@ -631,7 +631,7 @@
     <string name="ticket_recurrent_expense">ПОВТАРЯЩ СЕ РАЗХОД</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Минали периоди</string>
-    <string name="past_periods_subtitle">Докоснете период, за да видите пълната разбивка.</string>
+    <string name="past_periods_subtitle">Докоснете период, за да видите пълната разбивка. Задръжте, за да го изтриете.</string>
     <string name="past_periods_empty">Няма намерени архивирани периоди</string>
     <string name="past_periods_spent_label">Изразходвано</string>
     <string name="past_periods_limit_label">Лимит</string>
@@ -693,5 +693,7 @@
     <string name="past_period_unlocked_message">Редактирането на миналия период е успешно отключено</string>
     <string name="past_period_edit_confirm_title">Промяна на разход от минал период?</string>
     <string name="past_period_edit_confirm_message">Сигурни ли сте, че искате да редактирате или изтриете този разход от минал период? Ще е необходима биометрична автентификация.</string>
+    <string name="past_period_delete_confirm_title">Изтриване на минал период?</string>
+    <string name="past_period_delete_confirm_message">Периодът %1$s – %2$s и разходите му ще бъдат изтрити завинаги. Абонаментите се запазват. Ще се изисква биометрично удостоверяване.</string>
     <string name="dialog_yes">Да</string>
 </resources>
