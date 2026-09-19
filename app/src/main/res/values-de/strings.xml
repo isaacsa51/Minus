@@ -218,8 +218,8 @@
         <item quantity="other">%d Wochen</item>
     </plurals>
     <plurals name="budget_formula_biweeks">
-        <item quantity="one">%d Zweiwochenblock</item>
-        <item quantity="other">%d Zweiwochenblöcke</item>
+        <item quantity="one">%d Doppelwoche</item>
+        <item quantity="other">%d Doppelwochen</item>
     </plurals>
     <plurals name="budget_formula_months">
         <item quantity="one">%d Monat</item>

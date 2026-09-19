@@ -213,8 +213,8 @@
         <item quantity="one">%d주</item>
     </plurals>
     <plurals name="budget_formula_biweeks">
-        <item quantity="other">%d × 2주</item>
-        <item quantity="one">%d × 2주</item>
+        <item quantity="other">2주씩 %d번</item>
+        <item quantity="one">2주씩 %d번</item>
     </plurals>
     <plurals name="budget_formula_months">
         <item quantity="other">%d개월</item>

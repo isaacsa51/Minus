@@ -179,4 +179,37 @@ class NotificationSchedulerTest {
         )
         assertThat(result).isEqualTo(LocalDateTime.of(2026, 3, 20, 9, 0))
     }
+
+    @Test
+    fun `credit cutoff reminder fires three days before the due date of the last cutoff`() {
+        // cutoff 15 Sep -> due 5 Oct (Mon) -> reminder 2 Oct
+        val result = scheduler.nextCreditCutoffReminderDateTime(
+            cutoffDay = 15,
+            now = LocalDateTime.of(2026, 9, 18, 12, 0),
+            notificationTime = notifyAt9,
+        )
+        assertThat(result).isEqualTo(LocalDateTime.of(2026, 10, 2, 9, 0))
+    }
+
+    @Test
+    fun `credit cutoff reminder skips a due date that already passed and rolls to the next cycle`() {
+        // cutoff 15 Aug -> due 4 Sep is already past on 10 Sep; next cutoff 15 Sep -> due 5 Oct -> reminder 2 Oct
+        val result = scheduler.nextCreditCutoffReminderDateTime(
+            cutoffDay = 15,
+            now = LocalDateTime.of(2026, 9, 10, 12, 0),
+            notificationTime = notifyAt9,
+        )
+        assertThat(result).isEqualTo(LocalDateTime.of(2026, 10, 2, 9, 0))
+    }
+
+    @Test
+    fun `credit cutoff reminder moves to the next cycle once today's slot has passed`() {
+        val result = scheduler.nextCreditCutoffReminderDateTime(
+            cutoffDay = 15,
+            now = LocalDateTime.of(2026, 10, 2, 9, 30),
+            notificationTime = notifyAt9,
+        )
+        // cutoff 15 Oct -> due 4 Nov (Wed) -> reminder 1 Nov
+        assertThat(result).isEqualTo(LocalDateTime.of(2026, 11, 1, 9, 0))
+    }
 }

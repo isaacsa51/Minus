@@ -213,8 +213,8 @@
         <item quantity="one">%d 週間</item>
     </plurals>
     <plurals name="budget_formula_biweeks">
-        <item quantity="other">%d × 2週間</item>
-        <item quantity="one">%d × 2週間</item>
+        <item quantity="other">2週間ずつ%d回</item>
+        <item quantity="one">2週間ずつ%d回</item>
     </plurals>
     <plurals name="budget_formula_months">
         <item quantity="other">%d か月</item>

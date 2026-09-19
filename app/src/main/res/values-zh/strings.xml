@@ -215,8 +215,8 @@
         <item quantity="one">%d 周</item>
     </plurals>
     <plurals name="budget_formula_biweeks">
-        <item quantity="other">%d 个半月</item>
-        <item quantity="one">%d 个半月</item>
+        <item quantity="other">%d 个双周</item>
+        <item quantity="one">%d 个双周</item>
     </plurals>
     <plurals name="budget_formula_months">
         <item quantity="other">%d 个月</item>

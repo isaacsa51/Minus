@@ -38,6 +38,7 @@ class BudgetPeriodManager @Inject constructor(
     suspend fun updateRecurrentNotificationTime(hour: Int, minute: Int) {
         settingsRepository.setRecurrentNotificationTime(hour, minute)
         notificationScheduler.rescheduleRecurrentExpenseNotifications()
+        notificationScheduler.scheduleCreditCutoffReminder()
     }
 
     suspend fun finishBudgetEarly() = withContext(NonCancellable) {
@@ -173,6 +174,7 @@ class BudgetPeriodManager @Inject constructor(
         }
 
         notificationScheduler.schedulePeriodEndNotification(periodEndDate)
+        notificationScheduler.scheduleCreditCutoffReminder()
         PeriodBoundaryResult(periodStartMillis = periodStartMillis, periodId = periodId)
     }
 

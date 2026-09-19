@@ -13,8 +13,10 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.model.CreditCard
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.domain.model.calculatePaymentDueDate
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +53,9 @@ class NotificationScheduler @Inject constructor(
         const val ACTION_MIDNIGHT_PERIOD_CHECK =
             "com.serranoie.app.minus.action.MIDNIGHT_PERIOD_CHECK"
         private const val MAX_OCCURRENCE_LOOKUP_ITERATIONS = 500
+        const val CREDIT_CUTOFF_REMINDER_DAYS = 3L
+        private const val CREDIT_CUTOFF_WORK_NAME = "credit_cutoff_reminder"
+        private const val MAX_CREDIT_CUTOFF_LOOKAHEAD_MONTHS = 24L
     }
 
     private val workManager by lazy { WorkManager.getInstance(context) }
@@ -58,6 +63,7 @@ class NotificationScheduler @Inject constructor(
 
     fun initializeNotifications() {
         scheduleAllRecurrentExpenseNotifications()
+        scheduleCreditCutoffReminder()
         checkAndReschedulePeriodEndNotification()
         scheduleMidnightPeriodCheck()
     }
@@ -364,6 +370,51 @@ class NotificationScheduler @Inject constructor(
                 nextMonth.withDayOfMonth(subscriptionDay.coerceIn(1, nextMonth.lengthOfMonth()))
         }
         return if (candidate.isBefore(startDate)) startDate else candidate
+    }
+
+    fun scheduleCreditCutoffReminder() {
+        scope.launch {
+            try {
+                val cutoffDay = budgetRepository.getBudgetSettingsSync()?.creditCardCutoffDay
+                if (cutoffDay == null) {
+                    workManager.cancelUniqueWork(CREDIT_CUTOFF_WORK_NAME)
+                    logcat { "No credit card cutoff day configured, credit cutoff reminder cancelled" }
+                    return@launch
+                }
+                val now = LocalDateTime.now()
+                val triggerDateTime =
+                    nextCreditCutoffReminderDateTime(cutoffDay, now, getRecurrentNotificationTime())
+                val initialDelay = Duration.between(now, triggerDateTime).toMillis().coerceAtLeast(0L)
+                logcat {
+                    "Scheduling credit cutoff reminder: cutoffDay=$cutoffDay triggerDateTime=$triggerDateTime initialDelayMs=$initialDelay workName=$CREDIT_CUTOFF_WORK_NAME policy=REPLACE"
+                }
+                val workRequest = OneTimeWorkRequestBuilder<RecurrentExpenseNotificationWorker>()
+                    .setInputData(
+                        workDataOf(RecurrentExpenseNotificationWorker.KEY_CREDIT_CUTOFF_REMINDER to true)
+                    )
+                    .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+                    .addTag(RecurrentExpenseNotificationWorker.TAG_RECURRENT_NOTIFICATION)
+                    .build()
+                workManager.enqueueUniqueWork(CREDIT_CUTOFF_WORK_NAME, ExistingWorkPolicy.REPLACE, workRequest)
+            } catch (e: Exception) {
+                logcat { "Error scheduling credit cutoff reminder\n${e.asLog()}" }
+            }
+        }
+    }
+
+    internal fun nextCreditCutoffReminderDateTime(
+        cutoffDay: Int,
+        now: LocalDateTime,
+        notificationTime: Pair<Int, Int>,
+    ): LocalDateTime {
+        val card = CreditCard(cutoffDay = cutoffDay)
+        val time = LocalTime.of(notificationTime.first, notificationTime.second)
+        return (0L..MAX_CREDIT_CUTOFF_LOOKAHEAD_MONTHS).asSequence()
+            .map { monthsAhead ->
+                val dueDate = calculatePaymentDueDate(card, now.toLocalDate().plusMonths(monthsAhead))
+                LocalDateTime.of(dueDate.minusDays(CREDIT_CUTOFF_REMINDER_DAYS), time)
+            }
+            .first { it.isAfter(now) }
     }
 
     fun runRecurrentExpenseCheckNow() {

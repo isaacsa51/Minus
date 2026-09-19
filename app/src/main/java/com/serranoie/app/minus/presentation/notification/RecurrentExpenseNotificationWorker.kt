@@ -39,7 +39,9 @@ class RecurrentExpenseNotificationWorker(
         const val WORK_NAME = "recurrent_expense_notification"
         const val KEY_TRANSACTION_ID = "transaction_id"
         const val TAG_RECURRENT_NOTIFICATION = "recurrent_expense_notification_tag"
+        const val KEY_CREDIT_CUTOFF_REMINDER = "credit_cutoff_reminder"
         private const val LAST_RECURRENT_NOTIFICATION_PREFIX = "last_recurrent_notification_"
+        private const val LAST_CREDIT_CUTOFF_REMINDER_KEY = "last_credit_cutoff_reminder"
     }
     
     @EntryPoint
@@ -97,9 +99,14 @@ class RecurrentExpenseNotificationWorker(
                 settings = settings,
                 transactions = transactions,
                 today = today,
-                notificationHelper = notificationHelper
+                notificationHelper = notificationHelper,
+                settingsRepository = settingsRepository,
             )
-            logcat { "Legacy recurrent scan completed without sending app-open notifications" }
+            if (inputData.getBoolean(KEY_CREDIT_CUTOFF_REMINDER, false)) {
+                notificationScheduler.scheduleCreditCutoffReminder()
+            } else {
+                logcat { "Legacy recurrent scan completed without sending app-open notifications" }
+            }
             Result.success()
 
         } catch (e: Exception) {
@@ -107,20 +114,26 @@ class RecurrentExpenseNotificationWorker(
             Result.failure()
         }
     }
-    private fun maybeSendCreditCutoffReminder(
+    private suspend fun maybeSendCreditCutoffReminder(
         settings: BudgetSettings,
         transactions: List<Transaction>,
         today: LocalDate,
-        notificationHelper: NotificationHelper
+        notificationHelper: NotificationHelper,
+        settingsRepository: SettingsRepository,
     ) {
         val cutoffDay = settings.creditCardCutoffDay ?: return
         val card = CreditCard(cutoffDay = cutoffDay)
         val dueDate = calculatePaymentDueDate(card, today)
 
         val daysUntilDueDate = ChronoUnit.DAYS.between(today, dueDate)
-        
-        // Notify 3 days before the payment due date
-        if (daysUntilDueDate != 3L) return
+        if (daysUntilDueDate !in 0..NotificationScheduler.CREDIT_CUTOFF_REMINDER_DAYS) {
+            logcat { "Credit cutoff reminder skipped; dueDate=$dueDate is $daysUntilDueDate days away" }
+            return
+        }
+        if (settingsRepository.getString(LAST_CREDIT_CUTOFF_REMINDER_KEY) == dueDate.toString()) {
+            logcat { "Credit cutoff reminder already sent for dueDate=$dueDate" }
+            return
+        }
 
         // The billing period for this due date ended at the corresponding cutoff date.
         val currentMonthCutoff = runCatching { today.withDayOfMonth(cutoffDay) }.getOrElse {
@@ -150,6 +163,8 @@ class RecurrentExpenseNotificationWorker(
             dueDateText = dueDate.format(formatter),
             currency = settings.currencyCode
         )
+        settingsRepository.setString(LAST_CREDIT_CUTOFF_REMINDER_KEY, dueDate.toString())
+        logcat { "Credit cutoff reminder shown for dueDate=$dueDate total=$creditTotal" }
     }
 
     private suspend fun notifyRecurrentTransactionIfDue(
