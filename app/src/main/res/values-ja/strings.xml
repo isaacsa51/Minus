@@ -606,12 +606,13 @@
     <string name="notification_period_end_message_positive">期間は %1$s 残りで終了します。詳細を見るにはタップしてください。</string>
     <string name="notification_period_end_message_negative">期間が終了しました。%1$sの超過支出があります。詳細はこちら。</string>
     <string name="notification_period_end_message_neutral">期間は終了しました。あなたは何も費やしていません。詳細を参照してください。</string>
-    <string name="notification_recurrent_expense_title">定期的な費用</string>
-    <string name="notification_recurrent_expense_message_with_comment">\"%1$s\"に対する\"%2$s\"の定期的な経費は本日です。</string>
-    <string name="notification_recurrent_expense_message_without_comment">合計「%1$s」の定期的な費用は本日です。</string>
+    <string name="notification_recurrent_due_today_title">「%1$s」の支払いは今日が期日です</string>
+    <string name="notification_recurrent_charged_weekly">毎週の支出 %1$s が請求される予定です。</string>
+    <string name="notification_recurrent_charged_biweekly">隔週の支出 %1$s が請求される予定です。</string>
+    <string name="notification_recurrent_charged_monthly">毎月の支出 %1$s が請求される予定です。</string>
     <string name="notification_tomorrow">明日</string>
     <string name="notification_in_days">%1$d 日</string>
-    <string name="notification_upcoming_subscription_title">今後のサブスクリプション</string>
+    <string name="notification_upcoming_subscription_title">今後の支出</string>
     <string name="notification_upcoming_subscription_message_with_comment">サブスクリプション「%1$s」の「%2$s」は %3$sが課金されます。料金の準備をしてください。</string>
     <string name="notification_upcoming_subscription_message_without_comment">\"%1$s\" のサブスクリプションがあります。このサブスクリプションは %2$s となります。</string>
     <string name="notification_credit_cutoff_title">今後のクレジットカードでの支払い</string>

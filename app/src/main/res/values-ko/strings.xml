@@ -607,12 +607,13 @@
     <string name="notification_period_end_message_positive">%1$s가 남은 상태로 기간이 종료되었습니다. 탭하여 자세히 보기.</string>
     <string name="notification_period_end_message_negative">기간이 종료되었습니다. %1$s를 초과 사용했습니다. 자세히 보기.</string>
     <string name="notification_period_end_message_neutral">기간이 종료되었습니다. 사용한 금액이 없습니다. 자세히 보기.</string>
-    <string name="notification_recurrent_expense_title">정기 지출</string>
-    <string name="notification_recurrent_expense_message_with_comment">오늘 \"%2$s\"에 대한 \"%1$s\"의 정기 지출이 발생했습니다.</string>
-    <string name="notification_recurrent_expense_message_without_comment">오늘 총 \"%1$s\"의 정기 지출이 발생했습니다.</string>
+    <string name="notification_recurrent_due_today_title">\"%1$s\" 결제일이 오늘입니다</string>
+    <string name="notification_recurrent_charged_weekly">주간 지출 %1$s이(가) 청구될 예정입니다.</string>
+    <string name="notification_recurrent_charged_biweekly">2주 단위 지출 %1$s이(가) 청구될 예정입니다.</string>
+    <string name="notification_recurrent_charged_monthly">월간 지출 %1$s이(가) 청구될 예정입니다.</string>
     <string name="notification_tomorrow">내일</string>
     <string name="notification_in_days">%1$d일 후</string>
-    <string name="notification_upcoming_subscription_title">예산 확인</string>
+    <string name="notification_upcoming_subscription_title">예정된 지출</string>
     <string name="notification_upcoming_subscription_message_with_comment">\"%1$s\" 구독료 중 \"%2$s\"에 대해 %3$s가 청구될 예정입니다. 결제를 준비하세요.</string>
     <string name="notification_upcoming_subscription_message_without_comment">\"%1$s\" 구독료 중 %2$s가 청구될 예정입니다.</string>
     <string name="notification_credit_cutoff_title">신용카드 결제 예정</string>

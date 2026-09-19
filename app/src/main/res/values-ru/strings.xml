@@ -622,12 +622,13 @@
     <string name="notification_period_end_message_positive">Период завершился с остатком %1$s. Нажмите, чтобы посмотреть детали.</string>
     <string name="notification_period_end_message_negative">Период завершился. Вы потратили на %1$s больше. Подробнее внутри.</string>
     <string name="notification_period_end_message_neutral">Период завершился. Вы ничего не потратили. Подробнее внутри.</string>
-    <string name="notification_recurrent_expense_title">Повторяющийся расход</string>
-    <string name="notification_recurrent_expense_message_with_comment">Ваш повторяющийся расход \"%1$s\" на \"%2$s\" — сегодня.</string>
-    <string name="notification_recurrent_expense_message_without_comment">Ваш повторяющийся расход на сумму \"%1$s\" — сегодня.</string>
+    <string name="notification_recurrent_due_today_title">Платёж за «%1$s» — сегодня</string>
+    <string name="notification_recurrent_charged_weekly">Ваш еженедельный расход %1$s будет списан.</string>
+    <string name="notification_recurrent_charged_biweekly">Ваш двухнедельный расход %1$s будет списан.</string>
+    <string name="notification_recurrent_charged_monthly">Ваш ежемесячный расход %1$s будет списан.</string>
     <string name="notification_tomorrow">завтра</string>
     <string name="notification_in_days">через %1$d дн.</string>
-    <string name="notification_upcoming_subscription_title">Скоро списание по подписке</string>
+    <string name="notification_upcoming_subscription_title">Предстоящий расход</string>
     <string name="notification_upcoming_subscription_message_with_comment">Подписка \"%1$s\" на \"%2$s\" будет списана %3$s. Подготовьтесь к списанию.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Подписка на \"%1$s\" будет списана %2$s.</string>
     <string name="notification_credit_cutoff_title">Скоро платёж по кредитной карте</string>

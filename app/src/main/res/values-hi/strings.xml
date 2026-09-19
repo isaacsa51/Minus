@@ -605,12 +605,13 @@
     <string name="notification_period_end_message_positive">पीरियड %1$s बाकी रहने के साथ खत्म हो गया। जानकारी देखने के लिए टैप करें।</string>
     <string name="notification_period_end_message_negative">समय-सीमा खत्म हो गई। आपने %1$s ज़्यादा खर्च किए। ज़्यादा जानकारी देखें।</string>
     <string name="notification_period_end_message_neutral">समय-सीमा खत्म हो गई। आपने कुछ भी खर्च नहीं किया। ज़्यादा जानकारी देखें।</string>
-    <string name="notification_recurrent_expense_title">बार-बार होने वाला खर्च</string>
-    <string name="notification_recurrent_expense_message_with_comment">\"%2$s\" के लिए आपका \"%1$s\" का बार-बार होने वाला खर्च आज है।</string>
-    <string name="notification_recurrent_expense_message_without_comment">कुल \"%1$s\" का आपका बार-बार होने वाला खर्च आज है।</string>
+    <string name="notification_recurrent_due_today_title">\"%1$s\" का आपका भुगतान आज देय है</string>
+    <string name="notification_recurrent_charged_weekly">आपका %1$s का साप्ताहिक खर्च काटा जाने वाला है।</string>
+    <string name="notification_recurrent_charged_biweekly">आपका %1$s का पाक्षिक खर्च काटा जाने वाला है।</string>
+    <string name="notification_recurrent_charged_monthly">आपका %1$s का मासिक खर्च काटा जाने वाला है।</string>
     <string name="notification_tomorrow">कल</string>
     <string name="notification_in_days">%1$d दिनों में</string>
-    <string name="notification_upcoming_subscription_title">आने वाला सब्सक्रिप्शन</string>
+    <string name="notification_upcoming_subscription_title">आने वाला खर्च</string>
     <string name="notification_upcoming_subscription_message_with_comment">\"%2$s\" के आपके \"%1$s\" सब्सक्रिप्शन के लिए %3$s चार्ज किया जाएगा। चार्ज के लिए तैयार रहें।</string>
     <string name="notification_upcoming_subscription_message_without_comment">आपका \"%1$s\" का सब्सक्रिप्शन है जिसके लिए %2$s चार्ज किया जाएगा।</string>
     <string name="notification_credit_cutoff_title">आने वाला क्रेडिट कार्ड पेमेंट</string>

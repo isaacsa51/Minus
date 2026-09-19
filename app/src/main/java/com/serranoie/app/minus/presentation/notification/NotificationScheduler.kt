@@ -54,6 +54,7 @@ class NotificationScheduler @Inject constructor(
             "com.serranoie.app.minus.action.MIDNIGHT_PERIOD_CHECK"
         private const val MAX_OCCURRENCE_LOOKUP_ITERATIONS = 500
         const val CREDIT_CUTOFF_REMINDER_DAYS = 3L
+        const val UPCOMING_REMINDER_LEAD_DAYS = 3L
         private const val CREDIT_CUTOFF_WORK_NAME = "credit_cutoff_reminder"
         private const val MAX_CREDIT_CUTOFF_LOOKAHEAD_MONTHS = 24L
     }
@@ -235,6 +236,7 @@ class NotificationScheduler @Inject constructor(
     fun cancelRecurrentExpenseNotification(transaction: Transaction) {
         val workName = recurrentWorkName(transaction)
         workManager.cancelUniqueWork(workName)
+        workManager.cancelUniqueWork(upcomingWorkName(transaction))
         logcat { "Cancelled recurrent notification work: workName=$workName transactionId=${transaction.id}" }
     }
 
@@ -287,6 +289,40 @@ class NotificationScheduler @Inject constructor(
             ExistingWorkPolicy.REPLACE,
             workRequest
         )
+
+        scheduleUpcomingReminder(transaction, notificationTime, paidDates)
+    }
+
+    private fun scheduleUpcomingReminder(
+        transaction: Transaction,
+        notificationTime: Pair<Int, Int>,
+        paidDates: Set<LocalDate>,
+    ) {
+        val now = LocalDateTime.now()
+        val workName = upcomingWorkName(transaction)
+        val reminderDateTime = nextOccurrenceDateTime(
+            transaction, now, notificationTime, paidDates, leadDays = UPCOMING_REMINDER_LEAD_DAYS,
+        ) ?: run {
+            workManager.cancelUniqueWork(workName)
+            logcat { "No future upcoming reminder to schedule for transactionId=${transaction.id}" }
+            return
+        }
+        val occurrenceDate = reminderDateTime.toLocalDate().plusDays(UPCOMING_REMINDER_LEAD_DAYS)
+        val initialDelay = Duration.between(now, reminderDateTime).toMillis().coerceAtLeast(0L)
+        logcat {
+            "Scheduling upcoming recurrent reminder: transactionId=${transaction.id} occurrenceDate=$occurrenceDate reminderDateTime=$reminderDateTime initialDelayMs=$initialDelay workName=$workName policy=REPLACE"
+        }
+        val workRequest = OneTimeWorkRequestBuilder<RecurrentExpenseNotificationWorker>()
+            .setInputData(
+                workDataOf(
+                    RecurrentExpenseNotificationWorker.KEY_TRANSACTION_ID to transaction.id,
+                    RecurrentExpenseNotificationWorker.KEY_UPCOMING_OCCURRENCE_EPOCH_DAY to occurrenceDate.toEpochDay(),
+                )
+            )
+            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+            .addTag(RecurrentExpenseNotificationWorker.TAG_RECURRENT_NOTIFICATION)
+            .build()
+        workManager.enqueueUniqueWork(workName, ExistingWorkPolicy.REPLACE, workRequest)
     }
 
     private fun recurrentWorkName(transaction: Transaction): String {
@@ -294,12 +330,17 @@ class NotificationScheduler @Inject constructor(
         return "${RecurrentExpenseNotificationWorker.WORK_NAME}_$stableId"
     }
 
-    // `internal` (rather than `private`) so the pure occurrence math can be unit-tested directly.
+    private fun upcomingWorkName(transaction: Transaction): String {
+        val stableId = transaction.sourceTransactionId ?: transaction.id
+        return "${RecurrentExpenseNotificationWorker.WORK_NAME}_upcoming_$stableId"
+    }
+
     internal fun nextOccurrenceDateTime(
         transaction: Transaction,
         now: LocalDateTime,
         notificationTime: Pair<Int, Int>,
         paidDates: Set<LocalDate> = emptySet(),
+        leadDays: Long = 0L,
     ): LocalDateTime? {
         val startDate = transaction.date?.toLocalDate() ?: return null
         val frequency = transaction.recurrentFrequency ?: return null
@@ -326,7 +367,7 @@ class NotificationScheduler @Inject constructor(
             )
         }
         var triggerDateTime = LocalDateTime.of(
-            occurrenceDate,
+            occurrenceDate.minusDays(leadDays),
             LocalTime.of(notificationTime.first, notificationTime.second)
         )
 
@@ -336,7 +377,7 @@ class NotificationScheduler @Inject constructor(
         ) {
             occurrenceDate = advance(occurrenceDate)
             triggerDateTime = LocalDateTime.of(
-                occurrenceDate,
+                occurrenceDate.minusDays(leadDays),
                 LocalTime.of(notificationTime.first, notificationTime.second)
             )
             iterations++

@@ -3,6 +3,7 @@ package com.serranoie.app.minus.presentation.ui.budget
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetSettings
@@ -53,6 +54,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -323,11 +325,27 @@ class BudgetViewModel @Inject constructor(
             }
 
             try {
+                val isDebug = BuildConfig.DEBUG_FEATURES
+                val recurrentTemplate = budgetRepository.getTransactions().first()
+                    .firstOrNull { it.isRecurrent && !it.isDeleted && it.recurrentFrequency != null }
                 notificationHelper.showRecurrentExpenseNotification(
-                    amount = "50.00",
-                    comment = "Test expense",
-                    currency = currency
+                    amount = recurrentTemplate?.amount?.toPlainString() ?: "50.00",
+                    comment = recurrentTemplate?.comment ?: "Test expense",
+                    currency = currency,
+                    frequency = recurrentTemplate?.recurrentFrequency ?: RecurrentFrequency.MONTHLY,
+                    transactionId = if (isDebug) recurrentTemplate?.let { it.sourceTransactionId ?: it.id } else null,
+                    occurrenceDate = if (isDebug) recurrentTemplate?.let { LocalDate.now() } else null,
                 )
+                if (recurrentTemplate != null) {
+                    notificationHelper.showUpcomingSubscriptionNotification(
+                        amount = recurrentTemplate.amount.toPlainString(),
+                        comment = recurrentTemplate.comment,
+                        daysUntil = NotificationScheduler.UPCOMING_REMINDER_LEAD_DAYS,
+                        currency = currency,
+                        transactionId = if (isDebug) (recurrentTemplate.sourceTransactionId ?: recurrentTemplate.id) else null,
+                        occurrenceDate = if (isDebug) LocalDate.now().plusDays(NotificationScheduler.UPCOMING_REMINDER_LEAD_DAYS) else null,
+                    )
+                }
             } catch (e: Exception) {
                 logcat(TAG) { e.asLog() }
             }

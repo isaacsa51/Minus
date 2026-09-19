@@ -610,12 +610,13 @@
     <string name="notification_period_end_message_positive">本周期剩余 %1$s 预算。点击查看详情。</string>
     <string name="notification_period_end_message_negative">本周期已结束。你额外支出了 %1$s。点击查看详情。</string>
     <string name="notification_period_end_message_neutral">周期结束。你什么都没花。查看详情。</string>
-    <string name="notification_recurrent_expense_title">定期支出</string>
-    <string name="notification_recurrent_expense_message_with_comment">今天你有一项名为「%2$s」的定期支出，金额为 %1$s。</string>
-    <string name="notification_recurrent_expense_message_without_comment">今天你有总计 %1$s 的定期支出。</string>
+    <string name="notification_recurrent_due_today_title">您的“%1$s”付款今天到期</string>
+    <string name="notification_recurrent_charged_weekly">您的每周支出 %1$s 即将扣款。</string>
+    <string name="notification_recurrent_charged_biweekly">您的每两周支出 %1$s 即将扣款。</string>
+    <string name="notification_recurrent_charged_monthly">您的每月支出 %1$s 即将扣款。</string>
     <string name="notification_tomorrow">明天</string>
     <string name="notification_in_days">%1$d 天内</string>
-    <string name="notification_upcoming_subscription_title">即将到来的订阅</string>
+    <string name="notification_upcoming_subscription_title">即将到来的支出</string>
     <string name="notification_upcoming_subscription_message_with_comment">你「%2$s」中的「%1$s」订阅将收费 %3$s，请准备付款。</string>
     <string name="notification_upcoming_subscription_message_without_comment">你有一项名为「%1$s」的订阅将收费 %2$s。</string>
     <string name="notification_credit_cutoff_title">即将到来的信用卡付款</string>

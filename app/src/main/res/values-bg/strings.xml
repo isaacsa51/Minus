@@ -610,12 +610,13 @@
     <string name="notification_period_end_message_positive">Периодът приключи с остатък от %1$s. Натиснете за детайли.</string>
     <string name="notification_period_end_message_negative">Периодът приключи. Похарчихте %1$s повече. Вижте повече детайли.</string>
     <string name="notification_period_end_message_neutral">Периодът приключи. Не сте похарчили нищо. Вижте повече детайли.</string>
-    <string name="notification_recurrent_expense_title">Повтарящ се разход</string>
-    <string name="notification_recurrent_expense_message_with_comment">Вашият повтарящ се разход от „%1$s“ за „%2$s“ е днес.</string>
-    <string name="notification_recurrent_expense_message_without_comment">Вашият повтарящ се разход на обща стойност „%1$s“ е днес.</string>
+    <string name="notification_recurrent_due_today_title">Плащането за „%1$s“ е за днес</string>
+    <string name="notification_recurrent_charged_weekly">Седмичният ви разход от %1$s ще бъде начислен.</string>
+    <string name="notification_recurrent_charged_biweekly">Двуседмичният ви разход от %1$s ще бъде начислен.</string>
+    <string name="notification_recurrent_charged_monthly">Месечният ви разход от %1$s ще бъде начислен.</string>
     <string name="notification_tomorrow">утре</string>
     <string name="notification_in_days">след %1$d дни</string>
-    <string name="notification_upcoming_subscription_title">Предстоящ абонамент</string>
+    <string name="notification_upcoming_subscription_title">Предстоящ разход</string>
     <string name="notification_upcoming_subscription_message_with_comment">Вашият абонамент „%1$s“ за „%2$s“ ще бъде таксуван на %3$s. Подгответе се за плащането.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Имате абонамент за „%1$s“, който ще бъде таксуван на %2$s.</string>
     <string name="notification_credit_cutoff_title">Предстоящо плащане по кредитна карта</string>

@@ -608,12 +608,13 @@
     <string name="notification_period_end_message_positive">Il periodo è terminato con un avanzo di %1$s. Tocca per vedere i dettagli.</string>
     <string name="notification_period_end_message_negative">Il periodo è terminato. Hai speso %1$s in più. Vedi i dettagli.</string>
     <string name="notification_period_end_message_neutral">Il periodo è terminato. Non hai effettuato spese. Vedi i dettagli.</string>
-    <string name="notification_recurrent_expense_title">Spesa ricorrente</string>
-    <string name="notification_recurrent_expense_message_with_comment">La tua spesa ricorrente \"%1$s\" per \"%2$s\" è prevista per oggi.</string>
-    <string name="notification_recurrent_expense_message_without_comment">La tua spesa ricorrente di importo totale \"%1$s\" è prevista per oggi.</string>
+    <string name="notification_recurrent_due_today_title">Il pagamento di \"%1$s\" scade oggi</string>
+    <string name="notification_recurrent_charged_weekly">La tua spesa settimanale di %1$s sta per essere addebitata.</string>
+    <string name="notification_recurrent_charged_biweekly">La tua spesa quindicinale di %1$s sta per essere addebitata.</string>
+    <string name="notification_recurrent_charged_monthly">La tua spesa mensile di %1$s sta per essere addebitata.</string>
     <string name="notification_tomorrow">domani</string>
     <string name="notification_in_days">tra %1$d giorni</string>
-    <string name="notification_upcoming_subscription_title">Abbonamento in arrivo</string>
+    <string name="notification_upcoming_subscription_title">Spesa in arrivo</string>
     <string name="notification_upcoming_subscription_message_with_comment">Per il tuo abbonamento \"%1$s\" relativo a \"%2$s\" verrà addebitato l\'importo di %3$s. Preparati all\'addebito.</string>
     <string name="notification_upcoming_subscription_message_without_comment">You have a subscription of \"%1$s\" that will be charged %2$s.</string>
     <string name="notification_credit_cutoff_title">Prossimo pagamento carta di credito</string>

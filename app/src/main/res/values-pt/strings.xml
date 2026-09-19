@@ -608,12 +608,13 @@
     <string name="notification_period_end_message_positive">O período terminou com %1$s restante. Toque para ver detalhes.</string>
     <string name="notification_period_end_message_negative">O período terminou. Você gastou mais %1$s . Veja mais detalhes.</string>
     <string name="notification_period_end_message_neutral">O período terminou. Você não passou nada. Veja mais detalhes.</string>
-    <string name="notification_recurrent_expense_title">Despesas recorrentes</string>
-    <string name="notification_recurrent_expense_message_with_comment">Seu custo recorrente de \"%1$s\" para \"%2$s\" é hoje.</string>
-    <string name="notification_recurrent_expense_message_without_comment">Sua despesa recorrente com um total de \"%1$s\" é hoje.</string>
+    <string name="notification_recurrent_due_today_title">Seu pagamento de \"%1$s\" vence hoje</string>
+    <string name="notification_recurrent_charged_weekly">Sua despesa semanal de %1$s será cobrada.</string>
+    <string name="notification_recurrent_charged_biweekly">Sua despesa quinzenal de %1$s será cobrada.</string>
+    <string name="notification_recurrent_charged_monthly">Sua despesa mensal de %1$s será cobrada.</string>
     <string name="notification_tomorrow">Amanhã</string>
     <string name="notification_in_days">em %1$d dias</string>
-    <string name="notification_upcoming_subscription_title">Próxima assinatura</string>
+    <string name="notification_upcoming_subscription_title">Próxima despesa</string>
     <string name="notification_upcoming_subscription_message_with_comment">Sua assinatura \"%1$s\" de \"%2$s\" será cobrada %3$s. Prepare-se para a cobrança.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Você tem uma assinatura de \"%1$s\" que será cobrado em %2$s.</string>
     <string name="notification_credit_cutoff_title">Próximo pagamento com cartão de crédito</string>

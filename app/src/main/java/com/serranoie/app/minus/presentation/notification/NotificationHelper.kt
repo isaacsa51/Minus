@@ -12,11 +12,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.presentation.MainActivity
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import logcat.logcat
 import java.math.BigDecimal
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -140,17 +142,70 @@ class NotificationHelper @Inject constructor(
         }
     }
 
+    fun recurrentNotificationId(transactionId: Long): Int = "recurrent_$transactionId".hashCode()
+
+    private fun addRecurrentActions(
+        builder: NotificationCompat.Builder,
+        transactionId: Long,
+        occurrenceDate: LocalDate,
+        notificationId: Int,
+    ) {
+        builder
+            .addAction(
+                0,
+                context.getString(R.string.mark_as_paid),
+                recurrentActionIntent(
+                    RecurrentNotificationActionReceiver.ACTION_MARK_PAID, transactionId, occurrenceDate, notificationId,
+                ),
+            )
+            .addAction(
+                0,
+                context.getString(R.string.subscriptions_item_skip_short),
+                recurrentActionIntent(
+                    RecurrentNotificationActionReceiver.ACTION_SKIP, transactionId, occurrenceDate, notificationId,
+                ),
+            )
+    }
+
+    private fun recurrentActionIntent(
+        action: String,
+        transactionId: Long,
+        occurrenceDate: LocalDate,
+        notificationId: Int,
+    ): PendingIntent {
+        val intent = Intent(context, RecurrentNotificationActionReceiver::class.java).apply {
+            this.action = action
+            putExtra(RecurrentNotificationActionReceiver.EXTRA_TRANSACTION_ID, transactionId)
+            putExtra(RecurrentNotificationActionReceiver.EXTRA_OCCURRENCE_EPOCH_DAY, occurrenceDate.toEpochDay())
+            putExtra(RecurrentNotificationActionReceiver.EXTRA_NOTIFICATION_ID, notificationId)
+        }
+        return PendingIntent.getBroadcast(
+            context,
+            "$action$transactionId${occurrenceDate.toEpochDay()}$notificationId".hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
     private fun formatAmount(amount: String, currency: String): String {
         val decimalValue = amount.toBigDecimalOrNull() ?: BigDecimal.ZERO
         return symbolOnlyCurrencyFormat(currency).format(decimalValue)
     }
 
-    fun showRecurrentExpenseNotification(amount: String, comment: String, currency: String) {
+    fun showRecurrentExpenseNotification(
+        amount: String,
+        comment: String,
+        currency: String,
+        frequency: RecurrentFrequency,
+        transactionId: Long? = null,
+        occurrenceDate: LocalDate? = null,
+    ) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
             logcat { "Cannot show notification - permission not granted" }
             return
         }
+        val notificationId = transactionId?.let { recurrentNotificationId(it) } ?: NOTIFICATION_ID_RECURRENT
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -164,21 +219,18 @@ class NotificationHelper @Inject constructor(
         )
 
         val formattedAmount = formatAmount(amount, currency)
-        val title = context.getString(R.string.notification_recurrent_expense_title)
-        val message = if (comment.isNotBlank()) {
-            context.getString(
-                R.string.notification_recurrent_expense_message_with_comment,
-                comment,
-                formattedAmount
-            )
-        } else {
-            context.getString(
-                R.string.notification_recurrent_expense_message_without_comment,
-                formattedAmount
-            )
-        }
+        val name = comment.ifBlank { context.getString(R.string.upcoming_recurrent_unnamed_expense) }
+        val title = context.getString(R.string.notification_recurrent_due_today_title, name)
+        val message = context.getString(
+            when (frequency) {
+                RecurrentFrequency.WEEKLY -> R.string.notification_recurrent_charged_weekly
+                RecurrentFrequency.BIWEEKLY -> R.string.notification_recurrent_charged_biweekly
+                RecurrentFrequency.MONTHLY -> R.string.notification_recurrent_charged_monthly
+            },
+            formattedAmount,
+        )
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_RECURRENT)
+        val builder = NotificationCompat.Builder(context, CHANNEL_RECURRENT)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(message)
@@ -188,16 +240,21 @@ class NotificationHelper @Inject constructor(
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .build()
 
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_RECURRENT, notification)
+        if (transactionId != null && occurrenceDate != null) {
+            addRecurrentActions(builder, transactionId, occurrenceDate, notificationId)
+        }
+
+        NotificationManagerCompat.from(context).notify(notificationId, builder.build())
     }
 
     fun showUpcomingSubscriptionNotification(
         amount: String,
         comment: String,
         daysUntil: Long,
-        currency: String
+        currency: String,
+        transactionId: Long? = null,
+        occurrenceDate: LocalDate? = null,
     ) {
         val hasPermission = checkNotificationPermission()
         if (!hasPermission) {
@@ -238,7 +295,9 @@ class NotificationHelper @Inject constructor(
             )
         }
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_RECURRENT)
+        val notificationId = transactionId?.let { "upcoming_$it".hashCode() }
+            ?: (NOTIFICATION_ID_RECURRENT + daysUntil.toInt())
+        val builder = NotificationCompat.Builder(context, CHANNEL_RECURRENT)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(message)
@@ -248,10 +307,12 @@ class NotificationHelper @Inject constructor(
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .build()
 
-        val notificationId = NOTIFICATION_ID_RECURRENT + daysUntil.toInt()
-        NotificationManagerCompat.from(context).notify(notificationId, notification)
+        if (transactionId != null && occurrenceDate != null) {
+            addRecurrentActions(builder, transactionId, occurrenceDate, notificationId)
+        }
+
+        NotificationManagerCompat.from(context).notify(notificationId, builder.build())
         logcat { "Upcoming subscription notification shown: $message" }
     }
 

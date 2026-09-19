@@ -181,6 +181,27 @@ class NotificationSchedulerTest {
     }
 
     @Test
+    fun `lead days move the trigger ahead of the occurrence and roll past a lead already gone`() {
+        val weekly = recurringTx(date = LocalDateTime.of(2026, 3, 10, 8, 0), frequency = RecurrentFrequency.WEEKLY)
+
+        val ahead = scheduler.nextOccurrenceDateTime(
+            weekly, now = LocalDateTime.of(2026, 3, 5, 12, 0), notificationTime = notifyAt9, leadDays = 3,
+        )
+        assertThat(ahead).isEqualTo(LocalDateTime.of(2026, 3, 7, 9, 0))
+
+        val rolled = scheduler.nextOccurrenceDateTime(
+            weekly, now = LocalDateTime.of(2026, 3, 8, 12, 0), notificationTime = notifyAt9, leadDays = 3,
+        )
+        assertThat(rolled).isEqualTo(LocalDateTime.of(2026, 3, 14, 9, 0))
+
+        val resolved = scheduler.nextOccurrenceDateTime(
+            weekly, now = LocalDateTime.of(2026, 3, 5, 12, 0), notificationTime = notifyAt9,
+            paidDates = setOf(d(2026, 3, 10)), leadDays = 3,
+        )
+        assertThat(resolved).isEqualTo(LocalDateTime.of(2026, 3, 14, 9, 0))
+    }
+
+    @Test
     fun `credit cutoff reminder fires three days before the due date of the last cutoff`() {
         // cutoff 15 Sep -> due 5 Oct (Mon) -> reminder 2 Oct
         val result = scheduler.nextCreditCutoffReminderDateTime(

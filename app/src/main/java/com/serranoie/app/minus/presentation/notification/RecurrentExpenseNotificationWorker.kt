@@ -40,7 +40,9 @@ class RecurrentExpenseNotificationWorker(
         const val KEY_TRANSACTION_ID = "transaction_id"
         const val TAG_RECURRENT_NOTIFICATION = "recurrent_expense_notification_tag"
         const val KEY_CREDIT_CUTOFF_REMINDER = "credit_cutoff_reminder"
+        const val KEY_UPCOMING_OCCURRENCE_EPOCH_DAY = "upcoming_occurrence_epoch_day"
         private const val LAST_RECURRENT_NOTIFICATION_PREFIX = "last_recurrent_notification_"
+        private const val LAST_UPCOMING_NOTIFICATION_PREFIX = "last_upcoming_notification_"
         private const val LAST_CREDIT_CUTOFF_REMINDER_KEY = "last_credit_cutoff_reminder"
     }
     
@@ -82,14 +84,27 @@ class RecurrentExpenseNotificationWorker(
                     return Result.success()
                 }
 
-                notifyRecurrentTransactionIfDue(
-                    transaction = transaction,
-                    settings = settings,
-                    today = today,
-                    notificationHelper = notificationHelper,
-                    settingsRepository = settingsRepository,
-                    budgetRepository = budgetRepository,
-                )
+                val upcomingEpochDay = inputData.getLong(KEY_UPCOMING_OCCURRENCE_EPOCH_DAY, Long.MIN_VALUE)
+                if (upcomingEpochDay != Long.MIN_VALUE) {
+                    notifyUpcomingOccurrence(
+                        transaction = transaction,
+                        occurrenceDate = LocalDate.ofEpochDay(upcomingEpochDay),
+                        settings = settings,
+                        today = today,
+                        notificationHelper = notificationHelper,
+                        settingsRepository = settingsRepository,
+                        budgetRepository = budgetRepository,
+                    )
+                } else {
+                    notifyRecurrentTransactionIfDue(
+                        transaction = transaction,
+                        settings = settings,
+                        today = today,
+                        notificationHelper = notificationHelper,
+                        settingsRepository = settingsRepository,
+                        budgetRepository = budgetRepository,
+                    )
+                }
                 notificationScheduler.scheduleRecurrentExpenseNotification(transaction)
                 return Result.success()
             }
@@ -135,7 +150,6 @@ class RecurrentExpenseNotificationWorker(
             return
         }
 
-        // The billing period for this due date ended at the corresponding cutoff date.
         val currentMonthCutoff = runCatching { today.withDayOfMonth(cutoffDay) }.getOrElse {
             today.withDayOfMonth(today.lengthOfMonth())
         }
@@ -198,7 +212,10 @@ class RecurrentExpenseNotificationWorker(
         notificationHelper.showRecurrentExpenseNotification(
             amount = transaction.amount.toPlainString(),
             comment = transaction.comment,
-            currency = settings.currencyCode
+            currency = settings.currencyCode,
+            frequency = frequency,
+            transactionId = stableId,
+            occurrenceDate = today,
         )
         settingsRepository.setString(dedupeKey, today.toString())
         logcat { "Recurrent expense notification shown for transactionId=${transaction.id} date=$today" }
@@ -206,6 +223,45 @@ class RecurrentExpenseNotificationWorker(
 
     private fun recurrentNotificationDedupeKey(transaction: Transaction, date: LocalDate) =
         "$LAST_RECURRENT_NOTIFICATION_PREFIX${transaction.id}_${date}"
+
+    private suspend fun notifyUpcomingOccurrence(
+        transaction: Transaction,
+        occurrenceDate: LocalDate,
+        settings: BudgetSettings,
+        today: LocalDate,
+        notificationHelper: NotificationHelper,
+        settingsRepository: SettingsRepository,
+        budgetRepository: BudgetRepository,
+    ) {
+        val daysUntil = ChronoUnit.DAYS.between(today, occurrenceDate)
+        if (daysUntil <= 0L) {
+            logcat { "Upcoming reminder skipped; occurrence is not ahead anymore: transactionId=${transaction.id} occurrenceDate=$occurrenceDate today=$today" }
+            return
+        }
+
+        val stableId = transaction.sourceTransactionId ?: transaction.id
+        if (budgetRepository.getPaidOccurrenceDatesFor(stableId).contains(occurrenceDate)) {
+            logcat { "Upcoming reminder skipped; occurrence already resolved: transactionId=${transaction.id} occurrenceDate=$occurrenceDate" }
+            return
+        }
+
+        val dedupeKey = "$LAST_UPCOMING_NOTIFICATION_PREFIX${transaction.id}_$occurrenceDate"
+        if (settingsRepository.getString(dedupeKey) != null) {
+            logcat { "Skipping duplicate upcoming reminder: transactionId=${transaction.id} occurrenceDate=$occurrenceDate" }
+            return
+        }
+
+        notificationHelper.showUpcomingSubscriptionNotification(
+            amount = transaction.amount.toPlainString(),
+            comment = transaction.comment,
+            daysUntil = daysUntil,
+            currency = settings.currencyCode,
+            transactionId = stableId,
+            occurrenceDate = occurrenceDate,
+        )
+        settingsRepository.setString(dedupeKey, today.toString())
+        logcat { "Upcoming recurrent reminder shown for transactionId=${transaction.id} occurrenceDate=$occurrenceDate daysUntil=$daysUntil" }
+    }
 
     private fun isDueToday(transaction: Transaction, today: LocalDate, frequency: RecurrentFrequency): Boolean {
         val startDate = transaction.date?.toLocalDate() ?: return false

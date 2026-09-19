@@ -605,12 +605,13 @@
     <string name="notification_period_end_message_positive">Η περίοδος έληξε με υπόλοιπο %1$s. Πατήστε για να δείτε λεπτομέρειες.</string>
     <string name="notification_period_end_message_negative">Η περίοδος έληξε. Περάσατε το %1$s επιπλέον. Δείτε περισσότερες λεπτομέρειες.</string>
     <string name="notification_period_end_message_neutral">Η περίοδος έληξε. Δεν ξοδέψατε τίποτα. Δείτε περισσότερες λεπτομέρειες.</string>
-    <string name="notification_recurrent_expense_title">Επαναλαμβανόμενες δαπάνες</string>
-    <string name="notification_recurrent_expense_message_with_comment">Το επαναλαμβανόμενο έξοδο του \"%1$s\" για το \"%2$s\" είναι σήμερα.</string>
-    <string name="notification_recurrent_expense_message_without_comment">Η επαναλαμβανόμενη δαπάνη σας με ένα σύνολο \"%1$s\" είναι σήμερα.</string>
+    <string name="notification_recurrent_due_today_title">Η πληρωμή για «%1$s» είναι για σήμερα</string>
+    <string name="notification_recurrent_charged_weekly">Το εβδομαδιαίο σας έξοδο %1$s πρόκειται να χρεωθεί.</string>
+    <string name="notification_recurrent_charged_biweekly">Το δεκαπενθήμερο σας έξοδο %1$s πρόκειται να χρεωθεί.</string>
+    <string name="notification_recurrent_charged_monthly">Το μηνιαίο σας έξοδο %1$s πρόκειται να χρεωθεί.</string>
     <string name="notification_tomorrow">αύριο</string>
     <string name="notification_in_days">σε %1$d ημέρες</string>
-    <string name="notification_upcoming_subscription_title">Επερχόμενη συνδρομή</string>
+    <string name="notification_upcoming_subscription_title">Επερχόμενο έξοδο</string>
     <string name="notification_upcoming_subscription_message_with_comment">Η συνδρομή σας \"%1$s\" του \"%2$s\" θα χρεωθεί με %3$s. Προετοιμαστείτε για τη χρέωση.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Έχετε μια συνδρομή του \"%1$s\" που θα χρεωθεί %2$s.</string>
     <string name="notification_credit_cutoff_title">Επερχόμενη πληρωμή με πιστωτική κάρτα</string>
