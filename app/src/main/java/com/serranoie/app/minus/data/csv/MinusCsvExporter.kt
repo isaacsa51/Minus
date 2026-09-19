@@ -31,8 +31,8 @@ class MinusCsvExporter {
                     printer.printRecord(
                         MinusCsvContract.MARKER_META,
                         "", // amount
-                        "", // comment
-                        "", // note
+                        "", // category
+                        "", // extra_note
                         "", // is_recurrent
                         "", // frequency
                         "", // end_date
@@ -62,8 +62,8 @@ class MinusCsvExporter {
                     printer.printRecord(
                         MinusCsvContract.MARKER_ARCHIVED,
                         archive.spentAmount.toPlainString(),
-                        "", // comment
-                        "", // note
+                        "", // category
+                        "", // extra_note
                         "", // is_recurrent
                         "", // frequency
                         "", // end_date

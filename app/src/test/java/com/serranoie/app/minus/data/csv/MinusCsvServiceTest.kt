@@ -150,6 +150,21 @@ class MinusCsvServiceTest {
     }
 
     @Test
+    fun `a backup exported before the header rename still restores category and extra note`() = runTest {
+        val legacy = """
+            date,amount,comment,note,is_recurrent,frequency,end_date,sub_day,id,is_credit,is_credit_paid,period_id
+            2026-03-10 09:30,10.50,Coffee,Split with Sam,0,,,,5,0,0,7
+        """.trimIndent()
+
+        service.importTransactions(ByteArrayInputStream(legacy.toByteArray()))
+
+        val imported = upsertedTransactions.captured.single()
+        assertThat(imported.comment).isEqualTo("Coffee")
+        assertThat(imported.categoryId).isEqualTo(CATEGORY_IDS["Coffee"])
+        assertThat(imported.note).isEqualTo("Split with Sam")
+    }
+
+    @Test
     fun `blank comments do not trigger category resolution and leave the category unset`() = runTest {
         service.importTransactions(csvOf(listOf(tx(id = 1L, comment = "   "))))
 

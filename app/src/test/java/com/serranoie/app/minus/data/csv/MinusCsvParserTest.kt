@@ -30,7 +30,21 @@ class MinusCsvParserTest {
     }
 
     @Test
-    fun parse_readsNoteColumn() {
+    fun parse_readsCategoryAndExtraNoteColumns() {
+        val csv = """
+            date,amount,category,extra_note,is_recurrent,frequency,end_date,sub_day,id,is_credit,is_credit_paid,period_id
+            2026-03-10 09:30,10.50,Taxi,Split with Sam,0,,,,1,0,0,7
+        """.trimIndent()
+
+        val rows = parser.parse(ByteArrayInputStream(csv.toByteArray(StandardCharsets.UTF_8))).rows
+
+        assertEquals(1, rows.size)
+        assertEquals("Taxi", rows[0].comment)
+        assertEquals("Split with Sam", rows[0].note)
+    }
+
+    @Test
+    fun parse_legacyCommentAndNoteHeaders_mapToCategoryAndExtraNote() {
         val csv = """
             date,amount,comment,note,is_recurrent,frequency,end_date,sub_day,id,is_credit,is_credit_paid,period_id
             2026-03-10 09:30,10.50,Taxi,Split with Sam,0,,,,1,0,0,7

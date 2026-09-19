@@ -80,9 +80,10 @@ class MinusCsvParser {
     private fun parseRecord(raw: Map<String, String>): CsvTransactionRow {
         val date = LocalDateTime.parse(raw.valueOf(MinusCsvContract.COL_DATE), dateTimeFormatter)
         val amount = raw.valueOf(MinusCsvContract.COL_AMOUNT).toBigDecimal()
-        val comment = raw.valueOf(MinusCsvContract.COL_COMMENT)
-        // Absent in files exported before the note column existed → valueOf returns "".
-        val note = raw.valueOf(MinusCsvContract.COL_NOTE)
+        val comment = raw.valueOf(MinusCsvContract.COL_CATEGORY)
+            .ifEmpty { raw.valueOf(MinusCsvContract.COL_COMMENT_LEGACY) }
+        val note = raw.valueOf(MinusCsvContract.COL_EXTRA_NOTE)
+            .ifEmpty { raw.valueOf(MinusCsvContract.COL_NOTE_LEGACY) }
 
         val isRecurrent = raw.valueOf(MinusCsvContract.COL_IS_RECURRENT).trim() == "1"
         val frequency = raw.valueOf(MinusCsvContract.COL_FREQUENCY)

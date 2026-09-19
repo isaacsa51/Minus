@@ -59,6 +59,17 @@ class MinusCsvRoundTripTest {
     )
 
     @Test
+    fun `the header names the category and extra note columns, not comment`() {
+        val out = ByteArrayOutputStream()
+        exporter.export(listOf(tx()), emptyList(), null, out)
+
+        val header = out.toString(Charsets.UTF_8.name()).lineSequence().first()
+
+        assertThat(header).startsWith("date,amount,category,extra_note,")
+        assertThat(header.split(",")).containsNoneOf("comment", "note")
+    }
+
+    @Test
     fun `a plain transaction survives the round trip field for field`() {
         val original = tx(id = 42L, amount = "12.50", comment = "Lunch", periodId = 9L)
 
