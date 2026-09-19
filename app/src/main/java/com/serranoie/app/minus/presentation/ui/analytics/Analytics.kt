@@ -118,6 +118,8 @@ import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.toToast
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
 import com.serranoie.app.minus.presentation.util.combineColors
+import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
+import com.serranoie.app.minus.presentation.util.font.format.toLocalDate
 import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performUIHaptic
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -161,7 +163,10 @@ data class AnalyticsState(
     val previousPeriodTransactions: List<Transaction> = emptyList(),
     val categories: List<Category> = emptyList(),
     val graphGranularity: GraphGranularity = GraphGranularity.TOTAL,
-)
+) {
+    val periodKey: String
+        get() = "$periodFinished-$isHistoricalView-$isLoading-${startPeriodDate.time}-${finishPeriodDate?.time}"
+}
 
 data class AnalyticsActions(
     val onCreateNewPeriod: () -> Unit = {},
@@ -388,12 +393,26 @@ fun Analytics(
             modifier = Modifier.fillMaxSize(),
             topBar = {
                 if (!state.periodFinished || state.isHistoricalView) {
+                    val periodLabel = if (state.isHistoricalView) {
+                        val start = state.startPeriodDate.toLocalDate()
+                        val end = state.finishPeriodDate?.toLocalDate() ?: start
+                        "${start.format(DateTimeFormatter.ofPattern("dd MMM"))} – ${
+                            end.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+                        }"
+                    } else null
                     MiddlePeriodHeader(
                         onClose = actions.onClose,
                         onShowPastPeriods = { showPastPeriodsSheet = true },
                         historyIconModifier = Modifier.bringIntoViewRequester(
                             bringIntoViewRequesters[1]!!
-                        ).markIfInOrder(1)
+                        ).markIfInOrder(1),
+                        periodLabel = periodLabel,
+                        periodBudget = periodLabel?.let {
+                            stringResource(
+                                R.string.budget_formula_caption_per_period,
+                                formatCurrencySymbolOnly(state.wholeBudget, state.currencyCode),
+                            )
+                        },
                     )
                 }
             },
@@ -416,35 +435,34 @@ fun Analytics(
                     )
                 }
 
-                val transitionKey = remember(state.periodFinished, state.isHistoricalView) {
-                    "${state.periodFinished}-${state.isHistoricalView}"
-                }
                 AnimatedContent(
-                    targetState = transitionKey, transitionSpec = {
+                    targetState = state,
+                    contentKey = { it.periodKey },
+                    transitionSpec = {
                         fadeIn(animationSpec = tween(500)) togetherWith fadeOut(
                             animationSpec = tween(
                                 500
                             )
                         )
                     }, label = "AnalyticsContentTransition"
-                ) { target ->
-                    logcat("Analytics") { "Displaying state for: $target" }
+                ) { shown ->
+                    logcat("Analytics") { "Displaying state for: ${shown.periodKey}" }
                     Column(
                         Modifier
                             .fillMaxSize()
                             .onGloballyPositioned { scrollableContainerCoordinates = it }
                             .verticalScroll(scrollState)) {
-                        if (state.periodFinished) {
+                        if (shown.periodFinished) {
                             FinishedPeriodHeader(
                                 scrollState = scrollState,
-                                hasSpends = state.spends.isNotEmpty(),
-                                isOverBudget = state.spends.sumOf { it.amount } > state.wholeBudget,
+                                hasSpends = shown.spends.isNotEmpty(),
+                                isOverBudget = shown.spends.sumOf { it.amount } > shown.wholeBudget,
                             )
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
                         BudgetGraph(
-                            state = state,
+                            state = shown,
                             onGranularityChanged = actions.onGranularityChanged,
                             modifier = Modifier.padding(horizontal = 16.dp)
                                 .bringIntoViewRequester(bringIntoViewRequesters[2]!!)
@@ -456,7 +474,7 @@ fun Analytics(
                         Spacer(modifier = Modifier.height(16.dp))
                         AnalyticsResponsiveLayout(
                             useTabletLayout = useWideAnalyticsLayout,
-                            state = state,
+                            state = shown,
                             categories = categories,
                             onShowHistory = {
                                 showHistorySheet = true
@@ -465,7 +483,7 @@ fun Analytics(
                             onShowSubscriptions = actions.onNavigateToSubscriptions,
                             onShowCreditDetails = { showCreditSheet = true },
                             onCategoryClick = { categoryName, categorySpends ->
-                                selectedCategory = state.toCategoryAnalyticsState(
+                                selectedCategory = shown.toCategoryAnalyticsState(
                                     categoryName, categorySpends
                                 )
                                 view.weakHapticFeedback()
@@ -476,11 +494,11 @@ fun Analytics(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         SavingsRecommendationCard(
-                            budget = state.wholeBudget,
-                            recurringInPeriod = state.recurringInPeriod,
-                            oneTimeSpends = state.oneTimeSpends,
-                            currency = state.currencyCode,
-                            preferences = state.savingsPreferences,
+                            budget = shown.wholeBudget,
+                            recurringInPeriod = shown.recurringInPeriod,
+                            oneTimeSpends = shown.oneTimeSpends,
+                            currency = shown.currencyCode,
+                            preferences = shown.savingsPreferences,
                             modifier = Modifier.padding(horizontal = 16.dp)
                                 .bringIntoViewRequester(bringIntoViewRequesters[5]!!)
                                 .markIfInOrder(5),
