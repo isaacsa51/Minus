@@ -37,6 +37,7 @@ class FeatureLabScreenshotTest {
                     onCategoryPickerDirectPopupToggle = {},
                     onCategoryGridModeToggle = {},
                     onExtraNoteToggle = {},
+                    onReserveUpcomingChargesToggle = {},
                     onBack = {},
                 )
             }

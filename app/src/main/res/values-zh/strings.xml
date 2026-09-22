@@ -207,6 +207,7 @@
     <string name="budget_formula_caption_remaining_budget">总预算的剩余部分</string>
     <string name="budget_formula_caption_spread_over_left">分配到周期剩余的时间</string>
     <string name="budget_formula_caption_left">减去已花费的金额</string>
+    <string name="budget_formula_caption_reserved">为本周期内稍后到期的扣款预留</string>
     <string name="budget_formula_card_tap_hint">点击查看完整明细</string>
     <string name="budget_formula_tip_hold_pill">提示：长按主屏幕上的预算胶囊，随时查看此明细</string>
     <string name="budget_formula_tip_tap_card">提示：也可以点击周期面板中的计算金额</string>
@@ -315,6 +316,9 @@
     <string name="settings_feature_extra_note_subtitle">点击查看详情</string>
     <string name="settings_feature_extra_note_description">在添加或编辑交易时，在类别旁边添加一个可选的"附加备注"字段。用它来记录仅凭类别无法体现的细节，例如"通勤"里的钱具体花在了什么地方。</string>
     <string name="settings_feature_extra_note_switch_label">启用附加备注</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">预留即将到来的扣款</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">从第一天起就预留本周期内稍后到期的每笔定期扣款，而不是在到期日才扣除。剩余预算和每日金额将只显示真正可以自由支配的部分。</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">提前预留扣款</string>
     <string name="settings_feature_lab_title">附加功能</string>
     <string name="settings_feature_lab_subtitle">可以开启的可选实验性功能</string>
     <string name="settings_feature_lab_header">这里的每项功能都是可选的，默认关闭；部分为实验性功能，可能在后续更新中发生变化。只开启你需要的功能，点击某项功能即可查看它具体会改变什么。</string>

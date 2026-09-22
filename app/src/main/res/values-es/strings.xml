@@ -207,6 +207,7 @@
     <string name="budget_formula_caption_remaining_budget">Lo que queda del presupuesto total</string>
     <string name="budget_formula_caption_spread_over_left">Repartido en lo que queda del período</string>
     <string name="budget_formula_caption_left">Menos lo que has gastado</string>
+    <string name="budget_formula_caption_reserved">Reservado para cargos que vencen más adelante en el periodo</string>
     <string name="budget_formula_card_tap_hint">Toca para ver el desglose completo</string>
     <string name="budget_formula_tip_hold_pill">Consejo: mantén presionada la píldora del presupuesto en la pantalla de inicio para ver esto cuando quieras</string>
     <string name="budget_formula_tip_tap_card">Consejo: también puedes tocar el monto calculado en la hoja del período</string>
@@ -315,6 +316,9 @@
     <string name="settings_feature_extra_note_subtitle">Toca para ver los detalles</string>
     <string name="settings_feature_extra_note_description">Añade un campo opcional de "Nota adicional" junto a la categoría al agregar o editar una transacción. Úsalo para recordar un detalle que la categoría por sí sola no refleja, como en qué se gastó exactamente el dinero de "Transporte".</string>
     <string name="settings_feature_extra_note_switch_label">Habilitar nota adicional</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">Reservar cargos próximos</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">Reserva desde el primer día cada cargo recurrente que vence más adelante en el periodo actual, en lugar de descontarlo en su fecha de vencimiento. Tu presupuesto restante y tu importe diario mostrarán solo lo que realmente puedes gastar.</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">Reservar cargos por adelantado</string>
     <string name="settings_feature_lab_title">Funciones adicionales</string>
     <string name="settings_feature_lab_subtitle">Funciones opcionales y experimentales que puedes activar</string>
     <string name="settings_feature_lab_header">Cada función aquí es opcional y está desactivada de forma predeterminada; algunas son experimentales y pueden cambiar en una actualización posterior. Activa solo lo que necesitas y toca una para ver exactamente qué cambia.</string>

@@ -1,7 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.editor.sheets.split
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -96,42 +97,42 @@ fun CalculatedSplitCard(
         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
     )
     val content: @Composable () -> Unit = {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(R.string.budget_split_calculated_amount),
+                style = MaterialTheme.typography.labelMediumCondensed,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = formattedAmount,
+                style = MaterialTheme.typography.headlineSmallEmphasized,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.censor(),
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
             ) {
-                Text(
-                    text = stringResource(R.string.budget_split_calculated_amount),
-                    style = MaterialTheme.typography.labelMediumCondensed,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = formattedAmount,
-                    style = MaterialTheme.typography.headlineSmallEmphasized,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.censor(),
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+                if (onClick != null) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f),
+                        modifier = Modifier.size(14.dp),
+                    )
+                }
                 Text(
                     text = if (onClick != null) stringResource(R.string.budget_formula_card_tap_hint) else briefText,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f),
                     textAlign = TextAlign.Center,
-                )
-            }
-            if (onClick != null) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                        .size(18.dp),
                 )
             }
         }
@@ -164,7 +165,8 @@ private fun CalculatedSplitCardPreview() {
             currencyFormat = NumberFormat.getCurrencyInstance(Locale.US),
             totalBudget = BigDecimal("22000.00"),
             totalDays = 30,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            onClick = {},
         )
     }
 }

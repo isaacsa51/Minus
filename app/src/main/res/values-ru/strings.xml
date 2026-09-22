@@ -211,6 +211,7 @@
     <string name="budget_formula_caption_remaining_budget">Осталось от общего бюджета</string>
     <string name="budget_formula_caption_spread_over_left">Распределено на остаток периода</string>
     <string name="budget_formula_caption_left">Минус то, что вы потратили</string>
+    <string name="budget_formula_caption_reserved">Отложено на платежи, которые спишутся позже в этом периоде</string>
     <string name="budget_formula_card_tap_hint">Нажмите, чтобы увидеть полный расчёт</string>
     <string name="budget_formula_tip_hold_pill">Совет: удерживайте индикатор бюджета на главном экране, чтобы открыть этот расчёт в любой момент</string>
     <string name="budget_formula_tip_tap_card">Совет: также можно нажать на рассчитанную сумму в панели периода</string>
@@ -325,6 +326,9 @@
     <string name="settings_feature_extra_note_subtitle">Нажмите, чтобы узнать подробности</string>
     <string name="settings_feature_extra_note_description">Добавляет необязательное поле "Дополнительная заметка" рядом с категорией при добавлении или изменении транзакции. Используйте его, чтобы запомнить деталь, которую не передаёт одна лишь категория, — например, на что именно были потрачены деньги в категории "Дорога".</string>
     <string name="settings_feature_extra_note_switch_label">Включить дополнительную заметку</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">Резервировать предстоящие платежи</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">Откладывает каждый регулярный платёж, который спишется позже в текущем периоде, с первого дня, а не вычитает его в день списания. Остаток бюджета и сумма на день будут показывать только то, что действительно можно потратить.</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">Резервировать платежи заранее</string>
     <string name="settings_feature_lab_title">Дополнительные функции</string>
     <string name="settings_feature_lab_subtitle">Дополнительные и экспериментальные функции, которые можно включить</string>
     <string name="settings_feature_lab_header">Каждая функция здесь необязательна и по умолчанию отключена; некоторые из них экспериментальные и могут измениться в будущем обновлении. Включайте только то, что нужно, и нажмите на функцию, чтобы увидеть, что именно она меняет.</string>

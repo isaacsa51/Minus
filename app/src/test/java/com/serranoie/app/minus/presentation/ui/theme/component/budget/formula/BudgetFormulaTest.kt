@@ -5,6 +5,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.calculateBudgetMetrics
 import org.junit.Test
 import java.math.BigDecimal
@@ -94,6 +95,27 @@ class BudgetFormulaTest {
         assertThat(rows.last().result.compareTo(metrics.periodRemaining)).isEqualTo(0)
     }
 
+    @Test
+    fun `reserved charges get their own labelled row and are split out of the remaining budget`() {
+        val netflix = Transaction(amount = BigDecimal("15.00"), comment = "Netflix", date = LocalDate.of(2026, 9, 25).atStartOfDay())
+        val gym = Transaction(amount = BigDecimal("30.00"), comment = "Gym", date = LocalDate.of(2026, 9, 14).atStartOfDay())
+        val reserved = state.copy(
+            totalSpentInPeriod = BigDecimal("445.00"),
+            reservedCharges = listOf(gym, netflix),
+        )
+        val metrics = calculateBudgetMetrics(reserved, BudgetPeriod.WEEKLY, BudgetSplitMode.DYNAMIC)
+        val rows = buildBudgetFormula(request(BudgetSplitMode.DYNAMIC).copy(budgetState = reserved))
+
+        val reservedRow = rows.single { it.caption == FormulaCaption.RESERVED }
+        assertThat(reservedRow.terms.filterIsInstance<FormulaTerm.Charge>().map { it.transaction.comment })
+            .containsExactly("Netflix")
+        assertThat(reservedRow.result).isEqualTo(BigDecimal("15.00"))
+        val remainingRow = rows.first { it.caption == FormulaCaption.REMAINING_BUDGET }
+        assertThat(remainingRow.terms).hasSize(5)
+        rows.forEach { assertThat(evaluate(it).compareTo(it.result)).isEqualTo(0) }
+        assertThat(rows.last().result.compareTo(metrics.periodRemaining)).isEqualTo(0)
+    }
+
     private fun request(splitMode: BudgetSplitMode) = BudgetFormulaRequest(
         budgetState = state,
         budgetSettings = settings,
@@ -109,18 +131,19 @@ class BudgetFormulaTest {
             return first.numerator.multiply(BigDecimal(times))
                 .divide(BigDecimal(first.denominator.n), 2, RoundingMode.HALF_UP)
         }
-        val left = (first as FormulaTerm.Amount).value
-        val op = (row.terms[1] as FormulaTerm.Op).symbol
-        val right = when (val term = row.terms[2]) {
+        fun value(term: FormulaTerm): BigDecimal = when (term) {
             is FormulaTerm.Amount -> term.value
             is FormulaTerm.Count -> BigDecimal(term.n)
+            is FormulaTerm.Charge -> term.transaction.amount
             else -> error("unexpected $term")
         }
-        return when (op) {
-            "+" -> left.add(right)
-            "−" -> left.subtract(right)
-            "×" -> left.multiply(right)
-            else -> error("unexpected $op")
+        return row.terms.drop(1).chunked(2).fold(value(first)) { acc, (op, term) ->
+            when ((op as FormulaTerm.Op).symbol) {
+                "+" -> acc.add(value(term))
+                "−" -> acc.subtract(value(term))
+                "×" -> acc.multiply(value(term))
+                else -> error("unexpected $op")
+            }
         }
     }
 }

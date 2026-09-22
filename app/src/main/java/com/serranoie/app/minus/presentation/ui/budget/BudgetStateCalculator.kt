@@ -155,6 +155,7 @@ class BudgetStateCalculator @Inject constructor() {
             totalSpentThisBiweek = totalSpentThisBiweek,
             totalSpentThisMonth = totalSpentThisMonth,
             periodTotalDays = originalTotalDays,
+            reservedCharges = unpaidRecurringCharges.filter { it.date?.toLocalDate()?.isAfter(currentDate) == true },
         )
     }
 

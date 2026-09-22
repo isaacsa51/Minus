@@ -98,7 +98,6 @@ import com.serranoie.app.minus.domain.model.SupportedCurrencyData
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.allocationFor
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.CalculatedSplitCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaRequest
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaSource
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.SplitModePickerDialog
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.availablePeriodsFor
 import com.serranoie.app.minus.presentation.ui.onboarding.FinishDateSelector
@@ -127,7 +126,6 @@ import java.util.Date
 import java.util.Locale
 
 const val BUDGET_PERIOD_SHEET_TAG = "BudgetPeriodSheet"
-private const val CALCULATED_SPLIT_CARD_FORMULA_KEY = "calculated_split_card"
 const val BUDGET_PERIOD_EDIT_BUTTON_TAG = "BudgetPeriodSheet.EditButton"
 const val BUDGET_PERIOD_FINISH_EARLY_BUTTON_TAG = "BudgetPeriodSheet.FinishEarlyButton"
 const val BUDGET_PERIOD_APPLY_BUTTON_TAG = "BudgetPeriodSheet.ApplyButton"
@@ -155,6 +153,7 @@ fun BudgetPeriodSheet(
     onFinishEarly: (() -> Unit)? = null,
     startInEditMode: Boolean = false,
     pendingExpensesCount: Int = 0,
+    onShowFormula: ((BudgetFormulaRequest) -> Unit)? = null,
 ) {
     val haptic = LocalHapticFeedback.current
     val currencyFormat = remember(currencyCode) {
@@ -264,6 +263,7 @@ fun BudgetPeriodSheet(
                 startDateAsDate = startDateAsDate,
                 endDateAsDate = endDateAsDate,
                 available = available,
+                onShowFormula = onShowFormula,
                 onPeriodSelected = { p ->
                     logcat { "User selected period chip: $p (previous=$periodCache)" }
                     periodCache = p
@@ -337,6 +337,7 @@ private fun ViewBudgetContent(
     onEditClick: () -> Unit,
     onFinishEarlyClick: () -> Unit,
     showFinishEarly: Boolean,
+    onShowFormula: ((BudgetFormulaRequest) -> Unit)?,
 ) {
     val view = LocalView.current
     Column(
@@ -519,33 +520,31 @@ private fun ViewBudgetContent(
             Spacer(modifier = Modifier.height(4.dp))
 
             val splitMode = budgetSettings?.splitMode ?: BudgetSplitMode.STATIC
-            BudgetFormulaSource(key = CALCULATED_SPLIT_CARD_FORMULA_KEY) { sharedModifier, showFormula ->
-                val formulaTip = stringResource(R.string.budget_formula_tip_hold_pill)
-                val openFormula = if (showFormula != null && budgetState != null) {
-                    val request = BudgetFormulaRequest(
-                        budgetState, budgetSettings, periodCache, splitMode, currencyCode, tip = formulaTip,
-                    )
-                    fun() {
-                        view.weakHapticFeedback()
-                        showFormula(request)
-                    }
-                } else {
-                    null
-                }
-                CalculatedSplitCard(
-                    periodCache = periodCache,
-                    allocation = budgetState?.allocationFor(periodCache, splitMode) ?: BigDecimal.ZERO,
-                    splitMode = splitMode,
-                    currencyFormat = currencyFormat,
-                    totalBudget = budgetState?.totalBudget ?: BigDecimal.ZERO,
-                    remaining = (budgetState?.totalBudget ?: BigDecimal.ZERO)
-                        .subtract(budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO),
-                    totalDays = totalDays,
-                    daysRemaining = budgetState?.daysRemaining ?: 0,
-                    modifier = sharedModifier.fillMaxWidth(),
-                    onClick = openFormula,
+            val formulaTip = stringResource(R.string.budget_formula_tip_hold_pill)
+            val openFormula = if (onShowFormula != null && budgetState != null) {
+                val request = BudgetFormulaRequest(
+                    budgetState, budgetSettings, periodCache, splitMode, currencyCode, tip = formulaTip,
                 )
+                fun() {
+                    view.weakHapticFeedback()
+                    onShowFormula(request)
+                }
+            } else {
+                null
             }
+            CalculatedSplitCard(
+                periodCache = periodCache,
+                allocation = budgetState?.allocationFor(periodCache, splitMode) ?: BigDecimal.ZERO,
+                splitMode = splitMode,
+                currencyFormat = currencyFormat,
+                totalBudget = budgetState?.totalBudget ?: BigDecimal.ZERO,
+                remaining = (budgetState?.totalBudget ?: BigDecimal.ZERO)
+                    .subtract(budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO),
+                totalDays = totalDays,
+                daysRemaining = budgetState?.daysRemaining ?: 0,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = openFormula,
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))

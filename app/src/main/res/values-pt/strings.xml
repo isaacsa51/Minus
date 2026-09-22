@@ -207,6 +207,7 @@
     <string name="budget_formula_caption_remaining_budget">O que resta do orçamento total</string>
     <string name="budget_formula_caption_spread_over_left">Dividido pelo que resta do período</string>
     <string name="budget_formula_caption_left">Menos o que você gastou</string>
+    <string name="budget_formula_caption_reserved">Reservado para cobranças que vencem mais adiante no período</string>
     <string name="budget_formula_card_tap_hint">Toque para ver o detalhamento completo</string>
     <string name="budget_formula_tip_hold_pill">Dica: segure a pílula do orçamento na tela inicial para ver isto a qualquer momento</string>
     <string name="budget_formula_tip_tap_card">Dica: você também pode tocar no valor calculado na folha do período</string>
@@ -315,6 +316,9 @@
     <string name="settings_feature_extra_note_subtitle">Toque para ver mais detalhes</string>
     <string name="settings_feature_extra_note_description">Adiciona um campo opcional de "Nota adicional" ao lado da categoria ao adicionar ou editar uma transação. Use-o para lembrar de um detalhe que a categoria sozinha não registra, como em que exatamente o dinheiro de "Transporte" foi gasto.</string>
     <string name="settings_feature_extra_note_switch_label">Ativar nota adicional</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">Reservar cobranças futuras</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">Reserva desde o primeiro dia cada cobrança recorrente que vence mais adiante no período atual, em vez de descontá-la na data de vencimento. Seu orçamento restante e seu valor diário mostrarão apenas o que está realmente livre para gastar.</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">Reservar cobranças antecipadamente</string>
     <string name="settings_feature_lab_title">Recursos adicionais</string>
     <string name="settings_feature_lab_subtitle">Recursos opcionais e experimentais que você pode ativar</string>
     <string name="settings_feature_lab_header">Cada recurso aqui é opcional e vem desativado por padrão; alguns são experimentais e podem mudar em uma atualização futura. Ative apenas o que precisar e toque em um para ver exatamente o que ele muda.</string>

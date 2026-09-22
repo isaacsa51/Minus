@@ -24,6 +24,7 @@ data class UserSettings(
     val categoryPickerDirectPopupEnabled: Boolean = false,
     val categoryGridModeEnabled: Boolean = false,
     val extraNoteEnabled: Boolean = false,
+    val reserveUpcomingChargesEnabled: Boolean = false,
     val tutorialBoxCompleted: Boolean = false,
     val firstLaunchTutorialStage: FirstLaunchTutorialStage = FirstLaunchTutorialStage.COMPLETED,
     val analyticsTutorialCompleted: Boolean = false,

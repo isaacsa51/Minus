@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,16 +49,26 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
+import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
+import java.math.BigDecimal
 import java.text.NumberFormat
+import java.time.LocalDate
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Stable
@@ -237,6 +248,11 @@ private fun FormulaRowView(row: FormulaRow, currencyFormat: NumberFormat, highli
         fontWeight = FontWeight.Bold,
         fontFeatureSettings = "tnum",
     )
+    val charges = row.terms.filterIsInstance<FormulaTerm.Charge>()
+    if (charges.isNotEmpty()) {
+        ChargeSumView(charges, row.result, currencyFormat, style, highlightResult)
+        return
+    }
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -255,6 +271,63 @@ private fun FormulaRowView(row: FormulaRow, currencyFormat: NumberFormat, highli
 }
 
 @Composable
+private fun ChargeSumView(
+    charges: List<FormulaTerm.Charge>,
+    total: BigDecimal,
+    currencyFormat: NumberFormat,
+    style: TextStyle,
+    highlightResult: Boolean,
+) {
+    Column(
+        modifier = Modifier.width(IntrinsicSize.Max),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        charges.forEachIndexed { index, charge ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = charge.label(),
+                    style = MaterialTheme.typography.labelSmallCondensed,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                        .widthIn(max = 180.dp),
+                )
+                Text(
+                    text = (if (index == charges.lastIndex) "+ " else "") + currencyFormat.format(charge.transaction.amount),
+                    style = style,
+                    modifier = Modifier.censor(),
+                )
+            }
+        }
+        HorizontalDivider(thickness = 2.dp, color = LocalContentColor.current)
+        Text(
+            text = currencyFormat.format(total),
+            style = style,
+            color = if (highlightResult) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+            modifier = Modifier.censor(),
+        )
+    }
+}
+
+@Composable
+private fun FormulaTerm.Charge.label(): String = transaction.comment.ifBlank {
+    stringResource(
+        when (transaction.recurrentFrequency) {
+            RecurrentFrequency.WEEKLY -> R.string.recurrent_ticket_weekly_unnamed
+            RecurrentFrequency.BIWEEKLY -> R.string.recurrent_ticket_biweekly_unnamed
+            else -> R.string.recurrent_ticket_monthly_unnamed
+        }
+    )
+}
+
+@Composable
 private fun FormulaTermView(term: FormulaTerm, currencyFormat: NumberFormat, style: TextStyle) {
     when (term) {
         is FormulaTerm.Amount -> Text(
@@ -266,6 +339,12 @@ private fun FormulaTermView(term: FormulaTerm, currencyFormat: NumberFormat, sty
         is FormulaTerm.Op -> Text(text = term.symbol, style = style)
 
         is FormulaTerm.Count -> Text(text = term.label(), style = style)
+
+        is FormulaTerm.Charge -> Text(
+            text = currencyFormat.format(term.transaction.amount),
+            style = style,
+            modifier = Modifier.censor(),
+        )
 
         is FormulaTerm.Fraction -> Column(
             modifier = Modifier.width(IntrinsicSize.Max),
@@ -312,6 +391,7 @@ private fun FormulaRow.captionText(periodName: String, period: BudgetPeriod): St
     FormulaCaption.REMAINING_BUDGET -> stringResource(R.string.budget_formula_caption_remaining_budget)
     FormulaCaption.SPREAD_OVER_LEFT -> stringResource(R.string.budget_formula_caption_spread_over_left)
     FormulaCaption.LEFT -> stringResource(R.string.budget_formula_caption_left)
+    FormulaCaption.RESERVED -> stringResource(R.string.budget_formula_caption_reserved)
     FormulaCaption.NEXT_BLOCK -> stringResource(
         when (period) {
             BudgetPeriod.DAILY -> R.string.budget_pill_next_daily
@@ -328,4 +408,54 @@ private fun BudgetPeriod.nameRes(): Int = when (this) {
     BudgetPeriod.WEEKLY -> R.string.budget_period_weekly
     BudgetPeriod.BIWEEKLY -> R.string.budget_period_biweekly
     BudgetPeriod.MONTHLY -> R.string.budget_period_monthly
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BudgetFormulaContentPreview() {
+    MinusTheme {
+        BudgetFormulaContent(
+            request = BudgetFormulaRequest(
+                budgetState = BudgetState(
+                    remainingToday = BigDecimal.ZERO,
+                    totalSpentToday = BigDecimal("20.00"),
+                    dailyBudget = BigDecimal("33.33"),
+                    daysRemaining = 20,
+                    progress = 0f,
+                    isOverBudget = false,
+                    totalBudget = BigDecimal("1050.00"),
+                    totalSpentInPeriod = BigDecimal("400.00"),
+                    totalSpentThisWeek = BigDecimal("150.00"),
+                    periodTotalDays = 30,
+                    reservedCharges = listOf(
+                        Transaction(
+                            amount = BigDecimal("15.00"),
+                            comment = "Netflix",
+                            date = LocalDate.of(2026, 9, 25).atStartOfDay(),
+                        ),
+                        Transaction(
+                            amount = BigDecimal("30.00"),
+                            comment = "Gym",
+                            date = LocalDate.of(2026, 9, 28).atStartOfDay(),
+                        ),
+                        Transaction(
+                            amount = BigDecimal("9.99"),
+                            comment = "Spotify",
+                            date = LocalDate.of(2026, 9, 29).atStartOfDay(),
+                        ),
+                    ),
+                ),
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("1000.00"),
+                    period = BudgetPeriod.MONTHLY,
+                    startDate = LocalDate.of(2026, 9, 1),
+                    rollOverLimit = BigDecimal("100.00"),
+                    rollOverCarryForward = false,
+                ),
+                viewPeriod = BudgetPeriod.WEEKLY,
+                splitMode = BudgetSplitMode.DYNAMIC,
+                currencyCode = "USD",
+            )
+        )
+    }
 }

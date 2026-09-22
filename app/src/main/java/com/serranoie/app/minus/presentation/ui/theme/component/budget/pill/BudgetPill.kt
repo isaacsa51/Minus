@@ -90,7 +90,7 @@ import kotlinx.coroutines.delay
 import java.math.BigDecimal
 import java.time.LocalDate
 
-private const val BUDGET_PILL_FORMULA_KEY = "budget_pill"
+internal const val BUDGET_PILL_FORMULA_KEY = "budget_pill"
 private const val FORMULA_HOLD_MILLIS = 300
 private const val FORMULA_HOLD_SCALE = 0.9f
 

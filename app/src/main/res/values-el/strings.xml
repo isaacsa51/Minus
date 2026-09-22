@@ -205,6 +205,7 @@
     <string name="budget_formula_caption_remaining_budget">Υπόλοιπο του συνολικού προϋπολογισμού</string>
     <string name="budget_formula_caption_spread_over_left">Μοιρασμένο στο υπόλοιπο της περιόδου</string>
     <string name="budget_formula_caption_left">Μείον όσα έχετε ξοδέψει</string>
+    <string name="budget_formula_caption_reserved">Δεσμευμένο για χρεώσεις που λήγουν αργότερα στην περίοδο</string>
     <string name="budget_formula_card_tap_hint">Πατήστε για την πλήρη ανάλυση</string>
     <string name="budget_formula_tip_hold_pill">Συμβουλή: κρατήστε πατημένη την ένδειξη προϋπολογισμού στην αρχική οθόνη για να το δείτε όποτε θέλετε</string>
     <string name="budget_formula_tip_tap_card">Συμβουλή: μπορείτε επίσης να πατήσετε το υπολογισμένο ποσό στο φύλλο περιόδου</string>
@@ -312,6 +313,9 @@
     <string name="settings_feature_extra_note_subtitle">Πατήστε για να δείτε περισσότερες λεπτομέρειες</string>
     <string name="settings_feature_extra_note_description">Προσθέτει ένα προαιρετικό πεδίο "Επιπλέον σημείωση" δίπλα στην κατηγορία κατά την προσθήκη ή επεξεργασία μιας συναλλαγής. Χρησιμοποιήστε το για να θυμάστε μια λεπτομέρεια που δεν αποτυπώνει από μόνη της η κατηγορία — για παράδειγμα, σε τι ακριβώς ξοδεύτηκαν τα χρήματα της κατηγορίας "Μετακινήσεις".</string>
     <string name="settings_feature_extra_note_switch_label">Ενεργοποίηση επιπλέον σημείωσης</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">Δέσμευση επερχόμενων χρεώσεων</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">Δεσμεύει κάθε επαναλαμβανόμενη χρέωση που λήγει αργότερα στην τρέχουσα περίοδο από την πρώτη μέρα, αντί να την αφαιρεί την ημέρα λήξης της. Ο υπόλοιπος προϋπολογισμός και το ημερήσιο ποσό θα δείχνουν μόνο ό,τι είναι πραγματικά διαθέσιμο.</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">Δέσμευση χρεώσεων εκ των προτέρων</string>
     <string name="settings_feature_lab_title">Επιπλέον λειτουργίες</string>
     <string name="settings_feature_lab_subtitle">Προαιρετικές και πειραματικές λειτουργίες που μπορείτε να ενεργοποιήσετε</string>
     <string name="settings_feature_lab_header">Κάθε λειτουργία εδώ είναι προαιρετική και απενεργοποιημένη από προεπιλογή· ορισμένες είναι πειραματικές και ενδέχεται να αλλάξουν σε μελλοντική ενημέρωση. Ενεργοποιήστε μόνο ό,τι χρειάζεστε και πατήστε σε μια λειτουργία για να δείτε ακριβώς τι αλλάζει.</string>

@@ -205,6 +205,7 @@
     <string name="budget_formula_caption_remaining_budget">予算合計の残り</string>
     <string name="budget_formula_caption_spread_over_left">期間の残りに分割</string>
     <string name="budget_formula_caption_left">使った金額を差し引く</string>
+    <string name="budget_formula_caption_reserved">期間内に後日発生する支払いのために確保</string>
     <string name="budget_formula_card_tap_hint">タップして詳しい内訳を表示</string>
     <string name="budget_formula_tip_hold_pill">ヒント: ホーム画面の予算ピルを長押しすると、いつでもこの内訳を確認できます</string>
     <string name="budget_formula_tip_tap_card">ヒント: 期間シートの計算額をタップしても確認できます</string>
@@ -313,6 +314,9 @@
     <string name="settings_feature_extra_note_subtitle">タップして詳細を表示</string>
     <string name="settings_feature_extra_note_description">取引を追加または編集するときに、カテゴリの横に任意の「追加メモ」欄を表示します。カテゴリだけでは分からない詳細を記録するのに使えます。たとえば「通勤」のお金が具体的に何に使われたかなどです。</string>
     <string name="settings_feature_extra_note_switch_label">追加メモを有効にする</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">今後の支払いを確保</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">現在の期間内に後日発生する定期支払いを、支払日に差し引くのではなく初日から確保します。残りの予算と1日の金額には、本当に使える分だけが表示されます。</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">支払いを事前に確保する</string>
     <string name="settings_feature_lab_title">追加機能</string>
     <string name="settings_feature_lab_subtitle">オンにできる任意の実験的な機能</string>
     <string name="settings_feature_lab_header">ここにある機能はすべて任意で、初期状態ではオフです。一部は実験的な機能で、今後のアップデートで変更されることがあります。必要なものだけをオンにし、各機能をタップすると変更内容を詳しく確認できます。</string>

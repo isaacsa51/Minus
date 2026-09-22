@@ -210,6 +210,7 @@
     <string name="budget_formula_caption_remaining_budget">Rest vom Gesamtbudget</string>
     <string name="budget_formula_caption_spread_over_left">Auf den Rest der Periode verteilt</string>
     <string name="budget_formula_caption_left">Minus deine Ausgaben</string>
+    <string name="budget_formula_caption_reserved">Zurückgelegt für Zahlungen, die später in der Periode fällig sind</string>
     <string name="budget_formula_card_tap_hint">Tippe für die vollständige Aufschlüsselung</string>
     <string name="budget_formula_tip_hold_pill">Tipp: Halte die Budget-Anzeige auf dem Startbildschirm gedrückt, um das jederzeit zu sehen</string>
     <string name="budget_formula_tip_tap_card">Tipp: Du kannst auch auf den berechneten Betrag im Zeitraum-Sheet tippen</string>
@@ -318,6 +319,9 @@
     <string name="settings_feature_extra_note_subtitle">Tippen, um mehr Details zu sehen</string>
     <string name="settings_feature_extra_note_description">Fügt beim Hinzufügen oder Bearbeiten einer Transaktion ein optionales Feld "Zusätzliche Notiz" neben der Kategorie hinzu. Damit kannst du dir ein Detail merken, das die Kategorie allein nicht erfasst – zum Beispiel, wofür das Geld in "Pendeln" genau ausgegeben wurde.</string>
     <string name="settings_feature_extra_note_switch_label">Zusätzliche Notiz aktivieren</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">Anstehende Zahlungen zurücklegen</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">Legt jede wiederkehrende Zahlung, die später in der aktuellen Periode fällig ist, vom ersten Tag an zurück, statt sie erst am Fälligkeitstag abzuziehen. Dein restliches Budget und dein Tagesbetrag zeigen dann nur, was wirklich frei verfügbar ist.</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">Zahlungen im Voraus zurücklegen</string>
     <string name="settings_feature_lab_title">Zusätzliche Funktionen</string>
     <string name="settings_feature_lab_subtitle">Optionale und experimentelle Funktionen, die du aktivieren kannst</string>
     <string name="settings_feature_lab_header">Jede Funktion hier ist optional und standardmäßig deaktiviert; einige sind experimentell und können sich in einem späteren Update ändern. Aktiviere nur, was du brauchst, und tippe auf eine Funktion, um genau zu sehen, was sie ändert.</string>

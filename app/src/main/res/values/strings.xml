@@ -271,6 +271,7 @@
     <string name="budget_formula_caption_remaining_budget">Left of the total budget</string>
     <string name="budget_formula_caption_spread_over_left">Spread over what\'s left of the period</string>
     <string name="budget_formula_caption_left">Minus what you\'ve spent</string>
+    <string name="budget_formula_caption_reserved">Set aside for charges due later in the period</string>
     <string name="budget_formula_card_tap_hint">Tap for the full breakdown</string>
     <string name="budget_formula_tip_hold_pill">Tip: hold the budget pill on the home screen to see this anytime</string>
     <string name="budget_formula_tip_tap_card">Tip: you can also tap the calculated amount in the period sheet</string>

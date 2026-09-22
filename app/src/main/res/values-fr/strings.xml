@@ -210,6 +210,7 @@
     <string name="budget_formula_caption_remaining_budget">Reste du budget total</string>
     <string name="budget_formula_caption_spread_over_left">Réparti sur le reste de la période</string>
     <string name="budget_formula_caption_left">Moins ce que vous avez dépensé</string>
+    <string name="budget_formula_caption_reserved">Mis de côté pour les prélèvements à venir dans la période</string>
     <string name="budget_formula_card_tap_hint">Appuyez pour voir le détail complet</string>
     <string name="budget_formula_tip_hold_pill">Astuce : maintenez la pastille du budget sur l\'écran d\'accueil pour afficher ceci à tout moment</string>
     <string name="budget_formula_tip_tap_card">Astuce : vous pouvez aussi appuyer sur le montant calculé dans la feuille de période</string>
@@ -318,6 +319,9 @@
     <string name="settings_feature_extra_note_subtitle">Appuyez pour voir plus de détails</string>
     <string name="settings_feature_extra_note_description">Ajoute un champ facultatif "Note supplémentaire" à côté de la catégorie lors de l\'ajout ou de la modification d\'une transaction. Utilisez-le pour noter un détail que la catégorie seule ne capture pas, comme ce pour quoi l\'argent de "Trajet" a réellement été dépensé.</string>
     <string name="settings_feature_extra_note_switch_label">Activer la note supplémentaire</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">Réserver les prélèvements à venir</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">Met de côté dès le premier jour chaque prélèvement récurrent dû plus tard dans la période en cours, au lieu de le déduire à sa date d\'échéance. Votre budget restant et votre montant quotidien n\'afficheront que ce qui est vraiment disponible.</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">Réserver les prélèvements à l\'avance</string>
     <string name="settings_feature_lab_title">Fonctionnalités supplémentaires</string>
     <string name="settings_feature_lab_subtitle">Fonctionnalités facultatives et expérimentales que vous pouvez activer</string>
     <string name="settings_feature_lab_header">Chaque fonctionnalité ici est facultative et désactivée par défaut ; certaines sont expérimentales et peuvent changer dans une mise à jour ultérieure. N\'activez que ce dont vous avez besoin et appuyez sur une fonctionnalité pour voir exactement ce qu\'elle change.</string>

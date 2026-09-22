@@ -207,6 +207,7 @@
     <string name="budget_formula_caption_remaining_budget">Ciò che resta del bilancio totale</string>
     <string name="budget_formula_caption_spread_over_left">Suddiviso su ciò che resta del periodo</string>
     <string name="budget_formula_caption_left">Meno quello che hai speso</string>
+    <string name="budget_formula_caption_reserved">Accantonato per gli addebiti in scadenza più avanti nel periodo</string>
     <string name="budget_formula_card_tap_hint">Tocca per il dettaglio completo</string>
     <string name="budget_formula_tip_hold_pill">Suggerimento: tieni premuta la pillola del bilancio nella schermata iniziale per vedere questo in qualsiasi momento</string>
     <string name="budget_formula_tip_tap_card">Suggerimento: puoi anche toccare l\'importo calcolato nel foglio del periodo</string>
@@ -315,6 +316,9 @@
     <string name="settings_feature_extra_note_subtitle">Tocca per vedere maggiori dettagli</string>
     <string name="settings_feature_extra_note_description">Aggiunge un campo facoltativo "Nota aggiuntiva" accanto alla categoria quando aggiungi o modifichi una transazione. Usalo per ricordare un dettaglio che la categoria da sola non cattura, ad esempio per cosa sono stati spesi esattamente i soldi in "Spostamenti".</string>
     <string name="settings_feature_extra_note_switch_label">Abilita nota aggiuntiva</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">Riserva gli addebiti in arrivo</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">Accantona dal primo giorno ogni addebito ricorrente in scadenza più avanti nel periodo corrente, invece di sottrarlo alla data di scadenza. Il budget rimanente e l\'importo giornaliero mostreranno solo ciò che è davvero disponibile.</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">Riserva gli addebiti in anticipo</string>
     <string name="settings_feature_lab_title">Funzioni aggiuntive</string>
     <string name="settings_feature_lab_subtitle">Funzioni facoltative e sperimentali che puoi attivare</string>
     <string name="settings_feature_lab_header">Ogni funzione qui è facoltativa e disattivata per impostazione predefinita; alcune sono sperimentali e potrebbero cambiare in un aggiornamento futuro. Attiva solo ciò che ti serve e tocca una funzione per vedere esattamente cosa cambia.</string>

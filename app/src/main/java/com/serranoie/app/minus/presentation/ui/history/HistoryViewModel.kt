@@ -283,7 +283,8 @@ class HistoryViewModel @Inject constructor(
                 currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             )
             budgetStateCalculator.calculateBudgetState(
-                s, periodTransactions, today, paidOccurrences, transactions
+                s, periodTransactions, today, paidOccurrences, transactions,
+                reserveUpcomingCharges = userSettings?.reserveUpcomingChargesEnabled == true,
             )
         }
 

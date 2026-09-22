@@ -59,6 +59,7 @@ data class SettingsUiState(
     val isCategoryPickerDirectPopupEnabled: Boolean = false,
     val isCategoryGridModeEnabled: Boolean = false,
     val isExtraNoteEnabled: Boolean = false,
+    val isReserveUpcomingChargesEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val notificationHour: Int = 9,
     val notificationMinute: Int = 0,
@@ -119,6 +120,7 @@ class SettingsViewModel @Inject constructor(
             isCategoryPickerDirectPopupEnabled = settings.categoryPickerDirectPopupEnabled,
             isCategoryGridModeEnabled = settings.categoryGridModeEnabled,
             isExtraNoteEnabled = settings.extraNoteEnabled,
+            isReserveUpcomingChargesEnabled = settings.reserveUpcomingChargesEnabled,
             currentLanguage = settings.language,
             recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
             notificationHour = settings.notificationHour,
@@ -306,6 +308,13 @@ class SettingsViewModel @Inject constructor(
         val newValue = !uiState.value.isExtraNoteEnabled
         viewModelScope.launch {
             settingsRepository.setExtraNoteEnabled(newValue)
+        }
+    }
+
+    fun onReserveUpcomingChargesToggle() {
+        val newValue = !uiState.value.isReserveUpcomingChargesEnabled
+        viewModelScope.launch {
+            settingsRepository.setReserveUpcomingChargesEnabled(newValue)
         }
     }
 

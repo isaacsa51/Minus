@@ -205,6 +205,7 @@
     <string name="budget_formula_caption_remaining_budget">총 예산에서 남은 금액</string>
     <string name="budget_formula_caption_spread_over_left">기간의 남은 부분에 나누어 배분</string>
     <string name="budget_formula_caption_left">지출한 금액을 뺀 값</string>
+    <string name="budget_formula_caption_reserved">기간 후반에 결제될 금액으로 미리 확보</string>
     <string name="budget_formula_card_tap_hint">탭하여 전체 내역 보기</string>
     <string name="budget_formula_tip_hold_pill">팁: 홈 화면의 예산 알약을 길게 누르면 언제든지 이 내역을 볼 수 있습니다</string>
     <string name="budget_formula_tip_tap_card">팁: 기간 시트의 계산된 금액을 탭해도 볼 수 있습니다</string>
@@ -314,6 +315,9 @@
     <string name="settings_feature_extra_note_subtitle">탭하여 자세히 보기</string>
     <string name="settings_feature_extra_note_description">거래를 추가하거나 수정할 때 카테고리 옆에 선택적 "추가 메모" 필드를 표시합니다. 카테고리만으로는 알 수 없는 세부 정보를 기록할 때 사용하세요. 예를 들어 "교통" 항목의 돈을 정확히 어디에 썼는지 등입니다.</string>
     <string name="settings_feature_extra_note_switch_label">추가 메모 사용</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">예정된 결제 미리 확보</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">현재 기간 후반에 결제될 반복 결제를 결제일에 차감하는 대신 첫날부터 미리 확보합니다. 남은 예산과 하루 금액에는 실제로 쓸 수 있는 금액만 표시됩니다.</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">결제 금액 미리 확보</string>
     <string name="settings_feature_lab_title">추가 기능</string>
     <string name="settings_feature_lab_subtitle">켤 수 있는 선택적 실험 기능</string>
     <string name="settings_feature_lab_header">여기 있는 기능은 모두 선택 사항이며 기본적으로 꺼져 있습니다. 일부는 실험적 기능으로 이후 업데이트에서 변경될 수 있습니다. 필요한 것만 켜고, 기능을 탭하면 무엇이 바뀌는지 정확히 확인할 수 있습니다.</string>

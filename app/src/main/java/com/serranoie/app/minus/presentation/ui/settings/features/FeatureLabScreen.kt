@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.EditNote
+import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.Sell
 import androidx.compose.material.icons.rounded.YoutubeSearchedFor
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,6 +60,7 @@ fun FeatureLabScreen(
     onCategoryPickerDirectPopupToggle: () -> Unit,
     onCategoryGridModeToggle: () -> Unit,
     onExtraNoteToggle: () -> Unit,
+    onReserveUpcomingChargesToggle: () -> Unit,
     onBack: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -151,8 +153,18 @@ fun FeatureLabScreen(
                         switchLabel = stringResource(R.string.settings_feature_extra_note_switch_label),
                         checked = state.isExtraNoteEnabled,
                         onToggle = onExtraNoteToggle,
-                        position = PaddedListItemPosition.Last,
+                        position = PaddedListItemPosition.Middle,
                         testTag = "FeatureLabExtraNote",
+                    )
+                    FeatureToggleCard(
+                        icon = Icons.Rounded.EventRepeat,
+                        title = stringResource(R.string.settings_feature_reserve_upcoming_charges_title),
+                        description = stringResource(R.string.settings_feature_reserve_upcoming_charges_description),
+                        switchLabel = stringResource(R.string.settings_feature_reserve_upcoming_charges_switch_label),
+                        checked = state.isReserveUpcomingChargesEnabled,
+                        onToggle = onReserveUpcomingChargesToggle,
+                        position = PaddedListItemPosition.Last,
+                        testTag = "FeatureLabReserveUpcomingCharges",
                     )
                 }
             }
@@ -262,6 +274,7 @@ private fun FeatureLabScreenPreview() {
             onCategoryPickerDirectPopupToggle = {},
             onCategoryGridModeToggle = {},
             onExtraNoteToggle = {},
+            onReserveUpcomingChargesToggle = {},
             onBack = {},
         )
     }

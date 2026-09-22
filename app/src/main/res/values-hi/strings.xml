@@ -205,6 +205,7 @@
     <string name="budget_formula_caption_remaining_budget">कुल बजट में से बचा हुआ</string>
     <string name="budget_formula_caption_spread_over_left">अवधि के बचे हिस्से में बाँटा गया</string>
     <string name="budget_formula_caption_left">जो आपने खर्च किया, उसे घटाकर</string>
+    <string name="budget_formula_caption_reserved">अवधि में बाद में देय भुगतानों के लिए अलग रखा गया</string>
     <string name="budget_formula_card_tap_hint">पूरा ब्यौरा देखने के लिए टैप करें</string>
     <string name="budget_formula_tip_hold_pill">सुझाव: यह कभी भी देखने के लिए होम स्क्रीन पर बजट पिल को दबाकर रखें</string>
     <string name="budget_formula_tip_tap_card">सुझाव: आप अवधि शीट में हिसाब की गई रकम पर भी टैप कर सकते हैं</string>
@@ -312,6 +313,9 @@
     <string name="settings_feature_extra_note_subtitle">ज़्यादा जानकारी के लिए टैप करें</string>
     <string name="settings_feature_extra_note_description">ट्रांज़ैक्शन जोड़ते या एडिट करते समय कैटेगरी के बगल में एक वैकल्पिक "अतिरिक्त नोट" फ़ील्ड जोड़ता है. इससे आप वह जानकारी याद रख सकते हैं जो अकेले कैटेगरी से पता नहीं चलती — जैसे "आना-जाना" में खर्च हुआ पैसा असल में किस चीज़ पर गया.</string>
     <string name="settings_feature_extra_note_switch_label">अतिरिक्त नोट चालू करें</string>
+    <string name="settings_feature_reserve_upcoming_charges_title">आगामी भुगतान आरक्षित करें</string>
+    <string name="settings_feature_reserve_upcoming_charges_description">मौजूदा अवधि में बाद में देय हर आवर्ती भुगतान को उसकी देय तारीख पर घटाने के बजाय पहले दिन से ही अलग रख देता है। आपका शेष बजट और दैनिक राशि सिर्फ़ वही दिखाएँगे जो वाकई खर्च के लिए उपलब्ध है।</string>
+    <string name="settings_feature_reserve_upcoming_charges_switch_label">भुगतान पहले से आरक्षित करें</string>
     <string name="settings_feature_lab_title">अतिरिक्त फ़ीचर</string>
     <string name="settings_feature_lab_subtitle">वैकल्पिक और एक्सपेरिमेंटल फ़ीचर जिन्हें आप चालू कर सकते हैं</string>
     <string name="settings_feature_lab_header">यहाँ हर फ़ीचर वैकल्पिक है और डिफ़ॉल्ट रूप से बंद है; कुछ एक्सपेरिमेंटल हैं और आगे किसी अपडेट में बदल सकते हैं. सिर्फ़ वही चालू करें जिसकी ज़रूरत हो, और किसी फ़ीचर पर टैप करके देखें कि वह असल में क्या बदलता है.</string>
