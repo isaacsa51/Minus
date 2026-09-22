@@ -446,8 +446,9 @@ class SplitModeE2ETest {
 
     @Test
     fun when_dynamic_weekly_period_then_card_shows_remaining_split_into_week_blocks() {
-        // New formula: weekly = remaining / ceil(daysRemaining / 7)
-        //   = (16644.45 - 200) / ceil(28/7) = 16444.45 / 4 = 4111.11
+        // weekly = pool at the start of this week * 7 / days from that start to the period end
+        //   28 of 30 days left -> the week started 2 days ago, 30 days from its start
+        //   = (16644.45 - 200) * 7 / 30 = 3837.04
         val (settings, state) = customDynamicScenario(
             budget = totalBudget,
             spent = totalSpent,
@@ -460,7 +461,7 @@ class SplitModeE2ETest {
             .performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("4111.11"))).onLast()
+        composeTestRule.onAllNodesWithText(formatExpected(BigDecimal("3837.04"))).onLast()
             .assertIsDisplayed()
     }
 }
