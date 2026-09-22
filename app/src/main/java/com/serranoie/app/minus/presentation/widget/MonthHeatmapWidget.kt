@@ -16,7 +16,6 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.cornerRadius
@@ -278,8 +277,7 @@ suspend fun updateMonthHeatmapWidget(
 ) {
     val maxTransactions = monthData.days.maxOfOrNull { it.transactionCount }?.coerceAtLeast(1) ?: 1
 
-    val manager = GlanceAppWidgetManager(context)
-    val glanceIds = manager.getGlanceIds(MonthHeatmapWidget::class.java)
+    val glanceIds = boundGlanceIds(context, MonthHeatmapWidgetReceiver::class.java, MonthHeatmapWidget::class.java)
 
     glanceIds.forEach { glanceId ->
         updateAppWidgetState(context, glanceId) { prefs ->

@@ -16,7 +16,6 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.cornerRadius
@@ -222,8 +221,7 @@ suspend fun updateAverageSpendWidget(
     val chartRatios =
         recentSpends.map { (it.amount.toFloat() / maxAmount.toFloat()).coerceIn(0f, 1f) }
 
-    val manager = GlanceAppWidgetManager(context)
-    val glanceIds = manager.getGlanceIds(AverageSpendWidget::class.java)
+    val glanceIds = boundGlanceIds(context, AverageSpendWidgetReceiver::class.java, AverageSpendWidget::class.java)
 
     glanceIds.forEach { glanceId ->
         updateAppWidgetState(context, glanceId) { prefs ->

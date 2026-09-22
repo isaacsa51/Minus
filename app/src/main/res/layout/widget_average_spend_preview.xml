@@ -25,7 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/widget_average_spend_preview_amount"
-                android:textColor="#1B1B21"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/daily_average"
-                android:textColor="#5F6673"
+                android:textColor="?android:attr/textColorSecondary"
                 android:textSize="13sp" />
 
             <TextView
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/widget_average_spend_preview_meta"
-                android:textColor="#5F6673"
+                android:textColor="?android:attr/textColorSecondary"
                 android:textSize="12sp" />
         </LinearLayout>
     </FrameLayout>

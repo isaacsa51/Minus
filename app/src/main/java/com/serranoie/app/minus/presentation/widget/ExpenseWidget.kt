@@ -24,7 +24,6 @@ import androidx.glance.LocalSize
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.ActionCallback
@@ -279,8 +278,7 @@ class OpenAppAction : ActionCallback {
 
 suspend fun updateExpenseWidget(context: Context, spend: Int, budget: Int, currency: String) {
     logcat("ExpenseWidget") { "Updating ExpenseWidget: spend=$spend, budget=$budget, currency=$currency" }
-    val manager = GlanceAppWidgetManager(context)
-    val glanceIds = manager.getGlanceIds(ExpenseWidget::class.java)
+    val glanceIds = boundGlanceIds(context, ExpenseWidgetReceiver::class.java, ExpenseWidget::class.java)
 
     glanceIds.forEach { glanceId ->
         updateAppWidgetState(context, glanceId) { prefs ->

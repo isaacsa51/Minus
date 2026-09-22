@@ -35,6 +35,7 @@ data class UserSettings(
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val budgetSplitViewPeriod: BudgetPeriod? = null,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
+    val reserveUpcomingChargesEnabled: Boolean = false,
 ) {
     companion object {
         const val DEFAULT_NOTIFICATION_HOUR = 9

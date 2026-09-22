@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#111318"
+    android:background="?android:attr/colorBackground"
     android:gravity="center_vertical"
     android:orientation="vertical"
     android:padding="16dp">
@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/widget_budget_overview_preview_amount"
-        android:textColor="#F5F7FB"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="30sp"
         android:textStyle="bold" />
 
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:text="@string/total_budget"
-        android:textColor="#A3A6AD"
+        android:textColor="?android:attr/textColorSecondary"
         android:textSize="14sp" />
 
     <LinearLayout
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/widget_budget_overview_preview_start"
-            android:textColor="#A3A6AD"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="12sp" />
 
         <FrameLayout
@@ -42,16 +42,16 @@
             android:layout_height="2dp"
             android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
-            android:background="#5F6673" />
+            android:background="?android:attr/textColorSecondary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#A3A6AD"
+            android:background="?android:attr/colorPrimary"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
             android:text="@string/widget_budget_overview_preview_days"
-            android:textColor="#111318"
+            android:textColor="?android:attr/colorBackground"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -60,13 +60,13 @@
             android:layout_height="2dp"
             android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
-            android:background="#5F6673" />
+            android:background="?android:attr/textColorSecondary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/widget_budget_overview_preview_end"
-            android:textColor="#A3A6AD"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="12sp" />
     </LinearLayout>
 </LinearLayout>

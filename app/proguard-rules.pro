@@ -20,3 +20,10 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+
+# Glance resolves which receivers belong to a GlanceAppWidget through a persisted map keyed by
+# the widget class' canonical name (GlanceAppWidgetManager.getGlanceIds). Our widget classes are
+# builds; every merged widget then shares one name and getGlanceIds() returns ids that belong to
+# other receivers, rendering one widget inside another widget's slot. Keep them distinct.
+-keep class * extends androidx.glance.appwidget.GlanceAppWidget
+-keep class * extends androidx.glance.appwidget.GlanceAppWidgetReceiver

@@ -14,7 +14,6 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.provideContent
@@ -108,8 +107,7 @@ suspend fun updateDaysCountdownWidget(
     periodLabel: String = "",
 ) {
     val resolvedLabel = periodLabel.ifEmpty { context.getString(R.string.days_left) }
-    val manager = GlanceAppWidgetManager(context)
-    val glanceIds = manager.getGlanceIds(DaysCountdownWidget::class.java)
+    val glanceIds = boundGlanceIds(context, DaysCountdownWidgetReceiver::class.java, DaysCountdownWidget::class.java)
 
     glanceIds.forEach { glanceId ->
         updateAppWidgetState(context, glanceId) { prefs ->

@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/total_spent"
-            android:textColor="#5F6673"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="16sp" />
 
         <TextView
@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="$1,250"
-            android:textColor="#1B1B21"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="28sp"
             android:textStyle="bold" />
     </LinearLayout>
