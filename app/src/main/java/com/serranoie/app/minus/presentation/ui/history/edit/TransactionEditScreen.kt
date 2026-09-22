@@ -256,7 +256,7 @@ fun TransactionEditScreen(
                         }
                     },
                     icon = Icons.Rounded.CreditCard,
-                    contentDescription = "Credit card payment",
+                    contentDescription = stringResource(R.string.tutorial_credit_toggle_title),
                     position = TransactionEditTogglePosition.LEADING,
                 )
 
@@ -269,7 +269,7 @@ fun TransactionEditScreen(
                         }
                     },
                     icon = Icons.Rounded.EventRepeat,
-                    contentDescription = "Recurrent payment",
+                    contentDescription = stringResource(R.string.recurrent_expense),
                     position = TransactionEditTogglePosition.TRAILING,
                 )
 
@@ -285,7 +285,7 @@ fun TransactionEditScreen(
                             }
                         },
                         icon = Icons.Rounded.EventRepeat,
-                        contentDescription = "Recurrent payment",
+                        contentDescription = stringResource(R.string.recurrent_expense),
                         position = TransactionEditTogglePosition.STANDALONE,
                     )
                 }

@@ -1,4 +1,4 @@
-﻿package com.serranoie.app.minus.presentation.ui.home
+package com.serranoie.app.minus.presentation.ui.home
 
 import android.content.res.Configuration
 import android.util.Log
@@ -451,10 +451,10 @@ private fun MainNavigationRail(
             icon = {
                 Icon(
                     Icons.Rounded.BarChart,
-                    contentDescription = stringResource(R.string.settings_title)
+                    contentDescription = stringResource(R.string.analytics_title)
                 )
             },
-            label = { Text(stringResource(R.string.settings_title)) },
+            label = { Text(stringResource(R.string.analytics_title)) },
         )
         NavigationRailItem(
             modifier = itemModifier,
