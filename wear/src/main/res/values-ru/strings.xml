@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Minus Wear</string>
+
+    <!-- Экран обзора периода -->
+    <string name="overview_syncing">Синхронизация с телефоном…</string>
+    <string name="overview_no_budget">Бюджет на телефоне ещё не настроен</string>
+    <string name="overview_add_expense">Добавить расход</string>
+    <string name="overview_manual_sync">Синхронизировать сейчас</string>
+
+    <string name="overview_left_today">осталось сегодня</string>
+    <string name="overview_over_budget">перерасход</string>
+
+    <string name="overview_budget_title_daily">Дневной бюджет</string>
+    <string name="overview_budget_title_weekly">Недельный бюджет</string>
+    <string name="overview_budget_title_biweekly">Двухнедельный бюджет</string>
+    <string name="overview_budget_title_monthly">Месячный бюджет</string>
+    <string name="overview_budget_title_generic">Бюджет</string>
+
+    <string name="overview_ends_today">заканчивается сегодня</string>
+    <plurals name="overview_days_left">
+        <item quantity="one">остался %d день</item>
+        <item quantity="few">осталось %d дня</item>
+        <item quantity="many">осталось %d дней</item>
+        <item quantity="other">осталось %d дня</item>
+    </plurals>
+
+    <!-- Ввод расхода (клавиатура + категория) -->
+    <string name="numpad_clear_amount">Очистить сумму</string>
+    <string name="category_save">Сохранить</string>
+    <string name="category_none_yet">Категорий пока нет</string>
+    <string name="category_input_hint">Категория</string>
+</resources>
