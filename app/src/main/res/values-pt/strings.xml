@@ -180,10 +180,6 @@
     <string name="budget_period_label_this_week">Esta semana</string>
     <string name="budget_period_label_this_biweek">Isso duas vezes semanalmente</string>
     <string name="budget_period_label_this_month">Este Mês</string>
-    <string name="budget_pill_label_per_daily">Por dia</string>
-    <string name="budget_pill_label_per_weekly">Por semana</string>
-    <string name="budget_pill_label_per_biweekly">Bienal</string>
-    <string name="budget_pill_label_per_monthly">Por mês</string>
     <string name="budget_pill_next_daily">Para amanhã %1$s</string>
     <string name="budget_pill_next_weekly">Para a próxima semana %1$s</string>
     <string name="budget_pill_next_biweekly">Para a próxima quinzena %1$s</string>
@@ -199,6 +195,7 @@
     <string name="budget_formula_hold_hint">Mostrar como o valor é calculado</string>
     <string name="budget_formula_mode_static">Divisão estática</string>
     <string name="budget_formula_mode_dynamic">Divisão dinâmica</string>
+    <string name="budget_formula_mode_carry_over">Divisão acumulativa</string>
     <string name="budget_formula_caption_surplus_split">O excedente do período anterior entra no orçamento</string>
     <string name="budget_formula_caption_surplus_first_day">O excedente do período anterior fica no primeiro dia</string>
     <string name="budget_formula_caption_adjustments">Receitas e deduções deste período</string>
@@ -208,6 +205,7 @@
     <string name="budget_formula_caption_spread_over_left">Dividido pelo que resta do período</string>
     <string name="budget_formula_caption_left">Menos o que você gastou</string>
     <string name="budget_formula_caption_reserved">Reservado para cobranças que vencem mais adiante no período</string>
+    <string name="budget_formula_caption_carried">Acumulado dos dias anteriores</string>
     <string name="budget_formula_card_tap_hint">Toque para ver o detalhamento completo</string>
     <string name="budget_formula_tip_hold_pill">Dica: segure a pílula do orçamento na tela inicial para ver isto a qualquer momento</string>
     <string name="budget_formula_tip_tap_card">Dica: você também pode tocar no valor calculado na folha do período</string>
@@ -561,30 +559,33 @@
     <string name="wavy_divider_show_all_past_period_expenses">Mostrar todas as despesas do período anterior…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">Usar %d dias</string>
-    <string name="remaining_budget_label">Restante</string>
     <string name="currency_label">moeda</string>
+    <string name="budget_duration_label">Duração</string>
+    <string name="budget_base_currency_label">Moeda base</string>
+    <string name="budget_behaviour_title">Comportamento do orçamento</string>
+    <string name="budget_behaviour_subtitle">Escolha o que acontece com o dinheiro que sobra e como seu valor diário é calculado.</string>
+    <string name="budget_behaviour_surplus_title">Sobra no fim do período</string>
+    <string name="budget_behaviour_surplus_ask">Perguntar</string>
+    <string name="budget_behaviour_surplus_spread">Distribuir tudo</string>
+    <string name="budget_behaviour_surplus_first_day">Tudo no dia 1</string>
+    <string name="budget_behaviour_surplus_preview_ask">Você decide quando o período terminar</string>
+    <string name="budget_behaviour_surplus_preview_spread">ex. %1$s sobrando ÷ %2$s =</string>
+    <string name="budget_behaviour_surplus_preview_first_day">ex. %1$s sobrando → dia 1 =</string>
+    <string name="budget_behaviour_surplus_per_day">+%1$s / dia</string>
     <string name="select_currency">Selecione a moeda</string>
     <string name="search_currency">Pesquisar moeda…</string>
     <string name="clear">Limpar</string>
     <string name="currency_no_results">Nenhuma moeda encontrada</string>
     <string name="currency_selected">Selecionado</string>
     <!-- Remaining Budget Strategy -->
-    <string name="strategy_dialog_title">Excesso de orçamento</string>
-    <string name="strategy_dialog_description" formatted="false">Pode escolher como distribuir o orçamento restante quando o seu período termina.\n\nPor exemplo, o seu período termina com um excedente de 100: pode distribuí-lo igualmente pelos dias do seu próximo período, adicioná-lo todo ao primeiro dia do seu próximo período, ou decidir cada vez que isso acontece.</string>
-    <string name="strategy_ask_always">Perguntar-me sempre</string>
-    <string name="strategy_ask_always_desc">No final do período, vamos perguntar o que fazer com o excedente</string>
-    <string name="strategy_split_equally">Espalhe por todos os dias</string>
-    <string name="strategy_split_equally_desc">O excedente é dividido igualmente entre todos os dias do novo período</string>
-    <string name="strategy_add_to_first_day">Adicionar a hoje</string>
-    <string name="strategy_add_to_first_day_desc">Todo o excedente é adicionado apenas ao orçamento de hoje</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">Modo dividido</string>
-    <string name="split_mode_dialog_title">Como devemos dividir o seu orçamento?</string>
-    <string name="split_mode_dialog_description" formatted="false">Escolha como o valor por período é calculado.</string>
     <string name="split_mode_static">Estático</string>
-    <string name="split_mode_static_desc">O orçamento total está dividido igualmente em todos os períodos, independentemente do quanto você gasta.</string>
-    <string name="split_mode_dynamic">Dinâmico (Recomendado)</string>
-    <string name="split_mode_dynamic_desc">Recalcular diariamente conforme você gasta. O saldo restante está repartido pelos dias que ainda restam no período.</string>
+    <string name="split_mode_static_desc">O orçamento total é dividido igualmente entre todos os dias, independentemente de quanto você gasta ou se gasta.</string>
+    <string name="split_mode_dynamic">Distribuir por todos os dias</string>
+    <string name="split_mode_dynamic_desc">Calculado diariamente com base em como você gasta. O orçamento restante é distribuído pelos dias restantes do período.</string>
+    <string name="split_mode_carry_over">Acumulativo</string>
+    <string name="split_mode_carry_over_desc">O que você não gasta por dia é somado ao orçamento do dia seguinte e vai se acumulando.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Sem data</string>
     <string name="no_name">Sem nome</string>

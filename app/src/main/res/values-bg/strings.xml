@@ -183,10 +183,6 @@
     <string name="budget_period_label_this_week">Тази седмица</string>
     <string name="budget_period_label_this_biweek">Този двуседмичен период</string>
     <string name="budget_period_label_this_month">Този месец</string>
-    <string name="budget_pill_label_per_daily">На ден</string>
-    <string name="budget_pill_label_per_weekly">На седмица</string>
-    <string name="budget_pill_label_per_biweekly">Двуседмично</string>
-    <string name="budget_pill_label_per_monthly">На месец</string>
     <string name="budget_pill_next_daily">За утре %1$s</string>
     <string name="budget_pill_next_weekly">За следващата седмица %1$s</string>
     <string name="budget_pill_next_biweekly">За следващите две седмици %1$s</string>
@@ -202,6 +198,7 @@
     <string name="budget_formula_hold_hint">Покажи как се изчислява сумата</string>
     <string name="budget_formula_mode_static">Статично разделяне</string>
     <string name="budget_formula_mode_dynamic">Динамично разделяне</string>
+    <string name="budget_formula_mode_carry_over">Разделяне с натрупване</string>
     <string name="budget_formula_caption_surplus_split">Излишъкът от миналия период се добавя към бюджета</string>
     <string name="budget_formula_caption_surplus_first_day">Излишъкът от миналия период остава за първия ден</string>
     <string name="budget_formula_caption_adjustments">Приходи и удръжки за този период</string>
@@ -211,6 +208,7 @@
     <string name="budget_formula_caption_spread_over_left">Разпределено върху остатъка от периода</string>
     <string name="budget_formula_caption_left">Минус това, което сте похарчили</string>
     <string name="budget_formula_caption_reserved">Заделено за плащания с падеж по-късно през периода</string>
+    <string name="budget_formula_caption_carried">Прехвърлено от предишните дни</string>
     <string name="budget_formula_card_tap_hint">Докоснете за пълната разбивка</string>
     <string name="budget_formula_tip_hold_pill">Съвет: задръжте индикатора за бюджета на началния екран, за да видите това по всяко време</string>
     <string name="budget_formula_tip_tap_card">Съвет: можете също да докоснете изчислената сума в листа за периода</string>
@@ -563,30 +561,33 @@
     <string name="wavy_divider_show_all_past_period_expenses">Показване на всички разходи от предишния период…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">Използвай %d дни</string>
-    <string name="remaining_budget_label">Оставащи</string>
     <string name="currency_label">Валута</string>
+    <string name="budget_duration_label">Продължителност</string>
+    <string name="budget_base_currency_label">Основна валута</string>
+    <string name="budget_behaviour_title">Поведение на бюджета</string>
+    <string name="budget_behaviour_subtitle">Изберете какво да става с остатъка и как се изчислява дневната ви сума.</string>
+    <string name="budget_behaviour_surplus_title">Излишък в края на периода</string>
+    <string name="budget_behaviour_surplus_ask">Питай ме</string>
+    <string name="budget_behaviour_surplus_spread">Разпредели</string>
+    <string name="budget_behaviour_surplus_first_day">Всичко в ден 1</string>
+    <string name="budget_behaviour_surplus_preview_ask">Ще решите в края на периода</string>
+    <string name="budget_behaviour_surplus_preview_spread">напр. остатък %1$s ÷ %2$s =</string>
+    <string name="budget_behaviour_surplus_preview_first_day">напр. остатък %1$s → ден 1 =</string>
+    <string name="budget_behaviour_surplus_per_day">+%1$s / ден</string>
     <string name="select_currency">Избор на валута</string>
     <string name="search_currency">Търсене на валута…</string>
     <string name="clear">Изчистване</string>
     <string name="currency_no_results">Няма намерени валути</string>
     <string name="currency_selected">Избрано</string>
     <!-- Remaining Budget Strategy -->
-    <string name="strategy_dialog_title">Оставащи средства</string>
-    <string name="strategy_dialog_description" formatted="false">Можете да изберете как да разпределите остатъчния бюджет след края на периода си.\n\nНапример, периодът ви приключва с остатък от 100: можете да го разпределите равномерно между дните на следващия период, да го добавите изцяло към първия ден на следващия период, или да решавате всеки път, когато се случи.</string>
-    <string name="strategy_ask_always">Винаги ме питай</string>
-    <string name="strategy_ask_always_desc">В края на периода ще ви попитаме какво да направите с оставащите средства</string>
-    <string name="strategy_split_equally">Разпредели за всички дни</string>
-    <string name="strategy_split_equally_desc">Оставащите средства се разделят поравно между всички дни от новия период</string>
-    <string name="strategy_add_to_first_day">Добави към днес</string>
-    <string name="strategy_add_to_first_day_desc">Целият остатък се добавя само към бюджета за днес</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">Режим на разпределяне</string>
-    <string name="split_mode_dialog_title">Как трябва да разделим бюджета ви?</string>
-    <string name="split_mode_dialog_description" formatted="false">Изберете как да се изчислява сумата за период.</string>
     <string name="split_mode_static">Статично</string>
-    <string name="split_mode_static_desc">Общият бюджет се разделя поравно между всички дни, независимо от това колко харчите.</string>
-    <string name="split_mode_dynamic">Динамичен (Препоръчително)</string>
-    <string name="split_mode_dynamic_desc">Преизчислява се всеки ден, докато харчите. Оставащият баланс се разпределя за оставащите дни от периода.</string>
+    <string name="split_mode_static_desc">Общият бюджет се разделя поравно на всички дни, независимо колко и дали харчите.</string>
+    <string name="split_mode_dynamic">Разпределяне по всички дни</string>
+    <string name="split_mode_dynamic_desc">Изчислява се всеки ден според това как харчите. Оставащият бюджет се разпределя по оставащите дни от периода.</string>
+    <string name="split_mode_carry_over">Натрупване</string>
+    <string name="split_mode_carry_over_desc">Това, което не похарчите за деня, се добавя към бюджета на следващия ден и продължава да се натрупва.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Без дата</string>
     <string name="no_name">Няма име</string>

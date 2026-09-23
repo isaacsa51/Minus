@@ -4,7 +4,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
@@ -15,11 +19,15 @@ import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetPill
+import kotlinx.coroutines.delay
+import me.saket.touchrobot.onNode
+import me.saket.touchrobot.rememberTouchRobot
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 
 class BudgetPillScreenshotTest {
     @get:Rule
@@ -351,5 +359,57 @@ class BudgetPillScreenshotTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun budgetPillWeeklyAlternatesWithTodayAndSwipes() {
+        Locale.setDefault(Locale.US)
+
+        val view = ComposeView(paparazzi.context).apply {
+            setContent {
+                MinusTheme {
+                    Box(modifier = Modifier.padding(16.dp)) {
+                        BudgetPill(
+                            budgetState = BudgetState(
+                                remainingToday = BigDecimal("413.33"),
+                                totalSpentToday = BigDecimal("20.00"),
+                                dailyBudget = BigDecimal("433.33"),
+                                daysRemaining = 3,
+                                progress = 0.15f,
+                                isOverBudget = false,
+                                totalBudget = BigDecimal("1500.00"),
+                                totalSpentInPeriod = BigDecimal("220.00"),
+                                totalSpentThisWeek = BigDecimal("20.00"),
+                                periodTotalDays = 10,
+                            ),
+                            budgetSettings = BudgetSettings(
+                                totalBudget = BigDecimal("1500.00"),
+                                period = BudgetPeriod.WEEKLY,
+                                startDate = LocalDate.now(),
+                                currencyCode = "EUR",
+                                splitMode = BudgetSplitMode.DYNAMIC,
+                            ),
+                            viewPeriod = BudgetPeriod.WEEKLY,
+                            currencyCode = "EUR",
+                            splitMode = BudgetSplitMode.DYNAMIC,
+                            onOpenBudgetSheet = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                        )
+                    }
+
+                    val touchRobot = rememberTouchRobot()
+                    LaunchedEffect(Unit) {
+                        delay(1_000)
+                        touchRobot.onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).performGesture {
+                            swipe(start = center, stop = center.copy(x = center.x + 300), duration = 200.milliseconds)
+                        }
+                    }
+                }
+            }
+        }
+
+        paparazzi.gif(view, start = 1, end = 3_800)
     }
 }

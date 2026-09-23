@@ -6,6 +6,7 @@ import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.earnedAllowance
 import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -77,6 +78,7 @@ class BudgetStateCalculator @Inject constructor() {
         }
         val carryForFirstDay =
             if (currentDate.isEqual(settings.rollOverAppliedDate ?: settings.startDate)) carry else BigDecimal.ZERO
+        val splitBudget = settings.totalBudget.subtract(carry)
 
         val effectiveTotalBudget = settings.totalBudget
             .add(totalIncomeInPeriod)
@@ -107,9 +109,9 @@ class BudgetStateCalculator @Inject constructor() {
                 }
             }
 
-            BudgetSplitMode.STATIC -> {
+            BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER -> {
                 if (originalTotalDays > 0) {
-                    settings.totalBudget.subtract(carry).divide(
+                    splitBudget.divide(
                         BigDecimal(originalTotalDays),
                         2,
                         RoundingMode.HALF_UP,
@@ -130,7 +132,17 @@ class BudgetStateCalculator @Inject constructor() {
             activeTransactions + unpaidRecurringCharges, settings.startDate, currentDate, 30
         )
 
-        val remainingToday = originalDailyBudget.add(carryForFirstDay).add(incomeToday).subtract(spentToday)
+        val remainingToday = if (settings.splitMode == BudgetSplitMode.CARRY_OVER) {
+            val surplus =
+                if (currentDate.isBefore(settings.rollOverAppliedDate ?: settings.startDate)) BigDecimal.ZERO else carry
+            earnedAllowance(splitBudget, originalTotalDays - daysRemaining + 1, originalTotalDays)
+                .add(surplus)
+                .add(totalIncomeInPeriod)
+                .subtract(totalDecreasesInPeriod)
+                .subtract(totalExpensesInPeriod)
+        } else {
+            originalDailyBudget.add(carryForFirstDay).add(incomeToday).subtract(spentToday)
+        }
 
         val progress = if (effectiveTotalBudget > BigDecimal.ZERO) {
             totalExpensesInPeriod.divide(effectiveTotalBudget, 4, RoundingMode.HALF_UP)
@@ -156,6 +168,7 @@ class BudgetStateCalculator @Inject constructor() {
             totalSpentThisMonth = totalSpentThisMonth,
             periodTotalDays = originalTotalDays,
             reservedCharges = unpaidRecurringCharges.filter { it.date?.toLocalDate()?.isAfter(currentDate) == true },
+            splitBudget = splitBudget,
         )
     }
 

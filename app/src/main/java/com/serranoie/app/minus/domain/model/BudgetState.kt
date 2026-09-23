@@ -17,6 +17,7 @@ data class BudgetState(
     val totalSpentThisMonth: BigDecimal = BigDecimal.ZERO,
     val periodTotalDays: Int = 0,
     val reservedCharges: List<Transaction> = emptyList(),
+    val splitBudget: BigDecimal = BigDecimal.ZERO,
 ) {
     companion object {
         val EMPTY = BudgetState(

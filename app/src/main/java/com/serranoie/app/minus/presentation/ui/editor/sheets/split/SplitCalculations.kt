@@ -38,6 +38,33 @@ private fun share(pool: BigDecimal, days: Int, over: Int): BigDecimal =
     if (over <= 0 || pool.signum() <= 0) BigDecimal.ZERO
     else pool.multiply(BigDecimal(days)).divide(BigDecimal(over), 2, RoundingMode.HALF_UP)
 
+fun earnedAllowance(splitBudget: BigDecimal, throughDay: Int, totalDays: Int): BigDecimal =
+    share(splitBudget, minOf(throughDay, totalDays).coerceAtLeast(0), totalDays)
+
+internal fun BudgetState.spentIn(period: BudgetPeriod): BigDecimal = when (period) {
+    BudgetPeriod.DAILY -> totalSpentToday
+    BudgetPeriod.WEEKLY -> totalSpentThisWeek
+    BudgetPeriod.BIWEEKLY -> totalSpentThisBiweek
+    BudgetPeriod.MONTHLY -> totalSpentThisMonth
+}
+
+private fun BudgetState.carryOverThrough(day: Int, draft: BigDecimal): BigDecimal =
+    remainingToday.subtract(draft)
+        .add(earnedAllowance(splitBudget, day, periodTotalDays))
+        .subtract(earnedAllowance(splitBudget, periodTotalDays - daysRemaining + 1, periodTotalDays))
+
+fun BudgetState.carryOverRemaining(period: BudgetPeriod, draft: BigDecimal = BigDecimal.ZERO): BigDecimal {
+    val window = blockWindow(periodTotalDays, daysRemaining, period.toDays())
+    return carryOverThrough(periodTotalDays - window.daysAfter, draft)
+}
+
+fun BudgetState.carryOverNext(period: BudgetPeriod, draft: BigDecimal = BigDecimal.ZERO): BigDecimal {
+    val window = blockWindow(periodTotalDays, daysRemaining, period.toDays())
+    if (window.daysAfter <= 0) return BigDecimal.ZERO
+    val nextBlockEnd = periodTotalDays - window.daysAfter + minOf(period.toDays(), window.daysAfter)
+    return carryOverThrough(nextBlockEnd, draft)
+}
+
 fun staticBlockBudget(
     totalBudget: BigDecimal,
     totalDays: Int,
@@ -173,6 +200,8 @@ fun BudgetState.allocationFor(
     BudgetSplitMode.STATIC -> staticBlockBudget(totalBudget, periodTotalDays, daysRemaining, period)
 
     BudgetSplitMode.DYNAMIC -> dynamicAllocations(draft).forPeriod(period)
+
+    BudgetSplitMode.CARRY_OVER -> carryOverRemaining(period).add(spentIn(period))
 }
 
 fun BudgetState.nextAllocationFor(period: BudgetPeriod, draft: BigDecimal = BigDecimal.ZERO): BigDecimal =

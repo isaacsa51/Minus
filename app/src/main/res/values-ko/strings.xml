@@ -178,10 +178,6 @@
     <string name="budget_period_label_this_week">이번 주</string>
     <string name="budget_period_label_this_biweek">이번 2주 기간</string>
     <string name="budget_period_label_this_month">이번 달</string>
-    <string name="budget_pill_label_per_daily">일일</string>
-    <string name="budget_pill_label_per_weekly">주간</string>
-    <string name="budget_pill_label_per_biweekly">2주 단위</string>
-    <string name="budget_pill_label_per_monthly">월간</string>
     <string name="budget_pill_next_daily">내일은 %1$s</string>
     <string name="budget_pill_next_weekly">다음 주는 %1$s</string>
     <string name="budget_pill_next_biweekly">다음 2주는 %1$s</string>
@@ -197,6 +193,7 @@
     <string name="budget_formula_hold_hint">금액 계산 방법 보기</string>
     <string name="budget_formula_mode_static">고정 분할</string>
     <string name="budget_formula_mode_dynamic">동적 분할</string>
+    <string name="budget_formula_mode_carry_over">이월 분할</string>
     <string name="budget_formula_caption_surplus_split">지난 기간의 잔여 금액이 예산에 더해집니다</string>
     <string name="budget_formula_caption_surplus_first_day">지난 기간의 잔여 금액은 첫날에 남습니다</string>
     <string name="budget_formula_caption_adjustments">이번 기간의 수입과 공제</string>
@@ -206,6 +203,7 @@
     <string name="budget_formula_caption_spread_over_left">기간의 남은 부분에 나누어 배분</string>
     <string name="budget_formula_caption_left">지출한 금액을 뺀 값</string>
     <string name="budget_formula_caption_reserved">기간 후반에 결제될 금액으로 미리 확보</string>
+    <string name="budget_formula_caption_carried">이전 날짜에서 이월된 금액</string>
     <string name="budget_formula_card_tap_hint">탭하여 전체 내역 보기</string>
     <string name="budget_formula_tip_hold_pill">팁: 홈 화면의 예산 알약을 길게 누르면 언제든지 이 내역을 볼 수 있습니다</string>
     <string name="budget_formula_tip_tap_card">팁: 기간 시트의 계산된 금액을 탭해도 볼 수 있습니다</string>
@@ -560,30 +558,33 @@
     <string name="wavy_divider_show_all_past_period_expenses">이전 기간의 모든 지출 내역 표시…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">%d일 사용</string>
-    <string name="remaining_budget_label">남은 금액</string>
     <string name="currency_label">통화</string>
+    <string name="budget_duration_label">기간</string>
+    <string name="budget_base_currency_label">기본 통화</string>
+    <string name="budget_behaviour_title">예산 동작</string>
+    <string name="budget_behaviour_subtitle">남은 돈을 어떻게 처리할지와 하루 금액을 계산하는 방식을 선택하세요.</string>
+    <string name="budget_behaviour_surplus_title">기간 종료 시 잔액</string>
+    <string name="budget_behaviour_surplus_ask">물어보기</string>
+    <string name="budget_behaviour_surplus_spread">모두 분배</string>
+    <string name="budget_behaviour_surplus_first_day">첫날에 모두</string>
+    <string name="budget_behaviour_surplus_preview_ask">기간이 끝나면 직접 정합니다</string>
+    <string name="budget_behaviour_surplus_preview_spread">예: 남은 %1$s ÷ %2$s =</string>
+    <string name="budget_behaviour_surplus_preview_first_day">예: 남은 %1$s → 첫날 =</string>
+    <string name="budget_behaviour_surplus_per_day">+%1$s / 일</string>
     <string name="select_currency">통화 선택</string>
     <string name="search_currency">통화 검색…</string>
     <string name="clear">지우기</string>
     <string name="currency_no_results">검색된 통화 없음</string>
     <string name="currency_selected">선택됨</string>
     <!-- Remaining Budget Strategy -->
-    <string name="strategy_dialog_title">예산 잔액</string>
-    <string name="strategy_dialog_description" formatted="false">기간이 종료될 때 남은 예산을 어떻게 분배할지 선택할 수 있습니다.\n\n예를 들어 기간이 100의 잔여 예산으로 종료되면, 다음 기간의 날짜에 균등하게 분배하거나, 다음 기간의 첫날에 전부 추가하거나, 매번 발생할 때마다 결정할 수 있습니다.</string>
-    <string name="strategy_ask_always">항상 확인</string>
-    <string name="strategy_ask_always_desc">기간이 종료될 때 잔여 예산을 어떻게 처리할지 확인합니다.</string>
-    <string name="strategy_split_equally">모든 날짜에 분산</string>
-    <string name="strategy_split_equally_desc">잔여 예산이 새 기간의 모든 날짜에 동일하게 분할됩니다.</string>
-    <string name="strategy_add_to_first_day">오늘에 추가</string>
-    <string name="strategy_add_to_first_day_desc">모든 잔여 예산은 오늘 예산에만 추가됩니다</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">분할 모드</string>
-    <string name="split_mode_dialog_title">예산을 어떻게 분할할까요?</string>
-    <string name="split_mode_dialog_description" formatted="false">기간별 금액을 계산할 방식을 선택하세요.</string>
     <string name="split_mode_static">고정</string>
-    <string name="split_mode_static_desc">지출 금액과 관계없이 총 예산을 모든 날짜에 동일하게 분할합니다.</string>
-    <string name="split_mode_dynamic">동적 (권장)</string>
-    <string name="split_mode_dynamic_desc">지출에 따라 매일 다시 계산합니다. 남은 잔액은 해당 기간의 남은 일수 동안 분산됩니다.</string>
+    <string name="split_mode_static_desc">지출 여부나 금액과 상관없이 총 예산을 모든 날에 똑같이 나눕니다.</string>
+    <string name="split_mode_dynamic">모든 날에 분배</string>
+    <string name="split_mode_dynamic_desc">지출에 따라 매일 계산됩니다. 남은 예산은 기간의 남은 날에 나누어 배분됩니다.</string>
+    <string name="split_mode_carry_over">이월</string>
+    <string name="split_mode_carry_over_desc">매일 쓰지 않은 금액은 다음 날 예산에 더해지고 계속 쌓입니다.</string>
     <!-- Transaction Detail -->
     <string name="without_date">날짜 제외</string>
     <string name="no_name">이름 없음</string>

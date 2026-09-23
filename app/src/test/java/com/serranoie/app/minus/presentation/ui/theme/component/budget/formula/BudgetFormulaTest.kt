@@ -116,6 +116,49 @@ class BudgetFormulaTest {
         assertThat(rows.last().result.compareTo(metrics.periodRemaining)).isEqualTo(0)
     }
 
+    @Test
+    fun `carry over weekly chain adds what was carried and ends at the pill amount`() {
+        val carryState = state.copy(remainingToday = BigDecimal("60.00"), splitBudget = BigDecimal("1000.00"))
+        val metrics = calculateBudgetMetrics(carryState, BudgetPeriod.WEEKLY, BudgetSplitMode.CARRY_OVER)
+        val rows = buildBudgetFormula(request(BudgetSplitMode.CARRY_OVER).copy(budgetState = carryState))
+
+        assertThat(rows.map { it.caption }).containsExactly(
+            FormulaCaption.SURPLUS_SPLIT,
+            FormulaCaption.PER_DAY,
+            FormulaCaption.PER_PERIOD,
+            FormulaCaption.CARRIED,
+            FormulaCaption.LEFT,
+        ).inOrder()
+        rows.forEach { assertThat(evaluate(it).compareTo(it.result)).isEqualTo(0) }
+        assertThat(metrics.periodRemaining).isEqualTo(BigDecimal("160.00"))
+        assertThat(rows.last().result.compareTo(metrics.periodRemaining)).isEqualTo(0)
+    }
+
+    @Test
+    fun `carry over overspend ends with tomorrow's amount and never shows a negative number`() {
+        val overspentToday = "20.00" to "-20.00"
+        val debtBiggerThanADay = "0.00" to "-10.00"
+        listOf(overspentToday, debtBiggerThanADay).forEach { (spentToday, left) ->
+            val over = state.copy(
+                totalSpentToday = BigDecimal(spentToday),
+                remainingToday = BigDecimal(left),
+                splitBudget = BigDecimal("1000.00"),
+            )
+            val metrics = calculateBudgetMetrics(over, BudgetPeriod.DAILY, BudgetSplitMode.CARRY_OVER)
+            val rows = buildBudgetFormula(
+                request(BudgetSplitMode.CARRY_OVER).copy(budgetState = over, viewPeriod = BudgetPeriod.DAILY)
+            )
+            val shown = rows.map { it.result } +
+                rows.flatMap { it.terms }.filterIsInstance<FormulaTerm.Amount>().map { it.value }
+
+            assertThat(metrics.nextPeriodAllocation).isNotNull()
+            assertThat(rows.last().caption).isEqualTo(FormulaCaption.NEXT_BLOCK)
+            assertThat(rows.last().result.compareTo(metrics.nextPeriodAllocation)).isEqualTo(0)
+            rows.forEach { assertThat(evaluate(it).compareTo(it.result)).isEqualTo(0) }
+            assertThat(shown.none { it.signum() < 0 }).isTrue()
+        }
+    }
+
     private fun request(splitMode: BudgetSplitMode) = BudgetFormulaRequest(
         budgetState = state,
         budgetSettings = settings,

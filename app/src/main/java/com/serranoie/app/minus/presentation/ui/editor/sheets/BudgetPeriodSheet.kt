@@ -3,6 +3,7 @@
 package com.serranoie.app.minus.presentation.ui.editor.sheets
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -12,7 +13,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,13 +32,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.DateRange
-import androidx.compose.material.icons.rounded.FiberSmartRecord
-import androidx.compose.material.icons.rounded.Repartition
+import androidx.compose.material.icons.outlined.MonetizationOn
 import androidx.compose.material.icons.rounded.Sync
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -53,7 +55,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -82,6 +83,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -98,7 +100,6 @@ import com.serranoie.app.minus.domain.model.SupportedCurrencyData
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.allocationFor
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.CalculatedSplitCard
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaRequest
-import com.serranoie.app.minus.presentation.ui.editor.sheets.split.SplitModePickerDialog
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.availablePeriodsFor
 import com.serranoie.app.minus.presentation.ui.onboarding.FinishDateSelector
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -124,6 +125,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 const val BUDGET_PERIOD_SHEET_TAG = "BudgetPeriodSheet"
 const val BUDGET_PERIOD_EDIT_BUTTON_TAG = "BudgetPeriodSheet.EditButton"
@@ -132,14 +134,15 @@ const val BUDGET_PERIOD_APPLY_BUTTON_TAG = "BudgetPeriodSheet.ApplyButton"
 const val BUDGET_PERIOD_BUDGET_INPUT_TAG = "BudgetPeriodSheet.BudgetInput"
 const val BUDGET_PERIOD_PREVIOUS_VALUES_TAG = "BudgetPeriodSheet.PreviousValues"
 const val BUDGET_PERIOD_DATE_ROW_TAG = "BudgetPeriodSheet.DateRow"
-const val BUDGET_PERIOD_STRATEGY_ROW_TAG = "BudgetPeriodSheet.StrategyRow"
 const val BUDGET_PERIOD_CURRENCY_ROW_TAG = "BudgetPeriodSheet.CurrencyRow"
+const val BUDGET_PERIOD_NEXT_BUTTON_TAG = "BudgetPeriodSheet.NextButton"
 const val BUDGET_PERIOD_SPLIT_TOGGLE_ROW_TAG = "BudgetPeriodSheet.SplitToggleRow"
-const val BUDGET_PERIOD_SPLIT_MODE_ROW_TAG = "BudgetPeriodSheet.SplitModeRow"
 const val BUDGET_PERIOD_ROLLOVER_PREVIEW_BANNER_TAG = "BudgetPeriodSheet.RolloverPreviewBanner"
 
 fun budgetPeriodCardTag(period: BudgetPeriod) = "BudgetPeriodSheet.Period.${period.name}"
 fun budgetPeriodToggleTag(period: BudgetPeriod) = "BudgetPeriodSheet.SplitToggle.${period.name}"
+fun budgetStrategyOptionTag(strategy: RemainingBudgetStrategy) = "BudgetPeriodSheet.Strategy.${strategy.name}"
+fun budgetSplitModeOptionTag(mode: BudgetSplitMode) = "BudgetPeriodSheet.SplitMode.${mode.name}"
 
 @Composable
 fun BudgetPeriodSheet(
@@ -651,7 +654,7 @@ fun EditBudgetContent(
     val resources = LocalResources.current
     val dateFormatter =
         remember {
-            DateTimeFormatter.ofPattern("d MMMM", Locale.getDefault())
+            DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())
         }
 
     val pendingNotificationText =
@@ -703,8 +706,7 @@ fun EditBudgetContent(
 
     var showDateSelector by remember { mutableStateOf(false) }
     var showCurrencyPicker by remember { mutableStateOf(false) }
-    var showStrategyPicker by remember { mutableStateOf(false) }
-    var showSplitModePicker by remember { mutableStateOf(false) }
+    var showBehaviour by remember { mutableStateOf(false) }
     var showPreviousValues by remember { mutableStateOf(false) }
 
     val parsedBudget = budgetText.toBigDecimalOrNull()?.movePointLeft(currencyFractionDigits)
@@ -733,368 +735,401 @@ fun EditBudgetContent(
             }
         }
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .navigationBarsPadding(),
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLargeEmphasized,
-            fontWeight = FontWeight.W500,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-            textAlign = TextAlign.Center,
-        )
+    val view = LocalView.current
 
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            BasicTextField(
-                value = budgetText,
-                onValueChange = { newValue ->
-                    val filtered = newValue.filter { it.isDigit() }
-                    budgetText = filtered
+    fun applySettings() {
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        val periodDays =
+            endCache?.let { ChronoUnit.DAYS.between(startCache, it).toInt() + 1 } ?: 1
+        val period =
+            when {
+                periodDays >= 30 -> BudgetPeriod.MONTHLY
+                periodDays >= 14 -> BudgetPeriod.BIWEEKLY
+                periodDays >= 7 -> BudgetPeriod.WEEKLY
+                else -> BudgetPeriod.DAILY
+            }
+        val newSettings =
+            (budgetSettings ?: BudgetSettings.DEFAULT).copy(
+                totalBudget = parsedBudget,
+                startDate = startCache,
+                endDate = endCache,
+                daysInPeriod = periodDays,
+                currencyCode = currencyCache,
+                remainingBudgetStrategy = strategyCache,
+                splitMode = splitModeCache,
+                period = period,
+            )
+        logcat("BudgetPeriodSheet") {
+            "Apply tapped: budget=$parsedBudget, start=$startCache, end=$endCache, periodDays=$periodDays, resolvedPeriod=$period, strategy=$strategyCache, splitMode=$splitModeCache, currency=$currencyCache"
+        }
+        onApply(newSettings)
+    }
+
+    BackHandler(enabled = showBehaviour) { showBehaviour = false }
+
+    AnimatedContent(
+        targetState = showBehaviour,
+        transitionSpec = {
+            val direction = if (targetState) 1 else -1
+            (
+                slideInHorizontally(animationSpec = tween(300)) { direction * it / 3 } +
+                    fadeIn(tween(250, delayMillis = 50))
+            ).togetherWith(
+                slideOutHorizontally(animationSpec = tween(300)) { -direction * it / 3 } +
+                    fadeOut(tween(200)),
+            )
+        },
+        label = "editBudgetStep",
+    ) { behaviourStep ->
+        if (behaviourStep) {
+            BudgetBehaviourContent(
+                strategy = strategyCache,
+                splitMode = splitModeCache,
+                exampleLeftover = if (totalDays > 0) {
+                    parsedBudget.divide(BigDecimal(totalDays), 2, java.math.RoundingMode.HALF_UP)
+                } else {
+                    BigDecimal.ZERO
                 },
-                visualTransformation = CurrencyAmountInputVisualTransformation(
-                    fractionDigits = currencyFractionDigits,
-                ),
-                textStyle = MaterialTheme.typography.titleMediumCondensed.copy(
-                    fontSize = 48.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                ),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                decorationBox = { innerTextField ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box {
-                            if (budgetText.isEmpty()) {
-                                Text(
-                                    text = currencySymbol + "",
-                                    style =
-                                        MaterialTheme.typography.titleMediumCondensed.copy(
-                                            fontSize = 48.sp,
-                                        ),
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                },
+                periodDays = totalDays,
+                currencyCode = currencyCache,
+                onStrategySelected = { strategyCache = it },
+                onSplitModeSelected = { splitModeCache = it },
+                applyLabel = buttonLabel,
+                onBack = { showBehaviour = false },
+                onApply = { applySettings() },
+            )
+        } else {
+            Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .testTag(BUDGET_PERIOD_BUDGET_INPUT_TAG),
-            )
-        }
-
-        if (showPreviousValuesChip && currentBudget > BigDecimal.ZERO) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
+                        .padding(horizontal = 16.dp)
+                        .navigationBarsPadding(),
             ) {
-                AssistChip(
-                    onClick = { showPreviousValues = !showPreviousValues },
-                    modifier = Modifier.testTag(BUDGET_PERIOD_PREVIOUS_VALUES_TAG),
-                    label = {
-                        Text(
-                            stringResource(R.string.previous_values),
-                            style = MaterialTheme.typography.labelMediumCondensed,
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.Sync,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                    colors =
-                        AssistChipDefaults.assistChipColors(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            labelColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        ),
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLargeEmphasized,
+                    fontWeight = FontWeight.W500,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    textAlign = TextAlign.Center,
                 )
-            }
 
-            if (showPreviousValues) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = colorButton,
-                        ),
-                    shape = RoundedCornerShape(16.dp),
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Row(
+                    BasicTextField(
+                        value = budgetText,
+                        onValueChange = { newValue ->
+                            val filtered = newValue.filter { it.isDigit() }
+                            budgetText = filtered
+                        },
+                        visualTransformation = CurrencyAmountInputVisualTransformation(
+                            fractionDigits = currencyFractionDigits,
+                        ),
+                        textStyle = MaterialTheme.typography.titleMediumCondensed.copy(
+                            fontSize = 48.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center,
+                        ),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        decorationBox = { innerTextField ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Box {
+                                    if (budgetText.isEmpty()) {
+                                        Text(
+                                            text = currencySymbol + "",
+                                            style =
+                                                MaterialTheme.typography.titleMediumCondensed.copy(
+                                                    fontSize = 48.sp,
+                                                ),
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                            }
+                        },
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
+                                .testTag(BUDGET_PERIOD_BUDGET_INPUT_TAG),
+                    )
+                }
+
+                if (showPreviousValuesChip && currentBudget > BigDecimal.ZERO) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.budget),
-                                style = MaterialTheme.typography.labelSmallCondensed,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Text(
-                                text = remember(currentBudget, currentCurrency) {
-                                    symbolOnlyCurrencyFormat(currentCurrency)
-                                        .format(currentBudget)
-                                },
-                                style = MaterialTheme.typography.titleMediumCondensed,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Text(
-                                text = stringResource(R.string.period),
-                                style = MaterialTheme.typography.labelSmallCondensed,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Text(
-                                text = resources.getQuantityString(R.plurals.days, previousPeriodDays, previousPeriodDays),
-                                style = MaterialTheme.typography.titleMediumCondensed,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-
-                        Box(
-                            modifier = Modifier.weight(0.5f),
-                            contentAlignment = Alignment.CenterEnd,
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    budgetText =
-                                        if (currentBudget > BigDecimal.ZERO) {
-                                            (
-                                                currentBudget
-                                                    .multiply(BigDecimal(100))
-                                                    .toBigInteger()
-                                            ).toString()
-                                        } else {
-                                            ""
-                                        }
-                                    if (previousPeriodDays > 0) {
-                                        startCache = LocalDate.now()
-                                        endCache =
-                                            LocalDate
-                                                .now()
-                                                .plusDays(previousPeriodDays.toLong() - 1)
-                                    }
-                                    currencyCache = currentCurrency
-                                    strategyCache = currentStrategy
-                                    showPreviousValues = false
-                                },
-                                modifier = Modifier.size(40.dp),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = stringResource(R.string.apply),
+                        AssistChip(
+                            onClick = { showPreviousValues = !showPreviousValues },
+                            modifier = Modifier.testTag(BUDGET_PERIOD_PREVIOUS_VALUES_TAG),
+                            label = {
+                                Text(
+                                    stringResource(R.string.previous_values),
+                                    style = MaterialTheme.typography.labelLarge,
                                 )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.Sync,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            },
+                            colors =
+                                AssistChipDefaults.assistChipColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                                    labelColor = MaterialTheme.colorScheme.primary,
+                                    leadingIconContentColor = MaterialTheme.colorScheme.primary,
+                                ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)),
+                        )
+                    }
+
+                    if (showPreviousValues) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor = colorButton,
+                                ),
+                            shape = RoundedCornerShape(16.dp),
+                        ) {
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.budget),
+                                        style = MaterialTheme.typography.labelSmallCondensed,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    Text(
+                                        text = remember(currentBudget, currentCurrency) {
+                                            symbolOnlyCurrencyFormat(currentCurrency)
+                                                .format(currentBudget)
+                                        },
+                                        style = MaterialTheme.typography.titleMediumCondensed,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
+
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.period),
+                                        style = MaterialTheme.typography.labelSmallCondensed,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    Text(
+                                        text = resources.getQuantityString(R.plurals.days, previousPeriodDays, previousPeriodDays),
+                                        style = MaterialTheme.typography.titleMediumCondensed,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
+
+                                Box(
+                                    modifier = Modifier.weight(0.5f),
+                                    contentAlignment = Alignment.CenterEnd,
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            budgetText =
+                                                if (currentBudget > BigDecimal.ZERO) {
+                                                    (
+                                                        currentBudget
+                                                            .multiply(BigDecimal(100))
+                                                            .toBigInteger()
+                                                    ).toString()
+                                                } else {
+                                                    ""
+                                                }
+                                            if (previousPeriodDays > 0) {
+                                                startCache = LocalDate.now()
+                                                endCache =
+                                                    LocalDate
+                                                        .now()
+                                                        .plusDays(previousPeriodDays.toLong() - 1)
+                                            }
+                                            currencyCache = currentCurrency
+                                            strategyCache = currentStrategy
+                                            showPreviousValues = false
+                                        },
+                                        modifier = Modifier.size(40.dp),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = stringResource(R.string.apply),
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-        SettingsRow(
-            modifier = Modifier.testTag(BUDGET_PERIOD_DATE_ROW_TAG),
-            icon = Icons.Rounded.DateRange,
-            label =
-                if (endCache != null) {
-                    "${startCache.format(dateFormatter)} — ${endCache?.format(dateFormatter)}"
-                } else {
-                    stringResource(R.string.budget_no_date_defined)
-                },
-            onClick = { showDateSelector = true },
-        )
-
-        if (previousPeriodDays > 0 && endCache == null) {
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                AssistChip(
-                    onClick = {
-                        startCache = LocalDate.now()
-                        endCache = LocalDate.now().plusDays(previousPeriodDays.toLong() - 1)
-                    },
-                    label = {
-                        Text(
-                            stringResource(
-                                R.string.use_previous_period_days,
-                                previousPeriodDays,
-                            ),
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Rounded.Sync,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                        )
-                    },
-                    colors =
-                        AssistChipDefaults.assistChipColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        ),
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        SettingsRow(
-            modifier = Modifier.testTag(BUDGET_PERIOD_STRATEGY_ROW_TAG),
-            icon = Icons.Rounded.Repartition,
-            label = stringResource(R.string.remaining_budget_label),
-            trailingText =
-                when (strategyCache) {
-                    RemainingBudgetStrategy.ASK_ALWAYS -> stringResource(R.string.strategy_ask_always)
-                    RemainingBudgetStrategy.SPLIT_EQUALLY -> stringResource(R.string.strategy_split_equally)
-                    RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> stringResource(R.string.strategy_add_to_first_day)
-                },
-            onClick = { showStrategyPicker = true },
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        SettingsRow(
-            modifier = Modifier.testTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG),
-            icon = Icons.Rounded.Sync,
-            label = stringResource(R.string.split_mode_label),
-            trailingText =
-                when (splitModeCache) {
-                    BudgetSplitMode.STATIC -> stringResource(R.string.split_mode_static)
-                    BudgetSplitMode.DYNAMIC -> stringResource(R.string.split_mode_dynamic)
-                },
-            onClick = { showSplitModePicker = true },
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        val currencyDisplay = SupportedCurrency.findByCode(currencyCache)
-        SettingsRow(
-            modifier = Modifier.testTag(BUDGET_PERIOD_CURRENCY_ROW_TAG),
-            icon = Icons.Rounded.FiberSmartRecord,
-            label = stringResource(R.string.currency_label),
-            trailingText = currencyDisplay?.displayName() ?: currencyCache,
-            onClick = { showCurrencyPicker = true },
-        )
-
-        if (pendingExpensesCount > 0) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(24.dp),
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = pendingNotificationText,
-                    style = MaterialTheme.typography.bodyMediumCondensed,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.outline,
-                )
-            }
-        }
-
-        if (validationMessage != null) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.size(20.dp),
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = validationMessage,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                val periodDays =
-                    endCache?.let { ChronoUnit.DAYS.between(startCache, it).toInt() + 1 } ?: 1
-                val period =
-                    when {
-                        periodDays >= 30 -> BudgetPeriod.MONTHLY
-                        periodDays >= 14 -> BudgetPeriod.BIWEEKLY
-                        periodDays >= 7 -> BudgetPeriod.WEEKLY
-                        else -> BudgetPeriod.DAILY
+                BudgetDetailCard(
+                    modifier = Modifier.testTag(BUDGET_PERIOD_DATE_ROW_TAG),
+                    icon = Icons.Outlined.CalendarToday,
+                    label = stringResource(R.string.budget_duration_label),
+                    value =
+                        if (endCache != null) {
+                            "${startCache.format(dateFormatter)} — ${endCache?.format(dateFormatter)}"
+                        } else {
+                            stringResource(R.string.budget_no_date_defined)
+                        },
+                    onClick = { showDateSelector = true },
+                ) {
+                    if (endCache != null && totalDays > 0) {
+                        AccentBadge(resources.getQuantityString(R.plurals.days, totalDays, totalDays))
                     }
-                val newSettings =
-                    (budgetSettings ?: BudgetSettings.DEFAULT).copy(
-                        totalBudget = parsedBudget,
-                        startDate = startCache,
-                        endDate = endCache,
-                        daysInPeriod = periodDays,
-                        currencyCode = currencyCache,
-                        remainingBudgetStrategy = strategyCache,
-                        splitMode = splitModeCache,
-                        period = period,
-                    )
-                logcat {
-                    "Apply tapped: budget=$parsedBudget, start=$startCache, end=$endCache, periodDays=$periodDays, resolvedPeriod=$period, strategy=$strategyCache, splitMode=$splitModeCache, currency=$currencyCache"
                 }
-                onApply(newSettings)
-            },
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 56.dp)
-                    .testTag(BUDGET_PERIOD_APPLY_BUTTON_TAG),
-            enabled = canApply,
-        ) {
-            Text(buttonLabel, style = MaterialTheme.typography.labelMediumEmphasized)
+
+                if (previousPeriodDays > 0 && endCache == null) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        AssistChip(
+                            onClick = {
+                                startCache = LocalDate.now()
+                                endCache = LocalDate.now().plusDays(previousPeriodDays.toLong() - 1)
+                            },
+                            label = {
+                                Text(
+                                    stringResource(
+                                        R.string.use_previous_period_days,
+                                        previousPeriodDays,
+                                    ),
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Rounded.Sync,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            },
+                            colors =
+                                AssistChipDefaults.assistChipColors(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                ),
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                val currencyDisplay = SupportedCurrency.findByCode(currencyCache)
+                BudgetDetailCard(
+                    modifier = Modifier.testTag(BUDGET_PERIOD_CURRENCY_ROW_TAG),
+                    icon = Icons.Outlined.MonetizationOn,
+                    label = stringResource(R.string.budget_base_currency_label),
+                    value = currencyDisplay?.displayName() ?: currencyCache,
+                    onClick = { showCurrencyPicker = true },
+                ) {
+                    Text(
+                        text = currencyDisplay?.symbol?.takeIf { it != currencyCache }?.let { "$currencyCache ($it)" }
+                            ?: currencyCache,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                if (pendingExpensesCount > 0) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(24.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = pendingNotificationText,
+                            style = MaterialTheme.typography.bodyMediumCondensed,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.outline,
+                        )
+                    }
+                }
+
+                if (validationMessage != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = validationMessage,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = {
+                        view.weakHapticFeedback()
+                        showBehaviour = true
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 56.dp)
+                            .testTag(BUDGET_PERIOD_NEXT_BUTTON_TAG),
+                    enabled = canApply,
+                ) {
+                    Text(stringResource(R.string.next), style = MaterialTheme.typography.labelMediumEmphasized)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+            }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
     }
 
     AnimatedVisibility(
@@ -1135,168 +1170,88 @@ fun EditBudgetContent(
         )
     }
 
-    if (showStrategyPicker) {
-        StrategyPickerDialog(
-            currentStrategy = strategyCache,
-            onDismiss = { showStrategyPicker = false },
-            onSelect = { strategy ->
-                strategyCache = strategy
-                showStrategyPicker = false
-            },
-        )
-    }
+}
 
-    if (showSplitModePicker) {
-        SplitModePickerDialog(
-            currentMode = splitModeCache,
-            onDismiss = { showSplitModePicker = false },
-            onSelect = { mode ->
-                splitModeCache = mode
-                showSplitModePicker = false
-            },
+@Composable
+internal fun AccentBadge(text: String, modifier: Modifier = Modifier) {
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+        modifier = modifier,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            maxLines = 1,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
         )
     }
 }
 
 @Composable
-private fun SettingsRow(
+private fun BudgetDetailCard(
     icon: ImageVector,
     label: String,
-    trailingText: String? = null,
+    value: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    trailing: @Composable () -> Unit = {},
 ) {
-    Row(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .clickable(onClick = onClick)
-                .padding(vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = colorButton,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp),
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f),
-        )
-        if (trailingText != null) {
-            Text(
-                text = trailingText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.surface),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label.uppercase(LocalLocale.current.platformLocale),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            trailing()
+            Icon(
+                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
-}
-
-@Composable
-private fun StrategyPickerDialog(
-    currentStrategy: RemainingBudgetStrategy,
-    onDismiss: () -> Unit,
-    onSelect: (RemainingBudgetStrategy) -> Unit,
-) {
-    val strategies = listOf(
-        RemainingBudgetStrategy.ASK_ALWAYS,
-        RemainingBudgetStrategy.SPLIT_EQUALLY,
-        RemainingBudgetStrategy.ADD_TO_FIRST_DAY,
-    )
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                stringResource(R.string.strategy_dialog_title),
-                style = MaterialTheme.typography.titleLargeEmphasized
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = stringResource(R.string.strategy_dialog_description),
-                    style = MaterialTheme.typography.bodySmallCondensed,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                strategies.forEach { strategy ->
-                    val isSelected = strategy == currentStrategy
-                    val title = when (strategy) {
-                        RemainingBudgetStrategy.ASK_ALWAYS -> stringResource(R.string.strategy_ask_always)
-                        RemainingBudgetStrategy.SPLIT_EQUALLY -> stringResource(R.string.strategy_split_equally)
-                        RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> stringResource(R.string.strategy_add_to_first_day)
-                    }
-                    val description = when (strategy) {
-                        RemainingBudgetStrategy.ASK_ALWAYS -> stringResource(R.string.strategy_ask_always_desc)
-                        RemainingBudgetStrategy.SPLIT_EQUALLY -> stringResource(R.string.strategy_split_equally_desc)
-                        RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> stringResource(
-                            R.string.strategy_add_to_first_day_desc
-                        )
-                    }
-                    OutlinedCard(
-                        onClick = { onSelect(strategy) },
-                        modifier = Modifier.fillMaxWidth(),
-                        border = BorderStroke(
-                            width = if (isSelected) 2.dp else 1.dp,
-                            color = if (isSelected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                            },
-                        ),
-                        colors = CardDefaults.outlinedCardColors(
-                            containerColor = if (isSelected) {
-                                MaterialTheme.colorScheme.primaryContainer.copy(
-                                    alpha = 0.3f
-                                )
-                            } else {
-                                MaterialTheme.colorScheme.surface
-                            },
-                        ),
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = title,
-                                    style = MaterialTheme.typography.bodyMediumEmphasized,
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                if (isSelected) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                }
-                            }
-                            Text(
-                                text = description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    stringResource(R.string.close),
-                    style = MaterialTheme.typography.labelMediumEmphasized
-                )
-            }
-        },
-    )
 }
 
 @Composable

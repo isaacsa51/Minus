@@ -447,4 +447,45 @@ class BudgetStateCalculatorTest {
         assertThat(reserved.totalSpentToday).isEqualTo(BigDecimal.ZERO)
         assertThat(reserved.dailyBudget).isLessThan(deferred.dailyBudget)
     }
+
+    @Test
+    fun `carry over - unspent days add up and overspending comes out of the next day`() {
+        val carryOver = settings(
+            totalBudget = BigDecimal("1000"),
+            start = LocalDate.of(2026, 7, 1),
+            end = LocalDate.of(2026, 7, 10),
+            splitMode = BudgetSplitMode.CARRY_OVER,
+        )
+        fun onDay(day: Int, spentOnDayOne: String) = calculator.calculateBudgetState(
+            settings = carryOver,
+            transactions = listOf(transaction(BigDecimal(spentOnDayOne), LocalDate.of(2026, 7, 1))),
+            currentDate = LocalDate.of(2026, 7, day),
+        )
+
+        assertThat(onDay(1, "80").remainingToday).isEqualTo(BigDecimal("20.00"))
+        assertThat(onDay(2, "80").remainingToday).isEqualTo(BigDecimal("120.00"))
+        assertThat(onDay(3, "80").remainingToday).isEqualTo(BigDecimal("220.00"))
+        assertThat(onDay(3, "80").dailyBudget).isEqualTo(BigDecimal("100.00"))
+        assertThat(onDay(2, "150").remainingToday).isEqualTo(BigDecimal("50.00"))
+        assertThat(onDay(10, "80").remainingToday).isEqualTo(BigDecimal("920.00"))
+    }
+
+    @Test
+    fun `carry over - an unspent first-day surplus keeps carrying`() {
+        val result = calculator.calculateBudgetState(
+            settings = settings(
+                totalBudget = BigDecimal("1050"),
+                start = LocalDate.of(2026, 7, 1),
+                end = LocalDate.of(2026, 7, 10),
+                splitMode = BudgetSplitMode.CARRY_OVER,
+                carryForward = true,
+                rolloverLimit = BigDecimal("50"),
+            ),
+            transactions = emptyList(),
+            currentDate = LocalDate.of(2026, 7, 2),
+        )
+
+        assertThat(result.dailyBudget).isEqualTo(BigDecimal("100.00"))
+        assertThat(result.remainingToday).isEqualTo(BigDecimal("250.00"))
+    }
 }

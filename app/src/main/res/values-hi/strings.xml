@@ -178,10 +178,6 @@
     <string name="budget_period_label_this_week">यह हफ़्ता</string>
     <string name="budget_period_label_this_biweek">यह दो-हफ़्ते की अवधि</string>
     <string name="budget_period_label_this_month">यह महीना</string>
-    <string name="budget_pill_label_per_daily">रोज़ाना</string>
-    <string name="budget_pill_label_per_weekly">हर हफ़्ते</string>
-    <string name="budget_pill_label_per_biweekly">दो हफ़्ते में</string>
-    <string name="budget_pill_label_per_monthly">हर महीने</string>
     <string name="budget_pill_next_daily">कल के लिए %1$s</string>
     <string name="budget_pill_next_weekly">अगले हफ़्ते के लिए %1$s</string>
     <string name="budget_pill_next_biweekly">अगले दो हफ़्तों के लिए %1$s</string>
@@ -197,6 +193,7 @@
     <string name="budget_formula_hold_hint">दिखाएँ कि रकम का हिसाब कैसे लगता है</string>
     <string name="budget_formula_mode_static">स्टैटिक बँटवारा</string>
     <string name="budget_formula_mode_dynamic">डायनामिक बँटवारा</string>
+    <string name="budget_formula_mode_carry_over">कैरी ओवर बँटवारा</string>
     <string name="budget_formula_caption_surplus_split">पिछली अवधि की बची रकम बजट में जुड़ जाती है</string>
     <string name="budget_formula_caption_surplus_first_day">पिछली अवधि की बची रकम पहले दिन में रहती है</string>
     <string name="budget_formula_caption_adjustments">इस अवधि की आय और कटौतियाँ</string>
@@ -206,6 +203,7 @@
     <string name="budget_formula_caption_spread_over_left">अवधि के बचे हिस्से में बाँटा गया</string>
     <string name="budget_formula_caption_left">जो आपने खर्च किया, उसे घटाकर</string>
     <string name="budget_formula_caption_reserved">अवधि में बाद में देय भुगतानों के लिए अलग रखा गया</string>
+    <string name="budget_formula_caption_carried">पिछले दिनों से आगे बढ़ाई गई रकम</string>
     <string name="budget_formula_card_tap_hint">पूरा ब्यौरा देखने के लिए टैप करें</string>
     <string name="budget_formula_tip_hold_pill">सुझाव: यह कभी भी देखने के लिए होम स्क्रीन पर बजट पिल को दबाकर रखें</string>
     <string name="budget_formula_tip_tap_card">सुझाव: आप अवधि शीट में हिसाब की गई रकम पर भी टैप कर सकते हैं</string>
@@ -558,30 +556,33 @@
     <string name="wavy_divider_show_all_past_period_expenses">पिछले समय के सभी खर्च दिखाएं…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">%d दिनों का इस्तेमाल करें</string>
-    <string name="remaining_budget_label">बचा हुआ</string>
     <string name="currency_label">करेंसी</string>
+    <string name="budget_duration_label">अवधि</string>
+    <string name="budget_base_currency_label">मूल मुद्रा</string>
+    <string name="budget_behaviour_title">बजट का व्यवहार</string>
+    <string name="budget_behaviour_subtitle">चुनें कि बची हुई रकम का क्या होगा और आपकी रोज़ की रकम कैसे तय होगी।</string>
+    <string name="budget_behaviour_surplus_title">अवधि के अंत में बची रकम</string>
+    <string name="budget_behaviour_surplus_ask">मुझसे पूछें</string>
+    <string name="budget_behaviour_surplus_spread">सब में बांटें</string>
+    <string name="budget_behaviour_surplus_first_day">पहले दिन सब</string>
+    <string name="budget_behaviour_surplus_preview_ask">अवधि खत्म होने पर आप तय करेंगे</string>
+    <string name="budget_behaviour_surplus_preview_spread">उदा. %1$s बचे ÷ %2$s =</string>
+    <string name="budget_behaviour_surplus_preview_first_day">उदा. %1$s बचे → पहला दिन =</string>
+    <string name="budget_behaviour_surplus_per_day">+%1$s / दिन</string>
     <string name="select_currency">करेंसी चुनें</string>
     <string name="search_currency">करेंसी खोजें…</string>
     <string name="clear">साफ़ करें</string>
     <string name="currency_no_results">कोई करेंसी नहीं मिली</string>
     <string name="currency_selected">चुनी गई</string>
     <!-- Remaining Budget Strategy -->
-    <string name="strategy_dialog_title">बजट में बची हुई रकम</string>
-    <string name="strategy_dialog_description" formatted="false">आप चुन सकते हैं कि आपकी अवधि खत्म होने पर बचे हुए बजट को कैसे बांटा जाए।\n\nउदाहरण के लिए, आपकी अवधि 100 बचे होने के साथ खत्म होती है: आप इसे अपनी अगली अवधि के दिनों में समान रूप से बांट सकते हैं, इसे पूरी तरह अपनी अगली अवधि के पहले दिन में जोड़ सकते हैं, या हर बार ऐसा होने पर फैसला कर सकते हैं।</string>
-    <string name="strategy_ask_always">हमेशा मुझसे पूछें</string>
-    <string name="strategy_ask_always_desc">अवधि के आखिर में हम आपसे पूछेंगे कि बची हुई रकम का क्या करना है</string>
-    <string name="strategy_split_equally">सभी दिनों में बांटें</string>
-    <string name="strategy_split_equally_desc">बची हुई रकम को नई अवधि के सभी दिनों में बराबर-बराबर बांट दिया जाता है</string>
-    <string name="strategy_add_to_first_day">आज में जोड़ें</string>
-    <string name="strategy_add_to_first_day_desc">सारी बची हुई रकम केवल आज के बजट में जोड़ दी जाती है</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">बांटने का तरीका</string>
-    <string name="split_mode_dialog_title">हम आपके बजट को कैसे बांटें?</string>
-    <string name="split_mode_dialog_description" formatted="false">चुनें कि हर अवधि के लिए रकम का हिसाब कैसे लगाया जाए।</string>
     <string name="split_mode_static">स्टैटिक</string>
-    <string name="split_mode_static_desc">कुल बजट को सभी दिनों में बराबर-बराबर बांटा जाता है, चाहे आप कितना भी खर्च करें।</string>
-    <string name="split_mode_dynamic">डायनामिक (सुझाया गया)</string>
-    <string name="split_mode_dynamic_desc">आपके खर्च करने के साथ-साथ हर दिन हिसाब दोबारा लगाया जाता है। बची हुई रकम को अवधि के बाकी दिनों में बांट दिया जाता है।</string>
+    <string name="split_mode_static_desc">कुल बजट सभी दिनों में बराबर बांटा जाता है, चाहे आप कितना भी खर्च करें या न करें।</string>
+    <string name="split_mode_dynamic">सभी दिनों में बांटें</string>
+    <string name="split_mode_dynamic_desc">आपके खर्च के हिसाब से हर दिन गणना होती है। बचा हुआ बजट अवधि के बाकी दिनों में बांट दिया जाता है।</string>
+    <string name="split_mode_carry_over">कैरी ओवर</string>
+    <string name="split_mode_carry_over_desc">जो रकम आप रोज़ खर्च नहीं करते, वह अगले दिन के बजट में जुड़ जाती है और जमा होती रहती है।</string>
     <!-- Transaction Detail -->
     <string name="without_date">बिना तारीख के</string>
     <string name="no_name">कोई नाम नहीं</string>

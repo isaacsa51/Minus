@@ -13,10 +13,15 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -42,6 +47,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -50,8 +56,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -62,6 +71,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.Wallpapers
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
@@ -71,6 +81,7 @@ import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.SymbolPosition
+import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.colorGood
@@ -89,10 +100,27 @@ import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
 import kotlinx.coroutines.delay
 import java.math.BigDecimal
 import java.time.LocalDate
+import kotlin.math.abs
 
 internal const val BUDGET_PILL_FORMULA_KEY = "budget_pill"
 private const val FORMULA_HOLD_MILLIS = 300
 private const val FORMULA_HOLD_SCALE = 0.9f
+private const val TODAY_FACE_MILLIS = 2000L
+private const val VIEW_FACE_MILLIS = 5000L
+private const val FACE_SLIDE_MILLIS = 300
+private const val FACE_FADE_MILLIS = 150
+private const val FACE_SCALE = 0.85f
+private val FACE_SWIPE_THRESHOLD = 24.dp
+
+private data class PillFace(
+    val period: BudgetPeriod,
+    val metrics: BudgetMetrics,
+    val exhaustedMessage: String?,
+    val projectionLabel: String?,
+    val projectionAmount: String?,
+    val amountText: String,
+    val annotatedAmount: AnnotatedString,
+)
 
 /**
  * The compact budget "pill": a circular-ended card with a progress fill, the amount left in the current view period, and a status label.
@@ -117,16 +145,40 @@ fun BudgetPill(
 ) {
     val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
 
-    val metrics = remember(budgetState, viewPeriod, splitMode, draftAmount) {
+    val periodExpired = budgetSettings?.let { LocalDate.now().isAfter(it.getPeriodEndDate()) } ?: false
+    val isNoBudget = budgetState == null || (hasUnresolvedSurplus && periodExpired)
+    val showSurplusFace = hasUnresolvedSurplus && unresolvedSurplusAmount != null
+
+    val canAlternate = viewPeriod != BudgetPeriod.DAILY && !isNoBudget && !centerRemainingAmount &&
+        calculationPreview == null && !showSurplusFace
+    var showToday by remember { mutableStateOf(false) }
+    var swipeDirection by remember { mutableIntStateOf(0) }
+    var swipes by remember { mutableIntStateOf(0) }
+    LaunchedEffect(canAlternate, swipes) {
+        if (!canAlternate) {
+            showToday = false
+            return@LaunchedEffect
+        }
+        while (true) {
+            delay(if (showToday) TODAY_FACE_MILLIS else VIEW_FACE_MILLIS)
+            swipeDirection = 0
+            showToday = !showToday
+        }
+    }
+    fun swipeFace(direction: Int) {
+        swipeDirection = direction
+        showToday = !showToday
+        swipes++
+    }
+    val shownPeriod = if (showToday && canAlternate) BudgetPeriod.DAILY else viewPeriod
+
+    val metrics = remember(budgetState, shownPeriod, splitMode, draftAmount) {
         budgetState?.let {
-            calculateBudgetMetrics(it, viewPeriod, splitMode, draftAmount ?: BigDecimal.ZERO)
+            calculateBudgetMetrics(it, shownPeriod, splitMode, draftAmount ?: BigDecimal.ZERO)
         } ?: BudgetMetrics(BigDecimal.ZERO, 0f, false, false)
     }
 
-    val exhaustedMessage = resolveExhaustedMessage(budgetState, viewPeriod, splitMode)
-
-    val periodExpired = budgetSettings?.let { LocalDate.now().isAfter(it.getPeriodEndDate()) } ?: false
-    val isNoBudget = budgetState == null || (hasUnresolvedSurplus && periodExpired)
+    val exhaustedMessage = resolveExhaustedMessage(budgetState, shownPeriod, splitMode)
 
     val currency = remember(currencyCode) { SupportedCurrency.findByCode(currencyCode) }
     val currencySymbol = currency?.symbol ?: ""
@@ -143,7 +195,7 @@ fun BudgetPill(
 
     val projectionLabel = metrics.nextPeriodAllocation?.let {
         stringResource(
-            when (viewPeriod) {
+            when (shownPeriod) {
                 BudgetPeriod.DAILY -> R.string.budget_pill_next_daily
                 BudgetPeriod.WEEKLY -> R.string.budget_pill_next_weekly
                 BudgetPeriod.BIWEEKLY -> R.string.budget_pill_next_biweekly
@@ -194,6 +246,9 @@ fun BudgetPill(
             AnnotatedString(amountText)
         }
     }
+    val face = PillFace(
+        shownPeriod, metrics, exhaustedMessage, projectionLabel, projectionAmount, amountText, annotatedAmount,
+    )
 
     val annotatedCalculationPreview = remember(calculationPreview, currencyCode, symbolStyle) {
         if (calculationPreview == null) return@remember null
@@ -261,7 +316,6 @@ fun BudgetPill(
         label = "centeredAmountScale"
     )
 
-    val showSurplusFace = hasUnresolvedSurplus && unresolvedSurplusAmount != null
     val surplusAmountText = unresolvedSurplusAmount?.let { currencyFormat.format(it) }
     var showingSurplusMessage by remember { mutableStateOf(false) }
     LaunchedEffect(showSurplusFace) {
@@ -312,7 +366,7 @@ fun BudgetPill(
             val openFormula by rememberUpdatedState(
                 if (showFormula != null && budgetState != null && !isNoBudget) {
                     val request = BudgetFormulaRequest(
-                        budgetState, budgetSettings, viewPeriod, splitMode, currencyCode,
+                        budgetState, budgetSettings, shownPeriod, splitMode, currencyCode,
                         draftAmount = draftAmount ?: BigDecimal.ZERO,
                         tip = formulaTip,
                     )
@@ -340,6 +394,7 @@ fun BudgetPill(
                 }
             }
             val formulaHint = stringResource(R.string.budget_formula_hold_hint)
+            val otherFaceLabel = (if (shownPeriod == BudgetPeriod.DAILY) viewPeriod else BudgetPeriod.DAILY).periodLabel()
 
             Card(
                 modifier = Modifier
@@ -350,12 +405,33 @@ fun BudgetPill(
                         scaleX = pressScale.value
                         scaleY = pressScale.value
                     }
+                    .pointerInput(canAlternate) {
+                        if (!canAlternate) return@pointerInput
+                        var dragged = 0f
+                        detectHorizontalDragGestures(
+                            onDragStart = { dragged = 0f },
+                            onDragEnd = {
+                                if (abs(dragged) > FACE_SWIPE_THRESHOLD.toPx()) swipeFace(if (dragged > 0) 1 else -1)
+                            },
+                        ) { change, amount ->
+                            change.consume()
+                            dragged += amount
+                        }
+                    }
                     .semantics {
                         if (openFormula != null) {
                             onLongClick(label = formulaHint) {
                                 openFormula?.invoke()
                                 true
                             }
+                        }
+                        if (canAlternate) {
+                            customActions = listOf(
+                                CustomAccessibilityAction(otherFaceLabel) {
+                                    swipeFace(1)
+                                    true
+                                }
+                            )
                         }
                     },
                 shape = CircleShape, colors = CardDefaults.cardColors(
@@ -499,45 +575,69 @@ fun BudgetPill(
                                         }
                                     }
                                 } else {
-                                    val isCentered =
-                                        metrics.isCurrentPeriodOverBudget || metrics.isOverCurrentSubPeriod || bigVariant
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(horizontal = if (isCentered) 0.dp else 18.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = if (isCentered) Arrangement.Center else Arrangement.spacedBy(
-                                            8.dp
-                                        )
-                                    ) {
-                                        StatusLabel(
-                                            budgetState = budgetState,
-                                            budgetPeriod = viewPeriod,
-                                            isOverBudget = metrics.isCurrentPeriodOverBudget,
-                                            isOverSubPeriodAllocation = metrics.isOverCurrentSubPeriod,
-                                            exhaustedMessage = exhaustedMessage,
-                                            projectionLabel = projectionLabel,
-                                            projectionAmount = projectionAmount,
-                                            currencySymbol = currencySymbol,
-                                            symbolAtEnd = symbolAtEnd,
-                                            bigVariant = bigVariant,
-                                            splitMode = splitMode,
-                                            wrapContent = true,
-                                            modifier = if (isCentered) Modifier.padding(horizontal = 32.dp) else Modifier.wrapContentWidth(),
-                                        )
-
-                                        if (!metrics.isCurrentPeriodOverBudget && !metrics.isOverCurrentSubPeriod && !bigVariant) {
-                                            AdaptiveSingleLineText(
-                                                text = amountText,
-                                                annotatedText = annotatedAmount,
-                                                style = MaterialTheme.typography.titleMediumCondensed,
-                                                color = textColor,
-                                                minFontSize = 16.sp,
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .censor(),
-                                                textAlign = TextAlign.End
+                                    AnimatedContent(
+                                        targetState = face,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentKey = { it.period },
+                                        transitionSpec = {
+                                            val move = tween<IntOffset>(FACE_SLIDE_MILLIS)
+                                            val scale = tween<Float>(FACE_SLIDE_MILLIS)
+                                            val fade = tween<Float>(FACE_FADE_MILLIS)
+                                            val direction = swipeDirection
+                                            val slideIn = if (direction == 0) {
+                                                slideInVertically(move) { it }
+                                            } else {
+                                                slideInHorizontally(move) { -direction * it }
+                                            }
+                                            val slideOut = if (direction == 0) {
+                                                slideOutVertically(move) { -it }
+                                            } else {
+                                                slideOutHorizontally(move) { direction * it }
+                                            }
+                                            (slideIn + scaleIn(scale, FACE_SCALE) + fadeIn(fade)) togetherWith
+                                                (slideOut + scaleOut(scale, FACE_SCALE) + fadeOut(fade))
+                                        },
+                                        label = "budgetPillFace",
+                                    ) { shown ->
+                                        val isOver = shown.metrics.isCurrentPeriodOverBudget || shown.metrics.isOverCurrentSubPeriod
+                                        val isCentered = isOver || bigVariant
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(horizontal = if (isCentered) 0.dp else 18.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = if (isCentered) Arrangement.Center else Arrangement.spacedBy(
+                                                8.dp
                                             )
+                                        ) {
+                                            StatusLabel(
+                                                budgetState = budgetState,
+                                                budgetPeriod = shown.period,
+                                                isOverBudget = shown.metrics.isCurrentPeriodOverBudget,
+                                                isOverSubPeriodAllocation = shown.metrics.isOverCurrentSubPeriod,
+                                                exhaustedMessage = shown.exhaustedMessage,
+                                                projectionLabel = shown.projectionLabel,
+                                                projectionAmount = shown.projectionAmount,
+                                                currencySymbol = currencySymbol,
+                                                symbolAtEnd = symbolAtEnd,
+                                                bigVariant = bigVariant,
+                                                wrapContent = true,
+                                                modifier = if (isCentered) Modifier.padding(horizontal = 32.dp) else Modifier.wrapContentWidth(),
+                                            )
+
+                                            if (!isOver && !bigVariant) {
+                                                AdaptiveSingleLineText(
+                                                    text = shown.amountText,
+                                                    annotatedText = shown.annotatedAmount,
+                                                    style = MaterialTheme.typography.titleMediumCondensed,
+                                                    color = textColor,
+                                                    minFontSize = 16.sp,
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .censor(),
+                                                    textAlign = TextAlign.End
+                                                )
+                                            }
                                         }
                                     }
                                 }
