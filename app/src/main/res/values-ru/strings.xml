@@ -719,7 +719,6 @@
   <string name="widget_heatmap_title">Тепловая карта трат</string>
   <string name="widget_min_max_spent_title">Мин. и макс. расход</string>
   <string name="widget_month_heatmap_title">Тепловая карта месяца</string>
-  <string name="widget_complete_budget_description">Отслеживайте расходы, общий бюджет и оставшиеся дни — с быстрым добавлением нового расхода</string>
   <string name="unlock_past_period">Разблокировать для правки</string>
   <string name="biometric_prompt_title">Разблокировать прошлый период</string>
   <string name="biometric_prompt_subtitle">Подтвердите личность по отпечатку пальца для изменения прошлых расходов</string>
