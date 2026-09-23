@@ -182,9 +182,6 @@ fun BudgetPeriodSheet(
     val endDateAsDate = remember(endDate) { endDate?.toDate() }
     val totalSpent = budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO
 
-    // For dynamic split: how many days of the period are still ahead of us.
-    // Clamped to [0, totalDays] so we never divide by a negative or get values
-    // outside the period's window.
     val today = remember { LocalDate.now() }
     val daysRemaining =
         remember(startDate, endDate, today) {
@@ -1118,12 +1115,6 @@ fun EditBudgetContent(
                     enabled = canApply,
                 ) {
                     Text(stringResource(R.string.next), style = MaterialTheme.typography.labelMediumEmphasized)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

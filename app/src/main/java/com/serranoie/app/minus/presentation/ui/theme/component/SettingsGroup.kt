@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -400,15 +401,17 @@ fun SelectableInfoPaddedItem(
  *
  * @param modifier Modifier to be applied to the container
  * @param title Optional title displayed above the group
+ * @param paddingValues Padding values applied around the group container
  * @param content The composable content to be displayed inside the group
  */
 @Composable
 fun PaddedListGroup(
     modifier: Modifier = Modifier,
     title: String? = null,
+    paddingValues: PaddingValues = PaddingValues(16.dp),
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(modifier = modifier.padding(16.dp)) {
+    Column(modifier = modifier.padding(paddingValues)) {
         title?.let {
             Text(
                 text = it,

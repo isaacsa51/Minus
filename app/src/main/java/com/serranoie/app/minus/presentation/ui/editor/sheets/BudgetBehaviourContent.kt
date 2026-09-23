@@ -3,22 +3,21 @@
 package com.serranoie.app.minus.presentation.ui.editor.sheets
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,8 +28,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Calculate
-import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -58,10 +56,15 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
@@ -90,7 +93,6 @@ internal fun BudgetBehaviourContent(
     ) {
         Column(
             modifier = Modifier
-                .weight(1f, fill = false)
                 .verticalScroll(rememberScrollState()),
         ) {
             Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp)) {
@@ -106,7 +108,10 @@ internal fun BudgetBehaviourContent(
                 )
             }
 
-            PaddedListGroup(title = stringResource(R.string.budget_behaviour_surplus_title)) {
+            PaddedListGroup(
+                title = stringResource(R.string.budget_behaviour_surplus_title),
+                paddingValues = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
+            ) {
                 SurplusStrategyCard(
                     strategy = strategy,
                     onStrategySelected = onStrategySelected,
@@ -118,7 +123,11 @@ internal fun BudgetBehaviourContent(
 
             BehaviourOptionGroup(
                 title = stringResource(R.string.split_mode_label),
-                options = listOf(BudgetSplitMode.DYNAMIC, BudgetSplitMode.CARRY_OVER, BudgetSplitMode.STATIC),
+                options = listOf(
+                    BudgetSplitMode.DYNAMIC,
+                    BudgetSplitMode.CARRY_OVER,
+                    BudgetSplitMode.STATIC
+                ),
                 selected = splitMode,
                 onSelect = onSplitModeSelected,
                 optionTag = ::budgetSplitModeOptionTag,
@@ -140,6 +149,7 @@ internal fun BudgetBehaviourContent(
                         }
                     )
                 },
+                paddingValues = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
             )
         }
 
@@ -157,11 +167,15 @@ internal fun BudgetBehaviourContent(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = stringResource(R.string.back),
+                    modifier = Modifier.offset(x = 4.dp),
                 )
             }
             Button(
                 onClick = onApply,
-                shape = CircleShape.copy(topStart = CornerSize(8.dp), bottomStart = CornerSize(8.dp)),
+                shape = CircleShape.copy(
+                    topStart = CornerSize(8.dp),
+                    bottomStart = CornerSize(8.dp)
+                ),
                 modifier = Modifier
                     .weight(1f)
                     .heightIn(min = 56.dp)
@@ -192,7 +206,7 @@ private fun SurplusStrategyCard(
     )
     Surface(
         shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = colorButton,
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(modifier = Modifier.padding(6.dp)) {
@@ -240,7 +254,7 @@ private fun SurplusStrategyCard(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -250,9 +264,8 @@ private fun SurplusStrategyCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Calculate,
+                    imageVector = Icons.Rounded.Info,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(18.dp),
                 )
                 Spacer(modifier = Modifier.width(10.dp))
@@ -276,9 +289,12 @@ private fun SurplusStrategyCard(
                                 )
 
                                 RemainingBudgetStrategy.ADD_TO_FIRST_DAY ->
-                                    stringResource(R.string.budget_behaviour_surplus_preview_first_day, leftover)
+                                    stringResource(
+                                        R.string.budget_behaviour_surplus_preview_first_day,
+                                        leftover
+                                    )
                             },
-                            style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
+                            style = MaterialTheme.typography.bodyMediumCondensed,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
                                 .weight(1f)
@@ -290,12 +306,17 @@ private fun SurplusStrategyCard(
                                 R.string.budget_behaviour_surplus_per_day,
                                 currencyFormat.format(
                                     if (periodDays > 0) {
-                                        exampleLeftover.divide(BigDecimal(periodDays), 2, java.math.RoundingMode.HALF_UP)
+                                        exampleLeftover.divide(
+                                            BigDecimal(periodDays),
+                                            2,
+                                            java.math.RoundingMode.HALF_UP
+                                        )
                                     } else {
                                         BigDecimal.ZERO
                                     }
                                 ),
                             )
+
                             RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> "+$leftover"
                         }
                         if (badge != null) {
@@ -318,9 +339,14 @@ private fun <T> BehaviourOptionGroup(
     optionTag: (T) -> String,
     optionTitle: @Composable (T) -> String,
     optionDescription: @Composable (T) -> String,
+    paddingValues: PaddingValues = PaddingValues(16.dp),
 ) {
     val view = LocalView.current
-    PaddedListGroup(title = title, modifier = Modifier.selectableGroup()) {
+    PaddedListGroup(
+        title = title,
+        modifier = Modifier.selectableGroup(),
+        paddingValues = paddingValues,
+    ) {
         options.forEachIndexed { index, option ->
             val isSelected = option == selected
             CustomPaddedListItem(
@@ -334,6 +360,7 @@ private fun <T> BehaviourOptionGroup(
                     index == options.lastIndex -> PaddedListItemPosition.Last
                     else -> PaddedListItemPosition.Middle
                 },
+                customShape = if (isSelected) MaterialTheme.shapes.extraLarge else null,
                 modifier = Modifier
                     .testTag(optionTag(option))
                     .semantics(mergeDescendants = true) {
@@ -341,12 +368,12 @@ private fun <T> BehaviourOptionGroup(
                         role = Role.RadioButton
                     },
                 background = if (isSelected) {
-                    MaterialTheme.colorScheme.primaryContainer
+                    MaterialTheme.colorScheme.secondaryContainer
                 } else {
                     MaterialTheme.colorScheme.surfaceVariant
                 },
                 contentColor = if (isSelected) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
+                    MaterialTheme.colorScheme.onSecondaryContainer
                 } else {
                     MaterialTheme.colorScheme.onSurface
                 },
@@ -356,28 +383,39 @@ private fun <T> BehaviourOptionGroup(
                         .weight(1f)
                         .padding(vertical = 4.dp),
                 ) {
-                    Text(text = optionTitle(option), style = MaterialTheme.typography.bodyLargeEmphasized)
+                    Text(
+                        text = optionTitle(option),
+                        style = MaterialTheme.typography.bodyLargeEmphasized
+                    )
                     Text(
                         text = optionDescription(option),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmallCondensed,
                         color = LocalContentColor.current.copy(alpha = 0.8f),
-                    )
-                }
-                AnimatedVisibility(
-                    visible = isSelected,
-                    enter = scaleIn() + fadeIn(),
-                    exit = scaleOut() + fadeOut(),
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.CheckCircle,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .padding(start = 12.dp)
-                            .size(24.dp),
                     )
                 }
             }
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun BudgetBehaviourContentPreview() {
+    MinusTheme {
+        Surface {
+            BudgetBehaviourContent(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                splitMode = BudgetSplitMode.DYNAMIC,
+                exampleLeftover = BigDecimal("150.00"),
+                periodDays = 30,
+                currencyCode = "USD",
+                onStrategySelected = {},
+                onSplitModeSelected = {},
+                applyLabel = "Apply",
+                onBack = {},
+                onApply = {},
+            )
+        }
+    }
+}
+
