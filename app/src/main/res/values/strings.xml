@@ -681,7 +681,7 @@
     <string name="budget_behaviour_surplus_first_day">Day 1 lump</string>
     <string name="budget_behaviour_surplus_preview_ask">You\'ll decide when the period ends</string>
     <string name="budget_behaviour_surplus_preview_spread">e.g. %1$s left ÷ %2$s =</string>
-    <string name="budget_behaviour_surplus_preview_first_day">e.g. %1$s left → day 1 =</string>
+    <string name="budget_behaviour_surplus_preview_first_day">e.g. %1$s left -> day 1 =</string>
     <string name="budget_behaviour_surplus_per_day">+%1$s / day</string>
     <string name="select_currency">Select currency</string>
     <string name="search_currency">Search currency…</string>
