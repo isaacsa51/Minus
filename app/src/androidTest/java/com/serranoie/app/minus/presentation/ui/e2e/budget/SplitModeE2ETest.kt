@@ -284,7 +284,7 @@ class SplitModeE2ETest {
             .performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performClick()
+        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performScrollTo().performClick()
         composeTestRule.waitForIdle()
 
         val saved = captured.filterIsInstance<BudgetSettings>().lastOrNull()
@@ -302,7 +302,7 @@ class SplitModeE2ETest {
         )
         openBehaviourStep()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performClick()
+        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performScrollTo().performClick()
         composeTestRule.waitForIdle()
 
         val saved = captured.filterIsInstance<BudgetSettings>().lastOrNull()
