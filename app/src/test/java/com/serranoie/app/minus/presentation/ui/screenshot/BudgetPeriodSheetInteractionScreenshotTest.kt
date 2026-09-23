@@ -1,5 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,6 +14,8 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetBehaviourContent
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_EDIT_BUTTON_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SHEET_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
@@ -154,6 +158,30 @@ class BudgetPeriodSheetInteractionScreenshotTest {
 					onPeriodSelected = {},
 					onSaveBudget = {},
 				)
+			}
+		}
+	}
+
+	@Test
+	fun behaviourStep() {
+		Locale.setDefault(Locale.US)
+
+		paparazzi.snapshot {
+			MinusTheme {
+				Surface(color = MaterialTheme.colorScheme.surfaceContainerLow) {
+					BudgetBehaviourContent(
+						strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+						splitMode = BudgetSplitMode.CARRY_OVER,
+						exampleLeftover = BigDecimal("760.00"),
+						periodDays = 15,
+						currencyCode = "USD",
+						onStrategySelected = {},
+						onSplitModeSelected = {},
+						applyLabel = "Apply",
+						onBack = {},
+						onApply = {},
+					)
+				}
 			}
 		}
 	}

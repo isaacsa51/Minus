@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,21 +30,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
-import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.isRoundedFontEnabled
 import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.googleSansFlex
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
+import com.serranoie.app.minus.presentation.util.censor
 
 /**
- * The status text on the left of the pill ("Today", "Per week", "Daily Amount Exceeded",
+ * The status text on the left of the pill ("Today", "This week", "Daily Amount Exceeded",
  * "Budget amount exceeded", …) plus the small secondary line beneath it: either the red
  * "budget exhausted" note or the "For tomorrow $…" projection.
  */
@@ -57,7 +62,6 @@ internal fun StatusLabel(
     currencySymbol: String = "",
     symbolAtEnd: Boolean = false,
     bigVariant: Boolean = false,
-    splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
     wrapContent: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
@@ -85,15 +89,6 @@ internal fun StatusLabel(
                 BudgetPeriod.WEEKLY -> R.string.budget_pill_label_weekly_exceeded
                 BudgetPeriod.BIWEEKLY -> R.string.budget_pill_label_biweekly_exceeded
                 BudgetPeriod.MONTHLY -> R.string.budget_pill_label_monthly_exceeded
-            }
-        )
-
-        splitMode == BudgetSplitMode.DYNAMIC -> stringResource(
-            when (budgetPeriod) {
-                BudgetPeriod.DAILY -> R.string.budget_pill_label_per_daily
-                BudgetPeriod.WEEKLY -> R.string.budget_pill_label_per_weekly
-                BudgetPeriod.BIWEEKLY -> R.string.budget_pill_label_per_biweekly
-                BudgetPeriod.MONTHLY -> R.string.budget_pill_label_per_monthly
             }
         )
 
@@ -161,6 +156,7 @@ internal fun StatusLabel(
                         minFontSize = 12.sp,
                         currencySymbol = currencySymbol,
                         symbolAtEnd = symbolAtEnd,
+                        modifier = Modifier.censor(),
                         textAlign = TextAlign.Start,
                         fillWidth = false,
                     )
@@ -178,3 +174,51 @@ internal fun StatusLabel(
         }
     }
 }
+
+@PreviewLightDark
+@Composable
+private fun StatusLabelPreview() {
+    MinusTheme {
+        Surface {
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                StatusLabel(
+                    budgetState = BudgetState.EMPTY,
+                    budgetPeriod = BudgetPeriod.DAILY,
+                    isOverBudget = false,
+                )
+                StatusLabel(
+                    budgetState = BudgetState.EMPTY,
+                    budgetPeriod = BudgetPeriod.DAILY,
+                    isOverBudget = false,
+                    projectionLabel = "For tomorrow",
+                    projectionAmount = "25.00",
+                    currencySymbol = "$",
+                )
+                StatusLabel(
+                    budgetState = BudgetState.EMPTY,
+                    budgetPeriod = BudgetPeriod.WEEKLY,
+                    isOverBudget = false,
+                    isOverSubPeriodAllocation = true,
+                )
+                StatusLabel(
+                    budgetState = BudgetState.EMPTY,
+                    budgetPeriod = BudgetPeriod.DAILY,
+                    isOverBudget = true,
+                    exhaustedMessage = "Budget exhausted",
+                )
+                StatusLabel(
+                    budgetState = BudgetState.EMPTY,
+                    budgetPeriod = BudgetPeriod.DAILY,
+                    isOverBudget = false,
+                    bigVariant = true,
+                )
+            }
+        }
+    }
+}
+

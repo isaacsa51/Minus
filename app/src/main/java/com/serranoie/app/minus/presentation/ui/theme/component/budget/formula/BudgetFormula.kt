@@ -7,6 +7,7 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.blockWindow
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.toDays
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetMetrics
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.calculateBudgetMetrics
 import java.math.BigDecimal
 
@@ -31,6 +32,7 @@ internal enum class FormulaCaption {
     LEFT,
     NEXT_BLOCK,
     RESERVED,
+    CARRIED,
 }
 
 internal sealed interface FormulaTerm {
@@ -58,7 +60,7 @@ internal fun buildBudgetFormula(request: BudgetFormulaRequest): List<FormulaRow>
     val base = total.subtract(surplus)
 
     when (request.splitMode) {
-        BudgetSplitMode.STATIC -> {
+        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER -> {
             val surplusOnFirstDay = settings?.rollOverCarryForward == true
             if (surplus.signum() == 1) {
                 if (surplusOnFirstDay) {
@@ -88,6 +90,10 @@ internal fun buildBudgetFormula(request: BudgetFormulaRequest): List<FormulaRow>
                     state.dailyBudget
                 )
             )
+            if (request.splitMode == BudgetSplitMode.CARRY_OVER) {
+                addCarryOverRows(state, period, metrics)
+                return@buildList
+            }
             if (period != BudgetPeriod.DAILY) {
                 val terms = listOf(
                     FormulaTerm.Amount(state.dailyBudget),
@@ -189,6 +195,44 @@ internal fun buildBudgetFormula(request: BudgetFormulaRequest): List<FormulaRow>
         }
     }
     add(FormulaRow(FormulaCaption.NEXT_BLOCK, terms, next))
+}
+
+private fun MutableList<FormulaRow>.addCarryOverRows(
+    state: BudgetState,
+    period: BudgetPeriod,
+    metrics: BudgetMetrics,
+) {
+    val days = blockWindow(state.periodTotalDays, state.daysRemaining, period.toDays()).daysInBlock
+    val allowance = state.dailyBudget.multiply(BigDecimal(days))
+    if (period != BudgetPeriod.DAILY) {
+        val terms = listOf(
+            FormulaTerm.Amount(state.dailyBudget),
+            FormulaTerm.Op("×"),
+            FormulaTerm.Count(days, BudgetPeriod.DAILY),
+        )
+        add(FormulaRow(FormulaCaption.PER_PERIOD, terms, allowance))
+    }
+    val carried = metrics.periodBudget.subtract(allowance)
+    val budgetTerms = if (carried.signum() != 0 && metrics.periodBudget.signum() >= 0) {
+        add(FormulaRow(FormulaCaption.CARRIED, listOf(FormulaTerm.Amount(allowance)) + signed(carried), metrics.periodBudget))
+        listOf(FormulaTerm.Amount(metrics.periodBudget))
+    } else {
+        listOf(FormulaTerm.Amount(allowance)) + signed(carried)
+    }
+    val next = metrics.nextPeriodAllocation
+    if (next == null) {
+        val terms = budgetTerms + listOf(FormulaTerm.Op("−"), FormulaTerm.Amount(metrics.periodSpent))
+        add(FormulaRow(FormulaCaption.LEFT, terms, metrics.periodRemaining))
+    } else {
+        val terms = budgetTerms + signed(next.subtract(metrics.periodRemaining)) + signed(metrics.periodSpent.negate())
+        add(FormulaRow(FormulaCaption.NEXT_BLOCK, terms, next))
+    }
+}
+
+private fun signed(value: BigDecimal): List<FormulaTerm> = when (value.signum()) {
+    0 -> emptyList()
+    1 -> listOf(FormulaTerm.Op("+"), FormulaTerm.Amount(value))
+    else -> listOf(FormulaTerm.Op("−"), FormulaTerm.Amount(value.abs()))
 }
 
 private fun amountOp(left: BigDecimal, op: String, right: BigDecimal): List<FormulaTerm> =

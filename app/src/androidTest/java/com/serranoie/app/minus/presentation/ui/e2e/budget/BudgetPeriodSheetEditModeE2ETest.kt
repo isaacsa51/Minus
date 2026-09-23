@@ -13,6 +13,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_APPLY_BUTTON_TAG
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_NEXT_BUTTON_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_BUDGET_INPUT_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_EDIT_BUTTON_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SHEET_TAG
@@ -76,7 +77,7 @@ class BudgetPeriodSheetEditModeE2ETest {
     }
 
     @Test
-    fun when_no_active_budget_then_sheet_opens_in_edit_mode_and_apply_button_is_visible() {
+    fun when_no_active_budget_then_sheet_opens_in_edit_mode_and_next_button_is_visible() {
         // Given
         renderSheet(
             budgetSettings = null,
@@ -86,7 +87,7 @@ class BudgetPeriodSheetEditModeE2ETest {
 
         // Then
         composeTestRule
-            .onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG)
+            .onNodeWithTag(BUDGET_PERIOD_NEXT_BUTTON_TAG)
             .assertIsDisplayed()
     }
 

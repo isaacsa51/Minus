@@ -180,10 +180,6 @@
     <string name="budget_period_label_this_week">本周</string>
     <string name="budget_period_label_this_biweek">最近半月</string>
     <string name="budget_period_label_this_month">本月</string>
-    <string name="budget_pill_label_per_daily">每天</string>
-    <string name="budget_pill_label_per_weekly">每周</string>
-    <string name="budget_pill_label_per_biweekly">每半个月</string>
-    <string name="budget_pill_label_per_monthly">每月</string>
     <string name="budget_pill_next_daily">明天可用 %1$s</string>
     <string name="budget_pill_next_weekly">下周可用 %1$s</string>
     <string name="budget_pill_next_biweekly">下个半月可用 %1$s</string>
@@ -199,6 +195,7 @@
     <string name="budget_formula_hold_hint">显示金额的计算方式</string>
     <string name="budget_formula_mode_static">固定分配</string>
     <string name="budget_formula_mode_dynamic">动态分配</string>
+    <string name="budget_formula_mode_carry_over">结转分配</string>
     <string name="budget_formula_caption_surplus_split">上一周期的结余计入预算</string>
     <string name="budget_formula_caption_surplus_first_day">上一周期的结余保留在第一天</string>
     <string name="budget_formula_caption_adjustments">本周期的收入与扣减</string>
@@ -208,6 +205,7 @@
     <string name="budget_formula_caption_spread_over_left">分配到周期剩余的时间</string>
     <string name="budget_formula_caption_left">减去已花费的金额</string>
     <string name="budget_formula_caption_reserved">为本周期内稍后到期的扣款预留</string>
+    <string name="budget_formula_caption_carried">从前几天结转</string>
     <string name="budget_formula_card_tap_hint">点击查看完整明细</string>
     <string name="budget_formula_tip_hold_pill">提示：长按主屏幕上的预算胶囊，随时查看此明细</string>
     <string name="budget_formula_tip_tap_card">提示：也可以点击周期面板中的计算金额</string>
@@ -562,30 +560,33 @@
     <string name="wavy_divider_show_all_past_period_expenses">显示上一期间的全部支出……</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">使用 %d 天</string>
-    <string name="remaining_budget_label">剩余</string>
     <string name="currency_label">货币</string>
+    <string name="budget_duration_label">时长</string>
+    <string name="budget_base_currency_label">基础货币</string>
+    <string name="budget_behaviour_title">预算行为</string>
+    <string name="budget_behaviour_subtitle">选择如何处理剩余的钱，以及每日金额的计算方式。</string>
+    <string name="budget_behaviour_surplus_title">周期结束时的结余</string>
+    <string name="budget_behaviour_surplus_ask">询问我</string>
+    <string name="budget_behaviour_surplus_spread">全部平摊</string>
+    <string name="budget_behaviour_surplus_first_day">全放第1天</string>
+    <string name="budget_behaviour_surplus_preview_ask">周期结束时由你决定</string>
+    <string name="budget_behaviour_surplus_preview_spread">例如：剩余 %1$s ÷ %2$s =</string>
+    <string name="budget_behaviour_surplus_preview_first_day">例如：剩余 %1$s → 第1天 =</string>
+    <string name="budget_behaviour_surplus_per_day">+%1$s / 天</string>
     <string name="select_currency">选择货币</string>
     <string name="search_currency">搜索货币……</string>
     <string name="clear">清除</string>
     <string name="currency_no_results">找不到货币</string>
     <string name="currency_selected">已选择</string>
     <!-- Remaining Budget Strategy -->
-    <string name="strategy_dialog_title">预算结余</string>
-    <string name="strategy_dialog_description" formatted="false">你可以选择在周期结束时如何分配剩余的预算。\n\n例如，你的周期结束时结余 100：你可以将其平均分配到下一周期的每一天，全部添加到下一周期的第一天，或者每次发生时再决定。</string>
-    <string name="strategy_ask_always">总是询问</string>
-    <string name="strategy_ask_always_desc">周期结束时我们会询问你如何处理结余</string>
-    <string name="strategy_split_equally">平均分配</string>
-    <string name="strategy_split_equally_desc">结余将平均分配至新周期内的所有日期</string>
-    <string name="strategy_add_to_first_day">添加到今天</string>
-    <string name="strategy_add_to_first_day_desc">所有结余都只添加到今天的预算中</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">拆分模式</string>
-    <string name="split_mode_dialog_title">你想如何拆分你的预算？</string>
-    <string name="split_mode_dialog_description" formatted="false">选择每周期余额如何计算。</string>
     <string name="split_mode_static">固定</string>
-    <string name="split_mode_static_desc">总预算将平均分配在每一天，无论你花费多少钱。</string>
-    <string name="split_mode_dynamic">动态分配（推荐）</string>
-    <string name="split_mode_dynamic_desc">随支出重新计算每日预算。剩余预算将在该周期内的剩余日期中平均分配。</string>
+    <string name="split_mode_static_desc">无论花多少、花不花，总预算都会平均分配到每一天。</string>
+    <string name="split_mode_dynamic">平摊到所有天</string>
+    <string name="split_mode_dynamic_desc">根据你的支出每天重新计算。剩余预算会平摊到本周期剩下的日子。</string>
+    <string name="split_mode_carry_over">结转</string>
+    <string name="split_mode_carry_over_desc">每天没花完的钱会加到第二天的预算里，并不断累积。</string>
     <!-- Transaction Detail -->
     <string name="without_date">没有日期</string>
     <string name="no_name">没有名称</string>

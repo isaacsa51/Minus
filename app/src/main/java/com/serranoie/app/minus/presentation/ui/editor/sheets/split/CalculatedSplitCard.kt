@@ -68,7 +68,7 @@ fun CalculatedSplitCard(
     )
 
     val briefText = when (splitMode) {
-        BudgetSplitMode.STATIC -> {
+        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER -> {
             val blockCount = if (periodBlockDays > 0) {
                 (totalDays / periodBlockDays).coerceAtLeast(1)
             } else 1

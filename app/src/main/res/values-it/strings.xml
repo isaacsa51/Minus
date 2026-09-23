@@ -180,10 +180,6 @@
     <string name="budget_period_label_this_week">Questa settimana</string>
     <string name="budget_period_label_this_biweek">Questa bisettimanale</string>
     <string name="budget_period_label_this_month">Questo mese</string>
-    <string name="budget_pill_label_per_daily">Al giorno</string>
-    <string name="budget_pill_label_per_weekly">Per settimana</string>
-    <string name="budget_pill_label_per_biweekly">Biodimanale</string>
-    <string name="budget_pill_label_per_monthly">Al mese</string>
     <string name="budget_pill_next_daily">Per domani %1$s</string>
     <string name="budget_pill_next_weekly">Per la prossima settimana %1$s</string>
     <string name="budget_pill_next_biweekly">Per le prossime due settimane %1$s</string>
@@ -199,6 +195,7 @@
     <string name="budget_formula_hold_hint">Mostra come viene calcolato l\'importo</string>
     <string name="budget_formula_mode_static">Suddivisione statica</string>
     <string name="budget_formula_mode_dynamic">Suddivisione dinamica</string>
+    <string name="budget_formula_mode_carry_over">Suddivisione cumulativa</string>
     <string name="budget_formula_caption_surplus_split">L\'eccedenza del periodo precedente si aggiunge al bilancio</string>
     <string name="budget_formula_caption_surplus_first_day">L\'eccedenza del periodo precedente resta sul primo giorno</string>
     <string name="budget_formula_caption_adjustments">Entrate e detrazioni di questo periodo</string>
@@ -208,6 +205,7 @@
     <string name="budget_formula_caption_spread_over_left">Suddiviso su ciò che resta del periodo</string>
     <string name="budget_formula_caption_left">Meno quello che hai speso</string>
     <string name="budget_formula_caption_reserved">Accantonato per gli addebiti in scadenza più avanti nel periodo</string>
+    <string name="budget_formula_caption_carried">Riportato dai giorni precedenti</string>
     <string name="budget_formula_card_tap_hint">Tocca per il dettaglio completo</string>
     <string name="budget_formula_tip_hold_pill">Suggerimento: tieni premuta la pillola del bilancio nella schermata iniziale per vedere questo in qualsiasi momento</string>
     <string name="budget_formula_tip_tap_card">Suggerimento: puoi anche toccare l\'importo calcolato nel foglio del periodo</string>
@@ -561,30 +559,33 @@
     <string name="wavy_divider_show_all_past_period_expenses">Mostra tutte le spese del periodo precedente…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">Usa %d giorni</string>
-    <string name="remaining_budget_label">Rimanente</string>
     <string name="currency_label">Valuta</string>
+    <string name="budget_duration_label">Durata</string>
+    <string name="budget_base_currency_label">Valuta di base</string>
+    <string name="budget_behaviour_title">Comportamento del budget</string>
+    <string name="budget_behaviour_subtitle">Scegli cosa succede ai soldi avanzati e come viene calcolato il tuo importo giornaliero.</string>
+    <string name="budget_behaviour_surplus_title">Eccedenza a fine periodo</string>
+    <string name="budget_behaviour_surplus_ask">Chiedimi</string>
+    <string name="budget_behaviour_surplus_spread">Distribuisci tutto</string>
+    <string name="budget_behaviour_surplus_first_day">Tutto al giorno 1</string>
+    <string name="budget_behaviour_surplus_preview_ask">Deciderai alla fine del periodo</string>
+    <string name="budget_behaviour_surplus_preview_spread">es. %1$s avanzati ÷ %2$s =</string>
+    <string name="budget_behaviour_surplus_preview_first_day">es. %1$s avanzati → giorno 1 =</string>
+    <string name="budget_behaviour_surplus_per_day">+%1$s / giorno</string>
     <string name="select_currency">Seleziona valuta</string>
     <string name="search_currency">Cerca valuta…</string>
     <string name="clear">Pulisci</string>
     <string name="currency_no_results">Nessuna valuta trovata</string>
     <string name="currency_selected">Selezionato</string>
     <!-- Remaining Budget Strategy -->
-    <string name="strategy_dialog_title">Eccedenza di bilancio</string>
-    <string name="strategy_dialog_description" formatted="false">Puoi scegliere come distribuire il budget rimanente quando termina il tuo periodo.\n\nAd esempio, il tuo periodo termina con un\'eccedenza di 100: puoi distribuirla equamente tra i giorni del tuo prossimo periodo, aggiungerla interamente al primo giorno del tuo prossimo periodo, oppure decidere ogni volta che accade.</string>
-    <string name="strategy_ask_always">Chiedimi sempre</string>
-    <string name="strategy_ask_always_desc">Alla fine del periodo vi chiederemo cosa fare con l\'eccedenza</string>
-    <string name="strategy_split_equally">Diffusione in tutti i giorni</string>
-    <string name="strategy_split_equally_desc">L\'eccedenza è divisa equamente tra tutti i giorni del nuovo periodo</string>
-    <string name="strategy_add_to_first_day">Aggiungi a oggi</string>
-    <string name="strategy_add_to_first_day_desc">Tutta l\'eccedenza viene aggiunta solo al budget di oggi</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">Modalità di divisione</string>
-    <string name="split_mode_dialog_title">Come dovremmo dividere il vostro bilancio?</string>
-    <string name="split_mode_dialog_description" formatted="false">Scegli come calcolare l\'importo per periodo.</string>
     <string name="split_mode_static">Statico</string>
-    <string name="split_mode_static_desc">Il bilancio totale è ripartito equamente in tutti i periodi, indipendentemente da quanto spendi.</string>
-    <string name="split_mode_dynamic">Dinamico (consigliato)</string>
-    <string name="split_mode_dynamic_desc">Ricalcola quotidianamente mentre spendi. Il saldo rimanente è ripartito sui giorni rimasti nel periodo.</string>
+    <string name="split_mode_static_desc">Il budget totale viene diviso equamente su tutti i giorni, indipendentemente da quanto spendi o se spendi.</string>
+    <string name="split_mode_dynamic">Distribuisci su tutti i giorni</string>
+    <string name="split_mode_dynamic_desc">Calcolato ogni giorno in base a come spendi. Il budget rimanente viene distribuito sui giorni rimanenti del periodo.</string>
+    <string name="split_mode_carry_over">Cumulativo</string>
+    <string name="split_mode_carry_over_desc">Ciò che non spendi ogni giorno viene aggiunto al budget del giorno successivo e continua ad accumularsi.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Senza data</string>
     <string name="no_name">Nessun nome</string>

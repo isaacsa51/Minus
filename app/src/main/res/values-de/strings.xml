@@ -183,10 +183,6 @@
     <string name="budget_period_label_this_week">This week</string>
     <string name="budget_period_label_this_biweek">This biweekly</string>
     <string name="budget_period_label_this_month">This month</string>
-    <string name="budget_pill_label_per_daily">Per day</string>
-    <string name="budget_pill_label_per_weekly">Per week</string>
-    <string name="budget_pill_label_per_biweekly">alle zwei Wochen</string>
-    <string name="budget_pill_label_per_monthly">Per month</string>
     <string name="budget_pill_next_daily">Für morgen %1$s</string>
     <string name="budget_pill_next_weekly">Für nächste Woche %1$s</string>
     <string name="budget_pill_next_biweekly">Für die nächsten zwei Wochen %1$s</string>
@@ -202,6 +198,7 @@
     <string name="budget_formula_hold_hint">Zeigen, wie der Betrag berechnet wird</string>
     <string name="budget_formula_mode_static">Statische Aufteilung</string>
     <string name="budget_formula_mode_dynamic">Dynamische Aufteilung</string>
+    <string name="budget_formula_mode_carry_over">Aufteilung mit Übertrag</string>
     <string name="budget_formula_caption_surplus_split">Der Überschuss der letzten Periode fließt ins Budget</string>
     <string name="budget_formula_caption_surplus_first_day">Der Überschuss der letzten Periode bleibt beim ersten Tag</string>
     <string name="budget_formula_caption_adjustments">Einnahmen und Abzüge in dieser Periode</string>
@@ -211,6 +208,7 @@
     <string name="budget_formula_caption_spread_over_left">Auf den Rest der Periode verteilt</string>
     <string name="budget_formula_caption_left">Minus deine Ausgaben</string>
     <string name="budget_formula_caption_reserved">Zurückgelegt für Zahlungen, die später in der Periode fällig sind</string>
+    <string name="budget_formula_caption_carried">Übertrag aus den vorherigen Tagen</string>
     <string name="budget_formula_card_tap_hint">Tippe für die vollständige Aufschlüsselung</string>
     <string name="budget_formula_tip_hold_pill">Tipp: Halte die Budget-Anzeige auf dem Startbildschirm gedrückt, um das jederzeit zu sehen</string>
     <string name="budget_formula_tip_tap_card">Tipp: Du kannst auch auf den berechneten Betrag im Zeitraum-Sheet tippen</string>
@@ -565,30 +563,33 @@
     <string name="wavy_divider_show_all_past_period_expenses">Show all expenses from the previous period…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">Use %d days</string>
-    <string name="remaining_budget_label">Remaining</string>
     <string name="currency_label">Currency</string>
+    <string name="budget_duration_label">Dauer</string>
+    <string name="budget_base_currency_label">Basiswährung</string>
+    <string name="budget_behaviour_title">Budgetverhalten</string>
+    <string name="budget_behaviour_subtitle">Wähle, was mit übrigem Geld passiert und wie dein Tagesbetrag berechnet wird.</string>
+    <string name="budget_behaviour_surplus_title">Überschuss am Periodenende</string>
+    <string name="budget_behaviour_surplus_ask">Fragen</string>
+    <string name="budget_behaviour_surplus_spread">Alles verteilen</string>
+    <string name="budget_behaviour_surplus_first_day">Alles an Tag 1</string>
+    <string name="budget_behaviour_surplus_preview_ask">Du entscheidest am Ende der Periode</string>
+    <string name="budget_behaviour_surplus_preview_spread">z. B. %1$s übrig ÷ %2$s =</string>
+    <string name="budget_behaviour_surplus_preview_first_day">z. B. %1$s übrig → Tag 1 =</string>
+    <string name="budget_behaviour_surplus_per_day">+%1$s / Tag</string>
     <string name="select_currency">Select currency</string>
     <string name="search_currency">Search currency…</string>
     <string name="clear">Clear</string>
     <string name="currency_no_results">No currencies found</string>
     <string name="currency_selected">Selected</string>
     <!-- Remaining Budget Strategy -->
-    <string name="strategy_dialog_title">Budget surplus</string>
-    <string name="strategy_dialog_description" formatted="false">Du kannst wählen, wie ein übrig gebliebenes Budget am Ende deines Zeitraums verteilt wird.\n\nZum Beispiel: Dein Zeitraum endet mit 100 übrig – du kannst den Betrag gleichmäßig auf die Tage deines nächsten Zeitraums verteilen, ihn komplett dem ersten Tag deines nächsten Zeitraums hinzufügen oder jedes Mal neu entscheiden, wenn es passiert.</string>
-    <string name="strategy_ask_always">Ask me always</string>
-    <string name="strategy_ask_always_desc">At the end of the period we will ask you what to do with the surplus</string>
-    <string name="strategy_split_equally">Spread across all days</string>
-    <string name="strategy_split_equally_desc">The surplus is divided equally among all days of the new period</string>
-    <string name="strategy_add_to_first_day">Zu heute hinzufügen</string>
-    <string name="strategy_add_to_first_day_desc">Der gesamte Überschuss wird nur dem heutigen Budget hinzugefügt</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">Split mode</string>
-    <string name="split_mode_dialog_title">How should we split your budget?</string>
-    <string name="split_mode_dialog_description" formatted="false">Choose how the per-period amount is calculated.</string>
     <string name="split_mode_static">Static</string>
-    <string name="split_mode_static_desc">Total budget is split equally across all periods, regardless of how much you spend.</string>
-    <string name="split_mode_dynamic">Dynamic (Recommended)</string>
-    <string name="split_mode_dynamic_desc">Recalculates daily as you spend. The remaining balance is spread over the days still left in the period.</string>
+    <string name="split_mode_static_desc">Das Gesamtbudget wird gleichmäßig auf alle Tage verteilt, egal ob und wie viel du ausgibst.</string>
+    <string name="split_mode_dynamic">Auf alle Tage verteilen</string>
+    <string name="split_mode_dynamic_desc">Wird täglich anhand deiner Ausgaben berechnet. Das verbleibende Budget wird auf die restlichen Tage der Periode verteilt.</string>
+    <string name="split_mode_carry_over">Übertrag</string>
+    <string name="split_mode_carry_over_desc">Was du an einem Tag nicht ausgibst, kommt als Budget zum nächsten Tag hinzu und sammelt sich an.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>
     <string name="no_name">No name</string>

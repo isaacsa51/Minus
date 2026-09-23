@@ -5,14 +5,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.google.common.truth.Truth
-import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -22,9 +23,10 @@ import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.Editor
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_APPLY_BUTTON_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_EDIT_BUTTON_TAG
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_NEXT_BUTTON_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SHEET_TAG
-import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SPLIT_MODE_ROW_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
+import com.serranoie.app.minus.presentation.ui.editor.sheets.budgetSplitModeOptionTag
 import com.serranoie.app.minus.presentation.ui.editor.sheets.budgetPeriodToggleTag
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.BUDGET_PERIOD_CALCULATED_CARD_TAG
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -122,6 +124,11 @@ class SplitModeE2ETest {
         composeTestRule.mainClock.advanceTimeBy(400)
     }
 
+    private fun openBehaviourStep() {
+        composeTestRule.onNodeWithTag(BUDGET_PERIOD_NEXT_BUTTON_TAG).performClick()
+        composeTestRule.waitForIdle()
+    }
+
     private fun renderEditorWithSheet(
         budgetSettings: BudgetSettings = dynamicSettings(),
         budgetState: BudgetState = dynamicState(),
@@ -213,75 +220,53 @@ class SplitModeE2ETest {
     }
 
     @Test
-    fun when_edit_mode_then_split_mode_row_is_visible() {
+    fun when_edit_mode_next_then_split_mode_options_are_visible() {
         renderSheet(startInEditMode = true)
+        openBehaviourStep()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG)
+        composeTestRule.onNodeWithTag(budgetSplitModeOptionTag(BudgetSplitMode.DYNAMIC))
+            .performScrollTo()
             .assertIsDisplayed()
     }
 
     @Test
-    fun when_edit_mode_with_static_settings_then_split_mode_row_shows_static_label() {
+    fun when_edit_mode_with_static_settings_then_static_option_is_selected() {
         renderSheet(
             budgetSettings = dynamicSettings(BudgetSplitMode.STATIC),
             startInEditMode = true,
         )
+        openBehaviourStep()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG)
-            .assertIsDisplayed()
-        val staticLabel = composeTestRule.activity.getString(R.string.split_mode_static)
-        composeTestRule.onAllNodesWithText(staticLabel, substring = true).onLast()
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(budgetSplitModeOptionTag(BudgetSplitMode.STATIC)).assertIsSelected()
+        composeTestRule.onNodeWithTag(budgetSplitModeOptionTag(BudgetSplitMode.DYNAMIC)).assertIsNotSelected()
     }
 
     @Test
-    fun when_edit_mode_with_dynamic_settings_then_split_mode_row_shows_dynamic_label() {
+    fun when_edit_mode_with_dynamic_settings_then_dynamic_option_is_selected() {
         renderSheet(
             budgetSettings = dynamicSettings(BudgetSplitMode.DYNAMIC),
             startInEditMode = true,
         )
+        openBehaviourStep()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG)
-            .assertIsDisplayed()
-        val dynamicLabel = composeTestRule.activity.getString(R.string.split_mode_dynamic)
-        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast()
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(budgetSplitModeOptionTag(BudgetSplitMode.DYNAMIC)).assertIsSelected()
     }
 
     @Test
-    fun when_tap_split_mode_row_then_picker_dialog_opens() {
-        renderSheet(startInEditMode = true)
-
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG).performClick()
-        composeTestRule.waitForIdle()
-        composeTestRule.mainClock.advanceTimeBy(500)
-
-        val title = composeTestRule.activity.getString(R.string.split_mode_dialog_title)
-        composeTestRule.onAllNodesWithText(title, substring = true)
-            .onLast()
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun when_pick_dynamic_in_dialog_then_row_updates_to_dynamic_label() {
+    fun when_pick_dynamic_option_then_it_becomes_the_selected_one() {
         renderSheet(
             budgetSettings = dynamicSettings(BudgetSplitMode.STATIC),
             startInEditMode = true,
         )
+        openBehaviourStep()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG).performClick()
+        composeTestRule.onNodeWithTag(budgetSplitModeOptionTag(BudgetSplitMode.DYNAMIC))
+            .performScrollTo()
+            .performClick()
         composeTestRule.waitForIdle()
 
-        val dynamicLabel = composeTestRule.activity.getString(R.string.split_mode_dynamic)
-        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast().performClick()
-        composeTestRule.waitForIdle()
-
-        val title = composeTestRule.activity.getString(R.string.split_mode_dialog_title)
-        composeTestRule.onAllNodesWithText(title, substring = true)
-            .onLast()
-            .assertIsNotDisplayed()
-        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast()
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(budgetSplitModeOptionTag(BudgetSplitMode.DYNAMIC)).assertIsSelected()
+        composeTestRule.onNodeWithTag(budgetSplitModeOptionTag(BudgetSplitMode.STATIC)).assertIsNotSelected()
     }
 
     @Test
@@ -292,14 +277,14 @@ class SplitModeE2ETest {
             startInEditMode = true,
             capturedIntents = captured,
         )
+        openBehaviourStep()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_SPLIT_MODE_ROW_TAG).performClick()
-        composeTestRule.waitForIdle()
-        val dynamicLabel = composeTestRule.activity.getString(R.string.split_mode_dynamic)
-        composeTestRule.onAllNodesWithText(dynamicLabel, substring = true).onLast().performClick()
+        composeTestRule.onNodeWithTag(budgetSplitModeOptionTag(BudgetSplitMode.DYNAMIC))
+            .performScrollTo()
+            .performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performClick()
+        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performScrollTo().performClick()
         composeTestRule.waitForIdle()
 
         val saved = captured.filterIsInstance<BudgetSettings>().lastOrNull()
@@ -315,8 +300,9 @@ class SplitModeE2ETest {
             startInEditMode = true,
             capturedIntents = captured,
         )
+        openBehaviourStep()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performClick()
+        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performScrollTo().performClick()
         composeTestRule.waitForIdle()
 
         val saved = captured.filterIsInstance<BudgetSettings>().lastOrNull()

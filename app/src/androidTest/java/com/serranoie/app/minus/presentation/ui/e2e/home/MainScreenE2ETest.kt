@@ -22,6 +22,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
@@ -38,6 +39,7 @@ import com.serranoie.app.minus.presentation.ui.editor.Editor
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_APPLY_BUTTON_TAG
+import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_NEXT_BUTTON_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_BUDGET_INPUT_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SHEET_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
@@ -603,9 +605,11 @@ class MainScreenE2ETest {
         composeTestRule.mainClock.advanceTimeBy(400)
 
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_BUDGET_INPUT_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(BUDGET_PERIOD_NEXT_BUTTON_TAG).assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performClick()
+        composeTestRule.onNodeWithTag(BUDGET_PERIOD_NEXT_BUTTON_TAG).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performScrollTo().performClick()
         composeTestRule.waitForIdle()
 
         Truth.assertThat(intents).contains("SaveBudget")

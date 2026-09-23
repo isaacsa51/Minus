@@ -25,6 +25,7 @@ enum class RemainingBudgetStrategy {
 enum class BudgetSplitMode {
     STATIC,
     DYNAMIC,
+    CARRY_OVER,
 }
 
 enum class SymbolPosition {

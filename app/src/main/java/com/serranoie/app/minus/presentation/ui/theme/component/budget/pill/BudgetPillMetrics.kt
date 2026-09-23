@@ -6,8 +6,12 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.carryOverNext
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.carryOverRemaining
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.dynamicAllocations
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.nextAllocationFor
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.spentIn
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.toDays
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -38,13 +42,7 @@ internal fun calculateBudgetMetrics(
     }
     val periodBudget = state.dailyBudget.multiply(multiplier)
 
-    val basePeriodSpent = when (period) {
-        BudgetPeriod.DAILY -> state.totalSpentToday
-        BudgetPeriod.WEEKLY -> state.totalSpentThisWeek
-        BudgetPeriod.BIWEEKLY -> state.totalSpentThisBiweek
-        BudgetPeriod.MONTHLY -> state.totalSpentThisMonth
-    }
-    val periodSpent = basePeriodSpent.add(draftSpend)
+    val periodSpent = state.spentIn(period).add(draftSpend)
     val spentInPeriod = state.totalSpentInPeriod.add(draftSpend)
 
     val staticRemaining = periodBudget.subtract(periodSpent)
@@ -57,6 +55,13 @@ internal fun calculateBudgetMetrics(
             dynamicAllocation.subtract(periodSpent).coerceAtLeast(BigDecimal.ZERO)
 
         BudgetSplitMode.STATIC -> staticRemaining
+
+        BudgetSplitMode.CARRY_OVER -> state.carryOverRemaining(period, draftSpend)
+    }
+    val blockBudget = when (splitMode) {
+        BudgetSplitMode.STATIC -> periodBudget
+        BudgetSplitMode.DYNAMIC -> dynamicAllocation
+        BudgetSplitMode.CARRY_OVER -> periodRemaining.add(periodSpent)
     }
 
     val isOverBudget = state.isOverBudget || (hasDraft && spentInPeriod > state.totalBudget)
@@ -67,17 +72,21 @@ internal fun calculateBudgetMetrics(
             else -> dynamicAllocation.signum() == 1 && periodSpent > dynamicAllocation
         }
 
-        BudgetSplitMode.STATIC -> staticRemaining.signum() == -1
+        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER -> periodRemaining.signum() == -1
     }
 
+    val progressBudget = if (splitMode == BudgetSplitMode.CARRY_OVER) blockBudget else periodBudget
     val progress = if (isOverBudget || isOverSubPeriod) {
         1f
-    } else if (periodBudget.signum() == 1) {
-        periodSpent.divide(periodBudget, 2, RoundingMode.HALF_UP).toFloat().coerceIn(0f, 1f)
+    } else if (progressBudget.signum() == 1) {
+        periodSpent.divide(progressBudget, 2, RoundingMode.HALF_UP).toFloat().coerceIn(0f, 1f)
     } else 0f
 
-    val nextPeriodAllocation = dynamic?.let { state.nextAllocationFor(period, draftSpend) }
-        ?.takeIf { isOverSubPeriod && !isOverBudget && it.signum() == 1 }
+    val nextPeriodAllocation = when (splitMode) {
+        BudgetSplitMode.STATIC -> null
+        BudgetSplitMode.DYNAMIC -> state.nextAllocationFor(period, draftSpend)
+        BudgetSplitMode.CARRY_OVER -> state.carryOverNext(period, draftSpend)
+    }?.takeIf { isOverSubPeriod && !isOverBudget && it.signum() == 1 }
 
     return BudgetMetrics(
         periodRemaining = periodRemaining,
@@ -85,7 +94,7 @@ internal fun calculateBudgetMetrics(
         isCurrentPeriodOverBudget = isOverBudget,
         isOverCurrentSubPeriod = isOverSubPeriod,
         nextPeriodAllocation = nextPeriodAllocation,
-        periodBudget = if (splitMode == BudgetSplitMode.DYNAMIC) dynamicAllocation else periodBudget,
+        periodBudget = blockBudget,
         periodSpent = periodSpent,
         spentInPeriod = spentInPeriod,
     )
@@ -97,34 +106,23 @@ internal fun resolveExhaustedMessage(
 ): String? {
     if (state == null || state.isOverBudget) return null
 
-    val dailyRem = state.dailyBudget.subtract(state.totalSpentToday)
-    val isDailyExhausted = dailyRem.signum() <= 0
-    val isWeeklyExhausted =
-        (state.dailyBudget.multiply(BigDecimal(7))).subtract(state.totalSpentThisWeek).signum() <= 0
-    val isBiweeklyExhausted =
-        (state.dailyBudget.multiply(BigDecimal(14))).subtract(state.totalSpentThisBiweek)
-            .signum() <= 0
+    fun isExhausted(p: BudgetPeriod): Boolean {
+        val remaining = if (splitMode == BudgetSplitMode.CARRY_OVER) {
+            state.carryOverRemaining(p)
+        } else {
+            state.dailyBudget.multiply(BigDecimal(p.toDays())).subtract(state.spentIn(p))
+        }
+        return remaining.signum() <= 0
+    }
 
     return when (splitMode) {
-        BudgetSplitMode.STATIC -> {
-            val staticRem = when (period) {
-                BudgetPeriod.WEEKLY -> state.dailyBudget.multiply(BigDecimal(7))
-                    .subtract(state.totalSpentThisWeek)
-
-                BudgetPeriod.BIWEEKLY -> state.dailyBudget.multiply(BigDecimal(14))
-                    .subtract(state.totalSpentThisBiweek)
-
-                BudgetPeriod.MONTHLY -> state.dailyBudget.multiply(BigDecimal(30))
-                    .subtract(state.totalSpentThisMonth)
-
-                else -> BigDecimal.ZERO
-            }
-            if (staticRem.signum() <= 0) return null
+        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER -> {
+            if (period == BudgetPeriod.DAILY || isExhausted(period)) return null
 
             val labels = buildList {
-                if (isDailyExhausted) add(stringResource(R.string.budget_pill_exhausted_daily_label))
-                if (period >= BudgetPeriod.BIWEEKLY && isWeeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
-                if (period == BudgetPeriod.MONTHLY && isBiweeklyExhausted) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
+                if (isExhausted(BudgetPeriod.DAILY)) add(stringResource(R.string.budget_pill_exhausted_daily_label))
+                if (period >= BudgetPeriod.BIWEEKLY && isExhausted(BudgetPeriod.WEEKLY)) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
+                if (period == BudgetPeriod.MONTHLY && isExhausted(BudgetPeriod.BIWEEKLY)) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
             }
 
             when (labels.size) {
