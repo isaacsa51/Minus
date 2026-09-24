@@ -58,6 +58,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListI
 import com.serranoie.app.minus.presentation.ui.theme.component.MorphCornerShape
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.toShape
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleLargeCondensed
 import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
 import com.serranoie.app.minus.presentation.util.censor
