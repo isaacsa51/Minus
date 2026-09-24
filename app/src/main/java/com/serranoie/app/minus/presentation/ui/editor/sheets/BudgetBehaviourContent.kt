@@ -3,10 +3,13 @@
 package com.serranoie.app.minus.presentation.ui.editor.sheets
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.OverscrollEffect
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +24,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
@@ -41,22 +45,27 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -66,26 +75,25 @@ import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
+import com.serranoie.app.minus.presentation.ui.theme.component.MorphCornerShape
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
+import com.serranoie.app.minus.presentation.ui.theme.component.toShape
 import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
-import com.serranoie.app.minus.presentation.util.censor
-import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
-import java.math.BigDecimal
 
 @Composable
 internal fun BudgetBehaviourContent(
     strategy: RemainingBudgetStrategy,
     splitMode: BudgetSplitMode,
-    exampleLeftover: BigDecimal,
-    periodDays: Int,
-    currencyCode: String,
     onStrategySelected: (RemainingBudgetStrategy) -> Unit,
     onSplitModeSelected: (BudgetSplitMode) -> Unit,
     applyLabel: String,
     onBack: () -> Unit,
     onApply: () -> Unit,
 ) {
+    val scrollState = rememberScrollState()
+    val overscroll = rememberOverscrollEffect()
+    val scrollGuard = remember(scrollState, overscroll) { SheetScrollGuard(scrollState, overscroll) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -93,9 +101,11 @@ internal fun BudgetBehaviourContent(
     ) {
         Column(
             modifier = Modifier
-                .verticalScroll(rememberScrollState()),
+                .weight(1f, fill = false)
+                .nestedScroll(scrollGuard)
+                .verticalScroll(scrollState, overscrollEffect = scrollGuard),
         ) {
-            Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp)) {
+            Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp)) {
                 Text(
                     text = stringResource(R.string.budget_behaviour_title),
                     style = MaterialTheme.typography.headlineSmallEmphasized,
@@ -115,9 +125,6 @@ internal fun BudgetBehaviourContent(
                 SurplusStrategyCard(
                     strategy = strategy,
                     onStrategySelected = onStrategySelected,
-                    exampleLeftover = exampleLeftover,
-                    periodDays = periodDays,
-                    currencyCode = currencyCode,
                 )
             }
 
@@ -126,6 +133,7 @@ internal fun BudgetBehaviourContent(
                 options = listOf(
                     BudgetSplitMode.DYNAMIC,
                     BudgetSplitMode.CARRY_OVER,
+                    BudgetSplitMode.ASK_ME,
                     BudgetSplitMode.STATIC
                 ),
                 selected = splitMode,
@@ -137,6 +145,7 @@ internal fun BudgetBehaviourContent(
                             BudgetSplitMode.STATIC -> R.string.split_mode_static
                             BudgetSplitMode.DYNAMIC -> R.string.split_mode_dynamic
                             BudgetSplitMode.CARRY_OVER -> R.string.split_mode_carry_over
+                            BudgetSplitMode.ASK_ME -> R.string.split_mode_ask_me
                         }
                     )
                 },
@@ -146,6 +155,7 @@ internal fun BudgetBehaviourContent(
                             BudgetSplitMode.STATIC -> R.string.split_mode_static_desc
                             BudgetSplitMode.DYNAMIC -> R.string.split_mode_dynamic_desc
                             BudgetSplitMode.CARRY_OVER -> R.string.split_mode_carry_over_desc
+                            BudgetSplitMode.ASK_ME -> R.string.split_mode_ask_me_desc
                         }
                     )
                 },
@@ -193,12 +203,8 @@ internal fun BudgetBehaviourContent(
 private fun SurplusStrategyCard(
     strategy: RemainingBudgetStrategy,
     onStrategySelected: (RemainingBudgetStrategy) -> Unit,
-    exampleLeftover: BigDecimal,
-    periodDays: Int,
-    currencyCode: String,
 ) {
     val view = LocalView.current
-    val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
     val strategies = listOf(
         RemainingBudgetStrategy.ASK_ALWAYS,
         RemainingBudgetStrategy.SPLIT_EQUALLY,
@@ -233,7 +239,6 @@ private fun SurplusStrategyCard(
                             .semantics { role = Role.RadioButton }
                             .testTag(budgetStrategyOptionTag(option)),
                         colors = ToggleButtonDefaults.toggleButtonColors(
-                            containerColor = Color.Transparent,
                             checkedContainerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             checkedContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -265,6 +270,7 @@ private fun SurplusStrategyCard(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Info,
+                    tint = MaterialTheme.colorScheme.outline,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
                 )
@@ -275,55 +281,17 @@ private fun SurplusStrategyCard(
                     transitionSpec = { fadeIn(tween(150)) togetherWith fadeOut(tween(150)) },
                     label = "surplusPreview",
                 ) { shown ->
-                    val leftover = currencyFormat.format(exampleLeftover)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = when (shown) {
-                                RemainingBudgetStrategy.ASK_ALWAYS ->
-                                    stringResource(R.string.budget_behaviour_surplus_preview_ask)
-
-                                RemainingBudgetStrategy.SPLIT_EQUALLY -> stringResource(
-                                    R.string.budget_behaviour_surplus_preview_spread,
-                                    leftover,
-                                    pluralStringResource(R.plurals.days, periodDays, periodDays),
-                                )
-
-                                RemainingBudgetStrategy.ADD_TO_FIRST_DAY ->
-                                    stringResource(
-                                        R.string.budget_behaviour_surplus_preview_first_day,
-                                        leftover
-                                    )
-                            },
-                            style = MaterialTheme.typography.bodyMediumCondensed,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier
-                                .weight(1f)
-                                .censor(),
-                        )
-                        val badge = when (shown) {
-                            RemainingBudgetStrategy.ASK_ALWAYS -> null
-                            RemainingBudgetStrategy.SPLIT_EQUALLY -> stringResource(
-                                R.string.budget_behaviour_surplus_per_day,
-                                currencyFormat.format(
-                                    if (periodDays > 0) {
-                                        exampleLeftover.divide(
-                                            BigDecimal(periodDays),
-                                            2,
-                                            java.math.RoundingMode.HALF_UP
-                                        )
-                                    } else {
-                                        BigDecimal.ZERO
-                                    }
-                                ),
-                            )
-
-                            RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> "+$leftover"
-                        }
-                        if (badge != null) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            AccentBadge(text = badge, modifier = Modifier.censor())
-                        }
-                    }
+                    Text(
+                        text = stringResource(
+                            when (shown) {
+                                RemainingBudgetStrategy.ASK_ALWAYS -> R.string.budget_behaviour_surplus_preview_ask
+                                RemainingBudgetStrategy.SPLIT_EQUALLY -> R.string.budget_behaviour_surplus_preview_spread
+                                RemainingBudgetStrategy.ADD_TO_FIRST_DAY -> R.string.budget_behaviour_surplus_preview_first_day
+                            }
+                        ),
+                        style = MaterialTheme.typography.bodyMediumCondensed,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
         }
@@ -349,18 +317,20 @@ private fun <T> BehaviourOptionGroup(
     ) {
         options.forEachIndexed { index, option ->
             val isSelected = option == selected
+            val position = when {
+                options.size == 1 -> PaddedListItemPosition.Single
+                index == 0 -> PaddedListItemPosition.First
+                index == options.lastIndex -> PaddedListItemPosition.Last
+                else -> PaddedListItemPosition.Middle
+            }
+            val selection by animateFloatAsState(if (isSelected) 1f else 0f, label = "optionShape")
             CustomPaddedListItem(
                 onClick = {
                     view.confirmFeedback()
                     onSelect(option)
                 },
-                position = when {
-                    options.size == 1 -> PaddedListItemPosition.Single
-                    index == 0 -> PaddedListItemPosition.First
-                    index == options.lastIndex -> PaddedListItemPosition.Last
-                    else -> PaddedListItemPosition.Middle
-                },
-                customShape = if (isSelected) MaterialTheme.shapes.extraLarge else null,
+                position = position,
+                customShape = MorphCornerShape(position.toShape(), MaterialTheme.shapes.extraLarge, selection),
                 modifier = Modifier
                     .testTag(optionTag(option))
                     .semantics(mergeDescendants = true) {
@@ -398,6 +368,54 @@ private fun <T> BehaviourOptionGroup(
     }
 }
 
+private class SheetScrollGuard(
+    private val scrollState: ScrollState,
+    private val overscroll: OverscrollEffect?,
+) : NestedScrollConnection, OverscrollEffect {
+    private var blockedScroll = Offset.Zero
+    private var blockedFling = Velocity.Zero
+    private val canScroll: Boolean
+        get() = scrollState.canScrollForward || scrollState.canScrollBackward
+
+    override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+        blockedScroll = if (canScroll) available else Offset.Zero
+        return blockedScroll
+    }
+
+    override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+        blockedFling = if (canScroll) available else Velocity.Zero
+        return blockedFling
+    }
+
+    override fun applyToScroll(
+        delta: Offset,
+        source: NestedScrollSource,
+        performScroll: (Offset) -> Offset,
+    ): Offset {
+        val effect = overscroll ?: return performScroll(delta)
+        return effect.applyToScroll(delta, source) { available ->
+            blockedScroll = Offset.Zero
+            performScroll(available) - blockedScroll
+        }
+    }
+
+    override suspend fun applyToFling(velocity: Velocity, performFling: suspend (Velocity) -> Velocity) {
+        if (overscroll == null) {
+            performFling(velocity)
+            return
+        }
+        overscroll.applyToFling(velocity) { available ->
+            blockedFling = Velocity.Zero
+            performFling(available) - blockedFling
+        }
+    }
+
+    override val isInProgress: Boolean
+        get() = overscroll?.isInProgress == true
+
+    override val node: DelegatableNode = overscroll?.node ?: object : Modifier.Node() {}
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun BudgetBehaviourContentPreview() {
@@ -406,9 +424,6 @@ private fun BudgetBehaviourContentPreview() {
             BudgetBehaviourContent(
                 strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
                 splitMode = BudgetSplitMode.DYNAMIC,
-                exampleLeftover = BigDecimal("150.00"),
-                periodDays = 30,
-                currencyCode = "USD",
                 onStrategySelected = {},
                 onSplitModeSelected = {},
                 applyLabel = "Apply",

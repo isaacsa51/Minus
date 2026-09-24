@@ -23,39 +23,47 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Backspace
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.Utils.abortFeedback
-import com.serranoie.app.minus.presentation.util.haptic.HapticUtil
 import com.serranoie.app.minus.presentation.util.font.format.getFloatDivider
 import com.serranoie.app.minus.presentation.util.font.format.join
 import com.serranoie.app.minus.presentation.util.font.format.tryConvertStringToNumber
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil
+import java.math.BigDecimal
 import java.util.Date
 import kotlin.math.abs
 
@@ -109,6 +117,7 @@ fun Numpad(
     enableCalculationMode: Boolean = true,
     enableCalcModeSwipe: Boolean = enableCalculationMode,
     leftContent: (@Composable ColumnScope.() -> Unit)? = null,
+    backspaceIcon: ImageVector = Icons.AutoMirrored.Rounded.Backspace,
     tutorialBoxState: TutorialBoxState? = null,
 ) {
     val view = LocalView.current
@@ -138,7 +147,13 @@ fun Numpad(
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(horizontal = 14.dp)
-            .pointerInput(isCalculation, hasOperators, enableCalculationMode, enableCalcModeSwipe, hasHardKeyboard) {
+            .pointerInput(
+                isCalculation,
+                hasOperators,
+                enableCalculationMode,
+                enableCalcModeSwipe,
+                hasHardKeyboard
+            ) {
                 if (!enableCalculationMode || !enableCalcModeSwipe) return@pointerInput
                 var accumulatedDrag = 0f
                 var lastReportedProgress = 0f
@@ -158,9 +173,11 @@ fun Numpad(
                             accumulatedDrag < 0f && !isCalculation -> {
                                 (-accumulatedDrag / 110f).coerceIn(0f, 1f)
                             }
+
                             accumulatedDrag > 0f && isCalculation && !hasOperators -> {
                                 (accumulatedDrag / 110f).coerceIn(0f, 1f)
                             }
+
                             else -> 0f
                         }
 
@@ -211,19 +228,36 @@ fun Numpad(
                 )
             }
 
-            Row(Modifier.fillMaxWidth().weight(4f)) {
-                Box(Modifier.fillMaxHeight().weight(3f)) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(4f)
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxHeight()
+                        .weight(3f)
+                ) {
                     AnimatedContent(
                         targetState = leftContent != null,
                         label = "NumpadLeftContentSwap",
                         transitionSpec = {
-                            (fadeIn(tween(250)) + scaleIn(initialScale = 0.96f, animationSpec = tween(250))) togetherWith
-                            (fadeOut(tween(200)) + scaleOut(targetScale = 0.96f, animationSpec = tween(200))) using
-                            SizeTransform(clip = false)
+                            (fadeIn(tween(250)) + scaleIn(
+                                initialScale = 0.96f,
+                                animationSpec = tween(250)
+                            )) togetherWith
+                                    (fadeOut(tween(200)) + scaleOut(
+                                        targetScale = 0.96f,
+                                        animationSpec = tween(200)
+                                    )) using
+                                    SizeTransform(clip = false)
                         }
                     ) { hasLeftContent ->
                         if (hasLeftContent) {
-                            Column(Modifier.fillMaxSize()) { leftContent?.invoke(this) }
+                            Column(
+                                Modifier
+                                    .fillMaxSize()
+                            ) { leftContent?.invoke(this) }
                         } else {
                             NumberGrid(
                                 effectiveDragProgress = effectiveDragProgress,
@@ -235,7 +269,8 @@ fun Numpad(
                                 },
                                 onDotInput = {
                                     onDotInput()
-                                    debugProgress = (debugProgress + 1).coerceAtMost(TEST_NOTIFICATION_TAP_COUNT)
+                                    debugProgress =
+                                        (debugProgress + 1).coerceAtMost(TEST_NOTIFICATION_TAP_COUNT)
                                 },
                                 onThousandsInput = {
                                     onThousandsInput()
@@ -253,6 +288,7 @@ fun Numpad(
                     isCalculation = isCalculation,
                     effectiveDragProgress = effectiveDragProgress,
                     showThousandsShortcut = showThousandsShortcut,
+                    backspaceIcon = backspaceIcon,
                     onBackspace = {
                         onBackspace()
                         debugProgress = 0
@@ -290,10 +326,16 @@ private fun CompactHardwareLayout(
     onApply: () -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
-    Column(Modifier.fillMaxWidth().fillMaxHeight()) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
         ExpandableRow(
             items = listOf('÷', '×', '+', '-'),
-            modifier = Modifier.fillMaxWidth().weight(1f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
         ) { _, operator, interactionSource ->
             NumpadButton(
                 modifier = Modifier.padding(BUTTON_GAP),
@@ -310,7 +352,9 @@ private fun CompactHardwareLayout(
         ExpandableRow(
             itemCount = 2,
             baseWeights = listOf(2f, 2f),
-            modifier = Modifier.fillMaxWidth().weight(1f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
         ) { index, interactionSource ->
             if (index == 0) {
                 NumpadButton(
@@ -347,7 +391,9 @@ private fun CompactHardwareLayout(
         ExpandableRow(
             itemCount = 2,
             baseWeights = listOf(2f, 2f),
-            modifier = Modifier.fillMaxWidth().weight(1f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
         ) { index, interactionSource ->
             if (index == 0) {
                 NumpadButton(
@@ -389,7 +435,10 @@ private fun ColumnScope.OperatorRow(
     val haptic = LocalHapticFeedback.current
     val operators = remember { listOf('÷', '×', '+', '-') }
     Box(
-        Modifier.fillMaxWidth().weight(effectiveDragProgress.coerceAtLeast(0.01f)).clipToBounds(),
+        Modifier
+            .fillMaxWidth()
+            .weight(effectiveDragProgress.coerceAtLeast(0.01f))
+            .clipToBounds(),
         contentAlignment = Alignment.BottomCenter
     ) {
         ExpandableRow(
@@ -398,7 +447,12 @@ private fun ColumnScope.OperatorRow(
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .graphicsLayer(alpha = effectiveDragProgress)
-                .let { if (tutorialBoxState != null) it.markForTutorial(tutorialBoxState, 7) else it }
+                .let {
+                    if (tutorialBoxState != null) it.markForTutorial(
+                        tutorialBoxState,
+                        7
+                    ) else it
+                }
         ) { _, operator, interactionSource ->
             NumpadButton(
                 modifier = Modifier.padding(BUTTON_GAP),
@@ -464,7 +518,9 @@ private fun NumberGrid(
         for (row in rows) {
             ExpandableRow(
                 items = row.toList(),
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) { _, i, interactionSource ->
                 NumpadButton(
                     modifier = Modifier
@@ -482,52 +538,57 @@ private fun NumberGrid(
             }
         }
 
-        val dotButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
-            NumpadButton(
-                modifier = Modifier.padding(BUTTON_GAP),
-                type = NumpadButtonType.OPERATOR,
-                text = getFloatDivider(),
-                interactionSource = interactionSource,
-                onClick = {
-                    onDotInput()
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                }
-            )
-        }
+        val dotButton: @Composable RowScope.(MutableInteractionSource) -> Unit =
+            { interactionSource ->
+                NumpadButton(
+                    modifier = Modifier.padding(BUTTON_GAP),
+                    type = NumpadButtonType.OPERATOR,
+                    text = getFloatDivider(),
+                    interactionSource = interactionSource,
+                    onClick = {
+                        onDotInput()
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                )
+            }
 
-        val zeroButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
-            NumpadButton(
-                modifier = Modifier.padding(BUTTON_GAP),
-                type = NumpadButtonType.DEFAULT,
-                text = "0",
-                interactionSource = interactionSource,
-                onClick = {
-                    onNumberInput(0)
-                    onNumberPressedForTutorial?.invoke()
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                }
-            )
-        }
+        val zeroButton: @Composable RowScope.(MutableInteractionSource) -> Unit =
+            { interactionSource ->
+                NumpadButton(
+                    modifier = Modifier.padding(BUTTON_GAP),
+                    type = NumpadButtonType.DEFAULT,
+                    text = "0",
+                    interactionSource = interactionSource,
+                    onClick = {
+                        onNumberInput(0)
+                        onNumberPressedForTutorial?.invoke()
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                )
+            }
 
-        val thousandsButton: @Composable RowScope.(MutableInteractionSource) -> Unit = { interactionSource ->
-            NumpadButton(
-                modifier = Modifier.padding(BUTTON_GAP),
-                type = NumpadButtonType.DEFAULT,
-                interactionSource = interactionSource,
-                animateTextSize = false,
-                onClick = {
-                    onThousandsInput()
-                    onNumberPressedForTutorial?.invoke()
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                }
-            ) { color, style -> ThousandsButtonLabel(color, style) }
-        }
+        val thousandsButton: @Composable RowScope.(MutableInteractionSource) -> Unit =
+            { interactionSource ->
+                NumpadButton(
+                    modifier = Modifier.padding(BUTTON_GAP),
+                    type = NumpadButtonType.DEFAULT,
+                    interactionSource = interactionSource,
+                    animateTextSize = false,
+                    onClick = {
+                        onThousandsInput()
+                        onNumberPressedForTutorial?.invoke()
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                ) { color, style -> ThousandsButtonLabel(color, style) }
+            }
 
         if (showThousandsShortcut) {
             ExpandableRow(
                 itemCount = 3,
                 baseWeights = listOf(1.5f, 1.5f, 1.5f),
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) { index, interactionSource ->
                 when (index) {
                     0 -> dotButton(interactionSource)
@@ -539,7 +600,9 @@ private fun NumberGrid(
             ExpandableRow(
                 itemCount = 2,
                 baseWeights = listOf(1.5f, 3f),
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) { index, interactionSource ->
                 when (index) {
                     0 -> dotButton(interactionSource)
@@ -556,6 +619,7 @@ private fun RowScope.ActionButtonsColumn(
     isCalculation: Boolean,
     effectiveDragProgress: Float = 0f,
     showThousandsShortcut: Boolean = false,
+    backspaceIcon: ImageVector,
     onBackspace: () -> Unit,
     onBackspaceLongPress: () -> Unit,
     onDelete: () -> Unit,
@@ -564,11 +628,17 @@ private fun RowScope.ActionButtonsColumn(
     applyHintAnchorModifier: Modifier
 ) {
     val haptic = LocalHapticFeedback.current
-    Column(Modifier.fillMaxHeight().weight(1f)) {
+    Column(
+        Modifier
+            .fillMaxHeight()
+            .weight(1f)
+    ) {
         NumpadButton(
-            modifier = Modifier.weight(1f).padding(BUTTON_GAP),
+            modifier = Modifier
+                .weight(1f)
+                .padding(BUTTON_GAP),
             type = NumpadButtonType.TERTIARY,
-            icon = Icons.AutoMirrored.Rounded.Backspace,
+            icon = backspaceIcon,
             onClick = {
                 onBackspace()
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -595,7 +665,10 @@ private fun RowScope.ActionButtonsColumn(
             label = "Delete or Apply"
         ) { isDelete ->
             NumpadButton(
-                modifier = Modifier.fillMaxSize().padding(BUTTON_GAP).then(if (!isDelete) applyHintAnchorModifier else Modifier),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(BUTTON_GAP)
+                    .then(if (!isDelete) applyHintAnchorModifier else Modifier),
                 type = if (isDelete) NumpadButtonType.DELETE else NumpadButtonType.PRIMARY,
                 icon = if (isDelete) Icons.Default.Delete else (if (isCalculation) Icons.Default.Done else Icons.Default.Check),
                 onClick = {
@@ -697,5 +770,37 @@ private fun NumpadPreviewThousandsCalculation() {
             isCalculation = true,
             showThousandsShortcut = true
         )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun NumpadPreviewLeftoverChoice() {
+    MinusTheme {
+        var selected by remember { mutableStateOf(LeftoverChoice.SPREAD) }
+        Surface(modifier = Modifier.size(width = 393.dp, height = 360.dp)) {
+            Numpad(
+                editorState = EditorState(
+                    mode = EditMode.ADD,
+                    rawSpentValue = "",
+                    stage = EditStage.IDLE,
+                    currentSpent = "",
+                    currentComment = "",
+                    editedTransaction = null
+                ),
+                leftContent = {
+                    LeftoverChoiceList(
+                        amount = BigDecimal("25.00"),
+                        remainingToday = BigDecimal("100.00"),
+                        dailyBudget = BigDecimal("100.00"),
+                        daysRemaining = 8,
+                        currencyCode = "USD",
+                        selected = selected,
+                        onSelect = { selected = it },
+                    )
+                },
+                backspaceIcon = Icons.AutoMirrored.Rounded.ArrowBack,
+            )
+        }
     }
 }

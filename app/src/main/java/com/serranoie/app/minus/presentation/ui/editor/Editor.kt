@@ -148,6 +148,8 @@ fun Editor(
     onOpenAnalytics: () -> Unit = {},
     onOpenWallet: () -> Unit = {},
     onUnresolvedSurplusBannerClick: () -> Unit = {},
+    onPendingLeftoverClick: () -> Unit = {},
+    leftoverChoiceOpen: Boolean = false,
     openWalletOnStart: Boolean = false,
     showBudgetPeriodSheet: Boolean = false,
     forceBudgetPeriodSheetSetup: Boolean = false,
@@ -256,6 +258,8 @@ fun Editor(
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val periodSurplus = uiState.hasUnresolvedRolloverSurplus
+            val pendingLeftover = uiState.budgetState?.pendingLeftover?.takeIf { it.signum() > 0 }
             BudgetPill(
                 budgetState = uiState.budgetState,
                 budgetSettings = uiState.budgetSettings,
@@ -265,16 +269,17 @@ fun Editor(
                 splitMode = uiState.budgetSettings?.splitMode ?: BudgetSplitMode.STATIC,
                 calculationPreview = uiState.calculationPreview,
                 draftAmount = uiState.numpadDraftAmount,
-                hasUnresolvedSurplus = uiState.hasUnresolvedRolloverSurplus,
-                unresolvedSurplusAmount = uiState.unresolvedSurplusAmount,
+                hasUnresolvedSurplus = periodSurplus || pendingLeftover != null,
+                unresolvedSurplusAmount = if (periodSurplus) uiState.unresolvedSurplusAmount else pendingLeftover,
                 onOpenBudgetSheet = {
                     view.weakHapticFeedback()
                     onShowBudgetPeriodSheet()
                 },
                 onUnresolvedSurplusClick = {
                     view.weakHapticFeedback()
-                    onUnresolvedSurplusBannerClick()
+                    if (periodSurplus) onUnresolvedSurplusBannerClick() else onPendingLeftoverClick()
                 },
+                pinSurplusFace = leftoverChoiceOpen,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()

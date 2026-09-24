@@ -421,6 +421,7 @@ class AnalyticsViewModel @Inject constructor(
             paidOccurrences = paidOccurrences,
             allTransactions = allTransactions,
             reserveUpcomingCharges = userSettings.reserveUpcomingChargesEnabled,
+            leftoverChoices = userSettings.leftoverChoices,
         )
 
         val earlyFinishActive = userSettings.earlyFinishActive

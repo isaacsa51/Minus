@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -41,14 +43,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 
@@ -446,18 +453,7 @@ fun PaddedListItem(
     onClick: () -> Unit,
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
 ) {
-    val shape = when (position) {
-        PaddedListItemPosition.First -> RoundedCornerShape(
-            topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
-        )
-
-        PaddedListItemPosition.Last -> RoundedCornerShape(
-            bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
-        )
-
-        PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
-        PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
-    }
+    val shape = position.toShape()
 
     Surface(
         shape = shape,
@@ -509,18 +505,7 @@ fun CustomPaddedListItem(
     customShape: Shape? = null,
     content: @Composable RowScope.() -> Unit
 ) {
-    val shape = customShape ?: when (position) {
-        PaddedListItemPosition.First -> RoundedCornerShape(
-            topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
-        )
-
-        PaddedListItemPosition.Last -> RoundedCornerShape(
-            bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
-        )
-
-        PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
-        PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
-    }
+    val shape = customShape ?: position.toShape()
 
     Surface(
         shape = shape,
@@ -610,6 +595,36 @@ fun CustomPaddedExpandableItem(
 
 enum class PaddedListItemPosition {
     First, Middle, Last, Single
+}
+
+fun PaddedListItemPosition.toShape(): RoundedCornerShape = when (this) {
+    PaddedListItemPosition.First -> RoundedCornerShape(
+        topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
+    )
+
+    PaddedListItemPosition.Last -> RoundedCornerShape(
+        bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
+    )
+
+    PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
+    PaddedListItemPosition.Middle -> RoundedCornerShape(4.dp)
+}
+
+internal data class MorphCornerShape(
+    private val from: CornerBasedShape,
+    private val to: CornerBasedShape,
+    private val fraction: Float,
+) : Shape {
+    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
+        fun corner(start: CornerSize, stop: CornerSize) =
+            CornerSize(lerp(start.toPx(size, density), stop.toPx(size, density), fraction))
+        return RoundedCornerShape(
+            topStart = corner(from.topStart, to.topStart),
+            topEnd = corner(from.topEnd, to.topEnd),
+            bottomEnd = corner(from.bottomEnd, to.bottomEnd),
+            bottomStart = corner(from.bottomStart, to.bottomStart),
+        ).createOutline(size, layoutDirection, density)
+    }
 }
 
 @Preview(showBackground = true)

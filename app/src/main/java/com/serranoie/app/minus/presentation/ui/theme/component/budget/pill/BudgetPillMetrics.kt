@@ -56,12 +56,12 @@ internal fun calculateBudgetMetrics(
 
         BudgetSplitMode.STATIC -> staticRemaining
 
-        BudgetSplitMode.CARRY_OVER -> state.carryOverRemaining(period, draftSpend)
+        BudgetSplitMode.CARRY_OVER, BudgetSplitMode.ASK_ME -> state.carryOverRemaining(period, draftSpend)
     }
     val blockBudget = when (splitMode) {
         BudgetSplitMode.STATIC -> periodBudget
         BudgetSplitMode.DYNAMIC -> dynamicAllocation
-        BudgetSplitMode.CARRY_OVER -> periodRemaining.add(periodSpent)
+        BudgetSplitMode.CARRY_OVER, BudgetSplitMode.ASK_ME -> periodRemaining.add(periodSpent)
     }
 
     val isOverBudget = state.isOverBudget || (hasDraft && spentInPeriod > state.totalBudget)
@@ -72,10 +72,10 @@ internal fun calculateBudgetMetrics(
             else -> dynamicAllocation.signum() == 1 && periodSpent > dynamicAllocation
         }
 
-        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER -> periodRemaining.signum() == -1
+        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER, BudgetSplitMode.ASK_ME -> periodRemaining.signum() == -1
     }
 
-    val progressBudget = if (splitMode == BudgetSplitMode.CARRY_OVER) blockBudget else periodBudget
+    val progressBudget = if (splitMode.carriesLeftover) blockBudget else periodBudget
     val progress = if (isOverBudget || isOverSubPeriod) {
         1f
     } else if (progressBudget.signum() == 1) {
@@ -85,7 +85,7 @@ internal fun calculateBudgetMetrics(
     val nextPeriodAllocation = when (splitMode) {
         BudgetSplitMode.STATIC -> null
         BudgetSplitMode.DYNAMIC -> state.nextAllocationFor(period, draftSpend)
-        BudgetSplitMode.CARRY_OVER -> state.carryOverNext(period, draftSpend)
+        BudgetSplitMode.CARRY_OVER, BudgetSplitMode.ASK_ME -> state.carryOverNext(period, draftSpend)
     }?.takeIf { isOverSubPeriod && !isOverBudget && it.signum() == 1 }
 
     return BudgetMetrics(
@@ -107,7 +107,7 @@ internal fun resolveExhaustedMessage(
     if (state == null || state.isOverBudget) return null
 
     fun isExhausted(p: BudgetPeriod): Boolean {
-        val remaining = if (splitMode == BudgetSplitMode.CARRY_OVER) {
+        val remaining = if (splitMode.carriesLeftover) {
             state.carryOverRemaining(p)
         } else {
             state.dailyBudget.multiply(BigDecimal(p.toDays())).subtract(state.spentIn(p))
@@ -116,7 +116,7 @@ internal fun resolveExhaustedMessage(
     }
 
     return when (splitMode) {
-        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER -> {
+        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER, BudgetSplitMode.ASK_ME -> {
             if (period == BudgetPeriod.DAILY || isExhausted(period)) return null
 
             val labels = buildList {

@@ -196,6 +196,7 @@
     <string name="budget_formula_mode_static">Divisão estática</string>
     <string name="budget_formula_mode_dynamic">Divisão dinâmica</string>
     <string name="budget_formula_mode_carry_over">Divisão acumulativa</string>
+    <string name="budget_formula_mode_ask_me">Divisão por escolha</string>
     <string name="budget_formula_caption_surplus_split">O excedente do período anterior entra no orçamento</string>
     <string name="budget_formula_caption_surplus_first_day">O excedente do período anterior fica no primeiro dia</string>
     <string name="budget_formula_caption_adjustments">Receitas e deduções deste período</string>
@@ -206,6 +207,7 @@
     <string name="budget_formula_caption_left">Menos o que você gastou</string>
     <string name="budget_formula_caption_reserved">Reservado para cobranças que vencem mais adiante no período</string>
     <string name="budget_formula_caption_carried">Acumulado dos dias anteriores</string>
+    <string name="budget_formula_caption_spread_leftover">Sobras que você escolheu distribuir</string>
     <string name="budget_formula_card_tap_hint">Toque para ver o detalhamento completo</string>
     <string name="budget_formula_tip_hold_pill">Dica: segure a pílula do orçamento na tela inicial para ver isto a qualquer momento</string>
     <string name="budget_formula_tip_tap_card">Dica: você também pode tocar no valor calculado na folha do período</string>
@@ -568,10 +570,9 @@
     <string name="budget_behaviour_surplus_ask">Perguntar</string>
     <string name="budget_behaviour_surplus_spread">Distribuir tudo</string>
     <string name="budget_behaviour_surplus_first_day">Tudo no dia 1</string>
-    <string name="budget_behaviour_surplus_preview_ask">Você decide quando o período terminar</string>
-    <string name="budget_behaviour_surplus_preview_spread">ex. %1$s sobrando ÷ %2$s =</string>
-    <string name="budget_behaviour_surplus_preview_first_day">ex. %1$s sobrando → dia 1 =</string>
-    <string name="budget_behaviour_surplus_per_day">+%1$s / dia</string>
+    <string name="budget_behaviour_surplus_preview_ask">Quando o período terminar, você escolhe o que fazer com a sobra.</string>
+    <string name="budget_behaviour_surplus_preview_spread">A sobra é dividida igualmente entre todos os dias do próximo período.</string>
+    <string name="budget_behaviour_surplus_preview_first_day">Toda a sobra é somada ao primeiro dia do próximo período.</string>
     <string name="select_currency">Selecione a moeda</string>
     <string name="search_currency">Pesquisar moeda…</string>
     <string name="clear">Limpar</string>
@@ -586,6 +587,12 @@
     <string name="split_mode_dynamic_desc">Calculado diariamente com base em como você gasta. O orçamento restante é distribuído pelos dias restantes do período.</string>
     <string name="split_mode_carry_over">Acumulativo</string>
     <string name="split_mode_carry_over_desc">O que você não gasta por dia é somado ao orçamento do dia seguinte e vai se acumulando.</string>
+    <string name="split_mode_ask_me">Perguntar</string>
+    <string name="split_mode_ask_me_desc">Todo dia você decide o que fazer com o orçamento não usado de ontem: distribuir pelos dias restantes ou passar para hoje.</string>
+    <string name="leftover_choice_spread_outcome">%1$s para os próximos dias</string>
+    <string name="leftover_choice_carry_outcome">%1$s para amanhã</string>
+    <string name="leftover_choice_outcome">disponível hoje · depois %1$s/dia</string>
+    <string name="leftover_choice_outcome_last_day">disponível hoje</string>
     <!-- Transaction Detail -->
     <string name="without_date">Sem data</string>
     <string name="no_name">Sem nome</string>

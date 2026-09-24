@@ -260,6 +260,7 @@
     <string name="budget_formula_mode_static">Static split</string>
     <string name="budget_formula_mode_dynamic">Dynamic split</string>
     <string name="budget_formula_mode_carry_over">Carry over split</string>
+    <string name="budget_formula_mode_ask_me">Ask me split</string>
     <string name="budget_formula_caption_surplus_split">Last period\'s surplus joins the budget</string>
     <string name="budget_formula_caption_surplus_first_day">Last period\'s surplus stays on the first day</string>
     <string name="budget_formula_caption_adjustments">Income and deductions this period</string>
@@ -270,6 +271,7 @@
     <string name="budget_formula_caption_left">Minus what you\'ve spent</string>
     <string name="budget_formula_caption_reserved">Set aside for charges due later in the period</string>
     <string name="budget_formula_caption_carried">Carried over from earlier days</string>
+    <string name="budget_formula_caption_spread_leftover">Leftovers you chose to spread</string>
     <string name="budget_formula_card_tap_hint">Tap for the full breakdown</string>
     <string name="budget_formula_tip_hold_pill">Tip: hold the budget pill on the home screen to see this anytime</string>
     <string name="budget_formula_tip_tap_card">Tip: you can also tap the calculated amount in the period sheet</string>
@@ -679,10 +681,9 @@
     <string name="budget_behaviour_surplus_ask">Ask me</string>
     <string name="budget_behaviour_surplus_spread">Spread all</string>
     <string name="budget_behaviour_surplus_first_day">Day 1 lump</string>
-    <string name="budget_behaviour_surplus_preview_ask">You\'ll decide when the period ends</string>
-    <string name="budget_behaviour_surplus_preview_spread">e.g. %1$s left ÷ %2$s =</string>
-    <string name="budget_behaviour_surplus_preview_first_day">e.g. %1$s left -> day 1 =</string>
-    <string name="budget_behaviour_surplus_per_day">+%1$s / day</string>
+    <string name="budget_behaviour_surplus_preview_ask">When the period ends, you choose what to do with the leftover.</string>
+    <string name="budget_behaviour_surplus_preview_spread">Leftover is split evenly across every day of the next period.</string>
+    <string name="budget_behaviour_surplus_preview_first_day">All leftover is added to the first day of the next period.</string>
     <string name="select_currency">Select currency</string>
     <string name="search_currency">Search currency…</string>
     <string name="clear">Clear</string>
@@ -699,6 +700,14 @@
     <string name="split_mode_dynamic_desc">Calculates daily based on how you spend. The remaining budget is spread across the remaining days of the period.</string>
     <string name="split_mode_carry_over">Carry over</string>
     <string name="split_mode_carry_over_desc">What you don\'t spend daily is added to the next day as budget and keeps adding up.</string>
+    <string name="split_mode_ask_me">Ask me</string>
+    <string name="split_mode_ask_me_desc">Every day, you decide what happens to yesterday\'s unused budget: spread it over the remaining days or carry it over to today.</string>
+    <string name="leftover_choice_spread_desc">Allocate all unused remaining budget to all remaining days.</string>
+    <string name="leftover_choice_carry_desc">Move unused budget only to tomorrow.</string>
+    <string name="leftover_choice_spread_outcome">%1$s for upcoming days</string>
+    <string name="leftover_choice_carry_outcome">%1$s for tomorrow</string>
+    <string name="leftover_choice_outcome">left today · then %1$s/day</string>
+    <string name="leftover_choice_outcome_last_day">left today</string>
 
     <!-- Transaction Detail -->
     <string name="without_date">Without date</string>

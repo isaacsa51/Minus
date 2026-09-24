@@ -782,13 +782,6 @@ fun EditBudgetContent(
             BudgetBehaviourContent(
                 strategy = strategyCache,
                 splitMode = splitModeCache,
-                exampleLeftover = if (totalDays > 0) {
-                    parsedBudget.divide(BigDecimal(totalDays), 2, java.math.RoundingMode.HALF_UP)
-                } else {
-                    BigDecimal.ZERO
-                },
-                periodDays = totalDays,
-                currencyCode = currencyCache,
                 onStrategySelected = { strategyCache = it },
                 onSplitModeSelected = { splitModeCache = it },
                 applyLabel = buttonLabel,
@@ -1164,7 +1157,7 @@ fun EditBudgetContent(
 }
 
 @Composable
-internal fun AccentBadge(text: String, modifier: Modifier = Modifier) {
+private fun AccentBadge(text: String, modifier: Modifier = Modifier) {
     Surface(
         shape = MaterialTheme.shapes.small,
         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),

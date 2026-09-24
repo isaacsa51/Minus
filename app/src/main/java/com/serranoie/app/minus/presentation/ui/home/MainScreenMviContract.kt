@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.home
 
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
+import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
@@ -82,6 +83,7 @@ data class MainScreenActions(
     val onPeriodSelected: (BudgetPeriod) -> Unit = {},
     val onShowSnackbar: (String) -> Unit = {},
     val onUnresolvedSurplusBannerClick: () -> Unit = {},
+    val onLeftoverChoice: (LeftoverChoice) -> Unit = {},
 )
 
 data class MainScreenFeatureFlags(
@@ -96,4 +98,6 @@ data class MainScreenBudgetPeriodState(
     val forceBudgetPeriodSheetSetup: Boolean,
     val selectedViewPeriod: BudgetPeriod?,
     val onPeriodSelected: (BudgetPeriod) -> Unit,
+    val showLeftoverChoice: Boolean = false,
+    val onLeftoverChoiceVisible: (Boolean) -> Unit = {},
 )
