@@ -285,6 +285,7 @@ class HistoryViewModel @Inject constructor(
             budgetStateCalculator.calculateBudgetState(
                 s, periodTransactions, today, paidOccurrences, transactions,
                 reserveUpcomingCharges = userSettings?.reserveUpcomingChargesEnabled == true,
+                leftoverChoices = userSettings?.leftoverChoices.orEmpty(),
             )
         }
 

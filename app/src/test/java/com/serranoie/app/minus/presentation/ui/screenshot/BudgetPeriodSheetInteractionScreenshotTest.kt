@@ -1,15 +1,29 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
+import androidx.compose.foundation.LocalOverscrollFactory
+import androidx.compose.foundation.OverscrollEffect
+import androidx.compose.foundation.OverscrollFactory
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
+import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -20,6 +34,7 @@ import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_EDIT_
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BUDGET_PERIOD_SHEET_TAG
 import com.serranoie.app.minus.presentation.ui.editor.sheets.BudgetPeriodSheet
 import com.serranoie.app.minus.presentation.ui.editor.sheets.budgetPeriodToggleTag
+import com.serranoie.app.minus.presentation.ui.editor.sheets.budgetSplitModeOptionTag
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import me.saket.touchrobot.onNode
 import me.saket.touchrobot.rememberTouchRobot
@@ -168,13 +183,13 @@ class BudgetPeriodSheetInteractionScreenshotTest {
 
 		paparazzi.snapshot {
 			MinusTheme {
-				Surface(color = MaterialTheme.colorScheme.surfaceContainerLow) {
+				Surface(
+					color = MaterialTheme.colorScheme.surfaceContainerLow,
+					modifier = Modifier.height(640.dp),
+				) {
 					BudgetBehaviourContent(
 						strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
 						splitMode = BudgetSplitMode.CARRY_OVER,
-						exampleLeftover = BigDecimal("760.00"),
-						periodDays = 15,
-						currencyCode = "USD",
 						onStrategySelected = {},
 						onSplitModeSelected = {},
 						applyLabel = "Apply",
@@ -184,6 +199,92 @@ class BudgetPeriodSheetInteractionScreenshotTest {
 				}
 			}
 		}
+	}
+
+	@Test
+	fun behaviourListOverscrollsInsteadOfMovingTheSheet() {
+		Locale.setDefault(Locale.US)
+		var sheetScroll = Offset.Zero
+		var sheetFling = Velocity.Zero
+		var overscrolled = Offset.Zero
+		val sheet = object : NestedScrollConnection {
+			override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+				sheetScroll += available
+				return Offset.Zero
+			}
+
+			override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+				sheetFling += available
+				return Velocity.Zero
+			}
+		}
+		val overscrollFactory = object : OverscrollFactory {
+			override fun createOverscrollEffect(): OverscrollEffect = object : OverscrollEffect {
+				override fun applyToScroll(
+					delta: Offset,
+					source: NestedScrollSource,
+					performScroll: (Offset) -> Offset,
+				): Offset {
+					val consumed = performScroll(delta)
+					overscrolled += delta - consumed
+					return consumed
+				}
+
+				override suspend fun applyToFling(velocity: Velocity, performFling: suspend (Velocity) -> Velocity) {
+					performFling(velocity)
+				}
+
+				override val isInProgress = false
+			}
+
+			override fun hashCode() = 0
+
+			override fun equals(other: Any?) = other === this
+		}
+
+		val view = ComposeView(paparazzi.context).apply {
+			setContent {
+				MinusTheme {
+					CompositionLocalProvider(LocalOverscrollFactory provides overscrollFactory) {
+						Box {
+							Surface(
+								color = MaterialTheme.colorScheme.surfaceContainerLow,
+								modifier = Modifier
+									.height(640.dp)
+									.nestedScroll(sheet),
+							) {
+								BudgetBehaviourContent(
+									strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+									splitMode = BudgetSplitMode.CARRY_OVER,
+									onStrategySelected = {},
+									onSplitModeSelected = {},
+									applyLabel = "Apply",
+									onBack = {},
+									onApply = {},
+								)
+							}
+						}
+					}
+
+					val touchRobot = rememberTouchRobot()
+					LaunchedEffect(Unit) {
+						touchRobot.onNode(hasTestTag(budgetSplitModeOptionTag(BudgetSplitMode.DYNAMIC))).performGesture {
+							swipe(
+								start = center,
+								stop = center.copy(y = center.y + 300),
+								duration = 300.milliseconds,
+							)
+						}
+					}
+				}
+			}
+		}
+
+		paparazzi.gif(view, start = 1, end = 1_000)
+
+		assertThat(sheetScroll).isEqualTo(Offset.Zero)
+		assertThat(sheetFling).isEqualTo(Velocity.Zero)
+		assertThat(overscrolled.y).isGreaterThan(0f)
 	}
 
 	private val sampleBudgetSettings = BudgetSettings(

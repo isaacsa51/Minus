@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.domain.model
 
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
+import java.time.LocalDate
 
 data class UserSettings(
     val onboardingCompleted: Boolean = false,
@@ -36,6 +37,7 @@ data class UserSettings(
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val budgetSplitViewPeriod: BudgetPeriod? = null,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
+    val leftoverChoices: Map<LocalDate, LeftoverChoice> = emptyMap(),
 ) {
     companion object {
         const val DEFAULT_NOTIFICATION_HOUR = 9

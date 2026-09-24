@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.budget
 
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.EditMode
@@ -42,6 +43,7 @@ data class BudgetUiState(
     val numpadDraftAmount: BigDecimal? = null,
     val hasUnresolvedRolloverSurplus: Boolean = false,
     val unresolvedSurplusAmount: BigDecimal? = null,
+    val lastLeftoverChoice: LeftoverChoice? = null,
 ) {
     companion object {
         val INITIAL = BudgetUiState()

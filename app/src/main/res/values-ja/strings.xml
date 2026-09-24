@@ -194,6 +194,7 @@
     <string name="budget_formula_mode_static">固定分割</string>
     <string name="budget_formula_mode_dynamic">ダイナミック分割</string>
     <string name="budget_formula_mode_carry_over">繰り越し分割</string>
+    <string name="budget_formula_mode_ask_me">確認して分割</string>
     <string name="budget_formula_caption_surplus_split">前の期間の余剰金が予算に加算されます</string>
     <string name="budget_formula_caption_surplus_first_day">前の期間の余剰金は初日に残ります</string>
     <string name="budget_formula_caption_adjustments">この期間の収入と控除</string>
@@ -204,6 +205,7 @@
     <string name="budget_formula_caption_left">使った金額を差し引く</string>
     <string name="budget_formula_caption_reserved">期間内に後日発生する支払いのために確保</string>
     <string name="budget_formula_caption_carried">前日までからの繰り越し</string>
+    <string name="budget_formula_caption_spread_leftover">分散を選んだ残額</string>
     <string name="budget_formula_card_tap_hint">タップして詳しい内訳を表示</string>
     <string name="budget_formula_tip_hold_pill">ヒント: ホーム画面の予算ピルを長押しすると、いつでもこの内訳を確認できます</string>
     <string name="budget_formula_tip_tap_card">ヒント: 期間シートの計算額をタップしても確認できます</string>
@@ -566,10 +568,9 @@
     <string name="budget_behaviour_surplus_ask">確認する</string>
     <string name="budget_behaviour_surplus_spread">均等に分配</string>
     <string name="budget_behaviour_surplus_first_day">初日にまとめて</string>
-    <string name="budget_behaviour_surplus_preview_ask">期間の終わりに決めます</string>
-    <string name="budget_behaviour_surplus_preview_spread">例: 残り%1$s ÷ %2$s =</string>
-    <string name="budget_behaviour_surplus_preview_first_day">例: 残り%1$s → 初日 =</string>
-    <string name="budget_behaviour_surplus_per_day">+%1$s / 日</string>
+    <string name="budget_behaviour_surplus_preview_ask">期間の終わりに、余ったお金の扱いを選びます。</string>
+    <string name="budget_behaviour_surplus_preview_spread">余ったお金は次の期間の全日に均等に分けられます。</string>
+    <string name="budget_behaviour_surplus_preview_first_day">余ったお金はすべて次の期間の初日に加算されます。</string>
     <string name="select_currency">通貨を選択</string>
     <string name="search_currency">通貨を検索…</string>
     <string name="clear">クリア</string>
@@ -584,6 +585,12 @@
     <string name="split_mode_dynamic_desc">使い方に応じて毎日計算されます。残りの予算は期間の残りの日数に分散されます。</string>
     <string name="split_mode_carry_over">繰り越し</string>
     <string name="split_mode_carry_over_desc">その日に使わなかった分は翌日の予算に加算され、どんどん積み上がります。</string>
+    <string name="split_mode_ask_me">確認する</string>
+    <string name="split_mode_ask_me_desc">毎日、昨日使わなかった予算を残りの日に分散するか、今日に繰り越すかを選びます。</string>
+    <string name="leftover_choice_spread_outcome">残りの日は一日あたり %1$s</string>
+    <string name="leftover_choice_carry_outcome">明日は %1$s</string>
+    <string name="leftover_choice_outcome">今日の残り · 以降 %1$s/日</string>
+    <string name="leftover_choice_outcome_last_day">今日の残り</string>
     <!-- Transaction Detail -->
     <string name="without_date">日付なし</string>
     <string name="no_name">名前がありません</string>

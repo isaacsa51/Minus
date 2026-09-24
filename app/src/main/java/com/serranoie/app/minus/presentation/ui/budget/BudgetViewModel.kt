@@ -11,6 +11,7 @@ import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.CreditCard
+import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
@@ -159,6 +160,7 @@ class BudgetViewModel @Inject constructor(
             budgetStateCalculator.calculateBudgetState(
                 s, periodTransactions, LocalDate.now(), paidOccurrences, transactions,
                 reserveUpcomingCharges = userSettings.reserveUpcomingChargesEnabled,
+                leftoverChoices = userSettings.leftoverChoices,
             )
         }
 
@@ -202,6 +204,7 @@ class BudgetViewModel @Inject constructor(
             unresolvedSurplusAmount = pendingSurplusAmount.takeIf {
                 it > BigDecimal.ZERO && pendingSurplusStrategy == null
             },
+            lastLeftoverChoice = userSettings.leftoverChoices.maxByOrNull { it.key }?.value,
         )
     }.catch { error ->
         logcat(TAG) { "Error in uiState pipeline: ${error.asLog()}" }
@@ -298,6 +301,13 @@ class BudgetViewModel @Inject constructor(
 
     fun onUnresolvedSurplusBannerClicked() {
         viewModelScope.launch { midnightTransitionManager.reopenUnresolvedSurplusDialog() }
+    }
+
+    fun onLeftoverChoice(choice: LeftoverChoice) {
+        val periodStart = uiState.value.budgetSettings?.startDate ?: return
+        viewModelScope.launch {
+            settingsRepository.setLeftoverChoice(LocalDate.now(), choice, keepFrom = periodStart)
+        }
     }
 
     fun clearEarlyFinishState() {

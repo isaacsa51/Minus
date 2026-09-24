@@ -141,6 +141,7 @@ fun BudgetPill(
     hasUnresolvedSurplus: Boolean = false,
     unresolvedSurplusAmount: BigDecimal? = null,
     onUnresolvedSurplusClick: () -> Unit = {},
+    pinSurplusFace: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
@@ -328,7 +329,7 @@ fun BudgetPill(
             showingSurplusMessage = !showingSurplusMessage
         }
     }
-    val isShowingSurplusFace = showSurplusFace && showingSurplusMessage
+    val isShowingSurplusFace = showSurplusFace && (showingSurplusMessage || pinSurplusFace)
 
     val view = LocalView.current
     LaunchedEffect(isShowingSurplusFace) {

@@ -201,6 +201,7 @@ fun BudgetFormulaContent(request: BudgetFormulaRequest, modifier: Modifier = Mod
             BudgetSplitMode.STATIC -> R.string.budget_formula_mode_static
             BudgetSplitMode.DYNAMIC -> R.string.budget_formula_mode_dynamic
             BudgetSplitMode.CARRY_OVER -> R.string.budget_formula_mode_carry_over
+            BudgetSplitMode.ASK_ME -> R.string.budget_formula_mode_ask_me
         }
     )
 
@@ -394,6 +395,7 @@ private fun FormulaRow.captionText(periodName: String, period: BudgetPeriod): St
     FormulaCaption.LEFT -> stringResource(R.string.budget_formula_caption_left)
     FormulaCaption.RESERVED -> stringResource(R.string.budget_formula_caption_reserved)
     FormulaCaption.CARRIED -> stringResource(R.string.budget_formula_caption_carried)
+    FormulaCaption.SPREAD_LEFTOVER -> stringResource(R.string.budget_formula_caption_spread_leftover)
     FormulaCaption.NEXT_BLOCK -> stringResource(
         when (period) {
             BudgetPeriod.DAILY -> R.string.budget_pill_next_daily

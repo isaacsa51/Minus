@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.home
 
 import android.content.res.Configuration
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -31,6 +32,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.Backspace
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.Settings
@@ -90,6 +93,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
+import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
@@ -110,6 +114,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.animatedHeightPx
 import com.serranoie.app.minus.presentation.ui.theme.component.animatedRequiredHeightPx
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
+import com.serranoie.app.minus.presentation.ui.theme.component.numpad.LeftoverChoiceList
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.SavedCategoriesGrid
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
@@ -149,6 +154,14 @@ fun MainScreenContent(
     val topSheetState = rememberSwipeableState(TopSheetValue.HalfExpanded)
     var nightMode by remember { mutableStateOf(false) }
     var showCategoryGrid by remember { mutableStateOf(false) }
+    var leftoverChoiceOpen by remember { mutableStateOf(false) }
+    val hasPendingLeftover = !budgetUiState.hasUnresolvedRolloverSurplus &&
+        (budgetUiState.budgetState?.pendingLeftover?.signum() ?: 0) > 0
+    LaunchedEffect(hasPendingLeftover) {
+        if (!hasPendingLeftover) leftoverChoiceOpen = false
+    }
+    val showLeftoverChoice = leftoverChoiceOpen && hasPendingLeftover
+    BackHandler(enabled = showLeftoverChoice) { leftoverChoiceOpen = false }
 
     LaunchedEffect(budgetUiState.numpadInput) {
         if (budgetUiState.numpadInput.isEmpty() && showCategoryGrid) {
@@ -310,12 +323,15 @@ fun MainScreenContent(
                         forceBudgetPeriodSheetSetup,
                         selectedViewPeriod,
                         actions,
+                        showLeftoverChoice,
                     ) {
                         MainScreenBudgetPeriodState(
                             showBudgetPeriodSheet = showBudgetPeriodSheet,
                             forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
                             selectedViewPeriod = selectedViewPeriod,
                             onPeriodSelected = actions.onPeriodSelected,
+                            showLeftoverChoice = showLeftoverChoice,
+                            onLeftoverChoiceVisible = { leftoverChoiceOpen = it },
                         )
                     }
 
@@ -376,12 +392,15 @@ fun MainScreenContent(
                         forceBudgetPeriodSheetSetup,
                         selectedViewPeriod,
                         actions,
+                        showLeftoverChoice,
                     ) {
                         MainScreenBudgetPeriodState(
                             showBudgetPeriodSheet = showBudgetPeriodSheet,
                             forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
                             selectedViewPeriod = selectedViewPeriod,
                             onPeriodSelected = actions.onPeriodSelected,
+                            showLeftoverChoice = showLeftoverChoice,
+                            onLeftoverChoiceVisible = { leftoverChoiceOpen = it },
                         )
                     }
 
@@ -514,8 +533,8 @@ private fun PhoneLayout(
         configuration.screenWidthDp.toFloat() / configuration.screenHeightDp.toFloat() > 0.8f
 
     var isNumpadExpandedManually by remember { mutableStateOf<Boolean?>(null) }
-    val isNumpadCollapsed =
-        isNumpadExpandedManually?.let { !it } ?: (hasHardKeyboard && isSquareScreen)
+    val isNumpadCollapsed = !budgetPeriodState.showLeftoverChoice &&
+        (isNumpadExpandedManually?.let { !it } ?: (hasHardKeyboard && isSquareScreen))
 
     val heightFactor = if (isSquareScreen) 0.35f else 0.45f
     val defaultInternalKeyboardHeightBase =
@@ -870,6 +889,7 @@ private fun PhoneLayout(
                         showCategoryGrid = showCategoryGrid,
                         actions = actions,
                         featureFlags = featureFlags,
+                        budgetPeriodState = budgetPeriodState,
                         effectiveProgress = effectiveProgress,
                         onDragProgressChanged = { progress -> localDragProgress = progress },
                         hasHardKeyboard = hasHardKeyboard,
@@ -1181,6 +1201,7 @@ private fun TabletLayout(
                         showCategoryGrid = showCategoryGrid,
                         actions = actions,
                         featureFlags = featureFlags,
+                        budgetPeriodState = budgetPeriodState,
                         effectiveProgress = effectiveProgress,
                         onDragProgressChanged = { progress -> localDragProgress = progress },
                         hasHardKeyboard = hasHardKeyboard,
@@ -1198,6 +1219,7 @@ private fun MainScreenNumpadSection(
     showCategoryGrid: Boolean,
     actions: MainScreenActions,
     featureFlags: MainScreenFeatureFlags,
+    budgetPeriodState: MainScreenBudgetPeriodState,
     effectiveProgress: Float,
     onDragProgressChanged: (Float) -> Unit,
     hasHardKeyboard: Boolean = false,
@@ -1238,6 +1260,28 @@ private fun MainScreenNumpadSection(
         } else {
             null
         }
+    val budgetState = budgetUiState.budgetState
+    val choosingLeftover = budgetPeriodState.showLeftoverChoice && budgetState != null
+    var leftoverChoice by remember(choosingLeftover) {
+        mutableStateOf(budgetUiState.lastLeftoverChoice ?: LeftoverChoice.SPREAD)
+    }
+    val closeLeftoverChoice = { budgetPeriodState.onLeftoverChoiceVisible(false) }
+    val leftoverChoiceContent: (@Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit)? =
+        if (choosingLeftover && budgetState != null) {
+            {
+                LeftoverChoiceList(
+                    amount = budgetState.pendingLeftover,
+                    remainingToday = budgetState.remainingToday,
+                    dailyBudget = budgetState.dailyBudget,
+                    daysRemaining = budgetState.daysRemaining,
+                    currencyCode = budgetUiState.budgetSettings?.currencyCode ?: "USD",
+                    selected = leftoverChoice,
+                    onSelect = { leftoverChoice = it },
+                )
+            }
+        } else {
+            null
+        }
 
     Numpad(
         modifier =
@@ -1246,8 +1290,8 @@ private fun MainScreenNumpadSection(
                     Modifier.markForTutorial(state, index = 0)
                 } ?: Modifier,
             ),
-        editorState = editorState,
-        hasHardKeyboard = hasHardKeyboard,
+        editorState = if (choosingLeftover) editorState.copy(mode = NumpadEditMode.ADD) else editorState,
+        hasHardKeyboard = hasHardKeyboard && !choosingLeftover,
         numberHintAnchorModifier = Modifier,
         applyHintAnchorModifier = Modifier,
         showThousandsShortcut = remember(budgetUiState.budgetSettings?.currencyCode) {
@@ -1277,18 +1321,26 @@ private fun MainScreenNumpadSection(
             actions.onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANY_NUMBER)
         },
         onBackspace = {
-            actions.onProcessIntent(
-                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                    BudgetNumpadIntent.BackspaceTapped,
-                ),
-            )
+            if (choosingLeftover) {
+                closeLeftoverChoice()
+            } else {
+                actions.onProcessIntent(
+                    MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                        BudgetNumpadIntent.BackspaceTapped,
+                    ),
+                )
+            }
         },
         onBackspaceLongPress = {
-            actions.onProcessIntent(
-                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                    BudgetNumpadIntent.ResetInputTapped,
-                ),
-            )
+            if (choosingLeftover) {
+                closeLeftoverChoice()
+            } else {
+                actions.onProcessIntent(
+                    MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                        BudgetNumpadIntent.ResetInputTapped,
+                    ),
+                )
+            }
         },
         onOperatorInput = { op ->
             actions.onProcessIntent(
@@ -1305,17 +1357,22 @@ private fun MainScreenNumpadSection(
             )
         },
         onApply = {
-            Log.d("MainScreen", "Numpad check/save button pressed")
-            actions.onProcessIntent(
-                MainScreenUiIntent.ProcessBudgetNumpadIntent(
-                    BudgetNumpadIntent.ApplyTapped,
-                ),
-            )
-            actions.onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+            if (choosingLeftover) {
+                actions.onLeftoverChoice(leftoverChoice)
+                closeLeftoverChoice()
+            } else {
+                Log.d("MainScreen", "Numpad check/save button pressed")
+                actions.onProcessIntent(
+                    MainScreenUiIntent.ProcessBudgetNumpadIntent(
+                        BudgetNumpadIntent.ApplyTapped,
+                    ),
+                )
+                actions.onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
+            }
         },
         onDragProgressChanged = onDragProgressChanged,
         dragProgress = effectiveProgress,
-        isCalculation = budgetUiState.isCalculation,
+        isCalculation = budgetUiState.isCalculation && !choosingLeftover,
         onCalculationModeChanged = { enabled ->
             actions.onProcessIntent(
                 MainScreenUiIntent.ProcessBudgetNumpadIntent(
@@ -1332,8 +1389,13 @@ private fun MainScreenNumpadSection(
             )
         },
         enableCalculationMode = true,
-        enableCalcModeSwipe = !showCategoryGrid,
-        leftContent = categoryGridContent,
+        enableCalcModeSwipe = !showCategoryGrid && !choosingLeftover,
+        leftContent = leftoverChoiceContent ?: categoryGridContent,
+        backspaceIcon = if (choosingLeftover) {
+            Icons.AutoMirrored.Rounded.ArrowBack
+        } else {
+            Icons.AutoMirrored.Rounded.Backspace
+        },
         tutorialBoxState = tutorialBoxState,
     )
 }
@@ -1367,6 +1429,8 @@ private fun MainScreenEditorSection(
         onOpenSettings = onNavigateToSettings,
         onOpenAnalytics = onNavigateToAnalytics,
         onUnresolvedSurplusBannerClick = actions.onUnresolvedSurplusBannerClick,
+        onPendingLeftoverClick = { budgetPeriodState.onLeftoverChoiceVisible(true) },
+        leftoverChoiceOpen = budgetPeriodState.showLeftoverChoice,
         onOpenWallet = {
             val noBudget =
                 budgetUiState.budgetSettings == null || budgetUiState.budgetSettings.endDate == null

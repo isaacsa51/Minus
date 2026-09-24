@@ -201,7 +201,7 @@ fun BudgetState.allocationFor(
 
     BudgetSplitMode.DYNAMIC -> dynamicAllocations(draft).forPeriod(period)
 
-    BudgetSplitMode.CARRY_OVER -> carryOverRemaining(period).add(spentIn(period))
+    BudgetSplitMode.CARRY_OVER, BudgetSplitMode.ASK_ME -> carryOverRemaining(period).add(spentIn(period))
 }
 
 fun BudgetState.nextAllocationFor(period: BudgetPeriod, draft: BigDecimal = BigDecimal.ZERO): BigDecimal =

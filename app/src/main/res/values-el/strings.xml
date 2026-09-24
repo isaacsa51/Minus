@@ -194,6 +194,7 @@
     <string name="budget_formula_mode_static">Στατικός διαμοιρασμός</string>
     <string name="budget_formula_mode_dynamic">Δυναμικός διαμοιρασμός</string>
     <string name="budget_formula_mode_carry_over">Διαμοιρασμός με μεταφορά</string>
+    <string name="budget_formula_mode_ask_me">Διαμοιρασμός με ερώτηση</string>
     <string name="budget_formula_caption_surplus_split">Το πλεόνασμα της προηγούμενης περιόδου προστίθεται στον προϋπολογισμό</string>
     <string name="budget_formula_caption_surplus_first_day">Το πλεόνασμα της προηγούμενης περιόδου μένει στην πρώτη ημέρα</string>
     <string name="budget_formula_caption_adjustments">Έσοδα και αφαιρέσεις αυτής της περιόδου</string>
@@ -204,6 +205,7 @@
     <string name="budget_formula_caption_left">Μείον όσα έχετε ξοδέψει</string>
     <string name="budget_formula_caption_reserved">Δεσμευμένο για χρεώσεις που λήγουν αργότερα στην περίοδο</string>
     <string name="budget_formula_caption_carried">Μεταφέρθηκε από προηγούμενες μέρες</string>
+    <string name="budget_formula_caption_spread_leftover">Υπόλοιπα που επιλέξατε να κατανείμετε</string>
     <string name="budget_formula_card_tap_hint">Πατήστε για την πλήρη ανάλυση</string>
     <string name="budget_formula_tip_hold_pill">Συμβουλή: κρατήστε πατημένη την ένδειξη προϋπολογισμού στην αρχική οθόνη για να το δείτε όποτε θέλετε</string>
     <string name="budget_formula_tip_tap_card">Συμβουλή: μπορείτε επίσης να πατήσετε το υπολογισμένο ποσό στο φύλλο περιόδου</string>
@@ -565,10 +567,9 @@
     <string name="budget_behaviour_surplus_ask">Ρώτα με</string>
     <string name="budget_behaviour_surplus_spread">Κατανομή</string>
     <string name="budget_behaviour_surplus_first_day">Όλα την 1η μέρα</string>
-    <string name="budget_behaviour_surplus_preview_ask">Θα αποφασίσετε στο τέλος της περιόδου</string>
-    <string name="budget_behaviour_surplus_preview_spread">π.χ. %1$s υπόλοιπο ÷ %2$s =</string>
-    <string name="budget_behaviour_surplus_preview_first_day">π.χ. %1$s υπόλοιπο → 1η μέρα =</string>
-    <string name="budget_behaviour_surplus_per_day">+%1$s / μέρα</string>
+    <string name="budget_behaviour_surplus_preview_ask">Στο τέλος της περιόδου επιλέγετε τι θα γίνει με το υπόλοιπο.</string>
+    <string name="budget_behaviour_surplus_preview_spread">Το υπόλοιπο μοιράζεται εξίσου σε όλες τις μέρες της επόμενης περιόδου.</string>
+    <string name="budget_behaviour_surplus_preview_first_day">Όλο το υπόλοιπο προστίθεται στην πρώτη μέρα της επόμενης περιόδου.</string>
     <string name="select_currency">Επιλέξτε νόμισμα</string>
     <string name="search_currency">Αναζήτηση νομίσματος…</string>
     <string name="clear">Εκκαθάριση</string>
@@ -583,6 +584,14 @@
     <string name="split_mode_dynamic_desc">Υπολογίζεται καθημερινά ανάλογα με το πώς ξοδεύετε. Ο υπόλοιπος προϋπολογισμός κατανέμεται στις υπόλοιπες μέρες της περιόδου.</string>
     <string name="split_mode_carry_over">Μεταφορά</string>
     <string name="split_mode_carry_over_desc">Ό,τι δεν ξοδεύετε κάθε μέρα προστίθεται στον προϋπολογισμό της επόμενης μέρας και συνεχίζει να συσσωρεύεται.</string>
+    <string name="split_mode_ask_me">Ρώτα με</string>
+    <string name="split_mode_ask_me_desc">Κάθε μέρα αποφασίζετε τι θα γίνει με τον αχρησιμοποίητο προϋπολογισμό της χθες: κατανομή στις υπόλοιπες μέρες ή μεταφορά στο σήμερα.</string>
+    <string name="leftover_choice_spread_desc">Κατανείμετε όλο το υπόλοιπο μη χρησιμοποιημένο προϋπολογισμό σε όλες τις υπόλοιπες ημέρες.</string>
+    <string name="leftover_choice_carry_desc">Μεταφέρετε το μη χρησιμοποιημένο προϋπολογισμό μόνο για αύριο.</string>
+    <string name="leftover_choice_spread_outcome">%1$s για τις επόμενες ημέρες</string>
+    <string name="leftover_choice_carry_outcome">%1$s για αύριο</string>
+    <string name="leftover_choice_outcome">απομένουν σήμερα · μετά %1$s/μέρα</string>
+    <string name="leftover_choice_outcome_last_day">απομένουν σήμερα</string>
     <!-- Transaction Detail -->
     <string name="without_date">Χωρίς ημερομηνία</string>
     <string name="no_name">Χωρίς όνομα</string>

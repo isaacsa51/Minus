@@ -10,6 +10,7 @@ import com.serranoie.app.minus.presentation.ui.editor.sheets.split.toDays
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetMetrics
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.calculateBudgetMetrics
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 data class BudgetFormulaRequest(
     val budgetState: BudgetState,
@@ -33,6 +34,7 @@ internal enum class FormulaCaption {
     NEXT_BLOCK,
     RESERVED,
     CARRIED,
+    SPREAD_LEFTOVER,
 }
 
 internal sealed interface FormulaTerm {
@@ -60,7 +62,7 @@ internal fun buildBudgetFormula(request: BudgetFormulaRequest): List<FormulaRow>
     val base = total.subtract(surplus)
 
     when (request.splitMode) {
-        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER -> {
+        BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER, BudgetSplitMode.ASK_ME -> {
             val surplusOnFirstDay = settings?.rollOverCarryForward == true
             if (surplus.signum() == 1) {
                 if (surplusOnFirstDay) {
@@ -83,14 +85,24 @@ internal fun buildBudgetFormula(request: BudgetFormulaRequest): List<FormulaRow>
             }
             val splitBase = if (surplusOnFirstDay) base else total
             val days = FormulaTerm.Count(state.periodTotalDays, BudgetPeriod.DAILY)
+            val perDay = if (request.splitMode == BudgetSplitMode.ASK_ME && state.periodTotalDays > 0) {
+                splitBase.divide(BigDecimal(state.periodTotalDays), 2, RoundingMode.HALF_UP)
+            } else {
+                state.dailyBudget
+            }
             add(
                 FormulaRow(
                     FormulaCaption.PER_DAY,
                     listOf(FormulaTerm.Fraction(splitBase, days)),
-                    state.dailyBudget
+                    perDay
                 )
             )
-            if (request.splitMode == BudgetSplitMode.CARRY_OVER) {
+            val spread = state.dailyBudget.subtract(perDay)
+            if (spread.signum() != 0) {
+                val terms = listOf(FormulaTerm.Amount(perDay)) + signed(spread)
+                add(FormulaRow(FormulaCaption.SPREAD_LEFTOVER, terms, state.dailyBudget))
+            }
+            if (request.splitMode.carriesLeftover) {
                 addCarryOverRows(state, period, metrics)
                 return@buildList
             }

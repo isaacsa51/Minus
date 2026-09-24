@@ -4,11 +4,13 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.earnedAllowance
 import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
 import java.math.BigDecimal
+import java.math.MathContext
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -45,6 +47,7 @@ class BudgetStateCalculator @Inject constructor() {
         paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
         allTransactions: List<Transaction> = transactions,
         reserveUpcomingCharges: Boolean = false,
+        leftoverChoices: Map<LocalDate, LeftoverChoice> = emptyMap(),
     ): BudgetState {
         val periodEnd = settings.getPeriodEndDate()
         val daysRemaining = ChronoUnit.DAYS.between(currentDate, periodEnd).toInt() + 1
@@ -79,6 +82,14 @@ class BudgetStateCalculator @Inject constructor() {
         val carryForFirstDay =
             if (currentDate.isEqual(settings.rollOverAppliedDate ?: settings.startDate)) carry else BigDecimal.ZERO
         val splitBudget = settings.totalBudget.subtract(carry)
+        val leftovers = if (settings.splitMode == BudgetSplitMode.ASK_ME) {
+            replayLeftovers(
+                settings, splitBudget, carry, originalTotalDays, currentDate,
+                activeTransactions + unpaidRecurringCharges, leftoverChoices,
+            )
+        } else {
+            null
+        }
 
         val effectiveTotalBudget = settings.totalBudget
             .add(totalIncomeInPeriod)
@@ -109,6 +120,8 @@ class BudgetStateCalculator @Inject constructor() {
                 }
             }
 
+            BudgetSplitMode.ASK_ME -> leftovers?.rate?.setScale(2, RoundingMode.HALF_UP) ?: BigDecimal.ZERO
+
             BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER -> {
                 if (originalTotalDays > 0) {
                     splitBudget.divide(
@@ -132,7 +145,9 @@ class BudgetStateCalculator @Inject constructor() {
             activeTransactions + unpaidRecurringCharges, settings.startDate, currentDate, 30
         )
 
-        val remainingToday = if (settings.splitMode == BudgetSplitMode.CARRY_OVER) {
+        val remainingToday = if (leftovers != null) {
+            leftovers.remainingToday
+        } else if (settings.splitMode == BudgetSplitMode.CARRY_OVER) {
             val surplus =
                 if (currentDate.isBefore(settings.rollOverAppliedDate ?: settings.startDate)) BigDecimal.ZERO else carry
             earnedAllowance(splitBudget, originalTotalDays - daysRemaining + 1, originalTotalDays)
@@ -168,7 +183,72 @@ class BudgetStateCalculator @Inject constructor() {
             totalSpentThisMonth = totalSpentThisMonth,
             periodTotalDays = originalTotalDays,
             reservedCharges = unpaidRecurringCharges.filter { it.date?.toLocalDate()?.isAfter(currentDate) == true },
-            splitBudget = splitBudget,
+            splitBudget = leftovers?.rate
+                ?.multiply(BigDecimal(originalTotalDays))
+                ?.setScale(2, RoundingMode.HALF_UP)
+                ?: splitBudget,
+            pendingLeftover = leftovers?.pending ?: BigDecimal.ZERO,
+        )
+    }
+
+    private class LeftoverReplay(val rate: BigDecimal, val remainingToday: BigDecimal, val pending: BigDecimal)
+
+    private fun replayLeftovers(
+        settings: BudgetSettings,
+        splitBudget: BigDecimal,
+        carry: BigDecimal,
+        totalDays: Int,
+        currentDate: LocalDate,
+        flows: List<Transaction>,
+        choices: Map<LocalDate, LeftoverChoice>,
+    ): LeftoverReplay {
+        val start = settings.startDate
+        val end = settings.getPeriodEndDate()
+        val base = if (totalDays > 0) {
+            splitBudget.divide(BigDecimal(totalDays), MathContext.DECIMAL64)
+        } else {
+            BigDecimal.ZERO
+        }
+        if (currentDate.isBefore(start)) {
+            return LeftoverReplay(base, flows.sumOf { it.amount }.negate(), BigDecimal.ZERO)
+        }
+        val lastDay = minOf(currentDate, end)
+        val outflow = flows
+            .groupBy { (it.date?.toLocalDate() ?: lastDay).coerceIn(start, lastDay) }
+            .mapValues { (_, dayFlows) -> dayFlows.sumOf { it.amount } }
+        val surplusDay = maxOf(settings.rollOverAppliedDate ?: start, start)
+
+        var rate = base
+        var pending = BigDecimal.ZERO
+        var allowance = BigDecimal.ZERO
+        var day = start
+        while (!day.isAfter(lastDay)) {
+            if (day != start) {
+                pending += allowance.subtract(outflow[day.minusDays(1)] ?: BigDecimal.ZERO)
+            }
+            allowance = rate
+            if (pending.signum() < 0 || choices[day] == LeftoverChoice.CARRY) {
+                allowance += pending
+                pending = BigDecimal.ZERO
+            } else if (choices[day] == LeftoverChoice.SPREAD) {
+                val daysLeft = totalDays - ChronoUnit.DAYS.between(start, day).toInt()
+                rate += pending.divide(BigDecimal(daysLeft), MathContext.DECIMAL64)
+                allowance = rate
+                pending = BigDecimal.ZERO
+            }
+            if (day == surplusDay) allowance += carry
+            day = day.plusDays(1)
+        }
+
+        var remaining = allowance.subtract(outflow[lastDay] ?: BigDecimal.ZERO)
+        if (currentDate.isAfter(end)) {
+            remaining += pending
+            pending = BigDecimal.ZERO
+        }
+        return LeftoverReplay(
+            rate = rate,
+            remainingToday = remaining.setScale(2, RoundingMode.HALF_UP),
+            pending = pending.setScale(2, RoundingMode.HALF_UP),
         )
     }
 

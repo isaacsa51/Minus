@@ -194,6 +194,7 @@
     <string name="budget_formula_mode_static">고정 분할</string>
     <string name="budget_formula_mode_dynamic">동적 분할</string>
     <string name="budget_formula_mode_carry_over">이월 분할</string>
+    <string name="budget_formula_mode_ask_me">선택형 분할</string>
     <string name="budget_formula_caption_surplus_split">지난 기간의 잔여 금액이 예산에 더해집니다</string>
     <string name="budget_formula_caption_surplus_first_day">지난 기간의 잔여 금액은 첫날에 남습니다</string>
     <string name="budget_formula_caption_adjustments">이번 기간의 수입과 공제</string>
@@ -204,6 +205,7 @@
     <string name="budget_formula_caption_left">지출한 금액을 뺀 값</string>
     <string name="budget_formula_caption_reserved">기간 후반에 결제될 금액으로 미리 확보</string>
     <string name="budget_formula_caption_carried">이전 날짜에서 이월된 금액</string>
+    <string name="budget_formula_caption_spread_leftover">분배하기로 선택한 잔액</string>
     <string name="budget_formula_card_tap_hint">탭하여 전체 내역 보기</string>
     <string name="budget_formula_tip_hold_pill">팁: 홈 화면의 예산 알약을 길게 누르면 언제든지 이 내역을 볼 수 있습니다</string>
     <string name="budget_formula_tip_tap_card">팁: 기간 시트의 계산된 금액을 탭해도 볼 수 있습니다</string>
@@ -567,10 +569,9 @@
     <string name="budget_behaviour_surplus_ask">물어보기</string>
     <string name="budget_behaviour_surplus_spread">모두 분배</string>
     <string name="budget_behaviour_surplus_first_day">첫날에 모두</string>
-    <string name="budget_behaviour_surplus_preview_ask">기간이 끝나면 직접 정합니다</string>
-    <string name="budget_behaviour_surplus_preview_spread">예: 남은 %1$s ÷ %2$s =</string>
-    <string name="budget_behaviour_surplus_preview_first_day">예: 남은 %1$s → 첫날 =</string>
-    <string name="budget_behaviour_surplus_per_day">+%1$s / 일</string>
+    <string name="budget_behaviour_surplus_preview_ask">기간이 끝나면 남은 돈을 어떻게 할지 직접 정합니다.</string>
+    <string name="budget_behaviour_surplus_preview_spread">남은 돈은 다음 기간의 모든 날에 똑같이 나뉩니다.</string>
+    <string name="budget_behaviour_surplus_preview_first_day">남은 돈은 모두 다음 기간의 첫날에 더해집니다.</string>
     <string name="select_currency">통화 선택</string>
     <string name="search_currency">통화 검색…</string>
     <string name="clear">지우기</string>
@@ -585,6 +586,12 @@
     <string name="split_mode_dynamic_desc">지출에 따라 매일 계산됩니다. 남은 예산은 기간의 남은 날에 나누어 배분됩니다.</string>
     <string name="split_mode_carry_over">이월</string>
     <string name="split_mode_carry_over_desc">매일 쓰지 않은 금액은 다음 날 예산에 더해지고 계속 쌓입니다.</string>
+    <string name="split_mode_ask_me">물어보기</string>
+    <string name="split_mode_ask_me_desc">매일 어제 쓰지 않은 예산을 남은 날에 분배할지, 오늘로 이월할지 직접 정합니다.</string>
+    <string name="leftover_choice_spread_outcome">남은 일수 동안 1일당 %1$s</string>
+    <string name="leftover_choice_carry_outcome">내일 %1$s</string>
+    <string name="leftover_choice_outcome">오늘 남은 금액 · 이후 %1$s/일</string>
+    <string name="leftover_choice_outcome_last_day">오늘 남은 금액</string>
     <!-- Transaction Detail -->
     <string name="without_date">날짜 제외</string>
     <string name="no_name">이름 없음</string>

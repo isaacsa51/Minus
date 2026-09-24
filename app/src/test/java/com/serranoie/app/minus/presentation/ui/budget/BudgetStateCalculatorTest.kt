@@ -4,9 +4,11 @@ import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
+import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.carryOverRemaining
 import org.junit.Test
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -487,5 +489,53 @@ class BudgetStateCalculatorTest {
 
         assertThat(result.dailyBudget).isEqualTo(BigDecimal("100.00"))
         assertThat(result.remainingToday).isEqualTo(BigDecimal("250.00"))
+    }
+
+    private fun askMe(
+        day: Int,
+        choices: Map<LocalDate, LeftoverChoice> = emptyMap(),
+        vararg spends: Pair<Int, String>,
+    ) = calculator.calculateBudgetState(
+        settings = settings(
+            totalBudget = BigDecimal("1000"),
+            start = LocalDate.of(2026, 7, 1),
+            end = LocalDate.of(2026, 7, 10),
+            splitMode = BudgetSplitMode.ASK_ME,
+        ),
+        transactions = spends.map { (spentOn, amount) -> transaction(BigDecimal(amount), LocalDate.of(2026, 7, spentOn)) },
+        currentDate = LocalDate.of(2026, 7, day),
+        leftoverChoices = choices,
+    )
+
+    @Test
+    fun `ask me - unused money waits for a choice, then carries to today or spreads over the days left`() {
+        val dayTwo = LocalDate.of(2026, 7, 2)
+
+        val pending = askMe(2, emptyMap(), 1 to "80")
+        assertThat(pending.remainingToday).isEqualTo(BigDecimal("100.00"))
+        assertThat(pending.pendingLeftover).isEqualTo(BigDecimal("20.00"))
+
+        val carried = askMe(2, mapOf(dayTwo to LeftoverChoice.CARRY), 1 to "80")
+        assertThat(carried.remainingToday).isEqualTo(BigDecimal("120.00"))
+        assertThat(carried.pendingLeftover).isEqualTo(BigDecimal("0.00"))
+
+        val spread = askMe(2, mapOf(dayTwo to LeftoverChoice.SPREAD), 1 to "80")
+        assertThat(spread.remainingToday).isEqualTo(BigDecimal("102.22"))
+        assertThat(spread.dailyBudget).isEqualTo(BigDecimal("102.22"))
+        assertThat(spread.pendingLeftover).isEqualTo(BigDecimal("0.00"))
+        assertThat(spread.carryOverRemaining(BudgetPeriod.WEEKLY)).isEqualTo(BigDecimal("613.33"))
+
+        assertThat(askMe(11, emptyMap(), 1 to "80").remainingToday).isEqualTo(BigDecimal("920.00"))
+    }
+
+    @Test
+    fun `ask me - overspending first uses the waiting money, the rest comes out of today`() {
+        val absorbed = askMe(3, emptyMap(), 1 to "80", 2 to "110")
+        assertThat(absorbed.remainingToday).isEqualTo(BigDecimal("100.00"))
+        assertThat(absorbed.pendingLeftover).isEqualTo(BigDecimal("10.00"))
+
+        val debt = askMe(3, emptyMap(), 1 to "80", 2 to "130")
+        assertThat(debt.remainingToday).isEqualTo(BigDecimal("90.00"))
+        assertThat(debt.pendingLeftover).isEqualTo(BigDecimal("0.00"))
     }
 }

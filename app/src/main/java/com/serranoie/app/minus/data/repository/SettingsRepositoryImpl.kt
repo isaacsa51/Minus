@@ -7,9 +7,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.ContrastMode
 import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
+import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.SavingsPreferences
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -131,6 +134,7 @@ private val SAVINGS_WANTS_PCT = intPreferencesKey(SAVINGS_WANTS_PCT_KEY_NAME)
 private val SAVINGS_SAVINGS_PCT = intPreferencesKey(SAVINGS_SAVINGS_PCT_KEY_NAME)
 private val SAVINGS_GOAL_AMOUNT = stringPreferencesKey(SAVINGS_GOAL_AMOUNT_KEY_NAME)
 private val SAVINGS_GOAL_MONTHS = intPreferencesKey(SAVINGS_GOAL_MONTHS_KEY_NAME)
+private val LEFTOVER_CHOICES = stringSetPreferencesKey("leftover_choices")
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
@@ -213,7 +217,9 @@ class SettingsRepositoryImpl @Inject constructor(
                         savingsGoalAmount = preferences[SAVINGS_GOAL_AMOUNT]?.toBigDecimalOrNull(),
                         savingsGoalMonths = preferences[SAVINGS_GOAL_MONTHS],
                     )
-                })
+                },
+                leftoverChoices = preferences[LEFTOVER_CHOICES].orEmpty().toLeftoverChoices(),
+            )
         }
     }
 
@@ -494,6 +500,16 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setLeftoverChoice(date: LocalDate, choice: LeftoverChoice, keepFrom: LocalDate) {
+        dataStore.edit { preferences ->
+            val kept = preferences[LEFTOVER_CHOICES].orEmpty().toLeftoverChoices()
+                .filterKeys { !it.isBefore(keepFrom) }
+            preferences[LEFTOVER_CHOICES] = (kept + (date to choice))
+                .map { (day, picked) -> "$day=${picked.name}" }
+                .toSet()
+        }
+    }
+
     override suspend fun markSurplusUnresolved(amount: BigDecimal) {
         dataStore.edit { preferences ->
             preferences[PENDING_ROLLOVER_AMOUNT] = amount.toPlainString()
@@ -563,6 +579,13 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs.remove(REMAINING_FROM_LAST_PERIOD)
         }
     }
+
+    private fun Set<String>.toLeftoverChoices(): Map<LocalDate, LeftoverChoice> = mapNotNull { entry ->
+        runCatching {
+            val (day, picked) = entry.split('=')
+            LocalDate.parse(day) to LeftoverChoice.valueOf(picked)
+        }.getOrNull()
+    }.toMap()
 
     private fun String.toThemeMode(): ThemeMode {
         return try {

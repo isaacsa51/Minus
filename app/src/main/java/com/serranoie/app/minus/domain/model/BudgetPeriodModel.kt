@@ -26,6 +26,14 @@ enum class BudgetSplitMode {
     STATIC,
     DYNAMIC,
     CARRY_OVER,
+    ASK_ME;
+
+    val carriesLeftover: Boolean get() = this == CARRY_OVER || this == ASK_ME
+}
+
+enum class LeftoverChoice {
+    SPREAD,
+    CARRY,
 }
 
 enum class SymbolPosition {

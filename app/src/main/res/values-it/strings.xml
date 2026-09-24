@@ -196,6 +196,7 @@
     <string name="budget_formula_mode_static">Suddivisione statica</string>
     <string name="budget_formula_mode_dynamic">Suddivisione dinamica</string>
     <string name="budget_formula_mode_carry_over">Suddivisione cumulativa</string>
+    <string name="budget_formula_mode_ask_me">Suddivisione su richiesta</string>
     <string name="budget_formula_caption_surplus_split">L\'eccedenza del periodo precedente si aggiunge al bilancio</string>
     <string name="budget_formula_caption_surplus_first_day">L\'eccedenza del periodo precedente resta sul primo giorno</string>
     <string name="budget_formula_caption_adjustments">Entrate e detrazioni di questo periodo</string>
@@ -206,6 +207,7 @@
     <string name="budget_formula_caption_left">Meno quello che hai speso</string>
     <string name="budget_formula_caption_reserved">Accantonato per gli addebiti in scadenza più avanti nel periodo</string>
     <string name="budget_formula_caption_carried">Riportato dai giorni precedenti</string>
+    <string name="budget_formula_caption_spread_leftover">Avanzi che hai scelto di distribuire</string>
     <string name="budget_formula_card_tap_hint">Tocca per il dettaglio completo</string>
     <string name="budget_formula_tip_hold_pill">Suggerimento: tieni premuta la pillola del bilancio nella schermata iniziale per vedere questo in qualsiasi momento</string>
     <string name="budget_formula_tip_tap_card">Suggerimento: puoi anche toccare l\'importo calcolato nel foglio del periodo</string>
@@ -568,10 +570,9 @@
     <string name="budget_behaviour_surplus_ask">Chiedimi</string>
     <string name="budget_behaviour_surplus_spread">Distribuisci tutto</string>
     <string name="budget_behaviour_surplus_first_day">Tutto al giorno 1</string>
-    <string name="budget_behaviour_surplus_preview_ask">Deciderai alla fine del periodo</string>
-    <string name="budget_behaviour_surplus_preview_spread">es. %1$s avanzati ÷ %2$s =</string>
-    <string name="budget_behaviour_surplus_preview_first_day">es. %1$s avanzati → giorno 1 =</string>
-    <string name="budget_behaviour_surplus_per_day">+%1$s / giorno</string>
+    <string name="budget_behaviour_surplus_preview_ask">A fine periodo scegli tu cosa fare con l\'avanzo.</string>
+    <string name="budget_behaviour_surplus_preview_spread">L\'avanzo viene distribuito equamente su tutti i giorni del periodo successivo.</string>
+    <string name="budget_behaviour_surplus_preview_first_day">Tutto l\'avanzo viene aggiunto al primo giorno del periodo successivo.</string>
     <string name="select_currency">Seleziona valuta</string>
     <string name="search_currency">Cerca valuta…</string>
     <string name="clear">Pulisci</string>
@@ -586,6 +587,12 @@
     <string name="split_mode_dynamic_desc">Calcolato ogni giorno in base a come spendi. Il budget rimanente viene distribuito sui giorni rimanenti del periodo.</string>
     <string name="split_mode_carry_over">Cumulativo</string>
     <string name="split_mode_carry_over_desc">Ciò che non spendi ogni giorno viene aggiunto al budget del giorno successivo e continua ad accumularsi.</string>
+    <string name="split_mode_ask_me">Chiedimi</string>
+    <string name="split_mode_ask_me_desc">Ogni giorno decidi cosa fare con il budget non usato ieri: distribuirlo sui giorni rimanenti o riportarlo a oggi.</string>
+    <string name="leftover_choice_spread_outcome">%1$s per i giorni successivi</string>
+    <string name="leftover_choice_carry_outcome">%1$s per domani</string>
+    <string name="leftover_choice_outcome">restano oggi · poi %1$s/giorno</string>
+    <string name="leftover_choice_outcome_last_day">restano oggi</string>
     <!-- Transaction Detail -->
     <string name="without_date">Senza data</string>
     <string name="no_name">Nessun nome</string>

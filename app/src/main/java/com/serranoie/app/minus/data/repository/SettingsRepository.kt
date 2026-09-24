@@ -4,6 +4,7 @@ import com.serranoie.app.minus.domain.model.AppColorScheme
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.ContrastMode
 import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
+import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.SavingsPreferences
@@ -13,6 +14,7 @@ import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
+import java.time.LocalDate
 
 interface SettingsRepository {
 
@@ -105,6 +107,8 @@ interface SettingsRepository {
     fun observePendingRollover(): Flow<Pair<BigDecimal, RemainingBudgetStrategy?>>
 
     suspend fun markSurplusUnresolved(amount: BigDecimal)
+
+    suspend fun setLeftoverChoice(date: LocalDate, choice: LeftoverChoice, keepFrom: LocalDate)
 
     suspend fun setSavingsPreferences(prefs: SavingsPreferences)
 

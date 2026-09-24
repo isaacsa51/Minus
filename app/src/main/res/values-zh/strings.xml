@@ -196,6 +196,7 @@
     <string name="budget_formula_mode_static">固定分配</string>
     <string name="budget_formula_mode_dynamic">动态分配</string>
     <string name="budget_formula_mode_carry_over">结转分配</string>
+    <string name="budget_formula_mode_ask_me">询问分配</string>
     <string name="budget_formula_caption_surplus_split">上一周期的结余计入预算</string>
     <string name="budget_formula_caption_surplus_first_day">上一周期的结余保留在第一天</string>
     <string name="budget_formula_caption_adjustments">本周期的收入与扣减</string>
@@ -206,6 +207,7 @@
     <string name="budget_formula_caption_left">减去已花费的金额</string>
     <string name="budget_formula_caption_reserved">为本周期内稍后到期的扣款预留</string>
     <string name="budget_formula_caption_carried">从前几天结转</string>
+    <string name="budget_formula_caption_spread_leftover">你选择平摊的结余</string>
     <string name="budget_formula_card_tap_hint">点击查看完整明细</string>
     <string name="budget_formula_tip_hold_pill">提示：长按主屏幕上的预算胶囊，随时查看此明细</string>
     <string name="budget_formula_tip_tap_card">提示：也可以点击周期面板中的计算金额</string>
@@ -569,10 +571,9 @@
     <string name="budget_behaviour_surplus_ask">询问我</string>
     <string name="budget_behaviour_surplus_spread">全部平摊</string>
     <string name="budget_behaviour_surplus_first_day">全放第1天</string>
-    <string name="budget_behaviour_surplus_preview_ask">周期结束时由你决定</string>
-    <string name="budget_behaviour_surplus_preview_spread">例如：剩余 %1$s ÷ %2$s =</string>
-    <string name="budget_behaviour_surplus_preview_first_day">例如：剩余 %1$s → 第1天 =</string>
-    <string name="budget_behaviour_surplus_per_day">+%1$s / 天</string>
+    <string name="budget_behaviour_surplus_preview_ask">周期结束时，由你决定如何处理剩余的钱。</string>
+    <string name="budget_behaviour_surplus_preview_spread">剩余的钱会平均分配到下个周期的每一天。</string>
+    <string name="budget_behaviour_surplus_preview_first_day">剩余的钱会全部加到下个周期的第一天。</string>
     <string name="select_currency">选择货币</string>
     <string name="search_currency">搜索货币……</string>
     <string name="clear">清除</string>
@@ -587,6 +588,12 @@
     <string name="split_mode_dynamic_desc">根据你的支出每天重新计算。剩余预算会平摊到本周期剩下的日子。</string>
     <string name="split_mode_carry_over">结转</string>
     <string name="split_mode_carry_over_desc">每天没花完的钱会加到第二天的预算里，并不断累积。</string>
+    <string name="split_mode_ask_me">询问我</string>
+    <string name="split_mode_ask_me_desc">每天由你决定昨天没用完的预算：平摊到剩余天数，或结转到今天。</string>
+    <string name="leftover_choice_spread_outcome">剩余天数每日 %1$s</string>
+    <string name="leftover_choice_carry_outcome">明天 %1$s</string>
+    <string name="leftover_choice_outcome">今天剩余 · 之后 %1$s/天</string>
+    <string name="leftover_choice_outcome_last_day">今天剩余</string>
     <!-- Transaction Detail -->
     <string name="without_date">没有日期</string>
     <string name="no_name">没有名称</string>
