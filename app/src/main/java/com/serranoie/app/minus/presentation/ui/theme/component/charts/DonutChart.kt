@@ -102,31 +102,47 @@ fun DonutChart(
     Canvas(
         modifier =
             modifier
-                .pointerInput(items, finalAngles) {
+                .pointerInput(items, finalAngles, selectedIndex) {
                     detectTapGestures { offset ->
                         val centerX = size.width / 2f
                         val centerY = size.height / 2f
-                        val dx = offset.x - centerX
-                        val dy = offset.y - centerY
-                        val distance = sqrt(dx * dx + dy * dy)
-
                         val radius = min(size.width, size.height) / 2f
                         val innerRadius = radius * 0.45f
+                        val offsetDistPx = 12.dp.toPx()
 
-                        if (distance in innerRadius..radius) {
-                            var angle =
-                                Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
-                            if (angle < -90) angle += 360
+                        var currentStartAngle = -90f
+                        var clickedIndex = -1
 
-                            var currentAngle = -90f
-                            finalAngles.forEachIndexed { index, sweepAngle ->
-                                if (angle >= currentAngle && angle <= (currentAngle + sweepAngle)) {
-                                    onItemClick(index)
-                                    return@detectTapGestures
+                        items.forEachIndexed { index, _ ->
+                            val sweepAngle = finalAngles[index]
+                            val midAngle = currentStartAngle + (sweepAngle / 2f)
+
+                            val isSelected = index == selectedIndex
+                            val offsetDist = if (isSelected) offsetDistPx else 0f
+
+                            val arcCenterX =
+                                centerX + cos(Math.toRadians(midAngle.toDouble())).toFloat() * offsetDist
+                            val arcCenterY =
+                                centerY + sin(Math.toRadians(midAngle.toDouble())).toFloat() * offsetDist
+
+                            val dx = offset.x - arcCenterX
+                            val dy = offset.y - arcCenterY
+                            val distance = sqrt(dx * dx + dy * dy)
+
+                            if (distance in innerRadius..radius) {
+                                var angle =
+                                    Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+                                if (angle < -90f) angle += 360f
+
+                                if (angle >= currentStartAngle && angle <= (currentStartAngle + sweepAngle)) {
+                                    clickedIndex = index
                                 }
-                                currentAngle += sweepAngle
                             }
+
+                            currentStartAngle += sweepAngle
                         }
+
+                        onItemClick(clickedIndex)
                     }
                 },
     ) {

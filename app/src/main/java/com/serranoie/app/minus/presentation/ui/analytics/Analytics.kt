@@ -476,6 +476,7 @@ fun Analytics(
                             useTabletLayout = useWideAnalyticsLayout,
                             state = shown,
                             categories = categories,
+                            selectedCategoryName = selectedCategory?.categoryName,
                             onShowHistory = {
                                 showHistorySheet = true
                                 view.weakHapticFeedback()
@@ -896,6 +897,7 @@ private fun AnalyticsResponsiveLayout(
     useTabletLayout: Boolean,
     state: AnalyticsState,
     categories: List<Category>,
+    selectedCategoryName: String? = null,
     onShowHistory: () -> Unit,
     onShowSubscriptions: () -> Unit,
     onShowCreditDetails: () -> Unit,
@@ -908,6 +910,7 @@ private fun AnalyticsResponsiveLayout(
         AnalyticsTabletLayout(
             state = state,
             categories = categories,
+            selectedCategoryName = selectedCategoryName,
             onShowHistory = onShowHistory,
             onShowSubscriptions = onShowSubscriptions,
             onShowCreditDetails = onShowCreditDetails,
@@ -920,6 +923,7 @@ private fun AnalyticsResponsiveLayout(
         AnalyticsCompactLayout(
             state = state,
             categories = categories,
+            selectedCategoryName = selectedCategoryName,
             onShowHistory = onShowHistory,
             onShowSubscriptions = onShowSubscriptions,
             onShowCreditDetails = onShowCreditDetails,
@@ -935,6 +939,7 @@ private fun AnalyticsResponsiveLayout(
 private fun AnalyticsCompactLayout(
     state: AnalyticsState,
     categories: List<Category>,
+    selectedCategoryName: String? = null,
     onShowHistory: () -> Unit,
     onShowSubscriptions: () -> Unit,
     onShowCreditDetails: () -> Unit,
@@ -1088,6 +1093,7 @@ private fun AnalyticsCompactLayout(
         CategoriesChartCard(
             spends = state.spends,
             currency = state.currencyCode,
+            selectedCategoryName = selectedCategoryName,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
@@ -1102,6 +1108,7 @@ private fun AnalyticsCompactLayout(
 private fun AnalyticsTabletLayout(
     state: AnalyticsState,
     categories: List<Category>,
+    selectedCategoryName: String? = null,
     onShowHistory: () -> Unit,
     onShowSubscriptions: () -> Unit,
     onShowCreditDetails: () -> Unit,
@@ -1250,6 +1257,7 @@ private fun AnalyticsTabletLayout(
         CategoriesChartCard(
             spends = state.spends,
             currency = state.currencyCode,
+            selectedCategoryName = selectedCategoryName,
             modifier = Modifier
                 .fillMaxWidth()
                 .bringIntoViewRequester(bringIntoViewRequesters[4]!!)
