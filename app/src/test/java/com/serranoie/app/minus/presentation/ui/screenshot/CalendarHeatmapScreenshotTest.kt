@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.Modifier
@@ -12,7 +11,6 @@ import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.date.CalendarHeatmap
-import com.serranoie.app.minus.presentation.ui.theme.component.date.SpendingDay
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
@@ -37,13 +35,12 @@ class CalendarHeatmapScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 CalendarHeatmap(
-                    budget = BigDecimal("50.00"),
+                    budget = BigDecimal("750.00"),
                     transactions = sampleTransactions(),
                     startDate = fixedDate(2026, 1, 1),
                     finishDate = fixedDate(2026, 1, 30),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
                         .padding(16.dp),
                 )
             }

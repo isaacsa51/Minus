@@ -18,6 +18,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +43,7 @@ internal fun ChangelogItemCard(
         ) {
             ChangelogItemTitleWithLinks(
                 text = item.title,
-                style = MaterialTheme.typography.bodySmallEmphasized,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
         }

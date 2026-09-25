@@ -155,27 +155,3 @@ internal fun LazyListScope.pastTransactionDateSections(
         }
     }
 }
-
-
-@PreviewLightDark
-@Composable
-private fun PastTransactionDateSectionsPreview() {
-    val today = LocalDate.now()
-    val pastDate = today.minusDays(20)
-    val tx = Transaction(
-        id = 1L,
-        amount = BigDecimal("30.00"),
-        comment = "Lunch",
-        date = pastDate.atStartOfDay(),
-        isDeleted = false,
-    )
-    MinusTheme {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            // Previews for shared transitions are complex, usually no-op or mock
-            item("preview") {
-                Text("Past Transaction Date Sections Preview")
-            }
-
-        }
-    }
-}

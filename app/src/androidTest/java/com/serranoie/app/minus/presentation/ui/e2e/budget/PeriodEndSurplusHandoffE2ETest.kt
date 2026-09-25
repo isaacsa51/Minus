@@ -50,7 +50,7 @@ import java.time.ZoneId
  * [BudgetPeriodManager] creates the next period, [BudgetStateCalculator] reads it back. Only the
  * repositories are faked, and they keep their state so a write is visible to the next read.
  *
- * Fixture: a 30-day period of 1000 that ended yesterday having spent 700, so 300 is left over.
+ * Scenario: a 30-day period of 1000 that ended yesterday having spent 700, so 300 is left over.
  */
 class PeriodEndSurplusHandoffE2ETest {
 
@@ -147,7 +147,6 @@ class PeriodEndSurplusHandoffE2ETest {
         splitMode = splitMode,
     )
 
-    /** Arranges the period that ran out yesterday and lets the app notice it, as a cold start does. */
     private fun endLastPeriod(
         strategy: RemainingBudgetStrategy,
         spent: BigDecimal = lastPeriodBudget.subtract(surplus),
@@ -180,7 +179,6 @@ class PeriodEndSurplusHandoffE2ETest {
         runBlocking { transitionManager.handleAppStart() }
     }
 
-    /** Shows the rollover dialog exactly as the home screen wires it. */
     private fun showRolloverDialog() {
         composeTestRule.setContent {
             MinusTheme {
@@ -222,7 +220,6 @@ class PeriodEndSurplusHandoffE2ETest {
         }
     }
 
-    /** Creates the next period the way the budget sheet does, and returns what was persisted. */
     private fun startNextPeriod(
         totalBudget: BigDecimal = nextPeriodBudget,
         splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
@@ -248,10 +245,6 @@ class PeriodEndSurplusHandoffE2ETest {
         transactions = emptyList(),
         currentDate = settings.startDate,
     )
-
-    // ---------------------------------------------------------------------------------------
-    // The dialog the user is shown
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun when_a_period_ends_with_money_left_then_the_dialog_shows_the_surplus_and_what_was_spent() {
@@ -285,10 +278,6 @@ class PeriodEndSurplusHandoffE2ETest {
             .assertDoesNotExist()
         assertThat(pendingRollover.second).isEqualTo(RemainingBudgetStrategy.SPLIT_EQUALLY)
     }
-
-    // ---------------------------------------------------------------------------------------
-    // Answering the dialog, then living in the next period
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun when_answering_spread_it_then_day_one_of_the_next_period_has_a_bigger_daily_budget() {
@@ -382,10 +371,6 @@ class PeriodEndSurplusHandoffE2ETest {
         assertThat(pendingRollover.first).isEqualTo(BigDecimal.ZERO)
     }
 
-    // ---------------------------------------------------------------------------------------
-    // The strategies that never ask
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun when_spread_it_was_chosen_up_front_then_the_next_period_picks_the_surplus_up_silently() {
         endLastPeriod(RemainingBudgetStrategy.SPLIT_EQUALLY)
@@ -416,10 +401,6 @@ class PeriodEndSurplusHandoffE2ETest {
         assertThat(next.totalBudget).isEqualTo(nextPeriodBudget)
         assertThat(dayOneOf(next).isOverBudget).isFalse()
     }
-
-    // ---------------------------------------------------------------------------------------
-    // How the handed-over surplus behaves under the new period's split mode
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun when_the_new_period_runs_on_carry_over_then_an_unspent_lump_is_banked() {

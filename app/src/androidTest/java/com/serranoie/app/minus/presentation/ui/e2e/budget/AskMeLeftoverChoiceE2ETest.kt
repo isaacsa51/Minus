@@ -13,19 +13,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.emptyPreferences
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.repository.SettingsRepositoryImpl
@@ -125,10 +125,6 @@ class AskMeLeftoverChoiceE2ETest {
         )
     }
 
-    /**
-     * Renders the choice list the way the numpad does — a selection that starts on the last answer
-     * and an apply button that writes it down for today.
-     */
     private fun renderChoiceList(
         state: BudgetState = budgetToday(),
         initialSelection: LeftoverChoice? = null,
@@ -179,10 +175,6 @@ class AskMeLeftoverChoiceE2ETest {
         composeTestRule.onNodeWithTag(APPLY_TAG).performClick()
         composeTestRule.waitUntil(timeoutMillis = 5_000) { choicesApplied.get() > before }
     }
-
-    // ---------------------------------------------------------------------------------------
-    // The prompt itself
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun when_days_went_unspent_then_the_prompt_offers_both_answers() {
@@ -245,10 +237,6 @@ class AskMeLeftoverChoiceE2ETest {
         composeTestRule.onNodeWithTag(leftoverChoiceTag(LeftoverChoice.CARRY)).assertIsNotSelected()
     }
 
-    // ---------------------------------------------------------------------------------------
-    // Answering carry
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun when_answering_carry_then_it_is_written_down_for_today() {
         renderChoiceList()
@@ -294,10 +282,6 @@ class AskMeLeftoverChoiceE2ETest {
         assertThat(tomorrow.pendingLeftover).isEqualTo(BigDecimal("300.00"))
         assertThat(tomorrow.remainingToday).isEqualTo(BigDecimal("100.00"))
     }
-
-    // ---------------------------------------------------------------------------------------
-    // Answering spread
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun when_answering_spread_then_it_is_written_down_for_today() {
@@ -349,10 +333,6 @@ class AskMeLeftoverChoiceE2ETest {
         assertThat(spread.remainingToday).isLessThan(carried.remainingToday)
         assertThat(spread.dailyBudget).isGreaterThan(carried.dailyBudget)
     }
-
-    // ---------------------------------------------------------------------------------------
-    // Answering again, and answering across periods
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun when_answering_twice_on_the_same_day_then_the_last_answer_wins() {
@@ -417,10 +397,6 @@ class AskMeLeftoverChoiceE2ETest {
 
         assertThat(choices).containsExactly(today, LeftoverChoice.SPREAD)
     }
-
-    // ---------------------------------------------------------------------------------------
-    // When there is nothing to ask about
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun when_every_day_was_spent_to_the_cent_then_both_answers_preview_the_same_plain_day() {
