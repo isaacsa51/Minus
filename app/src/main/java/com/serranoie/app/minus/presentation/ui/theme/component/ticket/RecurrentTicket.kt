@@ -81,7 +81,6 @@ fun RecurrentTicketCard(
 					text = amountFormatted,
 					style = MaterialTheme.typography.titleSmallEmphasized,
 					color = MaterialTheme.colorScheme.primary,
-					fontWeight = FontWeight.Bold,
 					maxLines = 1,
 					overflow = TextOverflow.Clip
 				)

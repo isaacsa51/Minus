@@ -112,7 +112,6 @@ fun CalculatedSplitCard(
                 text = formattedAmount,
                 style = MaterialTheme.typography.headlineSmallEmphasized,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
                 modifier = Modifier.censor(),
             )
             Spacer(modifier = Modifier.height(4.dp))

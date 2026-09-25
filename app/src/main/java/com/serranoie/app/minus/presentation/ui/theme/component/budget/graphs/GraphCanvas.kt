@@ -69,7 +69,6 @@ internal fun GraphCanvas(
     val textMeasurer = rememberTextMeasurer()
     val tooltipStyle = MaterialTheme.typography.labelSmallEmphasized.copy(
         color = Color.White,
-        fontWeight = FontWeight.Bold
     )
 
     val labelStyle = MaterialTheme.typography.labelSmallCondensed.copy(

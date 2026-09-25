@@ -29,6 +29,7 @@ class HistoryDateDividerScreenshotTest {
                 HistoryDateDivider(
                     date = LocalDate.of(2026, 1, 15),
                     isExpanded = true,
+                    onToggleClick = {},
                     totalAmount = BigDecimal("125.75"),
                     currencyCode = "\$"
                 )

@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import java.math.BigDecimal
 import java.text.NumberFormat
@@ -34,9 +33,9 @@ internal fun DueTodayCard(
         onEdit = onEdit,
         onDelete = onDelete,
         modifier = modifier,
-        containerColor = colorNotGood.copy(alpha = 0.16f),
-        borderStroke = BorderStroke(1.dp, colorNotGood.copy(alpha = 0.5f)),
-        accentColor = colorNotGood,
+        containerColor = MinusTheme.budgetStatus.notGood.copy(alpha = 0.16f),
+        borderStroke = BorderStroke(1.dp, MinusTheme.budgetStatus.notGood.copy(alpha = 0.5f)),
+        accentColor = MinusTheme.budgetStatus.notGood,
     )
 }
 

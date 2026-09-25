@@ -40,7 +40,6 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.presentation.isRoundedFontEnabled
 import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.colorBad
 import com.serranoie.app.minus.presentation.ui.theme.googleSansFlex
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.censor
@@ -165,7 +164,7 @@ internal fun StatusLabel(
                 Text(
                     text = exhaustedMessage.orEmpty(),
                     style = secondaryStyle,
-                    color = colorBad,
+                    color = MinusTheme.budgetStatus.bad,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.basicMarquee(),

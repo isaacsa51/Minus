@@ -12,6 +12,10 @@ import androidx.compose.ui.unit.dp
 
 val LocalCensorMode = compositionLocalOf { false }
 
+/**
+ * A modifier extension that can be used to censor content.
+ * This applies a blur effect to the content if the censor mode is enabled.
+ */
 @Composable
 fun Modifier.censor(
     enabled: Boolean = true,

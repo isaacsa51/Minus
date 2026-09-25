@@ -1271,11 +1271,6 @@ private fun AnalyticsState.toCategoryAnalyticsState(
     categoryName: String,
     categorySpends: List<Transaction>,
 ): CategoryAnalyticsState = CategoryAnalyticsState(
-    periodFinished = periodFinished,
-    transactions = transactions,
-    spends = spends,
-    wholeBudget = wholeBudget,
-    finishPeriodActualDate = finishPeriodActualDate,
     startPeriodDate = startPeriodDate,
     finishPeriodDate = finishPeriodDate,
     isLoading = isLoading,

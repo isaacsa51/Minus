@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.SymbolPosition
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTextField
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
@@ -84,7 +83,7 @@ internal fun EditAmountDisplay(
     val baseTextStyle = MaterialTheme.typography.displayLargeCondensed.copy(
         fontWeight = FontWeight.W500,
         fontSize = AmountFontSize,
-        color = if (isIncome) colorGood else MaterialTheme.colorScheme.onSurface,
+        color = if (isIncome) MinusTheme.budgetStatus.good else MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.End,
     )
 

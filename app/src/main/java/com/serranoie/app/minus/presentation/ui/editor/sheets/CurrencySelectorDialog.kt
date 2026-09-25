@@ -140,7 +140,6 @@ fun CurrencySelectorDialog(
                                     text = currency.symbol,
                                     textAlign = TextAlign.Center,
                                     style = MaterialTheme.typography.titleMediumEmphasized,
-                                    fontWeight = FontWeight.Bold,
                                     modifier = Modifier.width(60.dp),
                                 )
                                 Column(

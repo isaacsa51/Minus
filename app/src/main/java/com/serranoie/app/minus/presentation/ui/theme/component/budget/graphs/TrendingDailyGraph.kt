@@ -101,7 +101,6 @@ internal fun GraphHourCanvas(
     val textMeasurer = rememberTextMeasurer()
     val tooltipStyle = MaterialTheme.typography.labelSmallEmphasized.copy(
         color = Color.White,
-        fontWeight = FontWeight.Bold
     )
     val labelStyle = MaterialTheme.typography.labelSmallCondensed.copy(
         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)

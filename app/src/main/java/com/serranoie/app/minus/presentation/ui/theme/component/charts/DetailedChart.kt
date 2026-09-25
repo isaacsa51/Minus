@@ -88,7 +88,6 @@ fun DetailedChart(
     val surfaceColor = MaterialTheme.colorScheme.surface
     val tooltipStyle = MaterialTheme.typography.labelSmallEmphasized.copy(
         color = Color.White,
-        fontWeight = FontWeight.Bold,
     )
     val emptyStateStyle = MaterialTheme.typography.bodyMedium.copy(
         color = MaterialTheme.colorScheme.onSurfaceVariant,

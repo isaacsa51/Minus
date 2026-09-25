@@ -495,7 +495,7 @@ fun PaddedListItem(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CustomPaddedListItem(
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
     modifier: Modifier = Modifier,
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
@@ -518,9 +518,13 @@ fun CustomPaddedListItem(
     ) {
         Row(
             modifier = Modifier
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick,
+                .then(
+                    if (onClick != null || onLongClick != null) {
+                        Modifier.combinedClickable(
+                            onClick = onClick ?: {},
+                            onLongClick = onLongClick,
+                        )
+                    } else Modifier
                 )
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,

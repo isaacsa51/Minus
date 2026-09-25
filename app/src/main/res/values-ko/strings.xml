@@ -711,4 +711,5 @@
     <string name="past_period_delete_confirm_title">지난 기간을 삭제할까요?</string>
     <string name="past_period_delete_confirm_message">%1$s – %2$s 기간과 해당 지출이 영구 삭제됩니다. 구독은 유지됩니다. 생체 인증이 필요합니다.</string>
     <string name="dialog_yes">예</string>
+    <string name="loading">로딩 중…</string>
 </resources>

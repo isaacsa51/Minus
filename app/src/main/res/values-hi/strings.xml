@@ -710,4 +710,5 @@
     <string name="past_period_delete_confirm_title">पिछला पीरियड हटाएँ?</string>
     <string name="past_period_delete_confirm_message">इससे पीरियड %1$s – %2$s और उसके खर्च स्थायी रूप से हट जाएँगे। सब्सक्रिप्शन बने रहेंगे। बायोमेट्रिक प्रमाणीकरण आवश्यक होगा।</string>
     <string name="dialog_yes">हाँ</string>
+    <string name="loading">लोड हो रहा है…</string>
 </resources>

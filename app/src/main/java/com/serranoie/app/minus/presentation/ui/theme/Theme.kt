@@ -13,6 +13,8 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalContext
 import com.serranoie.app.minus.domain.model.AppColorScheme
 import com.serranoie.app.minus.domain.model.ContrastMode
@@ -26,6 +28,7 @@ import com.serranoie.app.minus.presentation.isAmoledEnabled
 import com.serranoie.app.minus.presentation.isRoundedFontEnabled
 import com.serranoie.app.minus.presentation.ui.theme.schemes.getAppColorScheme
 import com.serranoie.app.minus.presentation.ui.theme.schemes.toAmoled
+import com.serranoie.app.minus.presentation.util.withTone
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -277,6 +280,7 @@ fun MinusTheme(
     appColorScheme: AppColorScheme = LocalContext.current.appColorScheme,
     contrastMode: ContrastMode = LocalContext.current.appContrast,
     isAmoledEnabled: Boolean = LocalContext.current.isAmoledEnabled,
+    budgetStatusColors: BudgetStatusColors? = null,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -315,11 +319,23 @@ fun MinusTheme(
         TypographyMode.EXPRESSIVE -> getTypography(isRoundedFontEnabled).withEmphasizedStyles(isRoundedFontEnabled)
     }
 
-    MaterialExpressiveTheme(
-        colorScheme = colorScheme,
-        motionScheme = MotionScheme.expressive(),
-        shapes = shape,
-        typography = typography,
-        content = content
+    val statusColors = budgetStatusColors ?: BudgetStatusColors(
+        bad = (if (darkTheme) colorScheme.errorContainer else colorScheme.error)
+            .withTone(BudgetStatusSeedTone),
     )
+
+    CompositionLocalProvider(LocalBudgetStatusColors provides statusColors) {
+        MaterialExpressiveTheme(
+            colorScheme = colorScheme,
+            motionScheme = MotionScheme.expressive(),
+            shapes = shape,
+            typography = typography,
+            content = content
+        )
+    }
+}
+
+object MinusTheme {
+    val budgetStatus: BudgetStatusColors
+        @Composable @ReadOnlyComposable get() = LocalBudgetStatusColors.current
 }

@@ -70,6 +70,11 @@ fun harmonizeWithColor(
     return Color(Hct.from(hct.hue, hct.chroma * chromaMultiplier, hct.tone).toInt())
 }
 
+fun Color.withTone(tone: Double): Color {
+    val hct = Hct.fromInt(toArgb())
+    return Color(Hct.from(hct.hue, hct.chroma, tone).toInt())
+}
+
 @Composable
 fun toPalette(color: Color, darkTheme: Boolean = isNightMode()): HarmonizedColorPalette =
     corePaletteFor(color, darkTheme)

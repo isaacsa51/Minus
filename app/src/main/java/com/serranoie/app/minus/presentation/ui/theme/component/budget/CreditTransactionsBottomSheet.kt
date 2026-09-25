@@ -129,7 +129,6 @@ fun CreditTransactionsBottomSheet(
                         modifier = Modifier.censor(),
                         text = currencyFormat.format(tx.amount),
                         style = MaterialTheme.typography.titleSmallEmphasized,
-                        fontWeight = FontWeight.Bold
                     )
                     IconButton(
                         onClick = { onPayTransactionClick(tx.id) },

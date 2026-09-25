@@ -710,4 +710,5 @@
     <string name="past_period_delete_confirm_title">Eliminare il periodo passato?</string>
     <string name="past_period_delete_confirm_message">Questa azione elimina definitivamente il periodo %1$s – %2$s e le sue spese. Gli abbonamenti vengono mantenuti. Sarà richiesta l\'autenticazione biometrica.</string>
     <string name="dialog_yes">Sì</string>
+    <string name="loading">Caricamento…</string>
 </resources>

@@ -710,4 +710,5 @@
     <string name="past_period_delete_confirm_title">Διαγραφή προηγούμενης περιόδου;</string>
     <string name="past_period_delete_confirm_message">Η περίοδος %1$s – %2$s και τα έξοδά της θα διαγραφούν οριστικά. Οι συνδρομές διατηρούνται. Θα απαιτηθεί βιομετρικός έλεγχος ταυτότητας.</string>
     <string name="dialog_yes">Ναι</string>
+    <string name="loading">Φόρτωση…</string>
 </resources>

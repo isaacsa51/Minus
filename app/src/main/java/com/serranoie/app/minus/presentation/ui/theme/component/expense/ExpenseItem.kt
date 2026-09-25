@@ -40,7 +40,6 @@ import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.font.format.calculateDaysToCutoff
 import com.serranoie.app.minus.presentation.util.font.format.prettyDate
-import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.util.Locale
@@ -52,7 +51,7 @@ fun ExpenseItem(
     currencyFormat: NumberFormat,
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
     isExpanded: Boolean = false,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
     onEdit: () -> Unit = {},
     onDelete: () -> Unit = {},
     onMarkAsPaid: () -> Unit = {},
@@ -206,7 +205,7 @@ fun ExpenseItem(
                             },
                             style = MaterialTheme.typography.titleSmallEmphasized,
                             color = when {
-                                isIncome -> colorGood
+                                isIncome -> MinusTheme.budgetStatus.good
                                 isDecrease -> MaterialTheme.colorScheme.error
                                 else -> MaterialTheme.colorScheme.onSurface
                             },

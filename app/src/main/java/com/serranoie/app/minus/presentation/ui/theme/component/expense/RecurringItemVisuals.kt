@@ -83,7 +83,6 @@ internal fun SubscriptionAvatar(
         Text(
             text = label,
             style = MaterialTheme.typography.labelMediumEmphasized,
-            fontWeight = FontWeight.Bold,
             color = palette.onContainer,
         )
     }
