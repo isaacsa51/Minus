@@ -104,7 +104,7 @@ fun LeftoverChoiceList(
                 label = "leftoverChoice"
             )
             val colors = MaterialTheme.colorScheme
-            val today = remainingToday + (if (option == LeftoverChoice.SPREAD) share else amount)
+            val today = remainingToday + if (option == LeftoverChoice.SPREAD) share else amount
             val perDay = if (option == LeftoverChoice.SPREAD) dailyBudget + share else dailyBudget
             CustomPaddedListItem(
                 onClick = {

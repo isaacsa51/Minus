@@ -242,14 +242,14 @@ fun Numpad(
                         targetState = leftContent != null,
                         label = "NumpadLeftContentSwap",
                         transitionSpec = {
-                            (fadeIn(tween(250)) + scaleIn(
+                            fadeIn(tween(250)) + scaleIn(
                                 initialScale = 0.96f,
                                 animationSpec = tween(250)
-                            )) togetherWith
-                                    (fadeOut(tween(200)) + scaleOut(
+                            ) togetherWith
+                                    fadeOut(tween(200)) + scaleOut(
                                         targetScale = 0.96f,
                                         animationSpec = tween(200)
-                                    )) using
+                                    ) using
                                     SizeTransform(clip = false)
                         }
                     ) { hasLeftContent ->
