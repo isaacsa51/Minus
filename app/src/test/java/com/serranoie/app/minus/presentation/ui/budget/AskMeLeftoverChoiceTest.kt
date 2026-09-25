@@ -11,18 +11,6 @@ import org.junit.Test
 import java.math.BigDecimal
 import java.time.LocalDate
 
-/**
- * The ASK_ME split mode: every day the user is asked what to do with the allowance nobody spent,
- * and answers with [LeftoverChoice.CARRY] ("give it to me today") or [LeftoverChoice.SPREAD]
- * ("share it over the days that are left").
- *
- * The calculator keeps no running state: it replays the period from day one on every call, using
- * the choices recorded so far. These tests pin that replay — what waits as `pendingLeftover`, what
- * each answer does to `remainingToday` and to the `dailyBudget` rate, and what happens when the
- * user answers late, answers twice, or never answers at all.
- *
- * Fixture: 10 days of 1000, so an untouched day is worth exactly 100.
- */
 class AskMeLeftoverChoiceTest {
 
     private val calculator = BudgetStateCalculator()
@@ -69,10 +57,6 @@ class AskMeLeftoverChoiceTest {
         leftoverChoices = choices.mapKeys { (dayNumber, _) -> day(dayNumber) },
     )
 
-    // ---------------------------------------------------------------------------------------
-    // Nobody has answered yet
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun `an untouched day turns into a pending prompt the next morning`() {
         val dayTwo = onDay(currentDay = 2, spends = listOf(1 to "80"))
@@ -109,10 +93,6 @@ class AskMeLeftoverChoiceTest {
                 .isEqualTo(BigDecimal("100.00"))
         }
     }
-
-    // ---------------------------------------------------------------------------------------
-    // CARRY: give it to me today
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `carry hands the whole pending amount to today and clears the prompt`() {
@@ -165,15 +145,10 @@ class AskMeLeftoverChoiceTest {
         assertThat(dayThree.pendingLeftover).isEqualTo(BigDecimal("70.00"))
     }
 
-    // ---------------------------------------------------------------------------------------
-    // SPREAD: share it over the days that are left
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun `spread raises the daily rate for the rest of the period instead of today alone`() {
         val spread = onDay(2, choices = mapOf(2 to LeftoverChoice.SPREAD), spends = listOf(1 to "80"))
 
-        // 20 shared over the 9 days from day two onwards
         assertThat(spread.dailyBudget).isEqualTo(BigDecimal("102.22"))
         assertThat(spread.remainingToday).isEqualTo(BigDecimal("102.22"))
         assertThat(spread.pendingLeftover).isEqualTo(BigDecimal("0.00"))
@@ -198,7 +173,6 @@ class AskMeLeftoverChoiceTest {
         val spreadOnDayFive = onDay(5, mapOf(5 to LeftoverChoice.SPREAD), spends)
         val spreadOnDayNine = onDay(9, mapOf(9 to LeftoverChoice.SPREAD), spends)
 
-        // 20 over 9 days, 320 over 6 days, 720 over 2 days
         assertThat(spreadOnDayTwo.dailyBudget).isEqualTo(BigDecimal("102.22"))
         assertThat(spreadOnDayFive.dailyBudget).isEqualTo(BigDecimal("153.33"))
         assertThat(spreadOnDayNine.dailyBudget).isEqualTo(BigDecimal("460.00"))
@@ -231,7 +205,6 @@ class AskMeLeftoverChoiceTest {
 
         val dayThree = onDay(3, twice, spends)
 
-        // day two ran on 102.22 and only 50 was spent, so 52.22 gets shared over the last 8 days
         assertThat(dayThree.dailyBudget).isEqualTo(BigDecimal("108.75"))
         assertThat(dayThree.pendingLeftover).isEqualTo(BigDecimal("0.00"))
     }
@@ -255,14 +228,9 @@ class AskMeLeftoverChoiceTest {
 
         val dayThree = onDay(3, mixed, spends)
 
-        // day two got 120 and spent 50, so 70 is shared over the last 8 days
         assertThat(dayThree.dailyBudget).isEqualTo(BigDecimal("108.75"))
         assertThat(dayThree.remainingToday).isEqualTo(BigDecimal("108.75"))
     }
-
-    // ---------------------------------------------------------------------------------------
-    // Answering late, or not at all
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `answering after skipping days settles everything that piled up, not only yesterday`() {
@@ -280,7 +248,6 @@ class AskMeLeftoverChoiceTest {
 
         val spreadOnDayFour = onDay(4, mapOf(4 to LeftoverChoice.SPREAD), spends)
 
-        // 60 of unspent allowance shared over the 7 days from day four onwards
         assertThat(spreadOnDayFour.dailyBudget).isEqualTo(BigDecimal("108.57"))
         assertThat(spreadOnDayFour.pendingLeftover).isEqualTo(BigDecimal("0.00"))
     }
@@ -325,10 +292,6 @@ class AskMeLeftoverChoiceTest {
         assertThat(today.pendingLeftover).isEqualTo(BigDecimal("20.00"))
     }
 
-    // ---------------------------------------------------------------------------------------
-    // Overspending
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun `an overspend eats the waiting money first, without asking`() {
         val absorbed = onDay(3, spends = listOf(1 to "80", 2 to "110"))
@@ -369,10 +332,6 @@ class AskMeLeftoverChoiceTest {
                 .isEqualTo(BigDecimal("0.00"))
         }
     }
-
-    // ---------------------------------------------------------------------------------------
-    // A rollover carried in from the previous period
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `a first-day rollover is offered on day one and joins the prompt if it is not spent`() {
@@ -421,10 +380,6 @@ class AskMeLeftoverChoiceTest {
         assertThat(onDay(5, settings = carried).dailyBudget).isEqualTo(BigDecimal("100.00"))
     }
 
-    // ---------------------------------------------------------------------------------------
-    // The edges of the period
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun `once the period is over everything still waiting is folded into what is left`() {
         val spends = listOf(1 to "80")
@@ -472,8 +427,6 @@ class AskMeLeftoverChoiceTest {
 
         val dayTwo = onDay(2, spends = bookedAhead)
 
-        // the replay clamps anything dated past today onto today, the same way carry over
-        // subtracts the whole period's spend from what is left right now
         assertThat(dayTwo.remainingToday).isEqualTo(BigDecimal("-100.00"))
         assertThat(dayTwo.pendingLeftover).isEqualTo(BigDecimal("20.00"))
         assertThat(dayTwo.totalSpentInPeriod).isEqualTo(BigDecimal("280"))

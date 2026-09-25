@@ -4,7 +4,6 @@ package com.serranoie.app.minus.presentation.ui.editor.sheets
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -20,30 +19,32 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -51,7 +52,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -59,12 +59,15 @@ import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
@@ -105,7 +108,7 @@ internal fun BudgetBehaviourContent(
                 .nestedScroll(scrollGuard)
                 .verticalScroll(scrollState, overscrollEffect = scrollGuard),
         ) {
-            Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp)) {
+            Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp)) {
                 Text(
                     text = stringResource(R.string.budget_behaviour_title),
                     style = MaterialTheme.typography.headlineSmallEmphasized,
@@ -169,26 +172,48 @@ internal fun BudgetBehaviourContent(
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
         ) {
-            FilledTonalButton(
-                onClick = onBack,
-                shape = CircleShape.copy(topEnd = CornerSize(8.dp), bottomEnd = CornerSize(8.dp)),
-                modifier = Modifier.heightIn(min = 56.dp),
+            val backLabel = stringResource(R.string.back)
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                    TooltipAnchorPosition.Above,
+                ),
+                state = rememberTooltipState(),
+                tooltip = {
+                    PlainTooltip(
+                        modifier = Modifier.semantics {
+                            liveRegion = LiveRegionMode.Assertive
+                            paneTitle = backLabel
+                        },
+                    ) {
+                        Text(backLabel)
+                    }
+                },
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
-                    modifier = Modifier.offset(x = 4.dp),
-                )
+                FilledTonalButton(
+                    onClick = onBack,
+                    shapes = ButtonDefaults.shapes(
+                        shape = ButtonGroupDefaults.connectedLeadingButtonShape,
+                        pressedShape = ButtonGroupDefaults.connectedLeadingButtonPressShape,
+                    ),
+                    contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight),
+                    modifier = Modifier.heightIn(min = ButtonDefaults.MediumContainerHeight),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = backLabel,
+                        modifier = Modifier.size(ButtonDefaults.iconSizeFor(ButtonDefaults.MediumContainerHeight)),
+                    )
+                }
             }
             Button(
                 onClick = onApply,
-                shape = CircleShape.copy(
-                    topStart = CornerSize(8.dp),
-                    bottomStart = CornerSize(8.dp)
+                shapes = ButtonDefaults.shapes(
+                    shape = ButtonGroupDefaults.connectedTrailingButtonShape,
+                    pressedShape = ButtonGroupDefaults.connectedTrailingButtonPressShape,
                 ),
                 modifier = Modifier
                     .weight(1f)
-                    .heightIn(min = 56.dp)
+                    .heightIn(min = ButtonDefaults.MediumContainerHeight)
                     .testTag(BUDGET_PERIOD_APPLY_BUTTON_TAG),
             ) {
                 Text(applyLabel, style = MaterialTheme.typography.labelMediumEmphasized)
@@ -205,6 +230,7 @@ private fun SurplusStrategyCard(
     onStrategySelected: (RemainingBudgetStrategy) -> Unit,
 ) {
     val view = LocalView.current
+    val previewFadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
     val strategies = listOf(
         RemainingBudgetStrategy.ASK_ALWAYS,
         RemainingBudgetStrategy.SPLIT_EQUALLY,
@@ -236,12 +262,16 @@ private fun SurplusStrategyCard(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .semantics { role = Role.RadioButton }
+                            .semantics {
+                                role = Role.RadioButton
+                                selected = option == strategy
+                            }
                             .testTag(budgetStrategyOptionTag(option)),
                         colors = ToggleButtonDefaults.toggleButtonColors(
-                            checkedContainerColor = MaterialTheme.colorScheme.primary,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                            checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+                            checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         ),
                     ) {
                         Text(
@@ -272,13 +302,13 @@ private fun SurplusStrategyCard(
                     imageVector = Icons.Rounded.Info,
                     tint = MaterialTheme.colorScheme.outline,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 AnimatedContent(
                     targetState = strategy,
                     modifier = Modifier.weight(1f),
-                    transitionSpec = { fadeIn(tween(150)) togetherWith fadeOut(tween(150)) },
+                    transitionSpec = { fadeIn(previewFadeSpec) togetherWith fadeOut(previewFadeSpec) },
                     label = "surplusPreview",
                 ) { shown ->
                     Text(
@@ -323,7 +353,11 @@ private fun <T> BehaviourOptionGroup(
                 index == options.lastIndex -> PaddedListItemPosition.Last
                 else -> PaddedListItemPosition.Middle
             }
-            val selection by animateFloatAsState(if (isSelected) 1f else 0f, label = "optionShape")
+            val selection by animateFloatAsState(
+                targetValue = if (isSelected) 1f else 0f,
+                animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                label = "optionShape",
+            )
             CustomPaddedListItem(
                 onClick = {
                     view.confirmFeedback()
@@ -340,7 +374,7 @@ private fun <T> BehaviourOptionGroup(
                 background = if (isSelected) {
                     MaterialTheme.colorScheme.secondaryContainer
                 } else {
-                    MaterialTheme.colorScheme.surfaceVariant
+                    MaterialTheme.colorScheme.surfaceContainer
                 },
                 contentColor = if (isSelected) {
                     MaterialTheme.colorScheme.onSecondaryContainer
@@ -360,7 +394,11 @@ private fun <T> BehaviourOptionGroup(
                     Text(
                         text = optionDescription(option),
                         style = MaterialTheme.typography.bodySmallCondensed,
-                        color = LocalContentColor.current.copy(alpha = 0.8f),
+                        color = if (isSelected) {
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
                     )
                 }
             }
@@ -416,7 +454,7 @@ private class SheetScrollGuard(
     override val node: DelegatableNode = overscroll?.node ?: object : Modifier.Node() {}
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun BudgetBehaviourContentPreview() {
     MinusTheme {

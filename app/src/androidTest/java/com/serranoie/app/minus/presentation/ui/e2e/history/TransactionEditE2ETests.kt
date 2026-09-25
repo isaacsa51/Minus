@@ -1,8 +1,12 @@
 package com.serranoie.app.minus.presentation.ui.e2e.history
 
+import android.content.res.Configuration
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -90,19 +94,28 @@ class TransactionEditE2ETests {
         ) -> Unit = { _, _, _, _, _, _, _, _, _ -> },
     ) {
         composeTestRule.setContent {
-            MinusTheme {
-                TransactionEditScreen(
-                    transaction = transaction,
-                    budgetStartDate = periodStart,
-                    budgetEndDate = periodEnd,
-                    currencyCode = "USD",
-                    isCreditQuickToggleEnabled = isCreditQuickToggleEnabled,
-                    creditCardCutoffDay = creditCardCutoffDay,
-                    onUpdateCreditCutoffDay = onUpdateCreditCutoffDay,
-                    onCancel = onCancel,
-                    onSave = onSave,
-                    modifier = Modifier.fillMaxSize(),
-                )
+            val deviceConfiguration = LocalConfiguration.current
+            val softKeyboardConfiguration = remember(deviceConfiguration) {
+                Configuration(deviceConfiguration).apply {
+                    keyboard = Configuration.KEYBOARD_NOKEYS
+                    hardKeyboardHidden = Configuration.HARDKEYBOARDHIDDEN_YES
+                }
+            }
+            CompositionLocalProvider(LocalConfiguration provides softKeyboardConfiguration) {
+                MinusTheme {
+                    TransactionEditScreen(
+                        transaction = transaction,
+                        budgetStartDate = periodStart,
+                        budgetEndDate = periodEnd,
+                        currencyCode = "USD",
+                        isCreditQuickToggleEnabled = isCreditQuickToggleEnabled,
+                        creditCardCutoffDay = creditCardCutoffDay,
+                        onUpdateCreditCutoffDay = onUpdateCreditCutoffDay,
+                        onCancel = onCancel,
+                        onSave = onSave,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
         }
     }
@@ -409,7 +422,6 @@ class TransactionEditE2ETests {
         Truth.assertThat(captured!!.subscriptionDay).isEqualTo(12)
     }
     
-    // CHECK DATE SELECTOR HANDLER
     @Test
     fun when_edit_and_change_date_and_save_then_on_save_has_new_date() {
         val original = LocalDateTime.now().minusDays(2)
@@ -540,7 +552,6 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        // "5" -> tap "0" on the numpad -> "50"
         composeTestRule.onNodeWithText("0").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(300)
@@ -566,7 +577,6 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        // Backspace "5" -> "0"; the primary action button now morphs into the delete button.
         composeTestRule.onAllNodesWithContentDescription("Editor action").onFirst().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(400)
@@ -637,7 +647,6 @@ class TransactionEditE2ETests {
 
         tapRecurrentToggle()
 
-        // Flip the recurrence switch off inside the configuration sheet.
         composeTestRule
             .onNode(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
             .performClick()

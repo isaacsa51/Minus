@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 
 data class BottomSheetScrollState(
-	val topPadding: Dp,
+    val topPadding: Dp,
 )
 
 val LocalBottomSheetScrollState = compositionLocalOf { BottomSheetScrollState(0.dp) }
@@ -43,60 +43,60 @@ val LocalBottomSheetScrollState = compositionLocalOf { BottomSheetScrollState(0.
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomSheetWrapper(
-	name: String,
-	cancelable: Boolean = true,
-	state: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-	content: @Composable (state: ModalBottomSheetState) -> Unit
+    name: String,
+    cancelable: Boolean = true,
+    state: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
+    content: @Composable (state: ModalBottomSheetState) -> Unit
 ) {
-	val coroutineScope = rememberCoroutineScope()
-	val localDensity = LocalDensity.current
-	val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
-	val statusBarFillProgress = if (statusBarHeight == 0.dp) {
-		0F
-	} else {
-		with(localDensity) {
-			0.toDp()
-		} / statusBarHeight
-	}.coerceIn(0f, 1f)
+    val coroutineScope = rememberCoroutineScope()
+    val localDensity = LocalDensity.current
+    val statusBarHeight = LocalWindowInsets.current.calculateTopPadding()
+    val statusBarFillProgress = if (statusBarHeight == 0.dp) {
+        0F
+    } else {
+        with(localDensity) {
+            0.toDp()
+        } / statusBarHeight
+    }.coerceIn(0f, 1f)
 
-	val focusManager = LocalFocusManager.current
+    val focusManager = LocalFocusManager.current
 
-	LaunchedEffect(Unit) {
-		focusManager.clearFocus()
-	}
+    LaunchedEffect(Unit) {
+        focusManager.clearFocus()
+    }
 
-	var predictiveBackProgress by remember {
-		mutableFloatStateOf(0f)
-	}
+    var predictiveBackProgress by remember {
+        mutableFloatStateOf(0f)
+    }
 
-	ModalBottomSheetLayout(
-		sheetBackgroundColor = MaterialTheme.colorScheme.surface,
-		sheetState = state,
-		sheetShape = MaterialTheme.shapes.extraLarge.copy(
-			bottomStart = CornerSize(0.dp),
-			bottomEnd = CornerSize(0.dp),
-			topStart = CornerSize(28.dp * (1F - statusBarFillProgress)),
-			topEnd = CornerSize(28.dp * (1F - statusBarFillProgress)),
-		),
-		sheetContent = {
-			Box {
-				CompositionLocalProvider(
-					LocalBottomSheetScrollState provides BottomSheetScrollState(
-						topPadding = statusBarHeight * statusBarFillProgress,
-					)
-				) {
-					content(state)
-				}
-			}
+    ModalBottomSheetLayout(
+        sheetBackgroundColor = MaterialTheme.colorScheme.surface,
+        sheetState = state,
+        sheetShape = MaterialTheme.shapes.extraLarge.copy(
+            bottomStart = CornerSize(0.dp),
+            bottomEnd = CornerSize(0.dp),
+            topStart = CornerSize(28.dp * (1F - statusBarFillProgress)),
+            topEnd = CornerSize(28.dp * (1F - statusBarFillProgress)),
+        ),
+        sheetContent = {
+            Box {
+                CompositionLocalProvider(
+                    LocalBottomSheetScrollState provides BottomSheetScrollState(
+                        topPadding = statusBarHeight * statusBarFillProgress,
+                    )
+                ) {
+                    content(state)
+                }
+            }
 
-			if (cancelable) {
-				Box(
-					Modifier
+            if (cancelable) {
+                Box(
+                    Modifier
 						.padding(8.dp)
 						.fillMaxWidth()
-				) {
-					Box(
-						Modifier
+                ) {
+                    Box(
+                        Modifier
 							.height(4.dp)
 							.width(30.dp)
 							.background(
@@ -104,22 +104,22 @@ fun BottomSheetWrapper(
 								shape = CircleShape
 							)
 							.align(Alignment.Center)
-					)
-				}
-			}
-		}) {}
+                    )
+                }
+            }
+        }) {}
 
-	PredictiveBackHandler(state.isVisible) { progress ->
-		try {
-			progress.collect { backEvent ->
-				predictiveBackProgress = backEvent.progress
-			}
+    PredictiveBackHandler(state.isVisible) { progress ->
+        try {
+            progress.collect { backEvent ->
+                predictiveBackProgress = backEvent.progress
+            }
 
-			coroutineScope.launch {
-				// TODO: Close sheet correctly
-			}
-		} catch (e: CancellationException) {
-			predictiveBackProgress = 0f
-		}
-	}
+            coroutineScope.launch {
+                // TODO: Close sheet correctly
+            }
+        } catch (e: CancellationException) {
+            predictiveBackProgress = 0f
+        }
+    }
 }

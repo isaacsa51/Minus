@@ -6,14 +6,14 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,12 +29,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.CalendarToday
@@ -50,16 +48,24 @@ import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,7 +74,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -77,18 +83,20 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
@@ -97,17 +105,20 @@ import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.SupportedCurrencyData
-import com.serranoie.app.minus.presentation.ui.editor.sheets.split.allocationFor
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.CalculatedSplitCard
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaRequest
+import com.serranoie.app.minus.presentation.ui.editor.sheets.split.allocationFor
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.availablePeriodsFor
 import com.serranoie.app.minus.presentation.ui.onboarding.FinishDateSelector
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.TotalBudgetCard
+import com.serranoie.app.minus.presentation.ui.theme.displaySmallCondensed
+import com.serranoie.app.minus.presentation.ui.theme.component.ButtonRow
+import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.SpendBudgetCard
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.TotalBudgetCard
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaRequest
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DaysLeftCard
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
@@ -125,7 +136,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
-import androidx.compose.ui.platform.LocalLocale
 
 const val BUDGET_PERIOD_SHEET_TAG = "BudgetPeriodSheet"
 const val BUDGET_PERIOD_EDIT_BUTTON_TAG = "BudgetPeriodSheet.EditButton"
@@ -207,6 +217,9 @@ fun BudgetPeriodSheet(
         }
     }
 
+    val stepSlideSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
+    val stepFadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
+
     AnimatedContent(
         modifier = Modifier.testTag(BUDGET_PERIOD_SHEET_TAG),
         targetState = isEditMode,
@@ -215,25 +228,25 @@ fun BudgetPeriodSheet(
                 (
                     slideInHorizontally(
                         initialOffsetX = { it / 3 },
-                        animationSpec = tween(300),
-                    ) + fadeIn(tween(250, delayMillis = 50))
+                        animationSpec = stepSlideSpec,
+                    ) + fadeIn(stepFadeSpec)
                 ).togetherWith(
                     slideOutHorizontally(
                         targetOffsetX = { -it / 3 },
-                        animationSpec = tween(300),
-                    ) + fadeOut(tween(200)),
+                        animationSpec = stepSlideSpec,
+                    ) + fadeOut(stepFadeSpec),
                 )
             } else {
                 (
                     slideInHorizontally(
                         initialOffsetX = { -it / 3 },
-                        animationSpec = tween(300),
-                    ) + fadeIn(tween(250, delayMillis = 50))
+                        animationSpec = stepSlideSpec,
+                    ) + fadeIn(stepFadeSpec)
                 ).togetherWith(
                     slideOutHorizontally(
                         targetOffsetX = { it / 3 },
-                        animationSpec = tween(300),
-                    ) + fadeOut(tween(200)),
+                        animationSpec = stepSlideSpec,
+                    ) + fadeOut(stepFadeSpec),
                 )
             }
         },
@@ -299,6 +312,7 @@ fun BudgetPeriodSheet(
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onFinishEarly?.invoke()
                     },
+                    shapes = ButtonDefaults.shapes(),
                 ) {
                     Text(
                         stringResource(R.string.finalize_action),
@@ -308,7 +322,10 @@ fun BudgetPeriodSheet(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showFinishConfirm = false }) {
+                TextButton(
+                    onClick = { showFinishConfirm = false },
+                    shapes = ButtonDefaults.shapes(),
+                ) {
                     Text(
                         stringResource(R.string.cancel),
                         style = MaterialTheme.typography.labelMediumEmphasized,
@@ -359,21 +376,14 @@ private fun ViewBudgetContent(
             Text(
                 text = stringResource(R.string.total_budget),
                 style = MaterialTheme.typography.titleLargeEmphasized,
-                fontWeight = FontWeight.W500,
             )
-            IconButton(
+            TooltipIconButton(
+                title = stringResource(R.string.edit_budget),
+                icon = Icons.Default.Edit,
                 onClick = onEditClick,
-                modifier =
-                    Modifier
-                        .size(40.dp)
-                        .testTag(BUDGET_PERIOD_EDIT_BUTTON_TAG),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit_budget),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-            }
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.testTag(BUDGET_PERIOD_EDIT_BUTTON_TAG),
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -444,7 +454,7 @@ private fun ViewBudgetContent(
                         CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                         ),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = MaterialTheme.shapes.medium,
                 ) {
                     Box(
                         modifier = Modifier.fillMaxWidth(),
@@ -454,7 +464,7 @@ private fun ViewBudgetContent(
                             text = stringResource(R.string.no_ending_date),
                             style = MaterialTheme.typography.bodySmallEmphasized,
                             textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(16.dp),
                         )
                     }
@@ -467,7 +477,6 @@ private fun ViewBudgetContent(
         Text(
             text = stringResource(R.string.budget_split_logic),
             style = MaterialTheme.typography.titleMediumCondensed,
-            fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 12.dp),
         )
 
@@ -475,11 +484,12 @@ private fun ViewBudgetContent(
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .selectableGroup()
                     .testTag(BUDGET_PERIOD_SPLIT_TOGGLE_ROW_TAG),
                 horizontalArrangement = Arrangement.spacedBy(
                     ButtonGroupDefaults.ConnectedSpaceBetween
                 ),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 available.forEachIndexed { index, p ->
                     val isSelected = p == periodCache
@@ -496,12 +506,13 @@ private fun ViewBudgetContent(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .semantics { role = Role.RadioButton }
+                            .semantics {
+                                role = Role.RadioButton
+                                selected = isSelected
+                            }
                             .testTag(budgetPeriodToggleTag(p)),
                         colors = ToggleButtonDefaults.toggleButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
-                                alpha = 0.5f
-                            ),
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
                             checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -509,9 +520,13 @@ private fun ViewBudgetContent(
                     ) {
                         Text(
                             text = periodLabel(p),
-                            style = MaterialTheme.typography.labelMediumCondensed,
-                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                            style = if (isSelected) {
+                                MaterialTheme.typography.labelMediumEmphasized
+                            } else {
+                                MaterialTheme.typography.labelMediumCondensed
+                            },
                             maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
@@ -568,6 +583,7 @@ private fun ViewBudgetContent(
         if (showFinishEarly) {
             OutlinedButton(
                 onClick = onFinishEarlyClick,
+                shapes = ButtonDefaults.shapes(),
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -576,13 +592,12 @@ private fun ViewBudgetContent(
                     ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.error,
                     ),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.25F)),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             ) {
                 Text(
                     text = stringResource(R.string.finalize_period),
                     style = MaterialTheme.typography.labelMediumEmphasized,
                     textAlign = TextAlign.Center,
-                    lineHeight = TextUnit(0.925f, TextUnitType.Em),
                 )
             }
         }
@@ -616,7 +631,10 @@ private fun RolloverPreviewBanner(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.16f)),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
@@ -631,7 +649,6 @@ private fun RolloverPreviewBanner(
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodySmallCondensed,
-                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }
@@ -653,6 +670,8 @@ fun EditBudgetContent(
         remember {
             DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())
         }
+
+    val budgetFieldLabel = stringResource(R.string.total_budget)
 
     val pendingNotificationText =
         resources.getQuantityString(
@@ -764,16 +783,19 @@ fun EditBudgetContent(
 
     BackHandler(enabled = showBehaviour) { showBehaviour = false }
 
+    val behaviourSlideSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
+    val behaviourFadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
+
     AnimatedContent(
         targetState = showBehaviour,
         transitionSpec = {
             val direction = if (targetState) 1 else -1
             (
-                slideInHorizontally(animationSpec = tween(300)) { direction * it / 3 } +
-                    fadeIn(tween(250, delayMillis = 50))
+                slideInHorizontally(animationSpec = behaviourSlideSpec) { direction * it / 3 } +
+                    fadeIn(behaviourFadeSpec)
             ).togetherWith(
-                slideOutHorizontally(animationSpec = tween(300)) { -direction * it / 3 } +
-                    fadeOut(tween(200)),
+                slideOutHorizontally(animationSpec = behaviourSlideSpec) { -direction * it / 3 } +
+                    fadeOut(behaviourFadeSpec),
             )
         },
         label = "editBudgetStep",
@@ -799,7 +821,6 @@ fun EditBudgetContent(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleLargeEmphasized,
-                    fontWeight = FontWeight.W500,
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -823,9 +844,7 @@ fun EditBudgetContent(
                         visualTransformation = CurrencyAmountInputVisualTransformation(
                             fractionDigits = currencyFractionDigits,
                         ),
-                        textStyle = MaterialTheme.typography.titleMediumCondensed.copy(
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.Bold,
+                        textStyle = MaterialTheme.typography.displaySmallCondensed.copy(
                             color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center,
                         ),
@@ -843,10 +862,8 @@ fun EditBudgetContent(
                                         Text(
                                             text = currencySymbol + "",
                                             style =
-                                                MaterialTheme.typography.titleMediumCondensed.copy(
-                                                    fontSize = 48.sp,
-                                                ),
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                                MaterialTheme.typography.displaySmallCondensed,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
                                     innerTextField()
@@ -856,6 +873,7 @@ fun EditBudgetContent(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
+                                .semantics { contentDescription = budgetFieldLabel }
                                 .testTag(BUDGET_PERIOD_BUDGET_INPUT_TAG),
                     )
                 }
@@ -865,7 +883,8 @@ fun EditBudgetContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
                     ) {
-                        AssistChip(
+                        FilterChip(
+                            selected = showPreviousValues,
                             onClick = { showPreviousValues = !showPreviousValues },
                             modifier = Modifier.testTag(BUDGET_PERIOD_PREVIOUS_VALUES_TAG),
                             label = {
@@ -881,25 +900,25 @@ fun EditBudgetContent(
                                     modifier = Modifier.size(18.dp),
                                 )
                             },
-                            colors =
-                                AssistChipDefaults.assistChipColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                                    labelColor = MaterialTheme.colorScheme.primary,
-                                    leadingIconContentColor = MaterialTheme.colorScheme.primary,
-                                ),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)),
                         )
                     }
 
-                    if (showPreviousValues) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                    AnimatedVisibility(
+                        visible = showPreviousValues,
+                        enter = fadeIn(animationSpec = MaterialTheme.motionScheme.fastEffectsSpec()) +
+                            expandVertically(animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()),
+                        exit = fadeOut(animationSpec = MaterialTheme.motionScheme.fastEffectsSpec()) +
+                            shrinkVertically(animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()),
+                    ) {
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
                             colors =
                                 CardDefaults.cardColors(
                                     containerColor = colorButton,
                                 ),
-                            shape = RoundedCornerShape(16.dp),
+                            shape = MaterialTheme.shapes.large,
                         ) {
                             Row(
                                 modifier =
@@ -921,7 +940,6 @@ fun EditBudgetContent(
                                                 .format(currentBudget)
                                         },
                                         style = MaterialTheme.typography.titleMediumCondensed,
-                                        fontWeight = FontWeight.Bold,
                                     )
                                 }
 
@@ -937,7 +955,6 @@ fun EditBudgetContent(
                                     Text(
                                         text = resources.getQuantityString(R.plurals.days, previousPeriodDays, previousPeriodDays),
                                         style = MaterialTheme.typography.titleMediumCondensed,
-                                        fontWeight = FontWeight.Bold,
                                     )
                                 }
 
@@ -945,7 +962,9 @@ fun EditBudgetContent(
                                     modifier = Modifier.weight(0.5f),
                                     contentAlignment = Alignment.CenterEnd,
                                 ) {
-                                    IconButton(
+                                    TooltipIconButton(
+                                        title = stringResource(R.string.apply),
+                                        icon = Icons.Default.Check,
                                         onClick = {
                                             budgetText =
                                                 if (currentBudget > BigDecimal.ZERO) {
@@ -968,13 +987,7 @@ fun EditBudgetContent(
                                             strategyCache = currentStrategy
                                             showPreviousValues = false
                                         },
-                                        modifier = Modifier.size(40.dp),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Check,
-                                            contentDescription = stringResource(R.string.apply),
-                                        )
-                                    }
+                                    )
                                 }
                             }
                         }
@@ -983,11 +996,18 @@ fun EditBudgetContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                BudgetDetailCard(
+                val showPreviousPeriodChip = previousPeriodDays > 0 && endCache == null
+
+                ButtonRow(
                     modifier = Modifier.testTag(BUDGET_PERIOD_DATE_ROW_TAG),
+                    position = if (showPreviousPeriodChip) {
+                        PaddedListItemPosition.Single
+                    } else {
+                        PaddedListItemPosition.First
+                    },
                     icon = Icons.Outlined.CalendarToday,
                     label = stringResource(R.string.budget_duration_label),
-                    value =
+                    description =
                         if (endCache != null) {
                             "${startCache.format(dateFormatter)} — ${endCache?.format(dateFormatter)}"
                         } else {
@@ -1000,7 +1020,7 @@ fun EditBudgetContent(
                     }
                 }
 
-                if (previousPeriodDays > 0 && endCache == null) {
+                if (showPreviousPeriodChip) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Row(modifier = Modifier.fillMaxWidth()) {
                         AssistChip(
@@ -1032,20 +1052,25 @@ fun EditBudgetContent(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(if (showPreviousPeriodChip) 12.dp else 3.dp))
 
                 val currencyDisplay = SupportedCurrency.findByCode(currencyCache)
-                BudgetDetailCard(
+                ButtonRow(
                     modifier = Modifier.testTag(BUDGET_PERIOD_CURRENCY_ROW_TAG),
+                    position = if (showPreviousPeriodChip) {
+                        PaddedListItemPosition.Single
+                    } else {
+                        PaddedListItemPosition.Last
+                    },
                     icon = Icons.Outlined.MonetizationOn,
                     label = stringResource(R.string.budget_base_currency_label),
-                    value = currencyDisplay?.displayName() ?: currencyCache,
+                    description = currencyDisplay?.displayName() ?: currencyCache,
                     onClick = { showCurrencyPicker = true },
                 ) {
                     Text(
                         text = currencyDisplay?.symbol?.takeIf { it != currencyCache }?.let { "$currencyCache ($it)" }
                             ?: currencyCache,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMediumEmphasized,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -1066,7 +1091,6 @@ fun EditBudgetContent(
                         Text(
                             text = pendingNotificationText,
                             style = MaterialTheme.typography.bodyMediumCondensed,
-                            fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.outline,
                         )
                     }
@@ -1081,14 +1105,14 @@ fun EditBudgetContent(
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = validationMessage,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -1100,10 +1124,11 @@ fun EditBudgetContent(
                         view.weakHapticFeedback()
                         showBehaviour = true
                     },
+                    shapes = ButtonDefaults.shapes(),
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 56.dp)
+                            .heightIn(min = ButtonDefaults.MediumContainerHeight)
                             .testTag(BUDGET_PERIOD_NEXT_BUTTON_TAG),
                     enabled = canApply,
                 ) {
@@ -1119,15 +1144,15 @@ fun EditBudgetContent(
     AnimatedVisibility(
         visible = showDateSelector,
         enter =
-            fadeIn(animationSpec = tween(220)) +
+            fadeIn(animationSpec = MaterialTheme.motionScheme.fastEffectsSpec()) +
                 slideInHorizontally(
-                    animationSpec = tween(300),
+                    animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
                     initialOffsetX = { fullWidth -> fullWidth },
                 ),
         exit =
-            fadeOut(animationSpec = tween(160)) +
+            fadeOut(animationSpec = MaterialTheme.motionScheme.fastEffectsSpec()) +
                 slideOutHorizontally(
-                    animationSpec = tween(240),
+                    animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
                     targetOffsetX = { fullWidth -> fullWidth },
                 ),
     ) {
@@ -1157,86 +1182,57 @@ fun EditBudgetContent(
 }
 
 @Composable
+private fun TooltipIconButton(
+    title: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current,
+) {
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+            TooltipAnchorPosition.Above,
+        ),
+        state = rememberTooltipState(),
+        tooltip = {
+            PlainTooltip(
+                modifier = Modifier.semantics {
+                    liveRegion = LiveRegionMode.Assertive
+                    paneTitle = title
+                },
+            ) {
+                Text(title)
+            }
+        },
+    ) {
+        IconButton(
+            onClick = onClick,
+            shapes = IconButtonDefaults.shapes(),
+            modifier = modifier,
+        ) {
+            Icon(imageVector = icon, contentDescription = title, tint = tint)
+        }
+    }
+}
+
+@Composable
 private fun AccentBadge(text: String, modifier: Modifier = Modifier) {
     Surface(
         shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         modifier = modifier,
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyMediumEmphasized,
             maxLines = 1,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
         )
     }
 }
 
-@Composable
-private fun BudgetDetailCard(
-    icon: ImageVector,
-    label: String,
-    value: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    trailing: @Composable () -> Unit = {},
-) {
-    Card(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = colorButton,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-        ),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.surface),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(22.dp),
-                )
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = label.uppercase(LocalLocale.current.platformLocale),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            trailing()
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
+
 
 @Composable
 private fun periodLabel(period: BudgetPeriod): String = stringResource(

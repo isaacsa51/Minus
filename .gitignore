@@ -42,5 +42,7 @@ app/src/main/assets/adi-registration.properties
 /keystore.properties
 
 specs/
+.claude/
+.claude/skills/
 .artifacts/
 /fastlane/minus-app-504107-53ece865faf4.json

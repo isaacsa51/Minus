@@ -22,7 +22,6 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
@@ -609,7 +608,7 @@ class MainScreenE2ETest {
 
         composeTestRule.onNodeWithTag(BUDGET_PERIOD_NEXT_BUTTON_TAG).performClick()
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performScrollTo().performClick()
+        composeTestRule.onNodeWithTag(BUDGET_PERIOD_APPLY_BUTTON_TAG).performClick()
         composeTestRule.waitForIdle()
 
         Truth.assertThat(intents).contains("SaveBudget")

@@ -33,7 +33,7 @@ import java.time.ZoneId
  * into the settings of the new period, and [BudgetStateCalculator] is then asked what day one of
  * that new period looks like — which is the part the user actually sees.
  *
- * Fixture: a 30-day period of 1000 that ended yesterday with 700 spent, so 300 is left over.
+ * Scenario: a 30-day period of 1000 that ended yesterday with 700 spent, so 300 is left over.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class PeriodEndSurplusHandoffTest {
@@ -163,7 +163,6 @@ class PeriodEndSurplusHandoffTest {
         checker.handleEndingPeriod()
     }
 
-    /** Creates the next period the way the budget sheet does, and returns what was persisted. */
     private suspend fun startNextPeriod(
         totalBudget: BigDecimal = BigDecimal("1200.00"),
         splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
@@ -183,7 +182,6 @@ class PeriodEndSurplusHandoffTest {
         return savedSettings.single()
     }
 
-    /** What the pill shows on the first day of [settings]. */
     private fun dayOneOf(settings: BudgetSettings): BudgetState = calculator.calculateBudgetState(
         settings = settings,
         transactions = emptyList(),
@@ -195,10 +193,6 @@ class PeriodEndSurplusHandoffTest {
         transactions = emptyList(),
         currentDate = settings.startDate.plusDays(1),
     )
-
-    // ---------------------------------------------------------------------------------------
-    // Ask me: the dialog decides
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `a period that ends with money left asks the user, and queues nothing on its own`() = runTest {
@@ -293,10 +287,6 @@ class PeriodEndSurplusHandoffTest {
         assertThat(pendingRollover.first).isEqualTo(BigDecimal.ZERO)
     }
 
-    // ---------------------------------------------------------------------------------------
-    // The automatic strategies: no question asked
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun `with spread it chosen up front the surplus is queued silently and the user is only shown analytics`() =
         runTest {
@@ -347,10 +337,6 @@ class PeriodEndSurplusHandoffTest {
         assertThat(pendingRollover.first).isEqualTo(BigDecimal.ZERO)
     }
 
-    // ---------------------------------------------------------------------------------------
-    // Nothing to hand over
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun `a period that ended over budget hands nothing over and routes the user to analytics`() = runTest {
         endLastPeriod(RemainingBudgetStrategy.ASK_ALWAYS, spent = BigDecimal("1300.00"))
@@ -383,10 +369,6 @@ class PeriodEndSurplusHandoffTest {
         assertThat(next.totalBudget).isEqualTo(BigDecimal("1200.00"))
         assertThat(dayOneOf(next).isOverBudget).isFalse()
     }
-
-    // ---------------------------------------------------------------------------------------
-    // The surplus number itself
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `the surplus is what the period had left, whatever split mode it ran on`() = runTest {
@@ -438,10 +420,6 @@ class PeriodEndSurplusHandoffTest {
         assertThat(startNextPeriod(totalBudget = BigDecimal("1200.00")).totalBudget)
             .isEqualTo(BigDecimal("1500.00"))
     }
-
-    // ---------------------------------------------------------------------------------------
-    // How the handed-over money behaves under each split mode of the new period
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `a day one lump left unspent is banked by a carry over period`() = runTest {
@@ -497,10 +475,6 @@ class PeriodEndSurplusHandoffTest {
         assertThat(dayOneOf(next).dailyBudget).isEqualTo(BigDecimal("50.00"))
         assertThat(dayOneOf(next).totalBudget).isEqualTo(BigDecimal("1500.00"))
     }
-
-    // ---------------------------------------------------------------------------------------
-    // Finishing a period early
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `finishing early with ask me chosen asks about the balance left on the day it was stopped`() = runTest {

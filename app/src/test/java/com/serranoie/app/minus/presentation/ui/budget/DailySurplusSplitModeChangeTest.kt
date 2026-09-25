@@ -19,7 +19,7 @@ import java.time.LocalDate
  * stays, only the reading of "what is left today" changes. These tests pin that reading for every
  * transition the behaviour sheet allows.
  *
- * Fixture: a 10-day period of 1000 (100/day), spending 60 on day 1 and 40 on day 2, looked at on
+ * Scenario: a 10-day period of 1000 (100/day), spending 60 on day 1 and 40 on day 2, looked at on
  * day 4. 200 of allowance went unused, which is exactly the number each mode treats differently.
  */
 class DailySurplusSplitModeChangeTest {
@@ -73,10 +73,6 @@ class DailySurplusSplitModeChangeTest {
         leftoverChoices = choices,
     )
 
-    // ---------------------------------------------------------------------------------------
-    // Where the unused 200 goes, per mode
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun `static ignores the unused allowance of earlier days - today is always a fresh daily budget`() {
         val static = stateOn(currentDay = 4, splitMode = BudgetSplitMode.STATIC)
@@ -113,10 +109,6 @@ class DailySurplusSplitModeChangeTest {
         assertThat(askMe.pendingLeftover).isEqualTo(BigDecimal("200.00"))
     }
 
-    // ---------------------------------------------------------------------------------------
-    // Switching mid-period: the transitions themselves
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun `switching static to carry over mid-period retroactively releases every unused day`() {
         val before = stateOn(currentDay = 4, splitMode = BudgetSplitMode.STATIC)
@@ -152,7 +144,6 @@ class DailySurplusSplitModeChangeTest {
 
         assertThat(carryOver.remainingToday).isEqualTo(BigDecimal("300.00"))
         assertThat(dynamic.remainingToday).isEqualTo(BigDecimal("128.57"))
-        // the same 900 either way, just handed out differently
         assertThat(carryOver.totalBudget.subtract(carryOver.totalSpentInPeriod))
             .isEqualTo(dynamic.totalBudget.subtract(dynamic.totalSpentInPeriod))
     }
@@ -248,10 +239,6 @@ class DailySurplusSplitModeChangeTest {
         assertThat(afterSwitchBack.remainingToday).isEqualTo(beforeSwitch.remainingToday)
     }
 
-    // ---------------------------------------------------------------------------------------
-    // What a mode switch must never touch
-    // ---------------------------------------------------------------------------------------
-
     @Test
     fun `no mode switch changes the money actually spent, the period total or the days left`() {
         val readings = BudgetSplitMode.entries.map { stateOn(currentDay = 4, splitMode = it) }
@@ -292,10 +279,6 @@ class DailySurplusSplitModeChangeTest {
         // and only today's 25 comes off it
         assertThat(remainingWith(BudgetSplitMode.DYNAMIC, "25")).isEqualTo(BigDecimal("103.57"))
     }
-
-    // ---------------------------------------------------------------------------------------
-    // Overspending before the switch
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `yesterday's overspend follows the user in carry over and ask me, but not in static`() {
@@ -344,10 +327,6 @@ class DailySurplusSplitModeChangeTest {
         assertThat(stateOn(2, BudgetSplitMode.STATIC, hugeOverspend).remainingToday)
             .isEqualTo(BigDecimal("100.00"))
     }
-
-    // ---------------------------------------------------------------------------------------
-    // A mode switch on top of a rollover carried in from the previous period
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `a first-day rollover survives every mode switch in the period total`() {
@@ -406,10 +385,6 @@ class DailySurplusSplitModeChangeTest {
         assertThat(carryBefore.remainingToday).isEqualTo(BigDecimal("300.00"))
         assertThat(carryOnDay.remainingToday).isEqualTo(BigDecimal("600.00"))
     }
-
-    // ---------------------------------------------------------------------------------------
-    // Edges of the period
-    // ---------------------------------------------------------------------------------------
 
     @Test
     fun `on day one every mode agrees, there is no surplus to argue about yet`() {
