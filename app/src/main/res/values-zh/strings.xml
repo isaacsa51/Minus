@@ -590,6 +590,8 @@
     <string name="split_mode_carry_over_desc">每天没花完的钱会加到第二天的预算里，并不断累积。</string>
     <string name="split_mode_ask_me">询问我</string>
     <string name="split_mode_ask_me_desc">每天由你决定昨天没用完的预算：平摊到剩余天数，或结转到今天。</string>
+    <string name="leftover_choice_spread_desc">将所有未使用的剩余预算平摊到剩下的每一天。</string>
+    <string name="leftover_choice_carry_desc">只把未使用的预算结转到明天。</string>
     <string name="leftover_choice_spread_outcome">剩余天数每日 %1$s</string>
     <string name="leftover_choice_carry_outcome">明天 %1$s</string>
     <string name="leftover_choice_outcome">今天剩余 · 之后 %1$s/天</string>

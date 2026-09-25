@@ -586,6 +586,8 @@
     <string name="split_mode_carry_over_desc">जो रकम आप रोज़ खर्च नहीं करते, वह अगले दिन के बजट में जुड़ जाती है और जमा होती रहती है।</string>
     <string name="split_mode_ask_me">मुझसे पूछें</string>
     <string name="split_mode_ask_me_desc">हर दिन आप तय करते हैं कि कल के बिना इस्तेमाल हुए बजट का क्या हो: बाकी दिनों में बांटें या आज में जोड़ें।</string>
+    <string name="leftover_choice_spread_desc">बचे हुए पूरे बजट को आगे के सभी दिनों में बांट दें।</string>
+    <string name="leftover_choice_carry_desc">बचा हुआ बजट सिर्फ़ कल के लिए ले जाएं।</string>
     <string name="leftover_choice_spread_outcome">आगामी दिनों के लिए %1$s</string>
     <string name="leftover_choice_carry_outcome">कल के लिए %1$s</string>
     <string name="leftover_choice_outcome">आज बचे · फिर %1$s/दिन</string>

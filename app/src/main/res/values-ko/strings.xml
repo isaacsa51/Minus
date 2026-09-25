@@ -588,6 +588,8 @@
     <string name="split_mode_carry_over_desc">매일 쓰지 않은 금액은 다음 날 예산에 더해지고 계속 쌓입니다.</string>
     <string name="split_mode_ask_me">물어보기</string>
     <string name="split_mode_ask_me_desc">매일 어제 쓰지 않은 예산을 남은 날에 분배할지, 오늘로 이월할지 직접 정합니다.</string>
+    <string name="leftover_choice_spread_desc">사용하지 않은 남은 예산을 남은 모든 날에 나눠 배분합니다.</string>
+    <string name="leftover_choice_carry_desc">사용하지 않은 예산을 내일에만 이월합니다.</string>
     <string name="leftover_choice_spread_outcome">남은 일수 동안 1일당 %1$s</string>
     <string name="leftover_choice_carry_outcome">내일 %1$s</string>
     <string name="leftover_choice_outcome">오늘 남은 금액 · 이후 %1$s/일</string>

@@ -587,6 +587,8 @@
     <string name="split_mode_carry_over_desc">その日に使わなかった分は翌日の予算に加算され、どんどん積み上がります。</string>
     <string name="split_mode_ask_me">確認する</string>
     <string name="split_mode_ask_me_desc">毎日、昨日使わなかった予算を残りの日に分散するか、今日に繰り越すかを選びます。</string>
+    <string name="leftover_choice_spread_desc">未使用の残りの予算を残りのすべての日に配分します。</string>
+    <string name="leftover_choice_carry_desc">未使用の予算を明日だけに繰り越します。</string>
     <string name="leftover_choice_spread_outcome">残りの日は一日あたり %1$s</string>
     <string name="leftover_choice_carry_outcome">明日は %1$s</string>
     <string name="leftover_choice_outcome">今日の残り · 以降 %1$s/日</string>
