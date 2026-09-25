@@ -221,6 +221,8 @@
   <string name="budget_formula_hold_hint">Показать, как рассчитана сумма</string>
   <string name="budget_formula_mode_static">Статичное распределение</string>
   <string name="budget_formula_mode_dynamic">Динамичное распределение</string>
+  <string name="budget_formula_mode_carry_over">Распределение с переносом</string>
+  <string name="budget_formula_mode_ask_me">Распределение по выбору</string>
   <string name="budget_formula_caption_surplus_split">Остаток прошлого периода добавляется к бюджету</string>
   <string name="budget_formula_caption_surplus_first_day">Остаток прошлого периода остаётся на первый день</string>
   <string name="budget_formula_caption_adjustments">Доходы и вычеты за этот период</string>
@@ -230,6 +232,8 @@
   <string name="budget_formula_caption_spread_over_left">Распределено на остаток периода</string>
   <string name="budget_formula_caption_left">Минус то, что вы потратили</string>
   <string name="budget_formula_caption_reserved">Отложено на платежи, которые спишутся позже в этом периоде</string>
+  <string name="budget_formula_caption_carried">Перенесено с предыдущих дней</string>
+  <string name="budget_formula_caption_spread_leftover">Остатки, которые вы решили распределить</string>
   <string name="budget_formula_card_tap_hint">Нажмите, чтобы увидеть полный расчёт</string>
   <string name="budget_formula_tip_hold_pill">Совет: удерживайте индикатор бюджета на главном экране, чтобы открыть этот расчёт в любой момент</string>
   <string name="budget_formula_tip_tap_card">Совет: также можно нажать на рассчитанную сумму в панели периода</string>
@@ -591,6 +595,17 @@
   <string name="use_previous_period_days">Использовать %d дн.</string>
   <string name="remaining_budget_label">Остаток</string>
   <string name="currency_label">Валюта</string>
+  <string name="budget_duration_label">Длительность</string>
+  <string name="budget_base_currency_label">Основная валюта</string>
+  <string name="budget_behaviour_title">Поведение бюджета</string>
+  <string name="budget_behaviour_subtitle">Выберите, что происходит с остатком денег и как рассчитывается ваша дневная сумма.</string>
+  <string name="budget_behaviour_surplus_title">Остаток в конце периода</string>
+  <string name="budget_behaviour_surplus_ask">Спросить</string>
+  <string name="budget_behaviour_surplus_spread">Распределить всё</string>
+  <string name="budget_behaviour_surplus_first_day">Всё в день 1</string>
+  <string name="budget_behaviour_surplus_preview_ask">В конце периода вы выберете, что делать с остатком.</string>
+  <string name="budget_behaviour_surplus_preview_spread">Остаток делится поровну между всеми днями следующего периода.</string>
+  <string name="budget_behaviour_surplus_preview_first_day">Весь остаток добавляется к первому дню следующего периода.</string>
   <string name="select_currency">Выберите валюту</string>
   <string name="search_currency">Поиск валюты…</string>
   <string name="clear">Очистить</string>
@@ -611,8 +626,18 @@
   <string name="split_mode_dialog_description" formatted="false">Выберите, как считается сумма на период.</string>
   <string name="split_mode_static">Фиксированный</string>
   <string name="split_mode_static_desc">Весь бюджет делится поровну по дням — независимо от того, сколько уже потрачено.</string>
-  <string name="split_mode_dynamic">Динамический (рекомендуется)</string>
+  <string name="split_mode_dynamic">Распределять по всем дням</string>
   <string name="split_mode_dynamic_desc">Пересчитывается каждый день по мере трат. Оставшаяся сумма распределяется по ещё не прошедшим дням периода.</string>
+  <string name="split_mode_carry_over">Перенос</string>
+  <string name="split_mode_carry_over_desc">Всё, что вы не потратили за день, добавляется к бюджету следующего дня и накапливается.</string>
+  <string name="split_mode_ask_me">Спрашивать</string>
+  <string name="split_mode_ask_me_desc">Каждый день вы решаете, что делать с неизрасходованным бюджетом за вчера: распределить его по оставшимся дням или перенести на сегодня.</string>
+  <string name="leftover_choice_spread_desc">Распределите весь неиспользованный остаток бюджета на все оставшиеся дни.</string>
+  <string name="leftover_choice_carry_desc">Перенесите неиспользованный бюджет только на завтра.</string>
+  <string name="leftover_choice_spread_outcome">%1$s в последующие дни</string>
+  <string name="leftover_choice_carry_outcome">%1$s на завтра</string>
+  <string name="leftover_choice_outcome">осталось на сегодня · затем %1$s/день</string>
+  <string name="leftover_choice_outcome_last_day">осталось на сегодня</string>
   <!-- Transaction Detail -->
   <string name="without_date">Без даты</string>
   <string name="no_name">Без названия</string>
