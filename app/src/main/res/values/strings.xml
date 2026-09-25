@@ -703,7 +703,7 @@
     <string name="split_mode_ask_me">Ask me</string>
     <string name="split_mode_ask_me_desc">Every day, you decide what happens to yesterday\'s unused budget: spread it over the remaining days or carry it over to today.</string>
     <string name="leftover_choice_spread_desc">Allocate all unused remaining budget to all remaining days.</string>
-    <string name="leftover_choice_carry_desc">Move unused budget only to tomorrow.</string>
+    <string name="leftover_choice_carry_desc">Add all unused budget to today only.</string>
     <string name="leftover_choice_spread_outcome">%1$s for upcoming days</string>
     <string name="leftover_choice_carry_outcome">%1$s for tomorrow</string>
     <string name="leftover_choice_outcome">left today · then %1$s/day</string>
