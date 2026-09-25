@@ -589,6 +589,8 @@
     <string name="split_mode_carry_over_desc">O que você não gasta por dia é somado ao orçamento do dia seguinte e vai se acumulando.</string>
     <string name="split_mode_ask_me">Perguntar</string>
     <string name="split_mode_ask_me_desc">Todo dia você decide o que fazer com o orçamento não usado de ontem: distribuir pelos dias restantes ou passar para hoje.</string>
+    <string name="leftover_choice_spread_desc">Distribua todo o orçamento restante não utilizado pelos dias que faltam.</string>
+    <string name="leftover_choice_carry_desc">Mova o orçamento não utilizado apenas para amanhã.</string>
     <string name="leftover_choice_spread_outcome">%1$s para os próximos dias</string>
     <string name="leftover_choice_carry_outcome">%1$s para amanhã</string>
     <string name="leftover_choice_outcome">disponível hoje · depois %1$s/dia</string>
