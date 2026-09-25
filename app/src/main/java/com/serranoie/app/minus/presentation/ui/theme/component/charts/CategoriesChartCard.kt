@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,8 +60,8 @@ import java.time.LocalDateTime
 data class CategoryUsage(
     val name: String,
     val amount: BigDecimal,
-    var color: HarmonizedColorPalette? = null,
-    var isSpecial: Boolean = false,
+    val color: HarmonizedColorPalette? = null,
+    val isSpecial: Boolean = false,
 )
 
 var baseColors =
@@ -86,7 +87,9 @@ fun CategoriesChartCard(
     spends: List<Transaction>,
     modifier: Modifier = Modifier,
     currency: String = "MXN",
+    selectedCategoryName: String? = null,
     onCategoryClick: ((categoryName: String, categorySpends: List<Transaction>) -> Unit)? = null,
+    onSelectedCategoryChange: ((String?) -> Unit)? = null,
 ) {
     val isNightMode = isNightMode()
     val labelWithoutTag = stringResource(R.string.categories_chart_uncategorized)
@@ -95,7 +98,11 @@ fun CategoriesChartCard(
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
     val maxDisplay = 20
 
-    var selectedCategoryName by remember { mutableStateOf<String?>(null) }
+    var internalSelectedCategoryName by remember(selectedCategoryName) { mutableStateOf(selectedCategoryName) }
+
+    LaunchedEffect(selectedCategoryName) {
+        internalSelectedCategoryName = selectedCategoryName
+    }
 
     val colors =
         remember(isNightMode, primaryColor) {
@@ -152,61 +159,59 @@ fun CategoriesChartCard(
             )
         }
 
-    var offsetColor = 0
-
     val filteredSpends = remember(spends) {
         spends.filter { it.amount > BigDecimal.ZERO }
     }
 
     val tags =
         remember(filteredSpends, labelWithoutTag, labelRest, colors, restColor) {
-            var result =
+            var offsetColor = 0
+            var rawTags =
                 filteredSpends
                     .map { it.copy(comment = it.comment.ifEmpty { labelWithoutTag }) }
                     .groupBy { it.comment.trim() }
                     .map { tag ->
                         CategoryUsage(
-                            tag.key,
-                            tag.value.map { it.amount }.reduce { acc, next -> acc + next },
+                            name = tag.key,
+                            amount = tag.value.map { it.amount }.reduce { acc, next -> acc + next },
                             isSpecial = tag.key == labelWithoutTag,
                         )
-                    }.sortedBy { it.amount }
-                    .reversed()
-                    .toList()
+                    }.sortedByDescending { it.amount }
 
-            if (result.size > maxDisplay) {
-                result.find { it.name == labelWithoutTag }?.let {
-                    result = result.filter { tagUsage -> tagUsage.name != labelWithoutTag }
-                    result = result + it
+            if (rawTags.size > maxDisplay) {
+                rawTags.find { it.name == labelWithoutTag }?.let { uncategorized ->
+                    rawTags = rawTags.filter { it.name != labelWithoutTag } + uncategorized
                 }
             }
 
-            result.subList(0, result.size.coerceAtMost(maxDisplay)).forEachIndexed { index, tagUsage ->
-                tagUsage.color =
-                    if (tagUsage.name == labelWithoutTag) {
-                        offsetColor++
-                        restColor
-                    } else {
-                        val colorIndex = (index - offsetColor).coerceIn(0, colors.lastIndex)
-                        colors[colorIndex]
-                    }
-            }
+            val displayTags = rawTags.take(maxDisplay).mapIndexed { index, tagUsage ->
+                val palette = if (tagUsage.name == labelWithoutTag) {
+                    offsetColor++
+                    restColor
+                } else {
+                    val colorIndex = (index - offsetColor).coerceIn(0, colors.lastIndex)
+                    colors[colorIndex]
+                }
+                tagUsage.copy(color = palette)
+            }.toMutableList()
 
-            if (result.size > maxDisplay) {
-                result = result.slice(0..<maxDisplay) +
+            if (rawTags.size > maxDisplay) {
+                val restAmount = rawTags
+                    .drop(maxDisplay)
+                    .map { it.amount }
+                    .reduce { acc, next -> acc + next }
+
+                displayTags.add(
                     CategoryUsage(
                         name = labelRest,
-                        amount =
-                            result
-                                .slice(maxDisplay until result.size)
-                                .map { it.amount }
-                                .reduce { acc, next -> acc + next },
+                        amount = restAmount,
                         color = restColor,
                         isSpecial = true,
                     )
+                )
             }
 
-            result
+            displayTags
         }
 
     val isEmpty = tags.isEmpty() || (tags.size == 1 && tags.first().name == labelWithoutTag)
@@ -231,12 +236,15 @@ fun CategoriesChartCard(
         } else {
             ChartContent(
                 tags = tags,
-                selectedCategoryName = selectedCategoryName,
+                selectedCategoryName = internalSelectedCategoryName,
                 spends = filteredSpends,
                 labelWithoutTag = labelWithoutTag,
                 currency = currency,
                 onCategoryClick = onCategoryClick,
-                onSelectionChange = { selectedCategoryName = it },
+                onSelectionChange = { newCategory ->
+                    internalSelectedCategoryName = newCategory
+                    onSelectedCategoryChange?.invoke(newCategory)
+                },
             )
         }
     }
@@ -336,8 +344,20 @@ private fun ChartContent(
             items = tags,
             selectedIndex = tags.indexOfFirst { it.name == selectedCategoryName },
             onItemClick = { index ->
-                val tag = tags[index]
-                onSelectionChange(if (selectedCategoryName == tag.name) null else tag.name)
+                if (index in tags.indices) {
+                    val tag = tags[index]
+                    val newSelection = if (selectedCategoryName == tag.name) null else tag.name
+                    onSelectionChange(newSelection)
+                    if (newSelection != null) {
+                        val categoryTransactions = spends.filter {
+                            val category = it.comment.trim().ifEmpty { labelWithoutTag }
+                            category == tag.name
+                        }
+                        onCategoryClick?.invoke(tag.name, categoryTransactions)
+                    }
+                } else {
+                    onSelectionChange(null)
+                }
             },
         )
         FlowRow(
@@ -364,8 +384,11 @@ private fun ChartContent(
                     currency = currency,
                     selected = selectedCategoryName == tag.name,
                     onClick = {
-                        onSelectionChange(if (selectedCategoryName == tag.name) null else tag.name)
-                        onCategoryClick?.invoke(tag.name, categoryTransactions)
+                        val newSelection = if (selectedCategoryName == tag.name) null else tag.name
+                        onSelectionChange(newSelection)
+                        if (newSelection != null) {
+                            onCategoryClick?.invoke(tag.name, categoryTransactions)
+                        }
                     },
                 )
             }
