@@ -534,7 +534,7 @@ private fun PhoneLayout(
 
     var isNumpadExpandedManually by remember { mutableStateOf<Boolean?>(null) }
     val isNumpadCollapsed = !budgetPeriodState.showLeftoverChoice &&
-        (isNumpadExpandedManually?.let { !it } ?: (hasHardKeyboard && isSquareScreen))
+        isNumpadExpandedManually?.let { !it } ?: (hasHardKeyboard && isSquareScreen)
 
     val heightFactor = if (isSquareScreen) 0.35f else 0.45f
     val defaultInternalKeyboardHeightBase =

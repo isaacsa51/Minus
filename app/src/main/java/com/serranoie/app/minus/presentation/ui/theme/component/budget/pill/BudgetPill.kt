@@ -595,8 +595,8 @@ fun BudgetPill(
                                             } else {
                                                 slideOutHorizontally(move) { direction * it }
                                             }
-                                            (slideIn + scaleIn(scale, FACE_SCALE) + fadeIn(fade)) togetherWith
-                                                (slideOut + scaleOut(scale, FACE_SCALE) + fadeOut(fade))
+                                            slideIn + scaleIn(scale, FACE_SCALE) + fadeIn(fade) togetherWith
+                                                slideOut + scaleOut(scale, FACE_SCALE) + fadeOut(fade)
                                         },
                                         label = "budgetPillFace",
                                     ) { shown ->
