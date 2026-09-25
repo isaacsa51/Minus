@@ -710,4 +710,5 @@
     <string name="past_period_delete_confirm_title">過去の期間を削除しますか？</string>
     <string name="past_period_delete_confirm_message">期間 %1$s – %2$s とその支出が完全に削除されます。サブスクリプションは保持されます。生体認証が必要です。</string>
     <string name="dialog_yes">はい</string>
+    <string name="loading">読み込み中…</string>
 </resources>

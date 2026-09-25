@@ -155,7 +155,6 @@ internal fun SubscriptionsWeeklyCalendar(
                                     )
                                 }",
                                 style = MaterialTheme.typography.titleMediumEmphasized,
-                                fontWeight = FontWeight.Bold,
                             )
 
                         }
@@ -330,7 +329,6 @@ private fun SubscriptionsWeeklyDayPill(
         Text(
             text = day.dayOfMonth.toString(),
             style = MaterialTheme.typography.bodyMediumEmphasized,
-            fontWeight = FontWeight.Bold,
             color = if (isToday) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
         )
 

@@ -709,4 +709,5 @@
     <string name="past_period_delete_confirm_title">删除过去的周期？</string>
     <string name="past_period_delete_confirm_message">这将永久删除 %1$s – %2$s 周期及其支出。订阅将保留。需要生物识别验证。</string>
     <string name="dialog_yes">是</string>
+    <string name="loading">加载中…</string>
 </resources>

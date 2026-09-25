@@ -56,7 +56,6 @@ internal fun SubscriptionsHeroCard(
                     modifier = Modifier.censor(),
                     text = currencyFormatted,
                     style = MaterialTheme.typography.headlineSmallEmphasized,
-                    fontWeight = FontWeight.Bold,
                 )
                 Text(
                     text = stringResource(R.string.subscriptions_per_month_suffix),

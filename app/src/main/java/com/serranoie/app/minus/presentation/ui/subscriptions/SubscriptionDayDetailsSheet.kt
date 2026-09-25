@@ -52,8 +52,6 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
-import com.serranoie.app.minus.presentation.ui.theme.colorGood
-import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.StatusBadge
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SubscriptionAvatar
@@ -152,9 +150,9 @@ private fun SubscriptionDayChargeRow(
         ChargeStatus.PENDING -> if (isToday) stringResource(R.string.subscriptions_due_today_label) else null
     }
     val statusColor = when (charge.status) {
-        ChargeStatus.PAID -> colorGood
+        ChargeStatus.PAID -> MinusTheme.budgetStatus.good
         ChargeStatus.SKIPPED -> MaterialTheme.colorScheme.onSurfaceVariant
-        ChargeStatus.PENDING -> colorNotGood
+        ChargeStatus.PENDING -> MinusTheme.budgetStatus.notGood
     }
     val shape = chargeRowShape(position)
 

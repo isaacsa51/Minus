@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
@@ -188,7 +187,7 @@ fun UpcomingRecurrentItemRow(
                             }
                             Spacer(modifier = Modifier.height(2.dp))
                             if (isDueTodayBadge) {
-                                StatusBadge(text = daysText, color = colorNotGood)
+                                StatusBadge(text = daysText, color = MinusTheme.budgetStatus.notGood)
                             } else {
                                 Text(
                                     text = daysText,

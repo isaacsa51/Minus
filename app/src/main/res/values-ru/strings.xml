@@ -753,4 +753,5 @@
   <string name="past_period_delete_confirm_title">Удалить прошлый период?</string>
   <string name="past_period_delete_confirm_message">Период %1$s – %2$s и его расходы будут удалены безвозвратно. Подписки сохраняются. Потребуется биометрическая аутентификация.</string>
   <string name="dialog_yes">Да</string>
+    <string name="loading">Загрузка…</string>
 </resources>

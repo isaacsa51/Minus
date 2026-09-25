@@ -423,7 +423,6 @@ private fun MockPillScreen(state: SettingsUiState) {
                                 "Expressive" -> MaterialTheme.typography.titleLargeEmphasized
                                 else -> MaterialTheme.typography.titleLarge
                             },
-                            fontWeight = FontWeight.Bold
                         )
                         Spacer(Modifier.height(2.dp))
                         Box(

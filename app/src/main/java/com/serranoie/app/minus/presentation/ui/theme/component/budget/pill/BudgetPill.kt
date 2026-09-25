@@ -24,7 +24,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,16 +82,15 @@ import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.SymbolPosition
 import com.serranoie.app.minus.presentation.ui.onboarding.periodLabel
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.colorBad
-import com.serranoie.app.minus.presentation.ui.theme.colorGood
-import com.serranoie.app.minus.presentation.ui.theme.colorNotGood
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaRequest
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaSource
+import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.combineColors
+import com.serranoie.app.minus.presentation.util.withTone
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import com.serranoie.app.minus.presentation.util.haptic.HapticUtil
 import com.serranoie.app.minus.presentation.util.harmonizeWithColor
@@ -293,18 +291,30 @@ fun BudgetPill(
                 isNoBudget || calculationPreview != null
         }
 
-    val isDarkTheme = isSystemInDarkTheme()
+    val isDarkTheme = isNightMode()
     val primaryColor = MaterialTheme.colorScheme.primary
-    val good = colorGood
-    val notGood = colorNotGood
-    val bad = colorBad
+    val good = MinusTheme.budgetStatus.good
+    val notGood = MinusTheme.budgetStatus.notGood
+    val bad = MinusTheme.budgetStatus.bad
 
-    val harmonizedColor =
+    val pillChromaMultiplier = if (isDarkTheme) 2f else 1.35f
+    val pillFillTone = if (isDarkTheme) 50.0 else 72.0
+    val pillTrackTone = if (isDarkTheme) 26.0 else 94.0
+
+    val harmonizedSeed =
         remember(metrics.spendProgress, primaryColor, isDarkTheme, good, notGood, bad) {
             val combined = combineColors(listOf(good, notGood, bad), metrics.spendProgress)
-            val harmonized = harmonizeWithColor(combined, primaryColor)
-            toPaletteWithTheme(harmonized, isDarkTheme)
+            harmonizeWithColor(combined, primaryColor, pillChromaMultiplier)
         }
+    val harmonizedColor = remember(harmonizedSeed, isDarkTheme) {
+        toPaletteWithTheme(harmonizedSeed, isDarkTheme)
+    }
+    val pillFillColor = remember(harmonizedSeed, pillFillTone) {
+        harmonizedSeed.withTone(pillFillTone)
+    }
+    val pillTrackColor = remember(harmonizedSeed, pillTrackTone) {
+        harmonizedSeed.withTone(pillTrackTone)
+    }
 
     val animatedProgress by animateFloatAsState(
         targetValue = if (metrics.isCurrentPeriodOverBudget) 1f else metrics.spendProgress,
@@ -338,15 +348,17 @@ fun BudgetPill(
         }
     }
 
-    val surplusPalette = remember(notGood, primaryColor, isDarkTheme) {
-        toPaletteWithTheme(harmonizeWithColor(notGood, primaryColor), isDarkTheme)
+    val surplusSeed = remember(notGood, primaryColor, pillChromaMultiplier) {
+        harmonizeWithColor(notGood, primaryColor, pillChromaMultiplier)
+    }
+    val surplusPalette = remember(surplusSeed, isDarkTheme) {
+        toPaletteWithTheme(surplusSeed, isDarkTheme)
+    }
+    val surplusTrackColor = remember(surplusSeed, pillTrackTone) {
+        surplusSeed.withTone(pillTrackTone)
     }
     val animatedContainerColor by animateColorAsState(
-        targetValue = if (isShowingSurplusFace) {
-            surplusPalette.container.copy(alpha = 0.6f)
-        } else {
-            harmonizedColor.container.copy(alpha = 0.6f)
-        },
+        targetValue = if (isShowingSurplusFace) surplusTrackColor else pillTrackColor,
         animationSpec = tween(220),
         label = "pillContainerColor",
     )
@@ -460,7 +472,7 @@ fun BudgetPill(
                                 .fillMaxHeight()
                                 .fillMaxWidth(animatedProgress.coerceIn(0f, 1f))
                                 .clip(RoundedCornerShape(topEndPercent = 100, bottomEndPercent = 100))
-                                .background(harmonizedColor.main)
+                                .background(pillFillColor)
                         )
                     }
 

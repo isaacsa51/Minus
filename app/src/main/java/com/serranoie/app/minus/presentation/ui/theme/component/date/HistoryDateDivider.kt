@@ -35,7 +35,7 @@ import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyF
 fun HistoryDateDivider(
     date: LocalDate?,
     isExpanded: Boolean = true,
-    onToggleClick: () -> Unit = {},
+    onToggleClick: (() -> Unit)? = null,
     totalAmount: BigDecimal? = null,
     currencyCode: String = "",
 ) {
@@ -44,10 +44,14 @@ fun HistoryDateDivider(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(
-                onClick = onToggleClick,
-                interactionSource = interactionSource,
-                indication = null
+            .then(
+                if (onToggleClick != null) {
+                    Modifier.clickable(
+                        onClick = onToggleClick,
+                        interactionSource = interactionSource,
+                        indication = null
+                    )
+                } else Modifier
             )
             .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -57,14 +61,15 @@ fun HistoryDateDivider(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(
-                imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                contentDescription = if (isExpanded) stringResource(R.string.collapse) else stringResource(
-                    R.string.expand
-                ),
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-            )
+            if (onToggleClick != null) {
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (isExpanded) stringResource(R.string.collapse) else stringResource(
+                        R.string.expand
+                    ),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
 
             Text(
                 text = prettyDate(

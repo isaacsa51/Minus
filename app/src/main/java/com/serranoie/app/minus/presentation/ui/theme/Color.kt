@@ -2,7 +2,9 @@ package com.serranoie.app.minus.presentation.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.serranoie.app.minus.presentation.util.combineColors
 
@@ -49,18 +51,16 @@ val colorOnEditor
     @Composable @ReadOnlyComposable
     get() = MaterialTheme.colorScheme.onSurface
 
-// Budget status colors
-val colorGood
-    @Composable @ReadOnlyComposable
-    get() = Color(0xFF81C784)
+@Immutable
+data class BudgetStatusColors(
+    val good: Color = Color(0xFF81C784),
+    val notGood: Color = Color(0xFFFFB74D),
+    val bad: Color = Color(0xFFE57373),
+)
 
-val colorNotGood
-    @Composable @ReadOnlyComposable
-    get() = Color(0xFFFFB74D)
+const val BudgetStatusSeedTone = 62.0
 
-val colorBad
-    @Composable @ReadOnlyComposable
-    get() = Color(0xFFE57373)
+val LocalBudgetStatusColors = staticCompositionLocalOf { BudgetStatusColors() }
 
 val primaryLight = Color(0xFF516526)
 val onPrimaryLight = Color(0xFFFFFFFF)

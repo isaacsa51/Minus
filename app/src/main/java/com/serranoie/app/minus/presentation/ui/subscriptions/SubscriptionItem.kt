@@ -133,7 +133,6 @@ internal fun SubscriptionItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleSmallEmphasized,
-                    fontWeight = FontWeight.Bold,
                 )
             }
 

@@ -710,4 +710,5 @@
     <string name="past_period_delete_confirm_title">Excluir período anterior?</string>
     <string name="past_period_delete_confirm_message">Isso exclui permanentemente o período %1$s – %2$s e suas despesas. As assinaturas são mantidas. Será necessária autenticação biométrica.</string>
     <string name="dialog_yes">Sim</string>
+    <string name="loading">Carregando…</string>
 </resources>

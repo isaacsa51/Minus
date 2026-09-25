@@ -170,6 +170,64 @@ class CategoryAnalyticsScreenshotTest {
     }
 
     @Test
+    fun categoryAnalytics_dayView() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    CompositionLocalProvider(LocalWindowInsets provides PaddingValues(0.dp)) {
+                        CategoryAnalytics(
+                            state = CategoryAnalyticsState(
+                                categoryName = "15 January",
+                                isDayView = true,
+                                categorySpends = listOf(
+                                    Transaction(
+                                        id = 1L,
+                                        amount = BigDecimal("40.00"),
+                                        comment = "Cafe",
+                                        date = testDate,
+                                        periodId = 7L,
+                                    ),
+                                    Transaction(
+                                        id = 2L,
+                                        amount = BigDecimal("12.50"),
+                                        comment = "Bus",
+                                        date = testDate.minusHours(3),
+                                        periodId = 7L,
+                                    ),
+                                ),
+                                startPeriodDate = startPeriodDate,
+                                finishPeriodDate = finishPeriodDate,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun categoryAnalytics_loading() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    CompositionLocalProvider(LocalWindowInsets provides PaddingValues(0.dp)) {
+                        CategoryAnalytics(
+                            state = CategoryAnalyticsState(
+                                categoryName = "Comida",
+                                isLoading = true,
+                                startPeriodDate = startPeriodDate,
+                                finishPeriodDate = finishPeriodDate,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun categoryAnalytics_darkTheme() {
         Locale.setDefault(Locale.US)
         paparazzi.snapshot {

@@ -103,6 +103,7 @@
     <string name="daily_average">Daily average</string>
     <string name="expenses_history">Expenses history</string>
     <string name="single_expense">Single expense</string>
+    <string name="loading">Loading…</string>
     <string name="add_expense">+ Add Expense</string>
     <string name="finalize_period_question">Finalize period?</string>
     <string name="finalize_period">Finalize budget period early</string>

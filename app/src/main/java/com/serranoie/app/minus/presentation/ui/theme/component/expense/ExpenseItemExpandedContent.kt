@@ -35,7 +35,6 @@ import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.font.format.calculateDaysToCutoff
-import com.serranoie.app.minus.presentation.ui.theme.colorGood
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDateTime
@@ -52,7 +51,7 @@ fun ExpenseItemExpandedContent(
     onMarkAsPaid: () -> Unit,
     readOnly: Boolean,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
     onSkip: (() -> Unit)? = null,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -127,7 +126,7 @@ fun ExpenseItemExpandedContent(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -145,7 +144,7 @@ fun ExpenseItemExpandedContent(
                 else -> currencyFormat.format(transaction.amount)
             },
             style = MaterialTheme.typography.headlineSmallEmphasized,
-            color = if (isIncome) colorGood else MaterialTheme.colorScheme.error,
+            color = if (isIncome) MinusTheme.budgetStatus.good else MaterialTheme.colorScheme.error,
             fontWeight = FontWeight.Black,
             textAlign = TextAlign.Center,
             modifier = Modifier

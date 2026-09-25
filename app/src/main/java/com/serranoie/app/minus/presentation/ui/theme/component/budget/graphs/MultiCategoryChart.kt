@@ -216,7 +216,6 @@ internal fun MultiCategoryChart(
     )
     val tooltipStyle = MaterialTheme.typography.labelSmallEmphasized.copy(
         color = Color.White,
-        fontWeight = FontWeight.Bold,
     )
 
     val thousandsUnit = stringResource(R.string.unit_thousands)

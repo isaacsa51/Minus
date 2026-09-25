@@ -112,7 +112,6 @@ internal fun MultiCategoryHourChart(
     )
     val tooltipStyle = MaterialTheme.typography.labelSmallEmphasized.copy(
         color = Color.White,
-        fontWeight = FontWeight.Bold,
     )
 
     var animateIn by remember { mutableStateOf(false) }
