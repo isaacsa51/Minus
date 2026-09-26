@@ -75,7 +75,13 @@ class BudgetWidgetUpdater @Inject constructor(
             return
         }
 
-        val metrics = calculateBudgetMetrics(budgetState, viewPeriod, settings.splitMode)
+        val draftAmount = baseState.numpadDraftAmount ?: BigDecimal.ZERO
+        val metrics = calculateBudgetMetrics(
+            state = budgetState,
+            period = viewPeriod,
+            splitMode = settings.splitMode,
+            draftSpend = draftAmount,
+        )
         updateBudgetPillWidget(
             context = context,
             hasBudget = true,
