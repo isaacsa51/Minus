@@ -44,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
@@ -523,7 +525,13 @@ fun CustomPaddedListItem(
                         Modifier.combinedClickable(
                             onClick = onClick ?: {},
                             onLongClick = onLongClick,
-                        )
+                        ).let {
+                            if (onClick == null) {
+                                it.semantics {
+                                    onClick(action = null)
+                                }
+                            } else it
+                        }
                     } else Modifier
                 )
                 .padding(horizontal = 16.dp, vertical = 12.dp),

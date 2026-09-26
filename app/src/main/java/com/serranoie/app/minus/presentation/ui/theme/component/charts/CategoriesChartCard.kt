@@ -351,7 +351,12 @@ private fun ChartContent(
                     if (newSelection != null) {
                         val categoryTransactions = spends.filter {
                             val category = it.comment.trim().ifEmpty { labelWithoutTag }
-                            category == tag.name
+                            if (tag.isSpecial) {
+                                val standaloneNames = tags.filter { !it.isSpecial }.map { it.name }
+                                category !in standaloneNames
+                            } else {
+                                category == tag.name
+                            }
                         }
                         onCategoryClick?.invoke(tag.name, categoryTransactions)
                     }
@@ -373,7 +378,12 @@ private fun ChartContent(
                     remember(spends, tag.name) {
                         spends.filter {
                             val category = it.comment.trim().ifEmpty { labelWithoutTag }
-                            category == tag.name
+                            if (tag.isSpecial) {
+                                val standaloneNames = tags.filter { !it.isSpecial }.map { it.name }
+                                category !in standaloneNames
+                            } else {
+                                category == tag.name
+                            }
                         }
                     }
                 CategoryAmount(

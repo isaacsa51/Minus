@@ -136,9 +136,8 @@ class TransactionEditE2ETests {
 
     private fun acceptLabel(): String = composeTestRule.activity.getString(R.string.accept)
 
-    // Content descriptions mirror the Material 3 toggle buttons shared with Editor.kt.
-    private val recurrentToggleDesc = "Recurrent payment"
-    private val creditToggleDesc = "Credit card payment"
+    private fun recurrentToggleDesc() = composeTestRule.activity.getString(R.string.recurrent_expense)
+    private fun creditToggleDesc() = composeTestRule.activity.getString(R.string.tutorial_credit_toggle_title)
 
     private fun tapApply() {
         composeTestRule.onAllNodesWithContentDescription("Editor action").onLast()
@@ -146,9 +145,8 @@ class TransactionEditE2ETests {
         composeTestRule.waitForIdle()
     }
 
-    /** Taps the recurrence toggle and waits for the delayed config bottom sheet to settle. */
     private fun tapRecurrentToggle() {
-        composeTestRule.onNodeWithContentDescription(recurrentToggleDesc).performClick()
+        composeTestRule.onNodeWithContentDescription(recurrentToggleDesc()).performClick()
         composeTestRule.mainClock.advanceTimeBy(400)
         composeTestRule.waitForIdle()
     }
@@ -271,7 +269,7 @@ class TransactionEditE2ETests {
 
         composeTestRule.onAllNodes(hasSetTextAction()).onLast().performImeAction()
         composeTestRule.waitForIdle()
-        composeTestRule.mainClock.advanceTimeBy(400)
+        composeTestRule.mainClock.advanceTimeBy(1000)
         composeTestRule.waitForIdle()
 
         tapApply()
@@ -684,7 +682,7 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithContentDescription(creditToggleDesc).performClick()
+        composeTestRule.onNodeWithContentDescription(creditToggleDesc()).performClick()
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(300)
         composeTestRule.waitForIdle()
@@ -716,7 +714,7 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithContentDescription(creditToggleDesc).performClick()
+        composeTestRule.onNodeWithContentDescription(creditToggleDesc()).performClick()
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(300)
         composeTestRule.waitForIdle()

@@ -24,6 +24,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -291,7 +292,7 @@ fun BudgetPill(
                 isNoBudget || calculationPreview != null
         }
 
-    val isDarkTheme = isNightMode()
+    val isDarkTheme = isSystemInDarkTheme()
     val primaryColor = MaterialTheme.colorScheme.primary
     val good = MinusTheme.budgetStatus.good
     val notGood = MinusTheme.budgetStatus.notGood
