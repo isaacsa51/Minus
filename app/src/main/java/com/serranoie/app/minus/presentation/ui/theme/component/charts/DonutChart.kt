@@ -117,8 +117,7 @@ fun DonutChart(
                             val sweepAngle = finalAngles[index]
                             val midAngle = currentStartAngle + (sweepAngle / 2f)
 
-                            val isSelected = index == selectedIndex
-                            val offsetDist = if (isSelected) offsetDistPx else 0f
+                            val offsetDist = animatedOffsets[index].value * offsetDistPx
 
                             val arcCenterX =
                                 centerX + cos(Math.toRadians(midAngle.toDouble())).toFloat() * offsetDist

@@ -1,7 +1,7 @@
 package com.serranoie.app.minus.presentation.util
 
 import android.os.Build
-import androidx.compose.foundation.background
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
@@ -14,7 +14,7 @@ val LocalCensorMode = compositionLocalOf { false }
 
 /**
  * A modifier extension that can be used to censor content.
- * This applies a blur effect to the content if the censor mode is enabled.
+ * This applies a blur effect to the content or obscures it with an opaque rectangle if the censor mode is enabled.
  */
 @Composable
 fun Modifier.censor(
@@ -27,7 +27,9 @@ fun Modifier.censor(
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         this.blur(radius)
     } else {
-        // Fallback for older versions: use a background color that masks content
-        this.background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f))
+        val censorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+        this.drawWithContent {
+            drawRect(color = censorColor)
+        }
     }
 }
