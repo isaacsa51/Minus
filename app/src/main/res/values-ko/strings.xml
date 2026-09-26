@@ -530,7 +530,7 @@
     <string name="savings_recommendation_current_savings_format">현재 저축액: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">반복 지출</string>
     <string name="savings_recommendation_one_time_expenses_label">일회성 지출</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">약 6개월 동안 매번 20%를 저축하면 다음과 같은 금액을 모을 수 있습니다:</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">약 6개월 동안 매번 %1$d%%를 저축하면 다음과 같은 금액을 모을 수 있습니다:</string>
     <string name="savings_recommendation_goal_format" formatted="false">%2$d개월 내에 %1$s를 모으려면 기간당 %3$s를 저축하세요.</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">기본값인 %1$d%% 예시를 보여줍니다. 특정 금액을 목표로 하려면 설정에서 저축 목표를 지정하세요.</string>
     <!-- Settings: Savings Preferences -->
@@ -665,6 +665,8 @@
     <string name="analytics_tutorial_charts_desc">어떤 카테고리에서 예산이 많이 소모되는지 확인하세요. 차트 조각이나 카테고리 이름을 탭하면 상세 내용을 볼 수 있습니다.</string>
     <string name="analytics_tutorial_savings_title">절약 제안</string>
     <string name="analytics_tutorial_savings_desc">50/30/20 법칙을 바탕으로 이상적인 저축액을 제안해 드립니다. 이 설정은 변경할 수 있습니다.</string>
+    <string name="analytics_no_period_title">예산 기간이 아직 없습니다</string>
+    <string name="analytics_no_period_body">예산 기간을 만들면 지출, 카테고리, 저축이 여기에 표시됩니다.</string>
     <string name="analytics_tutorial_credit_title">신용카드 관리</string>
     <string name="analytics_tutorial_credit_desc">신용카드 아이콘을 탭하여 모든 카드 결제 내역을 확인하고, 결제 완료로 표시하거나 이자 발생을 막기 위해 청구 마감일을 조정하세요.</string>
     <string name="analytics_tutorial_history_title">거래 내역</string>

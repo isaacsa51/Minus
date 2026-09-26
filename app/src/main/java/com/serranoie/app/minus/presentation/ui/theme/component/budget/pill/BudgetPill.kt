@@ -302,13 +302,14 @@ fun BudgetPill(
     val pillFillTone = if (isDarkTheme) 50.0 else 72.0
     val pillTrackTone = if (isDarkTheme) 26.0 else 94.0
 
-    val harmonizedSeed =
-        remember(metrics.spendProgress, primaryColor, isDarkTheme, good, notGood, bad) {
-            val combined = combineColors(listOf(good, notGood, bad), metrics.spendProgress)
-            harmonizeWithColor(combined, primaryColor, pillChromaMultiplier)
-        }
-    val harmonizedColor = remember(harmonizedSeed, isDarkTheme) {
-        toPaletteWithTheme(harmonizedSeed, isDarkTheme)
+    val combinedStatusColor = remember(metrics.spendProgress, good, notGood, bad) {
+        combineColors(listOf(good, notGood, bad), metrics.spendProgress)
+    }
+    val harmonizedSeed = remember(combinedStatusColor, primaryColor, pillChromaMultiplier) {
+        harmonizeWithColor(combinedStatusColor, primaryColor, pillChromaMultiplier)
+    }
+    val harmonizedColor = remember(combinedStatusColor, primaryColor, isDarkTheme) {
+        toPaletteWithTheme(harmonizeWithColor(combinedStatusColor, primaryColor), isDarkTheme)
     }
     val pillFillColor = remember(harmonizedSeed, pillFillTone) {
         harmonizedSeed.withTone(pillFillTone)
@@ -352,8 +353,8 @@ fun BudgetPill(
     val surplusSeed = remember(notGood, primaryColor, pillChromaMultiplier) {
         harmonizeWithColor(notGood, primaryColor, pillChromaMultiplier)
     }
-    val surplusPalette = remember(surplusSeed, isDarkTheme) {
-        toPaletteWithTheme(surplusSeed, isDarkTheme)
+    val surplusPalette = remember(notGood, primaryColor, isDarkTheme) {
+        toPaletteWithTheme(harmonizeWithColor(notGood, primaryColor), isDarkTheme)
     }
     val surplusTrackColor = remember(surplusSeed, pillTrackTone) {
         surplusSeed.withTone(pillTrackTone)

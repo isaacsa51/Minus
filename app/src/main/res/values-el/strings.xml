@@ -528,7 +528,7 @@
     <string name="savings_recommendation_current_savings_format">Τρέχουσα εξοικονόμηση: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">Επαναλαμβανόμενες δαπάνες</string>
     <string name="savings_recommendation_one_time_expenses_label">Έξοδα μιας χρήσης</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">Αν εξοικονομήσετε το 20% κάθε περίοδο για περίπου 6 μήνες, θα μπορούσατε να κατασκευάσετε:</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">Αν εξοικονομήσετε το %1$d%% κάθε περίοδο για περίπου 6 μήνες, θα μπορούσατε να κατασκευάσετε:</string>
     <string name="savings_recommendation_goal_format" formatted="false">Για να φτάσετε στο %1$s σε %2$d μήνες, εξοικονομήστε %3$s ανά περίοδο.</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">Εμφανίζεται το προεπιλεγμένο παράδειγμα %1$d%%. Ορίστε έναν στόχο εξοικονόμησης στις Ρυθμίσεις για να στοχεύσετε ένα συγκεκριμένο ποσό.</string>
     <!-- Settings: Savings Preferences -->
@@ -663,6 +663,8 @@
     <string name="analytics_tutorial_charts_desc">Δείτε ποιες κατηγορίες καταναλώνουν τον προϋπολογισμό σας. Πατήστε οποιοδήποτε όνομα μερίδας ή κατηγορίας για λεπτομέρειες.</string>
     <string name="analytics_tutorial_savings_title">Σύσταση Αποταμίευσης</string>
     <string name="analytics_tutorial_savings_desc">Με βάση τον κανόνα 50/30/20, σας προτείνουμε πόσο θα πρέπει ιδανικά να εξοικονομήσετε. Αυτό μπορεί να αλλάξει στις ρυθμίσεις.</string>
+    <string name="analytics_no_period_title">Δεν υπάρχει ακόμη περίοδος προϋπολογισμού</string>
+    <string name="analytics_no_period_body">Δημιουργήστε μια περίοδο προϋπολογισμού και οι δαπάνες, οι κατηγορίες και οι αποταμιεύσεις σας θα εμφανιστούν εδώ.</string>
     <string name="analytics_tutorial_credit_title">Διαχείριση Πιστωτικής Κάρτας</string>
     <string name="analytics_tutorial_credit_desc">Πατήστε την πιστωτική κάρτα για να δείτε όλες τις συναλλαγές CC, να τις επισημάνετε ως πληρωμένες ή να προσαρμόσετε την ημερομηνία περικοπής χρέωσής σας για να αποφύγετε τους τόκους.</string>
     <string name="analytics_tutorial_history_title">Ιστορικό Συναλλαγών</string>

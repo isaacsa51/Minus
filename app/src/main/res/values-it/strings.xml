@@ -531,7 +531,7 @@
     <string name="savings_recommendation_current_savings_format">Salvataggio attuale: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">Spese ricorrenti</string>
     <string name="savings_recommendation_one_time_expenses_label">Spese una tantum</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">Se si risparmia il 20% ogni periodo per circa 6 mesi, si potrebbe costruire:</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">Se si risparmia il %1$d%% ogni periodo per circa 6 mesi, si potrebbe costruire:</string>
     <string name="savings_recommendation_goal_format" formatted="false">Per raggiungere %1$s in %2$d mesi, risparmia %3$s per periodo.</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando l\'esempio predefinito %1$d%%. Impostare un obiettivo di risparmio in Impostazioni per raggiungere un importo specifico.</string>
     <!-- Settings: Savings Preferences -->
@@ -666,6 +666,8 @@
     <string name="analytics_tutorial_charts_desc">Scopri quali categorie incidono maggiormente sul tuo budget. Tocca una fetta del grafico o il nome di una categoria per i dettagli.</string>
     <string name="analytics_tutorial_savings_title">Suggerimento di risparmio</string>
     <string name="analytics_tutorial_savings_desc">Basandoci sulla regola 50/30/20, suggeriamo l\'importo ideale da risparmiare. Puoi modificare questa impostazione nelle opzioni.</string>
+    <string name="analytics_no_period_title">Nessun periodo di budget</string>
+    <string name="analytics_no_period_body">Crea un periodo di budget e qui compariranno le tue spese, categorie e risparmi.</string>
     <string name="analytics_tutorial_credit_title">Gestione carta di credito</string>
     <string name="analytics_tutorial_credit_desc">Tocca la carta di credito per visualizzare tutte le transazioni effettuate, contrassegnarle come pagate o modificare la data di chiusura dell\'estratto conto per evitare interessi.</string>
     <string name="analytics_tutorial_history_title">Storico transazioni</string>

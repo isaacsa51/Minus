@@ -528,7 +528,7 @@
     <string name="savings_recommendation_current_savings_format">मौजूदा बचत: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">बार-बार होने वाले खर्च</string>
     <string name="savings_recommendation_one_time_expenses_label">एक बार होने वाले खर्च</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">अगर आप लगभग 6 महीनों तक हर अवधि में 20% बचाते हैं, तो आप इतना जमा कर सकते हैं:</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">अगर आप लगभग 6 महीनों तक हर अवधि में %1$d%% बचाते हैं, तो आप इतना जमा कर सकते हैं:</string>
     <string name="savings_recommendation_goal_format" formatted="false">%2$d महीनों में %1$s तक पहुँचने के लिए, हर अवधि में %3$s बचाएँ।</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">डिफ़ॉल्ट %1$d%% उदाहरण दिखाया जा रहा है। किसी खास रकम का लक्ष्य तय करने के लिए सेटिंग में बचत का लक्ष्य सेट करें।</string>
     <!-- Settings: Savings Preferences -->
@@ -663,6 +663,8 @@
     <string name="analytics_tutorial_charts_desc">देखें कि कौन सी कैटेगरी आपका बजट ज़्यादा खर्च कर रही हैं। जानकारी के लिए किसी भी स्लाइस या कैटेगरी के नाम पर टैप करें।</string>
     <string name="analytics_tutorial_savings_title">बचत का सुझाव</string>
     <string name="analytics_tutorial_savings_desc">50/30/20 नियम के आधार पर, हम सुझाव देते हैं कि आपको आदर्श रूप से कितनी बचत करनी चाहिए। इसे सेटिंग्स में बदला जा सकता है।</string>
+    <string name="analytics_no_period_title">अभी कोई बजट अवधि नहीं है</string>
+    <string name="analytics_no_period_body">एक बजट अवधि बनाएं और आपके खर्च, श्रेणियां और बचत यहां दिखने लगेंगी।</string>
     <string name="analytics_tutorial_credit_title">क्रेडिट कार्ड मैनेजमेंट</string>
     <string name="analytics_tutorial_credit_desc">सभी CC ट्रांज़ैक्शन देखने, उन्हें \'पेड\' (भुगतान किया गया) के तौर पर मार्क करने या ब्याज से बचने के लिए अपनी बिलिंग कट-ऑफ तारीख बदलने के लिए क्रेडिट कार्ड पर टैप करें।</string>
     <string name="analytics_tutorial_history_title">ट्रांज़ैक्शन हिस्ट्री</string>

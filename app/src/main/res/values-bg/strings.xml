@@ -533,7 +533,7 @@
     <string name="savings_recommendation_current_savings_format">Текущи спестявания: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">Повтарящи се разходи</string>
     <string name="savings_recommendation_one_time_expenses_label">Еднократни разходи</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">Ако спестявате тези 20% всеки период в продължение на около 6 месеца, бихте могли да натрупате:</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">Ако спестявате тези %1$d%% всеки период в продължение на около 6 месеца, бихте могли да натрупате:</string>
     <string name="savings_recommendation_goal_format" formatted="false">За да достигнете %1$s за %2$d месеца, спестявайте %3$s на период.</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">Показва се примерът по подразбиране %1$d%%. Задайте цел за спестяване в Настройки, за да се насочите към конкретна сума.</string>
     <!-- Settings: Savings Preferences -->
@@ -668,6 +668,8 @@
     <string name="analytics_tutorial_charts_desc">Вижте кои категории изчерпват бюджета ви. Натиснете върху някой сектор или име на категория за детайли.</string>
     <string name="analytics_tutorial_savings_title">Препоръка за спестяване</string>
     <string name="analytics_tutorial_savings_desc">Въз основа на правилото 50/30/20 предлагаме колко би било препорачително да спестявате. Това може да се промени от настройките.</string>
+    <string name="analytics_no_period_title">Още няма бюджетен период</string>
+    <string name="analytics_no_period_body">Създайте бюджетен период и разходите, категориите и спестяванията ви ще се появят тук.</string>
     <string name="analytics_tutorial_credit_title">Управление на кредитни карти</string>
     <string name="analytics_tutorial_credit_desc">Натиснете върху кредитната карта, за да видите всички неини трансакции, да ги отбележите като платени или да коригирате датата на отчитане, за да избегнете лихви.</string>
     <string name="analytics_tutorial_history_title">История на транзакциите</string>

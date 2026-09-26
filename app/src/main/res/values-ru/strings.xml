@@ -563,7 +563,7 @@
   <string name="savings_recommendation_current_savings_format">Текущие накопления: %1$s</string>
   <string name="savings_recommendation_recurrent_expenses_label">Регулярные расходы</string>
   <string name="savings_recommendation_one_time_expenses_label">Разовые расходы</string>
-  <string name="savings_recommendation_six_month_example_intro" formatted="false">Если откладывать 20%% каждый период примерно полгода, можно накопить:</string>
+  <string name="savings_recommendation_six_month_example_intro" formatted="false">Если откладывать %1$d%% каждый период примерно полгода, можно накопить:</string>
   <string name="savings_recommendation_goal_format" formatted="false">Чтобы накопить %1$s за %2$d мес., откладывайте %3$s за период.</string>
   <string name="savings_recommendation_goal_disabled" formatted="false">Показан пример по умолчанию (%1$d%%). Задайте цель накоплений в настройках, чтобы считать конкретную сумму.</string>
   <!-- Settings: Savings Preferences -->
@@ -710,6 +710,8 @@
   <string name="analytics_tutorial_charts_desc">Посмотрите, какие категории съедают бюджет. Нажмите на сегмент или название категории, чтобы открыть подробности.</string>
   <string name="analytics_tutorial_savings_title">Рекомендация по накоплениям</string>
   <string name="analytics_tutorial_savings_desc">По правилу 50/30/20 подсказываем, сколько стоит откладывать. Пропорции можно изменить в настройках.</string>
+  <string name="analytics_no_period_title">Бюджетный период пока не создан</string>
+  <string name="analytics_no_period_body">Создайте бюджетный период, и здесь появятся ваши расходы, категории и накопления.</string>
   <string name="analytics_tutorial_credit_title">Кредитная карта</string>
   <string name="analytics_tutorial_credit_desc">Нажмите на карту, чтобы увидеть все операции по кредитке, отметить их как оплаченные или изменить день закрытия периода — так проще избежать процентов.</string>
   <string name="analytics_tutorial_history_title">История операций</string>
