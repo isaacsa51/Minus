@@ -262,7 +262,7 @@
     <string name="changelog_close">Затвори</string>
     <string name="changelog_previous_versions">Предишна версия</string>
     <string name="changelog_updated_to">Актуализирано до: %1$s</string>
-    <string name="changelog_see_changes">Вижте по-долу всички промени, за да не пропуснете нова функция</string>
+    <string name="changelog_see_changes">Minus вече е обновен.&lt;br&gt;За повече подробности, посетете &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt;.</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Изберете период</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d дни · %2$s - %3$s</string>

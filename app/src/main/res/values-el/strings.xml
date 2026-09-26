@@ -257,7 +257,7 @@
     <string name="changelog_close">Κλείσιμο</string>
     <string name="changelog_previous_versions">Προηγούμενη έκδοση</string>
     <string name="changelog_updated_to">Ενημερώθηκε σε: %1$s</string>
-    <string name="changelog_see_changes">Δείτε παρακάτω όλες τις αλλαγές για να μην χάσετε καμία νέα λειτουργία</string>
+    <string name="changelog_see_changes">Το Minus ενημερώθηκε.&lt;br&gt;Για περισσότερες λεπτομέρειες, επισκεφθείτε το &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt;.</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Επιλέξτε την περίοδο</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d ημέρες · %2$s - %3$s</string>
