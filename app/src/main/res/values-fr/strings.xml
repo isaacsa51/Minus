@@ -137,6 +137,7 @@
     <string name="add_new_category">Catégorie</string>
     <string name="add_new_category_action">Ajouter une nouvelle catégorie</string>
     <string name="delete_category">Supprimer la catégorie</string>
+    <string name="sort_alphabetically">Trier par ordre alphabétique</string>
     <string name="add_extra_note">Note supplémentaire</string>
     <string name="extra_note_label">Note</string>
     <string name="budget_validation_major_zero">Le budget doit être supérieur à 0</string>

@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.editor.category
 
+import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SizeTransform
@@ -16,6 +17,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +36,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.Sell
+import androidx.compose.material.icons.rounded.SortByAlpha
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
@@ -55,6 +58,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -97,6 +101,13 @@ fun EditableCategoryTag(
     val focusManager = LocalFocusManager.current
     val localDensity = LocalDensity.current
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val categoryPrefs = remember(context) {
+        context.getSharedPreferences("editable_category_tag_prefs", Context.MODE_PRIVATE)
+    }
+    var sortAlphabetically by remember {
+        mutableStateOf(categoryPrefs.getBoolean("sort_alphabetically", false))
+    }
 
     var isEdit by remember { mutableStateOf(startInEditMode) }
     var value by remember(currentComment) {
@@ -248,11 +259,18 @@ fun EditableCategoryTag(
         }
 
         val trimmedValue = value.text.trim()
-        val filteredItems = if (trimmedValue.isBlank()) {
-            if (directCategoryPopupEnabled) tags else emptyList()
-        } else {
-            tags.filter { tag ->
-                tag.contains(trimmedValue, ignoreCase = true) && tag != trimmedValue
+        val filteredItems = remember(trimmedValue, tags, directCategoryPopupEnabled, sortAlphabetically) {
+            val baseFiltered = if (trimmedValue.isBlank()) {
+                if (directCategoryPopupEnabled) tags else emptyList()
+            } else {
+                tags.filter { tag ->
+                    tag.contains(trimmedValue, ignoreCase = true) && tag != trimmedValue
+                }
+            }
+            if (sortAlphabetically) {
+                baseFiltered.sortedWith(String.CASE_INSENSITIVE_ORDER)
+            } else {
+                baseFiltered
             }
         }
 
@@ -312,25 +330,58 @@ fun EditableCategoryTag(
                                         }
                                     }, shape = RoundedCornerShape(16.dp)
                             ) {
-                                LazyColumn(
-                                    userScrollEnabled = true,
-                                    contentPadding = PaddingValues(vertical = 8.dp),
-                                ) {
-                                    filteredItems.forEach { item ->
-                                        itemSuggest(
-                                            name = item,
+                                Column {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 16.dp, end = 8.dp, top = 6.dp, bottom = 2.dp),
+                                    ) {
+                                        IconButton(
                                             onClick = {
                                                 dismissEvent.value = true
-                                                value = TextFieldValue(
-                                                    item,
-                                                    TextRange(item.length),
-                                                )
+                                                val newSort = !sortAlphabetically
+                                                sortAlphabetically = newSort
+                                                categoryPrefs.edit()
+                                                    .putBoolean("sort_alphabetically", newSort)
+                                                    .apply()
                                             },
-                                            onDelete = {
-                                                dismissEvent.value = true
-                                                onDeleteTag(item)
-                                            }
-                                        )
+                                            modifier = Modifier
+                                                .align(Alignment.CenterEnd)
+                                                .size(32.dp),
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.SortByAlpha,
+                                                contentDescription = stringResource(R.string.sort_alphabetically),
+                                                tint = if (sortAlphabetically) {
+                                                    MaterialTheme.colorScheme.primary
+                                                } else {
+                                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                                },
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                    }
+
+                                    LazyColumn(
+                                        userScrollEnabled = true,
+                                        contentPadding = PaddingValues(bottom = 8.dp),
+                                    ) {
+                                        filteredItems.forEach { item ->
+                                            itemSuggest(
+                                                name = item,
+                                                onClick = {
+                                                    dismissEvent.value = true
+                                                    value = TextFieldValue(
+                                                        item,
+                                                        TextRange(item.length),
+                                                    )
+                                                },
+                                                onDelete = {
+                                                    dismissEvent.value = true
+                                                    onDeleteTag(item)
+                                                }
+                                            )
+                                        }
                                     }
                                 }
                             }

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Minus</string>
 
     <string name="tutorial_numpad_title">Numpad</string>
@@ -147,6 +147,7 @@
     <string name="add_new_category">Category</string>
     <string name="add_new_category_action">Add New Category</string>
     <string name="delete_category">Delete Category</string>
+    <string name="sort_alphabetically" tools:ignore="MissingTranslation">Sort alphabetically</string>
     <string name="add_extra_note">Extra note</string>
     <string name="extra_note_label">Note</string>
 
