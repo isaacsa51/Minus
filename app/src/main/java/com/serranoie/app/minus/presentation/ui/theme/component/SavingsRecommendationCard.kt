@@ -44,6 +44,48 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
 
+internal data class SavingsCardMetrics(
+    val recurrentSpent: BigDecimal,
+    val variableSpent: BigDecimal,
+    val savings: BigDecimal,
+    val savingsPct: Int,
+    val recurrentPct: Int,
+    val variablePct: Int,
+    val idealSavingsPerPeriod: BigDecimal,
+    val projectedSavingsSixMonths: BigDecimal,
+    val goalPerPeriod: BigDecimal?,
+)
+
+internal fun savingsCardMetrics(
+    budget: BigDecimal,
+    recurringInPeriod: List<Transaction>,
+    oneTimeSpends: List<Transaction>,
+    preferences: SavingsPreferences,
+): SavingsCardMetrics? {
+    if (budget <= BigDecimal.ZERO) return null
+
+    val recurrentSpent = recurringInPeriod.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
+    val variableSpent = oneTimeSpends.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
+    val savings = budget.subtract(recurrentSpent).subtract(variableSpent).max(BigDecimal.ZERO)
+    val idealSavingsPerPeriod = budget.multiply(BigDecimal(preferences.savingsPct))
+        .divide(BigDecimal(100), 2, RoundingMode.HALF_UP)
+
+    fun pctOfBudget(amount: BigDecimal): Int =
+        amount.divide(budget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
+
+    return SavingsCardMetrics(
+        recurrentSpent = recurrentSpent,
+        variableSpent = variableSpent,
+        savings = savings,
+        savingsPct = pctOfBudget(savings),
+        recurrentPct = pctOfBudget(recurrentSpent),
+        variablePct = pctOfBudget(variableSpent),
+        idealSavingsPerPeriod = idealSavingsPerPeriod,
+        projectedSavingsSixMonths = idealSavingsPerPeriod.multiply(BigDecimal(6)),
+        goalPerPeriod = preferences.projectedPerPeriod(),
+    )
+}
+
 /**
  * Recommendation card based on the 50/30/20 rule (or any custom needs/wants/
  * savings split the user configured in Settings).
@@ -66,37 +108,25 @@ fun SavingsRecommendationCard(
     currency: String = "MXN",
     preferences: SavingsPreferences = SavingsPreferences.DEFAULT,
 ) {
-    val recurrentSpent = recurringInPeriod.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
-    val variableSpent = oneTimeSpends.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
-    val totalSpent = recurrentSpent.add(variableSpent)
-    val savings = budget.subtract(totalSpent).max(BigDecimal.ZERO)
+    val metrics = savingsCardMetrics(budget, recurringInPeriod, oneTimeSpends, preferences)
+        ?: return
 
-    val safeBudget = if (budget <= BigDecimal.ZERO) BigDecimal.ONE else budget
-
-    val savingsPct =
-        savings.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
-    val recurrentPct =
-        recurrentSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
-    val variablePct =
-        variableSpent.divide(safeBudget, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toInt()
-    val idealSavingsPerPeriod = budget.multiply(BigDecimal(preferences.savingsPct))
-        .divide(BigDecimal(100), 2, RoundingMode.HALF_UP)
-
-    val projectedPerPeriod =
-        preferences.projectedPerPeriod() ?: idealSavingsPerPeriod
-
-    val projectedSavingsSixMonths = idealSavingsPerPeriod.multiply(BigDecimal(6))
-
+    val savings = metrics.savings
+    val savingsPct = metrics.savingsPct
+    val recurrentPct = metrics.recurrentPct
+    val variablePct = metrics.variablePct
+    val idealSavingsPerPeriod = metrics.idealSavingsPerPeriod
+    val projectedSavingsSixMonths = metrics.projectedSavingsSixMonths
     val spendingCeiling = preferences.spendingCeilingPct
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
                 Icon(
                     imageVector = Icons.Outlined.Info,
                     contentDescription = null,
@@ -121,20 +151,25 @@ fun SavingsRecommendationCard(
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f)
             )
 
-            if (projectedPerPeriod != null && preferences.savingsGoalAmount != null && preferences.savingsGoalMonths != null) {
+            val goalAmount = preferences.savingsGoalAmount
+            val goalMonths = preferences.savingsGoalMonths
+            if (metrics.goalPerPeriod != null && goalAmount != null && goalMonths != null) {
                 Text(
                     text = stringResource(
                         R.string.savings_recommendation_goal_format,
-                        formatCurrencySymbolOnly(preferences.savingsGoalAmount, currency),
-                        preferences.savingsGoalMonths,
-                        formatCurrencySymbolOnly(projectedPerPeriod, currency),
+                        formatCurrencySymbolOnly(goalAmount, currency),
+                        goalMonths,
+                        formatCurrencySymbolOnly(metrics.goalPerPeriod, currency),
                     ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
                 )
             } else {
                 Text(
-                    text = stringResource(R.string.savings_recommendation_six_month_example_intro),
+                    text = stringResource(
+                        R.string.savings_recommendation_six_month_example_intro,
+                        preferences.savingsPct,
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
                 )
@@ -197,7 +232,7 @@ fun SavingsRecommendationCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Column(horizontalAlignment = Alignment.End) {
-                    val idealLabel = projectedPerPeriod ?: idealSavingsPerPeriod
+                    val idealLabel = metrics.goalPerPeriod ?: idealSavingsPerPeriod
                     Text(
                         modifier = Modifier.censor(),
                         text = stringResource(
@@ -228,7 +263,7 @@ fun SavingsRecommendationCard(
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             RecommendationItem(
                 label = stringResource(R.string.savings_recommendation_recurrent_expenses_label),
-                value = formatCurrencySymbolOnly(recurrentSpent, currency),
+                value = formatCurrencySymbolOnly(metrics.recurrentSpent, currency),
                 percentage = recurrentPct,
                 target = preferences.needsPct,
                 color = MaterialTheme.colorScheme.outlineVariant
@@ -236,7 +271,7 @@ fun SavingsRecommendationCard(
 
             RecommendationItem(
                 label = stringResource(R.string.savings_recommendation_one_time_expenses_label),
-                value = formatCurrencySymbolOnly(variableSpent, currency),
+                value = formatCurrencySymbolOnly(metrics.variableSpent, currency),
                 percentage = variablePct,
                 target = preferences.wantsPct,
                 color = MaterialTheme.colorScheme.primary

@@ -310,6 +310,7 @@ class AnalyticsViewModel @Inject constructor(
             budgetStateForDisplay = budgetState,
             isLoading = false,
             isHistoricalView = true,
+            savingsPreferences = userSettings.savingsPreferences,
             previousPeriodTransactions = previousTransactions,
             categories = categories,
             graphGranularity = granularity

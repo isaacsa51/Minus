@@ -12,6 +12,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -34,12 +35,15 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CalendarToday
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -68,6 +72,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
@@ -233,8 +238,16 @@ fun Analytics(
     val effectiveTutorialCompleted =
         showTutorialOverride?.let { !it } ?: (tutorialCompleted || state.isHistoricalView)
 
+    val showSavingsCard = state.wholeBudget > BigDecimal.ZERO
+
     val tutorialOrder =
-        remember(hasSpends, state.creditOwed, state.periodFinished, state.isHistoricalView) {
+        remember(
+            hasSpends,
+            state.creditOwed,
+            state.periodFinished,
+            state.isHistoricalView,
+            showSavingsCard,
+        ) {
             buildList {
                 // 1. Header (if visible)
                 if (!state.periodFinished || state.isHistoricalView) {
@@ -252,7 +265,7 @@ fun Analytics(
                     }
                     add(4) // Categories
                 } else {
-                    add(5) // Savings
+                    if (showSavingsCard) add(5) // Savings
                     if (state.creditOwed > BigDecimal.ZERO) {
                         add(6) // Credit Owed
                     }
@@ -346,7 +359,8 @@ fun Analytics(
     }
 
     TutorialBox(
-        showTutorial = !effectiveTutorialCompleted && !state.isLoading,
+        showTutorial = !effectiveTutorialCompleted && !state.isLoading &&
+                state.budgetSettingsForDisplay != null,
         state = tutorialBoxState,
         onTutorialCompleted = {
             actions.onTutorialCompleted(hasSpends)
@@ -459,6 +473,9 @@ fun Analytics(
                                 isOverBudget = shown.spends.sumOf { it.amount } > shown.wholeBudget,
                             )
                         }
+                        if (shown.budgetSettingsForDisplay == null) {
+                            AnalyticsNoPeriodState(modifier = Modifier.fillMaxWidth())
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp))
                         BudgetGraph(
@@ -493,17 +510,19 @@ fun Analytics(
                             bringIntoViewRequesters = bringIntoViewRequesters,
                             markIfInOrder = markIfInOrder,
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        SavingsRecommendationCard(
-                            budget = shown.wholeBudget,
-                            recurringInPeriod = shown.recurringInPeriod,
-                            oneTimeSpends = shown.oneTimeSpends,
-                            currency = shown.currencyCode,
-                            preferences = shown.savingsPreferences,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                                .bringIntoViewRequester(bringIntoViewRequesters[5]!!)
-                                .markIfInOrder(5),
-                        )
+                        if (shown.wholeBudget > BigDecimal.ZERO) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            SavingsRecommendationCard(
+                                budget = shown.wholeBudget,
+                                recurringInPeriod = shown.recurringInPeriod,
+                                oneTimeSpends = shown.oneTimeSpends,
+                                currency = shown.currencyCode,
+                                preferences = shown.savingsPreferences,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                                    .bringIntoViewRequester(bringIntoViewRequesters[5]!!)
+                                    .markIfInOrder(5),
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(80.dp + navigationBarHeight))
                     }
@@ -888,6 +907,35 @@ private fun FinishedPeriodBackgroundShapes(
                 .absoluteOffset(x = -halfWidth * 0.55f, y = halfHeight * 0.35f - scroll * 0.25f)
                 .rotate(angleShape4)
                 .background(color = shapeColor, shape = MaterialShapes.Flower.toShape())
+        )
+    }
+}
+
+@Composable
+private fun AnalyticsNoPeriodState(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.CalendarToday,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.height(48.dp),
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.analytics_no_period_title),
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.analytics_no_period_body),
+            style = MaterialTheme.typography.bodyMediumCondensed,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
     }
 }

@@ -529,7 +529,7 @@
     <string name="savings_recommendation_current_savings_format">現在の節約: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">定期的な費用</string>
     <string name="savings_recommendation_one_time_expenses_label">一回限りの費用</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">約6ヶ月間、それぞれの期間を20%節約すると、次のように作成できます。</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">約6ヶ月間、それぞれの期間を%1$d%%節約すると、次のように作成できます。</string>
     <string name="savings_recommendation_goal_format" formatted="false">%2$dヶ月で%1$sを達成するには、1期間あたり%3$sを貯蓄してください。</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">デフォルトの %1$d%%の例を表示します。特定の金額を目標に設定します。</string>
     <!-- Settings: Savings Preferences -->
@@ -664,6 +664,8 @@
     <string name="analytics_tutorial_charts_desc">どのカテゴリが予算を使い果たしているかを確認します。詳細はスライスまたはカテゴリ名をタップしてください。</string>
     <string name="analytics_tutorial_savings_title">節約のおすすめ情報</string>
     <string name="analytics_tutorial_savings_desc">50/30/20ルールに基づいて、理想的にいくら節約すべきかをお勧めします。これは設定で変更できます。</string>
+    <string name="analytics_no_period_title">予算期間がまだありません</string>
+    <string name="analytics_no_period_body">予算期間を作成すると、支出・カテゴリ・貯蓄がここに表示されます。</string>
     <string name="analytics_tutorial_credit_title">クレジットカード管理</string>
     <string name="analytics_tutorial_credit_desc">クレジットカードをタップして、すべてのCC取引を表示したり、支払い済みとしてマークしたり、関心を避けるために請求のカットオフ日を調整したりします。</string>
     <string name="analytics_tutorial_history_title">取引履歴</string>

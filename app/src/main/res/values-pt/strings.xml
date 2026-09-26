@@ -531,7 +531,7 @@
     <string name="savings_recommendation_current_savings_format">Economia atual: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">Despesas recorrentes</string>
     <string name="savings_recommendation_one_time_expenses_label">Despesas únicas</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">Se você economizar 20% por cerca de 6 meses, você pode construir:</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">Se você economizar %1$d%% por cerca de 6 meses, você pode construir:</string>
     <string name="savings_recommendation_goal_format" formatted="false">Para alcançar %1$s em %2$d meses, economize %3$s por período.</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando o exemplo padrão %1$d%. Defina um objetivo de poupança nas configurações para atingir um valor específico.</string>
     <!-- Settings: Savings Preferences -->
@@ -666,6 +666,8 @@
     <string name="analytics_tutorial_charts_desc">Veja quais categorias estão comendo seu orçamento. Toque em qualquer fatia ou categoria para obter detalhes.</string>
     <string name="analytics_tutorial_savings_title">Recomendação de Poupança</string>
     <string name="analytics_tutorial_savings_desc">Com base na regra 50/30/20, sugerimos quanto você idealmente deve poupar. Isto pode ser alterado nas configurações.</string>
+    <string name="analytics_no_period_title">Ainda não há período de orçamento</string>
+    <string name="analytics_no_period_body">Crie um período de orçamento e seus gastos, categorias e economias aparecerão aqui.</string>
     <string name="analytics_tutorial_credit_title">Gerenciamento de Cartões de Crédito</string>
     <string name="analytics_tutorial_credit_desc">Toque no cartão de crédito para ver todas as transações CC, marcá-las como pagas ou ajustar a data do cubo de cobrança para evitar juros.</string>
     <string name="analytics_tutorial_history_title">Histórico de transações</string>

@@ -532,7 +532,7 @@
     <string name="savings_recommendation_current_savings_format">当前存款：%1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">定期支出</string>
     <string name="savings_recommendation_one_time_expenses_label">一次性支出</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">连续 6 个月左右每周期存下 20%，你可以：</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">连续 6 个月左右每周期存下 %1$d%%，你可以：</string>
     <string name="savings_recommendation_goal_format" formatted="false">要在 %2$d 月内达到 %1$s，每周期需要存下 %3$s。</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">正在显示默认的 %1$d%% 示例。请在设置中设置一个包含具体金额的存款目标。</string>
     <!-- Settings: Savings Preferences -->
@@ -668,6 +668,8 @@
     <string name="analytics_tutorial_charts_desc">了解哪些分类正在蚕食你的预算。点击饼图扇区或分类名称来查看明细。</string>
     <string name="analytics_tutorial_savings_title">存钱妙招</string>
     <string name="analytics_tutorial_savings_desc">基于 50/30/20 法则建议的储蓄金额，可随时在设置中调整。</string>
+    <string name="analytics_no_period_title">还没有预算周期</string>
+    <string name="analytics_no_period_body">创建一个预算周期，你的支出、分类和储蓄就会显示在这里。</string>
     <string name="analytics_tutorial_credit_title">信用卡管理</string>
     <string name="analytics_tutorial_credit_desc">点击卡片可查看信用卡账单、标记已还款或修改账单日来避免产生利息。</string>
     <string name="analytics_tutorial_history_title">账单明细</string>

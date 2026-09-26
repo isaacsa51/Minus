@@ -534,7 +534,7 @@
     <string name="savings_recommendation_current_savings_format">Épargne actuelle : %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">Dépenses récurrentes</string>
     <string name="savings_recommendation_one_time_expenses_label">Dépenses ponctuelles</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">Si vous épargnez les 20 % à chaque période pendant environ 6 mois, vous pourriez constituer :</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">Si vous épargnez les %1$d %% à chaque période pendant environ 6 mois, vous pourriez constituer :</string>
     <string name="savings_recommendation_goal_format" formatted="false">Pour atteindre %1$s en %2$d mois, épargnez %3$s par période.</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">Affichage de l\'exemple par défaut %1$d%%. Définissez un objectif d\'épargne dans les Paramètres pour cibler un montant précis.</string>
     <!-- Settings: Savings Preferences -->
@@ -669,6 +669,8 @@
     <string name="analytics_tutorial_charts_desc">Voir quelles catégories sont en train de consommer votre budget. Appuyez sur n\'importe quel nom de catégorie pour plus de détails.</string>
     <string name="analytics_tutorial_savings_title">Recommandation d\'épargne</string>
     <string name="analytics_tutorial_savings_desc">Sur la base de la règle 50/30/20, nous vous suggérons de sauvegarder le montant idéal. Cela peut être modifié dans les paramètres.</string>
+    <string name="analytics_no_period_title">Aucune période budgétaire</string>
+    <string name="analytics_no_period_body">Créez une période budgétaire et vos dépenses, catégories et économies apparaîtront ici.</string>
     <string name="analytics_tutorial_credit_title">Gestion des cartes de crédit</string>
     <string name="analytics_tutorial_credit_desc">Appuyez sur la carte de crédit pour afficher toutes les transactions en CC, les marquer comme payées ou ajuster votre date limite de facturation pour éviter les intérêts.</string>
     <string name="analytics_tutorial_history_title">Historique des transactions</string>

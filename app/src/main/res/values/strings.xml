@@ -638,7 +638,7 @@
     <string name="savings_recommendation_current_savings_format">Current savings: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">Recurring expenses</string>
     <string name="savings_recommendation_one_time_expenses_label">One-time expenses</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">If you save the 20% each period for about 6 months, you could build:</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">If you save the %1$d%% each period for about 6 months, you could build:</string>
     <string name="savings_recommendation_six_month_example_equation" translatable="false">%1$s × 6 = %2$s</string>
     <string name="savings_recommendation_goal_format" formatted="false">To reach %1$s in %2$d months, save %3$s per period.</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">Showing the default %1$d%% example. Set a savings goal in Settings to target a specific amount.</string>
@@ -801,6 +801,8 @@
     <string name="analytics_tutorial_charts_desc">See which categories are eating up your budget. Tap any slice or category name for details.</string>
     <string name="analytics_tutorial_savings_title">Savings Recommendation</string>
     <string name="analytics_tutorial_savings_desc">Based on the 50/30/20 rule, we suggest how much you should ideally be saving. This can be changed on settings.</string>
+    <string name="analytics_no_period_title">No budget period yet</string>
+    <string name="analytics_no_period_body">Create a budget period and your spending, categories and savings will show up here.</string>
     <string name="analytics_tutorial_credit_title">Credit Card Management</string>
     <string name="analytics_tutorial_credit_desc">Tap the credit card to view all CC transactions, mark them as paid, or adjust your billing cutoff date to avoid interest.</string>
     <string name="analytics_tutorial_history_title">Transaction History</string>

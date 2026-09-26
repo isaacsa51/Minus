@@ -532,7 +532,7 @@
     <string name="savings_recommendation_current_savings_format">Ahorros actuales: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">Gastos recurrentes</string>
     <string name="savings_recommendation_one_time_expenses_label">Gastos únicos</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">Si ahorras el 20% en cada período durante aproximadamente 6 meses, podrías construir:</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">Si ahorras el %1$d%% en cada período durante aproximadamente 6 meses, podrías construir:</string>
     <string name="savings_recommendation_goal_format" formatted="false">Para alcanzar %1$s en %2$d meses, ahorra %3$s por período.</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando el ejemplo por defecto del %1$d%%. Define una meta de ahorro en Ajustes para apuntar a un monto específico.</string>
     <!-- Settings: Savings Preferences -->
@@ -668,6 +668,8 @@
     <string name="analytics_tutorial_charts_desc">Ve cuáles categorías están consumiendo tu presupuesto. Haz tap en la gráfica o en el nombre para ver más detalles.</string>
     <string name="analytics_tutorial_savings_title">Recomendaciones de Ahorro</string>
     <string name="analytics_tutorial_savings_desc">Según la regla 50/30/20, te sugerimos cuánto deberías ahorrar idealmente. Puedes modificar esta configuración en ajustes.</string>
+    <string name="analytics_no_period_title">Aún no hay período de presupuesto</string>
+    <string name="analytics_no_period_body">Crea un período de presupuesto y aquí aparecerán tus gastos, categorías y ahorros.</string>
     <string name="analytics_tutorial_credit_title">Gestión de tarjeta de crédito</string>
     <string name="analytics_tutorial_credit_desc">Pulsa sobre la estrella para ver todas las transacciones realizadas con ella, marcarlas como pagadas o ajusta la fecha límite de facturación para evitar intereses.</string>
     <string name="analytics_tutorial_history_title">Historial de Transacciones</string>
