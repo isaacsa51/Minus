@@ -713,4 +713,6 @@
     <string name="past_period_delete_confirm_message">Questa azione elimina definitivamente il periodo %1$s – %2$s e le sue spese. Gli abbonamenti vengono mantenuti. Sarà richiesta l\'autenticazione biometrica.</string>
     <string name="dialog_yes">Sì</string>
     <string name="loading">Caricamento…</string>
+    <string name="widget_budget_pill_title">Pillola del budget</string>
+    <string name="widget_budget_pill_description">Il residuo della modalità di visualizzazione scelta — giornaliera, settimanale, bisettimanale o mensile — in una barra sottile</string>
 </resources>

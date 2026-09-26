@@ -713,4 +713,6 @@
     <string name="past_period_delete_confirm_message">期間 %1$s – %2$s とその支出が完全に削除されます。サブスクリプションは保持されます。生体認証が必要です。</string>
     <string name="dialog_yes">はい</string>
     <string name="loading">読み込み中…</string>
+    <string name="widget_budget_pill_title">予算ピル</string>
+    <string name="widget_budget_pill_description">選択した表示モード（日次・週次・隔週・月次）の残額をスリムなバーで表示</string>
 </resources>

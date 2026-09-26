@@ -713,4 +713,6 @@
     <string name="past_period_delete_confirm_message">इससे पीरियड %1$s – %2$s और उसके खर्च स्थायी रूप से हट जाएँगे। सब्सक्रिप्शन बने रहेंगे। बायोमेट्रिक प्रमाणीकरण आवश्यक होगा।</string>
     <string name="dialog_yes">हाँ</string>
     <string name="loading">लोड हो रहा है…</string>
+    <string name="widget_budget_pill_title">बजट पिल</string>
+    <string name="widget_budget_pill_description">आपके चुने गए व्यू मोड — दैनिक, साप्ताहिक, द्वि-साप्ताहिक या मासिक — का शेष एक पतली पट्टी में</string>
 </resources>

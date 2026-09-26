@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  Fully rounded container for the budget pill widget — the `md.sys.shape.corner.full`
+  equivalent of the `CircleShape` the in-app BudgetPill card uses.
+
+  It is drawn white on purpose: the widget tints it per state with
+  `ColorFilter.tint`, which ImageView applies as SRC_ATOP, so only the shape's
+  alpha matters. Tinting an Image (instead of `GlanceModifier.cornerRadius`) keeps
+  the pill rounded on API 27-30 too, where Glance cannot round a view's corners.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="999dp" />
+    <solid android:color="@android:color/white" />
+</shape>

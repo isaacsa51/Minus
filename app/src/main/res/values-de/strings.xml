@@ -713,4 +713,6 @@
     <string name="past_period_delete_confirm_message">Dadurch werden der Zeitraum %1$s – %2$s und seine Ausgaben dauerhaft gelöscht. Abos bleiben erhalten. Biometrische Authentifizierung ist erforderlich.</string>
     <string name="dialog_yes">Ja</string>
     <string name="loading">Wird geladen…</string>
+    <string name="widget_budget_pill_title">Budget-Leiste</string>
+    <string name="widget_budget_pill_description">Der Restbetrag für den gewählten Ansichtsmodus – täglich, wöchentlich, zweiwöchentlich oder monatlich – als schmale Leiste</string>
 </resources>

@@ -713,4 +713,6 @@
     <string name="past_period_delete_confirm_message">Η περίοδος %1$s – %2$s και τα έξοδά της θα διαγραφούν οριστικά. Οι συνδρομές διατηρούνται. Θα απαιτηθεί βιομετρικός έλεγχος ταυτότητας.</string>
     <string name="dialog_yes">Ναι</string>
     <string name="loading">Φόρτωση…</string>
+    <string name="widget_budget_pill_title">Μπάρα προϋπολογισμού</string>
+    <string name="widget_budget_pill_description">Το υπόλοιπο για την προβολή που επιλέξατε — ημερήσια, εβδομαδιαία, δεκαπενθήμερη ή μηνιαία — σε μια λεπτή μπάρα</string>
 </resources>

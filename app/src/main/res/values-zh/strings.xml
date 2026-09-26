@@ -712,4 +712,6 @@
     <string name="past_period_delete_confirm_message">这将永久删除 %1$s – %2$s 周期及其支出。订阅将保留。需要生物识别验证。</string>
     <string name="dialog_yes">是</string>
     <string name="loading">加载中…</string>
+    <string name="widget_budget_pill_title">预算胶囊</string>
+    <string name="widget_budget_pill_description">以细长条显示所选视图模式（每日、每周、每两周、每月）的剩余金额</string>
 </resources>

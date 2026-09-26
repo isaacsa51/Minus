@@ -1,11 +1,14 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
 import android.content.Context
+import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.calculateBudgetMetrics
 import com.serranoie.app.minus.presentation.widget.DailySpending
 import com.serranoie.app.minus.presentation.widget.MonthHeatmapData
 import com.serranoie.app.minus.presentation.widget.updateAverageSpendWidget
 import com.serranoie.app.minus.presentation.widget.updateBudgetOverviewWidget
+import com.serranoie.app.minus.presentation.widget.updateBudgetPillWidget
 import com.serranoie.app.minus.presentation.widget.updateCompleteBudgetWidget
 import com.serranoie.app.minus.presentation.widget.updateDaysCountdownWidget
 import com.serranoie.app.minus.presentation.widget.updateExpenseWidget
@@ -24,8 +27,11 @@ class BudgetWidgetUpdater @Inject constructor(
 ) {
 
     suspend fun update(baseState: BudgetUiState) {
-        val budget = baseState.budgetState ?: return
         val currency = baseState.budgetSettings?.currencyCode ?: "USD"
+        // Pushed first: unlike the others, the pill has a "set up your budget" face to show.
+        updateBudgetPill(baseState, currency)
+
+        val budget = baseState.budgetState ?: return
         val totalSpent = budget.totalSpentInPeriod.toInt()
         val totalBudget = baseState.budgetSettings?.totalBudget?.toInt() ?: 1
         val daysLeft = budget.daysRemaining
@@ -42,6 +48,45 @@ class BudgetWidgetUpdater @Inject constructor(
         updateMonthHeatmapWidget(context, heatmapData.currentMonthHeatmap, heatmapData.currentMonthTotalSpent, currency)
         updateMinMaxSpentWidget(context, currentPeriodTransactions, currency)
         updateAverageSpendWidget(context, currentPeriodTransactions, currency, startDate, endDate)
+    }
+
+    /**
+     * Feeds the slim budget-pill widget the same numbers the in-app pill shows: the metrics for the
+     * view mode the user selected (daily / weekly / biweekly / monthly), computed by the pill's own
+     * [calculateBudgetMetrics] so the two can never drift apart.
+     */
+    private suspend fun updateBudgetPill(baseState: BudgetUiState, currency: String) {
+        val settings = baseState.budgetSettings
+        val budgetState = baseState.budgetState
+        val viewPeriod = baseState.selectedViewPeriod ?: settings?.period ?: BudgetPeriod.DAILY
+
+        if (settings == null || budgetState == null) {
+            updateBudgetPillWidget(
+                context = context,
+                hasBudget = false,
+                viewPeriod = viewPeriod,
+                remaining = BigDecimal.ZERO,
+                currency = currency,
+                progress = 0f,
+                isOverBudget = false,
+                isOverPeriodAllocation = false,
+                nextAllocation = null,
+            )
+            return
+        }
+
+        val metrics = calculateBudgetMetrics(budgetState, viewPeriod, settings.splitMode)
+        updateBudgetPillWidget(
+            context = context,
+            hasBudget = true,
+            viewPeriod = viewPeriod,
+            remaining = metrics.periodRemaining,
+            currency = currency,
+            progress = metrics.spendProgress,
+            isOverBudget = metrics.isCurrentPeriodOverBudget,
+            isOverPeriodAllocation = metrics.isOverCurrentSubPeriod,
+            nextAllocation = metrics.nextPeriodAllocation,
+        )
     }
 
     private fun filterCurrentPeriodTransactions(baseState: BudgetUiState): List<Transaction> {

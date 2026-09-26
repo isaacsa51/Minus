@@ -714,4 +714,6 @@
     <string name="past_period_delete_confirm_message">Cela supprime définitivement la période %1$s – %2$s et ses dépenses. Les abonnements sont conservés. Une authentification biométrique sera requise.</string>
     <string name="dialog_yes">Oui</string>
     <string name="loading">Chargement…</string>
+    <string name="widget_budget_pill_title">Pilule de budget</string>
+    <string name="widget_budget_pill_description">Le solde du mode d’affichage choisi — quotidien, hebdomadaire, bimensuel ou mensuel — dans une barre fine</string>
 </resources>

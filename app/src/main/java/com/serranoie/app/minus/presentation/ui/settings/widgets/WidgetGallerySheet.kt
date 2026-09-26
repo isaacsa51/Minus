@@ -54,6 +54,7 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.material3.ColorProviders
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.widget.AddExpenseWidget
@@ -62,6 +63,8 @@ import com.serranoie.app.minus.presentation.widget.AverageSpendWidget
 import com.serranoie.app.minus.presentation.widget.AverageSpendWidgetReceiver
 import com.serranoie.app.minus.presentation.widget.BudgetOverviewWidget
 import com.serranoie.app.minus.presentation.widget.BudgetOverviewWidgetReceiver
+import com.serranoie.app.minus.presentation.widget.BudgetPillWidget
+import com.serranoie.app.minus.presentation.widget.BudgetPillWidgetReceiver
 import com.serranoie.app.minus.presentation.widget.CompleteBudgetWidget
 import com.serranoie.app.minus.presentation.widget.CompleteBudgetWidgetReceiver
 import com.serranoie.app.minus.presentation.widget.DaysCountdownWidget
@@ -83,6 +86,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
+import java.math.BigDecimal
 import java.time.YearMonth
 import androidx.glance.LocalContext as GlanceLocalContext
 import androidx.glance.layout.Box as GlanceBox
@@ -103,6 +107,22 @@ private data class WidgetGalleryItem(
 )
 
 private val widgetGalleryItems = listOf(
+    WidgetGalleryItem(
+        titleRes = R.string.widget_budget_pill_title,
+        descriptionRes = R.string.widget_budget_pill_description,
+        receiver = BudgetPillWidgetReceiver::class.java,
+        previewHeight = 50.dp,
+    ) {
+        BudgetPillWidget().BudgetPillContent(
+            hasBudget = true,
+            viewPeriod = BudgetPeriod.WEEKLY,
+            remaining = BigDecimal("413.33"),
+            currency = PREVIEW_CURRENCY,
+            progress = 0.45f,
+            isOverBudget = false,
+            isOverPeriodAllocation = false,
+        )
+    },
     WidgetGalleryItem(
         titleRes = R.string.widget_complete_budget_title,
         descriptionRes = R.string.widget_complete_budget_description,

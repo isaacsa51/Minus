@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  Locked to a single row: it starts at 2x1 cells (2 wide, 1 tall) and can only be stretched
+  sideways to 1xN. `resizeMode="horizontal"` plus a `maxResizeHeight` equal to `minHeight` keeps
+  the launcher from ever offering a vertical handle, so the pill stays a slim bar.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:minWidth="110dp"
+    android:minHeight="50dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="50dp"
+    android:maxResizeWidth="600dp"
+    android:maxResizeHeight="50dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:updatePeriodMillis="1800000"
+    android:description="@string/widget_budget_pill_description"
+    android:previewLayout="@layout/widget_budget_pill_preview"
+    android:previewImage="@drawable/ic_launcher_foreground"
+    android:resizeMode="horizontal"
+    android:widgetCategory="home_screen|keyguard">
+</appwidget-provider>

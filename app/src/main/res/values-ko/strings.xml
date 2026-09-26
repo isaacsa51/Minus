@@ -714,4 +714,6 @@
     <string name="past_period_delete_confirm_message">%1$s – %2$s 기간과 해당 지출이 영구 삭제됩니다. 구독은 유지됩니다. 생체 인증이 필요합니다.</string>
     <string name="dialog_yes">예</string>
     <string name="loading">로딩 중…</string>
+    <string name="widget_budget_pill_title">예산 필</string>
+    <string name="widget_budget_pill_description">선택한 보기 모드(일간, 주간, 격주, 월간)의 남은 금액을 슬림한 바로 표시</string>
 </resources>
