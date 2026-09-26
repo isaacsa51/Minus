@@ -713,4 +713,6 @@
     <string name="past_period_delete_confirm_message">Периодът %1$s – %2$s и разходите му ще бъдат изтрити завинаги. Абонаментите се запазват. Ще се изисква биометрично удостоверяване.</string>
     <string name="dialog_yes">Да</string>
     <string name="loading">Зареждане…</string>
+    <string name="widget_budget_pill_title">Бюджетна лента</string>
+    <string name="widget_budget_pill_description">Остатъкът за избрания изглед — дневен, седмичен, двуседмичен или месечен — в тънка лента</string>
 </resources>

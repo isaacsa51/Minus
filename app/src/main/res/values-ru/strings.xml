@@ -756,4 +756,6 @@
   <string name="past_period_delete_confirm_message">Период %1$s – %2$s и его расходы будут удалены безвозвратно. Подписки сохраняются. Потребуется биометрическая аутентификация.</string>
   <string name="dialog_yes">Да</string>
     <string name="loading">Загрузка…</string>
+    <string name="widget_budget_pill_title">Бюджетная полоса</string>
+    <string name="widget_budget_pill_description">Остаток за выбранный режим просмотра — день, неделя, две недели или месяц — в узкой полосе</string>
 </resources>

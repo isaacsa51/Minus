@@ -205,6 +205,7 @@ class BudgetViewModel @Inject constructor(
                 it > BigDecimal.ZERO && pendingSurplusStrategy == null
             },
             lastLeftoverChoice = userSettings.leftoverChoices.maxByOrNull { it.key }?.value,
+            selectedViewPeriod = userSettings.budgetSplitViewPeriod,
         )
     }.catch { error ->
         logcat(TAG) { "Error in uiState pipeline: ${error.asLog()}" }

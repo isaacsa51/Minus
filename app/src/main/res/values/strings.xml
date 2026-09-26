@@ -824,4 +824,7 @@
     <string name="budget_graph_page_indicator" translatable="false">%1$d / %2$d</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
+    <string name="widget_budget_pill_title">Budget Pill</string>
+    <string name="widget_budget_pill_description">Remaining for the view mode you picked — daily, weekly, biweekly or monthly — in a slim bar</string>
+    <string name="widget_budget_pill_preview_amount" translatable="false">$110.00</string>
 </resources>

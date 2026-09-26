@@ -713,4 +713,6 @@
     <string name="past_period_delete_confirm_message">Isso exclui permanentemente o período %1$s – %2$s e suas despesas. As assinaturas são mantidas. Será necessária autenticação biométrica.</string>
     <string name="dialog_yes">Sim</string>
     <string name="loading">Carregando…</string>
+    <string name="widget_budget_pill_title">Pílula de orçamento</string>
+    <string name="widget_budget_pill_description">O restante do modo de visualização escolhido — diário, semanal, quinzenal ou mensal — numa barra fina</string>
 </resources>

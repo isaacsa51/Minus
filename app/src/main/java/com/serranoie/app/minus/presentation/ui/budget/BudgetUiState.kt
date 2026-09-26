@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
+import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.LeftoverChoice
@@ -44,6 +45,12 @@ data class BudgetUiState(
     val hasUnresolvedRolloverSurplus: Boolean = false,
     val unresolvedSurplusAmount: BigDecimal? = null,
     val lastLeftoverChoice: LeftoverChoice? = null,
+    /**
+     * The period the user picked for the budget pill's view mode, as persisted in settings. Null
+     * until they choose one, in which case the budget's own [BudgetSettings.period] stands in.
+     * Kept here so a view-mode change alone still re-emits this state and refreshes the widgets.
+     */
+    val selectedViewPeriod: BudgetPeriod? = null,
 ) {
     companion object {
         val INITIAL = BudgetUiState()
