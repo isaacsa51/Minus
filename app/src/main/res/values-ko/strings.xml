@@ -257,7 +257,7 @@
     <string name="changelog_close">닫기</string>
     <string name="changelog_previous_versions">이전 버전</string>
     <string name="changelog_updated_to">업데이트된 내용: %1$s</string>
-    <string name="changelog_see_changes">새로운 기능을 놓치지 않도록 변경 사항을 확인해 보세요</string>
+    <string name="changelog_see_changes">Minus가 업데이트되었습니다.&lt;br&gt;자세한 내용은 &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt;를 참조하세요.</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">기간을 선택하세요</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d일 · %2$s - %3$s</string>

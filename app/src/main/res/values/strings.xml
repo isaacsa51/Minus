@@ -326,7 +326,7 @@
     <string name="changelog_close">Close</string>
     <string name="changelog_previous_versions">Previous version</string>
     <string name="changelog_updated_to">Updated to: %1$s</string>
-    <string name="changelog_see_changes">Minus is now updated to the latest version, the list below specifies on a brief way the changes, features &amp; fixes implemented into this new version.&lt;br&gt;If you still have doubts about the functionality of the app, please look into the &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt;</string>
+    <string name="changelog_see_changes">Minus is now updated.&lt;br&gt;For more details, visit the &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt;.</string>
 
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Select the period</string>

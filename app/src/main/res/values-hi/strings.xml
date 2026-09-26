@@ -257,7 +257,7 @@
     <string name="changelog_close">बंद करें</string>
     <string name="changelog_previous_versions">पिछला वर्शन</string>
     <string name="changelog_updated_to">इस वर्शन पर अपडेट किया गया: %1$s</string>
-    <string name="changelog_see_changes">सभी बदलाव नीचे देखें ताकि कोई नया फ़ीचर न छूटे</string>
+    <string name="changelog_see_changes">Minus अब अपडेट हो गया है।&lt;br&gt;अधिक जानकारी के लिए, &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt; देखें।</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">पीरियड चुनें</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d दिन · %2$s - %3$s</string>

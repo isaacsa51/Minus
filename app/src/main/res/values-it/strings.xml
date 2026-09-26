@@ -259,7 +259,7 @@
     <string name="changelog_close">Chiudi</string>
     <string name="changelog_previous_versions">Versione precedente</string>
     <string name="changelog_updated_to">Aggiornato alla versione: %1$s</string>
-    <string name="changelog_see_changes">Consulta qui sotto tutte le modifiche per non perdere nessuna novità</string>
+    <string name="changelog_see_changes">Minus è stato aggiornato.&lt;br&gt;Per ulteriori dettagli, visita la &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt;.</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Seleziona il periodo</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d giorni · %2$s - %3$s</string>

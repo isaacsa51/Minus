@@ -259,7 +259,7 @@
     <string name="changelog_close">关闭</string>
     <string name="changelog_previous_versions">上一版本</string>
     <string name="changelog_updated_to">Updated to: %1$s</string>
-    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
+    <string name="changelog_see_changes">Minus 已更新。&lt;br&gt;如需了解更多详情，请访问 &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt;。</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">选择周期</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d 天 · %2$s - %3$s</string>
