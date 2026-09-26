@@ -61,29 +61,15 @@ import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
 import com.serranoie.app.minus.presentation.util.withTone
 import java.math.BigDecimal
 
-/**
- * Slim 1xN home screen counterpart of the in-app `BudgetPill`.
- *
- * Layout and color mirror the pill's small-height variant: a `corner.full` container filled from
- * the leading edge by the spend progress, with the view-period label on the start side and the
- * amount left for that period on the end side. When the period (or the whole budget) is blown the
- * amount drops out and the status label centres, exactly like the pill does.
- *
- * The widget is locked to a single row and only grows horizontally (1x2 → 1xN), so every size
- * decision here is driven by [LocalSize]'s width.
- */
 private val PILL_PADDING = 4.dp
 
 /** Below this the label/amount pair needs the tighter type and padding to stay on one line. */
 private val COMPACT_WIDTH = 190.dp
 
-/** From here on there is room for the pill's full 18dp inset and its 18sp amount. */
 private val WIDE_WIDTH = 300.dp
 
-/** The secondary "for next period" line only earns its place once the row is this tall. */
 private val SECONDARY_LINE_MIN_HEIGHT = 58.dp
 
-// BudgetPill's tonal recipe for the track/fill pair, kept verbatim so both read as one component.
 private const val CHROMA_MULTIPLIER_DARK = 2f
 private const val CHROMA_MULTIPLIER_LIGHT = 1.35f
 private const val FILL_TONE_DARK = 50.0
@@ -106,7 +92,6 @@ class BudgetPillWidgetReceiver : GlanceAppWidgetReceiver() {
 
 class BudgetPillWidget : GlanceAppWidget() {
 
-    // Exact, not Responsive: the progress fill is a measured width, so it needs the real one.
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -222,7 +207,6 @@ class BudgetPillWidget : GlanceAppWidget() {
     }
 }
 
-/** The pill's resting container — `surface-container`-like tone of the harmonized status color. */
 @Composable
 private fun PillTrack(color: Color) {
     Image(
@@ -234,11 +218,6 @@ private fun PillTrack(color: Color) {
     )
 }
 
-/**
- * The spend progress, drawn as a second pill pinned to the leading edge. Glance has no fractional
- * weight, so the width is measured from [pillWidth]; it never drops below [pillHeight] so the
- * trailing cap stays a circle instead of collapsing into a sliver.
- */
 @Composable
 private fun PillFill(color: Color, progress: Float, pillWidth: Dp, pillHeight: Dp) {
     val fraction = progress.coerceIn(0f, 1f)
@@ -262,7 +241,6 @@ private fun PillFill(color: Color, progress: Float, pillWidth: Dp, pillHeight: D
     }
 }
 
-/** "Today  $110.00" — the pill's default face. */
 @Composable
 private fun LabelAndAmount(
     label: String,
@@ -306,7 +284,6 @@ private fun LabelAndAmount(
     }
 }
 
-/** "Budget amount exceeded" / "Set up your budget" — emphasized and centred, no amount. */
 @Composable
 private fun CentredStatus(label: String, secondary: String?, labelSize: TextUnit, color: Color) {
     Column(
@@ -347,11 +324,6 @@ private fun SecondaryLine(text: String, color: Color, textAlign: TextAlign) {
 
 private data class PillColors(val track: Color, val fill: Color, val content: Color)
 
-/**
- * Reproduces `BudgetPill`'s color pipeline: blend good → notGood → bad by progress, harmonize the
- * result towards the widget host's primary so it stays in the Material You family, then read the
- * track/fill/content roles off that seed.
- */
 @Composable
 private fun pillColors(context: Context, progress: Float, hasBudget: Boolean): PillColors {
     val isDark = context.isNightMode
@@ -400,11 +372,6 @@ private fun BudgetPeriod.nextAllocationRes(): Int = when (this) {
     BudgetPeriod.MONTHLY -> R.string.budget_pill_next_monthly
 }
 
-/**
- * Pushes the pill state the widget renders. [remaining], [progress] and the two "over" flags all
- * come from `calculateBudgetMetrics` for the period the user picked in the app, so the widget and
- * the in-app pill can never disagree.
- */
 suspend fun updateBudgetPillWidget(
     context: Context,
     hasBudget: Boolean,
@@ -436,8 +403,6 @@ suspend fun updateBudgetPillWidget(
         BudgetPillWidget().update(context, glanceId)
     }
 }
-
-// Previews mirror the BudgetPill screenshot-test cases at the sizes this widget can take.
 
 @Preview(widthDp = 250, heightDp = 50)
 @Composable
