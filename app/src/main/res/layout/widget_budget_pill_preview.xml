@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  Static stand-in shown in the launcher's widget picker. Mirrors BudgetPillWidget: pill track,
-  a partial progress fill pinned to the leading edge, then the period label and the amount left.
--->
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -25,7 +22,7 @@
             android:background="@drawable/widget_budget_pill_shape"
             android:backgroundTint="?android:attr/colorAccent" />
 
-        <Space
+        <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="65" />

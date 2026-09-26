@@ -714,5 +714,5 @@
     <string name="dialog_yes">Oui</string>
     <string name="loading">Chargement…</string>
     <string name="widget_budget_pill_title">Pilule de budget</string>
-    <string name="widget_budget_pill_description">Le solde du mode d’affichage choisi — quotidien, hebdomadaire, bimensuel ou mensuel — dans une barre fine</string>
+    <string name="widget_budget_pill_description">Le solde du mode d’affichage choisi — quotidien, hebdomadaire, bihebdomadaire ou mensuel — dans une barre fine</string>
 </resources>
