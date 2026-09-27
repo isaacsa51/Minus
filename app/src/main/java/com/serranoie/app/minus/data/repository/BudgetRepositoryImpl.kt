@@ -353,6 +353,15 @@ class BudgetRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun createCategory(name: String) {
+        val existing = categoryDao.getCategoryByName(name)
+        if (existing == null) {
+            categoryDao.insertCategory(CategoryEntity(name = name, usageCount = 0))
+        } else if (existing.isHidden) {
+            categoryDao.unhideCategory(name)
+        }
+    }
+
     override suspend fun hideCategory(name: String) {
         categoryDao.hideCategory(name)
     }

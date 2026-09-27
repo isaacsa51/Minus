@@ -26,6 +26,7 @@ data class UserSettings(
     val categoryGridModeEnabled: Boolean = false,
     val extraNoteEnabled: Boolean = false,
     val reserveUpcomingChargesEnabled: Boolean = false,
+    val newCategoryTagEnabled: Boolean = false,
     val tutorialBoxCompleted: Boolean = false,
     val firstLaunchTutorialStage: FirstLaunchTutorialStage = FirstLaunchTutorialStage.COMPLETED,
     val analyticsTutorialCompleted: Boolean = false,

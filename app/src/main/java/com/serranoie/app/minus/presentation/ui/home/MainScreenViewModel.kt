@@ -45,6 +45,7 @@ class MainScreenViewModel @Inject constructor(
             directCategoryPopupEnabled = settings.categoryPickerDirectPopupEnabled,
             categoryGridModeEnabled = settings.categoryGridModeEnabled,
             extraNoteEnabled = settings.extraNoteEnabled,
+            newCategoryTagEnabled = settings.newCategoryTagEnabled,
             tutorialStage = settings.firstLaunchTutorialStage,
             selectedViewPeriod = settings.budgetSplitViewPeriod ?: local.selectedViewPeriod,
             pendingDeleteTransaction = local.pendingDeleteTransaction,

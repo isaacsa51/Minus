@@ -147,6 +147,7 @@ fun MainScreenContent(
     val directCategoryPopupEnabled = mainScreenState.directCategoryPopupEnabled
     val categoryGridModeEnabled = mainScreenState.categoryGridModeEnabled
     val extraNoteEnabled = mainScreenState.extraNoteEnabled
+    val newCategoryTagEnabled = mainScreenState.newCategoryTagEnabled
     val showBudgetPeriodSheet = mainScreenState.showBudgetPeriodSheet
     val forceBudgetPeriodSheetSetup = mainScreenState.forceBudgetPeriodSheetSetup
     val selectedViewPeriod = mainScreenState.selectedViewPeriod
@@ -308,12 +309,14 @@ fun MainScreenContent(
                         directCategoryPopupEnabled,
                         categoryGridModeEnabled,
                         extraNoteEnabled,
+                        newCategoryTagEnabled,
                     ) {
                         MainScreenFeatureFlags(
                             showCreditQuickToggleFeature = showCreditQuickToggleFeature,
                             directCategoryPopupEnabled = directCategoryPopupEnabled,
                             categoryGridModeEnabled = categoryGridModeEnabled,
                             extraNoteEnabled = extraNoteEnabled,
+                            newCategoryTagEnabled = newCategoryTagEnabled,
                         )
                     }
 
@@ -377,12 +380,14 @@ fun MainScreenContent(
                         directCategoryPopupEnabled,
                         categoryGridModeEnabled,
                         extraNoteEnabled,
+                        newCategoryTagEnabled,
                     ) {
                         MainScreenFeatureFlags(
                             showCreditQuickToggleFeature = showCreditQuickToggleFeature,
                             directCategoryPopupEnabled = directCategoryPopupEnabled,
                             categoryGridModeEnabled = categoryGridModeEnabled,
                             extraNoteEnabled = extraNoteEnabled,
+                            newCategoryTagEnabled = newCategoryTagEnabled,
                         )
                     }
 
@@ -556,19 +561,17 @@ private fun PhoneLayout(
     val systemKeyboardHeight = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
     val systemKeyboardHeightPx = with(localDensity) { systemKeyboardHeight.toPx() }
 
-    val isShowSystemKeyboard = systemKeyboardHeightPx > 0f
-    var keepImeLayout by remember { mutableStateOf(false) }
     var lastImeHeightPx by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(systemKeyboardHeightPx) {
         if (systemKeyboardHeightPx > 0f) {
-            lastImeHeightPx = maxOf(lastImeHeightPx, systemKeyboardHeightPx)
-            keepImeLayout = true
+            delay(ImeSettleDelay)
+            lastImeHeightPx = systemKeyboardHeightPx
         } else {
-            delay(140.milliseconds)
-            keepImeLayout = false
+            delay(ImeHideDelay)
             lastImeHeightPx = 0f
         }
     }
+    val isImeLayoutCommitted = lastImeHeightPx > 0f
 
     val effectiveProgress =
         if (budgetUiState.isCalculation) 1f - localDragProgress else localDragProgress
@@ -576,7 +579,7 @@ private fun PhoneLayout(
     val internalKeyboardTarget =
         defaultInternalKeyboardHeight + (calcModeKeyboardHeight - defaultInternalKeyboardHeight) * effectiveProgress
 
-    val currentKeyboardHeight = if (isShowSystemKeyboard || keepImeLayout) {
+    val currentKeyboardHeight = if (isImeLayoutCommitted) {
         lastImeHeightPx
     } else {
         internalKeyboardTarget
@@ -585,15 +588,19 @@ private fun PhoneLayout(
     val editorHeight by remember(
         contentHeight,
         currentKeyboardHeight,
-        isShowSystemKeyboard,
-        keepImeLayout,
+        isImeLayoutCommitted,
         navBarHeightPx,
         budgetUiState.isCalculation,
         localDragProgress,
     ) {
         derivedStateOf {
-            val additionalOffset =
-                with(localDensity) { if (isShowSystemKeyboard || keepImeLayout) 18.dp.toPx() else 18.dp.toPx() }
+            val additionalOffset = with(localDensity) {
+                if (isImeLayoutCommitted) {
+                    (EditorBottomInset + ImeExtraGap).toPx()
+                } else {
+                    EditorBottomInset.toPx()
+                }
+            }
             contentHeight
                 .minus(
                     currentKeyboardHeight.plus(navBarHeightPx).plus(additionalOffset)
@@ -1480,6 +1487,13 @@ private fun MainScreenEditorSection(
                 ),
             )
         },
+        onCreateCategory = { name ->
+            actions.onProcessIntent(
+                MainScreenUiIntent.ProcessBudgetEditorIntent(
+                    BudgetEditorIntent.CreateCategory(name),
+                ),
+            )
+        },
         onRecurrentToggle = { enabled ->
             actions.onProcessIntent(
                 MainScreenUiIntent.ProcessBudgetEditorIntent(
@@ -1496,6 +1510,7 @@ private fun MainScreenEditorSection(
         },
         showCreditQuickToggleFeature = featureFlags.showCreditQuickToggleFeature,
         extraNoteEnabled = featureFlags.extraNoteEnabled,
+        newCategoryTagEnabled = featureFlags.newCategoryTagEnabled,
         directCategoryPopupEnabled = featureFlags.directCategoryPopupEnabled,
         categoryGridModeEnabled = featureFlags.categoryGridModeEnabled,
         isCategoryGridVisible = showCategoryGrid,
@@ -1614,3 +1629,8 @@ private fun MainScreenPreview() {
         }
     }
 }
+
+private val EditorBottomInset = 8.dp
+private val ImeExtraGap = 8.dp
+private val ImeSettleDelay = 80.milliseconds
+private val ImeHideDelay = 140.milliseconds

@@ -343,69 +343,6 @@ fun SelectablePaddedItem(
 }
 
 /**
- * A selectable card item that hosts arbitrary content, similar to how [PaddedListGroup] exposes
- * a [content] slot. Use this when a single selectable card needs to compose multiple
- * sub-elements (Text, Switch, Row, etc.) while preserving the segmented padded list shape and
- * the active/inactive styling of [SelectablePaddedItem].
- *
- * Supports two visual states:
- * - **Inactive:** blends into the surface background
- * - **Active:** pill-shaped with secondaryContainer background and larger corner radius
- *
- * @param isActive Whether the item is in active/selected state
- * @param onClick Click handler for the whole card
- * @param modifier Modifier applied to the item
- * @param position The position in the list (affects inactive corner rounding)
- * @param content Composable content rendered inside the card (ColumnScope)
- */
-@Composable
-fun SelectableInfoPaddedItem(
-    isActive: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    position: PaddedListItemPosition = PaddedListItemPosition.Middle,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    val shape = when {
-        isActive -> RoundedCornerShape(16.dp)
-        position == PaddedListItemPosition.Single -> RoundedCornerShape(16.dp)
-        position == PaddedListItemPosition.First -> RoundedCornerShape(
-            topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 4.dp
-        )
-
-        position == PaddedListItemPosition.Last -> RoundedCornerShape(
-            bottomStart = 16.dp, bottomEnd = 16.dp, topStart = 4.dp, topEnd = 4.dp
-        )
-
-        else -> RoundedCornerShape(4.dp)
-    }
-
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .clickable { onClick() },
-        shape = shape,
-        color = if (isActive) {
-            MaterialTheme.colorScheme.secondaryContainer
-        } else {
-            MaterialTheme.colorScheme.surfaceContainer
-        },
-        contentColor = if (isActive) {
-            MaterialTheme.colorScheme.onSecondaryContainer
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        },
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            content = content
-        )
-    }
-}
-
-/**
  * A padded list group container with rounded corners that handles item positioning automatically.
  *
  * @param modifier Modifier to be applied to the container
@@ -548,7 +485,10 @@ fun CustomPaddedListItem(
  * @param onToggleExpanded Callback when the item is clicked to toggle expansion
  * @param position The position of this item in the list (affects corner rounding)
  * @param background The background color for the item
+ * @param contentColor The content color for the item
  * @param borderStroke Optional border, e.g. to flag the item as needing attention
+ * @param customShape Overrides the position-derived shape, e.g. a [MorphCornerShape] that
+ *                    animates the corners while the item expands
  * @param defaultContent The content to show when collapsed
  * @param expandedContent The content to show when expanded
  */
@@ -559,11 +499,13 @@ fun CustomPaddedExpandableItem(
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
     modifier: Modifier = Modifier,
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
     borderStroke: BorderStroke? = null,
+    customShape: Shape? = null,
     defaultContent: @Composable RowScope.() -> Unit,
     expandedContent: @Composable ColumnScope.() -> Unit
 ) {
-    val shape = when (position) {
+    val shape = customShape ?: when (position) {
         PaddedListItemPosition.First -> RoundedCornerShape(
             topStart = 16.dp, topEnd = 16.dp
         )
@@ -579,6 +521,7 @@ fun CustomPaddedExpandableItem(
     Surface(
         shape = shape,
         color = background,
+        contentColor = contentColor,
         border = borderStroke,
         modifier = modifier
             .fillMaxWidth()

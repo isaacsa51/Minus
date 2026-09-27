@@ -182,6 +182,7 @@ fun AppNavGraph(
                 onCategoryGridModeToggle = viewModel::onCategoryGridModeToggle,
                 onExtraNoteToggle = viewModel::onExtraNoteToggle,
                 onReserveUpcomingChargesToggle = viewModel::onReserveUpcomingChargesToggle,
+                onNewCategoryTagToggle = viewModel::onNewCategoryTagToggle,
                 onBack = { navController.popBackStack() },
             )
         }

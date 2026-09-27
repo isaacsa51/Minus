@@ -72,6 +72,7 @@ data class MainScreenUiState(
     val directCategoryPopupEnabled: Boolean = false,
     val categoryGridModeEnabled: Boolean = false,
     val extraNoteEnabled: Boolean = false,
+    val newCategoryTagEnabled: Boolean = false,
 )
 
 data class MainScreenActions(
@@ -91,6 +92,7 @@ data class MainScreenFeatureFlags(
     val directCategoryPopupEnabled: Boolean,
     val categoryGridModeEnabled: Boolean,
     val extraNoteEnabled: Boolean,
+    val newCategoryTagEnabled: Boolean,
 )
 
 data class MainScreenBudgetPeriodState(

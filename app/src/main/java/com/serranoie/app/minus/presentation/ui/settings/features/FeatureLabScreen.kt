@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,6 +18,7 @@ import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.EventRepeat
+import androidx.compose.material.icons.rounded.NewLabel
 import androidx.compose.material.icons.rounded.Sell
 import androidx.compose.material.icons.rounded.YoutubeSearchedFor
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,9 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -37,20 +35,18 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.glance.layout.Column
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.settings.SettingsUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
-import com.serranoie.app.minus.presentation.ui.theme.component.SelectableInfoPaddedItem
+import com.serranoie.app.minus.presentation.ui.theme.component.SettingsToggleItem
 
 @Composable
 fun FeatureLabScreen(
@@ -61,6 +57,7 @@ fun FeatureLabScreen(
     onCategoryGridModeToggle: () -> Unit,
     onExtraNoteToggle: () -> Unit,
     onReserveUpcomingChargesToggle: () -> Unit,
+    onNewCategoryTagToggle: () -> Unit,
     onBack: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -76,95 +73,89 @@ fun FeatureLabScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+            item { FeatureLabIntro() }
+
             item {
-                Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.Help,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.settings_what_is_this_for),
-                            style = MaterialTheme.typography.bodySmallCondensed,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    }
-
-
-                    Text(
-                        text = stringResource(R.string.settings_feature_lab_header),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_feature_group_categories)
+                ) {
+                    SettingsToggleItem(
+                        icon = Icons.Rounded.Sell,
+                        title = stringResource(R.string.settings_feature_category_direct_popup_title),
+                        description = stringResource(R.string.settings_category_picker_direct_popup_description),
+                        checked = state.isCategoryPickerDirectPopupEnabled,
+                        onToggle = onCategoryPickerDirectPopupToggle,
+                        position = PaddedListItemPosition.First,
+                        modifier = Modifier.testTag("FeatureLabCategoryDirectPopup"),
+                    )
+                    SettingsToggleItem(
+                        icon = Icons.AutoMirrored.Filled.ViewList,
+                        title = stringResource(R.string.settings_feature_category_grid_title),
+                        description = stringResource(R.string.settings_category_grid_mode_description),
+                        checked = state.isCategoryGridModeEnabled,
+                        onToggle = onCategoryGridModeToggle,
+                        position = PaddedListItemPosition.Middle,
+                        modifier = Modifier.testTag("FeatureLabCategoryGridMode"),
+                        label = stringResource(R.string.settings_feature_experimental),
+                    )
+                    SettingsToggleItem(
+                        icon = Icons.Rounded.NewLabel,
+                        title = stringResource(R.string.settings_feature_new_category_tag_title),
+                        description = stringResource(R.string.settings_feature_new_category_tag_description),
+                        checked = state.isNewCategoryTagEnabled,
+                        onToggle = onNewCategoryTagToggle,
+                        position = PaddedListItemPosition.Last,
+                        modifier = Modifier.testTag("FeatureLabNewCategoryTag"),
                     )
                 }
             }
 
             item {
-                PaddedListGroup {
-                    FeatureToggleCard(
-                        icon = Icons.Rounded.CreditCard,
-                        title = stringResource(R.string.settings_feature_credit_toggle_title),
-                        description = stringResource(R.string.settings_feature_credit_toggle_details),
-                        switchLabel = stringResource(R.string.settings_feature_credit_toggle_switch_label),
-                        checked = state.isCreditQuickToggleEnabled,
-                        onToggle = onCreditQuickToggle,
-                        position = PaddedListItemPosition.First,
-                        testTag = "FeatureLabCreditToggle",
-                    )
-                    FeatureToggleCard(
-                        icon = Icons.Rounded.YoutubeSearchedFor,
-                        title = stringResource(R.string.settings_feature_show_past_transactions_title),
-                        description = stringResource(R.string.settings_feature_show_past_transactions_subtitle),
-                        switchLabel = stringResource(R.string.settings_feature_show_past_transactions_switch_label),
-                        checked = state.showPastTransactions,
-                        onToggle = onShowPastTransactionsToggle,
-                        position = PaddedListItemPosition.Middle,
-                        testTag = "FeatureLabShowPastTransactions",
-                    )
-                    FeatureToggleCard(
-                        icon = Icons.Rounded.Sell,
-                        title = stringResource(R.string.settings_feature_category_direct_popup_title),
-                        description = stringResource(R.string.settings_category_picker_direct_popup_description),
-                        switchLabel = stringResource(R.string.settings_category_picker_direct_popup_switch_label),
-                        checked = state.isCategoryPickerDirectPopupEnabled,
-                        onToggle = onCategoryPickerDirectPopupToggle,
-                        position = PaddedListItemPosition.Middle,
-                        testTag = "FeatureLabCategoryDirectPopup",
-                    )
-                    FeatureToggleCard(
-                        icon = Icons.AutoMirrored.Filled.ViewList,
-                        title = stringResource(R.string.settings_feature_category_grid_title),
-                        description = stringResource(R.string.settings_category_grid_mode_description),
-                        switchLabel = stringResource(R.string.settings_category_grid_mode_switch_label),
-                        checked = state.isCategoryGridModeEnabled,
-                        onToggle = onCategoryGridModeToggle,
-                        position = PaddedListItemPosition.Middle,
-                        testTag = "FeatureLabCategoryGridMode",
-                    )
-                    FeatureToggleCard(
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_feature_group_transactions)
+                ) {
+                    SettingsToggleItem(
                         icon = Icons.Rounded.EditNote,
                         title = stringResource(R.string.settings_feature_extra_note_title),
                         description = stringResource(R.string.settings_feature_extra_note_description),
-                        switchLabel = stringResource(R.string.settings_feature_extra_note_switch_label),
                         checked = state.isExtraNoteEnabled,
                         onToggle = onExtraNoteToggle,
-                        position = PaddedListItemPosition.Middle,
-                        testTag = "FeatureLabExtraNote",
+                        position = PaddedListItemPosition.First,
+                        modifier = Modifier.testTag("FeatureLabExtraNote"),
                     )
-                    FeatureToggleCard(
+                    SettingsToggleItem(
+                        icon = Icons.Rounded.YoutubeSearchedFor,
+                        title = stringResource(R.string.settings_feature_show_past_transactions_title),
+                        description = stringResource(R.string.settings_feature_show_past_transactions_subtitle),
+                        checked = state.showPastTransactions,
+                        onToggle = onShowPastTransactionsToggle,
+                        position = PaddedListItemPosition.Last,
+                        modifier = Modifier.testTag("FeatureLabShowPastTransactions"),
+                    )
+                }
+            }
+
+            item {
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_feature_group_budget)
+                ) {
+                    SettingsToggleItem(
+                        icon = Icons.Rounded.CreditCard,
+                        title = stringResource(R.string.settings_feature_credit_toggle_title),
+                        description = stringResource(R.string.settings_feature_credit_toggle_details),
+                        checked = state.isCreditQuickToggleEnabled,
+                        onToggle = onCreditQuickToggle,
+                        position = PaddedListItemPosition.First,
+                        modifier = Modifier.testTag("FeatureLabCreditToggle"),
+                    )
+                    SettingsToggleItem(
                         icon = Icons.Rounded.EventRepeat,
                         title = stringResource(R.string.settings_feature_reserve_upcoming_charges_title),
                         description = stringResource(R.string.settings_feature_reserve_upcoming_charges_description),
-                        switchLabel = stringResource(R.string.settings_feature_reserve_upcoming_charges_switch_label),
                         checked = state.isReserveUpcomingChargesEnabled,
                         onToggle = onReserveUpcomingChargesToggle,
                         position = PaddedListItemPosition.Last,
-                        testTag = "FeatureLabReserveUpcomingCharges",
+                        modifier = Modifier.testTag("FeatureLabReserveUpcomingCharges"),
                     )
                 }
             }
@@ -175,57 +166,30 @@ fun FeatureLabScreen(
 }
 
 @Composable
-private fun FeatureToggleCard(
-    icon: ImageVector,
-    title: String,
-    description: String,
-    switchLabel: String,
-    checked: Boolean,
-    onToggle: () -> Unit,
-    position: PaddedListItemPosition,
-    testTag: String,
-) {
-    SelectableInfoPaddedItem(
-        isActive = checked,
-        onClick = onToggle,
-        position = position,
-        modifier = Modifier.testTag(testTag),
-    ) {
+private fun FeatureLabIntro() {
+    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = icon,
+                imageVector = Icons.AutoMirrored.Outlined.Help,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.size(20.dp)
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = title,
-                style = MaterialTheme.typography.bodyMediumEmphasized,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f),
+                text = stringResource(R.string.settings_what_is_this_for),
+                style = MaterialTheme.typography.bodySmallCondensed,
+                color = MaterialTheme.colorScheme.outline
             )
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = description,
-            style = MaterialTheme.typography.bodySmall,
+            text = stringResource(R.string.settings_feature_lab_header),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = switchLabel,
-                style = MaterialTheme.typography.bodyMediumEmphasized,
-                modifier = Modifier.weight(1f),
-            )
-            Switch(
-                checked = checked,
-                onCheckedChange = { onToggle() },
-                modifier = Modifier.testTag("${testTag}Switch"),
-            )
-        }
     }
 }
 
@@ -245,7 +209,7 @@ private fun FeatureLabTopBar(
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.back),
                 )
             }
         },
@@ -275,6 +239,7 @@ private fun FeatureLabScreenPreview() {
             onCategoryGridModeToggle = {},
             onExtraNoteToggle = {},
             onReserveUpcomingChargesToggle = {},
+            onNewCategoryTagToggle = {},
             onBack = {},
         )
     }

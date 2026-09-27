@@ -77,7 +77,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -121,7 +120,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpan
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
-import com.serranoie.app.minus.presentation.ui.theme.component.SelectablePaddedItem
+import com.serranoie.app.minus.presentation.ui.theme.component.SettingsLeadingIcon
+import com.serranoie.app.minus.presentation.ui.theme.component.SettingsToggleItem
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
 import com.serranoie.app.minus.presentation.util.Utils
 import com.serranoie.app.minus.presentation.util.Utils.toggleFeedback
@@ -266,11 +266,7 @@ fun Settings(
                         position = PaddedListItemPosition.First,
                         modifier = Modifier.testTag("SettingsAppearanceItem")
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Palette,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Default.Palette)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -291,27 +287,15 @@ fun Settings(
                         )
                     }
 
-                    SelectablePaddedItem(
-                        label = stringResource(R.string.settings_censor_mode_title),
-                        subtitle = stringResource(R.string.settings_censor_mode_subtitle),
-                        isActive = isCensored,
-                        onClick = onCensorModeToggle,
+                    SettingsToggleItem(
+                        icon = Icons.Outlined.RemoveRedEye,
+                        title = stringResource(R.string.settings_censor_mode_title),
+                        description = stringResource(R.string.settings_censor_mode_subtitle),
+                        checked = isCensored,
+                        onToggle = onCensorModeToggle,
                         position = PaddedListItemPosition.Middle,
                         modifier = Modifier.testTag("SettingsCensorModeItem"),
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Outlined.RemoveRedEye,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        trailingContent = {
-                            Switch(
-                                checked = isCensored, onCheckedChange = {
-                                    onCensorModeToggle()
-                                }, modifier = Modifier.testTag("SettingsCensorModeSwitch")
-                            )
-                        }
+                        expandDescription = false,
                     )
 
                     CustomPaddedListItem(
@@ -322,11 +306,7 @@ fun Settings(
                         position = PaddedListItemPosition.Last,
                         modifier = Modifier.testTag("SettingsWidgetsItem")
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Widgets,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Default.Widgets)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -356,11 +336,7 @@ fun Settings(
                         position = PaddedListItemPosition.First,
                         modifier = Modifier.testTag("SettingsFeatureLabItem")
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Science,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.Science)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -389,11 +365,7 @@ fun Settings(
                         position = PaddedListItemPosition.Middle,
                         modifier = Modifier.testTag("SettingsRecurrentPaymentsViewModeItem")
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ViewList,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.AutoMirrored.Filled.ViewList)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -422,11 +394,7 @@ fun Settings(
                         position = PaddedListItemPosition.Last,
                         modifier = Modifier.testTag("SettingsResetTutorialItem")
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.TipsAndUpdates,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.TipsAndUpdates)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -454,11 +422,7 @@ fun Settings(
                         position = PaddedListItemPosition.Single,
                         modifier = Modifier.testTag("SettingsSavingsPreferencesItem"),
                         defaultContent = {
-                            Icon(
-                                imageVector = Icons.Rounded.Savings,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
+                            SettingsLeadingIcon(icon = Icons.Rounded.Savings)
                             Spacer(modifier = Modifier.width(16.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
@@ -513,11 +477,7 @@ fun Settings(
                         },
                         position = PaddedListItemPosition.Middle,
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.AccessTime,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.AccessTime)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -547,11 +507,7 @@ fun Settings(
                         },
                         position = PaddedListItemPosition.Middle,
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Repeat,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.Repeat)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -586,14 +542,13 @@ fun Settings(
                             null
                         },
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Alarm,
-                            contentDescription = null,
+                        SettingsLeadingIcon(
+                            icon = Icons.Rounded.Alarm,
                             tint = if (exactAlarmEnabled) {
-                                MaterialTheme.colorScheme.primary
+                                null
                             } else {
                                 MaterialTheme.colorScheme.error
-                            }
+                            },
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
@@ -634,11 +589,7 @@ fun Settings(
                             view.toggleFeedback()
                         }, position = PaddedListItemPosition.First
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Backup,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.Backup)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -660,11 +611,7 @@ fun Settings(
                             view.toggleFeedback()
                         }, position = PaddedListItemPosition.Last
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Publish,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.Publish)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -693,11 +640,7 @@ fun Settings(
                         },
                         position = PaddedListItemPosition.First,
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.AutoAwesome,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.AutoAwesome)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -727,11 +670,7 @@ fun Settings(
                             view.weakHapticFeedback()
                         }, position = PaddedListItemPosition.Middle
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.QuestionMark,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.QuestionMark)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -753,11 +692,7 @@ fun Settings(
                             view.weakHapticFeedback()
                         }, position = PaddedListItemPosition.Middle
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.BugReport,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.BugReport)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -789,11 +724,7 @@ fun Settings(
                             }
                         },
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Info,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        SettingsLeadingIcon(icon = Icons.Rounded.Info)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(

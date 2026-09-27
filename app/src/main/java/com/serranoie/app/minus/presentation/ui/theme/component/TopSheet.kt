@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
@@ -121,7 +120,7 @@ fun TopSheetLayout(
         val fullHeight = constraints.maxHeight.toFloat()
         val halfHeight = customHalfHeight ?: (fullHeight / 2)
         val expandHeight =
-            with(localDensity) { (fullHeight - navigationBarHeight.toPx() - 18.dp.toPx()) }
+            with(localDensity) { (fullHeight - navigationBarHeight.toPx() - 8.dp.toPx()) }
         val maxOffset = (-(expandHeight - halfHeight)).coerceAtMost(0f)
 
         val prevHalfHeight = remember { mutableFloatStateOf(halfHeight) }
@@ -193,7 +192,7 @@ fun TopSheetLayout(
                 .fillMaxWidth()
                 .animatedHeightPx {
                     customCardHeight() ?: with(localDensity) {
-                        fullHeight - navigationBarHeight.toPx() - 18.dp.toPx()
+                        fullHeight - navigationBarHeight.toPx() - 8.dp.toPx()
                     }
                 }
                 .offset {

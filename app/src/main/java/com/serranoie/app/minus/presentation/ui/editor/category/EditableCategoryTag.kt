@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.serranoie.app.minus.presentation.ui.editor.category
 
 import android.content.Context
@@ -11,6 +13,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -38,6 +42,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.Sell
 import androidx.compose.material.icons.rounded.SortByAlpha
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -68,6 +73,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.serranoie.app.minus.R
@@ -140,6 +147,13 @@ fun EditableCategoryTag(
         focusManager.clearFocus()
     }
 
+    val labelFadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
+    val labelSlideSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
+    val labelSizeSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntSize>()
+    val placeholderLabel = stringResource(
+        if (isCategoryGridVisible) R.string.add_new_category_action
+        else R.string.add_new_category
+    )
 
     ExposedDropdownMenuBox(expanded = isShowSuggestions, onExpandedChange = {}) {
         Surface(
@@ -217,25 +231,30 @@ fun EditableCategoryTag(
                 }
 
                 AnimatedContent(
-                    label = "openCloseTaggingEditor", targetState = isEdit, transitionSpec = {
-                        (fadeIn(
-                            tween(durationMillis = 250)
-                        ) togetherWith fadeOut(
-                            tween(durationMillis = 250)
-                        )).using(
-                            SizeTransform(clip = false)
-                        )
-                    }) { targetIsEdit ->
-                    if (this.transition.currentState == this.transition.targetState && targetIsEdit) {
+                    label = "openCloseTaggingEditor",
+                    targetState = if (isEdit) null else value.text,
+                    transitionSpec = {
+                        val transform = if (initialState != null && targetState != null) {
+                            (fadeIn(labelFadeSpec) +
+                                slideInHorizontally(labelSlideSpec) { -it / 3 }) togetherWith
+                                (fadeOut(labelFadeSpec) +
+                                    slideOutHorizontally(labelSlideSpec) { it / 3 })
+                        } else {
+                            fadeIn(tween(durationMillis = 250)) togetherWith
+                                fadeOut(tween(durationMillis = 250))
+                        }
+                        transform.using(SizeTransform(clip = false) { _, _ -> labelSizeSpec })
+                    }) { targetLabel ->
+                    if (this.transition.currentState == this.transition.targetState && targetLabel == null) {
                         renderPopup = true
                     }
 
-                    if (targetIsEdit) {
+                    if (targetLabel == null) {
                         CommentEditor(
                             value = value,
                             onChange = { value = it },
                             onApply = { close() })
-                    } else if (!onlyIcon || value.text.isNotEmpty()) {
+                    } else if (!onlyIcon || targetLabel.isNotEmpty()) {
                         Text(
                             modifier = Modifier
                                 .padding(
@@ -243,12 +262,7 @@ fun EditableCategoryTag(
                                 )
                                 .heightIn(min = 28.dp)
                                 .wrapContentHeight(align = Alignment.CenterVertically),
-                            text = value.text.ifEmpty {
-                                stringResource(
-                                    if (isCategoryGridVisible) R.string.add_new_category_action
-                                    else R.string.add_new_category
-                                )
-                            },
+                            text = targetLabel.ifEmpty { placeholderLabel },
                             style = MaterialTheme.typography.bodyMediumCondensed,
                             softWrap = false,
                             overflow = TextOverflow.Ellipsis,

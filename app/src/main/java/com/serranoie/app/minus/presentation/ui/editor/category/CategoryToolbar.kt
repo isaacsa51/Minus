@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.serranoie.app.minus.presentation.ui.editor.category
 
 import android.content.res.Configuration
@@ -7,6 +9,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -25,16 +29,19 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,6 +51,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -116,6 +124,8 @@ fun CategoryToolbar(
         modifier = modifier.fillMaxWidth()
     ) {
         val toolbarWidth = maxWidth - 48.dp
+        val chipFadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
+        val chipSizeSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntSize>()
 
         Row(
             modifier = Modifier
@@ -130,39 +140,59 @@ fun CategoryToolbar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End,
         ) {
-            tags.take(5).reversed().filter { it != currentComment }.forEach { tag ->
-                AnimatedVisibility(
-                    visible = showAddComment && !isNoteEdit,
-                    enter = fadeIn(
-                        tween(
-                            durationMillis = 150,
-                            easing = EaseInOutQuad,
-                        )
-                    ) + slideInHorizontally(
-                        tween(
-                            durationMillis = 150,
-                            easing = EaseInOutQuad,
-                        )
-                    ) { with(localDensity) { 24.dp.toPx().toInt() } },
-                    exit = fadeOut(
-                        tween(
-                            durationMillis = 150,
-                            easing = EaseInOutQuad,
-                        )
-                    ) + slideOutHorizontally(
-                        tween(
-                            durationMillis = 150,
-                            easing = EaseInOutQuad,
-                        )
-                    ) { with(localDensity) { 24.dp.toPx().toInt() } },
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        CategoryTag(value = tag, onClick = {
-                            onCommentUpdate(tag)
-                        }, onDelete = {
-                            onDeleteTag(tag)
-                        })
-                        Spacer(modifier = Modifier.width(8.dp))
+            tags.take(5).reversed().forEach { tag ->
+                key(tag) {
+                    AnimatedVisibility(
+                        visible = showAddComment && !isNoteEdit,
+                        enter = fadeIn(
+                            tween(
+                                durationMillis = 150,
+                                easing = EaseInOutQuad,
+                            )
+                        ) + slideInHorizontally(
+                            tween(
+                                durationMillis = 150,
+                                easing = EaseInOutQuad,
+                            )
+                        ) { with(localDensity) { 24.dp.toPx().toInt() } },
+                        exit = fadeOut(
+                            tween(
+                                durationMillis = 150,
+                                easing = EaseInOutQuad,
+                            )
+                        ) + slideOutHorizontally(
+                            tween(
+                                durationMillis = 150,
+                                easing = EaseInOutQuad,
+                            )
+                        ) { with(localDensity) { 24.dp.toPx().toInt() } },
+                    ) {
+                        AnimatedVisibility(
+                            visible = tag != currentComment,
+                            enter = fadeIn(chipFadeSpec) +
+                                expandHorizontally(chipSizeSpec) +
+                                scaleIn(
+                                    animationSpec = chipFadeSpec,
+                                    initialScale = 0.85f,
+                                    transformOrigin = TransformOrigin(1f, 0.5f),
+                                ),
+                            exit = fadeOut(chipFadeSpec) +
+                                shrinkHorizontally(chipSizeSpec) +
+                                scaleOut(
+                                    animationSpec = chipFadeSpec,
+                                    targetScale = 0.85f,
+                                    transformOrigin = TransformOrigin(1f, 0.5f),
+                                ),
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                CategoryTag(value = tag, onClick = {
+                                    onCommentUpdate(tag)
+                                }, onDelete = {
+                                    onDeleteTag(tag)
+                                })
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                        }
                     }
                 }
             }
@@ -280,6 +310,7 @@ fun CommentEditor(
     value: TextFieldValue,
     onChange: (comment: TextFieldValue) -> Unit,
     onApply: () -> Unit,
+    placeholder: String? = null,
 ) {
     var focusIsTracking by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
@@ -302,6 +333,15 @@ fun CommentEditor(
         value = value,
         onValueChange = {
             onChange(it)
+        },
+        placeholder = placeholder?.let {
+            {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         },
         trailingIcon = {
             IconButton(
