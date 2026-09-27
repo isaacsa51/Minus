@@ -494,6 +494,7 @@ class BudgetViewModel @Inject constructor(
 
             is BudgetEditorIntent.UpdateSettings -> handleUpdateSettings(intent.settings)
             is BudgetEditorIntent.DeleteTag -> handleDeleteTag(intent.tag)
+            is BudgetEditorIntent.CreateCategory -> handleCreateCategory(intent.name)
             is BudgetEditorIntent.RecurrentExpenseApplied -> handleRecurrentExpenseApply(
                 intent.frequency,
                 intent.endDate,
@@ -602,6 +603,12 @@ class BudgetViewModel @Inject constructor(
 
     private fun handleDeleteTag(tag: String) {
         viewModelScope.launch { budgetRepository.hideCategory(tag) }
+    }
+
+    private fun handleCreateCategory(name: String) {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty()) return
+        viewModelScope.launch { budgetRepository.createCategory(trimmed) }
     }
 
     private suspend fun applyTransactionActions(actions: List<TransactionAction>) {

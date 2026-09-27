@@ -60,6 +60,7 @@ data class SettingsUiState(
     val isCategoryGridModeEnabled: Boolean = false,
     val isExtraNoteEnabled: Boolean = false,
     val isReserveUpcomingChargesEnabled: Boolean = false,
+    val isNewCategoryTagEnabled: Boolean = false,
     val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val notificationHour: Int = 9,
     val notificationMinute: Int = 0,
@@ -121,6 +122,7 @@ class SettingsViewModel @Inject constructor(
             isCategoryGridModeEnabled = settings.categoryGridModeEnabled,
             isExtraNoteEnabled = settings.extraNoteEnabled,
             isReserveUpcomingChargesEnabled = settings.reserveUpcomingChargesEnabled,
+            isNewCategoryTagEnabled = settings.newCategoryTagEnabled,
             currentLanguage = settings.language,
             recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
             notificationHour = settings.notificationHour,
@@ -315,6 +317,13 @@ class SettingsViewModel @Inject constructor(
         val newValue = !uiState.value.isReserveUpcomingChargesEnabled
         viewModelScope.launch {
             settingsRepository.setReserveUpcomingChargesEnabled(newValue)
+        }
+    }
+
+    fun onNewCategoryTagToggle() {
+        val newValue = !uiState.value.isNewCategoryTagEnabled
+        viewModelScope.launch {
+            settingsRepository.setNewCategoryTagEnabled(newValue)
         }
     }
 

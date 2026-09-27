@@ -51,6 +51,7 @@ const val CATEGORY_PICKER_DIRECT_POPUP_KEY_NAME = "category_picker_direct_popup_
 const val CATEGORY_GRID_MODE_KEY_NAME = "category_grid_mode_enabled"
 const val EXTRA_NOTE_ENABLED_KEY_NAME = "extra_note_enabled"
 const val RESERVE_UPCOMING_CHARGES_KEY_NAME = "reserve_upcoming_charges_enabled"
+const val NEW_CATEGORY_TAG_KEY_NAME = "new_category_tag_enabled"
 const val RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME = "recurrent_payments_view_mode"
 const val EARLY_FINISH_ACTIVE_KEY_NAME = "early_finish_active"
 const val PERIOD_END_ALREADY_HANDLED_KEY_NAME = "period_end_already_handled"
@@ -103,6 +104,8 @@ private val EXTRA_NOTE_ENABLED =
     booleanPreferencesKey(EXTRA_NOTE_ENABLED_KEY_NAME)
 private val RESERVE_UPCOMING_CHARGES_ENABLED =
     booleanPreferencesKey(RESERVE_UPCOMING_CHARGES_KEY_NAME)
+private val NEW_CATEGORY_TAG_ENABLED =
+    booleanPreferencesKey(NEW_CATEGORY_TAG_KEY_NAME)
 private val TUTORIAL_BOX_COMPLETED =
     booleanPreferencesKey(TUTORIAL_BOX_COMPLETED_KEY_NAME)
 private val FIRST_LAUNCH_TUTORIAL_STAGE =
@@ -176,6 +179,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 categoryGridModeEnabled = preferences[CATEGORY_GRID_MODE_ENABLED] ?: false,
                 extraNoteEnabled = preferences[EXTRA_NOTE_ENABLED] ?: false,
                 reserveUpcomingChargesEnabled = preferences[RESERVE_UPCOMING_CHARGES_ENABLED] ?: false,
+                newCategoryTagEnabled = preferences[NEW_CATEGORY_TAG_ENABLED] ?: false,
                 tutorialBoxCompleted = preferences[TUTORIAL_BOX_COMPLETED] ?: false,
                 firstLaunchTutorialStage = FirstLaunchTutorialStage.from(preferences[FIRST_LAUNCH_TUTORIAL_STAGE]),
                 analyticsTutorialCompleted = preferences[ANALYTICS_TUTORIAL_COMPLETED] ?: false,
@@ -393,6 +397,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setReserveUpcomingChargesEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[RESERVE_UPCOMING_CHARGES_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun setNewCategoryTagEnabled(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[NEW_CATEGORY_TAG_ENABLED] = enabled
         }
     }
 

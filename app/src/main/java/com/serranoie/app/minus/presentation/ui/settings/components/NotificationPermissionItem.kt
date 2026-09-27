@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
+import com.serranoie.app.minus.presentation.ui.theme.component.SettingsLeadingIcon
 
 @Composable
 fun NotificationPermissionItem(
@@ -36,14 +37,9 @@ fun NotificationPermissionItem(
             null
         },
     ) {
-        Icon(
-            imageVector = if (granted) Icons.Default.NotificationsActive else Icons.Default.NotificationsOff,
-            contentDescription = null,
-            tint = if (granted) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.error
-            }
+        SettingsLeadingIcon(
+            icon = if (granted) Icons.Default.NotificationsActive else Icons.Default.NotificationsOff,
+            tint = if (granted) null else MaterialTheme.colorScheme.error,
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {

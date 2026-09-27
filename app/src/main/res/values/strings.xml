@@ -146,6 +146,8 @@
 
     <string name="add_new_category">Category</string>
     <string name="add_new_category_action">Add New Category</string>
+    <string name="new_category">New category</string>
+    <string name="new_category_saved">New category %1$s saved</string>
     <string name="delete_category">Delete Category</string>
     <string name="sort_alphabetically" tools:ignore="MissingTranslation">Sort alphabetically</string>
     <string name="add_extra_note">Extra note</string>
@@ -398,19 +400,27 @@
     <string name="settings_category_grid_mode_description">Tap the category tag to open a grid of your saved categories, instead of entering inline edit mode. Also turns off the numpad\'s calculation mode while this is on.</string>
     <string name="settings_feature_extra_note_title">Extra note per transaction</string>
     <string name="settings_feature_extra_note_subtitle">Tap to see more details</string>
-    <string name="settings_feature_extra_note_description">Adds an optional "Extra note" field next to the category when adding or editing a transaction. Use it to remember a detail the category alone doesn\'t capture — like what exactly the money in "Commute" was spent on.</string>
+    <string name="settings_feature_extra_note_description">Adds an optional \"Extra note\" field next to the category when adding or editing a transaction. Use it to remember a detail the category alone doesn\'t capture — like what exactly the money in \"Commute\" was spent on.</string>
     <string name="settings_feature_extra_note_switch_label">Enable extra note</string>
     <string name="settings_feature_reserve_upcoming_charges_title">Reserve upcoming charges</string>
     <string name="settings_feature_reserve_upcoming_charges_description">Sets aside every recurring charge due later in the current period from day one, instead of deducting each one on its due date. Your remaining budget and daily amount will only show what is truly free to spend.</string>
     <string name="settings_feature_reserve_upcoming_charges_switch_label">Reserve charges up front</string>
     <string name="settings_feature_lab_title">Extra features</string>
     <string name="settings_feature_lab_subtitle">Optional and experimental features you can turn on</string>
-    <string name="settings_feature_lab_header">Each feature here is optional and off by default; some are experimental and may change in a later update. Turn on only what you need, and tap one to see exactly what it changes.</string>
+    <string name="settings_feature_lab_header">Each feature here is optional and off by default; some are experimental and may change in a later update. Tap one to turn it on and see exactly what it changes.</string>
+    <string name="settings_feature_new_category_tag_title">Save categories on their own</string>
+    <string name="settings_feature_new_category_tag_description">Adds a \"New category\" tag to the idle screen so you can create and save a category on its own, with no amount or transaction attached.</string>
     <string name="settings_feature_category_direct_popup_title">Category suggestions on tap</string>
     <string name="settings_feature_category_grid_title">Category list mode</string>
     <string name="settings_feature_show_past_transactions_switch_label">Load past periods</string>
     <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
     <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
+    <string name="settings_feature_group_categories">Categories</string>
+    <string name="settings_feature_group_transactions">Transactions</string>
+    <string name="settings_feature_group_budget">Budget &amp; payments</string>
+    <string name="settings_feature_experimental">Experimental</string>
+    <string name="settings_feature_state_on">On</string>
+    <string name="settings_feature_state_off">Off</string>
     <string name="settings_recurrent_payments_view_mode_title">Recurrent payments view mode</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">Change the type of display to show your recurrent payments</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">Recurrent payments view mode</string>

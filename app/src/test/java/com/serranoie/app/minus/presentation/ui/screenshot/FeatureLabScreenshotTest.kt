@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
+import androidx.compose.runtime.Composable
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
@@ -24,23 +25,41 @@ class FeatureLabScreenshotTest {
 
         paparazzi.snapshot {
             MinusTheme {
-                FeatureLabScreen(
-                    state = SettingsUiState(
-                        isCreditQuickToggleEnabled = true,
-                        showPastTransactions = true,
-                        isCategoryPickerDirectPopupEnabled = false,
-                        isCategoryGridModeEnabled = false,
-                        isExtraNoteEnabled = true,
-                    ),
-                    onCreditQuickToggle = {},
-                    onShowPastTransactionsToggle = {},
-                    onCategoryPickerDirectPopupToggle = {},
-                    onCategoryGridModeToggle = {},
-                    onExtraNoteToggle = {},
-                    onReserveUpcomingChargesToggle = {},
-                    onBack = {},
-                )
+                FeatureLabContent()
             }
         }
+    }
+
+    @Test
+    fun featureLabScreen_darkTheme() {
+        Locale.setDefault(Locale.US)
+
+        paparazzi.snapshot {
+            MinusTheme(darkTheme = true) {
+                FeatureLabContent()
+            }
+        }
+    }
+
+    @Composable
+    private fun FeatureLabContent() {
+        FeatureLabScreen(
+            state = SettingsUiState(
+                isCreditQuickToggleEnabled = true,
+                showPastTransactions = true,
+                isCategoryPickerDirectPopupEnabled = false,
+                isCategoryGridModeEnabled = false,
+                isExtraNoteEnabled = true,
+                isNewCategoryTagEnabled = true,
+            ),
+            onCreditQuickToggle = {},
+            onShowPastTransactionsToggle = {},
+            onCategoryPickerDirectPopupToggle = {},
+            onCategoryGridModeToggle = {},
+            onExtraNoteToggle = {},
+            onReserveUpcomingChargesToggle = {},
+            onNewCategoryTagToggle = {},
+            onBack = {},
+        )
     }
 }

@@ -98,6 +98,7 @@ import com.serranoie.app.minus.domain.model.SymbolPosition
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalculation
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
+import com.serranoie.app.minus.presentation.ui.editor.category.NewCategoryTag
 import com.serranoie.app.minus.presentation.ui.editor.category.EditableCategoryTag
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
@@ -166,11 +167,13 @@ fun Editor(
     onCommentUpdate: (String) -> Unit = {},
     onNoteUpdate: (String) -> Unit = {},
     onDeleteTag: (String) -> Unit = {},
+    onCreateCategory: (String) -> Unit = {},
     onCategoryEditingChanged: (Boolean) -> Unit = {},
     onRecurrentToggle: (Boolean) -> Unit = {},
     onCreditToggle: (Boolean) -> Unit = {},
     showCreditQuickToggleFeature: Boolean = false,
     extraNoteEnabled: Boolean = false,
+    newCategoryTagEnabled: Boolean = false,
     directCategoryPopupEnabled: Boolean = false,
     categoryGridModeEnabled: Boolean = false,
     isCategoryGridVisible: Boolean = false,
@@ -560,6 +563,8 @@ fun Editor(
                 )
             } else {
                 IdleContent(
+                    onCreateCategory = onCreateCategory,
+                    newCategoryTagEnabled = newCategoryTagEnabled,
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -1023,6 +1028,8 @@ private fun EditingContent(
 
 @Composable
 private fun IdleContent(
+    onCreateCategory: (String) -> Unit = {},
+    newCategoryTagEnabled: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val cursorVisible = remember { mutableStateOf(true) }
@@ -1033,25 +1040,47 @@ private fun IdleContent(
         }
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterEnd
-    ) {
-        val dashWidth = 4.dp
-        val dashHeight = 96.dp
-        Box(
-            modifier = Modifier
-                .size(width = dashWidth, height = dashHeight)
-                .graphicsLayer {
-                    alpha = if (cursorVisible.value) 1f else 0f
-                }
-                .background(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
-                    shape = CircleShape
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val tagWidth = maxWidth - 48.dp
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                val dashWidth = 4.dp
+                val dashHeight = 96.dp
+                Box(
+                    modifier = Modifier
+                        .size(width = dashWidth, height = dashHeight)
+                        .graphicsLayer {
+                            alpha = if (cursorVisible.value) 1f else 0f
+                        }
+                        .background(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
+                            shape = CircleShape
+                        )
                 )
-        )
+            }
+
+            if (newCategoryTagEnabled) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, end = 24.dp, bottom = 26.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    NewCategoryTag(
+                        onCreateCategory = onCreateCategory,
+                        extendWidth = tagWidth,
+                    )
+                }
+            }
+        }
     }
 }
 

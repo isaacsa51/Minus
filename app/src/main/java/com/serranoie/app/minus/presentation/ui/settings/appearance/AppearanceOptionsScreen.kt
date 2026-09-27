@@ -37,7 +37,6 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialShapes
@@ -69,6 +68,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -86,6 +86,8 @@ import com.serranoie.app.minus.presentation.ui.theme.component.PaddedExpandableL
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.SelectablePaddedItem
+import com.serranoie.app.minus.presentation.ui.theme.component.SettingsLeadingIcon
+import com.serranoie.app.minus.presentation.ui.theme.component.SettingsToggleItem
 import com.serranoie.app.minus.presentation.ui.theme.schemes.getSwatchColors
 
 @Composable
@@ -152,15 +154,35 @@ fun AppearanceOptionsScreen(
                                 }
                             }
 
-                            HorizontalDivider()
-
-                            MaterialYouSection(state.isMaterialYouEnabled, onMaterialYouToggle)
-
-                            AmoledSection(state.isAmoledEnabled, onAmoledToggle)
                         }
 
                         ColorSchemeSection(state.currentColorScheme, darkTheme, onColorSchemeChange)
                     }
+                }
+            }
+
+            item {
+                PaddedListGroup {
+                    SettingsToggleItem(
+                        icon = Icons.Default.Palette,
+                        title = stringResource(R.string.settings_material_you_title),
+                        description = stringResource(R.string.settings_material_you_subtitle),
+                        checked = state.isMaterialYouEnabled,
+                        onToggle = onMaterialYouToggle,
+                        position = PaddedListItemPosition.First,
+                        modifier = Modifier.testTag("AppearanceMaterialYouItem"),
+                        expandDescription = false,
+                    )
+                    SettingsToggleItem(
+                        icon = Icons.Default.Contrast,
+                        title = stringResource(R.string.settings_amoled_title),
+                        description = stringResource(R.string.settings_amoled_subtitle),
+                        checked = state.isAmoledEnabled,
+                        onToggle = onAmoledToggle,
+                        position = PaddedListItemPosition.Last,
+                        modifier = Modifier.testTag("AppearanceAmoledItem"),
+                        expandDescription = false,
+                    )
                 }
             }
 
@@ -315,78 +337,6 @@ private fun ContrastSection(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun MaterialYouSection(
-    isEnabled: Boolean,
-    onToggle: () -> Unit
-) {
-    Column {
-        Text(
-            stringResource(R.string.settings_material_you_title),
-            style = MaterialTheme.typography.titleSmallEmphasized
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Icon(
-                Icons.Default.Palette,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                stringResource(R.string.settings_material_you_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f)
-            )
-            Switch(
-                checked = isEnabled,
-                onCheckedChange = { onToggle() }
-            )
-        }
-    }
-}
-
-@Composable
-private fun AmoledSection(
-    isEnabled: Boolean,
-    onToggle: () -> Unit
-) {
-    Column {
-        Text(
-            stringResource(R.string.settings_amoled_title),
-            style = MaterialTheme.typography.titleSmallEmphasized
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Icon(
-                Icons.Default.Contrast,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                stringResource(R.string.settings_amoled_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f)
-            )
-            Switch(
-                checked = isEnabled,
-                onCheckedChange = { onToggle() }
-            )
         }
     }
 }
@@ -639,13 +589,7 @@ private fun LanguageSection(
         headerLabel = stringResource(R.string.settings_language_header),
         containerPosition = if (isExpanded) PaddedListItemPosition.First else PaddedListItemPosition.Single,
         headerSubtitle = stringResource(R.string.settings_language_currently_format, currentLabel),
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Language,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        },
+        leadingIcon = { SettingsLeadingIcon(icon = Icons.Default.Language) },
         headerSubtitleContent = {
             Text(
                 text = stringResource(R.string.settings_language_disclaimer),

@@ -55,6 +55,8 @@ interface BudgetRepository {
 
     suspend fun findOrCreateCategory(name: String): Category
 
+    suspend fun createCategory(name: String)
+
     suspend fun hideCategory(name: String)
 
     suspend fun incrementCategoryUsage(name: String)

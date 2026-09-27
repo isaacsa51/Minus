@@ -319,7 +319,15 @@
     <string name="settings_feature_reserve_upcoming_charges_switch_label">支払いを事前に確保する</string>
     <string name="settings_feature_lab_title">追加機能</string>
     <string name="settings_feature_lab_subtitle">オンにできる任意の実験的な機能</string>
-    <string name="settings_feature_lab_header">ここにある機能はすべて任意で、初期状態ではオフです。一部は実験的な機能で、今後のアップデートで変更されることがあります。必要なものだけをオンにし、各機能をタップすると変更内容を詳しく確認できます。</string>
+    <string name="settings_feature_lab_header">ここにある機能はすべて任意で、初期状態ではオフです。一部は実験的な機能で、今後のアップデートで変更されることがあります。各機能をタップするとオンになり、変更内容を詳しく確認できます。</string>
+    <string name="settings_feature_group_categories">カテゴリ</string>
+    <string name="settings_feature_group_transactions">取引</string>
+    <string name="settings_feature_group_budget">予算と支払い</string>
+    <string name="settings_feature_experimental">実験的機能</string>
+    <string name="settings_feature_state_on">オン</string>
+    <string name="settings_feature_state_off">オフ</string>
+    <string name="settings_feature_new_category_tag_title">カテゴリだけを保存</string>
+    <string name="settings_feature_new_category_tag_description">待機画面に「新しいカテゴリ」タグを追加し、金額や取引を入力せずにカテゴリだけを作成・保存できるようにします。</string>
     <string name="settings_feature_category_direct_popup_title">タップでカテゴリ候補を表示</string>
     <string name="settings_feature_category_grid_title">カテゴリ一覧モード</string>
     <string name="settings_feature_show_past_transactions_switch_label">過去の期間を読み込む</string>
