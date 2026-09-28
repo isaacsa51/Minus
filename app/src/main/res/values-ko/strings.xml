@@ -134,6 +134,9 @@
     <string name="expense_queued_for_next_period">지출이 다음 기간으로 예약되었습니다</string>
     <string name="add_new_category">카테고리</string>
     <string name="add_new_category_action">새 카테고리 추가</string>
+    <string name="new_category">새 카테고리</string>
+    <string name="new_category_saved">새 카테고리 %1$s을(를) 저장했습니다</string>
+    <string name="sort_alphabetically">가나다순 정렬</string>
     <string name="budget_validation_major_zero">예산은 0보다 커야 합니다.</string>
     <string name="budget_no_date_defined">종료일이 지정되지 않았습니다</string>
     <string name="budget_no_days_defined">기간이 지정되지 않았습니다</string>

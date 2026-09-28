@@ -134,6 +134,9 @@
     <string name="expense_queued_for_next_period">Το έξοδο προγραμματίστηκε για την επόμενη περίοδο</string>
     <string name="add_new_category">Κατηγορία</string>
     <string name="add_new_category_action">Προσθήκη Νέας Κατηγορίας</string>
+    <string name="new_category">Νέα κατηγορία</string>
+    <string name="new_category_saved">Η νέα κατηγορία %1$s αποθηκεύτηκε</string>
+    <string name="sort_alphabetically">Ταξινόμηση αλφαβητικά</string>
     <string name="budget_validation_major_zero">Ο προϋπολογισμός πρέπει να είναι μεγαλύτερος από 0</string>
     <string name="budget_no_date_defined">Δεν ορίστηκε ημερομηνία λήξης</string>
     <string name="budget_no_days_defined">Δεν έχουν οριστεί ημέρες</string>

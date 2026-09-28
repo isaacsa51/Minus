@@ -134,6 +134,9 @@
     <string name="expense_queued_for_next_period">खर्च अगली अवधि के लिए कतार में है</string>
     <string name="add_new_category">कैटेगरी</string>
     <string name="add_new_category_action">नई कैटेगरी जोड़ें</string>
+    <string name="new_category">नई कैटेगरी</string>
+    <string name="new_category_saved">नई कैटेगरी %1$s सेव हो गई</string>
+    <string name="sort_alphabetically">वर्णानुक्रम में क्रमबद्ध करें</string>
     <string name="budget_validation_major_zero">बजट 0 से ज़्यादा होना चाहिए</string>
     <string name="budget_no_date_defined">कोई समाप्ति तिथि तय नहीं है</string>
     <string name="budget_no_days_defined">कोई दिन तय नहीं हैं</string>

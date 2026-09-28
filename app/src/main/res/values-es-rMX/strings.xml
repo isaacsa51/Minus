@@ -136,6 +136,9 @@
     <string name="expense_queued_for_next_period">Gasto en cola para el próximo período</string>
     <string name="add_new_category">Categoría</string>
     <string name="add_new_category_action">Añadir nueva categoría</string>
+    <string name="new_category">Nueva categoría</string>
+    <string name="new_category_saved">Nueva categoría %1$s guardada</string>
+    <string name="sort_alphabetically">Ordenar alfabéticamente</string>
     <string name="budget_validation_major_zero">El presupuesto debe ser mayor que 0</string>
     <string name="budget_no_date_defined">No hay fecha de finalización definida</string>
     <string name="budget_no_days_defined">No hay días definidos</string>

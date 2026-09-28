@@ -137,6 +137,9 @@
   <string name="expense_queued_for_next_period">Расход перенесён в следующий период</string>
   <string name="add_new_category">Категория</string>
   <string name="add_new_category_action">Добавить категорию</string>
+  <string name="new_category">Новая категория</string>
+  <string name="new_category_saved">Новая категория %1$s сохранена</string>
+  <string name="sort_alphabetically">Сортировать по алфавиту</string>
   <string name="budget_validation_major_zero">Бюджет должен быть больше 0</string>
   <string name="budget_no_date_defined">Дата окончания не задана</string>
   <string name="budget_no_days_defined">Число дней не задано</string>

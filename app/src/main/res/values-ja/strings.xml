@@ -134,6 +134,9 @@
     <string name="expense_queued_for_next_period">支出は次の期間に繰り越されます</string>
     <string name="add_new_category">カテゴリ</string>
     <string name="add_new_category_action">新しいカテゴリを追加</string>
+    <string name="new_category">新しいカテゴリ</string>
+    <string name="new_category_saved">新しいカテゴリ「%1$s」を保存しました</string>
+    <string name="sort_alphabetically">五十音順に並べ替え</string>
     <string name="budget_validation_major_zero">予算は0より大きくなければなりません</string>
     <string name="budget_no_date_defined">終了日が定義されていません</string>
     <string name="budget_no_days_defined">日数が定義されていません</string>

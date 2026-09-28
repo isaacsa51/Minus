@@ -136,6 +136,9 @@
     <string name="expense_queued_for_next_period">Разходът е насрочен за следващия период</string>
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавяне на нова категория</string>
+    <string name="new_category">Нова категория</string>
+    <string name="new_category_saved">Новата категория %1$s е запазена</string>
+    <string name="sort_alphabetically">Сортиране по азбучен ред</string>
     <string name="delete_category">Изтриване на категория</string>
     <string name="add_extra_note">Допълнителна бележка</string>
     <string name="extra_note_label">Бележка</string>
