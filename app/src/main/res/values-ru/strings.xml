@@ -205,10 +205,7 @@
   <string name="budget_period_label_this_week">Эта неделя</string>
   <string name="budget_period_label_this_biweek">Эти две недели</string>
   <string name="budget_period_label_this_month">Этот месяц</string>
-  <string name="budget_pill_label_per_daily">За день</string>
-  <string name="budget_pill_label_per_weekly">За неделю</string>
-  <string name="budget_pill_label_per_biweekly">За две недели</string>
-  <string name="budget_pill_label_per_monthly">За месяц</string>
+
   <string name="budget_pill_next_daily">На завтра %1$s</string>
   <string name="budget_pill_next_weekly">На следующую неделю %1$s</string>
   <string name="budget_pill_next_biweekly">На следующие две недели %1$s</string>
@@ -604,7 +601,6 @@
   <string name="wavy_divider_show_all_past_period_expenses">Показать все расходы предыдущего периода…</string>
   <!-- Edit Budget Settings -->
   <string name="use_previous_period_days">Использовать %d дн.</string>
-  <string name="remaining_budget_label">Остаток</string>
   <string name="currency_label">Валюта</string>
   <string name="budget_duration_label">Длительность</string>
   <string name="budget_base_currency_label">Основная валюта</string>
@@ -622,19 +618,8 @@
   <string name="clear">Очистить</string>
   <string name="currency_no_results">Валюты не найдены</string>
   <string name="currency_selected">Выбрано</string>
-  <!-- Remaining Budget Strategy -->
-  <string name="strategy_dialog_title">Остаток бюджета</string>
-  <string name="strategy_dialog_description" formatted="false">Можно выбрать, как распределять остаток в конце каждого дня.\n\nНапример, дневной бюджет 500, а вчера потратили 400: 100 можно размазать по оставшимся дням или потратить сегодня 600 (дневной бюджет плюс вчерашний остаток).</string>
-  <string name="strategy_ask_always">Спрашивать каждый раз</string>
-  <string name="strategy_ask_always_desc">В конце периода спросим, что сделать с остатком</string>
-  <string name="strategy_split_equally">Распределить по всем дням</string>
-  <string name="strategy_split_equally_desc">Остаток делится поровну между всеми днями нового периода</string>
-  <string name="strategy_add_to_first_day">Добавить к первому дню</string>
-  <string name="strategy_add_to_first_day_desc">Весь остаток переносится на первый день нового периода</string>
   <!-- Budget Split Mode -->
   <string name="split_mode_label">Режим распределения</string>
-  <string name="split_mode_dialog_title">Как распределять бюджет?</string>
-  <string name="split_mode_dialog_description" formatted="false">Выберите, как считается сумма на период.</string>
   <string name="split_mode_static">Фиксированный</string>
   <string name="split_mode_static_desc">Весь бюджет делится поровну по дням — независимо от того, сколько уже потрачено.</string>
   <string name="split_mode_dynamic">Распределять по всем дням</string>
