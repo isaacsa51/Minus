@@ -235,10 +235,10 @@ fun EditableCategoryTag(
                     targetState = if (isEdit) null else value.text,
                     transitionSpec = {
                         val transform = if (initialState != null && targetState != null) {
-                            (fadeIn(labelFadeSpec) +
-                                slideInHorizontally(labelSlideSpec) { -it / 3 }) togetherWith
-                                (fadeOut(labelFadeSpec) +
-                                    slideOutHorizontally(labelSlideSpec) { it / 3 })
+                            fadeIn(labelFadeSpec) +
+                                slideInHorizontally(labelSlideSpec) { -it / 3 } togetherWith
+                                fadeOut(labelFadeSpec) +
+                                slideOutHorizontally(labelSlideSpec) { it / 3 }
                         } else {
                             fadeIn(tween(durationMillis = 250)) togetherWith
                                 fadeOut(tween(durationMillis = 250))

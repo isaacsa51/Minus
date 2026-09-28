@@ -120,7 +120,7 @@ fun TopSheetLayout(
         val fullHeight = constraints.maxHeight.toFloat()
         val halfHeight = customHalfHeight ?: (fullHeight / 2)
         val expandHeight =
-            with(localDensity) { (fullHeight - navigationBarHeight.toPx() - 8.dp.toPx()) }
+            with(localDensity) { fullHeight - navigationBarHeight.toPx() - 8.dp.toPx() }
         val maxOffset = (-(expandHeight - halfHeight)).coerceAtMost(0f)
 
         val prevHalfHeight = remember { mutableFloatStateOf(halfHeight) }

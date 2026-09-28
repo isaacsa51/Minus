@@ -29,7 +29,7 @@ class NewCategoryTagScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 Box(modifier = Modifier.padding(16.dp)) {
-                    NewCategoryTag(onCreateCategory = {}, extendWidth = 345.dp)
+                    NewCategoryTag(onCreateCategory = { true }, extendWidth = 345.dp)
                 }
             }
         }
@@ -45,7 +45,7 @@ class NewCategoryTagScreenshotTest {
                     contentAlignment = Alignment.CenterEnd,
                 ) {
                     NewCategoryTag(
-                        onCreateCategory = {},
+                        onCreateCategory = { true },
                         extendWidth = 345.dp,
                         startSavedName = "Groceries",
                     )
@@ -64,7 +64,7 @@ class NewCategoryTagScreenshotTest {
                     contentAlignment = Alignment.CenterEnd,
                 ) {
                     NewCategoryTag(
-                        onCreateCategory = {},
+                        onCreateCategory = { true },
                         extendWidth = 345.dp,
                         startSavedName = "Weekend groceries and household supplies",
                     )

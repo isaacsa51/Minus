@@ -26,13 +26,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -139,10 +139,15 @@ fun SettingsToggleItem(
         MaterialTheme.shapes.extraLarge,
         selection,
     )
-    val toggleSemantics = modifier.semantics(mergeDescendants = true) {
-        role = Role.Switch
-        stateDescription = toggleState
-    }
+    val rowToggleModifier = Modifier
+        .toggleable(
+            value = checked,
+            onValueChange = { onToggle() },
+            role = Role.Switch,
+        )
+        .semantics {
+            stateDescription = toggleState
+        }
 
     val row: @Composable RowScope.() -> Unit = {
         SettingsLeadingIcon(icon = icon, active = checked)
@@ -190,7 +195,8 @@ fun SettingsToggleItem(
             background = container,
             contentColor = onContainer,
             customShape = shape,
-            modifier = toggleSemantics,
+            modifier = modifier,
+            rowModifier = rowToggleModifier,
             defaultContent = row,
             expandedContent = {
                 HorizontalDivider(
@@ -209,7 +215,8 @@ fun SettingsToggleItem(
         CustomPaddedListItem(
             onClick = onToggle,
             position = position,
-            modifier = toggleSemantics,
+            modifier = modifier,
+            rowModifier = rowToggleModifier,
             background = container,
             contentColor = onContainer,
             customShape = shape,

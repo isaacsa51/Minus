@@ -437,6 +437,7 @@ fun CustomPaddedListItem(
     onClick: (() -> Unit)? = null,
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
     modifier: Modifier = Modifier,
+    rowModifier: Modifier = Modifier,
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     onLongClick: (() -> Unit)? = null,
@@ -458,7 +459,9 @@ fun CustomPaddedListItem(
         Row(
             modifier = Modifier
                 .then(
-                    if (onClick != null || onLongClick != null) {
+                    if (rowModifier != Modifier) {
+                        rowModifier
+                    } else if (onClick != null || onLongClick != null) {
                         Modifier.combinedClickable(
                             onClick = onClick ?: {},
                             onLongClick = onLongClick,
@@ -498,6 +501,7 @@ fun CustomPaddedExpandableItem(
     onToggleExpanded: () -> Unit,
     position: PaddedListItemPosition = PaddedListItemPosition.Middle,
     modifier: Modifier = Modifier,
+    rowModifier: Modifier = Modifier,
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     borderStroke: BorderStroke? = null,
@@ -530,7 +534,13 @@ fun CustomPaddedExpandableItem(
         Column {
             Row(
                 modifier = Modifier
-                    .clickable { onToggleExpanded() }
+                    .then(
+                        if (rowModifier != Modifier) {
+                            rowModifier
+                        } else {
+                            Modifier.clickable { onToggleExpanded() }
+                        }
+                    )
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 content = defaultContent)
