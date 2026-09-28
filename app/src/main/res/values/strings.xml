@@ -149,7 +149,7 @@
     <string name="new_category">New category</string>
     <string name="new_category_saved">New category %1$s saved</string>
     <string name="delete_category">Delete Category</string>
-    <string name="sort_alphabetically" tools:ignore="MissingTranslation">Sort alphabetically</string>
+    <string name="sort_alphabetically">Sort alphabetically</string>
     <string name="add_extra_note">Extra note</string>
     <string name="extra_note_label">Note</string>
 

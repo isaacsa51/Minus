@@ -136,6 +136,9 @@
     <string name="expense_queued_for_next_period">Ausgabe für die nächste Periode vorgemerkt</string>
     <string name="add_new_category">Kategorie</string>
     <string name="add_new_category_action">Füge neue Kategorie hinzu</string>
+    <string name="new_category">Neue Kategorie</string>
+    <string name="new_category_saved">Neue Kategorie %1$s gespeichert</string>
+    <string name="sort_alphabetically">Alphabetisch sortieren</string>
     <string name="delete_category">Kategorie löschen</string>
     <string name="add_extra_note">Zusätzliche Notiz</string>
     <string name="extra_note_label">Notiz</string>

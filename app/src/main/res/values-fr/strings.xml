@@ -136,6 +136,8 @@
     <string name="expense_queued_for_next_period">Dépense mise en attente pour la prochaine période</string>
     <string name="add_new_category">Catégorie</string>
     <string name="add_new_category_action">Ajouter une nouvelle catégorie</string>
+    <string name="new_category">Nouvelle catégorie</string>
+    <string name="new_category_saved">Nouvelle catégorie %1$s enregistrée</string>
     <string name="delete_category">Supprimer la catégorie</string>
     <string name="sort_alphabetically">Trier par ordre alphabétique</string>
     <string name="add_extra_note">Note supplémentaire</string>

@@ -136,6 +136,9 @@
     <string name="expense_queued_for_next_period">Despesa agendada para o próximo período</string>
     <string name="add_new_category">categoria</string>
     <string name="add_new_category_action">Adicionar Nova Categoria</string>
+    <string name="new_category">Nova categoria</string>
+    <string name="new_category_saved">Nova categoria %1$s salva</string>
+    <string name="sort_alphabetically">Ordenar alfabeticamente</string>
     <string name="budget_validation_major_zero">O orçamento deve ser maior que 0</string>
     <string name="budget_no_date_defined">Nenhuma data de término definida</string>
     <string name="budget_no_days_defined">Nenhum dia definido</string>
