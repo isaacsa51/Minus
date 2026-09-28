@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val SavedConfirmationMillis = 1_500L
 
@@ -59,11 +61,12 @@ private sealed interface NewCategoryStage {
 
 @Composable
 fun NewCategoryTag(
-    onCreateCategory: (String) -> Boolean,
+    onCreateCategory: suspend (String) -> Boolean,
     modifier: Modifier = Modifier,
     extendWidth: Dp = 0.dp,
     startSavedName: String? = null,
 ) {
+    val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     var stage by remember {
         mutableStateOf<NewCategoryStage>(
@@ -155,12 +158,20 @@ fun NewCategoryTag(
                         onApply = {
                             if (stage == NewCategoryStage.Editing) {
                                 val name = value.text.trim()
-                                stage = if (name.isNotEmpty() && onCreateCategory(name)) {
-                                    NewCategoryStage.Saved(name)
+                                if (name.isEmpty()) {
+                                    stage = NewCategoryStage.Collapsed
+                                    focusManager.clearFocus()
                                 } else {
-                                    NewCategoryStage.Collapsed
+                                    scope.launch {
+                                        val success = onCreateCategory(name)
+                                        stage = if (success) {
+                                            NewCategoryStage.Saved(name)
+                                        } else {
+                                            NewCategoryStage.Collapsed
+                                        }
+                                        focusManager.clearFocus()
+                                    }
                                 }
-                                focusManager.clearFocus()
                             }
                         },
                         placeholder = label,

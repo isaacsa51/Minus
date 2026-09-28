@@ -203,6 +203,7 @@ fun MainScreen(
                             onNavigateToSettings = onNavigateToSettings,
                             onUnresolvedSurplusBannerClick = budgetViewModel::onUnresolvedSurplusBannerClicked,
                             onLeftoverChoice = budgetViewModel::onLeftoverChoice,
+                            onCreateCategory = budgetViewModel::createCategory,
                             onPeriodSelected = { period ->
                                 mainScreenViewModel.processIntent(
                                     MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
