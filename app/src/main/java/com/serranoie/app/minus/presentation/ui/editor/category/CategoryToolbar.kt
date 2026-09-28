@@ -140,7 +140,8 @@ fun CategoryToolbar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End,
         ) {
-            tags.take(5).reversed().forEach { tag ->
+            val visibleTagCount = if (tags.take(5).contains(currentComment)) 6 else 5
+            tags.take(visibleTagCount).reversed().forEach { tag ->
                 key(tag) {
                     AnimatedVisibility(
                         visible = showAddComment && !isNoteEdit,

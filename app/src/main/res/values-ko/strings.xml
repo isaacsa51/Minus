@@ -331,7 +331,7 @@
     <string name="settings_feature_state_on">켜짐</string>
     <string name="settings_feature_state_off">꺼짐</string>
     <string name="settings_feature_new_category_tag_title">카테고리만 저장</string>
-    <string name="settings_feature_new_category_tag_description">대기 화면에 \"새 카테고리\" 태그를 추가해 금액이나 거래 없이 카테고리만 만들어 저장할 수 있습니다.</string>
+    <string name="settings_feature_new_category_tag_description">홈 화면이 대기 상태일 때 \"새 카테고리\" 태그를 추가해 금액이나 거래 없이 카테고리만 만들어 저장할 수 있습니다.</string>
     <string name="settings_feature_category_direct_popup_title">탭할 때 카테고리 추천</string>
     <string name="settings_feature_category_grid_title">카테고리 목록 모드</string>
     <string name="settings_feature_show_past_transactions_switch_label">지난 기간 불러오기</string>

@@ -1493,6 +1493,7 @@ private fun MainScreenEditorSection(
                     BudgetEditorIntent.CreateCategory(name),
                 ),
             )
+            true
         },
         onRecurrentToggle = { enabled ->
             actions.onProcessIntent(

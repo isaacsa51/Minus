@@ -59,7 +59,7 @@ private sealed interface NewCategoryStage {
 
 @Composable
 fun NewCategoryTag(
-    onCreateCategory: (String) -> Unit,
+    onCreateCategory: (String) -> Boolean,
     modifier: Modifier = Modifier,
     extendWidth: Dp = 0.dp,
     startSavedName: String? = null,
@@ -155,11 +155,10 @@ fun NewCategoryTag(
                         onApply = {
                             if (stage == NewCategoryStage.Editing) {
                                 val name = value.text.trim()
-                                stage = if (name.isEmpty()) {
-                                    NewCategoryStage.Collapsed
-                                } else {
-                                    onCreateCategory(name)
+                                stage = if (name.isNotEmpty() && onCreateCategory(name)) {
                                     NewCategoryStage.Saved(name)
+                                } else {
+                                    NewCategoryStage.Collapsed
                                 }
                                 focusManager.clearFocus()
                             }
@@ -200,7 +199,7 @@ fun NewCategoryTag(
 private fun NewCategoryTagPreview() {
     MinusTheme {
         Box(modifier = Modifier.padding(8.dp)) {
-            NewCategoryTag(onCreateCategory = {}, extendWidth = 300.dp)
+            NewCategoryTag(onCreateCategory = { true }, extendWidth = 300.dp)
         }
     }
 }
@@ -211,7 +210,7 @@ private fun NewCategoryTagSavedPreview() {
     MinusTheme {
         Box(modifier = Modifier.padding(8.dp)) {
             NewCategoryTag(
-                onCreateCategory = {},
+                onCreateCategory = { true },
                 extendWidth = 300.dp,
                 startSavedName = "Groceries",
             )
@@ -225,7 +224,7 @@ private fun NewCategoryTagSavedLongNamePreview() {
     MinusTheme {
         Box(modifier = Modifier.padding(8.dp)) {
             NewCategoryTag(
-                onCreateCategory = {},
+                onCreateCategory = { true },
                 extendWidth = 300.dp,
                 startSavedName = "Weekend groceries and household supplies",
             )

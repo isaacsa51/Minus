@@ -167,7 +167,7 @@ fun Editor(
     onCommentUpdate: (String) -> Unit = {},
     onNoteUpdate: (String) -> Unit = {},
     onDeleteTag: (String) -> Unit = {},
-    onCreateCategory: (String) -> Unit = {},
+    onCreateCategory: (String) -> Boolean = { true },
     onCategoryEditingChanged: (Boolean) -> Unit = {},
     onRecurrentToggle: (Boolean) -> Unit = {},
     onCreditToggle: (Boolean) -> Unit = {},
@@ -1028,7 +1028,7 @@ private fun EditingContent(
 
 @Composable
 private fun IdleContent(
-    onCreateCategory: (String) -> Unit = {},
+    onCreateCategory: (String) -> Boolean = { true },
     newCategoryTagEnabled: Boolean = false,
     modifier: Modifier = Modifier
 ) {
