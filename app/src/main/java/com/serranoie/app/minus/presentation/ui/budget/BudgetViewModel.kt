@@ -605,10 +605,20 @@ class BudgetViewModel @Inject constructor(
         viewModelScope.launch { budgetRepository.hideCategory(tag) }
     }
 
-    private fun handleCreateCategory(name: String) {
+    suspend fun createCategory(name: String): Boolean {
         val trimmed = name.trim()
-        if (trimmed.isEmpty()) return
-        viewModelScope.launch { budgetRepository.createCategory(trimmed) }
+        if (trimmed.isEmpty()) return false
+        return try {
+            budgetRepository.createCategory(trimmed)
+            true
+        } catch (e: Exception) {
+            logcat(TAG) { "Failed to create category $trimmed: ${e.asLog()}" }
+            false
+        }
+    }
+
+    private fun handleCreateCategory(name: String) {
+        viewModelScope.launch { createCategory(name) }
     }
 
     private suspend fun applyTransactionActions(actions: List<TransactionAction>) {

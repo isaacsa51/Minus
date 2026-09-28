@@ -1487,14 +1487,7 @@ private fun MainScreenEditorSection(
                 ),
             )
         },
-        onCreateCategory = { name ->
-            actions.onProcessIntent(
-                MainScreenUiIntent.ProcessBudgetEditorIntent(
-                    BudgetEditorIntent.CreateCategory(name),
-                ),
-            )
-            true
-        },
+        onCreateCategory = actions.onCreateCategory,
         onRecurrentToggle = { enabled ->
             actions.onProcessIntent(
                 MainScreenUiIntent.ProcessBudgetEditorIntent(
