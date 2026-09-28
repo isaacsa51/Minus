@@ -1,0 +1,8 @@
+- feat: standalone category creation & updated settings UI
+- feat: new Budget Pill home screen widget with dynamic previews
+- feat: daily budget interactive guidance flow
+- feat: deduct recurring payments inside active period
+- feat: expanded Russian, Wear OS & widget localizations
+- chore: alphabetical sorting icon in category popup
+- refactor: updated wallet edit UI & dynamic budget calculations
+- fix: savings handler, Glance widget collision & carry description
