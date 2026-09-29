@@ -95,7 +95,9 @@ fun AppNavGraph(
     val enteringOffsetPx = with(LocalDensity.current) {
         BackMotionTokens.EnteringStartOffset.roundToPx()
     }
-    val animated = rememberAnimationsEnabled()
+    val animatorScale = rememberAnimatorDurationScale()
+    val animated = animatorScale > 0f
+    val transitionDurationMillis = (BackMotionTokens.TransitionDurationMillis * (if (animatorScale <= 0f) 1f else animatorScale)).toInt()
     val popDirection = remember { PopDirection() }
 
     NavHost(
@@ -103,14 +105,14 @@ fun AppNavGraph(
         startDestination = startDestination,
         enterTransition = {
             popDirection.record(pop = false)
-            if (animated) screenEnter() else EnterTransition.None
+            if (animated) screenEnter(transitionDurationMillis) else EnterTransition.None
         },
-        exitTransition = { if (animated) screenExit() else ExitTransition.None },
+        exitTransition = { if (animated) screenExit(transitionDurationMillis) else ExitTransition.None },
         popEnterTransition = {
             popDirection.record(pop = true)
-            if (animated) screenPopEnter(enteringOffsetPx) else EnterTransition.None
+            if (animated) screenPopEnter(enteringOffsetPx, transitionDurationMillis) else EnterTransition.None
         },
-        popExitTransition = { if (animated) screenPopExit() else ExitTransition.None },
+        popExitTransition = { if (animated) screenPopExit(transitionDurationMillis) else ExitTransition.None },
     ) {
         screen(Screen.Onboarding.route, popDirection, animated) {
             OnboardingScreen(

@@ -1,6 +1,10 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.charts
 
+import androidx.activity.BackEventCompat
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -29,15 +33,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +62,9 @@ import com.serranoie.app.minus.presentation.util.harmonizeWithColor
 import com.serranoie.app.minus.presentation.util.toPaletteWithTheme
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 data class CategoryUsage(
     val name: String,
@@ -64,7 +73,9 @@ data class CategoryUsage(
     val isSpecial: Boolean = false,
 )
 
-var baseColors =
+private const val MAX_DISPLAY_CATEGORIES = 20
+
+val baseColors =
     listOf(
         Color(0xFFF86BAE),
         Color(0xFFF36FFF),
@@ -96,18 +107,46 @@ fun CategoriesChartCard(
     val labelRest = stringResource(R.string.categories_chart_rest)
     val primaryColor = MaterialTheme.colorScheme.primary
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
-    val maxDisplay = 20
 
     var internalSelectedCategoryName by remember(selectedCategoryName) { mutableStateOf(selectedCategoryName) }
 
-    LaunchedEffect(selectedCategoryName) {
-        internalSelectedCategoryName = selectedCategoryName
+    // Predictive back gesture exit/transition animation state
+    var scale by remember { mutableFloatStateOf(1f) }
+    var xOffset by remember { mutableFloatStateOf(0f) }
+    var alpha by remember { mutableFloatStateOf(1f) }
+    val coroutineScope = rememberCoroutineScope()
+
+    PredictiveBackHandler(enabled = internalSelectedCategoryName != null) { progressFlow ->
+        try {
+            progressFlow.collectLatest { backEvent ->
+                val progress = backEvent.progress
+                val directionMultiplier = if (backEvent.swipeEdge == BackEventCompat.EDGE_RIGHT) -1f else 1f
+                scale = 1f - (progress * 0.1f)
+                xOffset = progress * 100f * directionMultiplier
+                alpha = 1f - (progress * 0.2f)
+            }
+            internalSelectedCategoryName = null
+            onSelectedCategoryChange?.invoke(null)
+            scale = 1f
+            xOffset = 0f
+            alpha = 1f
+        } catch (e: CancellationException) {
+            coroutineScope.launch {
+                animate(scale, 1f) { value, _ -> scale = value }
+            }
+            coroutineScope.launch {
+                animate(xOffset, 0f) { value, _ -> xOffset = value }
+            }
+            coroutineScope.launch {
+                animate(alpha, 1f) { value, _ -> alpha = value }
+            }
+        }
     }
 
     val colors =
         remember(isNightMode, primaryColor) {
-            (0 until maxDisplay).map { i ->
-                val baseSize = baseColors.size
+            val baseSize = baseColors.size
+            (0 until MAX_DISPLAY_CATEGORIES).map { i ->
                 val colorIndex = i % baseSize
                 val iteration = i / baseSize
 
@@ -131,6 +170,7 @@ fun CategoriesChartCard(
                 )
             }
         }
+
     val restColor =
         remember(isNightMode, primaryColor) {
             toPaletteWithTheme(
@@ -145,6 +185,7 @@ fun CategoriesChartCard(
                 onSurface = if (isNightMode) Color(0xFF1A1A1A) else Color(0xFFF4F4F4),
             )
         }
+
     val stubColor =
         remember(isNightMode, primaryColor, surfaceVariantColor) {
             toPaletteWithTheme(
@@ -173,18 +214,18 @@ fun CategoriesChartCard(
                     .map { tag ->
                         CategoryUsage(
                             name = tag.key,
-                            amount = tag.value.map { it.amount }.reduce { acc, next -> acc + next },
+                            amount = tag.value.fold(BigDecimal.ZERO) { acc, tx -> acc + tx.amount },
                             isSpecial = tag.key == labelWithoutTag,
                         )
                     }.sortedByDescending { it.amount }
 
-            if (rawTags.size > maxDisplay) {
+            if (rawTags.size > MAX_DISPLAY_CATEGORIES) {
                 rawTags.find { it.name == labelWithoutTag }?.let { uncategorized ->
                     rawTags = rawTags.filter { it.name != labelWithoutTag } + uncategorized
                 }
             }
 
-            val displayTags = rawTags.take(maxDisplay).mapIndexed { index, tagUsage ->
+            val displayTags = rawTags.take(MAX_DISPLAY_CATEGORIES).mapIndexed { index, tagUsage ->
                 val palette = if (tagUsage.name == labelWithoutTag) {
                     offsetColor++
                     restColor
@@ -195,11 +236,10 @@ fun CategoriesChartCard(
                 tagUsage.copy(color = palette)
             }.toMutableList()
 
-            if (rawTags.size > maxDisplay) {
+            if (rawTags.size > MAX_DISPLAY_CATEGORIES) {
                 val restAmount = rawTags
-                    .drop(maxDisplay)
-                    .map { it.amount }
-                    .reduce { acc, next -> acc + next }
+                    .drop(MAX_DISPLAY_CATEGORIES)
+                    .fold(BigDecimal.ZERO) { acc, tag -> acc + tag.amount }
 
                 displayTags.add(
                     CategoryUsage(
@@ -224,7 +264,13 @@ fun CategoriesChartCard(
         )
 
     Card(
-        modifier = if (isEmpty) modifier else modifier.fillMaxHeight(),
+        modifier = (if (isEmpty) modifier else modifier.fillMaxHeight())
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                translationX = xOffset.dp.toPx()
+                this.alpha = alpha
+            },
         shape = RoundedCornerShape(22.dp),
         colors =
             CardDefaults.cardColors(
@@ -259,7 +305,7 @@ private fun EmptyChartContent(stubColor: HarmonizedColorPalette) {
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 12000, easing = LinearEasing),
-            repeatMode = androidx.compose.animation.core.RepeatMode.Restart,
+            repeatMode = RepeatMode.Restart,
         ),
         label = "emptyChartRotationAngle",
     )
@@ -332,6 +378,20 @@ private fun ChartContent(
     onCategoryClick: ((String, List<Transaction>) -> Unit)?,
     onSelectionChange: (String?) -> Unit,
 ) {
+    val transactionsByCategory = remember(spends, tags, labelWithoutTag) {
+        val standaloneNames = tags.filter { !it.isSpecial }.map { it.name }.toSet()
+        tags.associate { tag ->
+            tag.name to spends.filter { tx ->
+                val category = tx.comment.trim().ifEmpty { labelWithoutTag }
+                if (tag.isSpecial) {
+                    category !in standaloneNames
+                } else {
+                    category == tag.name
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -349,15 +409,7 @@ private fun ChartContent(
                     val newSelection = if (selectedCategoryName == tag.name) null else tag.name
                     onSelectionChange(newSelection)
                     if (newSelection != null) {
-                        val categoryTransactions = spends.filter {
-                            val category = it.comment.trim().ifEmpty { labelWithoutTag }
-                            if (tag.isSpecial) {
-                                val standaloneNames = tags.filter { !it.isSpecial }.map { it.name }
-                                category !in standaloneNames
-                            } else {
-                                category == tag.name
-                            }
-                        }
+                        val categoryTransactions = transactionsByCategory[tag.name].orEmpty()
                         onCategoryClick?.invoke(tag.name, categoryTransactions)
                     }
                 } else {
@@ -374,18 +426,7 @@ private fun ChartContent(
             verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
             tags.forEach { tag ->
-                val categoryTransactions =
-                    remember(spends, tag.name) {
-                        spends.filter {
-                            val category = it.comment.trim().ifEmpty { labelWithoutTag }
-                            if (tag.isSpecial) {
-                                val standaloneNames = tags.filter { !it.isSpecial }.map { it.name }
-                                category !in standaloneNames
-                            } else {
-                                category == tag.name
-                            }
-                        }
-                    }
+                val categoryTransactions = transactionsByCategory[tag.name].orEmpty()
                 CategoryAmount(
                     value = tag.name,
                     amount = tag.amount,
