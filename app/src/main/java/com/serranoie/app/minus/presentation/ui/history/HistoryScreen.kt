@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.history
 
 import android.content.res.Resources
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -42,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.navigation.predictiveDismiss
+import com.serranoie.app.minus.navigation.rememberPredictiveDismiss
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.dialogs.DeleteRecurrentExpenseDialog
 import com.serranoie.app.minus.presentation.ui.history.dialogs.TransactionEditDialog
@@ -155,16 +156,20 @@ fun History(
                     onProcessIntent = onProcessIntent,
                 )
             } else {
-                BackHandler {
+                val editorDismiss = rememberPredictiveDismiss(
+                    enabled = uiState.editingTransaction != null ||
+                        uiState.recurrentToEdit != null,
+                ) {
                     if (uiState.editingTransaction != null) {
                         onProcessIntent(HistoryUiIntent.SetEditingTransaction(null))
-                    } else if (uiState.recurrentToEdit != null) {
+                    } else {
                         onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(null))
                     }
                 }
 
                 Surface(
                     modifier = Modifier
+                        .predictiveDismiss(editorDismiss)
                         .fillMaxSize()
                         .then(
                             with(sharedTransitionScope) {

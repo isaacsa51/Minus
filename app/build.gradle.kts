@@ -150,6 +150,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
+
+        create("beta") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".beta"
+            versionNameSuffix = "-beta"
+            buildConfigField("Boolean", "SHOW_LOGS", "true")
+            buildConfigField("Boolean", "DEBUG_FEATURES", "false")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -166,14 +174,15 @@ android {
     }
 
     applicationVariants.all {
+        val versionLabel = appVersionName + (buildType.versionNameSuffix ?: "")
         outputs.all {
             val output = this as? BaseVariantOutputImpl
             if (output != null) {
                 val flavorName = name.replaceFirstChar { it.titlecase() }
                 output.outputFileName = if (flavorName.contains("wear", ignoreCase = true)) {
-                    "Minus-WearOS-v$appVersionName.apk"
+                    "Minus-WearOS-v$versionLabel.apk"
                 } else {
-                    "Minus-v$appVersionName.apk"
+                    "Minus-v$versionLabel.apk"
                 }
             }
         }
@@ -210,6 +219,45 @@ android {
 
 tasks.named("preBuild").configure {
     dependsOn(generateChangelogKotlin)
+}
+
+val adbExecutable: String = run {
+    val sdkDir = Properties()
+        .apply {
+            rootProject.file("local.properties")
+                .takeIf { it.exists() }
+                ?.inputStream()
+                ?.use { load(it) }
+        }.getProperty("sdk.dir")
+        ?: System.getenv("ANDROID_HOME")
+        ?: System.getenv("ANDROID_SDK_ROOT")
+    val binary = if (System.getProperty("os.name").startsWith("Windows")) "adb.exe" else "adb"
+    sdkDir?.let { File(it, "platform-tools/$binary").absolutePath } ?: binary
+}
+
+androidComponents {
+    onVariants { variant ->
+        val variantName = variant.name.replaceFirstChar { it.titlecase() }
+        val applicationId = variant.applicationId
+
+        tasks.register<Exec>("launch$variantName") {
+            group = "install"
+            description = "Installs the ${variant.name} variant and starts it on the device."
+            dependsOn("install$variantName")
+            executable = adbExecutable
+            argumentProviders.add(
+                CommandLineArgumentProvider {
+                    listOf(
+                        "shell",
+                        "am",
+                        "start",
+                        "-n",
+                        "${applicationId.get()}/com.serranoie.app.minus.presentation.MainActivity",
+                    )
+                },
+            )
+        }
+    }
 }
 
 dependencies {
@@ -275,6 +323,7 @@ dependencies {
     implementation(libs.androidx.room.paging)
     implementation(libs.androidx.hilt.navigationcompose)
     implementation(libs.androidx.navigationcompose)
+    implementation(libs.androidx.navigationevent.compose)
     "wearImplementation"(libs.play.services.wearable)
     "wearImplementation"(libs.kotlinx.coroutines.playservices)
     implementation(libs.androidx.lifecycle.viewmodelcompose)

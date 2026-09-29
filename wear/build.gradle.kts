@@ -83,6 +83,12 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        create("beta") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".beta"
+            versionNameSuffix = "-beta"
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -99,6 +105,7 @@ android {
     }
 
     applicationVariants.all {
+        val versionLabel = appVersionName + (buildType.versionNameSuffix ?: "")
         outputs.all {
             val output = this as? BaseVariantOutputImpl
             if (output != null) {
@@ -106,7 +113,7 @@ android {
                 // ":app" already ships "Minus-WearOS-v<x>.apk" (phone app + Wear
                 // OS bridge) — keep the names distinct so both can be attached
                 // to the same GitHub Release.
-                output.outputFileName = "Minus-Watch-v$appVersionName.apk"
+                output.outputFileName = "Minus-Watch-v$versionLabel.apk"
             }
         }
     }

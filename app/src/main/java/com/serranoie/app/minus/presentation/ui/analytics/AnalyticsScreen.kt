@@ -14,11 +14,12 @@ fun AnalyticsScreen(
     onNavigateToMainWithWallet: () -> Unit,
     onNavigateToMain: () -> Unit,
     onNavigateToSubscriptions: () -> Unit = {},
+    isRootDestination: Boolean = false,
     viewModel: AnalyticsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    BackHandler {
+    BackHandler(enabled = isRootDestination || uiState.selectedPeriodId != null) {
         viewModel.onClose()
     }
 

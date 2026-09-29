@@ -3,7 +3,6 @@
 package com.serranoie.app.minus.presentation.ui.editor.sheets
 
 import android.content.res.Configuration
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -98,6 +97,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.navigation.predictiveDismiss
+import com.serranoie.app.minus.navigation.rememberPredictiveDismiss
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -781,12 +782,15 @@ fun EditBudgetContent(
         onApply(newSettings)
     }
 
-    BackHandler(enabled = showBehaviour) { showBehaviour = false }
+    val behaviourDismiss = rememberPredictiveDismiss(enabled = showBehaviour) {
+        showBehaviour = false
+    }
 
     val behaviourSlideSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
     val behaviourFadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
 
     AnimatedContent(
+        modifier = Modifier.predictiveDismiss(behaviourDismiss),
         targetState = showBehaviour,
         transitionSpec = {
             val direction = if (targetState) 1 else -1

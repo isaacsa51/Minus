@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.presentation.ui.subscriptions
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -33,8 +32,6 @@ fun SubscriptionsScreen(
     val editingTransaction by viewModel.editingTransaction.collectAsStateWithLifecycle()
     val recurrentToDelete by viewModel.recurrentToDelete.collectAsStateWithLifecycle()
     val tags by viewModel.tags.collectAsStateWithLifecycle()
-
-    BackHandler(onBack = onBack)
 
     SharedTransitionLayout {
         AnimatedVisibility(visible = true) {

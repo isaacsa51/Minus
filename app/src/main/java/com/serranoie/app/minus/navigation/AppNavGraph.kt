@@ -1,19 +1,28 @@
 package com.serranoie.app.minus.navigation
 
 import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.FrameRateCategory
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.preferredFrameRate
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -35,23 +44,41 @@ import logcat.logcat
 
 private const val TAG = "ISAAC:AppNavGraph"
 
-private fun getScreenTransitions(
-    initialState: NavBackStackEntry,
-    targetState: NavBackStackEntry,
-): Pair<EnterTransition, ExitTransition> {
-    val isForward = targetState.destination.id > initialState.destination.id
+@OptIn(ExperimentalComposeUiApi::class)
+private fun NavGraphBuilder.screen(
+    route: String,
+    popDirection: PopDirection,
+    animated: Boolean,
+    arguments: List<NamedNavArgument> = emptyList(),
+    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+) = composable(route = route, arguments = arguments) { entry ->
+    val scope = this
+    val reveal = transition.animateFloat(
+        transitionSpec = { tween(BackMotionTokens.TransitionDurationMillis) },
+        label = "reveal",
+    ) { state -> if (state == EnterExitState.Visible) 1f else 0f }
 
-    val enter = slideInHorizontally(
-        initialOffsetX = { if (isForward) 30 else -30 },
-        animationSpec = tween(300),
-    ) + fadeIn(animationSpec = tween(250, delayMillis = 50))
+    val pageModifier = if (animated) {
+        Modifier
+            .predictiveBackPage(
+                gesture = rememberBackGesture(),
+                transition = transition,
+                dimAlpha = { if (popDirection.isPop) revealDim(reveal.value) else 0f },
+            )
+            .then(
+                if (transition.currentState != transition.targetState) {
+                    Modifier.preferredFrameRate(FrameRateCategory.High)
+                } else {
+                    Modifier
+                },
+            )
+    } else {
+        Modifier
+    }
 
-    val exit = slideOutHorizontally(
-        targetOffsetX = { if (isForward) -30 else 30 },
-        animationSpec = tween(300),
-    ) + fadeOut(animationSpec = tween(200))
-
-    return enter to exit
+    Box(modifier = Modifier.fillMaxSize().then(pageModifier)) {
+        with(scope) { content(entry) }
+    }
 }
 
 @Composable
@@ -65,15 +92,27 @@ fun AppNavGraph(
     val tag = TAG
     logcat(tag) { "Created with startDestination: $startDestination" }
 
+    val enteringOffsetPx = with(LocalDensity.current) {
+        BackMotionTokens.EnteringStartOffset.roundToPx()
+    }
+    val animated = rememberAnimationsEnabled()
+    val popDirection = remember { PopDirection() }
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        enterTransition = { getScreenTransitions(initialState, targetState).first },
-        exitTransition = { getScreenTransitions(initialState, targetState).second },
-        popEnterTransition = { getScreenTransitions(initialState, targetState).first },
-        popExitTransition = { getScreenTransitions(initialState, targetState).second },
+        enterTransition = {
+            popDirection.record(pop = false)
+            if (animated) screenEnter() else EnterTransition.None
+        },
+        exitTransition = { if (animated) screenExit() else ExitTransition.None },
+        popEnterTransition = {
+            popDirection.record(pop = true)
+            if (animated) screenPopEnter(enteringOffsetPx) else EnterTransition.None
+        },
+        popExitTransition = { if (animated) screenPopExit() else ExitTransition.None },
     ) {
-        composable(Screen.Onboarding.route) {
+        screen(Screen.Onboarding.route, popDirection, animated) {
             OnboardingScreen(
                 onOnboardingCompleted = {
                     onOnboardingComplete()
@@ -84,9 +123,10 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.Analytics.route) {
+        screen(Screen.Analytics.route, popDirection, animated) {
             AnalyticsScreen(
                 activityResultRegistryOwner = activityResultRegistryOwner,
+                isRootDestination = startDestination == Screen.Analytics.route,
                 onNavigateToMainWithWallet = {
                     navController.navigate(
                         Screen.Main.createRoute(openWallet = true, forceWalletSetup = true),
@@ -103,13 +143,15 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.Subscriptions.route) {
+        screen(Screen.Subscriptions.route, popDirection, animated) {
             SubscriptionsScreen(
                 onBack = { navController.popBackStack() },
             )
         }
 
-        composable(
+        screen(
+            popDirection = popDirection,
+            animated = animated,
             route = Screen.Main.route,
             arguments = listOf(
                 navArgument(Screen.Main.ARG_OPEN_WALLET) {
@@ -148,7 +190,7 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.Settings.route) {
+        screen(Screen.Settings.route, popDirection, animated) {
             logcat(tag) { "Navigating to Settings" }
 
             SettingsScreen(
@@ -170,7 +212,7 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.FeatureLab.route) {
+        screen(Screen.FeatureLab.route, popDirection, animated) {
             val viewModel: SettingsViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -187,7 +229,7 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.Appearance.route) {
+        screen(Screen.Appearance.route, popDirection, animated) {
             val viewModel: SettingsViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -205,7 +247,7 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.Changelog.route) {
+        screen(Screen.Changelog.route, popDirection, animated) {
             logcat(tag) { "Navigating to Changelog" }
 
             val viewModel = hiltViewModel<ChangelogHistoryViewModel>()
@@ -217,7 +259,7 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.BugReport.route) {
+        screen(Screen.BugReport.route, popDirection, animated) {
             BugReportScreen(
                 onBack = {
                     navController.popBackStack()

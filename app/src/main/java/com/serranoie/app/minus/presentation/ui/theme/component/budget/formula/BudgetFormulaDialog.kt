@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget.formula
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -55,6 +54,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.navigation.predictiveDismiss
+import com.serranoie.app.minus.navigation.rememberPredictiveDismiss
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -151,7 +152,8 @@ fun BudgetFormulaSource(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun SharedTransitionScope.BudgetFormulaOverlay(host: BudgetFormulaHostState, modifier: Modifier) {
-    BackHandler(enabled = host.shown) { host.dismiss() }
+    val dismiss = rememberPredictiveDismiss(enabled = host.shown) { host.dismiss() }
+
     AnimatedVisibility(visible = host.shown, modifier = modifier, enter = fadeIn(), exit = fadeOut()) {
         val request = host.request ?: return@AnimatedVisibility
         val sourceKey = host.sourceKey ?: return@AnimatedVisibility
@@ -167,6 +169,7 @@ private fun SharedTransitionScope.BudgetFormulaOverlay(host: BudgetFormulaHostSt
         ) {
             Card(
                 modifier = Modifier
+                    .predictiveDismiss(dismiss)
                     .padding(24.dp)
                     .widthIn(max = 400.dp)
                     .sharedBounds(

@@ -57,7 +57,6 @@ internal enum class BudgetPeriodKind { DAILY, WEEKLY, BIWEEKLY, MONTHLY, UNKNOWN
 internal data class PeriodOverviewUiState(
     val loading: Boolean = true,
     val hasBudget: Boolean = false,
-    /** Currency-formatted (locale-aware) — kept as a string, not a resource. */
     val headlineAmount: String = "",
     val progress: Float = 0f,
     val isOverBudget: Boolean = false,
