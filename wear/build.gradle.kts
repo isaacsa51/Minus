@@ -85,9 +85,10 @@ android {
         }
 
         create("beta") {
-            initWith(getByName("release"))
+            initWith(getByName("debug"))
             applicationIdSuffix = ".beta"
             versionNameSuffix = "-beta"
+            isMinifyEnabled = false
         }
     }
     compileOptions {

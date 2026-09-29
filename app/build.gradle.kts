@@ -152,9 +152,11 @@ android {
         }
 
         create("beta") {
-            initWith(getByName("release"))
+            initWith(getByName("debug"))
             applicationIdSuffix = ".beta"
             versionNameSuffix = "-beta"
+            isMinifyEnabled = false
+            isShrinkResources = false
             buildConfigField("Boolean", "SHOW_LOGS", "true")
             buildConfigField("Boolean", "DEBUG_FEATURES", "false")
         }
