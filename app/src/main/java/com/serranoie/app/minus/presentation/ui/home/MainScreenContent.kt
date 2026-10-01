@@ -1460,6 +1460,13 @@ private fun MainScreenEditorSection(
         onHideBudgetPeriodSheet = {
             actions.onProcessIntent(MainScreenUiIntent.HideBudgetPeriodSheet)
         },
+        onFinishBudgetEarly = {
+            actions.onProcessIntent(
+                MainScreenUiIntent.ProcessBudgetEditorIntent(
+                    BudgetEditorIntent.FinishBudgetEarly,
+                ),
+            )
+        },
         onAnalyticsClickForTutorial = {
             actions.onAdvanceTutorial(FirstLaunchTutorialStage.TAP_ANALYTICS)
         },

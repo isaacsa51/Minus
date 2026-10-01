@@ -8,10 +8,12 @@ import com.serranoie.app.minus.domain.time.MidnightPeriodChecker
 import com.serranoie.app.minus.domain.time.TimeProvider
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import kotlinx.coroutines.NonCancellable
+import logcat.logcat
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import javax.inject.Inject
 
@@ -44,20 +46,22 @@ class BudgetPeriodManager @Inject constructor(
     suspend fun finishBudgetEarly() = withContext(NonCancellable) {
         val settings = budgetRepository.getBudgetSettingsSync() ?: return@withContext
         val originalEndDate = settings.getPeriodEndDate()
-        val now = LocalDate.now()
+        val finishedAt = LocalDateTime.now()
+        val now = finishedAt.toLocalDate()
 
         settingsRepository.setEarlyFinishActive(
             active = true,
-            actualDate = now.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+            actualDate = finishedAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
             originalEndDate = originalEndDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
                 .toEpochMilli()
         )
 
         settingsRepository.setPeriodEndAlreadyHandled(true)
+        logcat { "Finished period early on $now, originally ending $originalEndDate" }
 
         val periodId = settingsRepository.getSettings().currentPeriodId
         val remainingAmount = settings.totalBudget.subtract(
-            midnightPeriodChecker.periodSpent(periodId, settings, now)
+            midnightPeriodChecker.periodSpent(periodId, settings, now, billedThrough = finishedAt)
         )
         midnightPeriodChecker.handleEarlyFinish(settings, remainingAmount)
     }
@@ -83,22 +87,37 @@ class BudgetPeriodManager @Inject constructor(
                         userSettings.periodEndAlreadyHandled ||
                         LocalDate.now().isAfter(previousSettings.getPeriodEndDate())
                 )
+        val periodWindowChanged = previousSettings != null && (
+                previousSettings.startDate != settings.startDate ||
+                        previousSettings.getPeriodEndDate() != settings.getPeriodEndDate()
+                )
         val isNewPeriodBoundary = forceNewPeriodBoundary || previousSettings == null ||
-                (previousPeriodOver && previousSettings.startDate != settings.startDate)
+                (previousPeriodOver && periodWindowChanged)
+
+        logcat {
+            if (isNewPeriodBoundary) {
+                "Starting a new period ${settings.startDate}..${settings.getPeriodEndDate()}, " +
+                        "replacing ${previousSettings?.startDate}..${previousSettings?.getPeriodEndDate()} " +
+                        "(id=${userSettings.currentPeriodId})"
+            } else {
+                "Editing the live period ${previousSettings?.startDate}..${previousSettings?.getPeriodEndDate()} " +
+                        "(id=${userSettings.currentPeriodId}); it is not over yet"
+            }
+        }
 
         val (pendingRolloverAmount, pendingRolloverStrategy) = settingsRepository.getPendingRollover()
 
         val previousPeriodId = userSettings.currentPeriodId
         val archivedSpent =
             if (isNewPeriodBoundary && previousSettings != null && previousPeriodId != 0L) {
-                val actualEndDate = if (userSettings.earlyFinishActualDate > 0L) {
+                val finishedAt = if (userSettings.earlyFinishActualDate > 0L) {
                     Instant.ofEpochMilli(userSettings.earlyFinishActualDate)
                         .atZone(ZoneId.systemDefault())
-                        .toLocalDate()
+                        .toLocalDateTime()
                 } else {
                     null
                 }
-                archivePeriod(previousPeriodId, previousSettings, actualEndDate, settings.startDate)
+                archivePeriod(previousPeriodId, previousSettings, finishedAt, settings.startDate)
             } else {
                 null
             }
@@ -181,13 +200,17 @@ class BudgetPeriodManager @Inject constructor(
     private suspend fun archivePeriod(
         periodId: Long,
         settings: BudgetSettings,
-        actualEndDate: LocalDate?,
+        finishedAt: LocalDateTime?,
         nextStartDate: LocalDate
     ): BigDecimal {
-        val endDate = minOf(actualEndDate ?: settings.getPeriodEndDate(), nextStartDate.minusDays(1))
-            .coerceAtLeast(settings.startDate)
+        val endDate = minOf(
+            finishedAt?.toLocalDate() ?: settings.getPeriodEndDate(),
+            nextStartDate.minusDays(1),
+        ).coerceAtLeast(settings.startDate)
         val archivedSettings = settings.copy(endDate = endDate)
-        val totalSpent = midnightPeriodChecker.periodSpent(periodId, archivedSettings, endDate)
+        val totalSpent = midnightPeriodChecker.periodSpent(
+            periodId, archivedSettings, endDate, billedThrough = finishedAt,
+        )
         budgetRepository.archiveCurrentPeriod(periodId, archivedSettings, totalSpent)
         return totalSpent
     }

@@ -23,6 +23,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -157,8 +158,8 @@ class MainActivity : AppCompatActivity() {
 
                 dataStoreLoaded.value = true
                 isDone.value = true
-            } catch (_: Exception) {
-                logcat("ISAAC:Main") { "Initial settings load failed" }
+            } catch (e: Exception) {
+                logcat { "Initial settings load failed: ${e.asLog()}" }
                 dataStoreLoaded.value = true
                 isDone.value = true
             }
@@ -198,10 +199,12 @@ class MainActivity : AppCompatActivity() {
                 val dynamicColor = context.dynamicColorEnabled
                 val isCensored by censorManager.isCensored.collectAsStateWithLifecycle()
 
-                val startDestination = when {
-                    earlyFinishPending.value -> Screen.Analytics.route
-                    !onboardingComplete.value -> Screen.Onboarding.route
-                    else -> Screen.Main.route
+                val startDestination = remember {
+                    when {
+                        earlyFinishPending.value -> Screen.Analytics.route
+                        !onboardingComplete.value -> Screen.Onboarding.route
+                        else -> Screen.Main.route
+                    }
                 }
 
                 MinusTheme(dynamicColor = dynamicColor) {
@@ -325,9 +328,7 @@ class MainActivity : AppCompatActivity() {
                     launchSingleTop = true
                 }
             } else if (needsBudgetSetup && !onboardingComplete.value) {
-                logcat {
-                    "needsBudgetSetup detected but onboarding NOT complete -> suppressing wallet setup navigation until onboarding finishes"
-                }
+                logcat { "Budget setup needed, but onboarding is unfinished: holding the wallet navigation" }
             }
         }
     }

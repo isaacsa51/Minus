@@ -195,6 +195,7 @@ class MainScreenE2ETest {
                     onSaveBudget = { capturedIntents += "SaveBudget" },
                     directCategoryPopupEnabled = false,
                     categoryGridModeEnabled = false,
+                    onFinishBudgetEarly = {},
                 )
             }
         }

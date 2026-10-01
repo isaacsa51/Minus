@@ -169,6 +169,7 @@ class SplitModeE2ETest {
                         onSaveBudget = { capturedIntents += it },
                         directCategoryPopupEnabled = false,
                         categoryGridModeEnabled = false,
+                        onFinishBudgetEarly = {},
                     )
                 }
             }

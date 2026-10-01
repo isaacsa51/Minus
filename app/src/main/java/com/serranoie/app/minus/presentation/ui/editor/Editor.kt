@@ -123,7 +123,6 @@ import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performUIHapt
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.milliseconds
@@ -162,7 +161,7 @@ fun Editor(
     onBudgetPillClickForTutorial: () -> Unit = {},
     onAnalyticsClickForTutorial: () -> Unit = {},
     onChangePeriod: (BudgetPeriod) -> Unit = {},
-    onFinishBudgetEarly: () -> Unit = {},
+    onFinishBudgetEarly: () -> Unit,
     onSaveBudget: (BudgetSettings) -> Unit = {},
     onCommentUpdate: (String) -> Unit = {},
     onNoteUpdate: (String) -> Unit = {},
@@ -535,7 +534,6 @@ fun Editor(
             label = "editorContent"
         ) { state ->
             if (state == AnimState.EDITING) {
-                logcat("IMPL:TUTORIAL") { "Editor entered EDITING state → composing EditingContent (category tag + recurrent will register)" }
                 EditingContent(
                     input = uiState.numpadInput,
                     currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
@@ -578,9 +576,6 @@ fun Editor(
             onDismissRequest = onHideBudgetPeriodSheet,
             sheetState = sheetState,
         ) {
-            logcat {
-                "Opening BudgetPeriodSheet: forceBudgetPeriodSheetSetup=$forceBudgetPeriodSheetSetup, hasBudgetSettings=${uiState.budgetSettings != null}, currentPeriodId=${uiState.currentPeriodId}, startInEditMode=$forceBudgetPeriodSheetSetup"
-            }
             val formulaHost = LocalBudgetFormulaHost.current
             BudgetPeriodSheet(
                 budgetSettings = uiState.budgetSettings,
@@ -590,11 +585,9 @@ fun Editor(
                 currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
                 startInEditMode = forceBudgetPeriodSheetSetup,
                 onPeriodSelected = { newPeriod ->
-                    logcat { "BudgetPeriodSheet onPeriodSelected -> newPeriod=$newPeriod" }
                     onPeriodSelected(newPeriod)
                 },
                 onSaveBudget = { newSettings ->
-                    logcat { "BudgetPeriodSheet onSaveBudget -> $newSettings" }
                     onSaveBudget(newSettings)
                     scope.launch { sheetState.hide() }
                     onHideBudgetPeriodSheet()
@@ -1122,7 +1115,8 @@ fun EditorPreview_Idle() {
             onDismissRecurrentDialog = {},
             onDismissCreditCutoffDialog = {},
             onRecurrentExpenseConfirm = { _, _, _, _ -> },
-            onCreditCutoffConfirm = {}
+            onCreditCutoffConfirm = {},
+            onFinishBudgetEarly = {},
         )
     }
 }
@@ -1166,7 +1160,8 @@ fun EditorPreview_Editing() {
             onDismissRecurrentDialog = {},
             onDismissCreditCutoffDialog = {},
             onRecurrentExpenseConfirm = { _, _, _, _ -> },
-            onCreditCutoffConfirm = {}
+            onCreditCutoffConfirm = {},
+            onFinishBudgetEarly = {},
         )
     }
 }
@@ -1213,7 +1208,8 @@ private fun EditorPreview_Editing_WithCredit() {
             onDismissRecurrentDialog = {},
             onDismissCreditCutoffDialog = {},
             onRecurrentExpenseConfirm = { _, _, _, _ -> },
-            onCreditCutoffConfirm = {}
+            onCreditCutoffConfirm = {},
+            onFinishBudgetEarly = {},
         )
     }
 }

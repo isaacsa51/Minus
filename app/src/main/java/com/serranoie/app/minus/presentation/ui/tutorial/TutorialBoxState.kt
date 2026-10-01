@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import logcat.logcat
 
-internal const val TUTORIAL_LOG_TAG = "IMPL:TUTORIAL"
+internal const val TUTORIAL_LOG_TAG = "Tutorial"
 
 @Stable
 class TutorialBoxState {
@@ -46,15 +46,9 @@ class TutorialBoxState {
         get() = targetBounds[currentIndexState.value]
 
     fun advance() {
-        if (isCompleted) {
-            logcat(TUTORIAL_LOG_TAG) { "advance: ignored, already completed" }
-            return
-        }
+        if (isCompleted) return
         val order = registrationOrder
-        if (order.isEmpty()) {
-            logcat(TUTORIAL_LOG_TAG) { "advance: ignored, registrationOrder is empty" }
-            return
-        }
+        if (order.isEmpty()) return
 
         if (currentIndexState.value in order) {
             visitedIndices.add(currentIndexState.value)
@@ -64,23 +58,11 @@ class TutorialBoxState {
         var nextPos = currentPos + 1
 
         while (nextPos < order.size && (order[nextPos] !in targetBounds || order[nextPos] in visitedIndices)) {
-            val skipIndex = order[nextPos]
-            val reason = if (skipIndex !in targetBounds) "no bounds yet" else "already shown"
-            logcat(TUTORIAL_LOG_TAG) {
-                "advance: skipping position=$nextPos index=$skipIndex ($reason)"
-            }
             nextPos++
-        }
-        logcat(TUTORIAL_LOG_TAG) {
-            "advance: from position=$currentPos (index=${order.getOrNull(currentPos)}) " + "→ next position=$nextPos (index=${
-                order.getOrNull(
-                    nextPos
-                )
-            }) " + "visitedIndices=$visitedIndices " + "registrationOrder=$order"
         }
         if (nextPos >= order.size) {
             isCompleted = true
-            logcat(TUTORIAL_LOG_TAG) { "advance: walk finished, isCompleted=true" }
+            logcat(TUTORIAL_LOG_TAG) { "Walk finished" }
         } else {
             currentIndexState.value = order[nextPos]
         }
@@ -89,7 +71,7 @@ class TutorialBoxState {
     fun skipAll() {
         isCompleted = true
         visitedIndices.addAll(registrationOrder)
-        logcat(TUTORIAL_LOG_TAG) { "skipAll: tutorial marked as completed" }
+        logcat(TUTORIAL_LOG_TAG) { "Skipped by the user" }
     }
 
     fun resetForReplay() {
@@ -147,9 +129,6 @@ fun Modifier.markForTutorial(
         onDispose {
             state.targetBounds.remove(index)
             state.measuredIndices.remove(index)
-            logcat(TUTORIAL_LOG_TAG) {
-                "markForTutorial: index=$index DISPOSED, cleared bounds " + "currentIndex=${state.currentIndexState.value} " + "isCompleted=${state.isCompleted}"
-            }
         }
     }
     onGloballyPositioned { coordinates ->
@@ -172,9 +151,7 @@ fun Modifier.markForTutorial(
                 val targetPos = state.registrationOrder.indexOf(index)
                 val currentPos =
                     state.registrationOrder.indexOf(state.currentIndexState.value).coerceAtLeast(0)
-                
-                logcat(TUTORIAL_LOG_TAG) { "markForTutorial: index=$index became visible at $bounds. currentIdx=${state.currentIndexState.value} (pos=$currentPos), targetPos=$targetPos, isCompleted=${state.isCompleted}" }
-                
+
                 if (state.isCompleted) {
                     if (index in GatedIndices) state.gatedJumpedIndices.add(index)
                     state.pendingRewindCandidates.add(index)

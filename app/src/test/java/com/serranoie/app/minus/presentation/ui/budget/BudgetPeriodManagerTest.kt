@@ -18,6 +18,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -691,5 +692,168 @@ class BudgetPeriodManagerTest {
             periodManager.persistBudgetSettings(newSettings, forceNewPeriodBoundary = true)
 
             assertThat(spentSlot.single()).isEqualTo(BigDecimal("120.00"))
+        }
+
+    @Test
+    fun `when the period finished early is replaced by one that only moves the end date then it is still a new period`() =
+        runTest {
+            val today = LocalDate.now()
+            val oldSettings = budget(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                startDate = today.minusDays(28),
+                endDate = today,
+                totalBudget = BigDecimal("50000.00"),
+            )
+            coEvery { budgetRepository.getBudgetSettingsSync() } returns oldSettings
+            coEvery { budgetRepository.getTransactions() } returns flowOf(
+                listOf(
+                    Transaction.create(
+                        amount = BigDecimal("42000.00"),
+                        date = today.minusDays(10).atStartOfDay(),
+                        periodId = 500L,
+                    ).copy(id = 1L)
+                )
+            )
+            coEvery { budgetRepository.getPaidRecurrentOccurrences() } returns
+                flowOf(emptySet<PaidRecurrentOccurrence>())
+            userSettings = userSettings.copy(currentPeriodId = 500L, currentPeriodStartedAt = 1L)
+
+            periodManager.finishBudgetEarly()
+
+            val savedSlot = mutableListOf<BudgetSettings>()
+            coEvery { budgetRepository.saveBudgetSettings(any()) } answers { savedSlot.add(firstArg()) }
+
+            val newSettings = oldSettings.copy(
+                endDate = today.plusDays(30),
+                totalBudget = BigDecimal("60000.00"),
+            )
+            val result = periodManager.persistBudgetSettings(newSettings, forceNewPeriodBoundary = false)
+
+            coVerify(exactly = 1) { budgetRepository.archiveCurrentPeriod(500L, any(), any()) }
+            assertThat(result.periodId).isNotEqualTo(500L)
+
+            val leaked = BudgetStateCalculator().filterPeriodTransactions(
+                transactions = budgetRepository.getTransactions().first(),
+                settings = savedSlot.last(),
+                currentPeriodId = result.periodId,
+                currentPeriodStartedAtMillis = result.periodStartMillis,
+            )
+            assertThat(leaked).isEmpty()
+        }
+
+    @Test
+    fun `when the new period keeps the start date and only shortens the end then the start-day spend of the closed period does not carry`() =
+        runTest {
+            val today = LocalDate.now()
+            val oldSettings = budget(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                startDate = today,
+                endDate = today.plusDays(7),
+                totalBudget = BigDecimal("1500.00"),
+            )
+            coEvery { budgetRepository.getBudgetSettingsSync() } returns oldSettings
+
+            val spend = Transaction.create(
+                amount = BigDecimal("55.50"),
+                date = today.atTime(10, 0),
+                periodId = 500L,
+            ).copy(id = 1L, createdAt = 1_000L)
+            coEvery { budgetRepository.getTransactions() } returns flowOf(listOf(spend))
+            coEvery { budgetRepository.getPaidRecurrentOccurrences() } returns
+                flowOf(emptySet<PaidRecurrentOccurrence>())
+            userSettings = userSettings.copy(currentPeriodId = 500L, currentPeriodStartedAt = 1L)
+
+            periodManager.finishBudgetEarly()
+
+            val savedSlot = mutableListOf<BudgetSettings>()
+            coEvery { budgetRepository.saveBudgetSettings(any()) } answers { savedSlot.add(firstArg()) }
+
+            val newSettings = oldSettings.copy(endDate = today.plusDays(4))
+            val result = periodManager.persistBudgetSettings(newSettings, forceNewPeriodBoundary = false)
+
+            val visible = BudgetStateCalculator().filterPeriodTransactions(
+                transactions = listOf(spend),
+                settings = savedSlot.last(),
+                currentPeriodId = result.periodId,
+                currentPeriodStartedAtMillis = result.periodStartMillis,
+            )
+            assertThat(visible).isEmpty()
+        }
+
+    @Test
+    fun `measuring the live period never claims an unstamped row that was created before the period started`() =
+        runTest {
+            val today = LocalDate.now()
+            val livePeriod = budget(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                startDate = today,
+                endDate = today.plusDays(15),
+                totalBudget = BigDecimal("550.00"),
+            )
+            coEvery { budgetRepository.getBudgetSettingsSync() } returns livePeriod
+
+            val stored = listOf(
+                Transaction.create(
+                    amount = BigDecimal("100.00"),
+                    comment = "Spend from the period that was closed",
+                    date = today.atTime(10, 0),
+                    periodId = 0L,
+                ).copy(id = 1L, createdAt = 1_000L)
+            )
+            coEvery { budgetRepository.getTransactions() } returns flowOf(stored)
+            coEvery { budgetRepository.getPaidRecurrentOccurrences() } returns
+                flowOf(emptySet<PaidRecurrentOccurrence>())
+
+            val livePeriodId = 2_000L
+            val spent =
+                midnightPeriodChecker.periodSpent(livePeriodId, livePeriod, livePeriod.getPeriodEndDate())
+
+            assertThat(spent).isEqualTo(BigDecimal.ZERO)
+            assertThat(stored.single().periodId).isEqualTo(0L)
+        }
+
+    @Test
+    fun `the boundary day belongs to the new period alone, so a subscription due then is not archived twice`() =
+        runTest {
+            val today = LocalDate.now()
+            val oldSettings = budget(
+                strategy = RemainingBudgetStrategy.SPLIT_EQUALLY,
+                startDate = today.minusDays(10),
+                endDate = today.plusDays(20),
+                totalBudget = BigDecimal("550.00"),
+            )
+            coEvery { budgetRepository.getBudgetSettingsSync() } returns oldSettings
+
+            val subscription = Transaction.create(
+                amount = BigDecimal("100.00"),
+                comment = "Netflix",
+                date = today.minusMonths(1).atTime(10, 0),
+                isRecurrent = true,
+                recurrentFrequency = RecurrentFrequency.MONTHLY,
+                subscriptionDay = today.dayOfMonth,
+            ).copy(id = 7L)
+            coEvery { budgetRepository.getTransactions() } returns flowOf(listOf(subscription))
+            coEvery { budgetRepository.getPaidRecurrentOccurrences() } returns
+                flowOf(emptySet<PaidRecurrentOccurrence>())
+            userSettings = userSettings.copy(currentPeriodId = 500L, currentPeriodStartedAt = 1L)
+
+            periodManager.finishBudgetEarly()
+
+            val archivedSettings = mutableListOf<BudgetSettings>()
+            val archivedSpend = mutableListOf<BigDecimal>()
+            coEvery {
+                budgetRepository.archiveCurrentPeriod(any(), any(), any())
+            } answers {
+                archivedSettings.add(secondArg())
+                archivedSpend.add(thirdArg())
+            }
+
+            periodManager.persistBudgetSettings(
+                oldSettings.copy(startDate = today, endDate = today.plusDays(15)),
+                forceNewPeriodBoundary = false,
+            )
+
+            assertThat(archivedSettings.single().getPeriodEndDate()).isEqualTo(today.minusDays(1))
+            assertThat(archivedSpend.single()).isEqualTo(BigDecimal.ZERO)
         }
 }
