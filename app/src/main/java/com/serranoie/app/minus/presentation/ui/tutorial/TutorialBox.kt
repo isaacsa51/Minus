@@ -126,8 +126,7 @@ fun TutorialBox(
             delay(400.milliseconds)
             if (state.currentBounds == null) {
                 logcat(TUTORIAL_LOG_TAG) {
-                    "TutorialBox: current target $currentIndex " +
-                            "still has no bounds after settle delay, auto-advancing"
+                    "Tutorial target $currentIndex never got bounds, skipping it"
                 }
                 state.advance()
             }
@@ -159,8 +158,7 @@ fun TutorialBox(
                     state.currentIndexState.value = lowest
                     onTutorialReopened()
                     logcat(TUTORIAL_LOG_TAG) {
-                        "rewind-apply: index=$lowest AFTER completion " +
-                                "(targetPos=$targetPos) — fired onTutorialReopened"
+                        "Tutorial reopened at target $lowest, which appeared after completion"
                     }
                 } else {
                     val currentPos = order
@@ -172,16 +170,6 @@ fun TutorialBox(
                             state.visitedIndices.add(outgoing)
                         }
                         state.currentIndexState.value = lowest
-                        logcat(TUTORIAL_LOG_TAG) {
-                            "rewind-apply: index=$lowest " +
-                                    "(currentPos=$currentPos, targetPos=$targetPos) " +
-                                    "marked outgoing index=$outgoing as visited"
-                        }
-                    } else {
-                        logcat(TUTORIAL_LOG_TAG) {
-                            "rewind-apply: skipped index=$lowest " +
-                                    "(currentPos=$currentPos == targetPos=$targetPos)"
-                        }
                     }
                 }
             }

@@ -10,8 +10,10 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
@@ -38,7 +40,11 @@ internal fun LazyListScope.pastPeriodToggleSection(
                 },
         ) {
             WavyDivider(
-                text = if (showPastPeriod) "Ocultar gastos del periodo pasado" else "Mostrar gastos del periodo pasado",
+                text = if (showPastPeriod) {
+                    stringResource(R.string.hide_past_period_expenses)
+                } else {
+                    stringResource(R.string.show_past_period_expenses)
+                },
                 horizontalPadding = 0.dp,
             )
         }

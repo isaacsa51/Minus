@@ -43,10 +43,7 @@ fun MainScreen(
         mainScreenState.selectedViewPeriod ?: budgetUiState.budgetSettings?.period
         ?: BudgetPeriod.DAILY
 
-    logcat(TAG) { "MainScreen composed (openWalletOnStart=$openWalletOnStart, effectivePeriod=$effectiveSelectedPeriod)" }
-
     LaunchedEffect(Unit) {
-        logcat(TAG) { "Triggering onRequestNotificationPermission from MainScreen LaunchedEffect" }
         onRequestNotificationPermission()
     }
 
@@ -112,14 +109,14 @@ fun MainScreen(
         TutorialBox(
             showTutorial = showNumpadTutorial,
             onTutorialCompleted = {
-                logcat(TAG) { "TutorialBox completed → persisting tutorialBoxCompleted=true" }
+                logcat(TAG) { "First-launch tutorial completed" }
                 mainScreenViewModel.processIntent(
                     MainScreenUiIntent.SetTutorialBoxCompleted(true),
                     tutorialStage,
                 )
             },
             onTutorialReopened = {
-                logcat(TAG) { "TutorialBox reopened (gated target became measurable) → persisting tutorialBoxCompleted=false" }
+                logcat(TAG) { "First-launch tutorial reopened: a gated target became measurable" }
                 mainScreenViewModel.processIntent(
                     MainScreenUiIntent.SetTutorialBoxCompleted(false),
                     tutorialStage,

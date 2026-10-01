@@ -264,7 +264,6 @@ class HistoryViewModel @Inject constructor(
         val startDate = budgetSettings?.startDate ?: LocalDate.now().minusDays(30)
         val endDate = budgetSettings?.getPeriodEndDate() ?: LocalDate.now()
         val today = LocalDate.now()
-        val previousPeriodId = currentPeriodId - 1
 
         val (currentPeriodTx, pastPeriodTx) = splitPeriodTransactions(
             transactions = displayTx,
@@ -272,7 +271,6 @@ class HistoryViewModel @Inject constructor(
             budgetEndDate = endDate,
             currentPeriodStartedAtMillis = currentPeriodStartedAtMillis,
             currentPeriodId = currentPeriodId,
-            previousPeriodId = previousPeriodId,
         )
 
         val budgetState = budgetSettings?.let { s ->

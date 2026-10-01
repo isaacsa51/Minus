@@ -8,6 +8,7 @@ import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.presentation.ui.history.getRecurringChargesInPeriod
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.carryOverRemaining
 import org.junit.Test
 import java.math.BigDecimal
@@ -537,5 +538,81 @@ class BudgetStateCalculatorTest {
         val debt = askMe(3, emptyMap(), 1 to "80", 2 to "130")
         assertThat(debt.remainingToday).isEqualTo(BigDecimal("90.00"))
         assertThat(debt.pendingLeftover).isEqualTo(BigDecimal("0.00"))
+    }
+
+    @Test
+    fun `a new period starts at zero spend, carrying nothing over from the period that just closed`() {
+        val boundaryDay = LocalDate.of(2026, 9, 30)
+        val closedPeriodSpend = Transaction.create(
+            amount = BigDecimal("100.00"),
+            comment = "Spent in the closed period",
+            date = boundaryDay.atTime(10, 0),
+            periodId = 500L,
+        ).copy(id = 1L)
+
+        val state = calculator.calculateBudgetState(
+            settings = settings(
+                totalBudget = BigDecimal("550.00"),
+                start = boundaryDay,
+                end = boundaryDay.plusDays(15),
+            ),
+            transactions = emptyList(),
+            currentDate = boundaryDay,
+            allTransactions = listOf(closedPeriodSpend),
+        )
+
+        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal.ZERO)
+        assertThat(state.progress).isEqualTo(0f)
+    }
+
+    @Test
+    fun `a subscription billed later today is not charged to the period that closed this morning`() {
+        val boundaryDay = LocalDate.of(2026, 9, 30)
+        val closedAtNoon = boundaryDay.atTime(12, 0)
+        val subscription = Transaction.create(
+            amount = BigDecimal("100.00"),
+            comment = "Netflix",
+            date = boundaryDay.minusMonths(1).atTime(18, 0),
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.MONTHLY,
+            subscriptionDay = 30,
+        ).copy(id = 7L)
+
+        val charges = getRecurringChargesInPeriod(
+            transaction = subscription,
+            periodStart = boundaryDay.minusDays(11),
+            periodEnd = boundaryDay,
+            today = boundaryDay,
+            billedThrough = closedAtNoon,
+        )
+
+        assertThat(charges).isEmpty()
+    }
+
+    @Test
+    fun `a subscription billed on the boundary day is charged to the new period`() {
+        val boundaryDay = LocalDate.of(2026, 9, 30)
+        val subscription = Transaction.create(
+            amount = BigDecimal("100.00"),
+            comment = "Netflix",
+            date = boundaryDay.minusMonths(1).atTime(10, 0),
+            periodId = 500L,
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.MONTHLY,
+            subscriptionDay = 30,
+        ).copy(id = 7L)
+
+        val state = calculator.calculateBudgetState(
+            settings = settings(
+                totalBudget = BigDecimal("550.00"),
+                start = boundaryDay,
+                end = boundaryDay.plusDays(15),
+            ),
+            transactions = emptyList(),
+            currentDate = boundaryDay,
+            allTransactions = listOf(subscription),
+        )
+
+        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal("100.00"))
     }
 }

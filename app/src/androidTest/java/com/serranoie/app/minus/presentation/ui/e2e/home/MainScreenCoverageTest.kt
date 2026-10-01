@@ -220,6 +220,7 @@ class MainScreenCoverageTest {
                     showCreditQuickToggleFeature = showCreditQuickToggle,
                     directCategoryPopupEnabled = false,
                     categoryGridModeEnabled = false,
+                    onFinishBudgetEarly = {},
                 )
             }
         }

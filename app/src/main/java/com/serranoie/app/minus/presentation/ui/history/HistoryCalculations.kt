@@ -5,6 +5,7 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 internal fun buildDisplayTransactions(
@@ -20,7 +21,6 @@ internal fun splitPeriodTransactions(
     budgetEndDate: LocalDate,
     currentPeriodStartedAtMillis: Long,
     currentPeriodId: Long,
-    previousPeriodId: Long,
 ): Pair<List<Transaction>, List<Transaction>> {
     val sorted = transactions.sortedByDescending { it.date }
     val current = sorted.filter { transaction ->
@@ -38,7 +38,7 @@ internal fun splitPeriodTransactions(
     }
     val past = sorted.filter { transaction ->
         if (currentPeriodId > 0L && transaction.periodId > 0L) {
-            return@filter transaction.periodId == previousPeriodId
+            return@filter transaction.periodId != currentPeriodId
         }
         val txDate = transaction.date?.toLocalDate() ?: return@filter false
         txDate.isBefore(budgetStartDate) || (txDate.isEqual(budgetStartDate) && currentPeriodStartedAtMillis > 0L && transaction.createdAt < currentPeriodStartedAtMillis)
@@ -170,6 +170,7 @@ internal fun getRecurringChargesInPeriod(
     periodEnd: LocalDate,
     today: LocalDate,
     paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
+    billedThrough: LocalDateTime? = null,
 ): List<Transaction> {
     val frequency = transaction.recurrentFrequency ?: return emptyList()
     val originalDateTime = transaction.date ?: return emptyList()
@@ -181,8 +182,14 @@ internal fun getRecurringChargesInPeriod(
     var chargeDate = startDate
 
     while (!chargeDate.isAfter(subscriptionEnd)) {
+        val chargedAt = chargeDate.atTime(originalTime)
+        val hasBeenCharged = if (billedThrough != null) {
+            !chargedAt.isAfter(billedThrough)
+        } else {
+            !chargeDate.isAfter(today)
+        }
         if (!chargeDate.isBefore(periodStart) && !chargeDate.isAfter(periodEnd) &&
-            !chargeDate.isAfter(today) &&
+            hasBeenCharged &&
             !paidOccurrences.contains(PaidRecurrentOccurrence(transaction.id, chargeDate))
         ) {
             virtualTransactions.add(
@@ -216,6 +223,7 @@ internal fun splitRecurringAndOneTime(
     periodEnd: LocalDate,
     today: LocalDate,
     paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
+    billedThrough: LocalDateTime? = null,
 ): Triple<List<Transaction>, List<Transaction>, List<Transaction>> {
     val oneTimeSpends =
         filteredTransactions.filterNot { it.isDeleted }.filterNot { it.isRecurrent }
@@ -227,7 +235,9 @@ internal fun splitRecurringAndOneTime(
         .filter { it.isRecurrent }).distinctBy { it.id }
 
     val paidCharges = recurringParents.flatMap { parent ->
-        getRecurringChargesInPeriod(parent, periodStart, periodEnd, today, paidOccurrences)
+        getRecurringChargesInPeriod(
+            parent, periodStart, periodEnd, today, paidOccurrences, billedThrough,
+        )
     }
 
     val upcomingCharges = recurringParents.mapNotNull { parent ->
