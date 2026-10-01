@@ -1,8 +1,8 @@
 package com.serranoie.app.minus.presentation.ui.history.sections
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
@@ -15,26 +15,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.date.HistoryDateDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableExpenseItem
-import java.math.BigDecimal
+import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import java.text.NumberFormat
 import java.time.LocalDate
 
@@ -138,14 +136,14 @@ internal fun LazyListScope.pastTransactionDateSections(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Total del día: ",
-                            style = MaterialTheme.typography.labelMedium,
+                            text = stringResource(id = R.string.day_total_format, ""),
+                            style = MaterialTheme.typography.labelMediumCondensed,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
 
                         Text(
                             text = totalText,
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.labelLargeCondensed,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                         )
