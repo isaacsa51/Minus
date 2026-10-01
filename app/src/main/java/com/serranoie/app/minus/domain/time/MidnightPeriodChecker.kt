@@ -15,6 +15,7 @@ import logcat.logcat
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -211,7 +212,8 @@ class MidnightPeriodChecker @Inject constructor(
     suspend fun periodSpent(
         periodId: Long,
         settings: BudgetSettings,
-        periodEnd: LocalDate
+        periodEnd: LocalDate,
+        billedThrough: LocalDateTime? = null,
     ): BigDecimal {
         val transactions = budgetRepository.getTransactions().firstOrNull() ?: emptyList()
         val paidOccurrences =
@@ -223,6 +225,7 @@ class MidnightPeriodChecker @Inject constructor(
             periodEnd = periodEnd,
             today = periodEnd,
             paidOccurrences = paidOccurrences,
+            billedThrough = billedThrough,
         )
         return (oneTimeSpends + paidRecurring).distinctBy { it.id }.sumOf { it.amount }
     }

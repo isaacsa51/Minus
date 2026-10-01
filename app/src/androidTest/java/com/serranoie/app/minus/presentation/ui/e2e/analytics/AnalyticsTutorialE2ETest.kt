@@ -11,6 +11,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.analytics.Analytics
@@ -19,6 +21,7 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Date
 
@@ -50,7 +53,15 @@ class AnalyticsTutorialE2ETest {
                             wholeBudget = BigDecimal("1000.00"),
                             isLoading = false,
                             startPeriodDate = Date(),
-                            finishPeriodDate = Date()
+                            finishPeriodDate = Date(),
+                            budgetSettingsForDisplay = BudgetSettings(
+                                totalBudget = BigDecimal("1000.00"),
+                                period = BudgetPeriod.MONTHLY,
+                                startDate = LocalDate.now(),
+                                endDate = LocalDate.now().plusDays(29),
+                                currencyCode = "USD",
+                                daysInPeriod = 30,
+                            ),
                         ),
                         showTutorialOverride = true
                     )

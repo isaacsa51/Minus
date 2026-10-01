@@ -284,7 +284,6 @@ class HistoryViewModel @Inject constructor(
                 s, periodTransactions, today, paidOccurrences, transactions,
                 reserveUpcomingCharges = userSettings?.reserveUpcomingChargesEnabled == true,
                 leftoverChoices = userSettings?.leftoverChoices.orEmpty(),
-                periodStartedAtMillis = currentPeriodStartedAtMillis,
             )
         }
 

@@ -590,68 +590,6 @@ class BudgetStateCalculatorTest {
     }
 
     @Test
-    fun `a subscription billed before the period opened belongs to the period that was live then`() {
-        val boundaryDay = LocalDate.of(2026, 9, 30)
-        val subscription = Transaction.create(
-            amount = BigDecimal("100.00"),
-            comment = "Netflix",
-            date = boundaryDay.minusMonths(1).atTime(9, 0),
-            isRecurrent = true,
-            recurrentFrequency = RecurrentFrequency.MONTHLY,
-            subscriptionDay = 30,
-        ).copy(id = 7L)
-
-        val openedAtNoon = boundaryDay.atTime(12, 0)
-        val state = calculator.calculateBudgetState(
-            settings = settings(
-                totalBudget = BigDecimal("550.00"),
-                start = boundaryDay,
-                end = boundaryDay.plusDays(15),
-            ),
-            transactions = emptyList(),
-            currentDate = boundaryDay,
-            allTransactions = listOf(subscription),
-            periodStartedAtMillis = openedAtNoon
-                .atZone(java.time.ZoneId.systemDefault())
-                .toInstant()
-                .toEpochMilli(),
-        )
-
-        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal.ZERO)
-    }
-
-    @Test
-    fun `a subscription billed after the period opened is charged to it exactly once`() {
-        val boundaryDay = LocalDate.of(2026, 9, 30)
-        val subscription = Transaction.create(
-            amount = BigDecimal("100.00"),
-            comment = "Netflix",
-            date = boundaryDay.minusMonths(1).atTime(18, 0),
-            isRecurrent = true,
-            recurrentFrequency = RecurrentFrequency.MONTHLY,
-            subscriptionDay = 30,
-        ).copy(id = 7L)
-
-        val openedAtNoon = boundaryDay.atTime(12, 0)
-        val state = calculator.calculateBudgetState(
-            settings = settings(
-                totalBudget = BigDecimal("550.00"),
-                start = boundaryDay,
-                end = boundaryDay.plusDays(15),
-            ),
-            transactions = emptyList(),
-            currentDate = boundaryDay,
-            allTransactions = listOf(subscription),
-            periodStartedAtMillis = openedAtNoon
-                .atZone(java.time.ZoneId.systemDefault())
-                .toInstant()
-                .toEpochMilli(),
-        )
-
-        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal("100.00"))
-    }
-
-    @Test
     fun `a subscription billed on the boundary day is charged to the new period`() {
         val boundaryDay = LocalDate.of(2026, 9, 30)
         val subscription = Transaction.create(
