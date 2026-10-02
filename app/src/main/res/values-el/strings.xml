@@ -517,11 +517,11 @@
     <string name="rollover_dialog_period_finished_title">Η περίοδος ολοκληρώθηκε</string>
     <string name="rollover_dialog_question">Τι θέλετε να κάνετε με τα υπόλοιπα χρήματα?</string>
     <string name="rollover_dialog_split_equally_title">Διαχωρισμός ισομερώς</string>
-    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
+    <string name="rollover_dialog_split_equally_desc">Μοιράστε %1$s ισόποσα σε κάθε ημέρα του επόμενου προϋπολογισμού σας</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">Προσθήκη σήμερα</string>
     <string name="rollover_dialog_carry_to_tomorrow_desc">Προσθέστε ολόκληρο το ποσό %1$s μόνο στον προϋπολογισμό της σημερινής ημέρας</string>
-    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
-    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="rollover_dialog_view_analytics_title">Απόρριψη υπολοίπου προϋπολογισμού</string>
+    <string name="rollover_dialog_view_analytics_desc">Απορρίψτε το υπόλοιπο ποσό και μεταβείτε απευθείας στα στατιστικά σας</string>
     <string name="unresolved_surplus_title">Εκκρεμές πλεόνασμα</string>
     <string name="rollover_dialog_pending_label">Από προηγούμενη περίοδο</string>
     <string name="unresolved_surplus_tap_to_manage">Πατήστε για διαχείριση</string>

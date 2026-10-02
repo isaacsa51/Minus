@@ -517,11 +517,11 @@
     <string name="rollover_dialog_period_finished_title">अवधि खत्म हो गई</string>
     <string name="rollover_dialog_question">आप बचे हुए पैसे का क्या करना चाहते हैं?</string>
     <string name="rollover_dialog_split_equally_title">बराबर बांटें</string>
-    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
+    <string name="rollover_dialog_split_equally_desc">%1$s को अपने अगले बजट के हर दिन में समान रूप से बाँटें</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">आज में जोड़ें</string>
     <string name="rollover_dialog_carry_to_tomorrow_desc">पूरी %1$s राशि केवल आज के बजट में जोड़ें</string>
-    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
-    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="rollover_dialog_view_analytics_title">शेष बजट हटाएँ</string>
+    <string name="rollover_dialog_view_analytics_desc">शेष राशि हटाएँ और सीधे अपने विश्लेषण पर जाएँ</string>
     <string name="unresolved_surplus_title">लंबित अतिरिक्त राशि</string>
     <string name="rollover_dialog_pending_label">पिछली अवधि से</string>
     <string name="unresolved_surplus_tap_to_manage">प्रबंधित करने के लिए टैप करें</string>

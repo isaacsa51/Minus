@@ -552,8 +552,8 @@
   <string name="rollover_dialog_split_equally_desc">Добавить %1$s к бюджету на ближайшие дни</string>
   <string name="rollover_dialog_carry_to_tomorrow_title">Перенести на завтра</string>
   <string name="rollover_dialog_carry_to_tomorrow_desc">Добавить %1$s к завтрашнему бюджету</string>
-  <string name="rollover_dialog_view_analytics_title">Открыть аналитику</string>
-  <string name="rollover_dialog_view_analytics_desc">Посмотреть сводку завершённого периода</string>
+  <string name="rollover_dialog_view_analytics_title">Отказаться от остатка бюджета</string>
+  <string name="rollover_dialog_view_analytics_desc">Отказаться от остатка и сразу перейти к аналитике</string>
   <string name="unresolved_surplus_title">Нераспределённый остаток</string>
   <string name="rollover_dialog_pending_label">С прошлого периода</string>
   <string name="unresolved_surplus_tap_to_manage">Нажмите, чтобы решить</string>

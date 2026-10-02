@@ -28,7 +28,7 @@ class RolloverDialogTest {
         onSplitEqually: () -> Unit = {},
         onCarryToNextDay: () -> Unit = {},
         onDismiss: () -> Unit = {},
-        onViewAnalytics: (() -> Unit)? = null,
+        onDiscardRemaining: (() -> Unit)? = null,
     ) {
         composeTestRule.setContent {
             MinusTheme {
@@ -40,7 +40,7 @@ class RolloverDialogTest {
                     onSplitEqually = onSplitEqually,
                     onCarryToNextDay = onCarryToNextDay,
                     onDismiss = onDismiss,
-                    onViewAnalytics = onViewAnalytics,
+                    onDiscardRemaining = onDiscardRemaining,
                 )
             }
         }
@@ -63,7 +63,7 @@ class RolloverDialogTest {
 
     @Test
     fun when_view_analytics_not_provided_then_that_option_is_hidden() {
-        renderDialog(onViewAnalytics = null)
+        renderDialog(onDiscardRemaining = null)
 
         val label = composeTestRule.activity.getString(R.string.rollover_dialog_view_analytics_title)
         composeTestRule.onNodeWithText(label).assertDoesNotExist()
@@ -71,7 +71,7 @@ class RolloverDialogTest {
 
     @Test
     fun when_view_analytics_provided_then_that_option_is_visible() {
-        renderDialog(onViewAnalytics = {})
+        renderDialog(onDiscardRemaining = {})
 
         val label = composeTestRule.activity.getString(R.string.rollover_dialog_view_analytics_title)
         composeTestRule.onNodeWithText(label).assertIsDisplayed()
@@ -102,7 +102,7 @@ class RolloverDialogTest {
     @Test
     fun when_view_analytics_tapped_then_callback_is_invoked() {
         var invoked = false
-        renderDialog(onViewAnalytics = { invoked = true })
+        renderDialog(onDiscardRemaining = { invoked = true })
 
         val label = composeTestRule.activity.getString(R.string.rollover_dialog_view_analytics_title)
         composeTestRule.onNodeWithText(label).performClick()

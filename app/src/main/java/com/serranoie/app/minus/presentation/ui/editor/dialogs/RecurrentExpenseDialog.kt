@@ -7,8 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -16,6 +15,7 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -23,6 +23,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -75,7 +76,9 @@ fun RecurrentExpenseDialog(
     val budgetEndDate = budgetSettings?.getPeriodEndDate() ?: today.plusDays(30)
 
     var selectedFrequency by remember { mutableStateOf(RecurrentFrequency.MONTHLY) }
-    var selectedDay by remember { mutableIntStateOf(today.dayOfMonth.coerceIn(1, 28)) }
+    var selectedDay by remember {
+        mutableIntStateOf(today.dayOfMonth.coerceIn(MinSubscriptionDay, MaxSubscriptionDay))
+    }
 
     var showDatePicker by remember { mutableStateOf(false) }
     val defaultEndDate = remember(budgetEndDate) { budgetEndDate.plusMonths(3) }
@@ -97,6 +100,7 @@ fun RecurrentExpenseDialog(
 
         DatePickerDialog(onDismissRequest = { showDatePicker = false }, confirmButton = {
             TextButton(
+                shapes = ButtonDefaults.shapes(),
                 onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
                         selectedEndDate =
@@ -109,7 +113,10 @@ fun RecurrentExpenseDialog(
                 Text(stringResource(android.R.string.ok))
             }
         }, dismissButton = {
-            TextButton(onClick = { showDatePicker = false }) {
+            TextButton(
+                onClick = { showDatePicker = false },
+                shapes = ButtonDefaults.shapes()
+            ) {
                 Text(stringResource(android.R.string.cancel))
             }
         }) {
@@ -124,11 +131,6 @@ fun RecurrentExpenseDialog(
             Text(
                 text = stringResource(R.string.recurrent_expense),
                 style = MaterialTheme.typography.titleLargeEmphasized
-            )
-            Text(
-                text = stringResource(R.string.recurrent_expense_details),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }, text = {
@@ -154,7 +156,9 @@ fun RecurrentExpenseDialog(
             val selectedIndex = frequencies.indexOf(selectedFrequency).coerceAtLeast(0)
 
             Row(
-                Modifier.padding(horizontal = 8.dp),
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .selectableGroup(),
                 horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
             ) {
                 val modifiers =
@@ -188,13 +192,14 @@ fun RecurrentExpenseDialog(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        IconButton(onClick = {
-                            selectedDay = (selectedDay - 1).coerceAtLeast(1)
-                        }) {
+                        IconButton(
+                            onClick = { selectedDay-- },
+                            enabled = selectedDay > MinSubscriptionDay,
+                            shapes = IconButtonDefaults.shapes(),
+                        ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                                 contentDescription = stringResource(R.string.previous_day),
-                                modifier = Modifier.size(18.dp)
                             )
                         }
 
@@ -203,13 +208,14 @@ fun RecurrentExpenseDialog(
                             style = MaterialTheme.typography.titleMedium
                         )
 
-                        IconButton(onClick = {
-                            selectedDay = (selectedDay + 1).coerceAtMost(31)
-                        }) {
+                        IconButton(
+                            onClick = { selectedDay++ },
+                            enabled = selectedDay < MaxSubscriptionDay,
+                            shapes = IconButtonDefaults.shapes(),
+                        ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.KeyboardArrowRight,
                                 contentDescription = stringResource(R.string.next_day),
-                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
@@ -227,13 +233,18 @@ fun RecurrentExpenseDialog(
                 readOnly = true,
                 placeholder = { Text(stringResource(R.string.date_placeholder)) },
                 trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.CalendarToday,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outlineVariant,
-                    )
+                    IconButton(
+                        onClick = { showDatePicker = true },
+                        shapes = IconButtonDefaults.shapes(),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = stringResource(R.string.change_date),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 },
-                shape = RoundedCornerShape(14.dp),
+                shape = MaterialTheme.shapes.medium,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.surfaceContainer,
                     unfocusedBorderColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -244,22 +255,13 @@ fun RecurrentExpenseDialog(
                 singleLine = true,
             )
 
-            TextButton(
-                onClick = { showDatePicker = true },
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text(stringResource(R.string.change_date))
-            }
-
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
-                border = BorderStroke(
-                    1.dp,
-                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                 colors = CardDefaults.outlinedCardColors(
-                    containerColor = Color.Transparent
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
             ) {
                 Row(
@@ -272,7 +274,6 @@ fun RecurrentExpenseDialog(
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outline,
                     )
                     Text(
                         text = buildRecurrentSummary(
@@ -282,13 +283,13 @@ fun RecurrentExpenseDialog(
                             formatter = dateFormatter,
                         ),
                         style = MaterialTheme.typography.bodySmallCondensed,
-                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
         }
     }, confirmButton = {
         Button(
+            shapes = ButtonDefaults.shapes(),
             onClick = {
                 onConfirm(
                     selectedFrequency,
@@ -304,7 +305,7 @@ fun RecurrentExpenseDialog(
             )
         }
     }, dismissButton = {
-        TextButton(onClick = onDismiss) {
+        TextButton(onClick = onDismiss, shapes = ButtonDefaults.shapes()) {
             Text(
                 stringResource(R.string.cancel),
                 style = MaterialTheme.typography.labelMediumEmphasized
@@ -312,6 +313,9 @@ fun RecurrentExpenseDialog(
         }
     })
 }
+
+private const val MinSubscriptionDay = 1
+private const val MaxSubscriptionDay = 28
 
 @Composable
 private fun buildRecurrentSummary(

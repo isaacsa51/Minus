@@ -518,11 +518,11 @@
     <string name="rollover_dialog_period_finished_title">生理が終了しました</string>
     <string name="rollover_dialog_question">残りのお金で何をしたいですか。</string>
     <string name="rollover_dialog_split_equally_title">均等に分割</string>
-    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
+    <string name="rollover_dialog_split_equally_desc">%1$s を次の予算の毎日に均等に振り分けます</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">今日に追加</string>
     <string name="rollover_dialog_carry_to_tomorrow_desc">%1$s の全額を今日の予算にのみ追加します</string>
-    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
-    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="rollover_dialog_view_analytics_title">残りの予算を破棄</string>
+    <string name="rollover_dialog_view_analytics_desc">残額を破棄して分析画面に直接移動します</string>
     <string name="unresolved_surplus_title">未処理の余剰金</string>
     <string name="rollover_dialog_pending_label">前の期間から</string>
     <string name="unresolved_surplus_tap_to_manage">タップして管理</string>

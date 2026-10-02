@@ -519,11 +519,11 @@
     <string name="rollover_dialog_period_finished_title">기간 종료</string>
     <string name="rollover_dialog_question">남은 금액으로 무엇을 하시겠습니까?</string>
     <string name="rollover_dialog_split_equally_title">균등하게 분할합니다.</string>
-    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
+    <string name="rollover_dialog_split_equally_desc">%1$s을(를) 다음 예산의 모든 날짜에 균등하게 나눕니다</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">오늘에 추가</string>
     <string name="rollover_dialog_carry_to_tomorrow_desc">%1$s 전액을 오늘 예산에만 추가합니다</string>
-    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
-    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="rollover_dialog_view_analytics_title">남은 예산 버리기</string>
+    <string name="rollover_dialog_view_analytics_desc">남은 잔액을 버리고 분석 화면으로 바로 이동합니다</string>
     <string name="unresolved_surplus_title">대기 중인 잔여 금액</string>
     <string name="rollover_dialog_pending_label">이전 기간에서</string>
     <string name="unresolved_surplus_tap_to_manage">탭하여 관리</string>

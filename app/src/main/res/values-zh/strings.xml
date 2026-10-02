@@ -521,11 +521,11 @@
     <string name="rollover_dialog_period_finished_title">周期完成</string>
     <string name="rollover_dialog_question">剩余的钱你想如何规划？</string>
     <string name="rollover_dialog_split_equally_title">平均分配</string>
-    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
+    <string name="rollover_dialog_split_equally_desc">将 %1$s 平均分配到下个预算的每一天</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">添加到今天</string>
     <string name="rollover_dialog_carry_to_tomorrow_desc">将 %1$s 全部添加到今天的预算中</string>
-    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
-    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="rollover_dialog_view_analytics_title">放弃剩余预算</string>
+    <string name="rollover_dialog_view_analytics_desc">放弃剩余金额并直接前往分析页面</string>
     <string name="unresolved_surplus_title">待处理的结余</string>
     <string name="rollover_dialog_pending_label">来自上一周期</string>
     <string name="unresolved_surplus_tap_to_manage">点击管理</string>

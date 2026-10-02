@@ -303,7 +303,7 @@ class MainActivity : AppCompatActivity() {
             onCarryToNextDay = {
                 resolveAndMaybeNavigate(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
             },
-            onViewAnalytics = { resolveAndMaybeNavigate(null) },
+            onDiscardRemaining = { resolveAndMaybeNavigate(null) },
             onDismiss = {
                 midnightTransitionManager.onTransitionDialogDismissed()
             },

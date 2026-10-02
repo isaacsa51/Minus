@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.serranoie.app.minus.presentation.ui.theme.component
 
 import android.content.res.Configuration
@@ -5,11 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.CallSplit
@@ -26,8 +24,10 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.rounded.NextPlan
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.rounded.Celebration
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,18 +41,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.Dialog
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
-import com.serranoie.app.minus.presentation.ui.theme.colorEditor
-import com.serranoie.app.minus.presentation.ui.theme.colorOnEditor
-import com.serranoie.app.minus.presentation.ui.theme.colorPrimary
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
+
+private val HeaderBadgeSize = 56.dp
 
 @Composable
 fun RolloverDialog(
@@ -63,7 +64,7 @@ fun RolloverDialog(
     onSplitEqually: () -> Unit,
     onCarryToNextDay: () -> Unit,
     onDismiss: () -> Unit,
-    onViewAnalytics: (() -> Unit)? = null,
+    onDiscardRemaining: (() -> Unit)? = null,
 ) {
     if (LocalInspectionMode.current) {
         RolloverDialogContent(
@@ -74,7 +75,7 @@ fun RolloverDialog(
             onSplitEqually = onSplitEqually,
             onCarryToNextDay = onCarryToNextDay,
             onDismiss = onDismiss,
-            onViewAnalytics = onViewAnalytics,
+            onDiscardRemaining = onDiscardRemaining,
         )
     } else {
         Dialog(onDismissRequest = onDismiss) {
@@ -86,7 +87,7 @@ fun RolloverDialog(
                 onSplitEqually = onSplitEqually,
                 onCarryToNextDay = onCarryToNextDay,
                 onDismiss = onDismiss,
-                onViewAnalytics = onViewAnalytics,
+                onDiscardRemaining = onDiscardRemaining,
             )
         }
     }
@@ -102,7 +103,7 @@ private fun RolloverDialogContent(
     onSplitEqually: () -> Unit,
     onCarryToNextDay: () -> Unit,
     onDismiss: () -> Unit,
-    onViewAnalytics: (() -> Unit)? = null,
+    onDiscardRemaining: (() -> Unit)? = null,
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
     val formattedRemaining = currencyFormat.format(remainingAmount)
@@ -115,8 +116,8 @@ private fun RolloverDialogContent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        colors = CardDefaults.cardColors(containerColor = colorEditor),
-        shape = RoundedCornerShape(28.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        shape = MaterialTheme.shapes.extraLarge
     ) {
         Column(
             modifier = Modifier
@@ -125,9 +126,7 @@ private fun RolloverDialogContent(
                 .padding(horizontal = 20.dp, vertical = 24.dp)
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -135,13 +134,13 @@ private fun RolloverDialogContent(
                     Text(
                         text = stringResource(R.string.rollover_dialog_period_finished_title),
                         style = MaterialTheme.typography.titleLargeEmphasized,
-                        color = colorOnEditor
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = periodLabel,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = colorOnEditor.copy(alpha = 0.6f)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
@@ -149,17 +148,16 @@ private fun RolloverDialogContent(
 
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1f)
+                        .size(HeaderBadgeSize)
                         .clip(CircleShape)
-                        .background(colorPrimary.copy(alpha = 0.14f)),
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Celebration,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(0.52f),
-                        tint = colorPrimary
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }
@@ -169,9 +167,9 @@ private fun RolloverDialogContent(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(colorOnEditor.copy(alpha = 0.05f))
-                    .padding(20.dp)
+                    .clip(MaterialTheme.shapes.large)
+                    .background(MaterialTheme.colorScheme.surfaceDim)
+                    .padding(16.dp)
             ) {
                 if (formattedSpent != null) {
                     Row(
@@ -182,19 +180,24 @@ private fun RolloverDialogContent(
                         Text(
                             text = stringResource(R.string.total_spent),
                             style = MaterialTheme.typography.labelMediumCondensed,
-                            color = colorOnEditor.copy(alpha = 0.6f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 12.dp),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = formattedSpent,
                             style = MaterialTheme.typography.titleLargeEmphasized,
-                            color = colorOnEditor,
+                            color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1
                         )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    HorizontalDivider(color = colorOnEditor.copy(alpha = 0.1f))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -207,7 +210,12 @@ private fun RolloverDialogContent(
                     Text(
                         text = stringResource(R.string.remaining),
                         style = MaterialTheme.typography.labelMediumCondensed,
-                        color = colorOnEditor.copy(alpha = 0.6f)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 12.dp),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = formattedRemaining,
@@ -244,7 +252,7 @@ private fun RolloverDialogContent(
                 onClick = onCarryToNextDay
             )
 
-            if (onViewAnalytics != null) {
+            if (onDiscardRemaining != null) {
                 Spacer(modifier = Modifier.height(10.dp))
 
                 RolloverActionRow(
@@ -252,7 +260,7 @@ private fun RolloverDialogContent(
                     title = stringResource(R.string.rollover_dialog_view_analytics_title),
                     description = stringResource(R.string.rollover_dialog_view_analytics_desc),
                     highlighted = false,
-                    onClick = onViewAnalytics
+                    onClick = onDiscardRemaining
                 )
             }
 
@@ -260,12 +268,15 @@ private fun RolloverDialogContent(
 
             TextButton(
                 onClick = onDismiss,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                shapes = ButtonDefaults.shapes(),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             ) {
                 Text(
                     text = stringResource(R.string.cancel),
-                    color = colorOnEditor.copy(alpha = 0.6f),
-                    style = MaterialTheme.typography.labelSmallEmphasized,
+                    style = MaterialTheme.typography.labelMediumEmphasized,
                 )
             }
         }
@@ -280,20 +291,25 @@ private fun RolloverActionRow(
     highlighted: Boolean,
     onClick: () -> Unit,
 ) {
-    val accent = MaterialTheme.colorScheme.secondary
-    val container = if (highlighted) accent else colorOnEditor.copy(alpha = 0.06f)
-    val onContainer = if (highlighted) MaterialTheme.colorScheme.onSecondary else colorOnEditor
-    val badgeBackground =
-        if (highlighted) onContainer.copy(alpha = 0.16f) else accent.copy(alpha = 0.14f)
-    val badgeTint = if (highlighted) onContainer else accent
-    val descriptionColor = onContainer.copy(alpha = if (highlighted) 0.75f else 0.6f)
-    val chevronColor = onContainer.copy(alpha = if (highlighted) 0.75f else 0.35f)
+    val container = if (highlighted) {
+        MaterialTheme.colorScheme.secondary
+    } else {
+        MaterialTheme.colorScheme.surfaceContainer
+    }
+    val onContainer = if (highlighted) {
+        MaterialTheme.colorScheme.onSecondary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
 
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = container),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = container,
+            contentColor = onContainer
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
@@ -302,20 +318,7 @@ private fun RolloverActionRow(
                 .padding(horizontal = 14.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(badgeBackground),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = badgeTint
-                )
-            }
+            SettingsLeadingIcon(icon = icon, active = highlighted)
 
             Spacer(modifier = Modifier.width(14.dp))
 
@@ -323,12 +326,11 @@ private fun RolloverActionRow(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmallEmphasized,
-                    color = onContainer
+                    lineHeight = 1.2.em
                 )
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.bodySmallCondensed,
-                    color = descriptionColor
+                    style = MaterialTheme.typography.bodySmallCondensed
                 )
             }
 
@@ -337,8 +339,7 @@ private fun RolloverActionRow(
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = chevronColor
+                modifier = Modifier.size(20.dp)
             )
         }
     }
@@ -386,7 +387,7 @@ private fun RolloverDialogAnalyticsPreview() {
             onSplitEqually = {},
             onCarryToNextDay = {},
             onDismiss = {},
-            onViewAnalytics = {})
+            onDiscardRemaining = {})
     }
 }
 
@@ -402,7 +403,7 @@ private fun RolloverDialogFullPreview() {
             onSplitEqually = {},
             onCarryToNextDay = {},
             onDismiss = {},
-            onViewAnalytics = {})
+            onDiscardRemaining = {})
     }
 }
 
@@ -420,6 +421,6 @@ private fun RolloverDialogDarkModePreview() {
             onSplitEqually = {},
             onCarryToNextDay = {},
             onDismiss = {},
-            onViewAnalytics = {})
+            onDiscardRemaining = {})
     }
 }

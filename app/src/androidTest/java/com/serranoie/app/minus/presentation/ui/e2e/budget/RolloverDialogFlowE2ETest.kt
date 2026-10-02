@@ -163,7 +163,7 @@ class RolloverDialogFlowE2ETest {
                                 transitionManager.resolveUnresolvedSurplus(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
                             }
                         },
-                        onViewAnalytics = {
+                        onDiscardRemaining = {
                             scope.launch { transitionManager.resolveUnresolvedSurplus(null) }
                         },
                         onDismiss = { transitionManager.onTransitionDialogDismissed() },
@@ -327,7 +327,7 @@ class RolloverDialogFlowE2ETest {
                             }
                         },
                         onCarryToNextDay = {},
-                        onViewAnalytics = null,
+                        onDiscardRemaining = null,
                         onDismiss = {},
                     )
                 }

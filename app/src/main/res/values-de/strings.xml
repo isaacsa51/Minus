@@ -524,11 +524,11 @@
     <string name="rollover_dialog_period_finished_title">Zeitraum beendet</string>
     <string name="rollover_dialog_question">Was möchtest du mit dem verbleibenden Geld tun?</string>
     <string name="rollover_dialog_split_equally_title">Gleichmäßig teilen</string>
-    <string name="rollover_dialog_split_equally_desc">Spread %1$s evenly across every day of your next budget</string>
+    <string name="rollover_dialog_split_equally_desc">Verteile %1$s gleichmäßig auf jeden Tag deines nächsten Budgets</string>
     <string name="rollover_dialog_carry_to_tomorrow_title">Zu heute hinzufügen</string>
     <string name="rollover_dialog_carry_to_tomorrow_desc">Füge den vollen Betrag %1$s nur dem heutigen Budget hinzu</string>
-    <string name="rollover_dialog_view_analytics_title">Discard remaining budget</string>
-    <string name="rollover_dialog_view_analytics_desc">Discard the remaining balance and go straight to your analytics</string>
+    <string name="rollover_dialog_view_analytics_title">Restbudget verwerfen</string>
+    <string name="rollover_dialog_view_analytics_desc">Verwirf den Restbetrag und gehe direkt zu deinen Auswertungen</string>
     <string name="unresolved_surplus_title">Pending extra money</string>
     <string name="rollover_dialog_pending_label">From a previous period</string>
     <string name="unresolved_surplus_tap_to_manage">Tap to manage</string>

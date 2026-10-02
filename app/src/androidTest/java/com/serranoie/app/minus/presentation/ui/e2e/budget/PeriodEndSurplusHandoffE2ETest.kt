@@ -202,7 +202,7 @@ class PeriodEndSurplusHandoffE2ETest {
                                 transitionManager.resolveUnresolvedSurplus(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
                             }
                         },
-                        onViewAnalytics = {
+                        onDiscardRemaining = {
                             scope.launch { transitionManager.resolveUnresolvedSurplus(null) }
                         },
                         onDismiss = { transitionManager.onTransitionDialogDismissed() },
