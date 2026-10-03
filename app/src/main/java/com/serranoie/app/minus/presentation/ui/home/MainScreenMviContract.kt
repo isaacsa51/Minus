@@ -32,6 +32,8 @@ sealed interface MainScreenUiIntent {
 
     data class SetTutorialBoxCompleted(val completed: Boolean) : MainScreenUiIntent
 
+    data class SetHistoryTutorialCompleted(val completed: Boolean) : MainScreenUiIntent
+
     data class ProcessBudgetTransactionIntent(val intent: BudgetTransactionIntent) : MainScreenUiIntent
     data class ProcessBudgetEditorIntent(val intent: BudgetEditorIntent) : MainScreenUiIntent
     data class ProcessBudgetNumpadIntent(val intent: BudgetNumpadIntent) : MainScreenUiIntent

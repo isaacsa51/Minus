@@ -3,23 +3,23 @@
     <string name="app_name">Минус</string>
     <string name="tile_new_transaction_label">Нова транзакция</string>
     <string name="tutorial_numpad_title">Цифрова клавиатура</string>
-    <string name="tutorial_numpad_description">Въведете похарчената сума и докоснете зелената отметка, за да запазите. Плъзнете нагоре върху цифровата клавиатура, за да пресметнете.</string>
+    <string name="tutorial_numpad_description">Въведете колко сте похарчили и докоснете отметката, за да запишете. Задръжте клавиша за изтриване, за да изчистите цялата сума, и плъзнете нагоре върху клавишите, за да отворите калкулатора.</string>
     <string name="tutorial_comment_title">Добави категория</string>
-    <string name="tutorial_comment_description">Добавете категория или кратка бележка, за да запомните за какво е бил разходът.</string>
+    <string name="tutorial_comment_description">Дайте категория на разхода, за да се появи в разбивката на анализите. Докоснете някой от запазените си етикети, за да го използвате отново, или напишете кратка бележка.</string>
     <string name="tutorial_budget_pill_title">Бюджетен прогрес</string>
-    <string name="tutorial_budget_pill_description">Докоснете, за да превключите между дневен, седмичен и месечен преглед на бюджета. Задръжте го, за да видите как се изчислява сумата.</string>
+    <string name="tutorial_budget_pill_description">Докоснете, за да отворите настройките на периода и да промените бюджета, датите или начина на разпределяне. Плъзнете настрани, за да превключите между оставащото за днес и оставащото за целия период. Задръжте, за да видите как точно е изчислена тази сума.</string>
     <string name="tutorial_settings_title">Настройки</string>
-    <string name="tutorial_settings_description">Отворете „Настройки“, за да активирате функции, да настроите уиджети за началния екран или да рестартирате този урок.</string>
+    <string name="tutorial_settings_description">Тук са вашите данни и предпочитания: резервно копие или импортиране на CSV, добавяне на джаджи на началния екран, цел за спестяване и часове за напомняне, както и включване на експериментални функции в „Допълнителни функции“. Оттук можете и да прегледате отново тези съвети.</string>
     <string name="tutorial_recurrent_title">Периодични плащания</string>
-    <string name="tutorial_recurrent_description">Докоснете тук, за да отбележите този разход като периодично плащане (седмично, на всеки двуседмично или месечно). Приложението ще ви напомня да го въведете по график.</string>
+    <string name="tutorial_recurrent_description">Включете това, за да се повтаря разходът всяка седмица, на две седмици или всеки месец. Minus ще ви напомни в деня на плащането и ще го покаже в „Повтарящи се плащания за този период“ в историята, докато не го отбележите като платен.</string>
     <string name="tutorial_analytics_title">Преглед на анализите</string>
-    <string name="tutorial_analytics_description">Отворете Анализи, за да видите как се разпределят разходите ви във времето, по категории и спрямо вашите бюджетни цели.</string>
+    <string name="tutorial_analytics_description">Вижте къде отидоха парите: топлинна карта по дни, разпределение по категории, най-големите и най-малките ви разходи и всеки затворен период.</string>
     <string name="tutorial_privacy_title">Режим за поверителност</string>
-    <string name="tutorial_privacy_description">Покрийте горната част на телефона (където е предната камера) с ръка за около секунда, за да замъглите всички суми на екрана. Покрийте я отново, за да го изключите.</string>
-    <string name="tutorial_calc_title">Активен бюджет</string>
-    <string name="tutorial_calc_description">Използвай + или - в началото, за да увеличиш или намалиш оставащия ти бюджет за този период.</string>
+    <string name="tutorial_privacy_description">Покрийте горната част на екрана с ръка, близо до слушалката, за около секунда и всички суми се размазват. Покрийте отново, за да ги върнете.</string>
+    <string name="tutorial_calc_title">Приходи и корекции</string>
+    <string name="tutorial_calc_description">Започнете сумата с +, за да върнете пари в този период — заплата, възстановена сума или входящ превод. Започнете с -, за да извадите пари. Останалите клавиши работят като обикновен калкулатор за самата сума.</string>
     <string name="tutorial_credit_toggle_title">Плащане с кредитна карта</string>
-    <string name="tutorial_credit_toggle_description">Натиснете тук, за да отбележите, че този разход е направен с кредитна карта. Той ще се проследява отделно във вашите анализи.</string>
+    <string name="tutorial_credit_toggle_description">Отбележете разхода като платен с кредитна карта. Той продължава да се брои в този период, но Minus следи дължимото отделно, за да можете да го погасите преди датата на падеж.</string>
     <string name="today">Днес</string>
     <string name="yesterday">Вчера</string>
     <string name="tomorrow">Утре</string>
@@ -340,13 +340,6 @@
     <string name="settings_feature_show_past_transactions_switch_label">Зареждане на минали периоди</string>
     <string name="settings_feature_show_past_transactions_title">Показване на минали трансакции</string>
     <string name="settings_feature_show_past_transactions_subtitle">Зареждане на трансакции от минали периоди</string>
-    <string name="settings_recurrent_payments_view_mode_title">Режим на преглед на повтарящите се плащания</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">Промяна на типа показване за вашите повтарящи се плащания</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">Режим на преглед на повтарящите се плащания</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">Хоризонтален</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Показване на повтарящите се плащания като хоризонтални карти</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">Вертикален</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Показване на повтарящите се плащания като обикновен списък с разходи</string>
     <string name="settings_period_end_time_title">Час на приключване на периода</string>
     <string name="settings_period_end_time_subtitle">Известието ще се показва на крайната дата на периода в този час</string>
     <string name="settings_recurrent_notification_time_title">Час за повтарящи се плащания</string>
@@ -476,9 +469,6 @@
     <string name="recurrent_ticket_weekly_unnamed">Седмичен абонамент без име</string>
     <string name="recurrent_ticket_biweekly_unnamed">Двуседмичен абонамент без име</string>
     <string name="recurrent_ticket_monthly_unnamed">Месечен абонамент без име</string>
-    <string name="recurrent_ticket_frequency_weekly">Седмично</string>
-    <string name="recurrent_ticket_frequency_biweekly">Двуседмично</string>
-    <string name="recurrent_ticket_frequency_monthly">Месечно</string>
     <!-- Subscriptions screen -->
     <string name="subscriptions_title">Абонаменти</string>
     <string name="subscriptions_analytics_card_label">Периодични</string>
@@ -669,8 +659,8 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Тенденции на разходите</string>
     <string name="analytics_tutorial_minmax_desc">Тези карти показват най-ниските и най-високите ви разходи.\nС добавянето на повече трансакции те ще се актуализират, за да ви помогнат да забележите отклоненията.</string>
-    <string name="analytics_tutorial_header_title">Исторически периоди</string>
-    <string name="analytics_tutorial_header_desc">Натиснете иконата, за да видите миналите си бюджетни периоди и да прегледате тяхното изпълнение.</string>
+    <string name="analytics_tutorial_header_title">Минали периоди</string>
+    <string name="analytics_tutorial_header_desc">Зад тази икона са всички периоди, които сте затворили. Докоснете някой, за да отворите отново пълните му анализи; сумите се преизчисляват при преглед, така че редакция на стар разход обновява периода, към който принадлежи. Задръжте период и потвърдете с пръстов отпечатък, за да го изтриете окончателно.</string>
     <string name="analytics_tutorial_budget_title">Статус на бюджета</string>
     <string name="analytics_tutorial_budget_desc">Проверете общия си бюджет и вижте общия брой дни.</string>
     <string name="analytics_tutorial_heatmap_title">Интензивност на разходите</string>
@@ -726,4 +716,18 @@
     <string name="loading">Зареждане…</string>
     <string name="widget_budget_pill_title">Бюджетна лента</string>
     <string name="widget_budget_pill_description">Остатъкът за избрания изглед — дневен, седмичен, двуседмичен или месечен — в тънка лента</string>
+
+    <!-- Tutorial hints -->
+    <string name="tutorial_history_budget_title">Периодът накратко</string>
+    <string name="tutorial_history_budget_description">Колко сте похарчили и колко остава в текущия период, включително дължимото по кредитна карта.</string>
+    <string name="tutorial_history_transaction_title">Редактиране или изтриване на разход</string>
+    <string name="tutorial_history_transaction_description">Докоснете разход, за да го разгънете и видите подробностите. Плъзнете надясно, за да редактирате сумата, датата, категорията или бележката; плъзнете наляво, за да го изтриете, с няколко секунди за отмяна.</string>
+    <string name="tutorial_history_recurrent_title">Предстоящи плащания</string>
+    <string name="tutorial_history_recurrent_description">Повтарящите се плащания с падеж в този период стоят тук, преди да бъдат платени. Отбележете едно като платено, когато дойде, или изтрийте само това плащане, за да го пропуснете този път, без да прекратявате поредицата.</string>
+    <string name="tutorial_history_past_period_title">Минал период</string>
+    <string name="tutorial_history_past_period_description">Разходите от периода преди този, прибрани настрани. Можете да изключите този раздел отново в настройките, в „Допълнителни функции“.</string>
+    <string name="analytics_tutorial_recurrent_title">Повтарящи се плащания</string>
+    <string name="analytics_tutorial_recurrent_desc">Всичко, което се повтаря, и колко ви струва на период. Отворете, за да видите следващата дата на плащане за всяко или да спрете поредица, която вече не плащате.</string>
+    <string name="analytics_tutorial_income_title">Върнати пари</string>
+    <string name="analytics_tutorial_income_desc">Всичко, което сте записали със знак + в началото — заплата, възстановена сума, входящ превод. Добавя се към този период, вместо да се брои като разход, така че оставащият бюджет се увеличава.</string>
 </resources>

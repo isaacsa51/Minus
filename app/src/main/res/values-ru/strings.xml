@@ -3,23 +3,23 @@
   <string name="app_name">Minus</string>
   <string name="tile_new_transaction_label">Новая операция</string>
   <string name="tutorial_numpad_title">Цифровая клавиатура</string>
-  <string name="tutorial_numpad_description">Введите сумму расхода и нажмите зелёную галочку, чтобы сохранить. Проведите вверх по клавиатуре, чтобы открыть калькулятор.</string>
+    <string name="tutorial_numpad_description">Введите потраченную сумму и нажмите галочку, чтобы сохранить. Удерживайте клавишу удаления, чтобы стереть всю сумму, и проведите вверх по клавишам, чтобы открыть калькулятор.</string>
   <string name="tutorial_comment_title">Добавьте категорию</string>
-  <string name="tutorial_comment_description">Укажите категорию или короткий комментарий, чтобы потом вспомнить, на что ушли деньги.</string>
+    <string name="tutorial_comment_description">Задайте расходу категорию, чтобы он попал в разбивку аналитики. Нажмите на один из сохранённых тегов, чтобы использовать его снова, или введите короткую заметку.</string>
   <string name="tutorial_budget_pill_title">Прогресс бюджета</string>
-  <string name="tutorial_budget_pill_description">Нажмите, чтобы переключаться между дневным, недельным и месячным видом бюджета или изменить настройки периода.</string>
+    <string name="tutorial_budget_pill_description">Нажмите, чтобы открыть настройки периода и изменить бюджет, даты или способ распределения. Проведите в сторону, чтобы переключаться между остатком на сегодня и остатком на весь период. Удерживайте, чтобы увидеть, как рассчитана эта сумма.</string>
   <string name="tutorial_settings_title">Настройки</string>
-  <string name="tutorial_settings_description">В настройках можно включить дополнительные функции, добавить виджеты на главный экран или запустить обучение заново.</string>
+    <string name="tutorial_settings_description">Здесь ваши данные и настройки: сохранить копию или импортировать CSV, добавить виджеты на главный экран, задать цель накоплений и время напоминаний, а также включить экспериментальные возможности в разделе «Дополнительные функции». Отсюда же можно пересмотреть эти подсказки.</string>
   <string name="tutorial_recurrent_title">Регулярные платежи</string>
-  <string name="tutorial_recurrent_description">Нажмите здесь, чтобы отметить расход как регулярный (раз в неделю, две недели или месяц). Приложение напомнит внести его в нужный день.</string>
+    <string name="tutorial_recurrent_description">Включите, чтобы расход повторялся каждую неделю, раз в две недели или ежемесячно. Minus напомнит в день списания и покажет его в разделе «Регулярные платежи в этом периоде» в истории, пока вы не отметите его оплаченным.</string>
   <string name="tutorial_analytics_title">Аналитика</string>
-  <string name="tutorial_analytics_description">Откройте аналитику, чтобы увидеть, как расходы распределяются по времени, категориям и относительно целей бюджета.</string>
+    <string name="tutorial_analytics_description">Посмотрите, куда ушли деньги: тепловая карта по дням, разбивка по категориям, самые крупные и самые мелкие расходы и все закрытые периоды.</string>
   <string name="tutorial_privacy_title">Режим конфиденциальности</string>
-  <string name="tutorial_privacy_description">Прикройте верхнюю часть телефона (где фронтальная камера) ладонью примерно на секунду — все суммы на экране размоются. Повторите жест, чтобы отключить режим.</string>
-  <string name="tutorial_calc_title">Корректировка бюджета</string>
-  <string name="tutorial_calc_description">Начните ввод с «+» или «−», чтобы увеличить или уменьшить остаток бюджета за текущий период.</string>
+    <string name="tutorial_privacy_description">Накройте верх экрана ладонью рядом с динамиком примерно на секунду — все суммы размоются. Накройте ещё раз, чтобы вернуть их.</string>
+    <string name="tutorial_calc_title">Доходы и корректировки</string>
+    <string name="tutorial_calc_description">Начните сумму со знака +, чтобы вернуть деньги в этот период: зарплата, возврат или входящий перевод. Начните со знака -, чтобы вычесть деньги. Остальные клавиши работают как обычный калькулятор для самой суммы.</string>
   <string name="tutorial_credit_toggle_title">Оплата кредитной картой</string>
-  <string name="tutorial_credit_toggle_description">Нажмите здесь, чтобы отметить, что расход оплачен кредитной картой. Такие операции учитываются отдельно в аналитике.</string>
+    <string name="tutorial_credit_toggle_description">Отметьте, что расход оплачен кредитной картой. Он по-прежнему учитывается в этом периоде, но Minus ведёт долг отдельно, чтобы вы успели погасить его до даты закрытия.</string>
   <string name="today">Сегодня</string>
   <string name="yesterday">Вчера</string>
   <string name="tomorrow">Завтра</string>
@@ -367,13 +367,6 @@
   <string name="settings_feature_show_past_transactions_switch_label">Загрузить прошлые периоды</string>
   <string name="settings_feature_show_past_transactions_title">Показывать прошлые операции</string>
   <string name="settings_feature_show_past_transactions_subtitle">Загружать операции из предыдущих периодов</string>
-  <string name="settings_recurrent_payments_view_mode_title">Вид регулярных платежей</string>
-  <string name="settings_recurrent_payments_view_mode_subtitle">Как отображать регулярные платежи в списке</string>
-  <string name="settings_recurrent_payments_view_mode_dialog_title">Вид регулярных платежей</string>
-  <string name="settings_recurrent_payments_view_mode_horizontal_title">Карточки</string>
-  <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Горизонтальные карточки регулярных платежей</string>
-  <string name="settings_recurrent_payments_view_mode_vertical_title">Список</string>
-  <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Обычный список, как у разовых расходов</string>
   <string name="settings_period_end_time_title">Время окончания периода</string>
   <string name="settings_period_end_time_subtitle">В этот час в день окончания периода придёт уведомление</string>
   <string name="settings_recurrent_notification_time_title">Время регулярных платежей</string>
@@ -504,9 +497,6 @@
   <string name="recurrent_ticket_weekly_unnamed">Еженедельная подписка без названия</string>
   <string name="recurrent_ticket_biweekly_unnamed">Двухнедельная подписка без названия</string>
   <string name="recurrent_ticket_monthly_unnamed">Ежемесячная подписка без названия</string>
-  <string name="recurrent_ticket_frequency_weekly">Раз в неделю</string>
-  <string name="recurrent_ticket_frequency_biweekly">Раз в две недели</string>
-  <string name="recurrent_ticket_frequency_monthly">Раз в месяц</string>
   <!-- Subscriptions screen -->
   <string name="subscriptions_title">Подписки</string>
   <string name="subscriptions_analytics_card_label">Регулярные</string>
@@ -696,8 +686,8 @@
   <!-- Analytics Tutorial -->
   <string name="analytics_tutorial_minmax_title">Динамика трат</string>
   <string name="analytics_tutorial_minmax_desc">Эти карточки показывают самый маленький и самый большой расход.\nПо мере новых операций значения обновляются — так легче заметить выбросы.</string>
-  <string name="analytics_tutorial_header_title">История периодов</string>
-  <string name="analytics_tutorial_header_desc">Нажмите на значок, чтобы открыть прошлые бюджетные периоды и оценить, как вы в них уложились.</string>
+    <string name="analytics_tutorial_header_title">Прошлые периоды</string>
+    <string name="analytics_tutorial_header_desc">За этим значком — все закрытые вами периоды. Нажмите на любой, чтобы снова открыть полную аналитику; итоги пересчитываются при просмотре, поэтому правка старого расхода обновляет его период. Нажмите и удерживайте период, затем подтвердите отпечатком, чтобы удалить его навсегда.</string>
   <string name="analytics_tutorial_budget_title">Состояние бюджета</string>
   <string name="analytics_tutorial_budget_desc">Здесь весь бюджет и длительность периода в днях.</string>
   <string name="analytics_tutorial_heatmap_title">Интенсивность трат</string>
@@ -754,4 +744,18 @@
     <string name="loading">Загрузка…</string>
     <string name="widget_budget_pill_title">Бюджетная полоса</string>
     <string name="widget_budget_pill_description">Остаток за выбранный режим просмотра — день, неделя, две недели или месяц — в узкой полосе</string>
+
+    <!-- Tutorial hints -->
+    <string name="tutorial_history_budget_title">Период кратко</string>
+    <string name="tutorial_history_budget_description">Сколько вы потратили и сколько осталось в текущем периоде, включая непогашенный долг по кредитной карте.</string>
+    <string name="tutorial_history_transaction_title">Изменить или удалить расход</string>
+    <string name="tutorial_history_transaction_description">Нажмите на расход, чтобы развернуть его и увидеть подробности. Проведите вправо, чтобы изменить сумму, дату, категорию или заметку; проведите влево, чтобы удалить, — несколько секунд будет доступна отмена.</string>
+    <string name="tutorial_history_recurrent_title">Ближайшие платежи</string>
+    <string name="tutorial_history_recurrent_description">Регулярные списания, которые должны пройти в этом периоде, ждут здесь до оплаты. Отметьте платёж оплаченным, когда он пройдёт, или удалите только это списание, чтобы пропустить его на этот раз, не отменяя всю серию.</string>
+    <string name="tutorial_history_past_period_title">Прошлый период</string>
+    <string name="tutorial_history_past_period_description">Расходы периода, предшествующего текущему, убраны в отдельный раздел. Отключить его снова можно в настройках, в разделе «Дополнительные функции».</string>
+    <string name="analytics_tutorial_recurrent_title">Регулярные списания</string>
+    <string name="analytics_tutorial_recurrent_desc">Всё, что повторяется, и сколько это стоит за период. Откройте, чтобы увидеть ближайшую дату списания по каждому или остановить серию, которую вы больше не оплачиваете.</string>
+    <string name="analytics_tutorial_income_title">Возвращённые деньги</string>
+    <string name="analytics_tutorial_income_desc">Всё, что вы записали со знаком + в начале: зарплата, возврат, входящий перевод. Это добавляется к периоду, а не считается тратой, поэтому остаток бюджета растёт.</string>
 </resources>

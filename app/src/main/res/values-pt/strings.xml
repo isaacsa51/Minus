@@ -3,23 +3,23 @@
     <string name="app_name">Minus</string>
     <string name="tile_new_transaction_label">Nova transação</string>
     <string name="tutorial_numpad_title">Empada</string>
-    <string name="tutorial_numpad_description">Digite a quantidade que gastou e toque na marca verde para salvar. Deslize para cima no empada para calcular.</string>
+    <string name="tutorial_numpad_description">Digite o quanto você gastou e toque no visto para salvar. Mantenha a tecla de apagar pressionada para limpar o valor inteiro e deslize para cima sobre as teclas para abrir a calculadora.</string>
     <string name="tutorial_comment_title">Adicionar uma categoria</string>
-    <string name="tutorial_comment_description">Adicione uma categoria ou nota curta para lembrar para que era o gasto.</string>
+    <string name="tutorial_comment_description">Dê uma categoria à despesa para ela aparecer no detalhamento das análises. Toque em uma das suas etiquetas salvas para reutilizá-la ou digite uma nota curta.</string>
     <string name="tutorial_budget_pill_title">Progresso do orçamento</string>
-    <string name="tutorial_budget_pill_description">Toque para alternar entre visualizações de orçamento diárias, semanais e mensais, ou para editar a configuração de período. Segure-a para ver como o valor é calculado.</string>
+    <string name="tutorial_budget_pill_description">Toque para abrir a configuração do período e mudar o orçamento, as datas ou como ele é dividido. Deslize para o lado para alternar entre o que resta hoje e o que resta para todo o período. Mantenha pressionado para ver exatamente como esse valor foi calculado.</string>
     <string name="tutorial_settings_title">Configurações</string>
-    <string name="tutorial_settings_description">Abra as configurações para habilitar os recursos, configurar widgets na tela inicial ou redefinir este tutorial.</string>
+    <string name="tutorial_settings_description">Seus dados e preferências ficam aqui: faça backup ou importe um CSV, adicione widgets à tela inicial, defina a meta de poupança e os horários dos lembretes e ative recursos experimentais em Recursos adicionais. Você também pode rever estas dicas por aqui.</string>
     <string name="tutorial_recurrent_title">Pagamentos recorrentes</string>
-    <string name="tutorial_recurrent_description">Toque aqui para marcar este gasto como um pagamento recorrente (semanal, semanal ou mensal). O aplicativo irá lembrá-lo de registrá-lo no cronograma.</string>
+    <string name="tutorial_recurrent_description">Ative isto para repetir a despesa toda semana, a cada duas semanas ou todo mês. O Minus lembra você no dia do vencimento e a mostra em Pagamentos recorrentes neste período no seu histórico até você marcá-la como paga.</string>
     <string name="tutorial_analytics_title">Veja as suas análises</string>
-    <string name="tutorial_analytics_description">Abra Analytics para ver como os seus gastos se dividem temporal, por categoria e contra os seus objetivos orçamentais.</string>
+    <string name="tutorial_analytics_description">Veja para onde o dinheiro foi: um mapa de calor dia a dia, a divisão por categoria, suas maiores e menores despesas e todos os períodos já encerrados.</string>
     <string name="tutorial_privacy_title">Modo de privacidade</string>
-    <string name="tutorial_privacy_description">Cubra o topo do telefone (onde a câmera frontal fica com a sua mão, por cerca de um segundo, para desfocar todas as quantidades na tela. Cubra novamente para desativá-lo.</string>
-    <string name="tutorial_calc_title">Orçamento em andamento</string>
-    <string name="tutorial_calc_description">Use + ou - no início para aumentar ou diminuir seu orçamento restante para este período.</string>
+    <string name="tutorial_privacy_description">Apoie a mão sobre a parte de cima da tela, perto do alto-falante, por cerca de um segundo e todos os valores ficam borrados. Cubra de novo para mostrá-los outra vez.</string>
+    <string name="tutorial_calc_title">Receitas e ajustes</string>
+    <string name="tutorial_calc_description">Comece o valor com + para devolver dinheiro a este período, como um salário, um reembolso ou uma transferência recebida. Comece com - para tirar dinheiro. As outras teclas funcionam como uma calculadora comum para o valor.</string>
     <string name="tutorial_credit_toggle_title">Pagamento com cartão de crédito</string>
-    <string name="tutorial_credit_toggle_description">Toque aqui para marcar que esta despesa foi feita com cartão de crédito. Ela será rastreada separadamente nas suas estatísticas.</string>
+    <string name="tutorial_credit_toggle_description">Marque a despesa como paga no cartão de crédito. Ela continua contando neste período, mas o Minus acompanha separadamente o que você deve para poder quitar antes da data de fechamento.</string>
     <string name="today">Hoje</string>
     <string name="yesterday">Ontem</string>
     <string name="tomorrow">Amanhã</string>
@@ -338,13 +338,6 @@
     <string name="settings_feature_show_past_transactions_switch_label">Carregar períodos anteriores</string>
     <string name="settings_feature_show_past_transactions_title">Mostrar transações anteriores</string>
     <string name="settings_feature_show_past_transactions_subtitle">Carregar transações de períodos anteriores</string>
-    <string name="settings_recurrent_payments_view_mode_title">Modo de visualização de pagamentos recorrentes</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">Altere o tipo de exibição para mostrar seus pagamentos recorrentes</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">Modo de visualização de pagamentos recorrentes</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Mostrar pagamentos recorrentes como cartões horizontais</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Mostrar pagamentos recorrentes como uma lista de despesas regular</string>
     <string name="settings_period_end_time_title">Hora Final Período</string>
     <string name="settings_period_end_time_subtitle">A notificação será exibida na data final da menstruação neste momento</string>
     <string name="settings_recurrent_notification_time_title">Tempo de pagamentos recorrentes</string>
@@ -474,9 +467,6 @@
     <string name="recurrent_ticket_weekly_unnamed">Assinatura semanal sem nome</string>
     <string name="recurrent_ticket_biweekly_unnamed">Assinatura bisemanal sem nome</string>
     <string name="recurrent_ticket_monthly_unnamed">Assinatura mensal sem nome</string>
-    <string name="recurrent_ticket_frequency_weekly">Semanalmente</string>
-    <string name="recurrent_ticket_frequency_biweekly">Bienal</string>
-    <string name="recurrent_ticket_frequency_monthly">Mensual</string>
     <!-- Subscriptions screen -->
     <string name="subscriptions_title">Assinaturas</string>
     <string name="subscriptions_analytics_card_label">Recorrente</string>
@@ -667,8 +657,8 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendências de gastos</string>
     <string name="analytics_tutorial_minmax_desc">Estes cartões mostram as suas despesas mínimas e máximas. À medida que adiciona mais transações, estas serão atualizadas para ajudar a identificar valores discrepantes.</string>
-    <string name="analytics_tutorial_header_title">Períodos históricos</string>
-    <string name="analytics_tutorial_header_desc">Toque no ícone para ver seus últimos períodos de orçamento e revisar seu desempenho.</string>
+    <string name="analytics_tutorial_header_title">Períodos anteriores</string>
+    <string name="analytics_tutorial_header_desc">Todos os períodos que você encerrou ficam atrás deste ícone. Toque em um para reabrir as análises completas; os totais são recalculados na hora da leitura, então editar uma despesa antiga atualiza o período a que ela pertence. Mantenha um período pressionado e confirme com sua digital para excluí-lo de vez.</string>
     <string name="analytics_tutorial_budget_title">Situação do orçamento</string>
     <string name="analytics_tutorial_budget_desc">Verifique o seu orçamento total e veja os dias no total.</string>
     <string name="analytics_tutorial_heatmap_title">Intensidade de Gastos</string>
@@ -726,4 +716,18 @@
     <string name="loading">Carregando…</string>
     <string name="widget_budget_pill_title">Pílula de orçamento</string>
     <string name="widget_budget_pill_description">O restante do modo de visualização escolhido — diário, semanal, quinzenal ou mensal — numa barra fina</string>
+
+    <!-- Tutorial hints -->
+    <string name="tutorial_history_budget_title">O período num relance</string>
+    <string name="tutorial_history_budget_description">Quanto você gastou e quanto resta no período atual, incluindo o que ainda está devendo no cartão de crédito.</string>
+    <string name="tutorial_history_transaction_title">Editar ou excluir uma despesa</string>
+    <string name="tutorial_history_transaction_description">Toque em uma despesa para expandi-la e ver todos os detalhes. Deslize para a direita para editar valor, data, categoria ou nota; deslize para a esquerda para excluí-la, com alguns segundos para desfazer.</string>
+    <string name="tutorial_history_recurrent_title">Próximos pagamentos</string>
+    <string name="tutorial_history_recurrent_description">As cobranças recorrentes que vencem neste período ficam aqui antes de serem pagas. Marque uma como paga quando ela chegar, ou exclua só aquela ocorrência para pulá-la desta vez sem cancelar a série.</string>
+    <string name="tutorial_history_past_period_title">Período anterior</string>
+    <string name="tutorial_history_past_period_description">Despesas do período anterior a este, guardadas fora do caminho. Você pode desativar esta seção em Configurações, em Recursos adicionais.</string>
+    <string name="analytics_tutorial_recurrent_title">Cobranças recorrentes</string>
+    <string name="analytics_tutorial_recurrent_desc">Tudo o que se repete, com quanto custa por período. Abra para ver a próxima data de vencimento de cada uma ou para encerrar uma série que você não paga mais.</string>
+    <string name="analytics_tutorial_income_title">Dinheiro devolvido</string>
+    <string name="analytics_tutorial_income_desc">Tudo o que você registrou começando com + — um salário, um reembolso, uma transferência recebida. É somado a este período em vez de contar como gasto, então seu orçamento restante aumenta.</string>
 </resources>

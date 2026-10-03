@@ -3,23 +3,23 @@
     <string name="app_name">負</string>
     <string name="tile_new_transaction_label">新しい取引</string>
     <string name="tutorial_numpad_title">テンキー</string>
-    <string name="tutorial_numpad_description">使用した金額を入力し、緑色のチェックマークをタップして保存します。数値パッドを上にスワイプして計算します。</string>
+    <string name="tutorial_numpad_description">使った金額を入力し、チェックをタップして保存します。バックスペースキーを長押しすると金額全体を消去でき、キーの上を上にスワイプすると電卓が開きます。</string>
     <string name="tutorial_comment_title">カテゴリを追加</string>
-    <string name="tutorial_comment_description">カテゴリまたは短いメモを追加して、支出が何のためだったかを覚えておいてください。</string>
+    <string name="tutorial_comment_description">支出にカテゴリを付けると、分析の内訳に表示されます。保存済みのタグをタップして再利用するか、短いメモを入力してください。</string>
     <string name="tutorial_budget_pill_title">予算の進捗状況</string>
-    <string name="tutorial_budget_pill_description">タップして毎日、毎週、毎月の予算表示を切り替えるか、期間設定を編集します。長押しすると金額の計算方法を確認できます。</string>
+    <string name="tutorial_budget_pill_description">タップすると期間の設定が開き、予算・日付・配分方法を変更できます。横にスワイプすると、今日の残りと期間全体の残りを切り替えられます。長押しすると、その金額の算出方法を確認できます。</string>
     <string name="tutorial_settings_title">設定</string>
-    <string name="tutorial_settings_description">設定を開いて機能を有効にするか、ホーム画面のウィジェットを設定するか、チュートリアルをリセットしてください。</string>
+    <string name="tutorial_settings_description">データと設定はここにあります。バックアップやCSVのインポート、ホーム画面へのウィジェット追加、貯蓄目標や通知時刻の設定、追加機能での実験的機能の有効化ができます。このヒントもここから見直せます。</string>
     <string name="tutorial_recurrent_title">繰り返し支払い</string>
-    <string name="tutorial_recurrent_description">ここをタップして定期支払いとしてマークします（毎週、隔週、または毎月）。アプリはスケジュールどおりにログインすることをお知らせします。</string>
+    <string name="tutorial_recurrent_description">これをオンにすると、支出が毎週・隔週・毎月くり返されます。Minus は支払日にお知らせし、支払い済みにするまで履歴の「この期間の繰り返し支払い」に表示します。</string>
     <string name="tutorial_analytics_title">分析結果を表示</string>
-    <string name="tutorial_analytics_description">Analytics を開くと、時間の経過とカテゴリ別、予算目標に対する支出がどのように分割されるかを確認できます。</string>
+    <string name="tutorial_analytics_description">お金の行き先を確認できます。日ごとのヒートマップ、カテゴリ別の内訳、最大と最小の支出、そして締めたすべての期間が見られます。</string>
     <string name="tutorial_privacy_title">プライバシーモード</string>
-    <string name="tutorial_privacy_description">画面上のすべての金額をぼかすために、携帯電話の上部(フロントカメラが座っている場所)を手で約1秒間覆います。 電源を切るには、もう一度カバーしてください。</string>
-    <string name="tutorial_calc_title">予算の調整</string>
-    <string name="tutorial_calc_description">先頭に「+」または「-」を入力して、現在の期間の残りの予算を増減させます。</string>
+    <string name="tutorial_privacy_description">画面上部の受話口のあたりに約1秒手をかざすと、すべての金額がぼかされます。もう一度かざすと元に戻ります。</string>
+    <string name="tutorial_calc_title">収入と調整</string>
+    <string name="tutorial_calc_description">金額の先頭に + を付けると、給料・返金・入金などとしてこの期間にお金が戻ります。先頭に - を付けるとお金を差し引きます。他のキーは金額を計算する通常の電卓として使えます。</string>
     <string name="tutorial_credit_toggle_title">クレジットカード払い</string>
-    <string name="tutorial_credit_toggle_description">ここをタップして、クレジットカードでの支払いであることを指定します。分析機能では個別に集計されます。</string>
+    <string name="tutorial_credit_toggle_description">支出をクレジットカード払いとして記録します。この期間には引き続き計上されますが、Minus は未払い分を別に管理するので、締め日までに精算できます。</string>
     <string name="today">今日</string>
     <string name="yesterday">昨日</string>
     <string name="tomorrow">明日</string>
@@ -336,13 +336,6 @@
     <string name="settings_feature_show_past_transactions_switch_label">過去の期間を読み込む</string>
     <string name="settings_feature_show_past_transactions_title">過去の取引を表示</string>
     <string name="settings_feature_show_past_transactions_subtitle">過去の期間の取引を読み込む</string>
-    <string name="settings_recurrent_payments_view_mode_title">反復支払い表示モード</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">定期支払いを表示するようにディスプレイの種類を変更します</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">反復支払い表示モード</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">水平方向</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">定期支払いを水平カードとして表示する</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">垂直方向</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">定期的な支払いを定期的な支出リストとして表示する</string>
     <string name="settings_period_end_time_title">生理終了時刻</string>
     <string name="settings_period_end_time_subtitle">期間終了日のこの時刻に通知が表示されます</string>
     <string name="settings_recurrent_notification_time_title">定期支払い時間</string>
@@ -472,9 +465,6 @@
     <string name="recurrent_ticket_weekly_unnamed">ウィークリーサブスクリプションに名前がありません</string>
     <string name="recurrent_ticket_biweekly_unnamed">名前なしで隔週サブスクリプション</string>
     <string name="recurrent_ticket_monthly_unnamed">月間サブスクリプションに名前がありません</string>
-    <string name="recurrent_ticket_frequency_weekly">毎週</string>
-    <string name="recurrent_ticket_frequency_biweekly">隔週</string>
-    <string name="recurrent_ticket_frequency_monthly">月ごと</string>
     <!-- Subscriptions screen -->
     <string name="subscriptions_title">サブスクリプション</string>
     <string name="subscriptions_analytics_card_label">定期支払い</string>
@@ -666,7 +656,7 @@
     <string name="analytics_tutorial_minmax_title">支出トレンド</string>
     <string name="analytics_tutorial_minmax_desc">これらのカードはあなたの最低費用と最高費用を表示します。\n取引を追加すると、これらは外れ値を見つけるのに役立ちます。</string>
     <string name="analytics_tutorial_header_title">過去の期間</string>
-    <string name="analytics_tutorial_header_desc">アイコンをタップすると、過去の予算の期間を確認し、パフォーマンスを確認できます。</string>
+    <string name="analytics_tutorial_header_desc">締めた期間はすべてこのアイコンの中にあります。タップすると、その期間の詳細な分析を再び開けます。合計は表示のたびに再計算されるため、古い支出を編集するとその期間に反映されます。期間を長押しし、指紋で確認すると完全に削除できます。</string>
     <string name="analytics_tutorial_budget_title">予算ステータス</string>
     <string name="analytics_tutorial_budget_desc">予算の合計を確認し、合計日数を確認してください。</string>
     <string name="analytics_tutorial_heatmap_title">支出の強度</string>
@@ -726,4 +716,18 @@
     <string name="loading">読み込み中…</string>
     <string name="widget_budget_pill_title">予算ピル</string>
     <string name="widget_budget_pill_description">選択した表示モード（日次・週次・隔週・月次）の残額をスリムなバーで表示</string>
+
+    <!-- Tutorial hints -->
+    <string name="tutorial_history_budget_title">期間の概要</string>
+    <string name="tutorial_history_budget_description">現在の期間で使った金額と残りです。クレジットカードの未払い分も含みます。</string>
+    <string name="tutorial_history_transaction_title">支出の編集と削除</string>
+    <string name="tutorial_history_transaction_description">支出をタップすると展開し、詳細をすべて確認できます。右にスワイプすると金額・日付・カテゴリ・メモを編集でき、左にスワイプすると削除されます。数秒間は取り消せます。</string>
+    <string name="tutorial_history_recurrent_title">今後の支払い</string>
+    <string name="tutorial_history_recurrent_description">この期間に支払期日が来る繰り返しの支出は、支払うまでここに表示されます。支払ったら支払い済みにするか、その回だけ削除すると、シリーズを解除せずに今回だけ見送れます。</string>
+    <string name="tutorial_history_past_period_title">前の期間</string>
+    <string name="tutorial_history_past_period_description">ひとつ前の期間の支出をまとめています。この欄は設定の「追加機能」から再び非表示にできます。</string>
+    <string name="analytics_tutorial_recurrent_title">繰り返しの支出</string>
+    <string name="analytics_tutorial_recurrent_desc">くり返されるものと、期間ごとの金額です。開くと、それぞれの次回の支払日を確認したり、支払わなくなったシリーズを停止したりできます。</string>
+    <string name="analytics_tutorial_income_title">戻ってきたお金</string>
+    <string name="analytics_tutorial_income_desc">先頭に + を付けて記録したもの（給料、返金、入金など）です。支出としてではなくこの期間に加算されるため、残りの予算が増えます。</string>
 </resources>

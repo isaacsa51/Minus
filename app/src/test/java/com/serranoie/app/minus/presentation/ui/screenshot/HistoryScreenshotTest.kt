@@ -32,7 +32,6 @@ import com.serranoie.app.minus.presentation.ui.theme.component.expense.ExpenseIt
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransactionsView
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.RecurrentPaymentsDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
-import com.serranoie.app.minus.presentation.ui.theme.component.ticket.RecurrentTicketCard
 import com.serranoie.app.minus.presentation.util.font.format.prettyDate
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import org.junit.Rule
@@ -79,19 +78,6 @@ class HistoryScreenshotTest {
 			MinusTheme {
 				Surface(modifier = Modifier.fillMaxSize()) {
 					HistoryMixedExpensesContent()
-				}
-			}
-		}
-	}
-
-	@Test
-	fun historyRecurringPaymentsSections() {
-		Locale.setDefault(Locale.US)
-
-		paparazzi.snapshot {
-			MinusTheme {
-				Surface(modifier = Modifier.fillMaxSize()) {
-					HistoryRecurringContent()
 				}
 			}
 		}
@@ -198,123 +184,6 @@ class HistoryScreenshotTest {
                         )
 					}
 				}
-		}
-	}
-
-	@Composable
-	private fun HistoryRecurringContent() {
-		val today = LocalDate.of(2026, 1, 15)
-		val currencyFormat = symbolOnlyCurrencyFormat("USD")
-		val currentRecurring = listOf(
-			UpcomingRecurrentItem(
-				transaction = Transaction(
-					id = 301L,
-					amount = BigDecimal("16.99"),
-					comment = "Video streaming",
-					date = today.minusMonths(1).atTime(9, 0),
-					isRecurrent = true,
-					recurrentFrequency = RecurrentFrequency.MONTHLY,
-					subscriptionDay = 18,
-				),
-				nextChargeDate = today.plusDays(3),
-				isInCurrentPeriod = true,
-			),
-			UpcomingRecurrentItem(
-				transaction = Transaction(
-					id = 302L,
-					amount = BigDecimal("9.99"),
-					comment = "Weekly app",
-					date = today.minusWeeks(1).atTime(8, 30),
-					isRecurrent = true,
-					recurrentFrequency = RecurrentFrequency.WEEKLY,
-				),
-				nextChargeDate = today.plusDays(5),
-				isInCurrentPeriod = true,
-			),
-		)
-		val nextPeriodRecurring = listOf(
-			UpcomingRecurrentItem(
-				transaction = Transaction(
-					id = 401L,
-					amount = BigDecimal("49.99"),
-					comment = "Gym membership",
-					date = today.minusMonths(1).atTime(8, 0),
-					isRecurrent = true,
-					recurrentFrequency = RecurrentFrequency.MONTHLY,
-					subscriptionDay = 2,
-				),
-				nextChargeDate = today.plusDays(20),
-				isInCurrentPeriod = false,
-			),
-			UpcomingRecurrentItem(
-				transaction = Transaction(
-					id = 402L,
-					amount = BigDecimal("7.99"),
-					comment = "Cloud storage",
-					date = today.minusWeeks(2).atTime(8, 0),
-					isRecurrent = true,
-					recurrentFrequency = RecurrentFrequency.BIWEEKLY,
-				),
-				nextChargeDate = today.plusDays(23),
-				isInCurrentPeriod = false,
-			),
-		)
-
-		LazyColumn(
-			modifier = Modifier.fillMaxSize(),
-			contentPadding = PaddingValues(bottom = 24.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
-		) {
-			item {
-				RecurrentPaymentsDivider(
-					title = "Recurrent payments this period",
-					isExpanded = true,
-					onToggleClick = {},
-					itemCount = currentRecurring.size,
-					modifier = Modifier.fillMaxWidth(),
-				)
-			}
-			item {
-				RecurringTicketsRow(currentRecurring, currencyFormat)
-			}
-			item {
-				WavyDivider(
-					text = "Recurrent payments next period",
-					horizontalPadding = 0.dp,
-					amplitude = 4f,
-					wavelength = 45f,
-				)
-			}
-			item {
-				RecurringTicketsRow(nextPeriodRecurring, currencyFormat)
-			}
-		}
-	}
-
-	@Composable
-	private fun RecurringTicketsRow(
-		items: List<UpcomingRecurrentItem>,
-		currencyFormat: java.text.NumberFormat,
-	) {
-		LazyRow(
-			modifier = Modifier.fillMaxWidth(),
-			horizontalArrangement = Arrangement.spacedBy(8.dp),
-			contentPadding = PaddingValues(horizontal = 16.dp),
-		) {
-			itemsIndexed(items, key = { _, item -> item.transaction.id }) { _, item ->
-				RecurrentTicketCard(
-					title = item.transaction.comment,
-					amountFormatted = currencyFormat.format(item.transaction.amount),
-					nextChargeDate = prettyDate(
-						item.nextChargeDate.atStartOfDay(),
-						showTime = false,
-						forceShowDate = false,
-					),
-					frequencyLabel = item.transaction.recurrentFrequency?.name?.lowercase()
-						?.replaceFirstChar { it.uppercase() },
-					modifier = Modifier.fillParentMaxWidth(0.45f),
-				)
-			}
 		}
 	}
 

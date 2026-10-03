@@ -3,23 +3,23 @@
     <string name="app_name">Minus</string>
     <string name="tile_new_transaction_label">Neue Transaktion</string>
     <string name="tutorial_numpad_title">Ziffernblock</string>
-    <string name="tutorial_numpad_description">Gebe den Betrag ein, den du ausgegeben haben, und tippe auf das grüne Häkchen zum Speichern. Wische auf dem Ziffernblock nach oben, um zu rechnen.</string>
+    <string name="tutorial_numpad_description">Gib ein, was du ausgegeben hast, und tippe auf das Häkchen zum Speichern. Halte die Rücktaste gedrückt, um den ganzen Betrag zu löschen, und wische auf den Tasten nach oben, um den Rechner zu öffnen.</string>
     <string name="tutorial_comment_title">Kategorie hinzufügen</string>
-    <string name="tutorial_comment_description">Füge eine Kategorie oder eine kurze Notiz hinzu, um dich daran zu erinnern, wofür die Ausgaben waren.</string>
+    <string name="tutorial_comment_description">Gib der Ausgabe eine Kategorie, damit sie in deiner Auswertung auftaucht. Tippe auf einen deiner gespeicherten Tags, um ihn wiederzuverwenden, oder schreibe stattdessen eine kurze Notiz.</string>
     <string name="tutorial_budget_pill_title">Budgetfortschritt</string>
-    <string name="tutorial_budget_pill_description">Tippe, um zwischen täglichen, wöchentlichen und monatlichen Budgetansichten zu wechseln oder um den Zeitraum zu verändern. Halte sie gedrückt, um zu sehen, wie der Betrag berechnet wird.</string>
+    <string name="tutorial_budget_pill_description">Tippe darauf, um deine Zeitraum-Einstellungen zu öffnen und Budget, Daten oder die Aufteilung zu ändern. Wische zur Seite, um zwischen dem Rest für heute und dem Rest für den ganzen Zeitraum zu wechseln. Halte es gedrückt, um zu sehen, wie der Betrag berechnet wurde.</string>
     <string name="tutorial_settings_title">Einstellungen</string>
-    <string name="tutorial_settings_description">Öffne die Einstellungen, um Funktionen zu aktivieren, Home-Screen-Widgets einzurichten oder dieses Tutorial zurückzusetzen.</string>
+    <string name="tutorial_settings_description">Hier liegen deine Daten und Einstellungen: Daten sichern oder eine CSV importieren, Widgets zum Startbildschirm hinzufügen, Sparziel und Erinnerungszeiten festlegen und experimentelle Funktionen unter Zusätzliche Funktionen aktivieren. Von hier kannst du diese Hinweise auch erneut ansehen.</string>
     <string name="tutorial_recurrent_title">Wiederkehrende Zahlungen</string>
-    <string name="tutorial_recurrent_description">Tippe hier, um diese Ausgabe als wiederkehrende Ausgabe zu markieren (wöchentlich, alle zwei Wochen oder monatlich). Die App erinnert dich dann daran, sie gemäß dem Zeitplan zu erfassen.</string>
+    <string name="tutorial_recurrent_description">Aktiviere das, um die Ausgabe wöchentlich, alle zwei Wochen oder monatlich zu wiederholen. Minus erinnert dich am Fälligkeitstag und zeigt sie unter Wiederkehrende Zahlungen in diesem Zeitraum in deinem Verlauf an, bis du sie als bezahlt markierst.</string>
     <string name="tutorial_analytics_title">Sehe deine Analyse</string>
-    <string name="tutorial_analytics_description">Öffne deine Analytics, um zu sehen, wie sich deine Ausgaben im Verlauf der Zeit nach Kategorien und im Vergleich zu deinen Budgetzielen verteilen.</string>
+    <string name="tutorial_analytics_description">Sieh, wohin das Geld geflossen ist: eine Heatmap Tag für Tag, die Aufteilung nach Kategorie, deine größten und kleinsten Ausgaben und jeder abgeschlossene Zeitraum.</string>
     <string name="tutorial_privacy_title">Privatsphäre-Modus</string>
-    <string name="tutorial_privacy_description">Halte deine Hand für etwa eine Sekunde über den oberen Bereich des Smartphones (wo sich die Frontkamera befindet), um alle Beträge auf dem Bildschirm unkenntlich zu machen. Halte sie erneut darüber, um die Funktion auszuschalten.</string>
-    <string name="tutorial_calc_title">Ongoing budget</string>
-    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_privacy_description">Lege deine Hand für etwa eine Sekunde über den oberen Rand des Bildschirms, in der Nähe des Hörers, und alle Beträge werden unkenntlich. Decke ihn erneut ab, um sie wieder anzuzeigen.</string>
+    <string name="tutorial_calc_title">Einnahmen und Anpassungen</string>
+    <string name="tutorial_calc_description">Beginne den Betrag mit +, um Geld in diesen Zeitraum zurückzubuchen, etwa ein Gehalt, eine Erstattung oder einen Zahlungseingang. Beginne ihn mit -, um Geld abzuziehen. Die übrigen Tasten funktionieren als normaler Rechner für den Betrag.</string>
     <string name="tutorial_credit_toggle_title">Credit Card payment</string>
-    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
+    <string name="tutorial_credit_toggle_description">Markiere die Ausgabe als mit Kreditkarte bezahlt. Sie zählt weiterhin zu diesem Zeitraum, aber Minus führt deine Schulden separat, damit du sie vor deinem Stichtag begleichen kannst.</string>
     <string name="today">Heute</string>
     <string name="yesterday">Gestern</string>
     <string name="tomorrow">Morgen</string>
@@ -341,13 +341,6 @@
     <string name="settings_feature_show_past_transactions_switch_label">Vergangene Zeiträume laden</string>
     <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
     <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
-    <string name="settings_recurrent_payments_view_mode_title">Recurrent payments view mode</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">Change the type of display to show your recurrent payments</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">Recurrent payments view mode</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Show recurring payments as horizontal cards</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Show recurring payments as a regular expenses list</string>
     <string name="settings_period_end_time_title">Period end time</string>
     <string name="settings_period_end_time_subtitle">The notification will be shown on the period end date at this time</string>
     <string name="settings_recurrent_notification_time_title">Recurring payments time</string>
@@ -478,9 +471,6 @@
     <string name="recurrent_ticket_weekly_unnamed">Weekly subscription without name</string>
     <string name="recurrent_ticket_biweekly_unnamed">Biweekly subscription without name</string>
     <string name="recurrent_ticket_monthly_unnamed">Monthly subscription without name</string>
-    <string name="recurrent_ticket_frequency_weekly">Wöchentlich</string>
-    <string name="recurrent_ticket_frequency_biweekly">alle zwei Wochen</string>
-    <string name="recurrent_ticket_frequency_monthly">monatlich</string>
     <!-- Subscriptions screen -->
     <string name="subscriptions_title">Abonnements</string>
     <string name="subscriptions_analytics_card_label">Wiederkehrend</string>
@@ -672,8 +662,8 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Spending Trends</string>
     <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>
-    <string name="analytics_tutorial_header_title">Historical Periods</string>
-    <string name="analytics_tutorial_header_desc">Tap the icon to see your past budget periods and review their performance.</string>
+    <string name="analytics_tutorial_header_title">Vergangene Zeiträume</string>
+    <string name="analytics_tutorial_header_desc">Hinter diesem Symbol liegen alle abgeschlossenen Zeiträume. Tippe auf einen, um seine vollständige Auswertung erneut zu öffnen; die Summen werden beim Lesen neu berechnet, eine Änderung an einer alten Ausgabe aktualisiert also den zugehörigen Zeitraum. Halte einen Zeitraum gedrückt und bestätige mit deinem Fingerabdruck, um ihn endgültig zu löschen.</string>
     <string name="analytics_tutorial_budget_title">Budget Status</string>
     <string name="analytics_tutorial_budget_desc">Check your total budget and see it\'s total days.</string>
     <string name="analytics_tutorial_heatmap_title">Spending Intensity</string>
@@ -726,4 +716,18 @@
     <string name="loading">Wird geladen…</string>
     <string name="widget_budget_pill_title">Budget-Leiste</string>
     <string name="widget_budget_pill_description">Der Restbetrag für den gewählten Ansichtsmodus – täglich, wöchentlich, zweiwöchentlich oder monatlich – als schmale Leiste</string>
+
+    <!-- Tutorial hints -->
+    <string name="tutorial_history_budget_title">Zeitraum auf einen Blick</string>
+    <string name="tutorial_history_budget_description">Was du ausgegeben hast und was im aktuellen Zeitraum übrig ist, einschließlich offener Kreditkartenbeträge.</string>
+    <string name="tutorial_history_transaction_title">Ausgabe bearbeiten oder löschen</string>
+    <string name="tutorial_history_transaction_description">Tippe auf eine Ausgabe, um sie aufzuklappen und alle Details zu sehen. Wische sie nach rechts, um Betrag, Datum, Kategorie oder Notiz zu bearbeiten; wische sie nach links, um sie zu löschen – mit ein paar Sekunden zum Rückgängigmachen.</string>
+    <string name="tutorial_history_recurrent_title">Anstehende Zahlungen</string>
+    <string name="tutorial_history_recurrent_description">Wiederkehrende Buchungen, die in diesem Zeitraum fällig sind, stehen hier, bevor sie bezahlt werden. Markiere eine als bezahlt, wenn sie kommt, oder lösche nur diesen Termin, um ihn diesmal zu überspringen, ohne die Serie zu beenden.</string>
+    <string name="tutorial_history_past_period_title">Letzter Zeitraum</string>
+    <string name="tutorial_history_past_period_description">Ausgaben aus dem Zeitraum davor, aus dem Weg geräumt. Du kannst diesen Bereich in den Einstellungen unter Zusätzliche Funktionen wieder ausblenden.</string>
+    <string name="analytics_tutorial_recurrent_title">Wiederkehrende Buchungen</string>
+    <string name="analytics_tutorial_recurrent_desc">Alles, was sich wiederholt, mit den Kosten pro Zeitraum. Öffne es, um das nächste Fälligkeitsdatum zu sehen oder eine Serie zu beenden, die du nicht mehr zahlst.</string>
+    <string name="analytics_tutorial_income_title">Zurückgebuchtes Geld</string>
+    <string name="analytics_tutorial_income_desc">Alles, was du mit einem führenden + erfasst hast – ein Gehalt, eine Erstattung, ein Zahlungseingang. Es wird diesem Zeitraum gutgeschrieben, statt als Ausgabe zu zählen, dein verbleibendes Budget steigt also.</string>
 </resources>

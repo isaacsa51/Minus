@@ -15,7 +15,6 @@ import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.util.CensorManager
 import io.mockk.Runs
 import io.mockk.coVerify
@@ -218,12 +217,6 @@ class SettingsViewModelTest {
     fun `onPeriodMappingModeChange persists the mode`() = runTest {
         newViewModel().onPeriodMappingModeChange(PeriodMappingMode.CALENDAR_BUCKET)
         coVerify { settingsRepository.setPeriodMappingMode(PeriodMappingMode.CALENDAR_BUCKET) }
-    }
-
-    @Test
-    fun `onRecurrentPaymentsViewModeChange persists the mode`() = runTest {
-        newViewModel().onRecurrentPaymentsViewModeChange(RecurrentPaymentsViewMode.HORIZONTAL_LIST)
-        coVerify { settingsRepository.setRecurrentPaymentsViewMode(RecurrentPaymentsViewMode.HORIZONTAL_LIST) }
     }
 
     @Test

@@ -107,7 +107,6 @@ import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.model.SavingsPreferences
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.buildAppEnvironmentMetadata
 import com.serranoie.app.minus.presentation.ui.settings.components.NotificationPermissionItem
 import com.serranoie.app.minus.presentation.ui.settings.savings.SavingsPreferencesEditor
@@ -136,7 +135,6 @@ import java.util.Locale
 fun Settings(
     modifier: Modifier = Modifier,
     isCensored: Boolean = false,
-    recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
     notificationHour: Int,
     notificationMinute: Int,
     recurrentNotificationHour: Int,
@@ -145,7 +143,6 @@ fun Settings(
     notificationPermissionGranted: Boolean,
     onCensorModeToggle: () -> Unit = {},
     onNavigateToFeatureLab: () -> Unit = {},
-    onRecurrentPaymentsViewModeChange: (RecurrentPaymentsViewMode) -> Unit,
     onNotificationTimeChange: (Int, Int) -> Unit,
     onRecurrentNotificationTimeChange: (Int, Int) -> Unit,
     onOpenExactAlarmSettings: () -> Unit,
@@ -162,13 +159,11 @@ fun Settings(
     onNavigateToAppearance: () -> Unit = {},
     onBack: () -> Unit = {},
 ) {
-    var showRecurrentPaymentsViewModeDialog by remember { mutableStateOf(false) }
     var showNotificationTimePicker by remember { mutableStateOf(false) }
     var showRecurrentNotificationTimePicker by remember { mutableStateOf(false) }
     var showWidgetsSheet by remember { mutableStateOf(false) }
     val widgetsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isSavingsExpanded by remember { mutableStateOf(false) }
-    val dismissRecurrentPaymentsViewModeDialog = { showRecurrentPaymentsViewModeDialog = false }
     val dismissNotificationTimePicker = { showNotificationTimePicker = false }
     val dismissRecurrentNotificationTimePicker = { showRecurrentNotificationTimePicker = false }
     val scrollBehavior =
@@ -354,35 +349,6 @@ fun Settings(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-
-                    CustomPaddedListItem(
-                        onClick = {
-                            showRecurrentPaymentsViewModeDialog = true
-                            view.weakHapticFeedback()
-                        },
-                        position = PaddedListItemPosition.Middle,
-                        modifier = Modifier.testTag("SettingsRecurrentPaymentsViewModeItem")
-                    ) {
-                        SettingsLeadingIcon(icon = Icons.AutoMirrored.Filled.ViewList)
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.settings_recurrent_payments_view_mode_title),
-                                style = MaterialTheme.typography.bodyMediumEmphasized,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(R.string.settings_recurrent_payments_view_mode_subtitle),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Text(
-                            text = recurrentPaymentsViewMode.label(),
-                            style = MaterialTheme.typography.labelLargeCondensed,
-                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -666,7 +632,7 @@ fun Settings(
 
                     CustomPaddedListItem(
                         onClick = {
-                            Utils.openWebLink(context, "https://www.github.com/isaacsa51/Minus")
+                            Utils.openWebLink(context, "https://github.com/isaacsa51/Minus/wiki")
                             view.weakHapticFeedback()
                         }, position = PaddedListItemPosition.Middle
                     ) {
@@ -743,14 +709,6 @@ fun Settings(
             }
         }
 
-        if (showRecurrentPaymentsViewModeDialog) {
-            RecurrentPaymentsViewModePickerDialog(
-                currentMode = recurrentPaymentsViewMode,
-                onModeSelected = onRecurrentPaymentsViewModeChange,
-                onDismiss = dismissRecurrentPaymentsViewModeDialog,
-            )
-        }
-
         if (showNotificationTimePicker) {
             NotificationTimePickerDialog(
                 initialHour = notificationHour,
@@ -785,159 +743,43 @@ fun Settings(
     }
 }
 
+
+private fun Context.copyAppEnvironmentMetadataToClipboard() {
+    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.setPrimaryClip(
+        ClipData.newPlainText(
+            "Minus app environment metadata",
+            buildAppEnvironmentMetadata(),
+        )
+    )
+}
+
+private fun formatNotificationTime(
+    context: Context, hour: Int, minute: Int
+): String {
+    val pattern = if (android.text.format.DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a"
+    return LocalTime.of(hour, minute)
+        .format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
+}
+
+@Preview
 @Composable
-fun RecurrentPaymentsViewModePickerDialog(
-    currentMode: RecurrentPaymentsViewMode,
-    onModeSelected: (RecurrentPaymentsViewMode) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(28.dp),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            tonalElevation = 6.dp,
-            modifier = Modifier.testTag("RecurrentPaymentsViewModePickerDialog")
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.settings_recurrent_payments_view_mode_dialog_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(
-                            if (currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST) {
-                                MaterialTheme.colorScheme.primaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.surface
-                            }
-                        )
-                        .clickable(onClick = {
-                            onModeSelected(RecurrentPaymentsViewMode.HORIZONTAL_LIST)
-                            onDismiss()
-                        })
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Repeat,
-                        contentDescription = null,
-                        tint = if (currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                        modifier = Modifier.size(24.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_title),
-                            style = MaterialTheme.typography.bodyMediumEmphasized,
-                            fontWeight = if (currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST) FontWeight.SemiBold else FontWeight.Normal,
-                            color = if (currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST) {
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.onSurface
-                            }
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_recurrent_payments_view_mode_horizontal_subtitle),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST) {
-                                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            }
-                        )
-                    }
-
-                    if (currentMode == RecurrentPaymentsViewMode.HORIZONTAL_LIST) {
-                        RadioButton(
-                            selected = true, onClick = null, colors = RadioButtonDefaults.colors(
-                                selectedColor = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(
-                            if (currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
-                                MaterialTheme.colorScheme.primaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.surface
-                            }
-                        )
-                        .clickable(onClick = {
-                            onModeSelected(RecurrentPaymentsViewMode.VERTICAL_LIST)
-                            onDismiss()
-                        })
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Repeat,
-                        contentDescription = null,
-                        tint = if (currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                        modifier = Modifier.size(24.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_recurrent_payments_view_mode_vertical_title),
-                            style = MaterialTheme.typography.bodyMediumEmphasized,
-                            fontWeight = if (currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST) FontWeight.SemiBold else FontWeight.Normal,
-                            color = if (currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.onSurface
-                            }
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_recurrent_payments_view_mode_vertical_subtitle),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
-                                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            }
-                        )
-                    }
-
-                    if (currentMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
-                        RadioButton(
-                            selected = true, onClick = null, colors = RadioButtonDefaults.colors(
-                                selectedColor = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                    }
-                }
-            }
-        }
+private fun PreviewSettings() {
+    MinusTheme {
+        Settings(
+            notificationHour = 9,
+            notificationMinute = 0,
+            recurrentNotificationHour = 8,
+            recurrentNotificationMinute = 0,
+            exactAlarmEnabled = true,
+            notificationPermissionGranted = true,
+            onNotificationTimeChange = { _, _ -> },
+            onRecurrentNotificationTimeChange = { _, _ -> },
+            onOpenExactAlarmSettings = {},
+            onOpenNotificationSettings = {},
+            periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
+            onPeriodMappingModeChange = {},
+            onNavigateToAppearance = {})
     }
 }
 
@@ -977,59 +819,5 @@ private fun NotificationTimePickerDialog(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun RecurrentPaymentsViewMode.label(): String {
-    return when (this) {
-        RecurrentPaymentsViewMode.HORIZONTAL_LIST -> stringResource(
-            R.string.settings_recurrent_payments_view_mode_horizontal_title
-        )
-
-        RecurrentPaymentsViewMode.VERTICAL_LIST -> stringResource(
-            R.string.settings_recurrent_payments_view_mode_vertical_title
-        )
-    }
-}
-
-private fun Context.copyAppEnvironmentMetadataToClipboard() {
-    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    clipboard.setPrimaryClip(
-        ClipData.newPlainText(
-            "Minus app environment metadata",
-            buildAppEnvironmentMetadata(),
-        )
-    )
-}
-
-private fun formatNotificationTime(
-    context: Context, hour: Int, minute: Int
-): String {
-    val pattern = if (android.text.format.DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a"
-    return LocalTime.of(hour, minute)
-        .format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
-}
-
-@Preview
-@Composable
-private fun PreviewSettings() {
-    MinusTheme {
-        Settings(
-            recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
-            notificationHour = 9,
-            notificationMinute = 0,
-            recurrentNotificationHour = 8,
-            recurrentNotificationMinute = 0,
-            exactAlarmEnabled = true,
-            notificationPermissionGranted = true,
-            onRecurrentPaymentsViewModeChange = {},
-            onNotificationTimeChange = { _, _ -> },
-            onRecurrentNotificationTimeChange = { _, _ -> },
-            onOpenExactAlarmSettings = {},
-            onOpenNotificationSettings = {},
-            periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
-            onPeriodMappingModeChange = {},
-            onNavigateToAppearance = {})
     }
 }

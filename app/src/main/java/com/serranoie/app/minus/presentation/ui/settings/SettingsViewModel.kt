@@ -29,7 +29,6 @@ import com.serranoie.app.minus.presentation.appTheme
 import com.serranoie.app.minus.presentation.appTypography
 import com.serranoie.app.minus.presentation.dynamicColorEnabled
 import com.serranoie.app.minus.presentation.isAmoledEnabled
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferManager
 import com.serranoie.app.minus.presentation.util.CensorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -61,7 +60,6 @@ data class SettingsUiState(
     val isExtraNoteEnabled: Boolean = false,
     val isReserveUpcomingChargesEnabled: Boolean = false,
     val isNewCategoryTagEnabled: Boolean = false,
-    val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val notificationHour: Int = 9,
     val notificationMinute: Int = 0,
     val recurrentNotificationHour: Int = 8,
@@ -124,7 +122,6 @@ class SettingsViewModel @Inject constructor(
             isReserveUpcomingChargesEnabled = settings.reserveUpcomingChargesEnabled,
             isNewCategoryTagEnabled = settings.newCategoryTagEnabled,
             currentLanguage = settings.language,
-            recurrentPaymentsViewMode = settings.recurrentPaymentsViewMode,
             notificationHour = settings.notificationHour,
             notificationMinute = settings.notificationMinute,
             recurrentNotificationHour = settings.recurrentNotificationHour,
@@ -324,12 +321,6 @@ class SettingsViewModel @Inject constructor(
         val newValue = !uiState.value.isNewCategoryTagEnabled
         viewModelScope.launch {
             settingsRepository.setNewCategoryTagEnabled(newValue)
-        }
-    }
-
-    fun onRecurrentPaymentsViewModeChange(mode: RecurrentPaymentsViewMode) {
-        viewModelScope.launch {
-            settingsRepository.setRecurrentPaymentsViewMode(mode)
         }
     }
 

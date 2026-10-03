@@ -7,7 +7,6 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.settings.Settings
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import org.junit.Rule
@@ -29,7 +28,6 @@ class SettingsScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 SettingsPreview(
-                    recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
                     notificationHour = 19,
                     notificationMinute = 0,
                     recurrentNotificationHour = 8,
@@ -48,7 +46,6 @@ class SettingsScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 SettingsPreview(
-                    recurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
                     notificationHour = 20,
                     notificationMinute = 30,
                     recurrentNotificationHour = 9,
@@ -62,7 +59,6 @@ class SettingsScreenshotTest {
 
     @Composable
     private fun SettingsPreview(
-        recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
         notificationHour: Int,
         notificationMinute: Int,
         recurrentNotificationHour: Int,
@@ -73,13 +69,11 @@ class SettingsScreenshotTest {
         MinusTheme {
             Settings(
                 modifier = Modifier.fillMaxSize(),
-                recurrentPaymentsViewMode = recurrentPaymentsViewMode,
                 notificationHour = notificationHour,
                 notificationMinute = notificationMinute,
                 recurrentNotificationHour = recurrentNotificationHour,
                 recurrentNotificationMinute = recurrentNotificationMinute,
                 exactAlarmEnabled = exactAlarmEnabled,
-                onRecurrentPaymentsViewModeChange = {},
                 onNotificationTimeChange = { _, _ -> },
                 onRecurrentNotificationTimeChange = { _, _ -> },
                 onOpenExactAlarmSettings = {},

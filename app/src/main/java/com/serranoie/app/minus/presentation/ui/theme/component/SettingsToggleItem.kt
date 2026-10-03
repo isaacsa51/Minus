@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -39,6 +40,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil
 
 /**
  * The circular leading icon used by every settings row.
@@ -110,9 +112,14 @@ fun SettingsToggleItem(
     label: String? = null,
     expandDescription: Boolean = true,
 ) {
+    val view = LocalView.current
     val toggleState = stringResource(
         if (checked) R.string.settings_feature_state_on else R.string.settings_feature_state_off
     )
+    val toggleWithHaptic = {
+        if (checked) HapticUtil.performLightHaptic(view) else HapticUtil.performMediumHaptic(view)
+        onToggle()
+    }
     val selection by animateFloatAsState(
         if (checked) 1f else 0f,
         label = "settingsToggleSelection",
@@ -142,7 +149,7 @@ fun SettingsToggleItem(
     val rowToggleModifier = Modifier
         .toggleable(
             value = checked,
-            onValueChange = { onToggle() },
+            onValueChange = { toggleWithHaptic() },
             role = Role.Switch,
         )
         .semantics {
@@ -190,7 +197,7 @@ fun SettingsToggleItem(
     if (expandDescription) {
         CustomPaddedExpandableItem(
             isExpanded = checked,
-            onToggleExpanded = onToggle,
+            onToggleExpanded = toggleWithHaptic,
             position = position,
             background = container,
             contentColor = onContainer,
@@ -213,7 +220,7 @@ fun SettingsToggleItem(
         )
     } else {
         CustomPaddedListItem(
-            onClick = onToggle,
+            onClick = toggleWithHaptic,
             position = position,
             modifier = modifier,
             rowModifier = rowToggleModifier,

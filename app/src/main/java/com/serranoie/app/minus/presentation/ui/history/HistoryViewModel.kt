@@ -326,6 +326,10 @@ class HistoryViewModel @Inject constructor(
             isCreditQuickToggleEnabled = userSettings?.isCreditQuickToggleEnabled ?: false,
             isExtraNoteEnabled = userSettings?.extraNoteEnabled ?: false,
             showPastTransactionsSetting = userSettings?.showPastTransactions ?: true,
+            showTutorial = userSettings != null &&
+                userSettings.tutorialBoxCompleted &&
+                !userSettings.historyTutorialCompleted &&
+                groupedCurrent.values.any { it.isNotEmpty() },
             tags = categories.map { it.name },
             transactions = transactions,
             editingTransaction = inputs.editingTransaction,
@@ -339,8 +343,6 @@ class HistoryViewModel @Inject constructor(
             showOutOfPeriodSubscriptions = inputs.showOutOfPeriodSubscriptions,
             showUpcomingRecurrentInPeriod = inputs.showUpcomingRecurrentInPeriod,
             lockSwipeable = inputs.lockSwipeable,
-            recurrentPaymentsViewMode = userSettings?.recurrentPaymentsViewMode
-                ?: RecurrentPaymentsViewMode.VERTICAL_LIST,
             displayTransactions = displayTx,
             groupedCurrentTransactions = groupedCurrent,
             groupedPastTransactions = groupedPast,

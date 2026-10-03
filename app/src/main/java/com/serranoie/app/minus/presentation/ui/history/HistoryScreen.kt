@@ -25,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -37,6 +38,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,19 +56,11 @@ import com.serranoie.app.minus.presentation.ui.history.sections.pastPeriodToggle
 import com.serranoie.app.minus.presentation.ui.history.sections.pastTransactionDateSections
 import com.serranoie.app.minus.presentation.ui.history.sections.transactionDateSections
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.NoTransactionsView
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
+import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.text.NumberFormat
 import java.time.LocalDate
-
-enum class RecurrentPaymentsViewMode {
-    HORIZONTAL_LIST, VERTICAL_LIST;
-
-    companion object {
-        fun fromName(value: String?): RecurrentPaymentsViewMode = runCatching {
-            value?.let(::valueOf)
-        }.getOrNull() ?: VERTICAL_LIST
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -77,6 +71,8 @@ fun HistoryScreen(
     onQueueDeleteWithUndo: (transaction: Transaction, message: String, onUndo: () -> Unit) -> Unit = { _, _, _ -> },
     onCancelPendingDelete: () -> Unit = {},
     onShowInfoSnackbar: (message: String) -> Unit = {},
+    tutorialBoxState: TutorialBoxState? = null,
+    onTutorialVisibilityChanged: (Boolean) -> Unit = {},
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -100,6 +96,8 @@ fun HistoryScreen(
                 onCancelPendingDelete = onCancelPendingDelete,
                 onShowInfoSnackbar = onShowInfoSnackbar,
                 onProcessIntent = viewModel::processIntent,
+                tutorialBoxState = tutorialBoxState,
+                onTutorialVisibilityChanged = onTutorialVisibilityChanged,
                 sharedTransitionScope = this@SharedTransitionLayout,
                 animatedVisibilityScope = this,
             )
@@ -121,6 +119,8 @@ fun History(
     onCancelPendingDelete: () -> Unit = {},
     onShowInfoSnackbar: (message: String) -> Unit = {},
     onProcessIntent: (HistoryUiIntent) -> Unit = {},
+    tutorialBoxState: TutorialBoxState? = null,
+    onTutorialVisibilityChanged: (Boolean) -> Unit = {},
 ) {
     val resources = LocalResources.current
     val scrollState = rememberLazyListState()
@@ -154,6 +154,8 @@ fun History(
                     onCancelPendingDelete = onCancelPendingDelete,
                     onShowInfoSnackbar = onShowInfoSnackbar,
                     onProcessIntent = onProcessIntent,
+                    tutorialBoxState = tutorialBoxState,
+                    onTutorialVisibilityChanged = onTutorialVisibilityChanged,
                 )
             } else {
                 val editorDismiss = rememberPredictiveDismiss(
@@ -249,6 +251,8 @@ fun History(
             onCancelPendingDelete = onCancelPendingDelete,
             onShowInfoSnackbar = onShowInfoSnackbar,
             onProcessIntent = onProcessIntent,
+            tutorialBoxState = tutorialBoxState,
+            onTutorialVisibilityChanged = onTutorialVisibilityChanged,
         )
 
         TransactionEditDialog(
@@ -316,7 +320,14 @@ private fun HistoryListContent(
     onCancelPendingDelete: () -> Unit,
     onShowInfoSnackbar: (message: String) -> Unit,
     onProcessIntent: (HistoryUiIntent) -> Unit,
+    tutorialBoxState: TutorialBoxState?,
+    onTutorialVisibilityChanged: (Boolean) -> Unit,
 ) {
+    val showTutorial = tutorialBoxState != null && uiState.showTutorial && !readOnly
+    val reportVisibility = rememberUpdatedState(onTutorialVisibilityChanged)
+    LaunchedEffect(showTutorial) { reportVisibility.value(showTutorial) }
+    DisposableEffect(Unit) { onDispose { reportVisibility.value(false) } }
+
     val currentOnCollapseDragDelta = rememberUpdatedState(onCollapseDragDelta)
     val density = LocalDensity.current
     val threshold = remember(density) { with(density) { 128.dp.toPx() } }
@@ -363,6 +374,7 @@ private fun HistoryListContent(
                 budgetSettings = uiState.budgetSettings,
                 currencyCode = currencyCode,
                 creditOwed = uiState.creditOwed,
+                hintModifier = tutorialBoxState.hintAt(0),
             )
 
             currentPeriodRecurrentSection(
@@ -374,7 +386,6 @@ private fun HistoryListContent(
                         HistoryUiIntent.ToggleUpcomingRecurrentInPeriod(!uiState.showUpcomingRecurrentInPeriod)
                     )
                 },
-                recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
                 currencyCode = currencyCode,
                 currencyFormat = currencyFormat,
                 onDelete = { expense ->
@@ -406,6 +417,7 @@ private fun HistoryListContent(
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
+                hintModifier = tutorialBoxState.hintAt(1),
             )
 
             transactionDateSections(
@@ -418,6 +430,7 @@ private fun HistoryListContent(
                 readOnly = readOnly,
                 disableAnimations = disableAnimations,
                 keyPrefix = "date",
+                firstItemHintModifier = tutorialBoxState.hintAt(2),
                 onToggleDate = { date -> onProcessIntent(HistoryUiIntent.ToggleExpandedDate(date)) },
                 onDelete = { expense ->
                     onQueueDeleteWithUndo(
@@ -457,7 +470,6 @@ private fun HistoryListContent(
                         HistoryUiIntent.ToggleOutOfPeriodSubscriptions(!uiState.showOutOfPeriodSubscriptions)
                     )
                 },
-                recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
                 currencyFormat = currencyFormat,
                 onDelete = { expense -> onProcessIntent(HistoryUiIntent.SetRecurrentToDelete(expense)) },
                 onEdit = { expense -> onProcessIntent(HistoryUiIntent.SetRecurrentToEdit(expense)) },
@@ -484,6 +496,7 @@ private fun HistoryListContent(
                     onToggleShowPastPeriod = {
                         onProcessIntent(HistoryUiIntent.TogglePastPeriod(!uiState.showPastPeriod))
                     },
+                    hintModifier = tutorialBoxState.hintAt(3),
                 )
 
                 pastTransactionDateSections(
@@ -545,3 +558,7 @@ private fun HistoryListContent(
         }
     }
 }
+
+private fun TutorialBoxState?.hintAt(index: Int): Modifier =
+    this?.let { Modifier.markForTutorial(it, index) } ?: Modifier
+

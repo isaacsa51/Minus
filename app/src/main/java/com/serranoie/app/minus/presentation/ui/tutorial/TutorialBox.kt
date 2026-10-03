@@ -5,7 +5,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateRectAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -17,6 +17,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,10 +53,12 @@ import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.R
@@ -62,6 +66,7 @@ import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import kotlinx.coroutines.delay
 import logcat.logcat
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -74,6 +79,7 @@ fun TutorialBox(
     content: @Composable () -> Unit,
 ) {
     var canvasSize by remember { mutableStateOf(Size.Zero) }
+    var rootOffset by remember { mutableStateOf(Offset.Zero) }
 
     val isCompleted by remember { derivedStateOf { state.isCompleted } }
     val currentIndex by remember { derivedStateOf { state.currentIndexState.value } }
@@ -95,6 +101,7 @@ fun TutorialBox(
                 val w = coords.size.width.toFloat()
                 val h = coords.size.height.toFloat()
                 if (w > 0f && h > 0f) canvasSize = Size(w, h)
+                rootOffset = coords.positionInWindow()
             },
     ) {
         content()
@@ -105,7 +112,7 @@ fun TutorialBox(
             exit = fadeOut(tween(400))
         ) {
             TutorialOverlay(
-                bounds = activeBounds ?: Rect.Zero,
+                bounds = (activeBounds ?: Rect.Zero).translate(-rootOffset),
                 canvasSize = canvasSize,
                 index = currentIndex,
                 isVirtual = isVirtual,
@@ -114,6 +121,17 @@ fun TutorialBox(
                 onSkip = { state.skipAll() }
             )
         }
+    }
+
+    LaunchedEffect(shouldShow) {
+        state.isActive = shouldShow
+    }
+
+    val targetTouchCount = state.targetTouchSignal.intValue
+    LaunchedEffect(targetTouchCount) {
+        if (targetTouchCount == 0 || !shouldShow) return@LaunchedEffect
+        delay(TargetActionSettleDelay)
+        state.advance()
     }
 
     LaunchedEffect(currentIndex, state.targetBounds.size, showTutorial) {
@@ -201,9 +219,11 @@ private fun TutorialOverlay(
     val paddingPx = with(density) { 4.dp.toPx() }
     val cornerRadiusPx = with(density) { 12.dp.toPx() }
     val tooltipGapPx = with(density) { 20.dp.toPx() }
-    val tooltipMaxWidthPx = with(density) { 280.dp.toPx() }
-    val tooltipMaxWidth = with(density) { tooltipMaxWidthPx.toDp() }
-    val tooltipMinHeightEstimate = with(density) { 180.dp.toPx() }
+    val tooltipMaxWidth = 280.dp
+
+    var tooltipSize by remember { mutableStateOf(IntSize.Zero) }
+    var measuredIndex by remember { mutableStateOf<Int?>(null) }
+    val isMeasured = measuredIndex == index && tooltipSize.width > 0 && tooltipSize.height > 0
 
     val infiniteTransition = rememberInfiniteTransition(label = "TutorialPulse")
     val pulseScale by infiniteTransition.animateFloat(
@@ -226,16 +246,16 @@ private fun TutorialOverlay(
     )
 
     val (tooltipX, tooltipY) = if (isVirtual) {
-        val centredX = (canvasSize.width - tooltipMaxWidthPx) / 2f
-        val centredY = (canvasSize.height - tooltipMinHeightEstimate) / 2f
-        centredX.toInt() to centredY.toInt()
+        val centredX = (canvasSize.width - tooltipSize.width) / 2f
+        val centredY = (canvasSize.height - tooltipSize.height) / 2f
+        centredX.roundToInt() to centredY.roundToInt()
     } else {
         computeTooltipPosition(
             targetBounds = bounds,
             canvasSize = canvasSize,
             gapPx = tooltipGapPx,
-            tooltipWidthPx = tooltipMaxWidthPx,
-            tooltipHeightPx = tooltipMinHeightEstimate,
+            tooltipWidthPx = tooltipSize.width.toFloat(),
+            tooltipHeightPx = tooltipSize.height.toFloat(),
         )
     }
 
@@ -252,11 +272,18 @@ private fun TutorialOverlay(
         bottom = animatedBounds.bottom + paddingPx,
     )
 
-    val animatedOffset by animateIntOffsetAsState(
-        targetValue = IntOffset(tooltipX, tooltipY),
-        animationSpec = tween(400, easing = LinearOutSlowInEasing),
-        label = "TooltipOffset"
-    )
+    val tooltipOffset = remember { Animatable(IntOffset.Zero, IntOffset.VectorConverter) }
+    var placedIndex by remember { mutableStateOf<Int?>(null) }
+    LaunchedEffect(index, isMeasured, tooltipX, tooltipY) {
+        if (!isMeasured) return@LaunchedEffect
+        val target = IntOffset(tooltipX, tooltipY)
+        if (placedIndex != index) {
+            tooltipOffset.snapTo(target)
+            placedIndex = index
+        } else {
+            tooltipOffset.animateTo(target, tween(400, easing = LinearOutSlowInEasing))
+        }
+    }
 
     val contentAlpha = remember { Animatable(0f) }
     val contentScale = remember { Animatable(0.92f) }
@@ -264,19 +291,14 @@ private fun TutorialOverlay(
     LaunchedEffect(index) {
         contentAlpha.snapTo(0f)
         contentScale.snapTo(0.92f)
+    }
+    LaunchedEffect(index, placedIndex) {
+        if (placedIndex != index) return@LaunchedEffect
         contentAlpha.animateTo(1f, tween(300))
         contentScale.animateTo(1f, tween(400, easing = LinearOutSlowInEasing))
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onTap,
-            ),
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             if (isVirtual) {
                 drawRect(color = scrimColor)
@@ -325,6 +347,20 @@ private fun TutorialOverlay(
             }
         }
 
+        if (isVirtual) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = onTap,
+                    ),
+            )
+        } else {
+            ScrimBlockers(cutout = animatedCutout, canvasSize = canvasSize, onTap = onTap)
+        }
+
         Surface(
             shape = RoundedCornerShape(12.dp),
             color = MaterialTheme.colorScheme.surface,
@@ -332,7 +368,11 @@ private fun TutorialOverlay(
             tonalElevation = 6.dp,
             shadowElevation = 8.dp,
             modifier = Modifier
-                .offset { animatedOffset }
+                .onGloballyPositioned { coords ->
+                    tooltipSize = coords.size
+                    measuredIndex = index
+                }
+                .offset { tooltipOffset.value }
                 .graphicsLayer {
                     alpha = contentAlpha.value
                     scaleX = contentScale.value
@@ -361,6 +401,44 @@ private fun TutorialOverlay(
     }
 }
 
+@Composable
+private fun BoxScope.ScrimBlockers(
+    cutout: Rect,
+    canvasSize: Size,
+    onTap: () -> Unit,
+) {
+    val density = LocalDensity.current
+
+    @Composable
+    fun Blocker(left: Float, top: Float, width: Float, height: Float) {
+        if (width <= 0f || height <= 0f) return
+        val source = remember { MutableInteractionSource() }
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(left.roundToInt(), top.roundToInt()) }
+                .size(
+                    width = with(density) { width.toDp() },
+                    height = with(density) { height.toDp() },
+                )
+                .clickable(
+                    interactionSource = source,
+                    indication = null,
+                    onClick = onTap,
+                ),
+        )
+    }
+
+    val left = cutout.left.coerceIn(0f, canvasSize.width)
+    val right = cutout.right.coerceIn(0f, canvasSize.width)
+    val top = cutout.top.coerceIn(0f, canvasSize.height)
+    val bottom = cutout.bottom.coerceIn(0f, canvasSize.height)
+
+    Blocker(0f, 0f, canvasSize.width, top)
+    Blocker(0f, bottom, canvasSize.width, canvasSize.height - bottom)
+    Blocker(0f, top, left, bottom - top)
+    Blocker(right, top, canvasSize.width - right, bottom - top)
+}
+
 private fun computeTooltipPosition(
     targetBounds: Rect,
     canvasSize: Size,
@@ -378,7 +456,8 @@ private fun computeTooltipPosition(
         spaceAbove >= tooltipHeightPx + gapPx -> TooltipPlacement.Above
         spaceRight >= tooltipWidthPx + gapPx -> TooltipPlacement.Right
         spaceLeft >= tooltipWidthPx + gapPx -> TooltipPlacement.Left
-        else -> TooltipPlacement.Below
+        spaceBelow >= spaceAbove -> TooltipPlacement.Below
+        else -> TooltipPlacement.Above
     }
 
     val tooltipWidth = tooltipWidthPx.coerceAtMost(canvasSize.width - 32f)
@@ -414,6 +493,8 @@ private fun computeTooltipPosition(
 
 private val Size.isSpecified: Boolean
     get() = width > 0f && height > 0f
+
+private val TargetActionSettleDelay = 220.milliseconds
 
 private enum class TooltipPlacement { Above, Below, Left, Right }
 
