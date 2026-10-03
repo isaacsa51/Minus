@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Splash: neutrals flip for the dark surface, the brand green carries over -->
+    <color name="splash_background">#12140D</color>
+    <color name="splash_icon">#E3E3D7</color>
+    <color name="splash_icon_variant">#C6C8B9</color>
+    <color name="splash_icon_accent">#A3CD51</color>
     <color name="widget_heatmap_empty_light">#14000000</color>
     <color name="widget_heatmap_empty_dark">#26FFFFFF</color>
 </resources>

@@ -1,7 +1,11 @@
 package com.serranoie.app.minus.presentation
 
+import android.animation.ObjectAnimator
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
+import android.view.animation.PathInterpolator
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -27,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -72,11 +77,8 @@ var Context.dynamicColorEnabled by mutableStateOf(false)
 
 val LocalWindowSize = compositionLocalOf { WindowWidthSizeClass.Compact }
 val LocalWindowInsets = compositionLocalOf { PaddingValues(0.dp) }
-
-const val DEFAULT_NOTIFICATION_HOUR = 9
-const val DEFAULT_NOTIFICATION_MINUTE = 0
-const val DEFAULT_RECURRENT_NOTIFICATION_HOUR = 8
-const val DEFAULT_RECURRENT_NOTIFICATION_MINUTE = 0
+private const val SPLASH_EXIT_DURATION_MS = 500L
+private const val SPLASH_EXIT_ICON_SCALE = 1.4f
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -132,13 +134,51 @@ class MainActivity : AppCompatActivity() {
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen().setKeepOnScreenCondition {
-            val keepOn = !dataStoreLoaded.value || !isDone.value
-            keepOn
-        }
+        val splashScreen = installSplashScreen()
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val iconAnimationEndsAt = SystemClock.uptimeMillis() + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            resources.getInteger(R.integer.splash_icon_animation_duration).toLong()
+        } else {
+            0L
+        }
+        splashScreen.setKeepOnScreenCondition {
+            val keepOn = !dataStoreLoaded.value || !isDone.value ||
+                SystemClock.uptimeMillis() < iconAnimationEndsAt
+            keepOn
+        }
+        splashScreen.setOnExitAnimationListener { provider ->
+            runCatching {
+                val emphasizedAccelerate = PathInterpolator(0.3f, 0f, 0.8f, 0.15f)
+
+                val fadeOut = ObjectAnimator.ofFloat(provider.view, "alpha", 1f, 0f).apply {
+                    interpolator = emphasizedAccelerate
+                    duration = SPLASH_EXIT_DURATION_MS
+                }
+                fadeOut.doOnEnd {
+                    provider.remove()
+                    enableEdgeToEdge()
+                }
+
+                runCatching { provider.iconView }.getOrNull()?.let { icon ->
+                    listOf(
+                        ObjectAnimator.ofFloat(icon, "scaleX", 1f, SPLASH_EXIT_ICON_SCALE),
+                        ObjectAnimator.ofFloat(icon, "scaleY", 1f, SPLASH_EXIT_ICON_SCALE),
+                    ).forEach {
+                        it.interpolator = PathInterpolator(0.05f, 0.7f, 0.1f, 1f)
+                        it.duration = SPLASH_EXIT_DURATION_MS
+                        it.start()
+                    }
+                }
+
+                fadeOut.start()
+            }.onFailure {
+                logcat { "Splash exit animation failed: ${it.asLog()}" }
+                runCatching { provider.remove() }
+            }
+        }
 
         lifecycleScope.launch {
             try {

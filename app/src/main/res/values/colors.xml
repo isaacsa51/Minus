@@ -2,6 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Splash: the launcher icon's own inks, on the light surface -->
+    <color name="splash_background">#FAFAEE</color>
+    <color name="splash_icon">#1A1C15</color>
+    <color name="splash_icon_variant">#45483C</color>
+    <color name="splash_icon_accent">#A3CD51</color>
 
     <!-- Heatmap widget colors -->
     <color name="widget_heatmap_neutral">#40FFFFFF</color>
