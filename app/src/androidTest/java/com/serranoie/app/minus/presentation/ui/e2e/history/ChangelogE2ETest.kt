@@ -20,7 +20,6 @@ import com.serranoie.app.minus.domain.model.changelog.ChangelogItem
 import com.serranoie.app.minus.domain.model.changelog.ReleaseType
 import com.serranoie.app.minus.domain.model.changelog.VersionRelease
 import com.serranoie.app.minus.presentation.ui.changelog.ChangelogHistoryScreen
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.settings.Settings
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import org.junit.Rule
@@ -73,13 +72,11 @@ class ChangelogE2ETest {
                 Settings(
                     modifier = Modifier.fillMaxSize(),
                     isCensored = false,
-                    recurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
                     notificationHour = 9,
                     notificationMinute = 0,
                     recurrentNotificationHour = 8,
                     recurrentNotificationMinute = 0,
                     exactAlarmEnabled = false,
-                    onRecurrentPaymentsViewModeChange = {},
                     onNotificationTimeChange = { _, _ -> },
                     onRecurrentNotificationTimeChange = { _, _ -> },
                     onOpenExactAlarmSettings = {},

@@ -3,23 +3,23 @@
     <string name="app_name">Menos</string>
     <string name="tile_new_transaction_label">Nueva transacción</string>
     <string name="tutorial_numpad_title">Teclado numérico</string>
-    <string name="tutorial_numpad_description">Ingresa el monto que gastaste. Toca los dígitos, usa la flecha para corregir y toca el botón verde para guardar. Desliza hacia arriba en el teclado para ingresar al modo calculadora.</string>
+    <string name="tutorial_numpad_description">Escribe lo que gastaste y toca la marca de verificación para guardarlo. Mantén pulsada la tecla de borrado para borrar todo el importe y desliza hacia arriba sobre las teclas para abrir la calculadora.</string>
     <string name="tutorial_comment_title">Añadir categoría</string>
-    <string name="tutorial_comment_description">Añade una categoría o nota corta para recordar en qué gastaste. Tus categorías más recientes aparecen como chips para etiquetar con un solo toque.</string>
+    <string name="tutorial_comment_description">Asigna una categoría al gasto para que aparezca en el desglose de las analíticas. Toca una de tus etiquetas guardadas para reutilizarla o escribe una nota corta.</string>
     <string name="tutorial_budget_pill_title">Período de presupuesto</string>
-    <string name="tutorial_budget_pill_description">Consulta cuánto presupuesto te queda para el período actual. Toca para cambiar entre las vistas diaria, semanal y mensual, o para abrir la hoja de configuración del período. Mantenla presionada para ver cómo se calcula el monto.</string>
+    <string name="tutorial_budget_pill_description">Tócalo para abrir la configuración del período y cambiar el presupuesto, las fechas o cómo se reparte. Deslízalo de lado para alternar entre lo que te queda hoy y lo que queda para todo el período. Mantenlo pulsado para ver exactamente cómo se calculó esa cifra.</string>
     <string name="tutorial_settings_title">Ajustes</string>
-    <string name="tutorial_settings_description">Abre Ajustes para activar funciones como la cuadrícula de categorías y el atajo de crédito, activar el modo privado, cambiar la moneda, configurar widgets o restablecer este tutorial.</string>
+    <string name="tutorial_settings_description">Aquí están tus datos y preferencias: haz una copia de seguridad o importa un CSV, añade widgets a la pantalla de inicio, define el objetivo de ahorro y las horas de recordatorio, y activa funciones experimentales en Funciones adicionales. También puedes volver a ver estas sugerencias desde aquí.</string>
     <string name="tutorial_recurrent_title">Pago recurrente</string>
-    <string name="tutorial_recurrent_description">Toca aquí para marcar este gasto como un pago recurrente (semanal, quincenal o mensual). La aplicación te recordará registrarlo según el calendario.</string>
+    <string name="tutorial_recurrent_description">Actívalo para repetir el gasto cada semana, cada dos semanas o cada mes. Minus te avisa el día del cobro y lo muestra en Pagos recurrentes en este periodo dentro de tu historial hasta que lo marques como pagado.</string>
     <string name="tutorial_analytics_title">Ver tus análisis</string>
-    <string name="tutorial_analytics_description">Abre Análisis para ver como tus gastos se comportan con el tiempo por su categoría, y sobre tus metas de ahorro.</string>
+    <string name="tutorial_analytics_description">Mira a dónde fue el dinero: un mapa de calor día a día, el reparto por categoría, tus gastos más altos y más bajos, y todos los períodos que ya has cerrado.</string>
     <string name="tutorial_privacy_title">Modo de privacidad</string>
-    <string name="tutorial_privacy_description">Tapa la parte inferior del teléfono (donde la cámara está) con tu mano por al menos un segundo para esconder todo monto en la pantalla. Cúbrelo de nuevo para apagarlo.</string>
-    <string name="tutorial_calc_title">Presupuesto en curso</string>
-    <string name="tutorial_calc_description">Usa + o - al principio para aumentar o disminuir el presupuesto restante de este período.</string>
+    <string name="tutorial_privacy_description">Cubre la parte superior de la pantalla con la mano, cerca del auricular, durante un segundo y todos los importes se difuminan. Vuelve a cubrirla para mostrarlos de nuevo.</string>
+    <string name="tutorial_calc_title">Ingresos y ajustes</string>
+    <string name="tutorial_calc_description">Empieza el importe con + para devolver dinero a este período, como una nómina, un reembolso o una transferencia recibida. Empiézalo con - para restar dinero. Las demás teclas funcionan como una calculadora normal para el importe.</string>
     <string name="tutorial_credit_toggle_title">Pago con Tarjeta</string>
-    <string name="tutorial_credit_toggle_description">Toca aquí para marcar que este gasto fue hecho con una tarjeta de crédito. Se rastreará por separado en tus análisis.</string>
+    <string name="tutorial_credit_toggle_description">Marca el gasto como pagado con tarjeta de crédito. Sigue contando en este período, pero Minus lleva aparte lo que debes para que puedas liquidarlo antes de tu fecha de corte.</string>
     <string name="today">Hoy</string>
     <string name="yesterday">Ayer</string>
     <string name="tomorrow">Mañana</string>
@@ -36,7 +36,7 @@
     <string name="remove">Eliminar</string>
     <string name="undo">DESHACER</string>
     <string name="back">Atrás</string>
-    <string name="next">Próximo</string>
+    <string name="next">Siguiente</string>
     <string name="navigate">Navegar</string>
     <string name="period">Período</string>
     <string name="previous_values">Valores anteriores</string>
@@ -338,13 +338,6 @@
     <string name="settings_feature_show_past_transactions_switch_label">Cargar periodos pasados</string>
     <string name="settings_feature_show_past_transactions_title">Mostrar transacciones pasadas</string>
     <string name="settings_feature_show_past_transactions_subtitle">Cargar transacciones de periodos pasados</string>
-    <string name="settings_recurrent_payments_view_mode_title">Modo de visualización de pagos recurrentes</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">Cambia el tipo de visualización para mostrar tus pagos recurrentes</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">Modo de visualización de pagos recurrentes</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Mostrar los pagos recurrentes como tarjetas horizontales</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Mostrar los pagos recurrentes como una lista de gastos regulares</string>
     <string name="settings_period_end_time_title">Hora de finalización del período</string>
     <string name="settings_period_end_time_subtitle">La notificación se mostrará el día que termina el período a esta hora</string>
     <string name="settings_recurrent_notification_time_title">Hora de pagos recurrentes</string>
@@ -475,9 +468,6 @@
     <string name="recurrent_ticket_weekly_unnamed">Suscripción semanal sin nombre</string>
     <string name="recurrent_ticket_biweekly_unnamed">Suscripción quincenal sin nombre</string>
     <string name="recurrent_ticket_monthly_unnamed">Suscripción sin nombre</string>
-    <string name="recurrent_ticket_frequency_weekly">Semanalmente</string>
-    <string name="recurrent_ticket_frequency_biweekly">Quincenal</string>
-    <string name="recurrent_ticket_frequency_monthly">Mensual</string>
     <!-- Subscriptions screen -->
     <string name="subscriptions_title">Suscripciones</string>
     <string name="subscriptions_analytics_card_label">Recurrente</string>
@@ -669,8 +659,8 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendencias de gasto</string>
     <string name="analytics_tutorial_minmax_desc">Estas gráficas muestran los gastos máximos y mínimos.\nComo vayas agregando más transacciones, estos te ayudaran a detectar valores atípicos.</string>
-    <string name="analytics_tutorial_header_title">Periodos Pasados</string>
-    <string name="analytics_tutorial_header_desc">Haz tap en el ícono para ver periodos pasados y revisar su desempeño.</string>
+    <string name="analytics_tutorial_header_title">Períodos anteriores</string>
+    <string name="analytics_tutorial_header_desc">Detrás de este icono están todos los períodos que has cerrado. Toca uno para volver a abrir sus analíticas completas; sus totales se recalculan al consultarlos, así que editar un gasto antiguo actualiza el período al que pertenece. Mantén pulsado un período y confirma con tu huella para eliminarlo definitivamente.</string>
     <string name="analytics_tutorial_budget_title">Estado del presupuesto</string>
     <string name="analytics_tutorial_budget_desc">Checa el total del presupuesto y los días totales.</string>
     <string name="analytics_tutorial_heatmap_title">Intensidad de Gastos</string>
@@ -726,4 +716,18 @@
     <string name="loading">Cargando…</string>
     <string name="widget_budget_pill_title">Píldora de presupuesto</string>
     <string name="widget_budget_pill_description">Lo que te queda del modo de vista elegido —diario, semanal, quincenal o mensual— en una barra delgada</string>
+
+    <!-- Tutorial hints -->
+    <string name="tutorial_history_budget_title">El período de un vistazo</string>
+    <string name="tutorial_history_budget_description">Lo que has gastado y lo que queda en el período actual, incluido lo que aún debes en la tarjeta de crédito.</string>
+    <string name="tutorial_history_transaction_title">Editar o eliminar un gasto</string>
+    <string name="tutorial_history_transaction_description">Toca un gasto para desplegarlo y ver todo el detalle. Deslízalo a la derecha para editar el importe, la fecha, la categoría o la nota; deslízalo a la izquierda para eliminarlo, con unos segundos para deshacer.</string>
+    <string name="tutorial_history_recurrent_title">Próximos pagos</string>
+    <string name="tutorial_history_recurrent_description">Los cargos recurrentes que vencen en este período aparecen aquí antes de pagarse. Marca uno como pagado cuando llegue, o elimina solo esa ocurrencia para saltártela esta vez sin cancelar la serie.</string>
+    <string name="tutorial_history_past_period_title">Período anterior</string>
+    <string name="tutorial_history_past_period_description">Gastos del período anterior a este, apartados para no estorbar. Puedes desactivar esta sección en Ajustes, en Funciones adicionales.</string>
+    <string name="analytics_tutorial_recurrent_title">Cargos recurrentes</string>
+    <string name="analytics_tutorial_recurrent_desc">Todo lo que se repite, con lo que te cuesta por período. Ábrelo para ver la próxima fecha de cobro de cada uno o para detener una serie que ya no pagas.</string>
+    <string name="analytics_tutorial_income_title">Dinero devuelto</string>
+    <string name="analytics_tutorial_income_desc">Todo lo que registraste empezando con + — una nómina, un reembolso, una transferencia recibida. Se suma a este período en lugar de contar como gasto, así que tu presupuesto restante aumenta.</string>
 </resources>

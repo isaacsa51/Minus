@@ -5,6 +5,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +20,9 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import logcat.logcat
 
 internal const val TUTORIAL_LOG_TAG = "Tutorial"
@@ -41,6 +45,16 @@ class TutorialBoxState {
     internal val pendingRewindCandidates: SnapshotStateSet<Int> = mutableStateSetOf()
 
     internal val gatedJumpedIndices: SnapshotStateSet<Int> = mutableStateSetOf()
+
+    internal val targetTouchSignal = mutableIntStateOf(0)
+
+    internal var isActive: Boolean by mutableStateOf(false)
+
+    fun notifyTargetTouched(index: Int) {
+        if (!isActive || isCompleted) return
+        if (currentIndexState.value != index) return
+        targetTouchSignal.intValue++
+    }
 
     val currentBounds: Rect?
         get() = targetBounds[currentIndexState.value]
@@ -124,7 +138,16 @@ fun rememberTutorialBoxState(
 fun Modifier.markForTutorial(
     state: TutorialBoxState,
     index: Int,
-): Modifier = this.composed {
+): Modifier = this
+    .pointerInput(state, index) {
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                if (event.type == PointerEventType.Press) state.notifyTargetTouched(index)
+            }
+        }
+    }
+    .composed {
     DisposableEffect(index) {
         onDispose {
             state.targetBounds.remove(index)

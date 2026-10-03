@@ -23,7 +23,6 @@ import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY_NA
 import com.serranoie.app.minus.domain.time.CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD_KEY_NAME
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_AMOUNT_KEY_NAME
 import com.serranoie.app.minus.domain.time.PENDING_ROLLOVER_STRATEGY_KEY_NAME
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -52,7 +51,6 @@ const val CATEGORY_GRID_MODE_KEY_NAME = "category_grid_mode_enabled"
 const val EXTRA_NOTE_ENABLED_KEY_NAME = "extra_note_enabled"
 const val RESERVE_UPCOMING_CHARGES_KEY_NAME = "reserve_upcoming_charges_enabled"
 const val NEW_CATEGORY_TAG_KEY_NAME = "new_category_tag_enabled"
-const val RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME = "recurrent_payments_view_mode"
 const val EARLY_FINISH_ACTIVE_KEY_NAME = "early_finish_active"
 const val PERIOD_END_ALREADY_HANDLED_KEY_NAME = "period_end_already_handled"
 const val EARLY_FINISH_ACTUAL_DATE_KEY_NAME = "early_finish_actual_date_millis"
@@ -69,6 +67,7 @@ const val SAVINGS_GOAL_MONTHS_KEY_NAME = "savings_goal_months"
 const val TUTORIAL_BOX_COMPLETED_KEY_NAME = "tutorial_box_completed"
 const val ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME = "analytics_tutorial_completed"
 const val ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME = "analytics_spends_tutorial_completed"
+const val HISTORY_TUTORIAL_COMPLETED_KEY_NAME = "history_tutorial_completed"
 
 private val ONBOARDING_COMPLETED = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NAME)
 private val EARLY_FINISH_ACTIVE = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
@@ -110,8 +109,6 @@ private val TUTORIAL_BOX_COMPLETED =
     booleanPreferencesKey(TUTORIAL_BOX_COMPLETED_KEY_NAME)
 private val FIRST_LAUNCH_TUTORIAL_STAGE =
     stringPreferencesKey("first_launch_tutorial_stage")
-private val RECURRENT_PAYMENTS_VIEW_MODE =
-    stringPreferencesKey(RECURRENT_PAYMENTS_VIEW_MODE_KEY_NAME)
 private val CURRENT_PERIOD_ROLLOVER_AMOUNT =
     stringPreferencesKey(CURRENT_PERIOD_ROLLOVER_AMOUNT_KEY_NAME)
 private val CURRENT_PERIOD_ROLLOVER_CARRY_FORWARD =
@@ -130,6 +127,7 @@ private val LAST_SEEN_VERSION_CODE = longPreferencesKey("changelog_last_seen_ver
 private val PERIOD_MAPPING_MODE = stringPreferencesKey("period_mapping_mode")
 private val ANALYTICS_TUTORIAL_COMPLETED = booleanPreferencesKey(ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME)
 private val ANALYTICS_SPENDS_TUTORIAL_COMPLETED = booleanPreferencesKey(ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME)
+private val HISTORY_TUTORIAL_COMPLETED = booleanPreferencesKey(HISTORY_TUTORIAL_COMPLETED_KEY_NAME)
 private val BUDGET_SPLIT_VIEW_PERIOD = stringPreferencesKey(BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME)
 private val SAVINGS_PRESET = stringPreferencesKey(SAVINGS_PRESET_KEY_NAME)
 private val SAVINGS_NEEDS_PCT = intPreferencesKey(SAVINGS_NEEDS_PCT_KEY_NAME)
@@ -184,14 +182,12 @@ class SettingsRepositoryImpl @Inject constructor(
                 firstLaunchTutorialStage = FirstLaunchTutorialStage.from(preferences[FIRST_LAUNCH_TUTORIAL_STAGE]),
                 analyticsTutorialCompleted = preferences[ANALYTICS_TUTORIAL_COMPLETED] ?: false,
                 analyticsSpendsTutorialCompleted = preferences[ANALYTICS_SPENDS_TUTORIAL_COMPLETED] ?: false,
+                historyTutorialCompleted = preferences[HISTORY_TUTORIAL_COMPLETED] ?: false,
                 periodMappingMode = try {
                     PeriodMappingMode.valueOf(preferences[PERIOD_MAPPING_MODE] ?: "")
                 } catch (_: Exception) {
                     PeriodMappingMode.ACTIVE_BUDGET
                 },
-                recurrentPaymentsViewMode = RecurrentPaymentsViewMode.fromName(
-                    preferences[RECURRENT_PAYMENTS_VIEW_MODE]
-                ),
                 budgetSplitViewPeriod = preferences[BUDGET_SPLIT_VIEW_PERIOD]?.let { name ->
                     try {
                         BudgetPeriod.valueOf(name)
@@ -424,6 +420,12 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setHistoryTutorialCompleted(completed: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[HISTORY_TUTORIAL_COMPLETED] = completed
+        }
+    }
+
     override suspend fun setPeriodMappingMode(mode: PeriodMappingMode) {
         dataStore.edit { preferences ->
             preferences[PERIOD_MAPPING_MODE] = mode.name
@@ -433,12 +435,6 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setFirstLaunchTutorialStage(stage: FirstLaunchTutorialStage) {
         dataStore.edit { preferences ->
             preferences[FIRST_LAUNCH_TUTORIAL_STAGE] = stage.name
-        }
-    }
-
-    override suspend fun setRecurrentPaymentsViewMode(mode: RecurrentPaymentsViewMode) {
-        dataStore.edit { preferences ->
-            preferences[RECURRENT_PAYMENTS_VIEW_MODE] = mode.name
         }
     }
 
@@ -559,6 +555,8 @@ class SettingsRepositoryImpl @Inject constructor(
         dataStore.edit { preferences ->
             preferences[TUTORIAL_BOX_COMPLETED] = false
             preferences[ANALYTICS_TUTORIAL_COMPLETED] = false
+            preferences[ANALYTICS_SPENDS_TUTORIAL_COMPLETED] = false
+            preferences[HISTORY_TUTORIAL_COMPLETED] = false
             preferences[FIRST_LAUNCH_TUTORIAL_STAGE] = FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
         }
     }

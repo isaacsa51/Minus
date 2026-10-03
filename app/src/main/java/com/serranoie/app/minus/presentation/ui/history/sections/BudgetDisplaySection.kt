@@ -23,6 +23,7 @@ internal fun LazyListScope.budgetDisplaySection(
     budgetSettings: BudgetSettings?,
     currencyCode: String,
     creditOwed: BigDecimal = BigDecimal.ZERO,
+    hintModifier: Modifier = Modifier,
 ) {
     item("budget-display") {
         val startDate = budgetSettings?.startDate?.let {
@@ -44,7 +45,7 @@ internal fun LazyListScope.budgetDisplaySection(
             budgetSettings = budgetSettings,
             currencyCode = currencyCode,
             bigVariant = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().then(hintModifier),
             startDate = startDate,
             finishDate = finishDate,
             creditOwed = creditOwed,

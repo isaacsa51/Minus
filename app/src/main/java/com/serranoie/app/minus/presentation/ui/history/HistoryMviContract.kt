@@ -42,6 +42,8 @@ data class HistoryUiState(
     val isExtraNoteEnabled: Boolean = false,
     val showPastTransactionsSetting: Boolean = true,
 
+    val showTutorial: Boolean = false,
+
     val tags: List<String> = emptyList(),
 
     val transactions: List<Transaction> = emptyList(),
@@ -58,7 +60,6 @@ data class HistoryUiState(
     val showOutOfPeriodSubscriptions: Boolean = false,
     val showUpcomingRecurrentInPeriod: Boolean = true,
     val lockSwipeable: Boolean = true,
-    val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
 
     val displayTransactions: List<Transaction> = emptyList(),
     val groupedCurrentTransactions: Map<LocalDate?, List<Transaction>> = emptyMap(),

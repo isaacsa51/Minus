@@ -3,23 +3,37 @@
     <string name="app_launcher_name" tools:ignore="MissingTranslation">@string/app_name</string>
 
     <string name="tutorial_numpad_title">Numpad</string>
-    <string name="tutorial_numpad_description">Enter the amount you spent and tap the green checkmark to save. Swipe up on the numpad to calculate.</string>
+    <string name="tutorial_numpad_description">Type what you spent and tap the check to save it. Hold the backspace key to clear the whole amount, and swipe up anywhere on the keys to open the calculator.</string>
     <string name="tutorial_comment_title">Add a category</string>
-    <string name="tutorial_comment_description">Add a category or short note to remember what the spend was for.</string>
+    <string name="tutorial_comment_description">Give the expense a category so it shows up in your Analytics breakdown. Tap one of your saved tags to reuse it, or type a short note instead.</string>
     <string name="tutorial_budget_pill_title">Budget progress</string>
-    <string name="tutorial_budget_pill_description">Tap to switch between daily, weekly, and monthly budget views, or to edit the period setup. Hold it to see how the amount is calculated.</string>
+    <string name="tutorial_budget_pill_description">Tap it to open your period setup and change the budget, dates or how it is split. Swipe sideways to flip between what is left today and what is left for the whole period. Hold it to see exactly how that number was worked out.</string>
     <string name="tutorial_settings_title">Settings</string>
-    <string name="tutorial_settings_description">Open Settings to enable features, set up home-screen widgets, or reset this tutorial.</string>
+    <string name="tutorial_settings_description">Your data and preferences live here: back up or import a CSV, add home-screen widgets, set the savings goal and reminder times, and turn on experimental features in the Feature Lab. You can also replay these hints from here.</string>
     <string name="tutorial_recurrent_title">Recurrent payments</string>
-    <string name="tutorial_recurrent_description">Tap here to mark this spend as a recurring payment (weekly, biweekly, or monthly). The app will remind you to log it on schedule.</string>
+    <string name="tutorial_recurrent_description">Turn this on to repeat the expense every week, two weeks or month. Minus reminds you on the due day and lists it under Upcoming recurrent payments in your history until you mark it paid.</string>
     <string name="tutorial_analytics_title">View your analytics</string>
-    <string name="tutorial_analytics_description">Open Analytics to see how your spending breaks down over time, by category, and against your budget goals.</string>
+    <string name="tutorial_analytics_description">See where the money went: a day-by-day heatmap, the split by category, your biggest and smallest expenses, and every past period you have closed.</string>
     <string name="tutorial_privacy_title">Privacy mode</string>
-    <string name="tutorial_privacy_description">Cover the top of the phone (where the front camera sits) with your hand for about a second to blur every amount on screen. Cover it again to turn it off.</string>
-    <string name="tutorial_calc_title">Ongoing budget</string>
-    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
+    <string name="tutorial_privacy_description">Rest your hand over the top of the screen, near the earpiece, for about a second and every amount blurs out. Cover it again to bring them back.</string>
+    <string name="tutorial_calc_title">Income and adjustments</string>
+    <string name="tutorial_calc_description">Start the amount with + to put money back into this period, such as a payday, a refund or a transfer in. Start it with - to take money off. The other keys work as a plain calculator for the amount itself.</string>
     <string name="tutorial_credit_toggle_title">Credit Card payment</string>
-    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
+    <string name="tutorial_credit_toggle_description">Mark the expense as paid by credit card. It still counts against this period, but Minus tracks what you owe separately so you can settle it before your cutoff date.</string>
+
+    <string name="tutorial_history_budget_title">Period at a glance</string>
+    <string name="tutorial_history_budget_description">What you have spent and what is left in the current period, including anything still owed on a credit card.</string>
+    <string name="tutorial_history_transaction_title">Edit or delete an expense</string>
+    <string name="tutorial_history_transaction_description">Tap an expense to expand it and see the full detail. Swipe it right to edit the amount, date, category or note; swipe it left to delete it, with a few seconds to undo.</string>
+    <string name="tutorial_history_recurrent_title">Upcoming payments</string>
+    <string name="tutorial_history_recurrent_description">Recurring charges due in this period sit here before they are paid. Mark one as paid when it lands, or delete just that occurrence to skip it this time without cancelling the series.</string>
+    <string name="tutorial_history_past_period_title">Last period</string>
+    <string name="tutorial_history_past_period_description">Expenses from the period before this one, kept out of the way. Turn this section off again in Settings, under Feature Lab.</string>
+
+    <string name="analytics_tutorial_recurrent_title">Recurring charges</string>
+    <string name="analytics_tutorial_recurrent_desc">Everything that repeats, with what it costs you per period. Open it to see the next due date for each one, or to stop a series you no longer pay.</string>
+    <string name="analytics_tutorial_income_title">Money added back</string>
+    <string name="analytics_tutorial_income_desc">Anything you logged with a leading + — a payday, a refund, a transfer in. It is added to this period instead of counting as a spend, so your remaining budget goes up.</string>
 
     <string name="empty" translatable="false">—</string>
 
@@ -422,13 +436,6 @@
     <string name="settings_feature_experimental">Experimental</string>
     <string name="settings_feature_state_on">On</string>
     <string name="settings_feature_state_off">Off</string>
-    <string name="settings_recurrent_payments_view_mode_title">Recurrent payments view mode</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">Change the type of display to show your recurrent payments</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">Recurrent payments view mode</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Show recurring payments as horizontal cards</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Show recurring payments as a regular expenses list</string>
 
     <string name="settings_period_end_time_title">Period end time</string>
     <string name="settings_period_end_time_subtitle">The notification will be shown on the period end date at this time</string>
@@ -579,9 +586,6 @@
     <string name="recurrent_ticket_weekly_unnamed">Weekly subscription without name</string>
     <string name="recurrent_ticket_biweekly_unnamed">Biweekly subscription without name</string>
     <string name="recurrent_ticket_monthly_unnamed">Monthly subscription without name</string>
-    <string name="recurrent_ticket_frequency_weekly">Weekly</string>
-    <string name="recurrent_ticket_frequency_biweekly">Biweekly</string>
-    <string name="recurrent_ticket_frequency_monthly">Monthly</string>
 
     <!-- Subscriptions screen -->
     <string name="subscriptions_title">Subscriptions</string>
@@ -803,8 +807,8 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Spending Trends</string>
     <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>
-    <string name="analytics_tutorial_header_title">Historical Periods</string>
-    <string name="analytics_tutorial_header_desc">Tap the icon to see your past budget periods and review their performance.</string>
+    <string name="analytics_tutorial_header_title">Past periods</string>
+    <string name="analytics_tutorial_header_desc">Every period you have closed lives behind this icon. Tap one to reopen its full analytics; its totals are recalculated as you read them, so editing an old expense updates the period it belongs to. Press and hold a period, then confirm with your fingerprint, to delete it for good.</string>
     <string name="analytics_tutorial_budget_title">Budget Status</string>
     <string name="analytics_tutorial_budget_desc">Check your total budget and see it\'s total days.</string>
     <string name="analytics_tutorial_heatmap_title">Spending Intensity</string>

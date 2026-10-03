@@ -12,6 +12,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,8 +56,9 @@ internal fun LazyListScope.transactionDateSections(
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     disableAnimations: Boolean = false,
     creditCardCutoffDay: Int? = null,
+    firstItemHintModifier: Modifier = Modifier,
 ) {
-    groupedTransactions.forEach { (date, transactions) ->
+    groupedTransactions.entries.forEachIndexed { groupIndex, (date, transactions) ->
         val isExpanded = date?.let { expandedDates.contains(it) } ?: false
         val dayTotal = transactions.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
 
@@ -103,6 +105,11 @@ internal fun LazyListScope.transactionDateSections(
                                     ) + fadeOut(animationSpec = tween(durationMillis = 280))
                                 } else ExitTransition.None,
                             ) {
+                                Box(
+                                    modifier = if (groupIndex == 0 && index == 0) {
+                                        firstItemHintModifier
+                                    } else Modifier,
+                                ) {
                                 SwipeableExpenseItem(
                                     transaction = transaction,
                                     currencyFormat = currencyFormat,
@@ -119,6 +126,7 @@ internal fun LazyListScope.transactionDateSections(
                                     onClick = { onClick(transaction) },
                                     creditCardCutoffDay = creditCardCutoffDay,
                                 )
+                                }
                             }
 
                             if (index < transactions.size - 1 && transaction.id !in deletingTransactionIds) {

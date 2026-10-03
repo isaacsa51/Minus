@@ -24,6 +24,7 @@ internal fun LazyListScope.pastPeriodToggleSection(
     groupedPastTransactions: Map<LocalDate?, List<Transaction>>,
     showPastPeriod: Boolean,
     onToggleShowPastPeriod: () -> Unit,
+    hintModifier: Modifier = Modifier,
 ) {
     if (groupedPastTransactions.isEmpty()) return
 
@@ -32,6 +33,7 @@ internal fun LazyListScope.pastPeriodToggleSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .then(hintModifier)
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null,

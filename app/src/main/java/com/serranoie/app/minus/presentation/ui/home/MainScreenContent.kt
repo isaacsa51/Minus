@@ -69,6 +69,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
@@ -119,7 +120,10 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.SavedCategoriesGrid
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
+import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
 import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
+import com.serranoie.app.minus.presentation.ui.tutorial.rememberTutorialBoxState
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.StatusBarPadding
 import kotlinx.coroutines.Job
@@ -258,6 +262,12 @@ fun MainScreenContent(
 
     nightMode = isNightMode()
 
+    val historyTutorialState = rememberTutorialBoxState(
+        order = HistoryTutorialOrder,
+        virtual = emptySet(),
+    )
+    var historyTutorialVisible by remember { mutableStateOf(false) }
+
     LaunchedEffect(windowSizeClass) {
         if (windowSizeClass != WindowWidthSizeClass.Compact && !budgetUiState.isCalculation) {
             actions.onProcessIntent(
@@ -268,182 +278,220 @@ fun MainScreenContent(
         }
     }
 
-    Row(modifier = Modifier.fillMaxSize()) {
-        if (windowSizeClass == WindowWidthSizeClass.Expanded) {
-            MainNavigationRail(
-                expanded = shouldExpandRail,
-                onNavigateToAnalytics = actions.onNavigateToAnalytics,
-                onNavigateToSettings = actions.onNavigateToSettings,
-                tutorialBoxState = tutorialBoxState,
-            )
-        }
-
-        BoxWithConstraints(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.surface),
-        ) {
-            val contentHeight = constraints.maxHeight.toFloat()
-            val contentWidth = constraints.maxWidth.toFloat()
-
-            if (windowSizeClass != WindowWidthSizeClass.Expanded) {
-                val actionsForLayout =
-                    remember(actions, snackbarHostState) {
-                        actions.copy(
-                            onShowSnackbar = { message ->
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        message = message,
-                                        duration = SnackbarDuration.Short,
-                                    )
-                                }
-                            },
-                        )
-                    }
-
-                val featureFlagsForLayout =
-                    remember(
-                        showCreditQuickToggleFeature,
-                        directCategoryPopupEnabled,
-                        categoryGridModeEnabled,
-                        extraNoteEnabled,
-                        newCategoryTagEnabled,
-                    ) {
-                        MainScreenFeatureFlags(
-                            showCreditQuickToggleFeature = showCreditQuickToggleFeature,
-                            directCategoryPopupEnabled = directCategoryPopupEnabled,
-                            categoryGridModeEnabled = categoryGridModeEnabled,
-                            extraNoteEnabled = extraNoteEnabled,
-                            newCategoryTagEnabled = newCategoryTagEnabled,
-                        )
-                    }
-
-                val budgetPeriodStateForLayout =
-                    remember(
-                        showBudgetPeriodSheet,
-                        forceBudgetPeriodSheetSetup,
-                        selectedViewPeriod,
-                        actions,
-                        showLeftoverChoice,
-                    ) {
-                        MainScreenBudgetPeriodState(
-                            showBudgetPeriodSheet = showBudgetPeriodSheet,
-                            forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
-                            selectedViewPeriod = selectedViewPeriod,
-                            onPeriodSelected = actions.onPeriodSelected,
-                            showLeftoverChoice = showLeftoverChoice,
-                            onLeftoverChoiceVisible = { leftoverChoiceOpen = it },
-                        )
-                    }
-
-                PhoneLayout(
-                    budgetUiState = budgetUiState,
-                    actions = actionsForLayout,
-                    featureFlags = featureFlagsForLayout,
-                    budgetPeriodState = budgetPeriodStateForLayout,
-                    topSheetState = topSheetState,
-                    contentHeight = contentHeight,
-                    contentWidth = contentWidth,
-                    localDensity = localDensity,
-                    windowInsets = windowInsets,
-                    showCategoryGrid = showCategoryGrid,
-                    onShowCategoryGrid = { showCategoryGrid = true },
-                    onHideCategoryGrid = { showCategoryGrid = false },
-                    openWalletOnStart = openWalletOnStart,
-                    quickLogSwipeModifier = quickLogSwipeModifier,
-                    queueDeleteWithUndo = ::queueDeleteWithUndo,
-                    cancelPendingDelete = ::cancelPendingDelete,
-                    showInfoSnackbar = ::showInfoSnackbar,
-                    snackbarHostState = snackbarHostState,
-                    tutorialBoxState = tutorialBoxState,
+    TutorialBox(
+        showTutorial = historyTutorialVisible,
+        state = historyTutorialState,
+        onTutorialCompleted = {
+            historyTutorialVisible = false
+            actions.onProcessIntent(MainScreenUiIntent.SetHistoryTutorialCompleted(true))
+        },
+        tutorialTarget = { index ->
+            when (index) {
+                0 -> TutorialTooltip(
+                    title = stringResource(R.string.tutorial_history_budget_title),
+                    description = stringResource(R.string.tutorial_history_budget_description),
                 )
-            } else {
-                val actionsForLayout =
-                    remember(actions, snackbarHostState) {
-                        actions.copy(
-                            onShowSnackbar = { message ->
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        message = message,
-                                        duration = SnackbarDuration.Short,
-                                    )
-                                }
-                            },
-                        )
-                    }
 
-                val featureFlagsForLayout =
-                    remember(
-                        showCreditQuickToggleFeature,
-                        directCategoryPopupEnabled,
-                        categoryGridModeEnabled,
-                        extraNoteEnabled,
-                        newCategoryTagEnabled,
-                    ) {
-                        MainScreenFeatureFlags(
-                            showCreditQuickToggleFeature = showCreditQuickToggleFeature,
-                            directCategoryPopupEnabled = directCategoryPopupEnabled,
-                            categoryGridModeEnabled = categoryGridModeEnabled,
-                            extraNoteEnabled = extraNoteEnabled,
-                            newCategoryTagEnabled = newCategoryTagEnabled,
-                        )
-                    }
+                1 -> TutorialTooltip(
+                    title = stringResource(R.string.tutorial_history_recurrent_title),
+                    description = stringResource(R.string.tutorial_history_recurrent_description),
+                )
 
-                val budgetPeriodStateForLayout =
-                    remember(
-                        showBudgetPeriodSheet,
-                        forceBudgetPeriodSheetSetup,
-                        selectedViewPeriod,
-                        actions,
-                        showLeftoverChoice,
-                    ) {
-                        MainScreenBudgetPeriodState(
-                            showBudgetPeriodSheet = showBudgetPeriodSheet,
-                            forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
-                            selectedViewPeriod = selectedViewPeriod,
-                            onPeriodSelected = actions.onPeriodSelected,
-                            showLeftoverChoice = showLeftoverChoice,
-                            onLeftoverChoiceVisible = { leftoverChoiceOpen = it },
-                        )
-                    }
+                2 -> TutorialTooltip(
+                    title = stringResource(R.string.tutorial_history_transaction_title),
+                    description = stringResource(R.string.tutorial_history_transaction_description),
+                )
 
-                // Expanded (>= 840dp): two-pane tablet layout
-                TabletLayout(
-                    budgetUiState = budgetUiState,
-                    actions = actionsForLayout,
-                    featureFlags = featureFlagsForLayout,
-                    budgetPeriodState = budgetPeriodStateForLayout,
-                    contentHeight = contentHeight,
-                    contentWidth = contentWidth,
-                    localDensity = localDensity,
-                    windowInsets = windowInsets,
-                    showCategoryGrid = showCategoryGrid,
-                    onShowCategoryGrid = { showCategoryGrid = true },
-                    onHideCategoryGrid = { showCategoryGrid = false },
-                    openWalletOnStart = openWalletOnStart,
-                    quickLogSwipeModifier = quickLogSwipeModifier,
-                    queueDeleteWithUndo = ::queueDeleteWithUndo,
-                    cancelPendingDelete = ::cancelPendingDelete,
-                    showInfoSnackbar = ::showInfoSnackbar,
-                    snackbarHostState = snackbarHostState,
+                3 -> TutorialTooltip(
+                    title = stringResource(R.string.tutorial_history_past_period_title),
+                    description = stringResource(R.string.tutorial_history_past_period_description),
+                )
+
+                else -> Unit
+            }
+        },
+    ) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            if (windowSizeClass == WindowWidthSizeClass.Expanded) {
+                MainNavigationRail(
+                    expanded = shouldExpandRail,
+                    onNavigateToAnalytics = actions.onNavigateToAnalytics,
+                    onNavigateToSettings = actions.onNavigateToSettings,
                     tutorialBoxState = tutorialBoxState,
                 )
             }
 
-            SnackbarHost(
-                hostState = snackbarHostState,
+            BoxWithConstraints(
                 modifier =
                     Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(horizontal = 16.dp, vertical = 20.dp)
-                        .navigationBarsPadding(),
-            ) { snackbarData ->
-                Snackbar(
-                    snackbarData = snackbarData,
-                    actionColor = MaterialTheme.colorScheme.tertiaryContainer,
-                )
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colorScheme.surface),
+            ) {
+                val contentHeight = constraints.maxHeight.toFloat()
+                val contentWidth = constraints.maxWidth.toFloat()
+
+                if (windowSizeClass != WindowWidthSizeClass.Expanded) {
+                    val actionsForLayout =
+                        remember(actions, snackbarHostState) {
+                            actions.copy(
+                                onShowSnackbar = { message ->
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = message,
+                                            duration = SnackbarDuration.Short,
+                                        )
+                                    }
+                                },
+                            )
+                        }
+
+                    val featureFlagsForLayout =
+                        remember(
+                            showCreditQuickToggleFeature,
+                            directCategoryPopupEnabled,
+                            categoryGridModeEnabled,
+                            extraNoteEnabled,
+                            newCategoryTagEnabled,
+                        ) {
+                            MainScreenFeatureFlags(
+                                showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+                                directCategoryPopupEnabled = directCategoryPopupEnabled,
+                                categoryGridModeEnabled = categoryGridModeEnabled,
+                                extraNoteEnabled = extraNoteEnabled,
+                                newCategoryTagEnabled = newCategoryTagEnabled,
+                            )
+                        }
+
+                    val budgetPeriodStateForLayout =
+                        remember(
+                            showBudgetPeriodSheet,
+                            forceBudgetPeriodSheetSetup,
+                            selectedViewPeriod,
+                            actions,
+                            showLeftoverChoice,
+                        ) {
+                            MainScreenBudgetPeriodState(
+                                showBudgetPeriodSheet = showBudgetPeriodSheet,
+                                forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
+                                selectedViewPeriod = selectedViewPeriod,
+                                onPeriodSelected = actions.onPeriodSelected,
+                                showLeftoverChoice = showLeftoverChoice,
+                                onLeftoverChoiceVisible = { leftoverChoiceOpen = it },
+                            )
+                        }
+
+                    PhoneLayout(
+                        budgetUiState = budgetUiState,
+                        actions = actionsForLayout,
+                        featureFlags = featureFlagsForLayout,
+                        budgetPeriodState = budgetPeriodStateForLayout,
+                        topSheetState = topSheetState,
+                        contentHeight = contentHeight,
+                        contentWidth = contentWidth,
+                        localDensity = localDensity,
+                        windowInsets = windowInsets,
+                        showCategoryGrid = showCategoryGrid,
+                        onShowCategoryGrid = { showCategoryGrid = true },
+                        onHideCategoryGrid = { showCategoryGrid = false },
+                        openWalletOnStart = openWalletOnStart,
+                        quickLogSwipeModifier = quickLogSwipeModifier,
+                        queueDeleteWithUndo = ::queueDeleteWithUndo,
+                        cancelPendingDelete = ::cancelPendingDelete,
+                        showInfoSnackbar = ::showInfoSnackbar,
+                        snackbarHostState = snackbarHostState,
+                        historyTutorialState = historyTutorialState,
+                        onHistoryTutorialVisibilityChanged = { historyTutorialVisible = it },
+                        tutorialBoxState = tutorialBoxState,
+                    )
+                } else {
+                    val actionsForLayout =
+                        remember(actions, snackbarHostState) {
+                            actions.copy(
+                                onShowSnackbar = { message ->
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = message,
+                                            duration = SnackbarDuration.Short,
+                                        )
+                                    }
+                                },
+                            )
+                        }
+
+                    val featureFlagsForLayout =
+                        remember(
+                            showCreditQuickToggleFeature,
+                            directCategoryPopupEnabled,
+                            categoryGridModeEnabled,
+                            extraNoteEnabled,
+                            newCategoryTagEnabled,
+                        ) {
+                            MainScreenFeatureFlags(
+                                showCreditQuickToggleFeature = showCreditQuickToggleFeature,
+                                directCategoryPopupEnabled = directCategoryPopupEnabled,
+                                categoryGridModeEnabled = categoryGridModeEnabled,
+                                extraNoteEnabled = extraNoteEnabled,
+                                newCategoryTagEnabled = newCategoryTagEnabled,
+                            )
+                        }
+
+                    val budgetPeriodStateForLayout =
+                        remember(
+                            showBudgetPeriodSheet,
+                            forceBudgetPeriodSheetSetup,
+                            selectedViewPeriod,
+                            actions,
+                            showLeftoverChoice,
+                        ) {
+                            MainScreenBudgetPeriodState(
+                                showBudgetPeriodSheet = showBudgetPeriodSheet,
+                                forceBudgetPeriodSheetSetup = forceBudgetPeriodSheetSetup,
+                                selectedViewPeriod = selectedViewPeriod,
+                                onPeriodSelected = actions.onPeriodSelected,
+                                showLeftoverChoice = showLeftoverChoice,
+                                onLeftoverChoiceVisible = { leftoverChoiceOpen = it },
+                            )
+                        }
+
+                    // Expanded (>= 840dp): two-pane tablet layout
+                    TabletLayout(
+                        budgetUiState = budgetUiState,
+                        actions = actionsForLayout,
+                        featureFlags = featureFlagsForLayout,
+                        budgetPeriodState = budgetPeriodStateForLayout,
+                        contentHeight = contentHeight,
+                        contentWidth = contentWidth,
+                        localDensity = localDensity,
+                        windowInsets = windowInsets,
+                        showCategoryGrid = showCategoryGrid,
+                        onShowCategoryGrid = { showCategoryGrid = true },
+                        onHideCategoryGrid = { showCategoryGrid = false },
+                        openWalletOnStart = openWalletOnStart,
+                        quickLogSwipeModifier = quickLogSwipeModifier,
+                        queueDeleteWithUndo = ::queueDeleteWithUndo,
+                        cancelPendingDelete = ::cancelPendingDelete,
+                        showInfoSnackbar = ::showInfoSnackbar,
+                        snackbarHostState = snackbarHostState,
+                        historyTutorialState = historyTutorialState,
+                        onHistoryTutorialVisibilityChanged = { historyTutorialVisible = it },
+                        tutorialBoxState = tutorialBoxState,
+                    )
+                }
+
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(horizontal = 16.dp, vertical = 20.dp)
+                            .navigationBarsPadding(),
+                ) { snackbarData ->
+                    Snackbar(
+                        snackbarData = snackbarData,
+                        actionColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    )
+                }
             }
         }
     }
@@ -522,6 +570,8 @@ private fun PhoneLayout(
     cancelPendingDelete: () -> Unit,
     showInfoSnackbar: (String) -> Unit,
     snackbarHostState: SnackbarHostState,
+    historyTutorialState: TutorialBoxState,
+    onHistoryTutorialVisibilityChanged: (Boolean) -> Unit,
     tutorialBoxState: TutorialBoxState? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -838,21 +888,20 @@ private fun PhoneLayout(
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
             colors =
                 CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = Color.Transparent,
                     contentColor = MaterialTheme.colorScheme.onSurface,
                 ),
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .animatedHeightPx {
-                        keyboardHeightAnimatedState.value + navBarHeightPx + with(localDensity) { 16.dp.toPx() }
+                        keyboardHeightAnimatedState.value + navBarHeightPx
                     }
                     .zIndex(if (isSheetExpanding) 0f else 1f),
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp)
                     .pointerInput(isNumpadCollapsed) {
                         detectVerticalDragGestures { change, dragAmount ->
                             if (dragAmount < -20f && isNumpadCollapsed) {
@@ -1033,6 +1082,8 @@ private fun PhoneLayout(
                         onQueueDeleteWithUndo = { tx, msg, _ -> queueDeleteWithUndo(tx, msg) },
                         onCancelPendingDelete = { cancelPendingDelete() },
                         onShowInfoSnackbar = { msg -> showInfoSnackbar(msg) },
+                        tutorialBoxState = historyTutorialState,
+                        onTutorialVisibilityChanged = onHistoryTutorialVisibilityChanged,
                     )
                 }
             },
@@ -1067,6 +1118,8 @@ private fun TabletLayout(
     cancelPendingDelete: () -> Unit,
     showInfoSnackbar: (String) -> Unit,
     snackbarHostState: SnackbarHostState,
+    historyTutorialState: TutorialBoxState,
+    onHistoryTutorialVisibilityChanged: (Boolean) -> Unit,
     tutorialBoxState: TutorialBoxState? = null,
 ) {
     val configuration = LocalConfiguration.current
@@ -1137,6 +1190,8 @@ private fun TabletLayout(
                 onQueueDeleteWithUndo = { tx, msg, _ -> queueDeleteWithUndo(tx, msg) },
                 onCancelPendingDelete = { cancelPendingDelete() },
                 onShowInfoSnackbar = { msg -> showInfoSnackbar(msg) },
+                tutorialBoxState = historyTutorialState,
+                onTutorialVisibilityChanged = onHistoryTutorialVisibilityChanged,
             )
         }
 
@@ -1189,7 +1244,7 @@ private fun TabletLayout(
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
                 colors =
                     CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
+                        containerColor = Color.Transparent,
                         contentColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 modifier =
@@ -1630,6 +1685,8 @@ private fun MainScreenPreview() {
         }
     }
 }
+
+private val HistoryTutorialOrder: List<Int> = listOf(0, 1, 2, 3)
 
 private val EditorBottomInset = 8.dp
 private val ImeExtraGap = 8.dp

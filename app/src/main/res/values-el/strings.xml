@@ -3,23 +3,23 @@
     <string name="app_name">Πλην</string>
     <string name="tile_new_transaction_label">Νέα συναλλαγή</string>
     <string name="tutorial_numpad_title">Καντράν</string>
-    <string name="tutorial_numpad_description">Εισαγάγετε το ποσό που ξοδέψατε και πατήστε το πράσινο σημάδι επιλογής για εξοικονόμηση. Σύρετε προς τα πάνω στο αριθμητικό πληκτρολόγιο για να υπολογίσετε.</string>
+    <string name="tutorial_numpad_description">Πληκτρολογήστε πόσα ξοδέψατε και πατήστε το σημάδι επιλογής για αποθήκευση. Κρατήστε πατημένο το πλήκτρο διαγραφής για να σβήσετε όλο το ποσό και σύρετε προς τα πάνω πάνω στα πλήκτρα για να ανοίξετε την αριθμομηχανή.</string>
     <string name="tutorial_comment_title">Προσθήκη κατηγορίας</string>
-    <string name="tutorial_comment_description">Προσθήκη κατηγορίας ή σύντομης σημείωσης για να θυμάστε για ποίο ήταν το κόστος.</string>
+    <string name="tutorial_comment_description">Δώστε μια κατηγορία στο έξοδο ώστε να εμφανιστεί στην ανάλυσή σας. Πατήστε μία από τις αποθηκευμένες ετικέτες σας για να την ξαναχρησιμοποιήσετε ή γράψτε μια σύντομη σημείωση.</string>
     <string name="tutorial_budget_pill_title">Πρόοδος του προϋπολογισμού</string>
-    <string name="tutorial_budget_pill_description">Πατήστε για εναλλαγή μεταξύ καθημερινών, εβδομαδιαίων και μηνιαίων προβολών προϋπολογισμού ή για να επεξεργαστείτε την περίοδο ρύθμισης. Κρατήστε το πατημένο για να δείτε πώς υπολογίζεται το ποσό.</string>
+    <string name="tutorial_budget_pill_description">Πατήστε το για να ανοίξετε τις ρυθμίσεις της περιόδου και να αλλάξετε τον προϋπολογισμό, τις ημερομηνίες ή τον τρόπο κατανομής. Σύρετε στο πλάι για εναλλαγή ανάμεσα σε όσα απομένουν σήμερα και όσα απομένουν για όλη την περίοδο. Κρατήστε το πατημένο για να δείτε πώς ακριβώς υπολογίστηκε το ποσό.</string>
     <string name="tutorial_settings_title">Ρυθμίσεις</string>
-    <string name="tutorial_settings_description">Ανοίξτε τις ρυθμίσεις για να ενεργοποιήσετε λειτουργίες, ρυθμίστε γραφικά συστατικά αρχικής οθόνης ή επαναφέρετε αυτό το σεμινάριο.</string>
+    <string name="tutorial_settings_description">Εδώ βρίσκονται τα δεδομένα και οι προτιμήσεις σας: αντίγραφο ασφαλείας ή εισαγωγή CSV, προσθήκη γραφικών στοιχείων στην αρχική οθόνη, στόχος αποταμίευσης και ώρες υπενθύμισης, καθώς και ενεργοποίηση πειραματικών λειτουργιών στις Επιπλέον λειτουργίες. Από εδώ μπορείτε επίσης να ξαναδείτε αυτές τις υποδείξεις.</string>
     <string name="tutorial_recurrent_title">Επαναλαμβανόμενες πληρωμές</string>
-    <string name="tutorial_recurrent_description">Πατήστε εδώ για να σημειώσετε αυτή τη δαπάνη ως επαναλαμβανόμενη πληρωμή (εβδομαδιαία, εβδομαδιαία ή μηνιαία). Η εφαρμογή θα σας υπενθυμίσει να τη συνδέσετε στο χρονοδιάγραμμα.</string>
+    <string name="tutorial_recurrent_description">Ενεργοποιήστε το για να επαναλαμβάνεται το έξοδο κάθε εβδομάδα, κάθε δύο εβδομάδες ή κάθε μήνα. Το Minus σας υπενθυμίζει την ημέρα της χρέωσης και το εμφανίζει στις Επαναλαμβανόμενες πληρωμές σε αυτήν την περίοδο στο ιστορικό σας μέχρι να το σημειώσετε ως πληρωμένο.</string>
     <string name="tutorial_analytics_title">Δείτε τα αναλυτικά στοιχεία σας</string>
-    <string name="tutorial_analytics_description">Ανοίξτε το Analytics για να δείτε πώς αναλύονται οι δαπάνες σας με την πάροδο του χρόνου, ανά κατηγορία και σε σχέση με τους στόχους του προϋπολογισμού σας.</string>
+    <string name="tutorial_analytics_description">Δείτε πού πήγαν τα χρήματα: θερμικός χάρτης ανά ημέρα, κατανομή ανά κατηγορία, τα μεγαλύτερα και τα μικρότερα έξοδά σας και κάθε περίοδος που έχετε κλείσει.</string>
     <string name="tutorial_privacy_title">Λειτουργία απορρήτου</string>
-    <string name="tutorial_privacy_description">Καλύψτε την κορυφή του τηλεφώνου (όπου κάθεται η μπροστινή φωτογραφική μηχανή) με το χέρι σας για περίπου ένα δευτερόλεπτο για να θολώσει κάθε ποσό στην οθόνη. Καλύψτε το ξανά για να το απενεργοποιήσετε.</string>
-    <string name="tutorial_calc_title">Τρέχων προϋπολογισμός</string>
-    <string name="tutorial_calc_description">Χρησιμοποιήστε + ή - στην αρχή για να αυξήσετε ή να μειώσετε τον υπολειπόμενο προϋπολογισμό σας για αυτήν την περίοδο.</string>
+    <string name="tutorial_privacy_description">Ακουμπήστε το χέρι σας στο επάνω μέρος της οθόνης, κοντά στο ακουστικό, για περίπου ένα δευτερόλεπτο και όλα τα ποσά θολώνουν. Καλύψτε το ξανά για να επανέλθουν.</string>
+    <string name="tutorial_calc_title">Έσοδα και προσαρμογές</string>
+    <string name="tutorial_calc_description">Ξεκινήστε το ποσό με + για να επιστρέψετε χρήματα σε αυτήν την περίοδο, όπως μισθό, επιστροφή χρημάτων ή εισερχόμενο έμβασμα. Ξεκινήστε το με - για να αφαιρέσετε χρήματα. Τα υπόλοιπα πλήκτρα λειτουργούν ως απλή αριθμομηχανή για το ποσό.</string>
     <string name="tutorial_credit_toggle_title">Πληρωμή με Πιστωτική Κάρτα</string>
-    <string name="tutorial_credit_toggle_description">Πατήστε εδώ για να επισημάνετε ότι αυτό το έξοδο έγινε με πιστωτική κάρτα. Θα παρακολουθείται ξεχωριστά στα αναλυτικά σας στοιχεία.</string>
+    <string name="tutorial_credit_toggle_description">Σημειώστε το έξοδο ως πληρωμένο με πιστωτική κάρτα. Συνεχίζει να μετράει σε αυτήν την περίοδο, αλλά το Minus παρακολουθεί χωριστά όσα οφείλετε ώστε να τα εξοφλήσετε πριν από την ημερομηνία κλεισίματος.</string>
     <string name="today">Σήμερα</string>
     <string name="yesterday">Χθες</string>
     <string name="tomorrow">Αύριο</string>
@@ -335,13 +335,6 @@
     <string name="settings_feature_show_past_transactions_switch_label">Φόρτωση προηγούμενων περιόδων</string>
     <string name="settings_feature_show_past_transactions_title">Εμφάνιση προηγούμενων συναλλαγών</string>
     <string name="settings_feature_show_past_transactions_subtitle">Φόρτωση συναλλαγών από προηγούμενες περιόδους</string>
-    <string name="settings_recurrent_payments_view_mode_title">Λειτουργία επαναλαμβανόμενης προβολής πληρωμών</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">Αλλάξτε τον τύπο εμφάνισης για να εμφανίσετε τις επαναλαμβανόμενες πληρωμές σας</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">Λειτουργία επαναλαμβανόμενης προβολής πληρωμών</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">Οριζόντια</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Εμφάνιση επαναλαμβανόμενων πληρωμών ως οριζόντιες κάρτες</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">Κατακόρυφα</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Εμφάνιση επαναλαμβανόμενων πληρωμών ως λίστα τακτικών εξόδων</string>
     <string name="settings_period_end_time_title">Χρόνος λήξης περιόδου</string>
     <string name="settings_period_end_time_subtitle">Η ειδοποίηση θα εμφανίζεται την ημερομηνία λήξης της περιόδου αυτή τη στιγμή</string>
     <string name="settings_recurrent_notification_time_title">Χρόνος επαναλαμβανόμενων πληρωμών</string>
@@ -471,9 +464,6 @@
     <string name="recurrent_ticket_weekly_unnamed">Εβδομαδιαία συνδρομή χωρίς όνομα</string>
     <string name="recurrent_ticket_biweekly_unnamed">Δύο εβδομάδες συνδρομή χωρίς όνομα</string>
     <string name="recurrent_ticket_monthly_unnamed">Μηνιαία συνδρομή χωρίς όνομα</string>
-    <string name="recurrent_ticket_frequency_weekly">Εβδομαδιαία</string>
-    <string name="recurrent_ticket_frequency_biweekly">Ανά δύο εβδομάδες</string>
-    <string name="recurrent_ticket_frequency_monthly">Μηνιαία</string>
     <!-- Subscriptions screen -->
     <string name="subscriptions_title">Συνδρομές</string>
     <string name="subscriptions_analytics_card_label">Επαναλαμβανόμενα</string>
@@ -664,8 +654,8 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Τάσεις Δαπάνης</string>
     <string name="analytics_tutorial_minmax_desc">Αυτές οι κάρτες δείχνουν τα χαμηλότερα και υψηλότερα έξοδά σας. Καθώς προσθέτετε περισσότερες συναλλαγές, αυτές θα ενημερώνονται για να σας βοηθήσουν να εντοπίσετε τις ακραίες τιμές.</string>
-    <string name="analytics_tutorial_header_title">Ιστορικές Περίοδοι</string>
-    <string name="analytics_tutorial_header_desc">Πατήστε το εικονίδιο για να δείτε τις προηγούμενες περιόδους του προϋπολογισμού σας και να αναθεωρήσετε την απόδοσή τους.</string>
+    <string name="analytics_tutorial_header_title">Προηγούμενες περίοδοι</string>
+    <string name="analytics_tutorial_header_desc">Πίσω από αυτό το εικονίδιο βρίσκονται όλες οι περίοδοι που έχετε κλείσει. Πατήστε μία για να ανοίξετε ξανά τα πλήρη αναλυτικά της· τα σύνολα υπολογίζονται εκ νέου καθώς τα διαβάζετε, οπότε η επεξεργασία ενός παλιού εξόδου ενημερώνει την περίοδο στην οποία ανήκει. Κρατήστε πατημένη μια περίοδο και επιβεβαιώστε με το δακτυλικό σας αποτύπωμα για να τη διαγράψετε οριστικά.</string>
     <string name="analytics_tutorial_budget_title">Κατάσταση Προϋπολογισμού</string>
     <string name="analytics_tutorial_budget_desc">Ελέγξτε το συνολικό προϋπολογισμό σας και δείτε ότι είναι συνολικές ημέρες.</string>
     <string name="analytics_tutorial_heatmap_title">Ένταση Δαπάνης</string>
@@ -726,4 +716,18 @@
     <string name="loading">Φόρτωση…</string>
     <string name="widget_budget_pill_title">Μπάρα προϋπολογισμού</string>
     <string name="widget_budget_pill_description">Το υπόλοιπο για την προβολή που επιλέξατε — ημερήσια, εβδομαδιαία, δεκαπενθήμερη ή μηνιαία — σε μια λεπτή μπάρα</string>
+
+    <!-- Tutorial hints -->
+    <string name="tutorial_history_budget_title">Η περίοδος με μια ματιά</string>
+    <string name="tutorial_history_budget_description">Πόσα έχετε ξοδέψει και πόσα απομένουν στην τρέχουσα περίοδο, μαζί με ό,τι οφείλετε ακόμη σε πιστωτική κάρτα.</string>
+    <string name="tutorial_history_transaction_title">Επεξεργασία ή διαγραφή εξόδου</string>
+    <string name="tutorial_history_transaction_description">Πατήστε ένα έξοδο για να το αναπτύξετε και να δείτε όλες τις λεπτομέρειες. Σύρετέ το δεξιά για να αλλάξετε ποσό, ημερομηνία, κατηγορία ή σημείωση· σύρετέ το αριστερά για να το διαγράψετε, με λίγα δευτερόλεπτα αναίρεσης.</string>
+    <string name="tutorial_history_recurrent_title">Επερχόμενες πληρωμές</string>
+    <string name="tutorial_history_recurrent_description">Οι επαναλαμβανόμενες χρεώσεις που λήγουν σε αυτήν την περίοδο βρίσκονται εδώ πριν πληρωθούν. Σημειώστε μία ως πληρωμένη όταν έρθει ή διαγράψτε μόνο αυτήν την εμφάνιση για να την παραλείψετε αυτήν τη φορά χωρίς να ακυρώσετε τη σειρά.</string>
+    <string name="tutorial_history_past_period_title">Προηγούμενη περίοδος</string>
+    <string name="tutorial_history_past_period_description">Έξοδα από την περίοδο πριν από αυτήν, φυλαγμένα στην άκρη. Μπορείτε να απενεργοποιήσετε ξανά αυτήν την ενότητα στις Ρυθμίσεις, στις Επιπλέον λειτουργίες.</string>
+    <string name="analytics_tutorial_recurrent_title">Επαναλαμβανόμενες χρεώσεις</string>
+    <string name="analytics_tutorial_recurrent_desc">Ό,τι επαναλαμβάνεται, με το κόστος ανά περίοδο. Ανοίξτε το για να δείτε την επόμενη ημερομηνία χρέωσης για καθένα ή για να σταματήσετε μια σειρά που δεν πληρώνετε πια.</string>
+    <string name="analytics_tutorial_income_title">Χρήματα που επιστράφηκαν</string>
+    <string name="analytics_tutorial_income_desc">Ό,τι καταχωρίσατε ξεκινώντας με + — μισθός, επιστροφή χρημάτων, εισερχόμενο έμβασμα. Προστίθεται σε αυτήν την περίοδο αντί να μετρά ως δαπάνη, οπότε ο υπόλοιπος προϋπολογισμός σας αυξάνεται.</string>
 </resources>

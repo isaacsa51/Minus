@@ -3,23 +3,23 @@
     <string name="app_name">Minus</string>
     <string name="tile_new_transaction_label">새 거래</string>
     <string name="tutorial_numpad_title">숫자 패드</string>
-    <string name="tutorial_numpad_description">지출 금액을 입력하고 녹색 체크 표시를 탭하여 저장하세요. 숫자 패드를 위로 쓸어 올리면 계산 기능을 사용할 수 있습니다.</string>
+    <string name="tutorial_numpad_description">사용한 금액을 입력하고 체크를 탭하면 저장됩니다. 백스페이스 키를 길게 누르면 금액 전체가 지워지고, 키패드 위에서 위로 쓸어올리면 계산기가 열립니다.</string>
     <string name="tutorial_comment_title">카테고리 추가</string>
-    <string name="tutorial_comment_description">카테고리나 간단한 메모를 추가하여 지출 용도를 기록해 보세요.</string>
+    <string name="tutorial_comment_description">지출에 카테고리를 지정하면 분석 내역에 표시됩니다. 저장한 태그를 탭해 다시 사용하거나 짧은 메모를 입력하세요.</string>
     <string name="tutorial_budget_pill_title">예산 진행 상황</string>
-    <string name="tutorial_budget_pill_description">탭하여 일간, 주간, 월간 예산 보기로 전환하거나 기간 설정을 변경하세요. 길게 누르면 금액이 어떻게 계산되는지 볼 수 있습니다.</string>
+    <string name="tutorial_budget_pill_description">탭하면 기간 설정이 열려 예산, 날짜, 배분 방식을 바꿀 수 있습니다. 옆으로 쓸면 오늘 남은 금액과 기간 전체의 남은 금액이 전환됩니다. 길게 누르면 그 금액이 어떻게 계산됐는지 확인할 수 있습니다.</string>
     <string name="tutorial_settings_title">설정</string>
-    <string name="tutorial_settings_description">설정을 열어 기능을 활성화하거나, 홈 화면 위젯을 설정하거나, 이 튜토리얼을 초기화하세요.</string>
+    <string name="tutorial_settings_description">데이터와 환경설정이 여기에 있습니다. 백업하거나 CSV를 가져오고, 홈 화면에 위젯을 추가하고, 저축 목표와 알림 시간을 정하고, 추가 기능에서 실험적 기능을 켤 수 있습니다. 이 도움말도 여기서 다시 볼 수 있습니다.</string>
     <string name="tutorial_recurrent_title">정기 결제</string>
-    <string name="tutorial_recurrent_description">이 지출을 정기 결제(매주, 격주 또는 매월)로 설정하려면 여기를 탭하세요. 앱이 일정에 맞춰 기록하도록 알림을 보내드립니다.</string>
+    <string name="tutorial_recurrent_description">켜면 지출이 매주, 2주마다 또는 매달 반복됩니다. Minus가 결제일에 알려주고, 결제 완료로 표시할 때까지 내역의 ‘이번 기간의 반복 지출’에 보여줍니다.</string>
     <string name="tutorial_analytics_title">분석 확인하기</string>
-    <string name="tutorial_analytics_description">분석 기능을 열어 시간별, 카테고리별 지출 내역과 예산 목표 대비 현황을 확인해 보세요.</string>
+    <string name="tutorial_analytics_description">돈이 어디로 갔는지 확인하세요. 날짜별 히트맵, 카테고리별 분포, 가장 큰 지출과 가장 작은 지출, 그리고 마감한 모든 기간을 볼 수 있습니다.</string>
     <string name="tutorial_privacy_title">개인정보 보호 모드</string>
-    <string name="tutorial_privacy_description">휴대폰 상단(전면 카메라 위치)을 약 1초간 손으로 가리면 화면의 모든 금액이 가려집니다. 다시 가리면 원래대로 돌아옵니다.</string>
-    <string name="tutorial_calc_title">예산 조정</string>
-    <string name="tutorial_calc_description">시작 부분에 + 또는 -를 입력하여 현재 기간의 잔여 예산을 늘리거나 줄일 수 있습니다.</string>
+    <string name="tutorial_privacy_description">화면 위쪽 수화부 근처를 손으로 1초쯤 가리면 모든 금액이 흐려집니다. 다시 가리면 원래대로 돌아옵니다.</string>
+    <string name="tutorial_calc_title">수입과 조정</string>
+    <string name="tutorial_calc_description">금액 앞에 +를 붙이면 급여, 환불, 입금처럼 이 기간에 돈이 다시 더해집니다. -를 붙이면 돈이 차감됩니다. 나머지 키는 금액을 계산하는 일반 계산기로 동작합니다.</string>
     <string name="tutorial_credit_toggle_title">신용카드 결제</string>
-    <string name="tutorial_credit_toggle_description">여기를 탭하여 신용카드 지출로 표시하세요. 분석에서 별도로 집계됩니다.</string>
+    <string name="tutorial_credit_toggle_description">지출을 신용카드 결제로 표시합니다. 이번 기간에는 그대로 반영되지만, Minus가 갚을 금액을 따로 관리해 결제 마감일 전에 정산할 수 있습니다.</string>
     <string name="today">오늘</string>
     <string name="yesterday">어제</string>
     <string name="tomorrow">내일</string>
@@ -337,13 +337,6 @@
     <string name="settings_feature_show_past_transactions_switch_label">지난 기간 불러오기</string>
     <string name="settings_feature_show_past_transactions_title">지난 거래 내역 표시</string>
     <string name="settings_feature_show_past_transactions_subtitle">지난 기간의 거래 내역 불러오기</string>
-    <string name="settings_recurrent_payments_view_mode_title">반복 결제 보기 모드</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">반복 결제 표시 방식 변경</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">반복 결제 보기 모드</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">가로형</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">반복 결제를 가로 카드 형태로 표시</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">세로형</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">정기 결제 내역을 일반 지출 목록 형태로 표시합니다.</string>
     <string name="settings_period_end_time_title">기간 종료 시간</string>
     <string name="settings_period_end_time_subtitle">기간 종료일에 이 시간에 알림이 표시됩니다</string>
     <string name="settings_recurrent_notification_time_title">반복 결제 확인 시간</string>
@@ -473,9 +466,6 @@
     <string name="recurrent_ticket_weekly_unnamed">이름 없는 주간 구독</string>
     <string name="recurrent_ticket_biweekly_unnamed">이름 없는 격주 구독</string>
     <string name="recurrent_ticket_monthly_unnamed">이름 없는 월간 구독</string>
-    <string name="recurrent_ticket_frequency_weekly">주간</string>
-    <string name="recurrent_ticket_frequency_biweekly">격주</string>
-    <string name="recurrent_ticket_frequency_monthly">월간</string>
     <!-- Subscriptions screen -->
     <string name="subscriptions_title">구독</string>
     <string name="subscriptions_analytics_card_label">정기 결제</string>
@@ -666,8 +656,8 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">지출 추이</string>
     <string name="analytics_tutorial_minmax_desc">이 카드들은 최저 및 최고 지출액을 보여줍니다. 거래 내역이 추가됨에 따라 정보가 업데이트되며, 이를 통해 특이 지출(이상치)을 파악할 수 있습니다.</string>
-    <string name="analytics_tutorial_header_title">지난 예산 기간</string>
-    <string name="analytics_tutorial_header_desc">아이콘을 탭하여 지난 예산 기간과 그 기간의 지출 현황을 확인하세요.</string>
+    <string name="analytics_tutorial_header_title">지난 기간</string>
+    <string name="analytics_tutorial_header_desc">마감한 모든 기간이 이 아이콘 안에 있습니다. 하나를 탭하면 전체 분석을 다시 열 수 있습니다. 합계는 볼 때마다 다시 계산되므로 예전 지출을 수정하면 해당 기간에 반영됩니다. 기간을 길게 누른 뒤 지문으로 확인하면 완전히 삭제됩니다.</string>
     <string name="analytics_tutorial_budget_title">예산 현황</string>
     <string name="analytics_tutorial_budget_desc">총 예산과 남은 기간을 확인하세요.</string>
     <string name="analytics_tutorial_heatmap_title">지출 집중도</string>
@@ -727,4 +717,18 @@
     <string name="loading">로딩 중…</string>
     <string name="widget_budget_pill_title">예산 필</string>
     <string name="widget_budget_pill_description">선택한 보기 모드(일간, 주간, 격주, 월간)의 남은 금액을 슬림한 바로 표시</string>
+
+    <!-- Tutorial hints -->
+    <string name="tutorial_history_budget_title">기간 한눈에 보기</string>
+    <string name="tutorial_history_budget_description">현재 기간에 쓴 금액과 남은 금액입니다. 신용카드 미결제 금액도 포함됩니다.</string>
+    <string name="tutorial_history_transaction_title">지출 수정 또는 삭제</string>
+    <string name="tutorial_history_transaction_description">지출을 탭하면 펼쳐져 자세한 내용을 볼 수 있습니다. 오른쪽으로 쓸면 금액, 날짜, 카테고리, 메모를 수정하고, 왼쪽으로 쓸면 삭제됩니다. 몇 초 동안 실행취소할 수 있습니다.</string>
+    <string name="tutorial_history_recurrent_title">예정된 결제</string>
+    <string name="tutorial_history_recurrent_description">이번 기간에 결제일이 오는 반복 지출이 결제 전까지 여기에 있습니다. 결제되면 완료로 표시하거나, 해당 회차만 삭제하면 전체 반복을 해지하지 않고 이번만 건너뜁니다.</string>
+    <string name="tutorial_history_past_period_title">지난 기간</string>
+    <string name="tutorial_history_past_period_description">바로 앞 기간의 지출을 따로 모아 둔 곳입니다. 설정의 추가 기능에서 이 섹션을 다시 끌 수 있습니다.</string>
+    <string name="analytics_tutorial_recurrent_title">반복 지출</string>
+    <string name="analytics_tutorial_recurrent_desc">반복되는 모든 항목과 기간당 비용입니다. 열면 각 항목의 다음 결제일을 보거나, 더 이상 내지 않는 반복을 중단할 수 있습니다.</string>
+    <string name="analytics_tutorial_income_title">다시 더해진 돈</string>
+    <string name="analytics_tutorial_income_desc">앞에 +를 붙여 기록한 모든 것(급여, 환불, 입금)입니다. 지출로 계산되지 않고 이번 기간에 더해지므로 남은 예산이 늘어납니다.</string>
 </resources>

@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.RecurrentPaymentsDivider
@@ -44,7 +43,6 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
     showUpcomingRecurrentInPeriod: Boolean,
     expandedTransactionId: Long?,
     onToggleShowUpcomingRecurrentInPeriod: () -> Unit,
-    recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
     currencyCode: String,
     currencyFormat: NumberFormat,
     onDelete: (Transaction) -> Unit,
@@ -54,6 +52,7 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     creditCardCutoffDay: Int? = null,
+    hintModifier: Modifier = Modifier,
 ) {
     if (upcomingRecurrentInPeriod.isEmpty()) return
 
@@ -67,7 +66,7 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
             itemCount = upcomingRecurrentInPeriod.size,
             totalAmount = recurrentTotal,
             currencyCode = currencyCode,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().then(hintModifier),
         )
     }
 
@@ -86,8 +85,6 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
             Column {
                 RecurrentItemsContent(
                     items = upcomingRecurrentInPeriod,
-                    recurrentPaymentsViewMode = recurrentPaymentsViewMode,
-                    currencyFormat = currencyFormat,
                     verticalItem = { _, item, position ->
                         SwipeableUpcomingRecurrentItem(
                             item = item,
@@ -113,20 +110,16 @@ internal fun LazyListScope.currentPeriodRecurrentSection(
                             creditCardCutoffDay = creditCardCutoffDay,
                         )
                     },
-                    horizontalKeyPrefix = "upcoming",
-                    onClick = onClick,
                 )
 
-                if (recurrentPaymentsViewMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    DayTotalItem(
-                        total = recurrentTotal,
-                        currencyFormat = currencyFormat,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                DayTotalItem(
+                    total = recurrentTotal,
+                    currencyFormat = currencyFormat,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                )
             }
         }
     }
@@ -158,7 +151,6 @@ private fun CurrentPeriodRecurrentSectionPreview() {
                 showUpcomingRecurrentInPeriod = true,
                 expandedTransactionId = null,
                 onToggleShowUpcomingRecurrentInPeriod = {},
-                recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
                 currencyCode = "USD",
                 currencyFormat = NumberFormat.getCurrencyInstance(),
                 onDelete = {},

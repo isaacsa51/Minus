@@ -11,7 +11,6 @@ import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.model.UserSettings
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -80,13 +79,14 @@ interface SettingsRepository {
 
     suspend fun setAnalyticsTutorialCompleted(completed: Boolean)
 
+    suspend fun setHistoryTutorialCompleted(completed: Boolean)
+
     suspend fun setAnalyticsSpendsTutorialCompleted(completed: Boolean)
 
     suspend fun setPeriodMappingMode(mode: PeriodMappingMode)
 
     suspend fun setFirstLaunchTutorialStage(stage: FirstLaunchTutorialStage)
 
-    suspend fun setRecurrentPaymentsViewMode(mode: RecurrentPaymentsViewMode)
 
     suspend fun setBudgetSplitViewPeriod(period: BudgetPeriod)
 

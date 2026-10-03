@@ -239,6 +239,8 @@ fun Analytics(
         showTutorialOverride?.let { !it } ?: (tutorialCompleted || state.isHistoricalView)
 
     val showSavingsCard = state.wholeBudget > BigDecimal.ZERO
+    val hasRecurring = state.recurringInPeriod.isNotEmpty()
+    val hasIncomes = state.incomes.isNotEmpty()
 
     val tutorialOrder =
         remember(
@@ -247,6 +249,8 @@ fun Analytics(
             state.periodFinished,
             state.isHistoricalView,
             showSavingsCard,
+            hasRecurring,
+            hasIncomes,
         ) {
             buildList {
                 // 1. Header (if visible)
@@ -263,12 +267,16 @@ fun Analytics(
                     if (state.creditOwed > BigDecimal.ZERO) {
                         add(6) // Credit Owed
                     }
+                    if (hasRecurring) add(7) // Recurring summary
+                    if (hasIncomes) add(8) // Income added
                     add(4) // Categories
                 } else {
                     if (showSavingsCard) add(5) // Savings
                     if (state.creditOwed > BigDecimal.ZERO) {
                         add(6) // Credit Owed
                     }
+                    if (hasRecurring) add(7) // Recurring summary
+                    if (hasIncomes) add(8) // Income added
                 }
             }
         }
@@ -305,6 +313,8 @@ fun Analytics(
             4 to BringIntoViewRequester(),
             5 to BringIntoViewRequester(),
             6 to BringIntoViewRequester(),
+            7 to BringIntoViewRequester(),
+            8 to BringIntoViewRequester(),
         )
     }
 
@@ -400,6 +410,16 @@ fun Analytics(
                 6 -> TutorialTooltip(
                     title = stringResource(R.string.analytics_tutorial_credit_title),
                     description = stringResource(R.string.analytics_tutorial_credit_desc)
+                )
+
+                7 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_recurrent_title),
+                    description = stringResource(R.string.analytics_tutorial_recurrent_desc)
+                )
+
+                8 -> TutorialTooltip(
+                    title = stringResource(R.string.analytics_tutorial_income_title),
+                    description = stringResource(R.string.analytics_tutorial_income_desc)
                 )
             }
         }) {
@@ -1113,7 +1133,10 @@ private fun AnalyticsCompactLayout(
                     onShowSubscriptions()
                     performUIHaptic(view)
                 },
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .bringIntoViewRequester(bringIntoViewRequesters[7]!!)
+                    .markIfInOrder(7),
             )
         }
         if (state.incomes.isNotEmpty()) {
@@ -1124,7 +1147,9 @@ private fun AnalyticsCompactLayout(
                 currency = state.currencyCode,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .bringIntoViewRequester(bringIntoViewRequesters[8]!!)
+                    .markIfInOrder(8),
             )
         }
         if (state.decreases.isNotEmpty()) {
@@ -1282,6 +1307,9 @@ private fun AnalyticsTabletLayout(
                     onShowSubscriptions()
                     performUIHaptic(view)
                 },
+                modifier = Modifier
+                    .bringIntoViewRequester(bringIntoViewRequesters[7]!!)
+                    .markIfInOrder(7),
             )
         }
         if (state.incomes.isNotEmpty()) {
@@ -1290,7 +1318,10 @@ private fun AnalyticsTabletLayout(
                 incomes = state.incomes,
                 categories = categories,
                 currency = state.currencyCode,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .bringIntoViewRequester(bringIntoViewRequesters[8]!!)
+                    .markIfInOrder(8),
             )
         }
         if (state.decreases.isNotEmpty()) {

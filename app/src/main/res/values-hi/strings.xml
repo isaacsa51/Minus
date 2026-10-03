@@ -3,23 +3,23 @@
     <string name="app_name">Minus</string>
     <string name="tile_new_transaction_label">नया लेन-देन</string>
     <string name="tutorial_numpad_title">नंपैड</string>
-    <string name="tutorial_numpad_description">अपनी खर्च की गई रकम डालें और सेव करने के लिए हरे रंग के चेक मार्क पर टैप करें। कैलकुलेट करने के लिए नंपैड पर ऊपर की ओर स्वाइप करें।</string>
+    <string name="tutorial_numpad_description">आपने जो खर्च किया वह लिखें और सेव करने के लिए टिक पर टैप करें। पूरी रकम मिटाने के लिए बैकस्पेस दबाए रखें, और कैलकुलेटर खोलने के लिए कीपैड पर कहीं भी ऊपर स्वाइप करें।</string>
     <string name="tutorial_comment_title">कैटेगरी जोड़ें</string>
-    <string name="tutorial_comment_description">यह याद रखने के लिए कि खर्च किस चीज़ के लिए किया गया था, एक कैटेगरी या छोटा नोट जोड़ें।</string>
+    <string name="tutorial_comment_description">खर्च को एक कैटेगरी दें ताकि वह आपके एनालिटिक्स ब्रेकडाउन में दिखे। दोबारा इस्तेमाल करने के लिए अपने सेव किए गए टैग पर टैप करें, या छोटा नोट लिखें।</string>
     <string name="tutorial_budget_pill_title">बजट की प्रगति</string>
-    <string name="tutorial_budget_pill_description">रोज़ाना, हफ़्तेवार और महीने के बजट व्यू के बीच स्विच करने या समय-सीमा सेट-अप को एडिट करने के लिए टैप करें। रकम का हिसाब कैसे लगता है, यह देखने के लिए इसे दबाकर रखें।</string>
+    <string name="tutorial_budget_pill_description">अवधि की सेटिंग खोलने और बजट, तारीखें या बंटवारा बदलने के लिए इस पर टैप करें। आज कितना बचा है और पूरी अवधि में कितना बचा है, इनके बीच बदलने के लिए बगल में स्वाइप करें। यह रकम कैसे निकली, यह देखने के लिए दबाए रखें।</string>
     <string name="tutorial_settings_title">सेटिंग्स</string>
-    <string name="tutorial_settings_description">फ़ीचर चालू करने, होम-स्क्रीन विजेट सेट अप करने या इस ट्यूटोरियल को रीसेट करने के लिए सेटिंग्स खोलें।</string>
+    <string name="tutorial_settings_description">आपका डेटा और प्राथमिकताएं यहीं हैं: बैकअप लें या CSV इंपोर्ट करें, होम स्क्रीन पर विजेट जोड़ें, बचत का लक्ष्य और रिमाइंडर का समय तय करें, और अतिरिक्त फ़ीचर में एक्सपेरिमेंटल फ़ीचर चालू करें। ये सुझाव यहीं से दोबारा देखे जा सकते हैं।</string>
     <string name="tutorial_recurrent_title">बार-बार होने वाले पेमेंट</string>
-    <string name="tutorial_recurrent_description">इस खर्च को बार-बार होने वाले पेमेंट (हफ़्ते में एक बार, हर दो हफ़्ते में, या महीने में एक बार) के तौर पर मार्क करने के लिए यहाँ टैप करें। ऐप आपको इसे तय समय पर रिकॉर्ड करने के लिए याद दिलाएगा।</string>
+    <string name="tutorial_recurrent_description">इसे चालू करें ताकि यह खर्च हर हफ़्ते, हर दो हफ़्ते या हर महीने दोहराया जाए। Minus आपको देय तारीख पर याद दिलाएगा और भुगतान होने तक इसे इतिहास में „इस अवधि में बार-बार होने वाले पेमेंट“ में दिखाएगा।</string>
     <string name="tutorial_analytics_title">अपना एनालिटिक्स देखें</string>
-    <string name="tutorial_analytics_description">यह देखने के लिए एनालिटिक्स खोलें कि समय के साथ, कैटेगरी के हिसाब से और आपके बजट लक्ष्यों के मुकाबले आपका खर्च कैसे हुआ है।</string>
+    <string name="tutorial_analytics_description">देखें पैसा कहां गया: दिन-प्रतिदिन का हीटमैप, कैटेगरी के हिसाब से बंटवारा, आपके सबसे बड़े और सबसे छोटे खर्च, और हर बंद की गई अवधि।</string>
     <string name="tutorial_privacy_title">प्राइवेसी मोड</string>
-    <string name="tutorial_privacy_description">स्क्रीन पर मौजूद सभी रकम को धुंधला करने के लिए लगभग एक सेकंड के लिए फ़ोन के ऊपरी हिस्से (जहाँ फ्रंट कैमरा होता है) को अपने हाथ से ढकें। इसे बंद करने के लिए फिर से ढकें।</string>
-    <string name="tutorial_calc_title">चल रहा बजट</string>
-    <string name="tutorial_calc_description">इस समय-सीमा के लिए अपने बचे हुए बजट को बढ़ाने या घटाने के लिए शुरुआत में + या - का इस्तेमाल करें।</string>
+    <string name="tutorial_privacy_description">स्क्रीन के ऊपरी हिस्से पर, ईयरपीस के पास, करीब एक सेकंड हाथ रखें और सभी रकमें धुंधली हो जाएंगी। दोबारा ढकने पर वे वापस दिख जाएंगी।</string>
+    <string name="tutorial_calc_title">आमदनी और समायोजन</string>
+    <string name="tutorial_calc_description">इस अवधि में पैसा वापस जोड़ने के लिए रकम की शुरुआत + से करें, जैसे सैलरी, रिफ़ंड या आया हुआ ट्रांसफ़र। पैसा घटाने के लिए शुरुआत - से करें। बाकी कुंजियां रकम के लिए सामान्य कैलकुलेटर की तरह काम करती हैं।</string>
     <string name="tutorial_credit_toggle_title">क्रेडिट कार्ड से पेमेंट</string>
-    <string name="tutorial_credit_toggle_description">यह मार्क करने के लिए कि यह खर्च क्रेडिट कार्ड से किया गया था, यहाँ टैप करें। इसे आपके एनालिटिक्स में अलग से ट्रैक किया जाएगा।</string>
+    <string name="tutorial_credit_toggle_description">खर्च को क्रेडिट कार्ड से भुगतान के रूप में चिह्नित करें। यह इसी अवधि में गिना जाता रहेगा, लेकिन Minus आपकी देनदारी अलग से ट्रैक करता है ताकि आप कट-ऑफ़ तारीख से पहले चुका सकें।</string>
     <string name="today">आज</string>
     <string name="yesterday">कल</string>
     <string name="tomorrow">कल</string>
@@ -335,13 +335,6 @@
     <string name="settings_feature_show_past_transactions_switch_label">पिछले समय के पीरियड लोड करें</string>
     <string name="settings_feature_show_past_transactions_title">पिछले ट्रांज़ैक्शन दिखाएं</string>
     <string name="settings_feature_show_past_transactions_subtitle">पिछले समय के ट्रांज़ैक्शन लोड करें</string>
-    <string name="settings_recurrent_payments_view_mode_title">बार-बार होने वाले पेमेंट का व्यू मोड</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">बार-बार होने वाले पेमेंट दिखाने के लिए डिस्प्ले का प्रकार बदलें</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">बार-बार होने वाले पेमेंट का व्यू मोड</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">हॉरिज़ॉन्टल</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">बार-बार होने वाले पेमेंट को हॉरिज़ॉन्टल कार्ड के तौर पर दिखाएं</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">वर्टिकल</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">बार-बार होने वाले पेमेंट को रेगुलर खर्चों की लिस्ट के तौर पर दिखाएं</string>
     <string name="settings_period_end_time_title">अवधि खत्म होने का समय</string>
     <string name="settings_period_end_time_subtitle">नोटिफ़िकेशन इस समय अवधि के खत्म होने की तारीख पर दिखाया जाएगा</string>
     <string name="settings_recurrent_notification_time_title">बार-बार होने वाले पेमेंट का समय</string>
@@ -471,9 +464,6 @@
     <string name="recurrent_ticket_weekly_unnamed">बिना नाम वाला हर हफ़्ते का सब्सक्रिप्शन</string>
     <string name="recurrent_ticket_biweekly_unnamed">बिना नाम वाला हर दो हफ़्ते का सब्सक्रिप्शन</string>
     <string name="recurrent_ticket_monthly_unnamed">बिना नाम वाला हर महीने का सब्सक्रिप्शन</string>
-    <string name="recurrent_ticket_frequency_weekly">हर हफ़्ते</string>
-    <string name="recurrent_ticket_frequency_biweekly">हर दो हफ़्ते में</string>
-    <string name="recurrent_ticket_frequency_monthly">हर महीने</string>
     <!-- Subscriptions screen -->
     <string name="subscriptions_title">सब्सक्रिप्शन</string>
     <string name="subscriptions_analytics_card_label">रिकरिंग</string>
@@ -664,8 +654,8 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">खर्च करने के ट्रेंड</string>
     <string name="analytics_tutorial_minmax_desc">ये कार्ड आपके सबसे कम और सबसे ज़्यादा खर्च दिखाते हैं। जैसे-जैसे आप और ट्रांज़ैक्शन जोड़ेंगे, ये अपडेट होते रहेंगे ताकि आप असामान्य खर्चों (आउटलायर्स) की पहचान कर सकें।</string>
-    <string name="analytics_tutorial_header_title">पुराने पीरियड</string>
-    <string name="analytics_tutorial_header_desc">अपने पिछले बजट पीरियड देखने और उनके परफ़ॉर्मेंस की समीक्षा करने के लिए आइकन पर टैप करें।</string>
+    <string name="analytics_tutorial_header_title">पिछली अवधियां</string>
+    <string name="analytics_tutorial_header_desc">आपकी बंद की गई सभी अवधियां इस आइकॉन के पीछे हैं। पूरी एनालिटिक्स दोबारा खोलने के लिए किसी एक पर टैप करें; कुल रकम पढ़ते समय फिर से गिनी जाती है, इसलिए पुराना खर्च बदलने पर उसकी अवधि अपडेट हो जाती है। किसी अवधि को दबाए रखें और फ़िंगरप्रिंट से पुष्टि करें ताकि वह हमेशा के लिए हट जाए।</string>
     <string name="analytics_tutorial_budget_title">बजट की स्थिति</string>
     <string name="analytics_tutorial_budget_desc">अपना कुल बजट और उसके कुल दिन देखें।</string>
     <string name="analytics_tutorial_heatmap_title">खर्च की तीव्रता</string>
@@ -726,4 +716,18 @@
     <string name="loading">लोड हो रहा है…</string>
     <string name="widget_budget_pill_title">बजट पिल</string>
     <string name="widget_budget_pill_description">आपके चुने गए व्यू मोड — दैनिक, साप्ताहिक, द्वि-साप्ताहिक या मासिक — का शेष एक पतली पट्टी में</string>
+
+    <!-- Tutorial hints -->
+    <string name="tutorial_history_budget_title">एक नज़र में अवधि</string>
+    <string name="tutorial_history_budget_description">मौजूदा अवधि में आपने कितना खर्च किया और कितना बचा है, क्रेडिट कार्ड पर बकाया रकम समेत।</string>
+    <string name="tutorial_history_transaction_title">खर्च बदलें या हटाएं</string>
+    <string name="tutorial_history_transaction_description">पूरा ब्योरा देखने के लिए किसी खर्च पर टैप करके उसे खोलें। रकम, तारीख, कैटेगरी या नोट बदलने के लिए उसे दाएं स्वाइप करें; हटाने के लिए बाएं स्वाइप करें, कुछ सेकंड तक पूर्ववत करने का विकल्प रहेगा।</string>
+    <string name="tutorial_history_recurrent_title">आने वाले पेमेंट</string>
+    <string name="tutorial_history_recurrent_description">इस अवधि में देय बार-बार होने वाले खर्च भुगतान से पहले यहां रहते हैं। आने पर इसे भुगतान किया हुआ चिह्नित करें, या पूरी सीरीज़ रद्द किए बिना इस बार छोड़ने के लिए सिर्फ़ उसी बार को हटाएं।</string>
+    <string name="tutorial_history_past_period_title">पिछली अवधि</string>
+    <string name="tutorial_history_past_period_description">इससे पहले की अवधि के खर्च, अलग रखे गए। इस हिस्से को सेटिंग्स में, अतिरिक्त फ़ीचर के तहत, फिर से बंद किया जा सकता है।</string>
+    <string name="analytics_tutorial_recurrent_title">बार-बार होने वाले खर्च</string>
+    <string name="analytics_tutorial_recurrent_desc">जो कुछ भी दोहराया जाता है, और हर अवधि में उसकी लागत। हर एक की अगली देय तारीख देखने या जो सीरीज़ अब आप नहीं चुकाते उसे रोकने के लिए इसे खोलें।</string>
+    <string name="analytics_tutorial_income_title">वापस जुड़ा पैसा</string>
+    <string name="analytics_tutorial_income_desc">वह सब जो आपने + से शुरू करके दर्ज किया — सैलरी, रिफ़ंड, आया हुआ ट्रांसफ़र। यह खर्च में गिनने के बजाय इस अवधि में जुड़ जाता है, इसलिए आपका बचा हुआ बजट बढ़ जाता है।</string>
 </resources>

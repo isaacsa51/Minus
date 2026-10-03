@@ -28,7 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.theme.component.WavyDivider
 import com.serranoie.app.minus.presentation.ui.theme.component.date.DayTotalItem
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.SwipeableUpcomingRecurrentItem
@@ -50,7 +49,6 @@ internal fun LazyListScope.futureRecurrentSection(
     showOutOfPeriodSubscriptions: Boolean,
     expandedTransactionId: Long?,
     onToggleShowOutOfPeriodSubscriptions: () -> Unit,
-    recurrentPaymentsViewMode: RecurrentPaymentsViewMode,
     currencyFormat: NumberFormat,
     onDelete: (Transaction) -> Unit,
     onEdit: (Transaction) -> Unit,
@@ -102,8 +100,6 @@ internal fun LazyListScope.futureRecurrentSection(
             Column {
                 RecurrentItemsContent(
                     items = futureRecurrentOutOfPeriod,
-                    recurrentPaymentsViewMode = recurrentPaymentsViewMode,
-                    currencyFormat = currencyFormat,
                     verticalItem = { _, item, position ->
                         SwipeableUpcomingRecurrentItem(
                             item = item,
@@ -129,20 +125,16 @@ internal fun LazyListScope.futureRecurrentSection(
                             creditCardCutoffDay = creditCardCutoffDay,
                         )
                     },
-                    horizontalKeyPrefix = "future",
-                    onClick = onClick,
                 )
 
-                if (recurrentPaymentsViewMode == RecurrentPaymentsViewMode.VERTICAL_LIST) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    DayTotalItem(
-                        total = futureTotal,
-                        currencyFormat = currencyFormat,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                DayTotalItem(
+                    total = futureTotal,
+                    currencyFormat = currencyFormat,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                )
             }
         }
     }

@@ -75,7 +75,6 @@ fun SettingsScreen(
 
     Settings(
         isCensored = uiState.isCensored,
-        recurrentPaymentsViewMode = uiState.recurrentPaymentsViewMode,
         notificationHour = uiState.notificationHour,
         notificationMinute = uiState.notificationMinute,
         recurrentNotificationHour = uiState.recurrentNotificationHour,
@@ -84,7 +83,6 @@ fun SettingsScreen(
         notificationPermissionGranted = uiState.notificationPermissionGranted,
         onCensorModeToggle = viewModel::onCensorModeToggle,
         onNavigateToFeatureLab = onNavigateToFeatureLab,
-        onRecurrentPaymentsViewModeChange = viewModel::onRecurrentPaymentsViewModeChange,
         onNotificationTimeChange = viewModel::onNotificationTimeChange,
         onRecurrentNotificationTimeChange = viewModel::onRecurrentNotificationTimeChange,
         onOpenExactAlarmSettings = viewModel::onOpenExactAlarmSettings,

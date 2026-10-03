@@ -32,7 +32,6 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.history.History
 import com.serranoie.app.minus.presentation.ui.history.HistoryUiIntent
 import com.serranoie.app.minus.presentation.ui.history.HistoryUiState
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import org.junit.Rule
@@ -140,7 +139,7 @@ class HistoryScreenE2ETest {
     )
 
     @Test
-    fun when_recurrent_view_mode_is_horizontal_then_recurrent_items_are_shown_as_cards() {
+    fun when_recurrent_items_exist_then_they_are_shown_as_list_items() {
         val recurrentItems = sampleUpcomingRecurrentItems()
         composeTestRule.setContent {
             HistoryTestContent(
@@ -149,28 +148,6 @@ class HistoryScreenE2ETest {
                     budgetState = sampleBudgetState(),
                     upcomingRecurrentInPeriod = recurrentItems,
                     showUpcomingRecurrentInPeriod = true,
-                    recurrentPaymentsViewMode = RecurrentPaymentsViewMode.HORIZONTAL_LIST,
-                ),
-            )
-        }
-
-        composeTestRule.onNodeWithText("Netflix").assertIsDisplayed()
-        val monthlyLabel =
-            composeTestRule.activity.getString(R.string.recurrent_ticket_frequency_monthly)
-        composeTestRule.onNodeWithText(monthlyLabel, substring = true).assertIsDisplayed()
-    }
-
-    @Test
-    fun when_recurrent_view_mode_is_vertical_then_recurrent_items_are_shown_as_list_items() {
-        val recurrentItems = sampleUpcomingRecurrentItems()
-        composeTestRule.setContent {
-            HistoryTestContent(
-                uiState = HistoryUiState(
-                    budgetSettings = sampleBudgetSettings(),
-                    budgetState = sampleBudgetState(),
-                    upcomingRecurrentInPeriod = recurrentItems,
-                    showUpcomingRecurrentInPeriod = true,
-                    recurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
                 ),
             )
         }

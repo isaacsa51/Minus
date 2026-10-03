@@ -78,6 +78,8 @@ class MainScreenViewModel @Inject constructor(
             is MainScreenUiIntent.SetSelectedPeriod -> setSelectedPeriod(intent.period)
             is MainScreenUiIntent.MarkWalletSheetOpened -> markWalletSheetOpened()
             is MainScreenUiIntent.SetTutorialBoxCompleted -> setTutorialBoxCompleted(intent.completed)
+            is MainScreenUiIntent.SetHistoryTutorialCompleted ->
+                setHistoryTutorialCompleted(intent.completed)
 
             is MainScreenUiIntent.ProcessBudgetTransactionIntent -> { /* caller */ }
             is MainScreenUiIntent.ProcessBudgetEditorIntent -> { /* caller */ }
@@ -206,6 +208,12 @@ class MainScreenViewModel @Inject constructor(
     private fun setTutorialBoxCompleted(completed: Boolean) {
         viewModelScope.launch {
             settingsRepository.setTutorialBoxCompleted(completed)
+        }
+    }
+
+    private fun setHistoryTutorialCompleted(completed: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setHistoryTutorialCompleted(completed)
         }
     }
 

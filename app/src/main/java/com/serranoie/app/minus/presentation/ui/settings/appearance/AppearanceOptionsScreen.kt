@@ -56,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -88,6 +89,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPos
 import com.serranoie.app.minus.presentation.ui.theme.component.SelectablePaddedItem
 import com.serranoie.app.minus.presentation.ui.theme.component.SettingsLeadingIcon
 import com.serranoie.app.minus.presentation.ui.theme.component.SettingsToggleItem
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil
 import com.serranoie.app.minus.presentation.ui.theme.schemes.getSwatchColors
 
 @Composable
@@ -548,9 +550,17 @@ private fun TypographySection(
                 },
                 modifier = Modifier.weight(1f)
             )
+            val view = LocalView.current
             Switch(
                 checked = isRoundedFontEnabled,
-                onCheckedChange = { onRoundedFontToggle() },
+                onCheckedChange = {
+                    if (isRoundedFontEnabled) {
+                        HapticUtil.performLightHaptic(view)
+                    } else {
+                        HapticUtil.performMediumHaptic(view)
+                    }
+                    onRoundedFontToggle()
+                },
                 enabled = currentTypography != "System"
             )
         }

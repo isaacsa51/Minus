@@ -1,6 +1,5 @@
 package com.serranoie.app.minus.domain.model
 
-import com.serranoie.app.minus.presentation.ui.history.RecurrentPaymentsViewMode
 import java.time.LocalDate
 
 data class UserSettings(
@@ -31,11 +30,11 @@ data class UserSettings(
     val firstLaunchTutorialStage: FirstLaunchTutorialStage = FirstLaunchTutorialStage.COMPLETED,
     val analyticsTutorialCompleted: Boolean = false,
     val analyticsSpendsTutorialCompleted: Boolean = false,
+    val historyTutorialCompleted: Boolean = false,
     val showPastTransactions: Boolean = false,
     val isRoundedFontEnabled: Boolean = true,
     val isAmoledEnabled: Boolean = false,
     val periodMappingMode: PeriodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
-    val recurrentPaymentsViewMode: RecurrentPaymentsViewMode = RecurrentPaymentsViewMode.VERTICAL_LIST,
     val budgetSplitViewPeriod: BudgetPeriod? = null,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
     val leftoverChoices: Map<LocalDate, LeftoverChoice> = emptyMap(),
