@@ -610,7 +610,7 @@ class BudgetPeriodManagerTest {
             val gym = Transaction.create(
                 amount = BigDecimal("50.00"),
                 comment = "Gym",
-                date = today.minusMonths(1).atTime(9, 0),
+                date = today.minusMonths(1).atStartOfDay(),
                 periodId = 1L,
                 isRecurrent = true,
                 recurrentFrequency = RecurrentFrequency.MONTHLY,
