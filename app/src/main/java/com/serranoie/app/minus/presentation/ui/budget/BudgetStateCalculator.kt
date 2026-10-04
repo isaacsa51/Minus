@@ -227,10 +227,10 @@ class BudgetStateCalculator @Inject constructor() {
                 pending += allowance.subtract(outflow[day.minusDays(1)] ?: BigDecimal.ZERO)
             }
             allowance = rate
-            if (pending.signum() < 0 || choices[day] == LeftoverChoice.CARRY) {
+            if (pending.signum() >= 0 && choices[day] == LeftoverChoice.CARRY) {
                 allowance += pending
                 pending = BigDecimal.ZERO
-            } else if (choices[day] == LeftoverChoice.SPREAD) {
+            } else if (pending.signum() < 0 || choices[day] == LeftoverChoice.SPREAD) {
                 val daysLeft = totalDays - ChronoUnit.DAYS.between(start, day).toInt()
                 rate += pending.divide(BigDecimal(daysLeft), MathContext.DECIMAL64)
                 allowance = rate

@@ -582,15 +582,17 @@
     <string name="currency_selected">已选择</string>
     <!-- Remaining Budget Strategy -->
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">拆分模式</string>
-    <string name="split_mode_static">固定</string>
+    <string name="split_mode_label">每日金额</string>
+    <string name="split_mode_static">每天相同</string>
     <string name="split_mode_static_desc">无论花多少、花不花，总预算都会平均分配到每一天。</string>
-    <string name="split_mode_dynamic">平摊到所有天</string>
+    <string name="split_mode_dynamic">每天重新分配</string>
     <string name="split_mode_dynamic_desc">根据你的支出每天重新计算。剩余预算会平摊到本周期剩下的日子。</string>
-    <string name="split_mode_carry_over">结转</string>
+    <string name="split_mode_carry_over">留到以后</string>
     <string name="split_mode_carry_over_desc">每天没花完的钱会加到第二天的预算里，并不断累积。</string>
-    <string name="split_mode_ask_me">询问我</string>
-    <string name="split_mode_ask_me_desc">每天由你决定昨天没用完的预算：平摊到剩余天数，或结转到今天。</string>
+    <string name="split_mode_ask_me">每天你来定</string>
+    <string name="split_mode_ask_me_desc">每天由你决定昨天没用完的预算：平摊到剩余天数，或结转到今天。超支总会平摊到剩余天数，因此每日金额会减少。</string>
+    <string name="leftover_choice_spread">平摊到剩余天数</string>
+    <string name="leftover_choice_carry">全部加到今天</string>
     <string name="leftover_choice_spread_desc">将所有未使用的剩余预算平摊到剩下的每一天。</string>
     <string name="leftover_choice_carry_desc">只把未使用的预算结转到明天。</string>
     <string name="leftover_choice_spread_outcome">剩余天数每日 %1$s</string>
@@ -659,7 +661,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">支出趋势</string>
     <string name="analytics_tutorial_minmax_desc">此处展示你的最低与最高支出。\n随记账实时更新，轻松识别异常开支</string>
-    <string name="analytics_tutorial_header_title">历史周期</string>
+    <string name="analytics_tutorial_header_title">周期历史</string>
     <string name="analytics_tutorial_header_desc">你关闭过的所有周期都在这个图标后面。点击其中一个可重新打开完整分析；总额会在查看时重新计算，因此修改旧支出会同步更新它所属的周期。长按某个周期并用指纹确认，即可永久删除。</string>
     <string name="analytics_tutorial_budget_title">预算状况</string>
     <string name="analytics_tutorial_budget_desc">检查您的总预算并查看周期总天数。</string>

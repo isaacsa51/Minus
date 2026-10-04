@@ -579,15 +579,17 @@
     <string name="currency_selected">選択済み</string>
     <!-- Remaining Budget Strategy -->
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">分割モード</string>
-    <string name="split_mode_static">固定</string>
+    <string name="split_mode_label">1日の金額</string>
+    <string name="split_mode_static">毎日同じ</string>
     <string name="split_mode_static_desc">使う金額や使うかどうかに関係なく、予算の合計をすべての日に均等に分けます。</string>
-    <string name="split_mode_dynamic">全日に分散</string>
+    <string name="split_mode_dynamic">毎日再計算</string>
     <string name="split_mode_dynamic_desc">使い方に応じて毎日計算されます。残りの予算は期間の残りの日数に分散されます。</string>
-    <string name="split_mode_carry_over">繰り越し</string>
+    <string name="split_mode_carry_over">後のために貯める</string>
     <string name="split_mode_carry_over_desc">その日に使わなかった分は翌日の予算に加算され、どんどん積み上がります。</string>
-    <string name="split_mode_ask_me">確認する</string>
-    <string name="split_mode_ask_me_desc">毎日、昨日使わなかった予算を残りの日に分散するか、今日に繰り越すかを選びます。</string>
+    <string name="split_mode_ask_me">毎日あなたが選ぶ</string>
+    <string name="split_mode_ask_me_desc">毎日、昨日使わなかった予算を残りの日に分散するか、今日に繰り越すかを選びます。使いすぎた分は常に残りの日に分散されるため、1日の金額は下がります。</string>
+    <string name="leftover_choice_spread">残りの日に分散</string>
+    <string name="leftover_choice_carry">すべて今日に追加</string>
     <string name="leftover_choice_spread_desc">未使用の残りの予算を残りのすべての日に配分します。</string>
     <string name="leftover_choice_carry_desc">未使用の予算を明日だけに繰り越します。</string>
     <string name="leftover_choice_spread_outcome">残りの日は一日あたり %1$s</string>
@@ -655,7 +657,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">支出トレンド</string>
     <string name="analytics_tutorial_minmax_desc">これらのカードはあなたの最低費用と最高費用を表示します。\n取引を追加すると、これらは外れ値を見つけるのに役立ちます。</string>
-    <string name="analytics_tutorial_header_title">過去の期間</string>
+    <string name="analytics_tutorial_header_title">期間の履歴</string>
     <string name="analytics_tutorial_header_desc">締めた期間はすべてこのアイコンの中にあります。タップすると、その期間の詳細な分析を再び開けます。合計は表示のたびに再計算されるため、古い支出を編集するとその期間に反映されます。期間を長押しし、指紋で確認すると完全に削除できます。</string>
     <string name="analytics_tutorial_budget_title">予算ステータス</string>
     <string name="analytics_tutorial_budget_desc">予算の合計を確認し、合計日数を確認してください。</string>

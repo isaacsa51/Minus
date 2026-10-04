@@ -530,13 +530,14 @@ class BudgetStateCalculatorTest {
     }
 
     @Test
-    fun `ask me - overspending first uses the waiting money, the rest comes out of today`() {
+    fun `ask me - overspending first uses the waiting money, the rest is re-sliced over the days left`() {
         val absorbed = askMe(3, emptyMap(), 1 to "80", 2 to "110")
         assertThat(absorbed.remainingToday).isEqualTo(BigDecimal("100.00"))
         assertThat(absorbed.pendingLeftover).isEqualTo(BigDecimal("10.00"))
 
         val debt = askMe(3, emptyMap(), 1 to "80", 2 to "130")
-        assertThat(debt.remainingToday).isEqualTo(BigDecimal("90.00"))
+        assertThat(debt.remainingToday).isEqualTo(BigDecimal("98.75"))
+        assertThat(debt.dailyBudget).isEqualTo(BigDecimal("98.75"))
         assertThat(debt.pendingLeftover).isEqualTo(BigDecimal("0.00"))
     }
 

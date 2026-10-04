@@ -165,8 +165,8 @@ fun LeftoverChoiceList(
                         Text(
                             text = stringResource(
                                 when (option) {
-                                    LeftoverChoice.SPREAD -> R.string.split_mode_dynamic
-                                    LeftoverChoice.CARRY -> R.string.split_mode_carry_over
+                                    LeftoverChoice.SPREAD -> R.string.leftover_choice_spread
+                                    LeftoverChoice.CARRY -> R.string.leftover_choice_carry
                                 }
                             ),
                             style = MaterialTheme.typography.titleSmallEmphasized,

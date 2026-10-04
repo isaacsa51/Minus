@@ -161,6 +161,9 @@ android {
             buildConfigField("Boolean", "DEBUG_FEATURES", "false")
         }
     }
+
+    testBuildType = "beta"
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -354,6 +357,7 @@ dependencies {
 
     debugImplementation(libs.androidx.compose.ui.tooling.v106)
     debugImplementation(libs.androidx.compose.ui.testmanifest.v183)
+    "betaImplementation"(libs.androidx.compose.ui.testmanifest.v183)
 }
 
 val prepareReleaseNotes by tasks.registering {

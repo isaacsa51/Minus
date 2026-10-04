@@ -710,15 +710,17 @@
     <!-- Remaining Budget Strategy -->
 
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">Split mode</string>
-    <string name="split_mode_static">Static</string>
+    <string name="split_mode_label">Daily amount</string>
+    <string name="split_mode_static">Same every day</string>
     <string name="split_mode_static_desc">Total budget is split equally across all days, regardless of how much you spend or not.</string>
-    <string name="split_mode_dynamic">Spread over all days</string>
+    <string name="split_mode_dynamic">Rebalanced daily</string>
     <string name="split_mode_dynamic_desc">Calculates daily based on how you spend. The remaining budget is spread across the remaining days of the period.</string>
-    <string name="split_mode_carry_over">Carry over</string>
+    <string name="split_mode_carry_over">Saved for later</string>
     <string name="split_mode_carry_over_desc">What you don\'t spend daily is added to the next day as budget and keeps adding up.</string>
-    <string name="split_mode_ask_me">Ask me</string>
-    <string name="split_mode_ask_me_desc">Every day, you decide what happens to yesterday\'s unused budget: spread it over the remaining days or carry it over to today.</string>
+    <string name="split_mode_ask_me">Your call each day</string>
+    <string name="split_mode_ask_me_desc">Every day, you decide what happens to yesterday\'s unused budget: spread it over the remaining days or carry it over to today. Overspending is always spread over the days left, so the daily amount drops.</string>
+    <string name="leftover_choice_spread">Spread over the days left</string>
+    <string name="leftover_choice_carry">Add it all to today</string>
     <string name="leftover_choice_spread_desc">Allocate all unused remaining budget to all remaining days.</string>
     <string name="leftover_choice_carry_desc">Add all unused budget to today only.</string>
     <string name="leftover_choice_spread_outcome">%1$s for upcoming days</string>
@@ -807,7 +809,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Spending Trends</string>
     <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>
-    <string name="analytics_tutorial_header_title">Past periods</string>
+    <string name="analytics_tutorial_header_title">Period history</string>
     <string name="analytics_tutorial_header_desc">Every period you have closed lives behind this icon. Tap one to reopen its full analytics; its totals are recalculated as you read them, so editing an old expense updates the period it belongs to. Press and hold a period, then confirm with your fingerprint, to delete it for good.</string>
     <string name="analytics_tutorial_budget_title">Budget Status</string>
     <string name="analytics_tutorial_budget_desc">Check your total budget and see it\'s total days.</string>

@@ -582,15 +582,17 @@
     <string name="currency_selected">Seleccionado</string>
     <!-- Remaining Budget Strategy -->
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">Dividir modo</string>
-    <string name="split_mode_static">Estático</string>
+    <string name="split_mode_label">Monto diario</string>
+    <string name="split_mode_static">Igual cada día</string>
     <string name="split_mode_static_desc">El presupuesto total se divide en partes iguales entre todos los días, sin importar si gastas o cuánto gastas.</string>
-    <string name="split_mode_dynamic">Repartir en todos los días</string>
+    <string name="split_mode_dynamic">Se recalcula cada día</string>
     <string name="split_mode_dynamic_desc">Se calcula a diario según cómo gastas. El presupuesto restante se reparte entre los días que quedan del periodo.</string>
-    <string name="split_mode_carry_over">Acumulativo</string>
+    <string name="split_mode_carry_over">Se guarda para después</string>
     <string name="split_mode_carry_over_desc">Lo que no gastas cada día se suma al día siguiente como presupuesto y se va acumulando.</string>
-    <string name="split_mode_ask_me">Preguntar</string>
-    <string name="split_mode_ask_me_desc">Cada día decides qué pasa con el presupuesto que no usaste ayer: repartirlo en los días restantes o sumarlo a hoy.</string>
+    <string name="split_mode_ask_me">Tú decides cada día</string>
+    <string name="split_mode_ask_me_desc">Cada día decides qué pasa con el presupuesto que no usaste ayer: repartirlo en los días restantes o sumarlo a hoy. Lo que gastes de más siempre se reparte en los días restantes, así que el monto diario baja.</string>
+    <string name="leftover_choice_spread">Repartir en los días restantes</string>
+    <string name="leftover_choice_carry">Sumarlo todo a hoy</string>
     <string name="leftover_choice_spread_desc">Asigna todo el presupuesto no utilizado a todos los días restantes.</string>
     <string name="leftover_choice_carry_desc">Mueve el presupuesto no utilizado solo a mañana.</string>
     <string name="leftover_choice_spread_outcome">%1$s para los días restantes</string>
@@ -659,7 +661,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendencias de gasto</string>
     <string name="analytics_tutorial_minmax_desc">Estas gráficas muestran los gastos máximos y mínimos.\nComo vayas agregando más transacciones, estos te ayudaran a detectar valores atípicos.</string>
-    <string name="analytics_tutorial_header_title">Períodos anteriores</string>
+    <string name="analytics_tutorial_header_title">Historial de periodos</string>
     <string name="analytics_tutorial_header_desc">Detrás de este icono están todos los períodos que has cerrado. Toca uno para volver a abrir sus analíticas completas; sus totales se recalculan al consultarlos, así que editar un gasto antiguo actualiza el período al que pertenece. Mantén pulsado un período y confirma con tu huella para eliminarlo definitivamente.</string>
     <string name="analytics_tutorial_budget_title">Estado del presupuesto</string>
     <string name="analytics_tutorial_budget_desc">Checa el total del presupuesto y los días totales.</string>

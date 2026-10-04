@@ -3,11 +3,14 @@ package com.serranoie.app.minus.presentation.ui.e2e.analytics
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.serranoie.app.minus.R
@@ -80,14 +83,17 @@ class AnalyticsTutorialE2ETest {
         composeTestRule.onNodeWithText(text).assertIsDisplayed()
     }
 
+    private fun advance() {
+        composeTestRule.onRoot().performTouchInput { click(Offset(1f, 1f)) }
+        composeTestRule.waitForIdle()
+    }
+
     @Test
     fun when_no_spends_tutorial_shows_header_step_first() {
         setAnalyticsContent(hasSpends = false)
 
-        val title = composeTestRule.activity.getString(R.string.analytics_tutorial_header_title)
-        composeTestRule.onNodeWithText(title).assertIsDisplayed()
-
-        composeTestRule.onNodeWithText(title).performClick()
+        awaitTutorialStep(R.string.analytics_tutorial_header_title)
+        advance()
 
         awaitTutorialStep(R.string.analytics_tutorial_budget_title)
     }
@@ -96,10 +102,8 @@ class AnalyticsTutorialE2ETest {
     fun when_has_spends_tutorial_shows_heatmap_step_first() {
         setAnalyticsContent(hasSpends = true)
 
-        val title = composeTestRule.activity.getString(R.string.analytics_tutorial_heatmap_title)
-        composeTestRule.onNodeWithText(title).assertIsDisplayed()
-
-        composeTestRule.onNodeWithText(title).performClick()
+        awaitTutorialStep(R.string.analytics_tutorial_heatmap_title)
+        advance()
 
         awaitTutorialStep(R.string.analytics_tutorial_minmax_title)
     }

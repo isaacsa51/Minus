@@ -578,15 +578,17 @@
     <string name="currency_selected">Επιλεγμένο</string>
     <!-- Remaining Budget Strategy -->
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">Λειτουργία διαχωρισμού</string>
-    <string name="split_mode_static">Στατική</string>
+    <string name="split_mode_label">Ημερήσιο ποσό</string>
+    <string name="split_mode_static">Ίδιο κάθε μέρα</string>
     <string name="split_mode_static_desc">Ο συνολικός προϋπολογισμός μοιράζεται εξίσου σε όλες τις μέρες, ανεξάρτητα από το πόσο ή αν ξοδεύετε.</string>
-    <string name="split_mode_dynamic">Κατανομή σε όλες τις μέρες</string>
+    <string name="split_mode_dynamic">Επανυπολογισμός κάθε μέρα</string>
     <string name="split_mode_dynamic_desc">Υπολογίζεται καθημερινά ανάλογα με το πώς ξοδεύετε. Ο υπόλοιπος προϋπολογισμός κατανέμεται στις υπόλοιπες μέρες της περιόδου.</string>
-    <string name="split_mode_carry_over">Μεταφορά</string>
+    <string name="split_mode_carry_over">Αποταμίευση για αργότερα</string>
     <string name="split_mode_carry_over_desc">Ό,τι δεν ξοδεύετε κάθε μέρα προστίθεται στον προϋπολογισμό της επόμενης μέρας και συνεχίζει να συσσωρεύεται.</string>
-    <string name="split_mode_ask_me">Ρώτα με</string>
-    <string name="split_mode_ask_me_desc">Κάθε μέρα αποφασίζετε τι θα γίνει με τον αχρησιμοποίητο προϋπολογισμό της χθες: κατανομή στις υπόλοιπες μέρες ή μεταφορά στο σήμερα.</string>
+    <string name="split_mode_ask_me">Εσείς αποφασίζετε κάθε μέρα</string>
+    <string name="split_mode_ask_me_desc">Κάθε μέρα αποφασίζετε τι θα γίνει με τον αχρησιμοποίητο προϋπολογισμό της χθες: κατανομή στις υπόλοιπες μέρες ή μεταφορά στο σήμερα. Η υπέρβαση κατανέμεται πάντα στις υπόλοιπες μέρες, οπότε το ημερήσιο ποσό μειώνεται.</string>
+    <string name="leftover_choice_spread">Κατανομή στις υπόλοιπες μέρες</string>
+    <string name="leftover_choice_carry">Προσθήκη όλων στο σήμερα</string>
     <string name="leftover_choice_spread_desc">Κατανείμετε όλο το υπόλοιπο μη χρησιμοποιημένο προϋπολογισμό σε όλες τις υπόλοιπες ημέρες.</string>
     <string name="leftover_choice_carry_desc">Μεταφέρετε το μη χρησιμοποιημένο προϋπολογισμό μόνο για αύριο.</string>
     <string name="leftover_choice_spread_outcome">%1$s για τις επόμενες ημέρες</string>
@@ -654,7 +656,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Τάσεις Δαπάνης</string>
     <string name="analytics_tutorial_minmax_desc">Αυτές οι κάρτες δείχνουν τα χαμηλότερα και υψηλότερα έξοδά σας. Καθώς προσθέτετε περισσότερες συναλλαγές, αυτές θα ενημερώνονται για να σας βοηθήσουν να εντοπίσετε τις ακραίες τιμές.</string>
-    <string name="analytics_tutorial_header_title">Προηγούμενες περίοδοι</string>
+    <string name="analytics_tutorial_header_title">Ιστορικό περιόδων</string>
     <string name="analytics_tutorial_header_desc">Πίσω από αυτό το εικονίδιο βρίσκονται όλες οι περίοδοι που έχετε κλείσει. Πατήστε μία για να ανοίξετε ξανά τα πλήρη αναλυτικά της· τα σύνολα υπολογίζονται εκ νέου καθώς τα διαβάζετε, οπότε η επεξεργασία ενός παλιού εξόδου ενημερώνει την περίοδο στην οποία ανήκει. Κρατήστε πατημένη μια περίοδο και επιβεβαιώστε με το δακτυλικό σας αποτύπωμα για να τη διαγράψετε οριστικά.</string>
     <string name="analytics_tutorial_budget_title">Κατάσταση Προϋπολογισμού</string>
     <string name="analytics_tutorial_budget_desc">Ελέγξτε το συνολικό προϋπολογισμό σας και δείτε ότι είναι συνολικές ημέρες.</string>
