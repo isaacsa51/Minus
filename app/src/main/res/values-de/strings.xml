@@ -585,15 +585,17 @@
     <string name="currency_selected">Selected</string>
     <!-- Remaining Budget Strategy -->
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">Split mode</string>
-    <string name="split_mode_static">Static</string>
+    <string name="split_mode_label">Täglicher Betrag</string>
+    <string name="split_mode_static">Jeden Tag gleich</string>
     <string name="split_mode_static_desc">Das Gesamtbudget wird gleichmäßig auf alle Tage verteilt, egal ob und wie viel du ausgibst.</string>
-    <string name="split_mode_dynamic">Auf alle Tage verteilen</string>
+    <string name="split_mode_dynamic">Täglich neu verteilt</string>
     <string name="split_mode_dynamic_desc">Wird täglich anhand deiner Ausgaben berechnet. Das verbleibende Budget wird auf die restlichen Tage der Periode verteilt.</string>
-    <string name="split_mode_carry_over">Übertrag</string>
+    <string name="split_mode_carry_over">Für später gespart</string>
     <string name="split_mode_carry_over_desc">Was du an einem Tag nicht ausgibst, kommt als Budget zum nächsten Tag hinzu und sammelt sich an.</string>
-    <string name="split_mode_ask_me">Fragen</string>
-    <string name="split_mode_ask_me_desc">Du entscheidest jeden Tag, was mit dem ungenutzten Budget von gestern passiert: auf die restlichen Tage verteilen oder auf heute übertragen.</string>
+    <string name="split_mode_ask_me">Du entscheidest täglich</string>
+    <string name="split_mode_ask_me_desc">Du entscheidest jeden Tag, was mit dem ungenutzten Budget von gestern passiert: auf die restlichen Tage verteilen oder auf heute übertragen. Mehrausgaben werden immer auf die restlichen Tage verteilt, dadurch sinkt der Tagesbetrag.</string>
+    <string name="leftover_choice_spread">Auf die restlichen Tage verteilen</string>
+    <string name="leftover_choice_carry">Alles zu heute hinzufügen</string>
     <string name="leftover_choice_spread_desc">Verteilen Sie das gesamte ungenutzte Restbudget auf alle verbleibenden Tage.</string>
     <string name="leftover_choice_carry_desc">Übertragen Sie ungenutztes Budget nur auf morgen.</string>
     <string name="leftover_choice_spread_outcome">%1$s für die restlichen Tage</string>
@@ -662,7 +664,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Spending Trends</string>
     <string name="analytics_tutorial_minmax_desc">These cards show your lowest and highest expenses.\nAs you add more transactions, these will update to help you spot outliers.</string>
-    <string name="analytics_tutorial_header_title">Vergangene Zeiträume</string>
+    <string name="analytics_tutorial_header_title">Periodenverlauf</string>
     <string name="analytics_tutorial_header_desc">Hinter diesem Symbol liegen alle abgeschlossenen Zeiträume. Tippe auf einen, um seine vollständige Auswertung erneut zu öffnen; die Summen werden beim Lesen neu berechnet, eine Änderung an einer alten Ausgabe aktualisiert also den zugehörigen Zeitraum. Halte einen Zeitraum gedrückt und bestätige mit deinem Fingerabdruck, um ihn endgültig zu löschen.</string>
     <string name="analytics_tutorial_budget_title">Budget Status</string>
     <string name="analytics_tutorial_budget_desc">Check your total budget and see it\'s total days.</string>

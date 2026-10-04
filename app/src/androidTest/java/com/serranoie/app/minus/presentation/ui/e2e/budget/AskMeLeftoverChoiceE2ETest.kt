@@ -414,16 +414,19 @@ class AskMeLeftoverChoiceE2ETest {
     }
 
     @Test
-    fun when_the_user_overspent_then_the_debt_is_already_taken_out_of_both_previews() {
+    fun when_the_user_overspent_then_the_rate_absorbs_the_debt_and_only_the_unused_days_are_asked_about() {
         val overspent = listOf(
             Transaction(1L, BigDecimal("350.00"), date = periodStart.atTime(12, 0), periodId = 1L),
         )
         val state = budgetToday(transactions = overspent)
-        assertThat(state.pendingLeftover).isEqualTo(BigDecimal("0.00"))
+        assertThat(state.dailyBudget).isEqualTo(BigDecimal("72.22"))
+        assertThat(state.remainingToday).isEqualTo(BigDecimal("72.22"))
+        assertThat(state.pendingLeftover).isEqualTo(BigDecimal("144.44"))
 
         renderChoiceList(state = state)
 
-        composeTestRule.onAllNodesWithText(usd(BigDecimal("50.00"))).assertCountEquals(2)
+        composeTestRule.onNodeWithText(usd(BigDecimal("92.85"))).assertIsDisplayed()
+        composeTestRule.onNodeWithText(usd(BigDecimal("216.66"))).assertIsDisplayed()
     }
 
     @Test

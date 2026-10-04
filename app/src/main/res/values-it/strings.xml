@@ -581,15 +581,17 @@
     <string name="currency_selected">Selezionato</string>
     <!-- Remaining Budget Strategy -->
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">Modalità di divisione</string>
-    <string name="split_mode_static">Statico</string>
+    <string name="split_mode_label">Importo giornaliero</string>
+    <string name="split_mode_static">Uguale ogni giorno</string>
     <string name="split_mode_static_desc">Il budget totale viene diviso equamente su tutti i giorni, indipendentemente da quanto spendi o se spendi.</string>
-    <string name="split_mode_dynamic">Distribuisci su tutti i giorni</string>
+    <string name="split_mode_dynamic">Ricalcolato ogni giorno</string>
     <string name="split_mode_dynamic_desc">Calcolato ogni giorno in base a come spendi. Il budget rimanente viene distribuito sui giorni rimanenti del periodo.</string>
-    <string name="split_mode_carry_over">Cumulativo</string>
+    <string name="split_mode_carry_over">Messo da parte</string>
     <string name="split_mode_carry_over_desc">Ciò che non spendi ogni giorno viene aggiunto al budget del giorno successivo e continua ad accumularsi.</string>
-    <string name="split_mode_ask_me">Chiedimi</string>
-    <string name="split_mode_ask_me_desc">Ogni giorno decidi cosa fare con il budget non usato ieri: distribuirlo sui giorni rimanenti o riportarlo a oggi.</string>
+    <string name="split_mode_ask_me">Decidi tu ogni giorno</string>
+    <string name="split_mode_ask_me_desc">Ogni giorno decidi cosa fare con il budget non usato ieri: distribuirlo sui giorni rimanenti o riportarlo a oggi. Le spese in eccesso vengono sempre distribuite sui giorni rimanenti, così l\'importo giornaliero cala.</string>
+    <string name="leftover_choice_spread">Distribuisci sui giorni restanti</string>
+    <string name="leftover_choice_carry">Aggiungi tutto a oggi</string>
     <string name="leftover_choice_spread_desc">Distribuisci tutto il budget rimasto non utilizzato su tutti i giorni restanti.</string>
     <string name="leftover_choice_carry_desc">Sposta il budget non utilizzato solo a domani.</string>
     <string name="leftover_choice_spread_outcome">%1$s per i giorni successivi</string>
@@ -657,7 +659,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendenze di spesa</string>
     <string name="analytics_tutorial_minmax_desc">Queste schede mostrano le tue spese minime e massime. Si aggiorneranno man mano che aggiungerai transazioni, aiutandoti a individuare valori anomali.</string>
-    <string name="analytics_tutorial_header_title">Periodi passati</string>
+    <string name="analytics_tutorial_header_title">Cronologia dei periodi</string>
     <string name="analytics_tutorial_header_desc">Dietro questa icona ci sono tutti i periodi che hai chiuso. Toccane uno per riaprire le sue analisi complete; i totali vengono ricalcolati mentre li leggi, quindi modificare una vecchia spesa aggiorna il periodo a cui appartiene. Tieni premuto un periodo e conferma con l\'impronta per eliminarlo definitivamente.</string>
     <string name="analytics_tutorial_budget_title">Stato del budget</string>
     <string name="analytics_tutorial_budget_desc">Controlla il budget totale e la sua durata complessiva in giorni.</string>

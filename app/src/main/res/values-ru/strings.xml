@@ -609,15 +609,17 @@
   <string name="currency_no_results">Валюты не найдены</string>
   <string name="currency_selected">Выбрано</string>
   <!-- Budget Split Mode -->
-  <string name="split_mode_label">Режим распределения</string>
-  <string name="split_mode_static">Фиксированный</string>
+  <string name="split_mode_label">Дневная сумма</string>
+  <string name="split_mode_static">Одинаково каждый день</string>
   <string name="split_mode_static_desc">Весь бюджет делится поровну по дням — независимо от того, сколько уже потрачено.</string>
-  <string name="split_mode_dynamic">Распределять по всем дням</string>
+  <string name="split_mode_dynamic">Пересчёт каждый день</string>
   <string name="split_mode_dynamic_desc">Пересчитывается каждый день по мере трат. Оставшаяся сумма распределяется по ещё не прошедшим дням периода.</string>
-  <string name="split_mode_carry_over">Перенос</string>
+  <string name="split_mode_carry_over">Копится на потом</string>
   <string name="split_mode_carry_over_desc">Всё, что вы не потратили за день, добавляется к бюджету следующего дня и накапливается.</string>
-  <string name="split_mode_ask_me">Спрашивать</string>
-  <string name="split_mode_ask_me_desc">Каждый день вы решаете, что делать с неизрасходованным бюджетом за вчера: распределить его по оставшимся дням или перенести на сегодня.</string>
+  <string name="split_mode_ask_me">Вы решаете каждый день</string>
+  <string name="split_mode_ask_me_desc">Каждый день вы решаете, что делать с неизрасходованным бюджетом за вчера: распределить его по оставшимся дням или перенести на сегодня. Перерасход всегда распределяется по оставшимся дням, поэтому дневная сумма уменьшается.</string>
+  <string name="leftover_choice_spread">Распределить по оставшимся дням</string>
+  <string name="leftover_choice_carry">Добавить всё на сегодня</string>
   <string name="leftover_choice_spread_desc">Распределите весь неиспользованный остаток бюджета на все оставшиеся дни.</string>
   <string name="leftover_choice_carry_desc">Перенесите неиспользованный бюджет только на завтра.</string>
   <string name="leftover_choice_spread_outcome">%1$s в последующие дни</string>
@@ -686,7 +688,7 @@
   <!-- Analytics Tutorial -->
   <string name="analytics_tutorial_minmax_title">Динамика трат</string>
   <string name="analytics_tutorial_minmax_desc">Эти карточки показывают самый маленький и самый большой расход.\nПо мере новых операций значения обновляются — так легче заметить выбросы.</string>
-    <string name="analytics_tutorial_header_title">Прошлые периоды</string>
+    <string name="analytics_tutorial_header_title">История периодов</string>
     <string name="analytics_tutorial_header_desc">За этим значком — все закрытые вами периоды. Нажмите на любой, чтобы снова открыть полную аналитику; итоги пересчитываются при просмотре, поэтому правка старого расхода обновляет его период. Нажмите и удерживайте период, затем подтвердите отпечатком, чтобы удалить его навсегда.</string>
   <string name="analytics_tutorial_budget_title">Состояние бюджета</string>
   <string name="analytics_tutorial_budget_desc">Здесь весь бюджет и длительность периода в днях.</string>

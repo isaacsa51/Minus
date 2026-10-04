@@ -580,15 +580,17 @@
     <string name="currency_selected">선택됨</string>
     <!-- Remaining Budget Strategy -->
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">분할 모드</string>
-    <string name="split_mode_static">고정</string>
+    <string name="split_mode_label">하루 금액</string>
+    <string name="split_mode_static">매일 같은 금액</string>
     <string name="split_mode_static_desc">지출 여부나 금액과 상관없이 총 예산을 모든 날에 똑같이 나눕니다.</string>
-    <string name="split_mode_dynamic">모든 날에 분배</string>
+    <string name="split_mode_dynamic">매일 재계산</string>
     <string name="split_mode_dynamic_desc">지출에 따라 매일 계산됩니다. 남은 예산은 기간의 남은 날에 나누어 배분됩니다.</string>
-    <string name="split_mode_carry_over">이월</string>
+    <string name="split_mode_carry_over">나중을 위해 모으기</string>
     <string name="split_mode_carry_over_desc">매일 쓰지 않은 금액은 다음 날 예산에 더해지고 계속 쌓입니다.</string>
-    <string name="split_mode_ask_me">물어보기</string>
-    <string name="split_mode_ask_me_desc">매일 어제 쓰지 않은 예산을 남은 날에 분배할지, 오늘로 이월할지 직접 정합니다.</string>
+    <string name="split_mode_ask_me">매일 직접 선택</string>
+    <string name="split_mode_ask_me_desc">매일 어제 쓰지 않은 예산을 남은 날에 분배할지, 오늘로 이월할지 직접 정합니다. 초과 지출은 항상 남은 날에 나눠지므로 하루 금액이 줄어듭니다.</string>
+    <string name="leftover_choice_spread">남은 날에 나누기</string>
+    <string name="leftover_choice_carry">전부 오늘에 추가</string>
     <string name="leftover_choice_spread_desc">사용하지 않은 남은 예산을 남은 모든 날에 나눠 배분합니다.</string>
     <string name="leftover_choice_carry_desc">사용하지 않은 예산을 내일에만 이월합니다.</string>
     <string name="leftover_choice_spread_outcome">남은 일수 동안 1일당 %1$s</string>
@@ -656,7 +658,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">지출 추이</string>
     <string name="analytics_tutorial_minmax_desc">이 카드들은 최저 및 최고 지출액을 보여줍니다. 거래 내역이 추가됨에 따라 정보가 업데이트되며, 이를 통해 특이 지출(이상치)을 파악할 수 있습니다.</string>
-    <string name="analytics_tutorial_header_title">지난 기간</string>
+    <string name="analytics_tutorial_header_title">기간 기록</string>
     <string name="analytics_tutorial_header_desc">마감한 모든 기간이 이 아이콘 안에 있습니다. 하나를 탭하면 전체 분석을 다시 열 수 있습니다. 합계는 볼 때마다 다시 계산되므로 예전 지출을 수정하면 해당 기간에 반영됩니다. 기간을 길게 누른 뒤 지문으로 확인하면 완전히 삭제됩니다.</string>
     <string name="analytics_tutorial_budget_title">예산 현황</string>
     <string name="analytics_tutorial_budget_desc">총 예산과 남은 기간을 확인하세요.</string>

@@ -581,15 +581,17 @@
     <string name="currency_selected">Selecionado</string>
     <!-- Remaining Budget Strategy -->
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">Modo dividido</string>
-    <string name="split_mode_static">Estático</string>
+    <string name="split_mode_label">Valor diário</string>
+    <string name="split_mode_static">Igual todo dia</string>
     <string name="split_mode_static_desc">O orçamento total é dividido igualmente entre todos os dias, independentemente de quanto você gasta ou se gasta.</string>
-    <string name="split_mode_dynamic">Distribuir por todos os dias</string>
+    <string name="split_mode_dynamic">Recalculado todo dia</string>
     <string name="split_mode_dynamic_desc">Calculado diariamente com base em como você gasta. O orçamento restante é distribuído pelos dias restantes do período.</string>
-    <string name="split_mode_carry_over">Acumulativo</string>
+    <string name="split_mode_carry_over">Guardado para depois</string>
     <string name="split_mode_carry_over_desc">O que você não gasta por dia é somado ao orçamento do dia seguinte e vai se acumulando.</string>
-    <string name="split_mode_ask_me">Perguntar</string>
-    <string name="split_mode_ask_me_desc">Todo dia você decide o que fazer com o orçamento não usado de ontem: distribuir pelos dias restantes ou passar para hoje.</string>
+    <string name="split_mode_ask_me">Você decide todo dia</string>
+    <string name="split_mode_ask_me_desc">Todo dia você decide o que fazer com o orçamento não usado de ontem: distribuir pelos dias restantes ou passar para hoje. O que você gastar a mais é sempre distribuído pelos dias restantes, então o valor diário diminui.</string>
+    <string name="leftover_choice_spread">Distribuir pelos dias restantes</string>
+    <string name="leftover_choice_carry">Somar tudo a hoje</string>
     <string name="leftover_choice_spread_desc">Distribua todo o orçamento restante não utilizado pelos dias que faltam.</string>
     <string name="leftover_choice_carry_desc">Mova o orçamento não utilizado apenas para amanhã.</string>
     <string name="leftover_choice_spread_outcome">%1$s para os próximos dias</string>
@@ -657,7 +659,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendências de gastos</string>
     <string name="analytics_tutorial_minmax_desc">Estes cartões mostram as suas despesas mínimas e máximas. À medida que adiciona mais transações, estas serão atualizadas para ajudar a identificar valores discrepantes.</string>
-    <string name="analytics_tutorial_header_title">Períodos anteriores</string>
+    <string name="analytics_tutorial_header_title">Histórico de períodos</string>
     <string name="analytics_tutorial_header_desc">Todos os períodos que você encerrou ficam atrás deste ícone. Toque em um para reabrir as análises completas; os totais são recalculados na hora da leitura, então editar uma despesa antiga atualiza o período a que ela pertence. Mantenha um período pressionado e confirme com sua digital para excluí-lo de vez.</string>
     <string name="analytics_tutorial_budget_title">Situação do orçamento</string>
     <string name="analytics_tutorial_budget_desc">Verifique o seu orçamento total e veja os dias no total.</string>

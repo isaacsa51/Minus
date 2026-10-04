@@ -281,7 +281,7 @@ class DailySurplusSplitModeChangeTest {
     }
 
     @Test
-    fun `yesterday's overspend follows the user in carry over and ask me, but not in static`() {
+    fun `yesterday's overspend lands whole on today in carry over, is re-sliced in ask me, and is ignored in static`() {
         val overspent = listOf(spend("150", 1))
 
         val static = stateOn(2, BudgetSplitMode.STATIC, overspent)
@@ -290,17 +290,18 @@ class DailySurplusSplitModeChangeTest {
 
         assertThat(static.remainingToday).isEqualTo(BigDecimal("100.00"))
         assertThat(carryOver.remainingToday).isEqualTo(BigDecimal("50.00"))
-        assertThat(askMe.remainingToday).isEqualTo(BigDecimal("50.00"))
+        assertThat(askMe.remainingToday).isEqualTo(BigDecimal("94.44"))
     }
 
     @Test
-    fun `switching to ask me after an overspend never parks a debt as a pending prompt, it is taken today`() {
+    fun `switching to ask me after an overspend never parks a debt as a pending prompt, the rate absorbs it`() {
         val overspent = listOf(spend("150", 1))
 
         val askMe = stateOn(2, BudgetSplitMode.ASK_ME, overspent)
 
         assertThat(askMe.pendingLeftover).isEqualTo(BigDecimal("0.00"))
-        assertThat(askMe.remainingToday).isEqualTo(BigDecimal("50.00"))
+        assertThat(askMe.remainingToday).isEqualTo(BigDecimal("94.44"))
+        assertThat(askMe.dailyBudget).isEqualTo(BigDecimal("94.44"))
     }
 
     @Test
@@ -315,15 +316,17 @@ class DailySurplusSplitModeChangeTest {
     }
 
     @Test
-    fun `a debt larger than one day keeps eating into the following days in carry over and ask me`() {
+    fun `a debt larger than one day keeps eating into the following days in carry over, ask me re-slices it once`() {
         val hugeOverspend = listOf(spend("450", 1))
 
         assertThat(stateOn(2, BudgetSplitMode.CARRY_OVER, hugeOverspend).remainingToday)
             .isEqualTo(BigDecimal("-250.00"))
-        assertThat(stateOn(2, BudgetSplitMode.ASK_ME, hugeOverspend).remainingToday)
-            .isEqualTo(BigDecimal("-250.00"))
         assertThat(stateOn(5, BudgetSplitMode.CARRY_OVER, hugeOverspend).remainingToday)
             .isEqualTo(BigDecimal("50.00"))
+        assertThat(stateOn(2, BudgetSplitMode.ASK_ME, hugeOverspend).remainingToday)
+            .isEqualTo(BigDecimal("61.11"))
+        assertThat(stateOn(5, BudgetSplitMode.ASK_ME, hugeOverspend).remainingToday)
+            .isEqualTo(BigDecimal("61.11"))
         assertThat(stateOn(2, BudgetSplitMode.STATIC, hugeOverspend).remainingToday)
             .isEqualTo(BigDecimal("100.00"))
     }

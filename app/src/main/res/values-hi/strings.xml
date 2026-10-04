@@ -578,15 +578,17 @@
     <string name="currency_selected">चुनी गई</string>
     <!-- Remaining Budget Strategy -->
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">बांटने का तरीका</string>
-    <string name="split_mode_static">स्टैटिक</string>
+    <string name="split_mode_label">रोज़ाना रकम</string>
+    <string name="split_mode_static">हर दिन एक जैसा</string>
     <string name="split_mode_static_desc">कुल बजट सभी दिनों में बराबर बांटा जाता है, चाहे आप कितना भी खर्च करें या न करें।</string>
-    <string name="split_mode_dynamic">सभी दिनों में बांटें</string>
+    <string name="split_mode_dynamic">हर दिन नया हिसाब</string>
     <string name="split_mode_dynamic_desc">आपके खर्च के हिसाब से हर दिन गणना होती है। बचा हुआ बजट अवधि के बाकी दिनों में बांट दिया जाता है।</string>
-    <string name="split_mode_carry_over">कैरी ओवर</string>
+    <string name="split_mode_carry_over">बाद के लिए जमा</string>
     <string name="split_mode_carry_over_desc">जो रकम आप रोज़ खर्च नहीं करते, वह अगले दिन के बजट में जुड़ जाती है और जमा होती रहती है।</string>
-    <string name="split_mode_ask_me">मुझसे पूछें</string>
-    <string name="split_mode_ask_me_desc">हर दिन आप तय करते हैं कि कल के बिना इस्तेमाल हुए बजट का क्या हो: बाकी दिनों में बांटें या आज में जोड़ें।</string>
+    <string name="split_mode_ask_me">हर दिन आप तय करें</string>
+    <string name="split_mode_ask_me_desc">हर दिन आप तय करते हैं कि कल के बिना इस्तेमाल हुए बजट का क्या हो: बाकी दिनों में बांटें या आज में जोड़ें। ज़्यादा खर्च हमेशा बाकी दिनों में बंट जाता है, इसलिए रोज़ाना रकम घट जाती है।</string>
+    <string name="leftover_choice_spread">बाकी दिनों में बांटें</string>
+    <string name="leftover_choice_carry">सब कुछ आज में जोड़ें</string>
     <string name="leftover_choice_spread_desc">बचे हुए पूरे बजट को आगे के सभी दिनों में बांट दें।</string>
     <string name="leftover_choice_carry_desc">बचा हुआ पूरा बजट सिर्फ़ आज में जोड़ें।</string>
     <string name="leftover_choice_spread_outcome">आगामी दिनों के लिए %1$s</string>
@@ -654,7 +656,7 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">खर्च करने के ट्रेंड</string>
     <string name="analytics_tutorial_minmax_desc">ये कार्ड आपके सबसे कम और सबसे ज़्यादा खर्च दिखाते हैं। जैसे-जैसे आप और ट्रांज़ैक्शन जोड़ेंगे, ये अपडेट होते रहेंगे ताकि आप असामान्य खर्चों (आउटलायर्स) की पहचान कर सकें।</string>
-    <string name="analytics_tutorial_header_title">पिछली अवधियां</string>
+    <string name="analytics_tutorial_header_title">अवधि का इतिहास</string>
     <string name="analytics_tutorial_header_desc">आपकी बंद की गई सभी अवधियां इस आइकॉन के पीछे हैं। पूरी एनालिटिक्स दोबारा खोलने के लिए किसी एक पर टैप करें; कुल रकम पढ़ते समय फिर से गिनी जाती है, इसलिए पुराना खर्च बदलने पर उसकी अवधि अपडेट हो जाती है। किसी अवधि को दबाए रखें और फ़िंगरप्रिंट से पुष्टि करें ताकि वह हमेशा के लिए हट जाए।</string>
     <string name="analytics_tutorial_budget_title">बजट की स्थिति</string>
     <string name="analytics_tutorial_budget_desc">अपना कुल बजट और उसके कुल दिन देखें।</string>

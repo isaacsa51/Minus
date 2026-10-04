@@ -301,36 +301,58 @@ class AskMeLeftoverChoiceTest {
     }
 
     @Test
-    fun `an overspend bigger than the waiting money comes out of today, whatever the user would have picked`() {
+    fun `an overspend bigger than the waiting money re-slices the rate, whatever the user would have picked`() {
         val spends = listOf(1 to "80", 2 to "130")
 
         val unanswered = onDay(3, spends = spends)
         val wouldHaveSpread = onDay(3, mapOf(3 to LeftoverChoice.SPREAD), spends)
 
-        assertThat(unanswered.remainingToday).isEqualTo(BigDecimal("90.00"))
+        assertThat(unanswered.remainingToday).isEqualTo(BigDecimal("98.75"))
+        assertThat(unanswered.dailyBudget).isEqualTo(BigDecimal("98.75"))
         assertThat(unanswered.pendingLeftover).isEqualTo(BigDecimal("0.00"))
-        assertThat(wouldHaveSpread.remainingToday).isEqualTo(BigDecimal("90.00"))
-        assertThat(wouldHaveSpread.dailyBudget).isEqualTo(BigDecimal("100.00"))
+        assertThat(wouldHaveSpread.remainingToday).isEqualTo(BigDecimal("98.75"))
+        assertThat(wouldHaveSpread.dailyBudget).isEqualTo(BigDecimal("98.75"))
     }
 
     @Test
-    fun `a debt that outlives one day keeps being taken from the days that follow`() {
+    fun `a debt bigger than one day is re-sliced over the days left instead of walking forward`() {
         val spends = listOf(1 to "350")
 
-        assertThat(onDay(2, spends = spends).remainingToday).isEqualTo(BigDecimal("-150.00"))
-        assertThat(onDay(3, spends = spends).remainingToday).isEqualTo(BigDecimal("-50.00"))
-        assertThat(onDay(4, spends = spends).remainingToday).isEqualTo(BigDecimal("50.00"))
-        assertThat(onDay(4, spends = spends).pendingLeftover).isEqualTo(BigDecimal("0.00"))
-    }
-
-    @Test
-    fun `no prompt is raised while the user is still paying off a debt`() {
-        val spends = listOf(1 to "350")
-
-        listOf(2, 3).forEach { dayNumber ->
-            assertThat(onDay(dayNumber, spends = spends).pendingLeftover)
-                .isEqualTo(BigDecimal("0.00"))
+        listOf(2, 3, 4).forEach { dayNumber ->
+            assertThat(onDay(dayNumber, spends = spends).dailyBudget).isEqualTo(BigDecimal("72.22"))
+            assertThat(onDay(dayNumber, spends = spends).remainingToday).isEqualTo(BigDecimal("72.22"))
         }
+    }
+
+    @Test
+    fun `a debt is never raised as a prompt, only the reduced allowance it leaves behind is`() {
+        val spends = listOf(1 to "350")
+
+        assertThat(onDay(2, spends = spends).pendingLeftover).isEqualTo(BigDecimal("0.00"))
+        assertThat(onDay(3, spends = spends).pendingLeftover).isEqualTo(BigDecimal("72.22"))
+        assertThat(onDay(4, spends = spends).pendingLeftover).isEqualTo(BigDecimal("144.44"))
+    }
+
+    @Test
+    fun `the reported case - an overspend re-slices the rate, then the unused day is the user's call`() {
+        val hundredOverTen = askMeSettings(totalBudget = BigDecimal("100"))
+        fun dayThree(choice: LeftoverChoice?) = onDay(
+            currentDay = 3,
+            choices = choice?.let { mapOf(3 to it) } ?: emptyMap(),
+            spends = listOf(1 to "20"),
+            settings = hundredOverTen,
+        )
+
+        assertThat(onDay(1, spends = listOf(1 to "20"), settings = hundredOverTen).dailyBudget)
+            .isEqualTo(BigDecimal("10.00"))
+
+        val dayTwo = onDay(2, spends = listOf(1 to "20"), settings = hundredOverTen)
+        assertThat(dayTwo.dailyBudget).isEqualTo(BigDecimal("8.89"))
+        assertThat(dayTwo.remainingToday).isEqualTo(BigDecimal("8.89"))
+
+        assertThat(dayThree(null).pendingLeftover).isEqualTo(BigDecimal("8.89"))
+        assertThat(dayThree(LeftoverChoice.CARRY).remainingToday).isEqualTo(BigDecimal("17.78"))
+        assertThat(dayThree(LeftoverChoice.SPREAD).dailyBudget).isEqualTo(BigDecimal("10.00"))
     }
 
     @Test
