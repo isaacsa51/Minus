@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":app:connectedFossDebugAndroidTest" />
+          <option value=":app:connectedFossBetaAndroidTest" />
           <option value=":app:verifyPaparazziFossDebug" />
         </list>
       </option>

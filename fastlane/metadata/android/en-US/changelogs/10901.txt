@@ -1,0 +1,9 @@
+- refactor: rebalance overspend over remaining days in ask me budget mode
+- feat: animate logo on splash
+- chore: enhance tutorial hints (#280)
+- chore: update rollover and recurrent expense dialogs
+- fix: same budget dates carries to new period (#275)
+- chore: added missing string value locales
+- refactor: remove exact period start time constraints for recurring charges
+- fix: prevent expense leakage across period boundaries
+- feat: add predictive back navigation and beta build variants
