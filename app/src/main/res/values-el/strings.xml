@@ -189,9 +189,9 @@
     <string name="budget_pill_label_weekly_exceeded">Υπέρβαση εβδομαδιαίας ποσότητας</string>
     <string name="budget_pill_label_biweekly_exceeded">Υπέρβαση δεκαεξαδικής εβδομάδας</string>
     <string name="budget_pill_label_monthly_exceeded">Υπέρβαση μηνιαίου ποσού</string>
-    <string name="budget_pill_sub_exceeded_single">Ποσό %1$s υπέρβαση</string>
-    <string name="budget_pill_sub_exceeded_double">%1$s και %2$s ποσό υπέρβαση</string>
-    <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s και %3$s ποσό υπέρβαση</string>
+    <string name="budget_pill_sub_exceeded_single">Ξεπεράστηκε ο %1$s προϋπολογισμός</string>
+    <string name="budget_pill_sub_exceeded_double">Ξεπεράστηκαν οι %1$s και %2$s προϋπολογισμοί</string>
+    <string name="budget_pill_sub_exceeded_triple">Ξεπεράστηκαν οι %1$s, %2$s και %3$s προϋπολογισμοί</string>
     <string name="budget_formula_title">Πώς υπολογίζεται</string>
     <string name="budget_formula_hold_hint">Εμφάνιση του τρόπου υπολογισμού του ποσού</string>
     <string name="budget_formula_caption_surplus_split">Το πλεόνασμα της προηγούμενης περιόδου προστίθεται στον προϋπολογισμό</string>
@@ -428,12 +428,12 @@
     <string name="budget_pill_over_budget">Υπέρβαση του προϋπολογισμού</string>
     <string name="budget_pill_no_budget">Χωρίς προϋπολογισμό</string>
     <string name="budget_pill_no_budget_action">Δημιουργήστε τον προϋπολογισμό σας</string>
-    <string name="budget_pill_exhausted_daily_label">Καθημερινά</string>
-    <string name="budget_pill_exhausted_weekly_label">Εβδομαδιαία</string>
-    <string name="budget_pill_exhausted_biweekly_label">Ανά δύο εβδομάδες</string>
-    <string name="budget_pill_exhausted_single">Ο προϋπολογισμός %1$s δαπανήθηκε</string>
-    <string name="budget_pill_exhausted_double">Ο προϋπολογισμός %1$s και %2$s δαπανήθηκε</string>
-    <string name="budget_pill_exhausted_triple">%1$s, %2$s και %3$s προϋπολογισμός δαπανημένος</string>
+    <string name="budget_pill_exhausted_daily_label">ημερήσιος</string>
+    <string name="budget_pill_exhausted_weekly_label">εβδομαδιαίος</string>
+    <string name="budget_pill_exhausted_biweekly_label">δεκαπενθήμερος</string>
+    <string name="budget_pill_exhausted_single">Εξαντλήθηκε ο %1$s προϋπολογισμός</string>
+    <string name="budget_pill_exhausted_double">Εξαντλήθηκαν οι %1$s και %2$s προϋπολογισμοί</string>
+    <string name="budget_pill_exhausted_triple">Εξαντλήθηκαν οι %1$s, %2$s και %3$s προϋπολογισμοί</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">Δαπανήθηκε</string>
     <string name="spend_budget_card_available_percent_format">Διαθέσιμο: %1$s%%</string>

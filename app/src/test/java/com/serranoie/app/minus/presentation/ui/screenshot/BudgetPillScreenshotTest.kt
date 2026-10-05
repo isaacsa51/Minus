@@ -413,3 +413,50 @@ class BudgetPillScreenshotTest {
         paparazzi.gif(view, start = 1, end = 3_800)
     }
 }
+
+class BudgetPillSpanishScreenshotTest {
+    @get:Rule
+    val paparazzi = Paparazzi(
+        deviceConfig = DeviceConfig.PIXEL_5.copy(locale = "es"),
+        renderingMode = SessionParams.RenderingMode.SHRINK,
+        maxPercentDifference = 0.1,
+    )
+
+    @Test
+    fun budgetPillBiweeklyKeepsAmountWhenDailyAndWeeklyExhausted() {
+        Locale.setDefault(Locale.forLanguageTag("es-MX"))
+        paparazzi.snapshot {
+            MinusTheme {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    BudgetPill(
+                        budgetState = BudgetState(
+                            remainingToday = BigDecimal("0.00"),
+                            totalSpentToday = BigDecimal("100.00"),
+                            dailyBudget = BigDecimal("100.00"),
+                            daysRemaining = 7,
+                            progress = 0.5f,
+                            isOverBudget = false,
+                            totalBudget = BigDecimal("2000.00"),
+                            totalSpentInPeriod = BigDecimal("700.00"),
+                            totalSpentThisWeek = BigDecimal("700.00"),
+                            totalSpentThisBiweek = BigDecimal("700.00"),
+                            periodTotalDays = 14,
+                        ),
+                        budgetSettings = BudgetSettings(
+                            totalBudget = BigDecimal("2000.00"),
+                            period = BudgetPeriod.BIWEEKLY,
+                            startDate = LocalDate.now(),
+                            currencyCode = "MXN",
+                        ),
+                        viewPeriod = BudgetPeriod.BIWEEKLY,
+                        currencyCode = "MXN",
+                        onOpenBudgetSheet = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                    )
+                }
+            }
+        }
+    }
+}
