@@ -85,6 +85,13 @@ fun HistoryScreen(
         }
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.processIntent(HistoryUiIntent.SetEditingTransaction(null))
+            viewModel.processIntent(HistoryUiIntent.SetRecurrentToEdit(null))
+        }
+    }
+
     SharedTransitionLayout {
         AnimatedVisibility(visible = true) {
             History(

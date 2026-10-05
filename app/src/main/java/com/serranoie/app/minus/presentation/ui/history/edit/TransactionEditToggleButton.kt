@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CreditCard
@@ -36,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 
 /** Fixed size so the [ToggleButtonDefaults.checkedShape] override renders as an exact circle. */
-private val ToggleButtonSize = 40.dp
+private val ToggleButtonSize = 50.dp
 
 private val ToggleButtonOuterCorner = ToggleButtonSize / 2
 
@@ -67,7 +66,7 @@ private fun restShapeFor(position: TransactionEditTogglePosition): RoundedCorner
         )
     }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun TransactionEditToggleButton(
     checked: Boolean,
@@ -98,7 +97,7 @@ internal fun TransactionEditToggleButton(
             shapes = ToggleButtonShapes(
                 shape = restShape,
                 pressedShape = restShape,
-                checkedShape = CircleShape,
+                checkedShape = RoundedCornerShape(ToggleButtonOuterCorner),
             ),
             colors = ToggleButtonDefaults.toggleButtonColors(
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
@@ -106,7 +105,7 @@ internal fun TransactionEditToggleButton(
                 contentColor = MaterialTheme.colorScheme.tertiary,
                 checkedContentColor = MaterialTheme.colorScheme.onTertiary,
             ),
-            contentPadding = PaddingValues(0.dp),
+            contentPadding = PaddingValues(4.dp),
             modifier = modifier
                 .size(ToggleButtonSize)
                 .semantics { role = Role.RadioButton },

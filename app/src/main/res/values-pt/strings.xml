@@ -74,6 +74,7 @@
     <string name="edit_recurrent_expense_title">Editar despesa recorrente</string>
     <string name="edit_expense_title">Editar despesa</string>
     <string name="cancel_edit_content_desc">Cancelar edição</string>
+    <string name="tap_to_exit_edit_transaction">Toque para sair</string>
     <string name="configure_recurrence">Configurar recorrência</string>
     <string name="make_recurrent">Fazer recorrente</string>
     <string name="select_time">Selecionar horário</string>

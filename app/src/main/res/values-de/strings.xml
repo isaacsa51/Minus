@@ -74,6 +74,7 @@
     <string name="edit_recurrent_expense_title">Wiederkehrende Ausgaben bearbeiten</string>
     <string name="edit_expense_title">Ausgabe bearbeiten</string>
     <string name="cancel_edit_content_desc">Bearbeitung abbrechen</string>
+    <string name="tap_to_exit_edit_transaction">Zum Beenden tippen</string>
     <string name="configure_recurrence">Wiederholung konfigurieren</string>
     <string name="make_recurrent">Wiederholend</string>
     <string name="select_time">Zeit auswählen</string>

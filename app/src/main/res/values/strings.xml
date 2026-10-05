@@ -94,6 +94,7 @@
     <string name="edit_recurrent_expense_title">Edit recurrent expense</string>
     <string name="edit_expense_title">Edit expense</string>
     <string name="cancel_edit_content_desc">Cancel edit</string>
+    <string name="tap_to_exit_edit_transaction">Tap to exit</string>
     <string name="configure_recurrence">Configure recurrence</string>
     <string name="make_recurrent">Make recurrent</string>
     <string name="select_time">Select time</string>

@@ -74,6 +74,7 @@
     <string name="edit_recurrent_expense_title">Редактиране на повтарящ се разход</string>
     <string name="edit_expense_title">Редактиране на разход</string>
     <string name="cancel_edit_content_desc">Отказ от редакция</string>
+    <string name="tap_to_exit_edit_transaction">Докоснете за изход</string>
     <string name="configure_recurrence">Настройка на повторението</string>
     <string name="make_recurrent">Направи повтарящ се</string>
     <string name="select_time">Избери час</string>

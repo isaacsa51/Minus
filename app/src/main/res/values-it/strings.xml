@@ -74,6 +74,7 @@
     <string name="edit_recurrent_expense_title">Modifica spesa ricorrente</string>
     <string name="edit_expense_title">Modifica spesa</string>
     <string name="cancel_edit_content_desc">Annulla modifica</string>
+    <string name="tap_to_exit_edit_transaction">Tocca per uscire</string>
     <string name="configure_recurrence">Configura ricorrenza</string>
     <string name="make_recurrent">Rendi ricorrente</string>
     <string name="select_time">Seleziona ora</string>

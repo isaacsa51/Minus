@@ -263,8 +263,9 @@ class HistoryScreenE2ETest {
 
         composeTestRule.mainClock.advanceTimeBy(500)
 
-        val editTitle = composeTestRule.activity.getString(R.string.edit_expense_title)
-        composeTestRule.onNodeWithText(editTitle).assertIsDisplayed()
+        val exitPillLabel =
+            composeTestRule.activity.getString(R.string.tap_to_exit_edit_transaction)
+        composeTestRule.onNodeWithText(exitPillLabel).assertIsDisplayed()
 
         composeTestRule.onAllNodesWithText("Coffee").onLast().assertIsDisplayed()
     }
@@ -368,8 +369,9 @@ class HistoryScreenE2ETest {
 
         composeTestRule.waitForIdle()
 
-        val editTitle = composeTestRule.activity.getString(R.string.edit_expense_title)
-        composeTestRule.onNodeWithText(editTitle, substring = true).assertIsDisplayed()
+        val exitPillLabel =
+            composeTestRule.activity.getString(R.string.tap_to_exit_edit_transaction)
+        composeTestRule.onNodeWithText(exitPillLabel, substring = true).assertIsDisplayed()
         composeTestRule.onAllNodesWithText("Coffee").onLast().assertIsDisplayed()
     }
 
