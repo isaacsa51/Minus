@@ -66,6 +66,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -81,6 +82,7 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performStrongHaptic
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -108,6 +110,7 @@ fun EditableCategoryTag(
     val focusManager = LocalFocusManager.current
     val localDensity = LocalDensity.current
     val scope = rememberCoroutineScope()
+    val view = LocalView.current
     val context = LocalContext.current
     val categoryPrefs = remember(context) {
         context.getSharedPreferences("editable_category_tag_prefs", Context.MODE_PRIVATE)
@@ -168,6 +171,7 @@ fun EditableCategoryTag(
                         Modifier
                     } else {
                         Modifier.clickable {
+                            performStrongHaptic(view)
                             if (categoryGridModeEnabled) {
                                 // First: ensure calc mode is off so the grid has full height.
                                 if (isCalculation) {

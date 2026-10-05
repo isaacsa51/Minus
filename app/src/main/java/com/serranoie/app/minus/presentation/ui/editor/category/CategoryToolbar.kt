@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -71,6 +72,7 @@ import androidx.compose.ui.window.PopupPositionProvider
 import com.serranoie.app.minus.presentation.ui.editor.note.EditableNoteTag
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performConfirmHaptic
 
 class FocusController {
     var onFocus: MutableState<(() -> Unit)?> = mutableStateOf(null)
@@ -318,6 +320,7 @@ fun CommentEditor(
     val keyboardController = LocalSoftwareKeyboardController.current
     val configuration = LocalConfiguration.current
     val hasHardKeyboard = configuration.keyboard == Configuration.KEYBOARD_QWERTY
+    val view = LocalView.current
 
     TextField(
         modifier = modifier
@@ -351,7 +354,10 @@ fun CommentEditor(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ),
-                onClick = { onApply() },
+                onClick = {
+                    performConfirmHaptic(view)
+                    onApply()
+                },
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -366,7 +372,10 @@ fun CommentEditor(
             imeAction = ImeAction.Done,
         ),
         keyboardActions = KeyboardActions(
-            onDone = { onApply() }
+            onDone = {
+                performConfirmHaptic(view)
+                onApply()
+            }
         ),
         shape = RoundedCornerShape(24.dp),
         colors = TextFieldDefaults.colors(

@@ -32,12 +32,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performConfirmHaptic
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performStrongHaptic
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -45,6 +48,7 @@ fun CategoryTag(
     value: String, onClick: () -> Unit, onDelete: () -> Unit, modifier: Modifier = Modifier
 ) {
     var showDeleteButton by remember { mutableStateOf(false) }
+    val view = LocalView.current
 
     Surface(
         shape = CircleShape,
@@ -53,12 +57,14 @@ fun CategoryTag(
         modifier = modifier
             .clip(CircleShape)
             .combinedClickable(onClick = {
+                performConfirmHaptic(view)
                 if (showDeleteButton) {
                     showDeleteButton = false
                 } else {
                     onClick()
                 }
             }, onLongClick = {
+                performStrongHaptic(view)
                 showDeleteButton = true
             })
     ) {

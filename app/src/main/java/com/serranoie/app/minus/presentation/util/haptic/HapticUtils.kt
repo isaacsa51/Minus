@@ -52,6 +52,20 @@ object HapticUtil {
         view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
     }
 
+    fun performStrongHaptic(view: View) {
+        if (!isAppHapticsEnabled.value) return
+        view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+    }
+
+    fun performConfirmHaptic(view: View) {
+        if (!isAppHapticsEnabled.value) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        } else {
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        }
+    }
+
     fun performSliderHaptic(view: View) {
         if (!isAppHapticsEnabled.value) return
         if (Build.VERSION.SDK_INT >= 34) {
