@@ -432,6 +432,9 @@
     <string name="budget_pill_exhausted_daily_label">毎日</string>
     <string name="budget_pill_exhausted_weekly_label">週単位</string>
     <string name="budget_pill_exhausted_biweekly_label">隔週</string>
+    <string name="budget_pill_exhausted_daily_label_plural">毎日</string>
+    <string name="budget_pill_exhausted_weekly_label_plural">週単位</string>
+    <string name="budget_pill_exhausted_biweekly_label_plural">隔週</string>
     <string name="budget_pill_exhausted_single">%1$s の予算を使い切りました</string>
     <string name="budget_pill_exhausted_double">%1$s と %2$s の予算を使い切りました</string>
     <string name="budget_pill_exhausted_triple">%1$s、 %2$s 、 %3$s の予算を使い切りました</string>
