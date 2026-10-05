@@ -142,16 +142,7 @@ internal fun BudgetBehaviourContent(
                 selected = splitMode,
                 onSelect = onSplitModeSelected,
                 optionTag = ::budgetSplitModeOptionTag,
-                optionTitle = { option ->
-                    stringResource(
-                        when (option) {
-                            BudgetSplitMode.STATIC -> R.string.split_mode_static
-                            BudgetSplitMode.DYNAMIC -> R.string.split_mode_dynamic
-                            BudgetSplitMode.CARRY_OVER -> R.string.split_mode_carry_over
-                            BudgetSplitMode.ASK_ME -> R.string.split_mode_ask_me
-                        }
-                    )
-                },
+                optionTitle = { option -> stringResource(option.labelRes()) },
                 optionDescription = { option ->
                     stringResource(
                         when (option) {
@@ -452,6 +443,13 @@ private class SheetScrollGuard(
         get() = overscroll?.isInProgress == true
 
     override val node: DelegatableNode = overscroll?.node ?: object : Modifier.Node() {}
+}
+
+internal fun BudgetSplitMode.labelRes(): Int = when (this) {
+    BudgetSplitMode.STATIC -> R.string.split_mode_static
+    BudgetSplitMode.DYNAMIC -> R.string.split_mode_dynamic
+    BudgetSplitMode.CARRY_OVER -> R.string.split_mode_carry_over
+    BudgetSplitMode.ASK_ME -> R.string.split_mode_ask_me
 }
 
 @PreviewLightDark

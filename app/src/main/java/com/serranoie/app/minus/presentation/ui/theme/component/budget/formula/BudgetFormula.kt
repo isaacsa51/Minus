@@ -37,8 +37,16 @@ internal enum class FormulaCaption {
     SPREAD_LEFTOVER,
 }
 
+internal enum class FormulaLabel {
+    BUDGET,
+    CARRIED,
+    RECURRING,
+    REBALANCED,
+    SPENT,
+}
+
 internal sealed interface FormulaTerm {
-    data class Amount(val value: BigDecimal) : FormulaTerm
+    data class Amount(val value: BigDecimal, val label: FormulaLabel? = null) : FormulaTerm
     data class Count(val n: Int, val unit: BudgetPeriod) : FormulaTerm
     data class Fraction(val numerator: BigDecimal, val denominator: Count) : FormulaTerm
     data class Op(val symbol: String) : FormulaTerm
@@ -60,6 +68,7 @@ internal fun buildBudgetFormula(request: BudgetFormulaRequest): List<FormulaRow>
     val surplus = settings?.rollOverLimit?.takeIf { it.signum() == 1 } ?: BigDecimal.ZERO
     val total = settings?.totalBudget ?: state.totalBudget
     val base = total.subtract(surplus)
+    var spentTerms = listOf(FormulaTerm.Op("−"), FormulaTerm.Amount(metrics.periodSpent, FormulaLabel.SPENT))
 
     when (request.splitMode) {
         BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER, BudgetSplitMode.ASK_ME -> {
@@ -114,6 +123,18 @@ internal fun buildBudgetFormula(request: BudgetFormulaRequest): List<FormulaRow>
                 )
                 add(FormulaRow(FormulaCaption.PER_PERIOD, terms, metrics.periodBudget))
             }
+            val blockEnd = settings?.getPeriodEndDate()?.minusDays(
+                blockWindow(state.periodTotalDays, state.daysRemaining, period.toDays()).daysAfter.toLong()
+            )
+            val reserved = state.reservedCharges.filter { charge ->
+                blockEnd != null && charge.date?.toLocalDate()?.isAfter(blockEnd) == false
+            }
+            if (reserved.isNotEmpty()) {
+                val reservedTotal = reserved.sumOf { it.amount }
+                add(FormulaRow(FormulaCaption.RESERVED, chargeTerms(reserved), reservedTotal))
+                spentTerms = signed(metrics.periodSpent.subtract(reservedTotal).negate(), FormulaLabel.SPENT) +
+                        listOf(FormulaTerm.Op("−"), FormulaTerm.Amount(reservedTotal, FormulaLabel.RECURRING))
+            }
         }
 
         BudgetSplitMode.DYNAMIC -> {
@@ -139,13 +160,7 @@ internal fun buildBudgetFormula(request: BudgetFormulaRequest): List<FormulaRow>
             }
             val reservedTotal = reserved.sumOf { it.amount }
             if (reserved.isNotEmpty()) {
-                val terms = reserved.flatMapIndexed { index, charge ->
-                    listOfNotNull(
-                        FormulaTerm.Op("+").takeIf { index > 0 },
-                        FormulaTerm.Charge(charge)
-                    )
-                }
-                add(FormulaRow(FormulaCaption.RESERVED, terms, reservedTotal))
+                add(FormulaRow(FormulaCaption.RESERVED, chargeTerms(reserved), reservedTotal))
             }
             val spentBeforeBlock = metrics.spentInPeriod.subtract(metrics.periodSpent)
             val pool = state.totalBudget.subtract(spentBeforeBlock)
@@ -177,7 +192,7 @@ internal fun buildBudgetFormula(request: BudgetFormulaRequest): List<FormulaRow>
         add(
             FormulaRow(
                 FormulaCaption.LEFT,
-                amountOp(metrics.periodBudget, "−", metrics.periodSpent),
+                listOf(FormulaTerm.Amount(metrics.periodBudget, FormulaLabel.BUDGET)) + spentTerms,
                 metrics.periodBudget.subtract(metrics.periodSpent),
             )
         )
@@ -224,27 +239,50 @@ private fun MutableList<FormulaRow>.addCarryOverRows(
         )
         add(FormulaRow(FormulaCaption.PER_PERIOD, terms, allowance))
     }
+    val reservedTotal = state.reservedCharges.sumOf { it.amount }
+    if (state.reservedCharges.isNotEmpty()) {
+        add(FormulaRow(FormulaCaption.RESERVED, chargeTerms(state.reservedCharges), reservedTotal))
+    }
     val carried = metrics.periodBudget.subtract(allowance)
-    val budgetTerms = if (carried.signum() != 0 && metrics.periodBudget.signum() >= 0) {
-        add(FormulaRow(FormulaCaption.CARRIED, listOf(FormulaTerm.Amount(allowance)) + signed(carried), metrics.periodBudget))
-        listOf(FormulaTerm.Amount(metrics.periodBudget))
+    val carriedTerms = signed(carried.add(reservedTotal), FormulaLabel.CARRIED) + if (reservedTotal.signum() == 0) {
+        emptyList()
     } else {
-        listOf(FormulaTerm.Amount(allowance)) + signed(carried)
+        listOf(FormulaTerm.Op("−"), FormulaTerm.Amount(reservedTotal, FormulaLabel.RECURRING))
+    }
+    val allowanceTerm = listOf(FormulaTerm.Amount(allowance, FormulaLabel.BUDGET))
+    val budgetTerms = if (carriedTerms.isNotEmpty() && metrics.periodBudget.signum() >= 0) {
+        add(FormulaRow(FormulaCaption.CARRIED, allowanceTerm + carriedTerms, metrics.periodBudget))
+        listOf(FormulaTerm.Amount(metrics.periodBudget, FormulaLabel.BUDGET))
+    } else {
+        allowanceTerm + carriedTerms
     }
     val next = metrics.nextPeriodAllocation
     if (next == null) {
-        val terms = budgetTerms + listOf(FormulaTerm.Op("−"), FormulaTerm.Amount(metrics.periodSpent))
+        val terms = budgetTerms + spentTerm(metrics.periodSpent)
         add(FormulaRow(FormulaCaption.LEFT, terms, metrics.periodRemaining))
     } else {
-        val terms = budgetTerms + signed(next.subtract(metrics.periodRemaining)) + signed(metrics.periodSpent.negate())
+        val terms = budgetTerms +
+                signed(next.subtract(metrics.periodRemaining), FormulaLabel.REBALANCED) +
+                spentTerm(metrics.periodSpent)
         add(FormulaRow(FormulaCaption.NEXT_BLOCK, terms, next))
     }
 }
 
-private fun signed(value: BigDecimal): List<FormulaTerm> = when (value.signum()) {
+private fun chargeTerms(charges: List<Transaction>): List<FormulaTerm> =
+    charges.flatMapIndexed { index, charge ->
+        listOfNotNull(FormulaTerm.Op("+").takeIf { index > 0 }, FormulaTerm.Charge(charge))
+    }
+
+private fun spentTerm(spent: BigDecimal): List<FormulaTerm> = if (spent.signum() == 0) {
+    listOf(FormulaTerm.Op("−"), FormulaTerm.Amount(spent, FormulaLabel.SPENT))
+} else {
+    signed(spent.negate(), FormulaLabel.SPENT)
+}
+
+private fun signed(value: BigDecimal, label: FormulaLabel? = null): List<FormulaTerm> = when (value.signum()) {
     0 -> emptyList()
-    1 -> listOf(FormulaTerm.Op("+"), FormulaTerm.Amount(value))
-    else -> listOf(FormulaTerm.Op("−"), FormulaTerm.Amount(value.abs()))
+    1 -> listOf(FormulaTerm.Op("+"), FormulaTerm.Amount(value, label))
+    else -> listOf(FormulaTerm.Op("−"), FormulaTerm.Amount(value.abs(), label))
 }
 
 private fun amountOp(left: BigDecimal, op: String, right: BigDecimal): List<FormulaTerm> =

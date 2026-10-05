@@ -102,10 +102,10 @@ fun WavyDivider(
  * @param color The color of the wave line
  */
 @Composable
-private fun WavyLine(
+fun WavyLine(
     modifier: Modifier = Modifier,
-    amplitude: Float = 8f,
-    wavelength: Float = 20f,
+    amplitude: Float = 2f,
+    wavelength: Float = 30f,
     strokeWidth: Float = 3f,
     color: Color,
 ) {

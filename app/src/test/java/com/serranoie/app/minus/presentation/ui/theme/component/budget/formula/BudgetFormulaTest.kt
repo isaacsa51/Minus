@@ -159,6 +159,94 @@ class BudgetFormulaTest {
         }
     }
 
+    @Test
+    fun `static splits the charges inside the block out of what you have spent`() {
+        val inBlock = Transaction(amount = BigDecimal("30.00"), comment = "Gym", date = LocalDate.of(2026, 9, 14).atStartOfDay())
+        val afterBlock = Transaction(amount = BigDecimal("15.00"), comment = "Netflix", date = LocalDate.of(2026, 9, 25).atStartOfDay())
+        val reserved = state.copy(
+            totalSpentThisWeek = BigDecimal("180.00"),
+            reservedCharges = listOf(inBlock, afterBlock),
+        )
+        val metrics = calculateBudgetMetrics(reserved, BudgetPeriod.WEEKLY, BudgetSplitMode.STATIC)
+        val rows = buildBudgetFormula(request(BudgetSplitMode.STATIC).copy(budgetState = reserved))
+
+        val reservedRow = rows.single { it.caption == FormulaCaption.RESERVED }
+        assertThat(reservedRow.terms.filterIsInstance<FormulaTerm.Charge>().map { it.transaction.comment })
+            .containsExactly("Gym")
+        assertThat(reservedRow.result.compareTo(BigDecimal("30.00"))).isEqualTo(0)
+        val left = rows.last()
+        assertThat(left.caption).isEqualTo(FormulaCaption.LEFT)
+        assertThat(left.terms.filterIsInstance<FormulaTerm.Amount>().map { it.value })
+            .containsAtLeast(BigDecimal("150.00"), BigDecimal("30.00"))
+        rows.forEach { assertThat(evaluate(it).compareTo(it.result)).isEqualTo(0) }
+        assertThat(left.result.compareTo(metrics.periodRemaining)).isEqualTo(0)
+    }
+
+    @Test
+    fun `static daily never claims a future charge is already spent`() {
+        val reserved = state.copy(
+            reservedCharges = listOf(
+                Transaction(amount = BigDecimal("15.00"), comment = "Netflix", date = LocalDate.of(2026, 9, 25).atStartOfDay())
+            ),
+        )
+        val rows = buildBudgetFormula(
+            request(BudgetSplitMode.STATIC).copy(budgetState = reserved, viewPeriod = BudgetPeriod.DAILY)
+        )
+
+        assertThat(rows.none { it.caption == FormulaCaption.RESERVED }).isTrue()
+        rows.forEach { assertThat(evaluate(it).compareTo(it.result)).isEqualTo(0) }
+    }
+
+    @Test
+    fun `carry over lists the reserved charges instead of burying them in what was carried`() {
+        val reserved = listOf(
+            Transaction(amount = BigDecimal("4152.00"), comment = "terreno", date = LocalDate.of(2026, 10, 5).atStartOfDay()),
+            Transaction(amount = BigDecimal("400.00"), comment = "gym", date = LocalDate.of(2026, 10, 11).atStartOfDay()),
+        )
+        val carryState = BudgetState(
+            remainingToday = BigDecimal("-3986.64"),
+            totalSpentToday = BigDecimal.ZERO,
+            dailyBudget = BigDecimal("535.13"),
+            daysRemaining = 12,
+            progress = 1f,
+            isOverBudget = false,
+            totalBudget = BigDecimal("8027.00"),
+            totalSpentInPeriod = BigDecimal("6127.17"),
+            totalSpentThisWeek = BigDecimal("6127.17"),
+            periodTotalDays = 15,
+            reservedCharges = reserved,
+            splitBudget = BigDecimal("8027.00"),
+        )
+        val metrics = calculateBudgetMetrics(carryState, BudgetPeriod.DAILY, BudgetSplitMode.CARRY_OVER)
+        val rows = buildBudgetFormula(
+            BudgetFormulaRequest(
+                budgetState = carryState,
+                budgetSettings = BudgetSettings(
+                    totalBudget = BigDecimal("8027.00"),
+                    period = BudgetPeriod.BIWEEKLY,
+                    startDate = LocalDate.of(2026, 10, 1),
+                ),
+                viewPeriod = BudgetPeriod.DAILY,
+                splitMode = BudgetSplitMode.CARRY_OVER,
+                currencyCode = "MXN",
+            )
+        )
+
+        assertThat(rows.map { it.caption }).containsExactly(
+            FormulaCaption.PER_DAY,
+            FormulaCaption.RESERVED,
+            FormulaCaption.LEFT,
+        ).inOrder()
+        val reservedRow = rows.single { it.caption == FormulaCaption.RESERVED }
+        assertThat(reservedRow.terms.filterIsInstance<FormulaTerm.Charge>().map { it.transaction.comment })
+            .containsExactly("terreno", "gym").inOrder()
+        assertThat(reservedRow.result.compareTo(BigDecimal("4552.00"))).isEqualTo(0)
+        assertThat(rows.last().terms.filterIsInstance<FormulaTerm.Amount>().map { it.value })
+            .contains(BigDecimal("4552.00"))
+        rows.forEach { assertThat(evaluate(it).compareTo(it.result)).isEqualTo(0) }
+        assertThat(rows.last().result.compareTo(metrics.periodRemaining)).isEqualTo(0)
+    }
+
     private fun request(splitMode: BudgetSplitMode) = BudgetFormulaRequest(
         budgetState = state,
         budgetSettings = settings,

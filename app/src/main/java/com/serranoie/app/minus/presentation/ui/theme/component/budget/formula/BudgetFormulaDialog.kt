@@ -1,7 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget.formula
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.fadeIn
@@ -27,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -42,26 +40,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
 import com.serranoie.app.minus.R
-import com.serranoie.app.minus.navigation.predictiveDismiss
-import com.serranoie.app.minus.navigation.rememberPredictiveDismiss
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
+import com.serranoie.app.minus.navigation.predictiveDismiss
+import com.serranoie.app.minus.navigation.rememberPredictiveDismiss
+import com.serranoie.app.minus.presentation.ui.editor.sheets.labelRes
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
@@ -71,7 +71,6 @@ import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.LocalDate
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Stable
 class BudgetFormulaHostState internal constructor(
     internal val sharedTransitionScope: SharedTransitionScope,
@@ -98,7 +97,6 @@ class BudgetFormulaHostState internal constructor(
 
 val LocalBudgetFormulaHost = compositionLocalOf<BudgetFormulaHostState?> { null }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun BudgetFormulaHost(content: @Composable () -> Unit) {
     SharedTransitionLayout {
@@ -112,7 +110,6 @@ fun BudgetFormulaHost(content: @Composable () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun BudgetFormulaSource(
     key: String,
@@ -149,12 +146,19 @@ fun BudgetFormulaSource(
     }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedTransitionScope.BudgetFormulaOverlay(host: BudgetFormulaHostState, modifier: Modifier) {
+private fun SharedTransitionScope.BudgetFormulaOverlay(
+    host: BudgetFormulaHostState,
+    modifier: Modifier
+) {
     val dismiss = rememberPredictiveDismiss(enabled = host.shown) { host.dismiss() }
 
-    AnimatedVisibility(visible = host.shown, modifier = modifier, enter = fadeIn(), exit = fadeOut()) {
+    AnimatedVisibility(
+        visible = host.shown,
+        modifier = modifier,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
         val request = host.request ?: return@AnimatedVisibility
         val sourceKey = host.sourceKey ?: return@AnimatedVisibility
         Box(
@@ -193,20 +197,13 @@ private fun SharedTransitionScope.BudgetFormulaOverlay(host: BudgetFormulaHostSt
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BudgetFormulaContent(request: BudgetFormulaRequest, modifier: Modifier = Modifier) {
     val rows = remember(request) { buildBudgetFormula(request) }
-    val currencyFormat = remember(request.currencyCode) { symbolOnlyCurrencyFormat(request.currencyCode) }
+    val currencyFormat =
+        remember(request.currencyCode) { symbolOnlyCurrencyFormat(request.currencyCode) }
     val periodName = stringResource(request.viewPeriod.nameRes())
-    val modeName = stringResource(
-        when (request.splitMode) {
-            BudgetSplitMode.STATIC -> R.string.budget_formula_mode_static
-            BudgetSplitMode.DYNAMIC -> R.string.budget_formula_mode_dynamic
-            BudgetSplitMode.CARRY_OVER -> R.string.budget_formula_mode_carry_over
-            BudgetSplitMode.ASK_ME -> R.string.budget_formula_mode_ask_me
-        }
-    )
+    val modeName = stringResource(request.splitMode.labelRes())
 
     Column(
         modifier = modifier
@@ -226,20 +223,29 @@ fun BudgetFormulaContent(request: BudgetFormulaRequest, modifier: Modifier = Mod
             textAlign = TextAlign.Center,
         )
         rows.forEachIndexed { index, row ->
-            Spacer(modifier = Modifier.height(if (index == 0) 16.dp else 12.dp))
+            val isResult = index == rows.lastIndex
+            if (index == 0) {
+                Spacer(modifier = Modifier.height(16.dp))
+            } else {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                )
+            }
             Text(
                 text = row.captionText(periodName, request.viewPeriod),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
-            FormulaRowView(row, currencyFormat, highlightResult = index == rows.lastIndex)
+            Spacer(modifier = Modifier.height(4.dp))
+            FormulaRowView(row, currencyFormat, highlightResult = isResult)
         }
         request.tip?.let { tip ->
             Spacer(modifier = Modifier.height(20.dp))
             Text(
                 text = tip,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelSmallCondensed,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
@@ -248,14 +254,20 @@ fun BudgetFormulaContent(request: BudgetFormulaRequest, modifier: Modifier = Mod
 }
 
 @Composable
-private fun FormulaRowView(row: FormulaRow, currencyFormat: NumberFormat, highlightResult: Boolean) {
-    val style = MaterialTheme.typography.titleMediumCondensed.copy(
-        fontWeight = FontWeight.Bold,
-        fontFeatureSettings = "tnum",
-    )
+private fun FormulaRowView(
+    row: FormulaRow,
+    currencyFormat: NumberFormat,
+    highlightResult: Boolean
+) {
+    val style = MaterialTheme.typography.titleMediumCondensed.copy(fontFeatureSettings = "tnum")
+    val resultTint = resultColor(row.result, highlightResult)
     val charges = row.terms.filterIsInstance<FormulaTerm.Charge>()
     if (charges.isNotEmpty()) {
-        ChargeSumView(charges, row.result, currencyFormat, style, highlightResult)
+        ChargeSumView(charges, row.result, currencyFormat, style, resultTint)
+        return
+    }
+    if (row.terms.any { it is FormulaTerm.Amount && it.label != null }) {
+        LedgerRowView(row, currencyFormat, style, resultTint)
         return
     }
     FlowRow(
@@ -264,12 +276,14 @@ private fun FormulaRowView(row: FormulaRow, currencyFormat: NumberFormat, highli
         verticalArrangement = Arrangement.spacedBy(4.dp),
         itemVerticalAlignment = Alignment.CenterVertically,
     ) {
-        row.terms.forEach { term -> FormulaTermView(term, currencyFormat, style) }
-        Text(text = "=", style = style)
+        row.terms.withOps().forEach { (term, op) ->
+            FormulaTermView(term, op, currencyFormat, style)
+        }
+        Text(text = "=", style = style, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(
             text = currencyFormat.format(row.result),
             style = style,
-            color = if (highlightResult) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+            color = resultTint,
             modifier = Modifier.censor(),
         )
     }
@@ -281,44 +295,133 @@ private fun ChargeSumView(
     total: BigDecimal,
     currencyFormat: NumberFormat,
     style: TextStyle,
-    highlightResult: Boolean,
+    resultTint: Color,
+) {
+    val chargeTint = MaterialTheme.colorScheme.secondary
+    val single = charges.size == 1
+    LedgerView(
+        lines = charges.mapIndexed { index, charge ->
+            LedgerLine(
+                label = charge.label(),
+                amount = (if (index > 0) "+ " else "") + currencyFormat.format(charge.transaction.amount),
+                tint = if (single) resultTint else chargeTint,
+            )
+        },
+        total = if (single) null else LedgerLine("", currencyFormat.format(total), resultTint),
+        style = style,
+        ruleTint = chargeTint,
+    )
+}
+
+@Composable
+private fun LedgerRowView(
+    row: FormulaRow,
+    currencyFormat: NumberFormat,
+    style: TextStyle,
+    resultTint: Color,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        LedgerView(
+            lines = row.terms.withOps().mapIndexedNotNull { index, (term, op) ->
+                val amount = term as? FormulaTerm.Amount ?: return@mapIndexedNotNull null
+                LedgerLine(
+                    label = amount.label?.let { stringResource(it.textRes()) }.orEmpty(),
+                    amount = (if (index == 0) "" else "$op ") + currencyFormat.format(amount.value),
+                    tint = termColor(amount.value, op),
+                )
+            },
+            total = LedgerLine(
+                label = stringResource(R.string.budget_formula_label_total),
+                amount = "= " + currencyFormat.format(row.result),
+                tint = resultTint,
+            ),
+            style = style,
+            ruleTint = MaterialTheme.colorScheme.outlineVariant,
+        )
+        negativeReason(row)?.let { reason ->
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = reason,
+                style = MaterialTheme.typography.labelSmallCondensed,
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun negativeReason(row: FormulaRow): String? {
+    if (row.result.signum() >= 0) return null
+    val biggest = row.terms.withOps()
+        .mapNotNull { (term, op) -> (term as? FormulaTerm.Amount)?.takeIf { op == "−" } }
+        .maxByOrNull { it.value } ?: return null
+    return stringResource(
+        when (biggest.label) {
+            FormulaLabel.RECURRING -> R.string.budget_formula_negative_recurring
+            FormulaLabel.CARRIED -> R.string.budget_formula_negative_carried
+            else -> R.string.budget_formula_negative_spent
+        }
+    )
+}
+
+private data class LedgerLine(val label: String, val amount: String, val tint: Color)
+
+@Composable
+private fun LedgerView(
+    lines: List<LedgerLine>,
+    total: LedgerLine?,
+    style: TextStyle,
+    ruleTint: Color,
 ) {
     Column(
         modifier = Modifier.width(IntrinsicSize.Max),
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        charges.forEachIndexed { index, charge ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = charge.label(),
-                    style = MaterialTheme.typography.labelSmallCondensed,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .weight(1f)
-                        .widthIn(max = 180.dp),
-                )
-                Text(
-                    text = (if (index == charges.lastIndex) "+ " else "") + currencyFormat.format(charge.transaction.amount),
-                    style = style,
-                    modifier = Modifier.censor(),
-                )
-            }
+        lines.forEach { line -> LedgerLineView(line, style) }
+        if (total != null) {
+            HorizontalDivider(thickness = 2.dp, color = ruleTint)
+            LedgerLineView(total, style)
         }
-        HorizontalDivider(thickness = 2.dp, color = LocalContentColor.current)
+    }
+}
+
+@Composable
+private fun LedgerLineView(line: LedgerLine, style: TextStyle) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
-            text = currencyFormat.format(total),
+            text = line.label,
+            style = MaterialTheme.typography.labelSmallCondensed,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .weight(1f)
+                .widthIn(max = 180.dp),
+        )
+        Text(
+            text = line.amount,
             style = style,
-            color = if (highlightResult) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+            color = line.tint,
             modifier = Modifier.censor(),
         )
     }
+}
+
+private fun FormulaLabel.textRes(): Int = when (this) {
+    FormulaLabel.BUDGET -> R.string.budget_formula_label_budget
+    FormulaLabel.CARRIED -> R.string.budget_formula_label_carried
+    FormulaLabel.RECURRING -> R.string.budget_formula_label_recurring
+    FormulaLabel.REBALANCED -> R.string.budget_formula_label_rebalanced
+    FormulaLabel.SPENT -> R.string.budget_formula_label_spent
 }
 
 @Composable
@@ -332,22 +435,63 @@ private fun FormulaTerm.Charge.label(): String = transaction.comment.ifBlank {
     )
 }
 
+private fun List<FormulaTerm>.withOps(): List<Pair<FormulaTerm, String?>> {
+    var op: String? = null
+    return map { term ->
+        if (term is FormulaTerm.Op) op = term.symbol
+        term to op
+    }
+}
+
 @Composable
-private fun FormulaTermView(term: FormulaTerm, currencyFormat: NumberFormat, style: TextStyle) {
+private fun opColor(op: String?, neutral: Color = LocalContentColor.current): Color = when (op) {
+    "+" -> MaterialTheme.colorScheme.secondary
+    "−" -> MaterialTheme.colorScheme.tertiary
+    else -> neutral
+}
+
+@Composable
+private fun termColor(value: BigDecimal, op: String?): Color =
+    if (value.signum() < 0) MaterialTheme.colorScheme.error else opColor(op)
+
+@Composable
+private fun resultColor(value: BigDecimal, highlight: Boolean): Color = when {
+    value.signum() < 0 -> MaterialTheme.colorScheme.error
+    highlight -> MaterialTheme.colorScheme.primary
+    else -> LocalContentColor.current
+}
+
+@Composable
+private fun FormulaTermView(
+    term: FormulaTerm,
+    op: String?,
+    currencyFormat: NumberFormat,
+    style: TextStyle,
+) {
     when (term) {
         is FormulaTerm.Amount -> Text(
             text = currencyFormat.format(term.value),
             style = style,
+            color = termColor(term.value, op),
             modifier = Modifier.censor(),
         )
 
-        is FormulaTerm.Op -> Text(text = term.symbol, style = style)
+        is FormulaTerm.Op -> Text(
+            text = term.symbol,
+            style = style,
+            color = opColor(term.symbol, MaterialTheme.colorScheme.onSurfaceVariant),
+        )
 
-        is FormulaTerm.Count -> Text(text = term.label(), style = style)
+        is FormulaTerm.Count -> Text(
+            text = term.label(),
+            style = style,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
 
         is FormulaTerm.Charge -> Text(
             text = currencyFormat.format(term.transaction.amount),
             style = style,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.censor(),
         )
 
@@ -358,6 +502,7 @@ private fun FormulaTermView(term: FormulaTerm, currencyFormat: NumberFormat, sty
             Text(
                 text = currencyFormat.format(term.numerator),
                 style = style,
+                color = termColor(term.numerator, op),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -367,6 +512,7 @@ private fun FormulaTermView(term: FormulaTerm, currencyFormat: NumberFormat, sty
             Text(
                 text = term.denominator.label(),
                 style = style,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -387,28 +533,33 @@ private fun FormulaTerm.Count.label(): String = pluralStringResource(
 )
 
 @Composable
-private fun FormulaRow.captionText(periodName: String, period: BudgetPeriod): String = when (caption) {
-    FormulaCaption.SURPLUS_SPLIT -> stringResource(R.string.budget_formula_caption_surplus_split)
-    FormulaCaption.SURPLUS_FIRST_DAY -> stringResource(R.string.budget_formula_caption_surplus_first_day)
-    FormulaCaption.ADJUSTMENTS -> stringResource(R.string.budget_formula_caption_adjustments)
-    FormulaCaption.PER_DAY -> stringResource(R.string.budget_formula_caption_per_day)
-    FormulaCaption.PER_PERIOD -> stringResource(R.string.budget_formula_caption_per_period, periodName)
-    FormulaCaption.REMAINING_BUDGET -> stringResource(R.string.budget_formula_caption_remaining_budget)
-    FormulaCaption.SPREAD_OVER_LEFT -> stringResource(R.string.budget_formula_caption_spread_over_left)
-    FormulaCaption.LEFT -> stringResource(R.string.budget_formula_caption_left)
-    FormulaCaption.RESERVED -> stringResource(R.string.budget_formula_caption_reserved)
-    FormulaCaption.CARRIED -> stringResource(R.string.budget_formula_caption_carried)
-    FormulaCaption.SPREAD_LEFTOVER -> stringResource(R.string.budget_formula_caption_spread_leftover)
-    FormulaCaption.NEXT_BLOCK -> stringResource(
-        when (period) {
-            BudgetPeriod.DAILY -> R.string.budget_pill_next_daily
-            BudgetPeriod.WEEKLY -> R.string.budget_pill_next_weekly
-            BudgetPeriod.BIWEEKLY -> R.string.budget_pill_next_biweekly
-            BudgetPeriod.MONTHLY -> R.string.budget_pill_next_monthly
-        },
-        "",
-    ).trim()
-}
+private fun FormulaRow.captionText(periodName: String, period: BudgetPeriod): String =
+    when (caption) {
+        FormulaCaption.SURPLUS_SPLIT -> stringResource(R.string.budget_formula_caption_surplus_split)
+        FormulaCaption.SURPLUS_FIRST_DAY -> stringResource(R.string.budget_formula_caption_surplus_first_day)
+        FormulaCaption.ADJUSTMENTS -> stringResource(R.string.budget_formula_caption_adjustments)
+        FormulaCaption.PER_DAY -> stringResource(R.string.budget_formula_caption_per_day)
+        FormulaCaption.PER_PERIOD -> stringResource(
+            R.string.budget_formula_caption_per_period,
+            periodName
+        )
+
+        FormulaCaption.REMAINING_BUDGET -> stringResource(R.string.budget_formula_caption_remaining_budget)
+        FormulaCaption.SPREAD_OVER_LEFT -> stringResource(R.string.budget_formula_caption_spread_over_left)
+        FormulaCaption.LEFT -> stringResource(R.string.budget_formula_caption_left)
+        FormulaCaption.RESERVED -> stringResource(R.string.budget_formula_caption_reserved)
+        FormulaCaption.CARRIED -> stringResource(R.string.budget_formula_caption_carried)
+        FormulaCaption.SPREAD_LEFTOVER -> stringResource(R.string.budget_formula_caption_spread_leftover)
+        FormulaCaption.NEXT_BLOCK -> stringResource(
+            when (period) {
+                BudgetPeriod.DAILY -> R.string.budget_pill_next_daily
+                BudgetPeriod.WEEKLY -> R.string.budget_pill_next_weekly
+                BudgetPeriod.BIWEEKLY -> R.string.budget_pill_next_biweekly
+                BudgetPeriod.MONTHLY -> R.string.budget_pill_next_monthly
+            },
+            "",
+        ).trim()
+    }
 
 private fun BudgetPeriod.nameRes(): Int = when (this) {
     BudgetPeriod.DAILY -> R.string.budget_period_daily
