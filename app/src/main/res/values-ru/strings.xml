@@ -74,6 +74,7 @@
   <string name="edit_recurrent_expense_title">Редактирование регулярного расхода</string>
   <string name="edit_expense_title">Редактирование расхода</string>
   <string name="cancel_edit_content_desc">Отменить редактирование</string>
+  <string name="tap_to_exit_edit_transaction">Нажмите для выхода</string>
   <string name="configure_recurrence">Настроить повтор</string>
   <string name="make_recurrent">Сделать регулярным</string>
   <string name="select_time">Выберите время</string>

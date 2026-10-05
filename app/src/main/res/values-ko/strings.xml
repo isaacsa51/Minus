@@ -74,6 +74,7 @@
     <string name="edit_recurrent_expense_title">반복 지출 수정</string>
     <string name="edit_expense_title">지출 수정</string>
     <string name="cancel_edit_content_desc">편집 취소</string>
+    <string name="tap_to_exit_edit_transaction">탭하여 종료</string>
     <string name="configure_recurrence">반복 설정</string>
     <string name="make_recurrent">반복 설정</string>
     <string name="select_time">기간 선택</string>

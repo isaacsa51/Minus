@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.EventRepeat
@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,6 +60,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorState
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.util.handleHardwareNumpadKeyEvent
+import com.serranoie.app.minus.presentation.util.withTone
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -69,6 +71,8 @@ import java.time.ZoneId
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Transaction as NumpadTransaction
+
+private const val ExitPillContentTone = 10.0
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -235,18 +239,38 @@ fun TransactionEditScreen(
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
         }
-        TransactionEditTopBar(
-            isRecurrent = transaction.isRecurrent,
-            onCancel = onCancel,
-        )
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
+            val badColor = MinusTheme.budgetStatus.bad
+            Surface(
+                onClick = onCancel,
+                shape = CircleShape,
+                color = badColor,
+                contentColor = badColor.withTone(ExitPillContentTone),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(50.dp),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Text(
+                        text = stringResource(R.string.tap_to_exit_edit_transaction),
+                        style = MaterialTheme.typography.labelMediumEmphasized,
+                        maxLines = 1,
+                    )
+                }
+            }
+
             if (isCreditQuickToggleEnabled) {
                 TransactionEditToggleButton(
                     checked = isCredit,
@@ -274,32 +298,31 @@ fun TransactionEditScreen(
                     contentDescription = stringResource(R.string.recurrent_expense),
                     position = TransactionEditTogglePosition.TRAILING,
                 )
-
-                Spacer(modifier = Modifier.weight(1f))
             } else {
-                Box(modifier = Modifier.weight(1f)) {
-                    TransactionEditToggleButton(
-                        checked = isRecurrent,
-                        onCheckedChange = {
-                            scope.launch {
-                                delay(180.milliseconds)
-                                showRecurrentBottomSheet = true
-                            }
-                        },
-                        icon = Icons.Rounded.EventRepeat,
-                        contentDescription = stringResource(R.string.recurrent_expense),
-                        position = TransactionEditTogglePosition.STANDALONE,
-                    )
-                }
+                TransactionEditToggleButton(
+                    checked = isRecurrent,
+                    onCheckedChange = {
+                        scope.launch {
+                            delay(180.milliseconds)
+                            showRecurrentBottomSheet = true
+                        }
+                    },
+                    icon = Icons.Rounded.EventRepeat,
+                    contentDescription = stringResource(R.string.recurrent_expense),
+                    position = TransactionEditTogglePosition.STANDALONE,
+                )
             }
-
-            TransactionDateTimeRow(
-                date = editedDate,
-                time = editedTime,
-                onDateClick = { showDatePicker = true },
-                onTimeClick = { showTimePicker = true },
-            )
         }
+
+        TransactionDateTimeRow(
+            date = editedDate,
+            time = editedTime,
+            onDateClick = { showDatePicker = true },
+            onTimeClick = { showTimePicker = true },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        )
 
         EditAmountDisplay(
             rawAmount = editedAmount,

@@ -129,8 +129,8 @@ class TransactionEditE2ETests {
     private fun prettyTime(time: LocalTime): String =
         String.format("%02d:%02d", time.hour, time.minute)
 
-    private fun cancelContentDesc(): String =
-        composeTestRule.activity.getString(R.string.cancel_edit_content_desc)
+    private fun exitPillLabel(): String =
+        composeTestRule.activity.getString(R.string.tap_to_exit_edit_transaction)
 
     private fun saveLabel(): String = composeTestRule.activity.getString(R.string.save)
 
@@ -168,8 +168,7 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        val editTitle = composeTestRule.activity.getString(R.string.edit_expense_title)
-        composeTestRule.onNodeWithText(editTitle).assertIsDisplayed()
+        composeTestRule.onNodeWithText(exitPillLabel()).assertIsDisplayed()
 
         composeTestRule.onAllNodesWithText("Groceries").assertCountEquals(1)
 
@@ -195,7 +194,7 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithContentDescription(cancelContentDesc()).performClick()
+        composeTestRule.onNodeWithText(exitPillLabel()).performClick()
 
         composeTestRule.waitForIdle()
 
@@ -352,9 +351,7 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        val recurrentTitle =
-            composeTestRule.activity.getString(R.string.edit_recurrent_expense_title)
-        composeTestRule.onNodeWithText(recurrentTitle).assertIsDisplayed()
+        composeTestRule.onNodeWithText(exitPillLabel()).assertIsDisplayed()
 
         tapRecurrentToggle()
 

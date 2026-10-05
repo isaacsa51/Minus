@@ -74,6 +74,7 @@
     <string name="edit_recurrent_expense_title">बार-बार होने वाला खर्च बदलें</string>
     <string name="edit_expense_title">खर्च बदलें</string>
     <string name="cancel_edit_content_desc">बदलाव रद्द करें</string>
+    <string name="tap_to_exit_edit_transaction">बाहर निकलने के लिए टैप करें</string>
     <string name="configure_recurrence">दोहराव कॉन्फ़िगर करें</string>
     <string name="make_recurrent">बार-बार होने वाला बनाएँ</string>
     <string name="select_time">समय चुनें</string>

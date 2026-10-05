@@ -74,6 +74,7 @@
     <string name="edit_recurrent_expense_title">Επεξεργασία επαναλαμβανόμενων εξόδων</string>
     <string name="edit_expense_title">Επεξεργασία εξόδων</string>
     <string name="cancel_edit_content_desc">Ακύρωση επεξεργασίας</string>
+    <string name="tap_to_exit_edit_transaction">Πατήστε για έξοδο</string>
     <string name="configure_recurrence">Ρύθμιση επανάληψης</string>
     <string name="make_recurrent">Κάντε επαναλαμβανόμενο</string>
     <string name="select_time">Επιλογή ώρας</string>
