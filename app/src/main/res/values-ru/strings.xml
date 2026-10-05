@@ -464,6 +464,9 @@
   <string name="budget_pill_exhausted_daily_label">дневной</string>
   <string name="budget_pill_exhausted_weekly_label">недельный</string>
   <string name="budget_pill_exhausted_biweekly_label">двухнедельный</string>
+  <string name="budget_pill_exhausted_daily_label_plural">дневной</string>
+  <string name="budget_pill_exhausted_weekly_label_plural">недельный</string>
+  <string name="budget_pill_exhausted_biweekly_label_plural">двухнедельный</string>
   <string name="budget_pill_exhausted_single">Исчерпан %1$s бюджет</string>
   <string name="budget_pill_exhausted_double">Исчерпаны бюджеты: %1$s и %2$s</string>
   <string name="budget_pill_exhausted_triple">Исчерпаны бюджеты: %1$s, %2$s и %3$s</string>

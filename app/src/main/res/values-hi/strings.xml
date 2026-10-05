@@ -431,6 +431,9 @@
     <string name="budget_pill_exhausted_daily_label">रोज़ाना</string>
     <string name="budget_pill_exhausted_weekly_label">हफ़्तेवार</string>
     <string name="budget_pill_exhausted_biweekly_label">हर दो हफ़्ते में</string>
+    <string name="budget_pill_exhausted_daily_label_plural">रोज़ाना</string>
+    <string name="budget_pill_exhausted_weekly_label_plural">हफ़्तेवार</string>
+    <string name="budget_pill_exhausted_biweekly_label_plural">हर दो हफ़्ते में</string>
     <string name="budget_pill_exhausted_single">%1$s का बजट खर्च हो गया है</string>
     <string name="budget_pill_exhausted_double">%1$s और %2$s का बजट खर्च हो गया है</string>
     <string name="budget_pill_exhausted_triple">%1$s, %2$s और %3$s का बजट खर्च हो गया है</string>

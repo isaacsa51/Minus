@@ -101,6 +101,34 @@ internal fun calculateBudgetMetrics(
 }
 
 @Composable
+private fun exhaustedPeriodLabels(periods: List<BudgetPeriod>): List<String> {
+    val plural = periods.size > 1
+    return periods.map { labelPeriod ->
+        stringResource(
+            when (labelPeriod) {
+                BudgetPeriod.WEEKLY -> if (plural) {
+                    R.string.budget_pill_exhausted_weekly_label_plural
+                } else {
+                    R.string.budget_pill_exhausted_weekly_label
+                }
+
+                BudgetPeriod.BIWEEKLY -> if (plural) {
+                    R.string.budget_pill_exhausted_biweekly_label_plural
+                } else {
+                    R.string.budget_pill_exhausted_biweekly_label
+                }
+
+                else -> if (plural) {
+                    R.string.budget_pill_exhausted_daily_label_plural
+                } else {
+                    R.string.budget_pill_exhausted_daily_label
+                }
+            }
+        )
+    }
+}
+
+@Composable
 internal fun resolveExhaustedMessage(
     state: BudgetState?, period: BudgetPeriod, splitMode: BudgetSplitMode
 ): String? {
@@ -119,11 +147,11 @@ internal fun resolveExhaustedMessage(
         BudgetSplitMode.STATIC, BudgetSplitMode.CARRY_OVER, BudgetSplitMode.ASK_ME -> {
             if (period == BudgetPeriod.DAILY || isExhausted(period)) return null
 
-            val labels = buildList {
-                if (isExhausted(BudgetPeriod.DAILY)) add(stringResource(R.string.budget_pill_exhausted_daily_label))
-                if (period >= BudgetPeriod.BIWEEKLY && isExhausted(BudgetPeriod.WEEKLY)) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
-                if (period == BudgetPeriod.MONTHLY && isExhausted(BudgetPeriod.BIWEEKLY)) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
-            }
+            val labels = exhaustedPeriodLabels(buildList {
+                if (isExhausted(BudgetPeriod.DAILY)) add(BudgetPeriod.DAILY)
+                if (period >= BudgetPeriod.BIWEEKLY && isExhausted(BudgetPeriod.WEEKLY)) add(BudgetPeriod.WEEKLY)
+                if (period == BudgetPeriod.MONTHLY && isExhausted(BudgetPeriod.BIWEEKLY)) add(BudgetPeriod.BIWEEKLY)
+            })
 
             when (labels.size) {
                 1 -> stringResource(R.string.budget_pill_exhausted_single, labels[0])
@@ -154,11 +182,11 @@ internal fun resolveExhaustedMessage(
             }
             if (currentOver) return null
 
-            val overspent = buildList {
-                if (isOverDaily) add(stringResource(R.string.budget_pill_exhausted_daily_label))
-                if (period >= BudgetPeriod.BIWEEKLY && isOverWeekly) add(stringResource(R.string.budget_pill_exhausted_weekly_label))
-                if (period == BudgetPeriod.MONTHLY && isOverBiweekly) add(stringResource(R.string.budget_pill_exhausted_biweekly_label))
-            }
+            val overspent = exhaustedPeriodLabels(buildList {
+                if (isOverDaily) add(BudgetPeriod.DAILY)
+                if (period >= BudgetPeriod.BIWEEKLY && isOverWeekly) add(BudgetPeriod.WEEKLY)
+                if (period == BudgetPeriod.MONTHLY && isOverBiweekly) add(BudgetPeriod.BIWEEKLY)
+            })
 
             when (overspent.size) {
                 1 -> stringResource(R.string.budget_pill_sub_exceeded_single, overspent[0])

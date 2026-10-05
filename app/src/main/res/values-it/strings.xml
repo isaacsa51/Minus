@@ -434,6 +434,9 @@
     <string name="budget_pill_exhausted_daily_label">giornaliero</string>
     <string name="budget_pill_exhausted_weekly_label">settimanale</string>
     <string name="budget_pill_exhausted_biweekly_label">bisettimanale</string>
+    <string name="budget_pill_exhausted_daily_label_plural">giornaliero</string>
+    <string name="budget_pill_exhausted_weekly_label_plural">settimanale</string>
+    <string name="budget_pill_exhausted_biweekly_label_plural">bisettimanale</string>
     <string name="budget_pill_exhausted_single">Budget %1$s speso</string>
     <string name="budget_pill_exhausted_double">Budget %1$s e %2$s spesi</string>
     <string name="budget_pill_exhausted_triple">Budget %1$s, %2$s e %3$s spesi</string>

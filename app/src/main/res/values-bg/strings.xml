@@ -436,6 +436,9 @@
     <string name="budget_pill_exhausted_daily_label">дневен</string>
     <string name="budget_pill_exhausted_weekly_label">седмичен</string>
     <string name="budget_pill_exhausted_biweekly_label">двуседмичен</string>
+    <string name="budget_pill_exhausted_daily_label_plural">дневни</string>
+    <string name="budget_pill_exhausted_weekly_label_plural">седмични</string>
+    <string name="budget_pill_exhausted_biweekly_label_plural">двуседмични</string>
     <string name="budget_pill_exhausted_single">Изразходван %1$s бюджет</string>
     <string name="budget_pill_exhausted_double">Изразходвани %1$s и %2$s бюджети</string>
     <string name="budget_pill_exhausted_triple">Изразходвани %1$s, %2$s и %3$s бюджети</string>

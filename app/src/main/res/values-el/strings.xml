@@ -431,6 +431,9 @@
     <string name="budget_pill_exhausted_daily_label">ημερήσιος</string>
     <string name="budget_pill_exhausted_weekly_label">εβδομαδιαίος</string>
     <string name="budget_pill_exhausted_biweekly_label">δεκαπενθήμερος</string>
+    <string name="budget_pill_exhausted_daily_label_plural">ημερήσιοι</string>
+    <string name="budget_pill_exhausted_weekly_label_plural">εβδομαδιαίοι</string>
+    <string name="budget_pill_exhausted_biweekly_label_plural">δεκαπενθήμεροι</string>
     <string name="budget_pill_exhausted_single">Εξαντλήθηκε ο %1$s προϋπολογισμός</string>
     <string name="budget_pill_exhausted_double">Εξαντλήθηκαν οι %1$s και %2$s προϋπολογισμοί</string>
     <string name="budget_pill_exhausted_triple">Εξαντλήθηκαν οι %1$s, %2$s και %3$s προϋπολογισμοί</string>
