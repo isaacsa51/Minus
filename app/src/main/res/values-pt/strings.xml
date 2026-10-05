@@ -191,9 +191,9 @@
     <string name="budget_pill_label_weekly_exceeded">Valor semanal excedido</string>
     <string name="budget_pill_label_biweekly_exceeded">Quantia bisemanal excedida</string>
     <string name="budget_pill_label_monthly_exceeded">Valor mensal excedido</string>
-    <string name="budget_pill_sub_exceeded_single">Valor de %1$s excedido</string>
-    <string name="budget_pill_sub_exceeded_double">Excedido o valor de %1$s e %2$s</string>
-    <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s e %3$s valor excedido</string>
+    <string name="budget_pill_sub_exceeded_single">Valor %1$s excedido</string>
+    <string name="budget_pill_sub_exceeded_double">Valor %1$s e %2$s excedido</string>
+    <string name="budget_pill_sub_exceeded_triple">Valor %1$s, %2$s e %3$s excedido</string>
     <string name="budget_formula_title">Como é calculado</string>
     <string name="budget_formula_hold_hint">Mostrar como o valor é calculado</string>
     <string name="budget_formula_caption_surplus_split">O excedente do período anterior entra no orçamento</string>
@@ -431,9 +431,9 @@
     <string name="budget_pill_over_budget">Valor do orçamento excedido</string>
     <string name="budget_pill_no_budget">Nenhum orçamento</string>
     <string name="budget_pill_no_budget_action">Configurar seu orçamento</string>
-    <string name="budget_pill_exhausted_daily_label">Diariamente</string>
-    <string name="budget_pill_exhausted_weekly_label">Semanalmente</string>
-    <string name="budget_pill_exhausted_biweekly_label">Bienal</string>
+    <string name="budget_pill_exhausted_daily_label">diário</string>
+    <string name="budget_pill_exhausted_weekly_label">semanal</string>
+    <string name="budget_pill_exhausted_biweekly_label">quinzenal</string>
     <string name="budget_pill_exhausted_single">Orçamento %1$s gasto</string>
     <string name="budget_pill_exhausted_double">Orçamento %1$s e %2$s gasto</string>
     <string name="budget_pill_exhausted_triple">Orçamento %1$s, %2$s e %3$s gasto</string>

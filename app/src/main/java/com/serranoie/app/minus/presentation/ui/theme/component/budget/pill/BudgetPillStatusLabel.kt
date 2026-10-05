@@ -25,12 +25,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +45,25 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.googleSansFlex
 import com.serranoie.app.minus.presentation.ui.theme.titleMediumCondensed
 import com.serranoie.app.minus.presentation.util.censor
+import kotlin.math.roundToInt
+
+private const val SECONDARY_MAX_WIDTH_FRACTION = 0.65f
+
+private fun Modifier.secondaryWidthCap(enabled: Boolean) = if (!enabled) this else layout { measurable, constraints ->
+    val cap = if (constraints.hasBoundedWidth) {
+        (constraints.maxWidth * SECONDARY_MAX_WIDTH_FRACTION).roundToInt()
+    } else {
+        constraints.maxWidth
+    }
+    val placeable = measurable.measure(
+        Constraints(
+            maxWidth = cap,
+            minHeight = constraints.minHeight,
+            maxHeight = constraints.maxHeight,
+        )
+    )
+    layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+}
 
 /**
  * The status text on the left of the pill ("Today", "This week", "Daily Amount Exceeded",
@@ -132,6 +153,7 @@ internal fun StatusLabel(
         }
 
         AnimatedVisibility(
+            modifier = Modifier.secondaryWidthCap(!centreContent),
             visible = secondaryVisible && !bigVariant, enter = slideInVertically(
                 initialOffsetY = { -it }, animationSpec = tween(300)
             ) + fadeIn(animationSpec = tween(300))

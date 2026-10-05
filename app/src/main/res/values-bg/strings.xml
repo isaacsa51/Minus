@@ -194,9 +194,9 @@
     <string name="budget_pill_label_weekly_exceeded">Седмичната сума е надвишена</string>
     <string name="budget_pill_label_biweekly_exceeded">Двуседмичната сума е надвишена</string>
     <string name="budget_pill_label_monthly_exceeded">Месечната сума е надвишена</string>
-    <string name="budget_pill_sub_exceeded_single">Сумата за %1$s е надвишена</string>
-    <string name="budget_pill_sub_exceeded_double">Сумите за %1$s и %2$s са надвишени</string>
-    <string name="budget_pill_sub_exceeded_triple">Сумите за %1$s, %2$s и %3$s са надвишени</string>
+    <string name="budget_pill_sub_exceeded_single">Превишен %1$s бюджет</string>
+    <string name="budget_pill_sub_exceeded_double">Превишени %1$s и %2$s бюджети</string>
+    <string name="budget_pill_sub_exceeded_triple">Превишени %1$s, %2$s и %3$s бюджети</string>
     <string name="budget_formula_title">Как се изчислява</string>
     <string name="budget_formula_hold_hint">Покажи как се изчислява сумата</string>
     <string name="budget_formula_caption_surplus_split">Излишъкът от миналия период се добавя към бюджета</string>
@@ -433,12 +433,12 @@
     <string name="budget_pill_over_budget">Бюджетната сума е надвишена</string>
     <string name="budget_pill_no_budget">Няма бюджет</string>
     <string name="budget_pill_no_budget_action">Настройте бюджета си</string>
-    <string name="budget_pill_exhausted_daily_label">Дневно</string>
-    <string name="budget_pill_exhausted_weekly_label">Седмично</string>
-    <string name="budget_pill_exhausted_biweekly_label">Двуседмично</string>
-    <string name="budget_pill_exhausted_single">Бюджетът за %1$s е изразходван</string>
-    <string name="budget_pill_exhausted_double">Бюджет %1$s и %2$s е изразходван</string>
-    <string name="budget_pill_exhausted_triple">Бюджет %1$s, %2$s и %3$s е изразходван</string>
+    <string name="budget_pill_exhausted_daily_label">дневен</string>
+    <string name="budget_pill_exhausted_weekly_label">седмичен</string>
+    <string name="budget_pill_exhausted_biweekly_label">двуседмичен</string>
+    <string name="budget_pill_exhausted_single">Изразходван %1$s бюджет</string>
+    <string name="budget_pill_exhausted_double">Изразходвани %1$s и %2$s бюджети</string>
+    <string name="budget_pill_exhausted_triple">Изразходвани %1$s, %2$s и %3$s бюджети</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">Изразходвано</string>
     <string name="spend_budget_card_available_percent_format">Налични: %1$s%%</string>

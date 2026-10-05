@@ -433,7 +433,7 @@
     <string name="budget_pill_no_budget_action">Establece tu presupuesto</string>
     <string name="budget_pill_calc_subtracted">%1$s será restado</string>
     <string name="budget_pill_exhausted_daily_label">diario</string>
-    <string name="budget_pill_exhausted_weekly_label">semanalmente</string>
+    <string name="budget_pill_exhausted_weekly_label">semanal</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
     <string name="budget_pill_exhausted_single">Presupuesto %1$s gastado</string>
     <string name="budget_pill_exhausted_double">Presupuesto %1$s y %2$s gastado</string>

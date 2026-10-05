@@ -339,7 +339,7 @@ private fun LedgerRowView(
                 tint = resultTint,
             ),
             style = style,
-            ruleTint = MaterialTheme.colorScheme.outlineVariant,
+            ruleTint = MaterialTheme.colorScheme.onSurface,
         )
         negativeReason(row)?.let { reason ->
             Spacer(modifier = Modifier.height(6.dp))
