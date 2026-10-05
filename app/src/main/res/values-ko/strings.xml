@@ -433,9 +433,6 @@
     <string name="budget_pill_exhausted_daily_label">일일</string>
     <string name="budget_pill_exhausted_weekly_label">주간</string>
     <string name="budget_pill_exhausted_biweekly_label">2주 단위</string>
-    <string name="budget_pill_exhausted_daily_label_plural">일일</string>
-    <string name="budget_pill_exhausted_weekly_label_plural">주간</string>
-    <string name="budget_pill_exhausted_biweekly_label_plural">2주 단위</string>
     <string name="budget_pill_exhausted_single">%1$s 예산 모두 사용</string>
     <string name="budget_pill_exhausted_double">%1$s 및 %2$s 예산 모두 사용</string>
     <string name="budget_pill_exhausted_triple">%1$s, %2$s 및 %3$s 예산 모두 사용</string>

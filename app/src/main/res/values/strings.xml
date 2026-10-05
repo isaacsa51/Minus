@@ -546,9 +546,6 @@
     <string name="budget_pill_exhausted_daily_label">Daily</string>
     <string name="budget_pill_exhausted_weekly_label">Weekly</string>
     <string name="budget_pill_exhausted_biweekly_label">Biweekly</string>
-    <string name="budget_pill_exhausted_daily_label_plural">Daily</string>
-    <string name="budget_pill_exhausted_weekly_label_plural">Weekly</string>
-    <string name="budget_pill_exhausted_biweekly_label_plural">Biweekly</string>
     <string name="budget_pill_exhausted_single">%1$s budget spent</string>
     <string name="budget_pill_exhausted_double">%1$s and %2$s budget spent</string>
     <string name="budget_pill_exhausted_triple">%1$s, %2$s and %3$s budget spent</string>
