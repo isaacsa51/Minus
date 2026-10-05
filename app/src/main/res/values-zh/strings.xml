@@ -435,9 +435,6 @@
     <string name="budget_pill_exhausted_daily_label">每天</string>
     <string name="budget_pill_exhausted_weekly_label">每周</string>
     <string name="budget_pill_exhausted_biweekly_label">每半个月</string>
-    <string name="budget_pill_exhausted_daily_label_plural">每天</string>
-    <string name="budget_pill_exhausted_weekly_label_plural">每周</string>
-    <string name="budget_pill_exhausted_biweekly_label_plural">每半个月</string>
     <string name="budget_pill_exhausted_single">%1$s 预算已用完</string>
     <string name="budget_pill_exhausted_double">%1$s 和 %2$s 预算已用完</string>
     <string name="budget_pill_exhausted_triple">%1$s、%2$s 和 %3$s 预算已用完</string>

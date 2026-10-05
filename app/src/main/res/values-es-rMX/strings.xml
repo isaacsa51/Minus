@@ -435,9 +435,6 @@
     <string name="budget_pill_exhausted_daily_label">diario</string>
     <string name="budget_pill_exhausted_weekly_label">semanal</string>
     <string name="budget_pill_exhausted_biweekly_label">quincenal</string>
-    <string name="budget_pill_exhausted_daily_label_plural">diario</string>
-    <string name="budget_pill_exhausted_weekly_label_plural">semanal</string>
-    <string name="budget_pill_exhausted_biweekly_label_plural">quincenal</string>
     <string name="budget_pill_exhausted_single">Presupuesto %1$s gastado</string>
     <string name="budget_pill_exhausted_double">Presupuesto %1$s y %2$s gastado</string>
     <string name="budget_pill_exhausted_triple">Presupuesto %1$s, %2$s y %3$s gastado</string>
