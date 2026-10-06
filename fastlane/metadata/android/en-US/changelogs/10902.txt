@@ -1,0 +1,3 @@
+- chore: add missing haptic into category chips
+- refactor: replace top bar with exit pill in transaction edit screen
+- feat: improve budget formula breakdown with ledger layout and explicit term labels
