@@ -21,7 +21,7 @@
     <string name="conversion_missing">No hay tasa %1$s/%2$s guardada. Configúrala en Ajustes.</string>
     <string name="conversion_budget_line">Presupuesto: %1$s ≈ %2$s</string>
     <string name="conversion_spent_line">Gastado: %1$s ≈ %2$s</string>
-    <string name="conversion_manual_note">Tasa manual. Solo visualización.</string>
+    <string name="conversion_manual_note">Tasa manual guardada el %1$s. Solo visualización.</string>
     <string name="conversion_cached_note">Tasa de referencia Frankfurter guardada del %1$s. Solo visualización.</string>
     <string name="conversion_choose">Elegir moneda</string>
 </resources>

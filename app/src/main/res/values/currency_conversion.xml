@@ -21,7 +21,7 @@
     <string name="conversion_missing">No saved %1$s/%2$s rate. Set a rate in Settings.</string>
     <string name="conversion_budget_line">Budget: %1$s ≈ %2$s</string>
     <string name="conversion_spent_line">Spent: %1$s ≈ %2$s</string>
-    <string name="conversion_manual_note">Manual rate. Display only.</string>
+    <string name="conversion_manual_note">Manual rate saved on %1$s. Display only.</string>
     <string name="conversion_cached_note">Saved Frankfurter reference rate dated %1$s. Display only.</string>
     <string name="conversion_choose">Choose currency</string>
 </resources>

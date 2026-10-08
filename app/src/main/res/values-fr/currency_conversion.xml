@@ -21,7 +21,7 @@
     <string name="conversion_missing">Aucun taux %1$s/%2$s enregistré. Définissez-le dans les paramètres.</string>
     <string name="conversion_budget_line">Budget : %1$s ≈ %2$s</string>
     <string name="conversion_spent_line">Dépensé : %1$s ≈ %2$s</string>
-    <string name="conversion_manual_note">Taux manuel. Affichage uniquement.</string>
+    <string name="conversion_manual_note">Taux manuel enregistré le %1$s. Affichage uniquement.</string>
     <string name="conversion_cached_note">Taux de référence Frankfurter enregistré du %1$s. Affichage uniquement.</string>
     <string name="conversion_choose">Choisir une devise</string>
 </resources>

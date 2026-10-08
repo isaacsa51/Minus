@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -14,15 +15,10 @@ import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.currency.ConversionPreferences
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import java.math.BigDecimal
-import java.math.RoundingMode
 import java.util.Locale
 
 private fun normalize(code: String) = code.trim().uppercase(Locale.ROOT)
 private fun known(code: String) = SupportedCurrency.findByCode(code) != null || code in setOf("IRR", "IRT")
-private fun formatted(amount: BigDecimal, currency: String): String {
-    val digits = SupportedCurrency.findByCode(currency)?.defaultFractionDigits ?: 2
-    return "$currency ${amount.setScale(digits.coerceAtLeast(0), RoundingMode.HALF_EVEN).toPlainString()}"
-}
 
 @Composable
 fun CurrencyConversionSettings(viewModel: CurrencyConversionViewModel = hiltViewModel()) {
@@ -104,15 +100,16 @@ fun CurrencyPeriodSummary(base: String, budget: BigDecimal, spent: BigDecimal, m
 internal fun CurrencyPeriodSummaryContent(base: String, budget: BigDecimal, spent: BigDecimal, preferences: ConversionPreferences, censored: Boolean, modifier: Modifier = Modifier) {
     val target = preferences.displayCurrency ?: return
     if (target == base || censored) return
+    val locale = LocalConfiguration.current.locales[0]
     val rate = preferences.rateFor(base, target)
     Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(stringResource(R.string.conversion_title), style = MaterialTheme.typography.labelLarge)
         if (rate == null) {
             Text(stringResource(R.string.conversion_missing, base, target), style = MaterialTheme.typography.bodySmall)
         } else {
-            Text(stringResource(R.string.conversion_budget_line, formatted(budget, base), formatted(preferences.convert(budget, base)!!, target)), style = MaterialTheme.typography.bodyMedium)
-            Text(stringResource(R.string.conversion_spent_line, formatted(spent, base), formatted(preferences.convert(spent, base)!!, target)), style = MaterialTheme.typography.bodyMedium)
-            Text(if (rate.manual) stringResource(R.string.conversion_manual_note) else stringResource(R.string.conversion_cached_note, rate.date), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.conversion_budget_line, formatConversionAmount(budget, base, locale), formatConversionAmount(preferences.convert(budget, base)!!, target, locale)), style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.conversion_spent_line, formatConversionAmount(spent, base, locale), formatConversionAmount(preferences.convert(spent, base)!!, target, locale)), style = MaterialTheme.typography.bodyMedium)
+            Text(if (rate.manual) stringResource(R.string.conversion_manual_note, rate.date) else stringResource(R.string.conversion_cached_note, rate.date), style = MaterialTheme.typography.bodySmall)
         }
     }
 }

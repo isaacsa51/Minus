@@ -25,9 +25,41 @@ class CurrencyConversionScreenshotTest {
             } }
         }
     }
+    @Test fun pairedManualTotalsShowSavedDate() {
+        paparazzi.snapshot {
+            MinusTheme { Surface {
+                CurrencyPeriodSummaryContent("EUR", BigDecimal("200"), BigDecimal("20"),
+                    ConversionPreferences("BRL", manualRates = listOf(ExchangeRate("EUR", "BRL", BigDecimal("6"), "2026-10-07", true))), false, Modifier.padding(16.dp))
+            } }
+        }
+    }
     @Test fun missingRate() {
         paparazzi.snapshot {
             MinusTheme { Surface { CurrencyPeriodSummaryContent("USD", BigDecimal("100"), BigDecimal("12.50"), ConversionPreferences("BRL"), false, Modifier.padding(16.dp)) } }
+        }
+    }
+}
+
+class CurrencyConversionFrenchScreenshotTest {
+    @get:Rule val paparazzi = Paparazzi(deviceConfig = DeviceConfig.PIXEL_5.copy(locale = "fr"), renderingMode = SessionParams.RenderingMode.SHRINK)
+    @Test fun localizedManualTotalsAndDate() {
+        paparazzi.snapshot {
+            MinusTheme { Surface {
+                CurrencyPeriodSummaryContent("EUR", BigDecimal("200"), BigDecimal("20.50"),
+                    ConversionPreferences("BRL", manualRates = listOf(ExchangeRate("EUR", "BRL", BigDecimal("6"), "2026-10-07", true))), false, Modifier.padding(16.dp))
+            } }
+        }
+    }
+}
+
+class CurrencyConversionSpanishScreenshotTest {
+    @get:Rule val paparazzi = Paparazzi(deviceConfig = DeviceConfig.PIXEL_5.copy(locale = "es"), renderingMode = SessionParams.RenderingMode.SHRINK)
+    @Test fun localizedManualTotalsAndDate() {
+        paparazzi.snapshot {
+            MinusTheme { Surface {
+                CurrencyPeriodSummaryContent("EUR", BigDecimal("200"), BigDecimal("20.50"),
+                    ConversionPreferences("BRL", manualRates = listOf(ExchangeRate("EUR", "BRL", BigDecimal("6"), "2026-10-07", true))), false, Modifier.padding(16.dp))
+            } }
         }
     }
 }

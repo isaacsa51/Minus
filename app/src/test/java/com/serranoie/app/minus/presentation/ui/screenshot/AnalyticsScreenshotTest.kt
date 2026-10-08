@@ -38,6 +38,19 @@ class AnalyticsScreenshotTest {
     )
 
     @Test
+    fun analyticsNoPeriodWithSavedConversion() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            CompositionLocalProvider(
+                com.serranoie.app.minus.presentation.ui.currency.LocalConversionPreferences provides
+                    com.serranoie.app.minus.domain.currency.ConversionPreferences("BRL", referenceRates = listOf(
+                        com.serranoie.app.minus.domain.currency.ExchangeRate("USD", "BRL", BigDecimal("5"), "2026-10-08", false)
+                    ))
+            ) { AnalyticsPreview(AnalyticsState(isLoading = false)) }
+        }
+    }
+
+    @Test
     fun analyticsActivePeriod() {
         Locale.setDefault(Locale.US)
 
