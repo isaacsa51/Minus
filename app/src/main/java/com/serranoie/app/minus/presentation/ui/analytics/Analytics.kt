@@ -498,6 +498,12 @@ fun Analytics(
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
+                        com.serranoie.app.minus.presentation.ui.currency.CurrencyPeriodSummary(
+                            base = shown.currencyCode,
+                            budget = shown.wholeBudget,
+                            spent = shown.budgetStateForDisplay?.totalSpentInPeriod ?: shown.spends.sumOf { it.amount },
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
                         BudgetGraph(
                             state = shown,
                             onGranularityChanged = actions.onGranularityChanged,

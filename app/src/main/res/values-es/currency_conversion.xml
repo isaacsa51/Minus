@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="conversion_title">Conversión de moneda</string>
+    <string name="conversion_display_current">Moneda de visualización: %1$s</string>
+    <string name="conversion_off">Desactivada</string>
+    <string name="conversion_description">Convierte los totales del período solo para visualización. Los importes y monedas originales no cambian. Usa códigos como USD, BRL o EUR. IRT significa tomán tradicional, 10 IRR por IRT; configura su tasa manualmente.</string>
+    <string name="conversion_display">Código de moneda de visualización</string>
+    <string name="conversion_save_display">Definir moneda de visualización</string>
+    <string name="conversion_disable">Desactivar</string>
+    <string name="conversion_from">Moneda de origen</string>
+    <string name="conversion_to">Moneda de destino</string>
+    <string name="conversion_rate">Tasa manual</string>
+    <string name="conversion_rate_help">Unidades de la moneda de destino por 1 unidad de origen. Usa punto decimal. Las tasas manuales tienen prioridad en ambas direcciones.</string>
+    <string name="conversion_save_manual">Guardar tasa manual</string>
+    <string name="conversion_fetch">Obtener tasa de referencia</string>
+    <string name="conversion_error">No se pudo actualizar la tasa. Las tasas guardadas no cambian. Revisa el par y la conexión, o introduce una tasa manual.</string>
+    <string name="conversion_reference_note">Tasas de referencia de Frankfurter. No son tasas en vivo ni de mercado informal. Solo se envían códigos de moneda, nunca importes. Las tasas guardadas funcionan sin conexión.</string>
+    <string name="conversion_manual_record">Manual %1$s/%2$s: %3$s</string>
+    <string name="conversion_remove">Eliminar manual %1$s/%2$s</string>
+    <string name="conversion_reference_record">Frankfurter %1$s/%2$s: %3$s · %4$s</string>
+    <string name="conversion_missing">No hay tasa %1$s/%2$s guardada. Configúrala en Ajustes.</string>
+    <string name="conversion_budget_line">Presupuesto: %1$s ≈ %2$s</string>
+    <string name="conversion_spent_line">Gastado: %1$s ≈ %2$s</string>
+    <string name="conversion_manual_note">Tasa manual. Solo visualización.</string>
+    <string name="conversion_cached_note">Tasa de referencia Frankfurter guardada del %1$s. Solo visualización.</string>
+    <string name="conversion_choose">Elegir moneda</string>
+</resources>

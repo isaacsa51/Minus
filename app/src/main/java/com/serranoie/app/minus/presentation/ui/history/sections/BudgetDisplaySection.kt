@@ -25,6 +25,13 @@ internal fun LazyListScope.budgetDisplaySection(
     creditOwed: BigDecimal = BigDecimal.ZERO,
     hintModifier: Modifier = Modifier,
 ) {
+    item("currency-conversion") {
+        com.serranoie.app.minus.presentation.ui.currency.CurrencyPeriodSummary(
+            base = currencyCode,
+            budget = budgetState?.totalBudget ?: budgetSettings?.totalBudget ?: BigDecimal.ZERO,
+            spent = budgetState?.totalSpentInPeriod ?: BigDecimal.ZERO,
+        )
+    }
     item("budget-display") {
         val startDate = budgetSettings?.startDate?.let {
             Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())

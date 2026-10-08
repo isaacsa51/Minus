@@ -74,6 +74,7 @@ fun SettingsScreen(
     }
 
     Settings(
+        currencyConversionContent = { com.serranoie.app.minus.presentation.ui.currency.CurrencyConversionSettings() },
         isCensored = uiState.isCensored,
         notificationHour = uiState.notificationHour,
         notificationMinute = uiState.notificationMinute,

@@ -158,6 +158,7 @@ fun Settings(
     onNavigateToChangelog: () -> Unit = {},
     onNavigateToAppearance: () -> Unit = {},
     onBack: () -> Unit = {},
+    currencyConversionContent: @Composable () -> Unit = {},
 ) {
     var showNotificationTimePicker by remember { mutableStateOf(false) }
     var showRecurrentNotificationTimePicker by remember { mutableStateOf(false) }
@@ -206,6 +207,7 @@ fun Settings(
                 .padding(paddingValues)
                 .testTag("SettingsScreen"),
         ) {
+            item { currencyConversionContent() }
             if (isCensored) {
                 item {
                     OutlinedCard(

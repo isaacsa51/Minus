@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="conversion_title">Conversion de devises</string>
+    <string name="conversion_display_current">Devise affichée : %1$s</string>
+    <string name="conversion_off">Désactivée</string>
+    <string name="conversion_description">Convertit les totaux des périodes uniquement pour affichage. Les montants et devises d’origine restent inchangés. Utilisez des codes comme USD, BRL ou EUR. IRT désigne le toman traditionnel, 10 IRR par IRT ; définissez son taux manuellement.</string>
+    <string name="conversion_display">Code de devise affichée</string>
+    <string name="conversion_save_display">Définir la devise affichée</string>
+    <string name="conversion_disable">Désactiver</string>
+    <string name="conversion_from">Devise source</string>
+    <string name="conversion_to">Devise cible</string>
+    <string name="conversion_rate">Taux manuel</string>
+    <string name="conversion_rate_help">Unités de la devise cible pour 1 unité source. Utilisez un point décimal. Les taux manuels sont prioritaires dans les deux sens.</string>
+    <string name="conversion_save_manual">Enregistrer le taux manuel</string>
+    <string name="conversion_fetch">Obtenir le taux de référence</string>
+    <string name="conversion_error">Impossible de mettre à jour le taux. Les taux enregistrés restent inchangés. Vérifiez la paire et la connexion, ou saisissez un taux manuel.</string>
+    <string name="conversion_reference_note">Taux de référence Frankfurter. Pas des taux de trading en direct ni du marché parallèle. Seuls les codes de devises sont envoyés, jamais les montants. Les taux enregistrés fonctionnent hors ligne.</string>
+    <string name="conversion_manual_record">Manuel %1$s/%2$s : %3$s</string>
+    <string name="conversion_remove">Supprimer le taux manuel %1$s/%2$s</string>
+    <string name="conversion_reference_record">Frankfurter %1$s/%2$s : %3$s · %4$s</string>
+    <string name="conversion_missing">Aucun taux %1$s/%2$s enregistré. Définissez-le dans les paramètres.</string>
+    <string name="conversion_budget_line">Budget : %1$s ≈ %2$s</string>
+    <string name="conversion_spent_line">Dépensé : %1$s ≈ %2$s</string>
+    <string name="conversion_manual_note">Taux manuel. Affichage uniquement.</string>
+    <string name="conversion_cached_note">Taux de référence Frankfurter enregistré du %1$s. Affichage uniquement.</string>
+    <string name="conversion_choose">Choisir une devise</string>
+</resources>

@@ -393,6 +393,13 @@ private fun ViewBudgetContent(
             "BudgetDisplay input totalBudget=$totalBudget budgetStateTotal=${budgetState?.totalBudget} budgetSettingsTotal=${budgetSettings?.totalBudget} rollOverLimit=${budgetSettings?.rollOverLimit} rollOverCarry=${budgetSettings?.rollOverCarryForward}"
         }
 
+        com.serranoie.app.minus.presentation.ui.currency.CurrencyPeriodSummary(
+            base = currencyCode,
+            budget = budgetState?.totalBudget ?: totalBudget,
+            spent = totalSpent,
+            modifier = Modifier.padding(bottom = 12.dp),
+        )
+
         SpendBudgetCard(
             modifier =
                 Modifier

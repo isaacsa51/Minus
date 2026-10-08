@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.analytics
 
+import com.serranoie.app.minus.presentation.ui.currency.CurrencyConversionHost
 import androidx.activity.compose.BackHandler
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.runtime.Composable
@@ -39,46 +40,48 @@ fun AnalyticsScreen(
         }
     }
 
-    Analytics(
-        state = uiState.displayState,
-        archivedBudgets = uiState.archivedBudgets,
-        categories = uiState.categories,
-        actions = AnalyticsActions(
-            onCreateNewPeriod = {
-                viewModel.onCreateNewPeriod()
-            },
-            onClose = {
-                viewModel.onClose()
-            },
-            onNavigateToSubscriptions = onNavigateToSubscriptions,
-            onMarkCreditPaid = {
-                viewModel.onMarkCreditPaid()
-            },
-            onPayTransactionClick = { txId ->
-                viewModel.onPayTransactionClick(txId)
-            },
-            onCutoffDayChanged = { day ->
-                viewModel.onCutoffDayChanged(day)
-            },
-            onHistoricalPeriodSelected = { periodId ->
-                viewModel.onPeriodSelected(periodId)
-            },
-            onTutorialCompleted = { hasSpends ->
-                viewModel.onTutorialCompleted(hasSpends)
-            },
-            onGranularityChanged = { granularity ->
-                viewModel.onGranularityChanged(granularity)
-            },
-            onUpdateTransaction = { tx ->
-                viewModel.updateTransaction(tx)
-            },
-            onDeleteTransaction = { tx ->
-                viewModel.deleteTransaction(tx)
-            },
-            onDeleteArchivedPeriod = { periodId ->
-                viewModel.deleteArchivedPeriod(periodId)
-            },
-        ),
-        activityResultRegistryOwner = activityResultRegistryOwner,
-    )
+    CurrencyConversionHost {
+        Analytics(
+            state = uiState.displayState,
+            archivedBudgets = uiState.archivedBudgets,
+            categories = uiState.categories,
+            actions = AnalyticsActions(
+                onCreateNewPeriod = {
+                    viewModel.onCreateNewPeriod()
+                },
+                onClose = {
+                    viewModel.onClose()
+                },
+                onNavigateToSubscriptions = onNavigateToSubscriptions,
+                onMarkCreditPaid = {
+                    viewModel.onMarkCreditPaid()
+                },
+                onPayTransactionClick = { txId ->
+                    viewModel.onPayTransactionClick(txId)
+                },
+                onCutoffDayChanged = { day ->
+                    viewModel.onCutoffDayChanged(day)
+                },
+                onHistoricalPeriodSelected = { periodId ->
+                    viewModel.onPeriodSelected(periodId)
+                },
+                onTutorialCompleted = { hasSpends ->
+                    viewModel.onTutorialCompleted(hasSpends)
+                },
+                onGranularityChanged = { granularity ->
+                    viewModel.onGranularityChanged(granularity)
+                },
+                onUpdateTransaction = { tx ->
+                    viewModel.updateTransaction(tx)
+                },
+                onDeleteTransaction = { tx ->
+                    viewModel.deleteTransaction(tx)
+                },
+                onDeleteArchivedPeriod = { periodId ->
+                    viewModel.deleteArchivedPeriod(periodId)
+                },
+            ),
+            activityResultRegistryOwner = activityResultRegistryOwner,
+        )
+    }
 }

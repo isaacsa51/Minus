@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.home
 
+import com.serranoie.app.minus.presentation.ui.currency.CurrencyConversionHost
 import android.os.Build
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -165,51 +166,53 @@ fun MainScreen(
                 }
             },
         ) {
-            BudgetFormulaHost {
-                MainScreenContent(
-                    mainScreenState = mainScreenState,
-                    budgetUiState = budgetUiState,
-                    actions =
-                        MainScreenActions(
-                            onProcessIntent = { intent ->
-                                when (intent) {
-                                    is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
-                                        budgetViewModel.processIntent(intent.intent)
-                                    }
+            CurrencyConversionHost {
+                BudgetFormulaHost {
+                    MainScreenContent(
+                        mainScreenState = mainScreenState,
+                        budgetUiState = budgetUiState,
+                        actions =
+                            MainScreenActions(
+                                onProcessIntent = { intent ->
+                                    when (intent) {
+                                        is MainScreenUiIntent.ProcessBudgetTransactionIntent -> {
+                                            budgetViewModel.processIntent(intent.intent)
+                                        }
 
-                                    is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
-                                        budgetViewModel.processIntent(intent.intent)
-                                    }
+                                        is MainScreenUiIntent.ProcessBudgetEditorIntent -> {
+                                            budgetViewModel.processIntent(intent.intent)
+                                        }
 
-                                    is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
-                                        budgetViewModel.processIntent(intent.intent)
-                                    }
+                                        is MainScreenUiIntent.ProcessBudgetNumpadIntent -> {
+                                            budgetViewModel.processIntent(intent.intent)
+                                        }
 
-                                    else -> {
-                                        mainScreenViewModel.processIntent(intent, tutorialStage)
+                                        else -> {
+                                            mainScreenViewModel.processIntent(intent, tutorialStage)
+                                        }
                                     }
-                                }
-                            },
-                            onAdvanceTutorial = { expected ->
-                                mainScreenViewModel.processIntent(
-                                    MainScreenUiIntent.AdvanceTutorial(expected),
-                                    tutorialStage
-                                )
-                            },
-                            onNavigateToAnalytics = onNavigateToAnalytics,
-                            onNavigateToSettings = onNavigateToSettings,
-                            onUnresolvedSurplusBannerClick = budgetViewModel::onUnresolvedSurplusBannerClicked,
-                            onLeftoverChoice = budgetViewModel::onLeftoverChoice,
-                            onCreateCategory = budgetViewModel::createCategory,
-                            onPeriodSelected = { period ->
-                                mainScreenViewModel.processIntent(
-                                    MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
-                                )
-                            },
-                        ),
-                    openWalletOnStart = openWalletOnStart,
-                    tutorialBoxState = tutorialBoxState,
-                )
+                                },
+                                onAdvanceTutorial = { expected ->
+                                    mainScreenViewModel.processIntent(
+                                        MainScreenUiIntent.AdvanceTutorial(expected),
+                                        tutorialStage
+                                    )
+                                },
+                                onNavigateToAnalytics = onNavigateToAnalytics,
+                                onNavigateToSettings = onNavigateToSettings,
+                                onUnresolvedSurplusBannerClick = budgetViewModel::onUnresolvedSurplusBannerClicked,
+                                onLeftoverChoice = budgetViewModel::onLeftoverChoice,
+                                onCreateCategory = budgetViewModel::createCategory,
+                                onPeriodSelected = { period ->
+                                    mainScreenViewModel.processIntent(
+                                        MainScreenUiIntent.SetSelectedPeriod(period), tutorialStage
+                                    )
+                                },
+                            ),
+                        openWalletOnStart = openWalletOnStart,
+                        tutorialBoxState = tutorialBoxState,
+                    )
+                }
             }
         }
     }

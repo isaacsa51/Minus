@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="conversion_title">Currency conversion</string>
+    <string name="conversion_display_current">Display currency: %1$s</string>
+    <string name="conversion_off">Off</string>
+    <string name="conversion_description">Convert period totals for display only. Original amounts and period currencies stay unchanged. Use currency codes such as USD, BRL or EUR. IRT means traditional toman, 10 IRR per IRT; set its rate manually.</string>
+    <string name="conversion_display">Display currency code</string>
+    <string name="conversion_save_display">Set display currency</string>
+    <string name="conversion_disable">Turn off</string>
+    <string name="conversion_from">From currency</string>
+    <string name="conversion_to">To currency</string>
+    <string name="conversion_rate">Manual rate</string>
+    <string name="conversion_rate_help">Units of the target currency per 1 source unit. Use a decimal point. Manual rates override reference rates in both directions.</string>
+    <string name="conversion_save_manual">Save manual rate</string>
+    <string name="conversion_fetch">Fetch reference rate</string>
+    <string name="conversion_error">Could not update the rate. Your saved rates are unchanged. Check the pair and connection, or enter a manual rate.</string>
+    <string name="conversion_reference_note">Frankfurter reference rates. Not live trading or street-market rates. Only currency codes are sent, never amounts. Fetch when needed; saved rates work offline.</string>
+    <string name="conversion_manual_record">Manual %1$s/%2$s: %3$s</string>
+    <string name="conversion_remove">Remove manual %1$s/%2$s</string>
+    <string name="conversion_reference_record">Frankfurter %1$s/%2$s: %3$s · %4$s</string>
+    <string name="conversion_missing">No saved %1$s/%2$s rate. Set a rate in Settings.</string>
+    <string name="conversion_budget_line">Budget: %1$s ≈ %2$s</string>
+    <string name="conversion_spent_line">Spent: %1$s ≈ %2$s</string>
+    <string name="conversion_manual_note">Manual rate. Display only.</string>
+    <string name="conversion_cached_note">Saved Frankfurter reference rate dated %1$s. Display only.</string>
+    <string name="conversion_choose">Choose currency</string>
+</resources>
