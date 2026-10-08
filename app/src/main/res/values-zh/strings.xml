@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">俭</string>
-    <string name="tile_new_transaction_label">新交易</string>
     <string name="tutorial_numpad_title">数字键盘</string>
-    <string name="tutorial_numpad_description">输入你花的金额，点击对勾即可保存。长按退格键可清空整个金额，在按键区向上滑动可打开计算器。</string>
+    <string name="tutorial_numpad_description">输入你支出的金额并点击绿色勾号来保存。上滑打开数字键盘进行计算。</string>
     <string name="tutorial_comment_title">添加一个类别</string>
-    <string name="tutorial_comment_description">给这笔支出加上分类，它就会出现在分析的明细里。点击已保存的标签可直接复用，也可以输入一条简短备注。</string>
+    <string name="tutorial_comment_description">添加一个类别或简短备注来记录支出去向。</string>
     <string name="tutorial_budget_pill_title">预算进度</string>
-    <string name="tutorial_budget_pill_description">点击可打开周期设置，修改预算、日期或分配方式。左右滑动可在今天剩余和整个周期剩余之间切换。长按可查看这个数字是怎么算出来的。</string>
+    <string name="tutorial_budget_pill_description">在每天、每周和每月预算视图间点击切换，或编辑周期设置。</string>
     <string name="tutorial_settings_title">设置</string>
-    <string name="tutorial_settings_description">你的数据和偏好都在这里：备份或导入 CSV、把小组件添加到主屏幕、设置存款目标和提醒时间，以及在附加功能中开启实验性功能。这些提示也可以从这里重新查看。</string>
+    <string name="tutorial_settings_description">打开设置以启用功能、设定主屏小组件或重新查看该教程。</string>
     <string name="tutorial_recurrent_title">定期付款</string>
-    <string name="tutorial_recurrent_description">开启后，这笔支出会每周、每两周或每月重复。Minus 会在到期日提醒你，并在历史记录的“该周期的定期支出”中显示，直到你标记为已付。</string>
+    <string name="tutorial_recurrent_description">点击这里将该支出标记为定期付款（每周、每半个月或每月）。应用会准时提醒你记录这笔支出。</string>
     <string name="tutorial_analytics_title">查看你的统计数据</string>
-    <string name="tutorial_analytics_description">看看钱花到哪里去了：按天的热力图、按分类的占比、最大和最小的支出，以及你关闭过的每个周期。</string>
+    <string name="tutorial_analytics_description">打开统计数据可按时间、分类和预算目标来查看你的支出分析。</string>
     <string name="tutorial_privacy_title">隐私模式</string>
-    <string name="tutorial_privacy_description">用手盖住屏幕顶部听筒附近约一秒，所有金额都会模糊。再盖一次即可恢复显示。</string>
-    <string name="tutorial_calc_title">收入与调整</string>
-    <string name="tutorial_calc_description">金额以 + 开头，可把钱加回这个周期，比如发薪、退款或转入。以 - 开头则扣减金额。其余按键作为普通计算器使用。</string>
+    <string name="tutorial_privacy_description">用手挡住手机顶部（前置摄像头区域）约一秒左右，即可隐藏屏幕上的金额显示。再次挡住以取消隐藏。</string>
+    <string name="tutorial_calc_title">Ongoing budget</string>
+    <string name="tutorial_calc_description">Use + or - at the beginning to increase or decrease your remaining budget for this period.</string>
     <string name="tutorial_credit_toggle_title">Credit Card payment</string>
-    <string name="tutorial_credit_toggle_description">把这笔支出标记为信用卡支付。它仍计入本周期，但 Minus 会单独记录你的欠款，方便你在账单日前结清。</string>
+    <string name="tutorial_credit_toggle_description">Tap here to mark that this expense was made with a credit card. It will be tracked separately in your analytics.</string>
     <string name="today">今日</string>
     <string name="yesterday">昨天</string>
     <string name="tomorrow">明天</string>
@@ -37,7 +36,7 @@
     <string name="undo">撤销</string>
     <string name="back">返回</string>
     <string name="next">继续</string>
-    <string name="navigate">导航</string>
+    <string name="navigate">Navigate</string>
     <string name="period">周期</string>
     <string name="previous_values">先前值</string>
     <string name="budget">预算</string>
@@ -59,8 +58,9 @@
     <string name="credit_cutoff_dialog_title">信用卡账单日</string>
     <string name="credit_cutoff_dialog_message">设置账单日（1-31）来追踪信用卡支出。</string>
     <string name="credit_cutoff_dialog_label">账单日</string>
+    <string name="expand_numpad">Expand numpad</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
-    <string name="numpad_action">数字小键盘操作</string>
     <string name="period_finished">已完成周期</string>
     <string name="remaining_budget">剩余的预算</string>
     <string name="rollover_question">剩余的钱你想如何规划？</string>
@@ -74,7 +74,6 @@
     <string name="edit_recurrent_expense_title">编辑定期支出</string>
     <string name="edit_expense_title">编辑支出</string>
     <string name="cancel_edit_content_desc">取消编辑</string>
-    <string name="tap_to_exit_edit_transaction">点按退出</string>
     <string name="configure_recurrence">配置定期</string>
     <string name="make_recurrent">设置定期</string>
     <string name="select_time">选择时间</string>
@@ -86,15 +85,14 @@
     <string name="edit_budget">编辑预算</string>
     <string name="new_budget">新的预算周期</string>
     <plurals name="pending_expense">
-        <item quantity="one">%d 笔下个周期的支出</item>
         <item quantity="other">下一周期的 %d 支出</item>
     </plurals>
     <string name="new_period_title">新的预算周期</string>
     <string name="widget_description">快速查看你的支出并添加新纪录</string>
     <string name="total_expenses">总计支出</string>
     <string name="new_expense">新的支出</string>
-    <string name="income_added">已添加收入</string>
-    <string name="deducted_budget">已扣除预算</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">每天平均</string>
     <string name="expenses_history">支出历史</string>
     <string name="single_expense">单笔支出</string>
@@ -103,7 +101,9 @@
     <string name="finalize_period">提前结束预算周期</string>
     <string name="finalize_period_confirm">这将关闭当前周期并开始一个新周期。你确定吗？</string>
     <string name="finalize_action">确定</string>
-    <string name="rollover_preview_ask_always">您还有 %1$s 未使用。本期结束后，系统会询问您如何处理这笔余额。</string>
+    <string name="rollover_preview_split_equally">You have %1$s left unspent. When this period ends, it will be spread across every day of your next budget.</string>
+    <string name="rollover_preview_add_to_first_day">You have %1$s left unspent. When this period ends, it will be added to the first day of your next budget.</string>
+    <string name="rollover_preview_ask_always">You have %1$s left unspent. You\'ll be asked what to do with it when this period ends.</string>
     <string name="no_ending_date">没有结束日期</string>
     <string name="budget_split_logic">你想如何拆分预算？</string>
     <string name="new_budget_period">新的预算周期</string>
@@ -127,20 +127,13 @@
     <string name="show_subscriptions_outside_period">显示周期外的订阅</string>
     <string name="hide_past_period_expenses">隐藏上一周期支出</string>
     <string name="show_past_period_expenses">显示上一周期支出</string>
-    <string name="history_snackbar_delete_transaction_failed">无法删除交易</string>
-    <string name="history_snackbar_save_transaction_failed">无法保存交易</string>
-    <string name="history_snackbar_delete_recurrent_failed">无法删除定期付款</string>
-    <string name="history_snackbar_mark_paid_failed">无法将交易标记为已付款</string>
-    <string name="history_snackbar_restore_transaction_failed">无法恢复该交易</string>
-    <string name="expense_queued_for_next_period">支出已排入下一周期</string>
+    <string name="history_snackbar_delete_transaction_failed">Could not delete transaction</string>
+    <string name="history_snackbar_save_transaction_failed">Could not save transaction</string>
+    <string name="history_snackbar_delete_recurrent_failed">Could not delete recurring payment</string>
+    <string name="history_snackbar_mark_paid_failed">Could not mark transaction as paid</string>
     <string name="add_new_category">类别</string>
     <string name="add_new_category_action">添加新类别</string>
-    <string name="new_category">新建类别</string>
-    <string name="new_category_saved">已保存新类别 %1$s</string>
-    <string name="sort_alphabetically">按字母顺序排序</string>
-    <string name="delete_category">删除分类</string>
-    <string name="add_extra_note">附加备注</string>
-    <string name="extra_note_label">备注</string>
+    <string name="delete_category">Delete Category</string>
     <string name="budget_validation_major_zero">预算必须比 0 多</string>
     <string name="budget_no_date_defined">未设定结束日期</string>
     <string name="budget_no_days_defined">未设定天数</string>
@@ -151,7 +144,6 @@
         <item quantity="other">%d 天</item>
     </plurals>
     <plurals name="analytics_days_left">
-        <item quantity="one">%d 天</item>
         <item quantity="other">%d 天</item>
     </plurals>
     <string name="total_budget">总预算</string>
@@ -159,7 +151,17 @@
     <string name="maximum_spent">最大支出</string>
     <string name="average_spent">平均每日支出</string>
     <string name="days_remaining_label">剩余\n天数</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Your device doesn\'t support adding widgets this way. Long-press your home screen and look for Minus instead.</string>
+    <string name="widget_complete_budget_title">Complete Budget</string>
+    <string name="widget_average_spend_title">Average Spend</string>
+    <string name="widget_days_countdown_title">Days Countdown</string>
+    <string name="widget_expense_title">Expense Summary</string>
+    <string name="widget_heatmap_title">Spending Heatmap</string>
+    <string name="widget_min_max_spent_title">Min/Max Spent</string>
+    <string name="widget_month_heatmap_title">Month Heatmap</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Track spending, total budget, and days left — with quick-add for a new expense</string>
     <string name="widget_budget_overview_description">快速查看支出和剩余预算</string>
     <string name="widget_days_countdown_description">预算周期内剩余天数倒数</string>
     <string name="widget_budget_detail_description">包含常用类别和剩余天数的完整预算视图</string>
@@ -168,6 +170,8 @@
     <string name="widget_add_expense_description">添加新支出的快捷方式</string>
     <string name="widget_add_expense_label">添加新支出</string>
     <string name="widget_add_expense_compact_label">添加支出</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">New Transaction</string>
     <!-- Widget Labels -->
     <string name="spent">已支出</string>
     <string name="left">剩余</string>
@@ -184,10 +188,10 @@
     <string name="budget_period_label_this_week">本周</string>
     <string name="budget_period_label_this_biweek">最近半月</string>
     <string name="budget_period_label_this_month">本月</string>
-    <string name="budget_pill_next_daily">明天可用 %1$s</string>
-    <string name="budget_pill_next_weekly">下周可用 %1$s</string>
-    <string name="budget_pill_next_biweekly">下个半月可用 %1$s</string>
-    <string name="budget_pill_next_monthly">下个月可用 %1$s</string>
+    <string name="budget_pill_label_per_daily">每天</string>
+    <string name="budget_pill_label_per_weekly">每周</string>
+    <string name="budget_pill_label_per_biweekly">每半个月</string>
+    <string name="budget_pill_label_per_monthly">每月</string>
     <string name="budget_pill_label_daily_exceeded">超出每日金额</string>
     <string name="budget_pill_label_weekly_exceeded">超出每周金额</string>
     <string name="budget_pill_label_biweekly_exceeded">超出每半个月金额</string>
@@ -195,43 +199,6 @@
     <string name="budget_pill_sub_exceeded_single">%1$s 金额超出</string>
     <string name="budget_pill_sub_exceeded_double">%1$s 和 %2$s 金额超出</string>
     <string name="budget_pill_sub_exceeded_triple">%1$s、%2$s 和 %3$s 金额超出</string>
-    <string name="budget_formula_title">计算方式</string>
-    <string name="budget_formula_hold_hint">显示金额的计算方式</string>
-    <string name="budget_formula_caption_surplus_split">上一周期的结余计入预算</string>
-    <string name="budget_formula_caption_surplus_first_day">上一周期的结余保留在第一天</string>
-    <string name="budget_formula_caption_adjustments">本周期的收入与扣减</string>
-    <string name="budget_formula_caption_per_day">平均分配到周期内的每一天</string>
-    <string name="budget_formula_caption_per_period">预算：%1$s</string>
-    <string name="budget_formula_caption_remaining_budget">总预算的剩余部分</string>
-    <string name="budget_formula_caption_spread_over_left">分配到周期剩余的时间</string>
-    <string name="budget_formula_caption_left">剩余</string>
-    <string name="budget_formula_caption_reserved">为本周期内稍后到期的扣款预留</string>
-    <string name="budget_formula_caption_carried">从前几天结转</string>
-    <string name="budget_formula_caption_spread_leftover">你选择平摊的结余</string>
-    <string name="budget_formula_label_budget">剩余预算</string>
-    <string name="budget_formula_label_carried">结转</string>
-    <string name="budget_formula_label_recurring">已计入的定期支出</string>
-    <string name="budget_formula_label_rebalanced">分摊到剩余天数</string>
-    <string name="budget_formula_label_spent">已花费</string>
-    <string name="budget_formula_label_total">合计</string>
-    <string name="budget_formula_negative_spent">你的支出已超出这个预算。</string>
-    <string name="budget_formula_negative_recurring">即将到来的扣款超出了这个预算。</string>
-    <string name="budget_formula_negative_carried">之前几天结转的赤字。</string>
-    <string name="budget_formula_card_tap_hint">点击查看完整明细</string>
-    <string name="budget_formula_tip_hold_pill">提示：长按主屏幕上的预算胶囊，随时查看此明细</string>
-    <string name="budget_formula_tip_tap_card">提示：也可以点击周期面板中的计算金额</string>
-    <plurals name="budget_formula_weeks">
-        <item quantity="other">%d 周</item>
-        <item quantity="one">%d 周</item>
-    </plurals>
-    <plurals name="budget_formula_biweeks">
-        <item quantity="other">%d 个双周</item>
-        <item quantity="one">%d 个双周</item>
-    </plurals>
-    <plurals name="budget_formula_months">
-        <item quantity="other">%d 个月</item>
-        <item quantity="one">%d 个月</item>
-    </plurals>
     <string name="day_total_format">总计：%1$s</string>
     <string name="onboarding_welcome_title">欢迎使用 Minus</string>
     <string name="onboarding_welcome_subtitle">你好，欢迎，让我们一起存钱吧。</string>
@@ -268,7 +235,7 @@
     <string name="changelog_close">关闭</string>
     <string name="changelog_previous_versions">上一版本</string>
     <string name="changelog_updated_to">Updated to: %1$s</string>
-    <string name="changelog_see_changes">Minus 已更新。&lt;br&gt;如需了解更多详情，请访问 &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt;。</string>
+    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">选择周期</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d 天 · %2$s - %3$s</string>
@@ -276,10 +243,10 @@
     <!-- Settings -->
     <string name="settings_title">设置</string>
     <string name="settings_section_appearance">外观</string>
-    <string name="settings_section_language">語言</string>
-    <string name="settings_language_header">應用語言</string>
-    <string name="settings_language_currently_format">當前: %1$s</string>
-    <string name="settings_language_disclaimer">語言翻譯可能不準確。</string>
+    <string name="settings_section_language">Language</string>
+    <string name="settings_language_header">App Language</string>
+    <string name="settings_language_currently_format">Currently: %1$s</string>
+    <string name="settings_language_disclaimer">Language translations might be incorrect.</string>
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
@@ -289,7 +256,7 @@
     <string name="settings_contrast_high">High</string>
     <string name="settings_typography_condensed">Condensed</string>
     <string name="settings_typography_expressive">Expressive</string>
-    <string name="settings_color_scheme_title">App Color Scheme</string>
+    <string name="settings_color_scheme_title">Colorscheme</string>
     <string name="settings_section_notifications">通知</string>
     <string name="settings_section_features">功能</string>
     <string name="settings_section_app_info">应用信息</string>
@@ -300,15 +267,13 @@
     <string name="settings_theme_subtitle">更改应用主题风格</string>
     <string name="settings_appearance_title">Theming and color</string>
     <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
-    <string name="settings_widgets_title">小组件</string>
-    <string name="settings_widgets_subtitle">探索可添加到主屏幕的小组件</string>
+    <string name="settings_widgets_title">Widgets</string>
+    <string name="settings_widgets_subtitle">Explore and see widgets to use on your home screen</string>
     <string name="settings_typography_title">排版</string>
     <string name="settings_typography_subtitle">更改应用的排版风格</string>
-    <string name="settings_rounded_font_title">圆体字形</string>
+    <string name="settings_rounded_font_title">Rounded font style</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">基于壁纸颜色的动态应用主题</string>
-    <string name="settings_amoled_title">AMOLED 主题</string>
-    <string name="settings_amoled_subtitle">在深色模式下为背景和界面使用纯黑色</string>
     <string name="settings_censor_mode_title">隐私模式</string>
     <string name="settings_censor_mode_subtitle">隐藏并模糊应用内的所有财务数值</string>
     <string name="settings_feature_credit_toggle_title">使用信用卡支付</string>
@@ -321,29 +286,15 @@
     <string name="settings_category_picker_direct_popup_description">点击类别区域时打开包含已保存类别的建议弹窗。关闭时，建议弹窗仅在你输入时出现。</string>
     <string name="settings_category_grid_mode_switch_label">显示为列表（实验性）</string>
     <string name="settings_category_grid_mode_description">点击类别标签后会以网格视图展开已保存类别，而不是进入內联编辑模式。开启该选项时也会关闭数字键盘计算器。</string>
-    <string name="settings_feature_extra_note_title">每笔交易的附加备注</string>
-    <string name="settings_feature_extra_note_subtitle">点击查看详情</string>
-    <string name="settings_feature_extra_note_description">在添加或编辑交易时，在类别旁边添加一个可选的\"附加备注\"字段。用它来记录仅凭类别无法体现的细节，例如\"通勤\"里的钱具体花在了什么地方。</string>
-    <string name="settings_feature_extra_note_switch_label">启用附加备注</string>
-    <string name="settings_feature_reserve_upcoming_charges_title">预留即将到来的扣款</string>
-    <string name="settings_feature_reserve_upcoming_charges_description">从第一天起就预留本周期内稍后到期的每笔定期扣款，而不是在到期日才扣除。剩余预算和每日金额将只显示真正可以自由支配的部分。</string>
-    <string name="settings_feature_reserve_upcoming_charges_switch_label">提前预留扣款</string>
-    <string name="settings_feature_lab_title">附加功能</string>
-    <string name="settings_feature_lab_subtitle">可以开启的可选实验性功能</string>
-    <string name="settings_feature_lab_header">这里的每项功能都是可选的，默认关闭；部分为实验性功能，可能在后续更新中发生变化。点击某项功能即可开启它，并查看它具体会改变什么。</string>
-    <string name="settings_feature_group_categories">类别</string>
-    <string name="settings_feature_group_transactions">交易</string>
-    <string name="settings_feature_group_budget">预算与付款</string>
-    <string name="settings_feature_experimental">实验性</string>
-    <string name="settings_feature_state_on">已开启</string>
-    <string name="settings_feature_state_off">已关闭</string>
-    <string name="settings_feature_new_category_tag_title">单独保存类别</string>
-    <string name="settings_feature_new_category_tag_description">在待机屏幕上添加\"新建类别\"标签，让你无需填写金额或交易即可单独创建并保存类别。</string>
-    <string name="settings_feature_category_direct_popup_title">点击时显示类别建议</string>
-    <string name="settings_feature_category_grid_title">类别列表模式</string>
-    <string name="settings_feature_show_past_transactions_switch_label">加载过去的周期</string>
     <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
     <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
+    <string name="settings_recurrent_payments_view_mode_title">定期支出视图</string>
+    <string name="settings_recurrent_payments_view_mode_subtitle">更改显示类型来查看你的定期支出</string>
+    <string name="settings_recurrent_payments_view_mode_dialog_title">定期支出视图</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_title">横向</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">以横向卡片的形式显示定期支出</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_title">纵向</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">以常规支出清单的方式显示定期支出</string>
     <string name="settings_period_end_time_title">周期结束时间</string>
     <string name="settings_period_end_time_subtitle">周期截止日期的通知将于此刻发送</string>
     <string name="settings_recurrent_notification_time_title">定期支出时间</string>
@@ -361,7 +312,7 @@
     <string name="settings_about_subtitle">了解更多应用和开发信息</string>
     <string name="settings_bug_report_title">遇到 bug？</string>
     <string name="settings_bug_report_subtitle">创建问题报告，我们将尽快修复</string>
-    <string name="settings_what_is_this_for">这是做什么用的？</string>
+    <string name="settings_what_is_this_for">What is this for?</string>
     <string name="settings_version_title">版本</string>
     <string name="settings_version_metadata_copied">应用与设备信息已复制至剪贴板</string>
     <!-- Bug Report -->
@@ -405,7 +356,7 @@
     <string name="bug_report_upload_assets">上传素材</string>
     <string name="bug_report_upload_assets_subtitle">截图或视频（最多 10MB）</string>
     <string name="bug_report_upload_assets_selected_count">已选择 %1$d 个附件</string>
-    <string name="bug_report_remove_attachment">移除附件</string>
+    <string name="bug_report_remove_attachment">Remove attachment</string>
     <string name="settings_backup_title">备份数据</string>
     <string name="settings_backup_subtitle">备份数据至 minus_export.csv</string>
     <string name="settings_import_csv_title">导入 CSV</string>
@@ -429,16 +380,17 @@
     <string name="expand">展开</string>
     <string name="collapse">折叠</string>
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">已超出預算金額</string>
+    <string name="budget_pill_over_budget">Budget amount exceeded</string>
     <string name="budget_pill_no_budget">没有预算</string>
     <string name="budget_pill_no_budget_action">设置预算</string>
-    <string name="budget_pill_calc_subtracted">将扣除 %1$s</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
     <string name="budget_pill_exhausted_daily_label">每天</string>
     <string name="budget_pill_exhausted_weekly_label">每周</string>
     <string name="budget_pill_exhausted_biweekly_label">每半个月</string>
-    <string name="budget_pill_exhausted_single">%1$s 预算已用完</string>
-    <string name="budget_pill_exhausted_double">%1$s 和 %2$s 预算已用完</string>
-    <string name="budget_pill_exhausted_triple">%1$s、%2$s 和 %3$s 预算已用完</string>
+    <string name="budget_pill_exhausted_single">%1$s 预算耗尽</string>
+    <string name="budget_pill_exhausted_double">%1$s 和 %2$s 预算耗尽</string>
+    <string name="budget_pill_exhausted_triple">%1$s、%2$s 和 %3$s 预算耗尽</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">支出</string>
     <string name="spend_budget_card_available_percent_format">可用：%1$s%%</string>
@@ -474,57 +426,18 @@
     <string name="recurrent_ticket_weekly_unnamed">未命名的每周订阅</string>
     <string name="recurrent_ticket_biweekly_unnamed">未命名的每两周订阅</string>
     <string name="recurrent_ticket_monthly_unnamed">未命名的月度订阅</string>
-    <!-- Subscriptions screen -->
-    <string name="subscriptions_title">订阅</string>
-    <string name="subscriptions_analytics_card_label">定期扣费</string>
-    <string name="subscriptions_monthly_commitment_label">每月支出</string>
-    <string name="subscriptions_per_month_suffix">/月</string>
-    <string name="subscriptions_hero_subtitle_with_next">%1$d 个进行中 · 下一个 %2$s</string>
-    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d 个进行中</string>
-    <string name="subscriptions_due_soon_header">即将到期</string>
-    <string name="subscriptions_upcoming_header">即将到来</string>
-    <string name="subscriptions_due_today_label">今天到期</string>
-    <string name="subscriptions_mark_as_paid">标记为已付款</string>
-    <string name="subscriptions_skip_this_cycle">本期跳过</string>
-    <string name="subscriptions_empty_title">暂无订阅</string>
-    <string name="subscriptions_empty_body">将一笔支出标记为定期后，它会显示在这里，包含到期日和剩余时间。</string>
-    <string name="subscriptions_snackbar_confirm_failed">无法确认此笔付款</string>
-    <string name="subscriptions_snackbar_skip_failed">无法跳过此笔付款</string>
-    <string name="subscriptions_status_paid">已付款</string>
-    <string name="subscriptions_status_skipped">已跳过</string>
-    <string name="subscriptions_budget_committed">本期预算的 %1$s</string>
-    <string name="subscriptions_snackbar_edit_failed">无法保存此更改</string>
-    <string name="subscriptions_snackbar_delete_failed">无法删除此订阅</string>
-    <string name="subscriptions_frequency_breakdown_title">按扣费频率</string>
-    <string name="subscriptions_view_mode_whole_period">整个周期</string>
-    <string name="subscriptions_view_mode_weekly">每周</string>
-    <string name="subscriptions_view_mode_category">类别</string>
-    <string name="subscriptions_weekly_week_badge">第 %d 周</string>
-    <string name="subscriptions_weekly_category_distribution_title">类别分布</string>
-    <string name="subscriptions_weekly_total_suffix">共 %s</string>
-
-    <plurals name="subscriptions_weekly_bills_scheduled">
-        <item quantity="one">本周有 %d 笔账单到期</item>
-        <item quantity="other">本周有 %d 笔账单到期</item>
-    </plurals>
-
-    <string name="subscriptions_item_mark_paid_short">标记已付款</string>
-    <string name="subscriptions_item_skip_short">跳过</string>
-    <string name="subscriptions_item_due_in_days">%1$d 天后 (%2$s)</string>
-    <string name="subscriptions_item_due_in_weeks">%1$d 周后 (%2$s)</string>
-
+    <string name="recurrent_ticket_frequency_weekly">每周</string>
+    <string name="recurrent_ticket_frequency_biweekly">每半个月</string>
+    <string name="recurrent_ticket_frequency_monthly">每月</string>
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">周期完成</string>
     <string name="rollover_dialog_question">剩余的钱你想如何规划？</string>
     <string name="rollover_dialog_split_equally_title">平均分配</string>
-    <string name="rollover_dialog_split_equally_desc">将 %1$s 平均分配到下个预算的每一天</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">添加到今天</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">将 %1$s 全部添加到今天的预算中</string>
-    <string name="rollover_dialog_view_analytics_title">放弃剩余预算</string>
-    <string name="rollover_dialog_view_analytics_desc">放弃剩余金额并直接前往分析页面</string>
-    <string name="unresolved_surplus_title">待处理的结余</string>
-    <string name="rollover_dialog_pending_label">来自上一周期</string>
-    <string name="unresolved_surplus_tap_to_manage">点击管理</string>
+    <string name="rollover_dialog_split_equally_desc">为接下来的日子添加 %1$s 预算</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">累积至明天</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">添加 %1$s 至明天的预算</string>
+    <string name="rollover_dialog_view_analytics_title">查看分析数据</string>
+    <string name="rollover_dialog_view_analytics_desc">查看已完成周期的摘要信息</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">周期完成</string>
     <string name="finished_period_header_no_spends">嗯？这个周期你竟然一毛不拔</string>
@@ -539,7 +452,7 @@
     <string name="savings_recommendation_current_savings_format">当前存款：%1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">定期支出</string>
     <string name="savings_recommendation_one_time_expenses_label">一次性支出</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">连续 6 个月左右每周期存下 %1$d%%，你可以：</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">连续 6 个月左右每周期存下 20%，你可以：</string>
     <string name="savings_recommendation_goal_format" formatted="false">要在 %2$d 月内达到 %1$s，每周期需要存下 %3$s。</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">正在显示默认的 %1$d%% 示例。请在设置中设置一个包含具体金额的存款目标。</string>
     <!-- Settings: Savings Preferences -->
@@ -569,48 +482,36 @@
     <string name="wavy_divider_show_all_past_period_expenses">显示上一期间的全部支出……</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">使用 %d 天</string>
+    <string name="remaining_budget_label">剩余</string>
     <string name="currency_label">货币</string>
-    <string name="budget_duration_label">时长</string>
-    <string name="budget_base_currency_label">基础货币</string>
-    <string name="budget_behaviour_title">预算行为</string>
-    <string name="budget_behaviour_subtitle">选择如何处理剩余的钱，以及每日金额的计算方式。</string>
-    <string name="budget_behaviour_surplus_title">周期结束时的结余</string>
-    <string name="budget_behaviour_surplus_ask">询问我</string>
-    <string name="budget_behaviour_surplus_spread">全部平摊</string>
-    <string name="budget_behaviour_surplus_first_day">全放第1天</string>
-    <string name="budget_behaviour_surplus_preview_ask">周期结束时，由你决定如何处理剩余的钱。</string>
-    <string name="budget_behaviour_surplus_preview_spread">剩余的钱会平均分配到下个周期的每一天。</string>
-    <string name="budget_behaviour_surplus_preview_first_day">剩余的钱会全部加到下个周期的第一天。</string>
     <string name="select_currency">选择货币</string>
     <string name="search_currency">搜索货币……</string>
     <string name="clear">清除</string>
     <string name="currency_no_results">找不到货币</string>
     <string name="currency_selected">已选择</string>
     <!-- Remaining Budget Strategy -->
+    <string name="strategy_dialog_title">预算结余</string>
+    <string name="strategy_dialog_description" formatted="false">你可以选择一天结束时如何分配你的预算余额。\n\n比如你每天有 500 的预算但昨天只花了 400，剩下的 100 就可以在剩余的日子里平分或直接加入今天的预算变成 600（每日预算 + 上一周期结余）。</string>
+    <string name="strategy_ask_always">总是询问</string>
+    <string name="strategy_ask_always_desc">周期结束时我们会询问你如何处理结余</string>
+    <string name="strategy_split_equally">平均分配</string>
+    <string name="strategy_split_equally_desc">结余将平均分配至新周期内的所有日期</string>
+    <string name="strategy_add_to_first_day">添加至首日</string>
+    <string name="strategy_add_to_first_day_desc">结余将添加至新周期的首日</string>
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">每日金额</string>
-    <string name="split_mode_static">每天相同</string>
-    <string name="split_mode_static_desc">无论花多少、花不花，总预算都会平均分配到每一天。</string>
-    <string name="split_mode_dynamic">每天重新分配</string>
-    <string name="split_mode_dynamic_desc">根据你的支出每天重新计算。剩余预算会平摊到本周期剩下的日子。</string>
-    <string name="split_mode_carry_over">留到以后</string>
-    <string name="split_mode_carry_over_desc">每天没花完的钱会加到第二天的预算里，并不断累积。</string>
-    <string name="split_mode_ask_me">每天你来定</string>
-    <string name="split_mode_ask_me_desc">每天由你决定昨天没用完的预算：平摊到剩余天数，或结转到今天。超支总会平摊到剩余天数，因此每日金额会减少。</string>
-    <string name="leftover_choice_spread">平摊到剩余天数</string>
-    <string name="leftover_choice_carry">全部加到今天</string>
-    <string name="leftover_choice_spread_desc">将所有未使用的剩余预算平摊到剩下的每一天。</string>
-    <string name="leftover_choice_carry_desc">只把未使用的预算结转到明天。</string>
-    <string name="leftover_choice_spread_outcome">剩余天数每日 %1$s</string>
-    <string name="leftover_choice_carry_outcome">明天 %1$s</string>
-    <string name="leftover_choice_outcome">今天剩余 · 之后 %1$s/天</string>
-    <string name="leftover_choice_outcome_last_day">今天剩余</string>
+    <string name="split_mode_label">拆分模式</string>
+    <string name="split_mode_dialog_title">你想如何拆分你的预算？</string>
+    <string name="split_mode_dialog_description" formatted="false">选择每周期余额如何计算。</string>
+    <string name="split_mode_static">固定</string>
+    <string name="split_mode_static_desc">总预算将平均分配在每一天，无论你花费多少钱。</string>
+    <string name="split_mode_dynamic">动态分配（推荐）</string>
+    <string name="split_mode_dynamic_desc">随支出重新计算每日预算。剩余预算将在该周期内的剩余日期中平均分配。</string>
     <!-- Transaction Detail -->
     <string name="without_date">没有日期</string>
     <string name="no_name">没有名称</string>
-    <string name="no_name_income">未具名收入</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">购买原因</string>
-    <string name="adjustment_reason">原因</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">日期</string>
     <string name="frequency">频率</string>
     <string name="charge_day">计费日期</string>
@@ -633,17 +534,16 @@
     <string name="notification_period_end_message_positive">本周期剩余 %1$s 预算。点击查看详情。</string>
     <string name="notification_period_end_message_negative">本周期已结束。你额外支出了 %1$s。点击查看详情。</string>
     <string name="notification_period_end_message_neutral">周期结束。你什么都没花。查看详情。</string>
-    <string name="notification_recurrent_due_today_title">您的“%1$s”付款今天到期</string>
-    <string name="notification_recurrent_charged_weekly">您的每周支出 %1$s 即将扣款。</string>
-    <string name="notification_recurrent_charged_biweekly">您的每两周支出 %1$s 即将扣款。</string>
-    <string name="notification_recurrent_charged_monthly">您的每月支出 %1$s 即将扣款。</string>
+    <string name="notification_recurrent_expense_title">定期支出</string>
+    <string name="notification_recurrent_expense_message_with_comment">今天你有一项名为「%2$s」的定期支出，金额为 %1$s。</string>
+    <string name="notification_recurrent_expense_message_without_comment">今天你有总计 %1$s 的定期支出。</string>
     <string name="notification_tomorrow">明天</string>
     <string name="notification_in_days">%1$d 天内</string>
-    <string name="notification_upcoming_subscription_title">即将到来的支出</string>
+    <string name="notification_upcoming_subscription_title">即将到来的订阅</string>
     <string name="notification_upcoming_subscription_message_with_comment">你「%2$s」中的「%1$s」订阅将收费 %3$s，请准备付款。</string>
     <string name="notification_upcoming_subscription_message_without_comment">你有一项名为「%1$s」的订阅将收费 %2$s。</string>
     <string name="notification_credit_cutoff_title">即将到来的信用卡付款</string>
-    <string name="notification_credit_cutoff_message">你的账单日期是 %1$s。推荐支付 %2$s 来避免利息产生。</string>
+    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
     <string name="credit_owed_label">总负债</string>
     <string name="debt_adjusted_balance_label">经调整的余额</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s 信用债务</string>
@@ -654,21 +554,21 @@
     <string name="ticket_recurrent_expense">周期性支出</string>
     <!-- Past Periods -->
     <string name="past_periods_title">以往周期</string>
-    <string name="past_periods_subtitle">点按某个周期查看完整明细。长按可将其删除。</string>
+    <string name="past_periods_subtitle">Tap a period to see its full breakdown.</string>
     <string name="past_periods_empty">未找到归档的周期</string>
     <string name="past_periods_spent_label">已支出</string>
     <string name="past_periods_limit_label">限额</string>
     <string name="past_periods_status_on_track">追踪中</string>
     <string name="past_periods_status_over_budget">超出预算</string>
-    <string name="past_periods_status_estimated">估算</string>
-    <string name="past_periods_estimated_divider">以下为估算周期</string>
+    <string name="past_periods_status_estimated">Estimated</string>
+    <string name="past_periods_estimated_divider">Estimated periods below</string>
     <string name="past_periods_status_saved">节约 %1$s</string>
-    <string name="past_periods_saved_label">节省的钱</string>
+    <string name="past_periods_saved_label">Money Saved</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">支出趋势</string>
     <string name="analytics_tutorial_minmax_desc">此处展示你的最低与最高支出。\n随记账实时更新，轻松识别异常开支</string>
-    <string name="analytics_tutorial_header_title">周期历史</string>
-    <string name="analytics_tutorial_header_desc">你关闭过的所有周期都在这个图标后面。点击其中一个可重新打开完整分析；总额会在查看时重新计算，因此修改旧支出会同步更新它所属的周期。长按某个周期并用指纹确认，即可永久删除。</string>
+    <string name="analytics_tutorial_header_title">历史周期</string>
+    <string name="analytics_tutorial_header_desc">点击图标查看历史预算及执行状况</string>
     <string name="analytics_tutorial_budget_title">预算状况</string>
     <string name="analytics_tutorial_budget_desc">检查您的总预算并查看周期总天数。</string>
     <string name="analytics_tutorial_heatmap_title">消费强度</string>
@@ -677,8 +577,6 @@
     <string name="analytics_tutorial_charts_desc">了解哪些分类正在蚕食你的预算。点击饼图扇区或分类名称来查看明细。</string>
     <string name="analytics_tutorial_savings_title">存钱妙招</string>
     <string name="analytics_tutorial_savings_desc">基于 50/30/20 法则建议的储蓄金额，可随时在设置中调整。</string>
-    <string name="analytics_no_period_title">还没有预算周期</string>
-    <string name="analytics_no_period_body">创建一个预算周期，你的支出、分类和储蓄就会显示在这里。</string>
     <string name="analytics_tutorial_credit_title">信用卡管理</string>
     <string name="analytics_tutorial_credit_desc">点击卡片可查看信用卡账单、标记已还款或修改账单日来避免产生利息。</string>
     <string name="analytics_tutorial_history_title">账单明细</string>
@@ -687,7 +585,8 @@
     <string name="budget_graph_header_spending">Spending</string>
     <string name="budget_graph_legend_current">Current</string>
     <string name="budget_graph_legend_previous">Previous</string>
-    <string name="budget_graph_view_mode_categories">分类</string>
+    <string name="budget_graph_view_mode_cumulative">Trend</string>
+    <string name="budget_graph_view_mode_categories">Categories</string>
     <string name="budget_graph_nav_prev">Previous</string>
     <string name="budget_graph_nav_next">Next</string>
     <string name="graph_granularity_days">Days</string>
@@ -697,44 +596,4 @@
     <string name="graph_granularity_total">Total</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
-    <string name="expand_numpad">展开数字小键盘</string>
-    <string name="rollover_preview_split_equally">您还有 %1$s 未使用。本周期结束后，这笔金额将分摊到您下一个预算周期的每一天。</string>
-    <string name="rollover_preview_add_to_first_day">您还有 %1$s 未使用。本周期结束后，这笔金额将计入您下一个预算周期的首日。</string>
-    <string name="settings_widgets_pin_not_supported">您的设备不支持通过这种方式添加小组件。请改为长按主屏幕，然后查找“减号”图标。</string>
-    <string name="widget_complete_budget_title">完整预算</string>
-    <string name="widget_average_spend_title">平均消费额</string>
-    <string name="widget_days_countdown_title">天数倒计时</string>
-    <string name="widget_expense_title">费用汇总</string>
-    <string name="widget_heatmap_title">支出热力图</string>
-    <string name="widget_min_max_spent_title">最低/最高消费额</string>
-    <string name="widget_month_heatmap_title">月份热力图</string>
-    <string name="widget_complete_budget_description">追踪支出、总预算及剩余天数——支持快速添加新支出</string>
-    <string name="budget_pill_calc_added">将添加 %1$s</string>
-    <string name="budget_graph_view_mode_cumulative">趋势</string>
-    <string name="unlock_past_period">解锁以编辑</string>
-    <string name="biometric_prompt_title">解锁上一周期</string>
-    <string name="biometric_prompt_subtitle">使用指纹验证来修改先前的支出</string>
-    <string name="past_period_unlocked_message">已成功解锁上一周期的编辑权限</string>
-    <string name="past_period_edit_confirm_title">修改上一周期的支出？</string>
-    <string name="past_period_edit_confirm_message">您确定要编辑或删除上一周期的这笔支出吗？这需要生物识别验证。</string>
-    <string name="past_period_delete_confirm_title">删除过去的周期？</string>
-    <string name="past_period_delete_confirm_message">这将永久删除 %1$s – %2$s 周期及其支出。订阅将保留。需要生物识别验证。</string>
-    <string name="dialog_yes">是</string>
-    <string name="loading">加载中…</string>
-    <string name="widget_budget_pill_title">预算胶囊</string>
-    <string name="widget_budget_pill_description">以细长条显示所选视图模式（每日、每周、每两周、每月）的剩余金额</string>
-
-    <!-- Tutorial hints -->
-    <string name="tutorial_history_budget_title">周期概览</string>
-    <string name="tutorial_history_budget_description">当前周期已花费和剩余的金额，包含信用卡尚未结清的部分。</string>
-    <string name="tutorial_history_transaction_title">编辑或删除支出</string>
-    <string name="tutorial_history_transaction_description">点击支出可展开查看完整明细。向右滑动可编辑金额、日期、分类或备注；向左滑动可删除，并有几秒钟可以撤销。</string>
-    <string name="tutorial_history_recurrent_title">即将到期的支出</string>
-    <string name="tutorial_history_recurrent_description">本周期内到期的定期支出在付款前会显示在这里。到期后可标记为已付，也可只删除这一次以跳过本次，而不取消整个周期。</string>
-    <string name="tutorial_history_past_period_title">上一周期</string>
-    <string name="tutorial_history_past_period_description">上一个周期的支出，单独收起。可在设置的附加功能中再次关闭这一区块。</string>
-    <string name="analytics_tutorial_recurrent_title">定期支出</string>
-    <string name="analytics_tutorial_recurrent_desc">所有重复的项目及其每个周期的花费。打开可查看每一项的下次到期日，或停止你不再支付的项目。</string>
-    <string name="analytics_tutorial_income_title">加回的钱</string>
-    <string name="analytics_tutorial_income_desc">所有以 + 开头记录的条目——发薪、退款、转入。它会计入本周期而不算作支出，因此你的剩余预算会增加。</string>
 </resources>
