@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Minus</string>
-    <string name="tile_new_transaction_label">Nova transação</string>
     <string name="tutorial_numpad_title">Empada</string>
-    <string name="tutorial_numpad_description">Digite o quanto você gastou e toque no visto para salvar. Mantenha a tecla de apagar pressionada para limpar o valor inteiro e deslize para cima sobre as teclas para abrir a calculadora.</string>
+    <string name="tutorial_numpad_description">Digite a quantidade que gastou e toque na marca verde para salvar. Deslize para cima no empada para calcular.</string>
     <string name="tutorial_comment_title">Adicionar uma categoria</string>
-    <string name="tutorial_comment_description">Dê uma categoria à despesa para ela aparecer no detalhamento das análises. Toque em uma das suas etiquetas salvas para reutilizá-la ou digite uma nota curta.</string>
+    <string name="tutorial_comment_description">Adicione uma categoria ou nota curta para lembrar para que era o gasto.</string>
     <string name="tutorial_budget_pill_title">Progresso do orçamento</string>
-    <string name="tutorial_budget_pill_description">Toque para abrir a configuração do período e mudar o orçamento, as datas ou como ele é dividido. Deslize para o lado para alternar entre o que resta hoje e o que resta para todo o período. Mantenha pressionado para ver exatamente como esse valor foi calculado.</string>
+    <string name="tutorial_budget_pill_description">Toque para alternar entre visualizações de orçamento diárias, semanais e mensais, ou para editar a configuração de período.</string>
     <string name="tutorial_settings_title">Configurações</string>
-    <string name="tutorial_settings_description">Seus dados e preferências ficam aqui: faça backup ou importe um CSV, adicione widgets à tela inicial, defina a meta de poupança e os horários dos lembretes e ative recursos experimentais em Recursos adicionais. Você também pode rever estas dicas por aqui.</string>
+    <string name="tutorial_settings_description">Abra as configurações para habilitar os recursos, configurar widgets na tela inicial ou redefinir este tutorial.</string>
     <string name="tutorial_recurrent_title">Pagamentos recorrentes</string>
-    <string name="tutorial_recurrent_description">Ative isto para repetir a despesa toda semana, a cada duas semanas ou todo mês. O Minus lembra você no dia do vencimento e a mostra em Pagamentos recorrentes neste período no seu histórico até você marcá-la como paga.</string>
+    <string name="tutorial_recurrent_description">Toque aqui para marcar este gasto como um pagamento recorrente (semanal, semanal ou mensal). O aplicativo irá lembrá-lo de registrá-lo no cronograma.</string>
     <string name="tutorial_analytics_title">Veja as suas análises</string>
-    <string name="tutorial_analytics_description">Veja para onde o dinheiro foi: um mapa de calor dia a dia, a divisão por categoria, suas maiores e menores despesas e todos os períodos já encerrados.</string>
+    <string name="tutorial_analytics_description">Abra Analytics para ver como os seus gastos se dividem temporal, por categoria e contra os seus objetivos orçamentais.</string>
     <string name="tutorial_privacy_title">Modo de privacidade</string>
-    <string name="tutorial_privacy_description">Apoie a mão sobre a parte de cima da tela, perto do alto-falante, por cerca de um segundo e todos os valores ficam borrados. Cubra de novo para mostrá-los outra vez.</string>
-    <string name="tutorial_calc_title">Receitas e ajustes</string>
-    <string name="tutorial_calc_description">Comece o valor com + para devolver dinheiro a este período, como um salário, um reembolso ou uma transferência recebida. Comece com - para tirar dinheiro. As outras teclas funcionam como uma calculadora comum para o valor.</string>
+    <string name="tutorial_privacy_description">Cubra o topo do telefone (onde a câmera frontal fica com a sua mão, por cerca de um segundo, para desfocar todas as quantidades na tela. Cubra novamente para desativá-lo.</string>
+    <string name="tutorial_calc_title">Orçamento em andamento</string>
+    <string name="tutorial_calc_description">Use + ou - no início para aumentar ou diminuir seu orçamento restante para este período.</string>
     <string name="tutorial_credit_toggle_title">Pagamento com cartão de crédito</string>
-    <string name="tutorial_credit_toggle_description">Marque a despesa como paga no cartão de crédito. Ela continua contando neste período, mas o Minus acompanha separadamente o que você deve para poder quitar antes da data de fechamento.</string>
+    <string name="tutorial_credit_toggle_description">Toque aqui para marcar que esta despesa foi feita com cartão de crédito. Ela será rastreada separadamente nas suas estatísticas.</string>
     <string name="today">Hoje</string>
     <string name="yesterday">Ontem</string>
     <string name="tomorrow">Amanhã</string>
@@ -59,8 +58,9 @@
     <string name="credit_cutoff_dialog_title">Data de corte no cartão de crédito</string>
     <string name="credit_cutoff_dialog_message">Para controlar as despesas de crédito, defina o dia do faturamento (1-31).</string>
     <string name="credit_cutoff_dialog_label">Cortar dia</string>
+    <string name="expand_numpad">Expandir teclado numérico</string>
+    <string name="numpad_action">Editor action</string>
     <!-- Rollover Dialog -->
-    <string name="numpad_action">Ação do teclado numérico</string>
     <string name="period_finished">Período terminado</string>
     <string name="remaining_budget">Orçamento restante</string>
     <string name="rollover_question">O que você quer fazer com o dinheiro restante?</string>
@@ -74,7 +74,6 @@
     <string name="edit_recurrent_expense_title">Editar despesa recorrente</string>
     <string name="edit_expense_title">Editar despesa</string>
     <string name="cancel_edit_content_desc">Cancelar edição</string>
-    <string name="tap_to_exit_edit_transaction">Toque para sair</string>
     <string name="configure_recurrence">Configurar recorrência</string>
     <string name="make_recurrent">Fazer recorrente</string>
     <string name="select_time">Selecionar horário</string>
@@ -93,8 +92,8 @@
     <string name="widget_description">Visualização rápida de suas despesas e adição de novas despesas</string>
     <string name="total_expenses">Total Despesas</string>
     <string name="new_expense">Nova despesa</string>
-    <string name="income_added">Rendimento adicionado</string>
-    <string name="deducted_budget">Orçamento deduzido</string>
+    <string name="income_added">Income Added</string>
+    <string name="deducted_budget">Deducted budget</string>
     <string name="daily_average">Média diária</string>
     <string name="expenses_history">Histórico de despesas</string>
     <string name="single_expense">Gasto único</string>
@@ -103,9 +102,9 @@
     <string name="finalize_period">Finalize o período de orçamento mais cedo</string>
     <string name="finalize_period_confirm">Isto irá fechar o período atual e iniciar um novo. Tem certeza?</string>
     <string name="finalize_action">Finalizar</string>
-    <string name="rollover_preview_split_equally">Tem %1$s restante não gasto. Quando este período terminar, será distribuído por todos os dias do seu próximo orçamento.</string>
-    <string name="rollover_preview_add_to_first_day">Tem %1$s restantes sem gastar. Quando este período terminar, este valor será adicionado ao primeiro dia do seu próximo orçamento.</string>
-    <string name="rollover_preview_ask_always">Continua a ter %1$s sem gastar. Ser-lhe-á perguntado o que fazer com ele quando este período terminar.</string>
+    <string name="rollover_preview_split_equally">Tem %1$ restante não gasto. Quando este período terminar, será distribuído por todos os dias do seu próximo orçamento.</string>
+    <string name="rollover_preview_add_to_first_day">Tem %1$ restantes sem gastar. Quando este período terminar, este valor será adicionado ao primeiro dia do seu próximo orçamento.</string>
+    <string name="rollover_preview_ask_always">Continua a ter %1$ sem gastar. Ser-lhe-á perguntado o que fazer com ele quando este período terminar.</string>
     <string name="no_ending_date">Sem data final</string>
     <string name="budget_split_logic">Como pretende dividir o orçamento?</string>
     <string name="new_budget_period">Novo Período de Orçamento</string>
@@ -133,13 +132,9 @@
     <string name="history_snackbar_save_transaction_failed">Não foi possível guardar a transação</string>
     <string name="history_snackbar_delete_recurrent_failed">Não foi possível excluir o pagamento recorrente</string>
     <string name="history_snackbar_mark_paid_failed">Não foi possível marcar a transação como paga</string>
-    <string name="history_snackbar_restore_transaction_failed">Não foi possível restaurar a transação</string>
-    <string name="expense_queued_for_next_period">Despesa agendada para o próximo período</string>
     <string name="add_new_category">categoria</string>
     <string name="add_new_category_action">Adicionar Nova Categoria</string>
-    <string name="new_category">Nova categoria</string>
-    <string name="new_category_saved">Nova categoria %1$s salva</string>
-    <string name="sort_alphabetically">Ordenar alfabeticamente</string>
+    <string name="delete_category">Excluir categoria</string>
     <string name="budget_validation_major_zero">O orçamento deve ser maior que 0</string>
     <string name="budget_no_date_defined">Nenhuma data de término definida</string>
     <string name="budget_no_days_defined">Nenhum dia definido</string>
@@ -159,7 +154,17 @@
     <string name="maximum_spent">Máximo gasto</string>
     <string name="average_spent">Média por dia gasto</string>
     <string name="days_remaining_label">Dias\nrestantes</string>
+    <!-- Widget Gallery -->
+    <string name="settings_widgets_pin_not_supported">Seu dispositivo não suporta a adição de widgets desta forma. Pressione e segure sua tela inicial e procure por Minus.</string>
+    <string name="widget_complete_budget_title">Orçamento completo</string>
+    <string name="widget_average_spend_title">Gasto médio</string>
+    <string name="widget_days_countdown_title">Contagem regressiva de dias</string>
+    <string name="widget_expense_title">Resumo de despesas</string>
+    <string name="widget_heatmap_title">Mapa de calor de gastos</string>
+    <string name="widget_min_max_spent_title">Gasto Mín/Máx</string>
+    <string name="widget_month_heatmap_title">Mapa de calor mensal</string>
     <!-- Widget Descriptions -->
+    <string name="widget_complete_budget_description">Acompanhe gastos, orçamento total e dias restantes — com adição rápida para uma nova despesa</string>
     <string name="widget_budget_overview_description">Veja rapidamente os gastos e o orçamento restante</string>
     <string name="widget_days_countdown_description">Contagem regressiva de dias restantes no período orçamental</string>
     <string name="widget_budget_detail_description">Resumo do orçamento completo com categoria superior e dias restantes</string>
@@ -168,6 +173,8 @@
     <string name="widget_add_expense_description">Atalho rápido para adicionar uma nova despesa</string>
     <string name="widget_add_expense_label">Adicionar nova despesa</string>
     <string name="widget_add_expense_compact_label">Adicionar despesa</string>
+    <!-- Quick Settings Tile -->
+    <string name="tile_new_transaction_label">Nova transação</string>
     <!-- Widget Labels -->
     <string name="spent">Gasto</string>
     <string name="left">Esquerda</string>
@@ -184,54 +191,17 @@
     <string name="budget_period_label_this_week">Esta semana</string>
     <string name="budget_period_label_this_biweek">Isso duas vezes semanalmente</string>
     <string name="budget_period_label_this_month">Este Mês</string>
-    <string name="budget_pill_next_daily">Para amanhã %1$s</string>
-    <string name="budget_pill_next_weekly">Para a próxima semana %1$s</string>
-    <string name="budget_pill_next_biweekly">Para a próxima quinzena %1$s</string>
-    <string name="budget_pill_next_monthly">Para o próximo mês %1$s</string>
+    <string name="budget_pill_label_per_daily">Por dia</string>
+    <string name="budget_pill_label_per_weekly">Por semana</string>
+    <string name="budget_pill_label_per_biweekly">Bienal</string>
+    <string name="budget_pill_label_per_monthly">Por mês</string>
     <string name="budget_pill_label_daily_exceeded">Valor diário excedido</string>
-    <string name="budget_pill_label_weekly_exceeded">Valor semanal excedido</string>
+    <string name="budget_pill_label_weekly_exceeded">Valor Semanal Excedido</string>
     <string name="budget_pill_label_biweekly_exceeded">Quantia bisemanal excedida</string>
-    <string name="budget_pill_label_monthly_exceeded">Valor mensal excedido</string>
-    <string name="budget_pill_sub_exceeded_single">Valor %1$s excedido</string>
-    <string name="budget_pill_sub_exceeded_double">Valor %1$s e %2$s excedido</string>
-    <string name="budget_pill_sub_exceeded_triple">Valor %1$s, %2$s e %3$s excedido</string>
-    <string name="budget_formula_title">Como é calculado</string>
-    <string name="budget_formula_hold_hint">Mostrar como o valor é calculado</string>
-    <string name="budget_formula_caption_surplus_split">O excedente do período anterior entra no orçamento</string>
-    <string name="budget_formula_caption_surplus_first_day">O excedente do período anterior fica no primeiro dia</string>
-    <string name="budget_formula_caption_adjustments">Receitas e deduções deste período</string>
-    <string name="budget_formula_caption_per_day">Dividido por cada dia do período</string>
-    <string name="budget_formula_caption_per_period">Orçamento: %1$s</string>
-    <string name="budget_formula_caption_remaining_budget">O que resta do orçamento total</string>
-    <string name="budget_formula_caption_spread_over_left">Dividido pelo que resta do período</string>
-    <string name="budget_formula_caption_left">O que resta</string>
-    <string name="budget_formula_caption_reserved">Reservado para cobranças que vencem mais adiante no período</string>
-    <string name="budget_formula_caption_carried">Acumulado dos dias anteriores</string>
-    <string name="budget_formula_caption_spread_leftover">Sobras que você escolheu distribuir</string>
-    <string name="budget_formula_label_budget">Orçamento restante</string>
-    <string name="budget_formula_label_carried">Acumulado</string>
-    <string name="budget_formula_label_recurring">Pagamentos recorrentes cobrados</string>
-    <string name="budget_formula_label_rebalanced">Distribuído pelos dias restantes</string>
-    <string name="budget_formula_label_spent">O que você gastou</string>
-    <string name="budget_formula_label_total">Total</string>
-    <string name="budget_formula_negative_spent">Você gastou mais do que este orçamento permite.</string>
-    <string name="budget_formula_negative_recurring">As cobranças futuras superam este orçamento.</string>
-    <string name="budget_formula_negative_carried">Dívida acumulada de dias anteriores.</string>
-    <string name="budget_formula_card_tap_hint">Toque para ver o detalhamento completo</string>
-    <string name="budget_formula_tip_hold_pill">Dica: segure a pílula do orçamento na tela inicial para ver isto a qualquer momento</string>
-    <string name="budget_formula_tip_tap_card">Dica: você também pode tocar no valor calculado na folha do período</string>
-    <plurals name="budget_formula_weeks">
-        <item quantity="one">%d semana</item>
-        <item quantity="other">%d semanas</item>
-    </plurals>
-    <plurals name="budget_formula_biweeks">
-        <item quantity="one">%d quinzena</item>
-        <item quantity="other">%d quinzenas</item>
-    </plurals>
-    <plurals name="budget_formula_months">
-        <item quantity="one">%d mês</item>
-        <item quantity="other">%d meses</item>
-    </plurals>
+    <string name="budget_pill_label_monthly_exceeded">Valor Mensal Excedido</string>
+    <string name="budget_pill_sub_exceeded_single">Valor de %1$s excedido</string>
+    <string name="budget_pill_sub_exceeded_double">Excedido o valor de %1$s e %2$s</string>
+    <string name="budget_pill_sub_exceeded_triple">%1$s, %2$s e %3$s valor excedido</string>
     <string name="day_total_format">Total: %1$s</string>
     <string name="onboarding_welcome_title">Bem-vindo ao Minus</string>
     <string name="onboarding_welcome_subtitle">Olá e bem-vindo, vamos começar a economizar juntos.</string>
@@ -268,7 +238,7 @@
     <string name="changelog_close">FECHAR</string>
     <string name="changelog_previous_versions">Versão anterior</string>
     <string name="changelog_updated_to">Atualizado para: %1$s</string>
-    <string name="changelog_see_changes">Minus foi atualizado.&lt;br&gt;Para mais detalhes, visite a &lt;a href="https://github.com/isaacsa51/Minus/wiki"&gt;Wiki&lt;/a&gt;.</string>
+    <string name="changelog_see_changes">Veja abaixo todas as alterações para não perder nenhum novo recurso</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">Selecione o período</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d dias · %2$s - %3$s</string>
@@ -307,8 +277,6 @@
     <string name="settings_rounded_font_title">Estilo de fonte arredondado</string>
     <string name="settings_material_you_title">Material de que você</string>
     <string name="settings_material_you_subtitle">Usar cores de papel de parede para aplicar um tema dinâmico</string>
-    <string name="settings_amoled_title">Tema AMOLED</string>
-    <string name="settings_amoled_subtitle">Usar fundos e superfícies em preto puro no modo escuro</string>
     <string name="settings_censor_mode_title">Modo de privacidade</string>
     <string name="settings_censor_mode_subtitle">Ocultar e desfocar todos os valores financeiros no app</string>
     <string name="settings_feature_credit_toggle_title">Usar Cartão de Crédito como pagamento</string>
@@ -321,29 +289,15 @@
     <string name="settings_category_picker_direct_popup_description">Abra a janela de sugestões com todas as suas categorias salvas assim que você tocar no campo da categoria. Quando desativado, as sugestões só aparecem depois de você começar a digitar.</string>
     <string name="settings_category_grid_mode_switch_label">Exibir como uma lista (Experimental)</string>
     <string name="settings_category_grid_mode_description">Toque na tag da categoria para abrir uma grade de suas categorias salvas, em vez de entrar no modo de edição. Também desativa o modo de cálculo do número enquanto isto estiver ativado.</string>
-    <string name="settings_feature_extra_note_title">Nota adicional por transação</string>
-    <string name="settings_feature_extra_note_subtitle">Toque para ver mais detalhes</string>
-    <string name="settings_feature_extra_note_description">Adiciona um campo opcional de \"Nota adicional\" ao lado da categoria ao adicionar ou editar uma transação. Use-o para lembrar de um detalhe que a categoria sozinha não registra, como em que exatamente o dinheiro de \"Transporte\" foi gasto.</string>
-    <string name="settings_feature_extra_note_switch_label">Ativar nota adicional</string>
-    <string name="settings_feature_reserve_upcoming_charges_title">Reservar cobranças futuras</string>
-    <string name="settings_feature_reserve_upcoming_charges_description">Reserva desde o primeiro dia cada cobrança recorrente que vence mais adiante no período atual, em vez de descontá-la na data de vencimento. Seu orçamento restante e seu valor diário mostrarão apenas o que está realmente livre para gastar.</string>
-    <string name="settings_feature_reserve_upcoming_charges_switch_label">Reservar cobranças antecipadamente</string>
-    <string name="settings_feature_lab_title">Recursos adicionais</string>
-    <string name="settings_feature_lab_subtitle">Recursos opcionais e experimentais que você pode ativar</string>
-    <string name="settings_feature_lab_header">Cada recurso aqui é opcional e vem desativado por padrão; alguns são experimentais e podem mudar em uma atualização futura. Toque em um para ativá-lo e ver exatamente o que ele muda.</string>
-    <string name="settings_feature_group_categories">Categorias</string>
-    <string name="settings_feature_group_transactions">Transações</string>
-    <string name="settings_feature_group_budget">Orçamento e pagamentos</string>
-    <string name="settings_feature_experimental">Experimental</string>
-    <string name="settings_feature_state_on">Ativado</string>
-    <string name="settings_feature_state_off">Desativado</string>
-    <string name="settings_feature_new_category_tag_title">Salvar categorias sozinhas</string>
-    <string name="settings_feature_new_category_tag_description">Adiciona uma etiqueta \"Nova categoria\" na tela inicial para criar e salvar uma categoria sozinha, sem valor nem transação.</string>
-    <string name="settings_feature_category_direct_popup_title">Sugestões de categoria ao tocar</string>
-    <string name="settings_feature_category_grid_title">Modo de lista de categorias</string>
-    <string name="settings_feature_show_past_transactions_switch_label">Carregar períodos anteriores</string>
     <string name="settings_feature_show_past_transactions_title">Mostrar transações anteriores</string>
     <string name="settings_feature_show_past_transactions_subtitle">Carregar transações de períodos anteriores</string>
+    <string name="settings_recurrent_payments_view_mode_title">Modo de visualização de pagamentos recorrentes</string>
+    <string name="settings_recurrent_payments_view_mode_subtitle">Altere o tipo de exibição para mostrar seus pagamentos recorrentes</string>
+    <string name="settings_recurrent_payments_view_mode_dialog_title">Modo de visualização de pagamentos recorrentes</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_title">Horizontal</string>
+    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">Mostrar pagamentos recorrentes como cartões horizontais</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_title">Vertical</string>
+    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">Mostrar pagamentos recorrentes como uma lista de despesas regular</string>
     <string name="settings_period_end_time_title">Hora Final Período</string>
     <string name="settings_period_end_time_subtitle">A notificação será exibida na data final da menstruação neste momento</string>
     <string name="settings_recurrent_notification_time_title">Tempo de pagamentos recorrentes</string>
@@ -392,7 +346,7 @@
     <string name="bug_report_share_title">Enviar relatório</string>
     <string name="bug_report_help_title">Ajude-nos a melhorar o Menus</string>
     <string name="bug_report_help_message_prefix">"Relatar problemas ou sugerir melhorias nos ajuda a fazer o Menus melhor para todos.\n\nEste formulário guiado o ajuda a empacotar todos os detalhes necessários em um relatório anexando automaticamente metadados do dispositivo e diagnósticos de aplicativos para acelerar nossa investigação.\n\nUma vez preparado, você pode enviar o relatório por e-mail ou contribuir via "</string>
-    <string name="bug_report_help_github_issues">Issues do GitHub</string>
+    <string name="bug_report_help_github_issues">"Issues do GitHub"</string>
     <string name="bug_report_help_message_suffix"> diretamente em nosso repositório.</string>
     <string name="bug_report_steps_to_reproduce_label">Passos para reproduzir</string>
     <string name="bug_report_include_steps_label">Incluir etapas de reprodução</string>
@@ -432,12 +386,14 @@
     <string name="budget_pill_over_budget">Valor do orçamento excedido</string>
     <string name="budget_pill_no_budget">Nenhum orçamento</string>
     <string name="budget_pill_no_budget_action">Configurar seu orçamento</string>
-    <string name="budget_pill_exhausted_daily_label">diário</string>
-    <string name="budget_pill_exhausted_weekly_label">semanal</string>
-    <string name="budget_pill_exhausted_biweekly_label">quinzenal</string>
-    <string name="budget_pill_exhausted_single">Orçamento %1$s gasto</string>
-    <string name="budget_pill_exhausted_double">Orçamento %1$s e %2$s gasto</string>
-    <string name="budget_pill_exhausted_triple">Orçamento %1$s, %2$s e %3$s gasto</string>
+    <string name="budget_pill_calc_added">%1$s will be added</string>
+    <string name="budget_pill_calc_subtracted">%1$s will be subtracted</string>
+    <string name="budget_pill_exhausted_daily_label">Diariamente</string>
+    <string name="budget_pill_exhausted_weekly_label">Semanalmente</string>
+    <string name="budget_pill_exhausted_biweekly_label">Bienal</string>
+    <string name="budget_pill_exhausted_single">Orçamento %1$s esgotado</string>
+    <string name="budget_pill_exhausted_double">Orçamento %1$s e %2$s esgotado</string>
+    <string name="budget_pill_exhausted_triple">Orçamento %1$s, %2$s e %3$s esgotado</string>
     <!-- Spend Budget Card -->
     <string name="spend_budget_card_spent_label">Gasto</string>
     <string name="spend_budget_card_available_percent_format">Disponível: %1$s%%</string>
@@ -473,57 +429,18 @@
     <string name="recurrent_ticket_weekly_unnamed">Assinatura semanal sem nome</string>
     <string name="recurrent_ticket_biweekly_unnamed">Assinatura bisemanal sem nome</string>
     <string name="recurrent_ticket_monthly_unnamed">Assinatura mensal sem nome</string>
-    <!-- Subscriptions screen -->
-    <string name="subscriptions_title">Assinaturas</string>
-    <string name="subscriptions_analytics_card_label">Recorrente</string>
-    <string name="subscriptions_monthly_commitment_label">Compromisso mensal</string>
-    <string name="subscriptions_per_month_suffix">/mês</string>
-    <string name="subscriptions_hero_subtitle_with_next">%1$d ativas · próxima %2$s</string>
-    <string name="subscriptions_hero_subtitle_no_upcoming">%1$d ativas</string>
-    <string name="subscriptions_due_soon_header">Vencendo em breve</string>
-    <string name="subscriptions_upcoming_header">Próximas</string>
-    <string name="subscriptions_due_today_label">Vence hoje</string>
-    <string name="subscriptions_mark_as_paid">Marcar como pago</string>
-    <string name="subscriptions_skip_this_cycle">Pular neste período</string>
-    <string name="subscriptions_empty_title">Ainda não há assinaturas</string>
-    <string name="subscriptions_empty_body">Marque uma despesa como recorrente e ela aparecerá aqui com a data de vencimento e o tempo restante.</string>
-    <string name="subscriptions_snackbar_confirm_failed">Não foi possível confirmar este pagamento</string>
-    <string name="subscriptions_snackbar_skip_failed">Não foi possível pular este pagamento</string>
-    <string name="subscriptions_status_paid">Pago</string>
-    <string name="subscriptions_status_skipped">Ignorado</string>
-    <string name="subscriptions_budget_committed">%1$s do seu orçamento neste período</string>
-    <string name="subscriptions_snackbar_edit_failed">Não foi possível salvar esta alteração</string>
-    <string name="subscriptions_snackbar_delete_failed">Não foi possível excluir esta assinatura</string>
-    <string name="subscriptions_frequency_breakdown_title">Por frequência de cobrança</string>
-    <string name="subscriptions_view_mode_whole_period">Período inteiro</string>
-    <string name="subscriptions_view_mode_weekly">Semanalmente</string>
-    <string name="subscriptions_view_mode_category">Categoria</string>
-    <string name="subscriptions_weekly_week_badge">Semana %d</string>
-    <string name="subscriptions_weekly_category_distribution_title">Distribuição por categoria</string>
-    <string name="subscriptions_weekly_total_suffix">total de %s</string>
-
-    <plurals name="subscriptions_weekly_bills_scheduled">
-        <item quantity="one">%d conta agendada esta semana</item>
-        <item quantity="other">%d contas agendadas esta semana</item>
-    </plurals>
-
-    <string name="subscriptions_item_mark_paid_short">Marcar pago</string>
-    <string name="subscriptions_item_skip_short">Pular</string>
-    <string name="subscriptions_item_due_in_days">Em %1$d dias (%2$s)</string>
-    <string name="subscriptions_item_due_in_weeks">Em %1$d semanas (%2$s)</string>
-
+    <string name="recurrent_ticket_frequency_weekly">Semanalmente</string>
+    <string name="recurrent_ticket_frequency_biweekly">Bienal</string>
+    <string name="recurrent_ticket_frequency_monthly">Mensual</string>
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">Período terminado</string>
     <string name="rollover_dialog_question">O que você quer fazer com o dinheiro restante?</string>
     <string name="rollover_dialog_split_equally_title">Dividir igualmente</string>
-    <string name="rollover_dialog_split_equally_desc">Distribua %1$s igualmente por cada dia do seu próximo orçamento</string>
-    <string name="rollover_dialog_carry_to_tomorrow_title">Adicionar a hoje</string>
-    <string name="rollover_dialog_carry_to_tomorrow_desc">Adicione o valor total de %1$s apenas ao orçamento de hoje</string>
-    <string name="rollover_dialog_view_analytics_title">Descartar o orçamento restante</string>
-    <string name="rollover_dialog_view_analytics_desc">Descarte o saldo restante e vá direto para as suas análises</string>
-    <string name="unresolved_surplus_title">Excedente pendente</string>
-    <string name="rollover_dialog_pending_label">De um período anterior</string>
-    <string name="unresolved_surplus_tap_to_manage">Toque para gerenciar</string>
+    <string name="rollover_dialog_split_equally_desc">Adicione %1$s ao orçamento para os próximos dias</string>
+    <string name="rollover_dialog_carry_to_tomorrow_title">Carregue para amanhã</string>
+    <string name="rollover_dialog_carry_to_tomorrow_desc">Adicione %1$s ao orçamento de amanhã</string>
+    <string name="rollover_dialog_view_analytics_title">Visualizar análise</string>
+    <string name="rollover_dialog_view_analytics_desc">Revisar o resumo do período finalizado</string>
     <!-- Finished Period Header -->
     <string name="finished_period_header_title">Período terminado</string>
     <string name="finished_period_header_no_spends">Hã? Você não passou nada neste período</string>
@@ -538,7 +455,7 @@
     <string name="savings_recommendation_current_savings_format">Economia atual: %1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">Despesas recorrentes</string>
     <string name="savings_recommendation_one_time_expenses_label">Despesas únicas</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">Se você economizar %1$d%% por cerca de 6 meses, você pode construir:</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">Se você economizar 20% por cerca de 6 meses, você pode construir:</string>
     <string name="savings_recommendation_goal_format" formatted="false">Para alcançar %1$s em %2$d meses, economize %3$s por período.</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando o exemplo padrão %1$d%. Defina um objetivo de poupança nas configurações para atingir um valor específico.</string>
     <!-- Settings: Savings Preferences -->
@@ -568,47 +485,36 @@
     <string name="wavy_divider_show_all_past_period_expenses">Mostrar todas as despesas do período anterior…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">Usar %d dias</string>
+    <string name="remaining_budget_label">Restante</string>
     <string name="currency_label">moeda</string>
-    <string name="budget_duration_label">Duração</string>
-    <string name="budget_base_currency_label">Moeda base</string>
-    <string name="budget_behaviour_title">Comportamento do orçamento</string>
-    <string name="budget_behaviour_subtitle">Escolha o que acontece com o dinheiro que sobra e como seu valor diário é calculado.</string>
-    <string name="budget_behaviour_surplus_title">Sobra no fim do período</string>
-    <string name="budget_behaviour_surplus_ask">Perguntar</string>
-    <string name="budget_behaviour_surplus_spread">Distribuir tudo</string>
-    <string name="budget_behaviour_surplus_first_day">Tudo no dia 1</string>
-    <string name="budget_behaviour_surplus_preview_ask">Quando o período terminar, você escolhe o que fazer com a sobra.</string>
-    <string name="budget_behaviour_surplus_preview_spread">A sobra é dividida igualmente entre todos os dias do próximo período.</string>
-    <string name="budget_behaviour_surplus_preview_first_day">Toda a sobra é somada ao primeiro dia do próximo período.</string>
     <string name="select_currency">Selecione a moeda</string>
     <string name="search_currency">Pesquisar moeda…</string>
     <string name="clear">Limpar</string>
     <string name="currency_no_results">Nenhuma moeda encontrada</string>
     <string name="currency_selected">Selecionado</string>
     <!-- Remaining Budget Strategy -->
+    <string name="strategy_dialog_title">Excesso de orçamento</string>
+    <string name="strategy_dialog_description" formatted="false">Pode escolher como distribuir o seu saldo de orçamento ao final de cada dia.\n\nPor exemplo, tem um orçamento de 500 por dia, e ontem gastou 400: pode espalhar os 100 pelos dias restantes, ou gastar 600 hoje (orçamento diário + excedente do período anterior).</string>
+    <string name="strategy_ask_always">Perguntar-me sempre</string>
+    <string name="strategy_ask_always_desc">No final do período, vamos perguntar o que fazer com o excedente</string>
+    <string name="strategy_split_equally">Espalhe por todos os dias</string>
+    <string name="strategy_split_equally_desc">O excedente é dividido igualmente entre todos os dias do novo período</string>
+    <string name="strategy_add_to_first_day">Adicionar ao primeiro dia</string>
+    <string name="strategy_add_to_first_day_desc">Todo o excedente é adicionado ao primeiro dia do novo período</string>
     <!-- Budget Split Mode -->
-    <string name="split_mode_label">Valor diário</string>
-    <string name="split_mode_static">Igual todo dia</string>
-    <string name="split_mode_static_desc">O orçamento total é dividido igualmente entre todos os dias, independentemente de quanto você gasta ou se gasta.</string>
-    <string name="split_mode_dynamic">Recalculado todo dia</string>
-    <string name="split_mode_dynamic_desc">Calculado diariamente com base em como você gasta. O orçamento restante é distribuído pelos dias restantes do período.</string>
-    <string name="split_mode_carry_over">Guardado para depois</string>
-    <string name="split_mode_carry_over_desc">O que você não gasta por dia é somado ao orçamento do dia seguinte e vai se acumulando.</string>
-    <string name="split_mode_ask_me">Você decide todo dia</string>
-    <string name="split_mode_ask_me_desc">Todo dia você decide o que fazer com o orçamento não usado de ontem: distribuir pelos dias restantes ou passar para hoje. O que você gastar a mais é sempre distribuído pelos dias restantes, então o valor diário diminui.</string>
-    <string name="leftover_choice_spread">Distribuir pelos dias restantes</string>
-    <string name="leftover_choice_carry">Somar tudo a hoje</string>
-    <string name="leftover_choice_spread_desc">Distribua todo o orçamento restante não utilizado pelos dias que faltam.</string>
-    <string name="leftover_choice_carry_desc">Mova o orçamento não utilizado apenas para amanhã.</string>
-    <string name="leftover_choice_spread_outcome">%1$s para os próximos dias</string>
-    <string name="leftover_choice_carry_outcome">%1$s para amanhã</string>
-    <string name="leftover_choice_outcome">disponível hoje · depois %1$s/dia</string>
-    <string name="leftover_choice_outcome_last_day">disponível hoje</string>
+    <string name="split_mode_label">Modo dividido</string>
+    <string name="split_mode_dialog_title">Como devemos dividir o seu orçamento?</string>
+    <string name="split_mode_dialog_description" formatted="false">Escolha como o valor por período é calculado.</string>
+    <string name="split_mode_static">Estático</string>
+    <string name="split_mode_static_desc">O orçamento total está dividido igualmente em todos os períodos, independentemente do quanto você gasta.</string>
+    <string name="split_mode_dynamic">Dinâmico (Recomendado)</string>
+    <string name="split_mode_dynamic_desc">Recalcular diariamente conforme você gasta. O saldo restante está repartido pelos dias que ainda restam no período.</string>
     <!-- Transaction Detail -->
     <string name="without_date">Sem data</string>
     <string name="no_name">Sem nome</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">Descrição:</string>
-    <string name="adjustment_reason">Motivo</string>
+    <string name="adjustment_reason">Reason</string>
     <string name="date">Encontro</string>
     <string name="frequency">Frequência</string>
     <string name="charge_day">Carregar dia</string>
@@ -631,13 +537,12 @@
     <string name="notification_period_end_message_positive">O período terminou com %1$s restante. Toque para ver detalhes.</string>
     <string name="notification_period_end_message_negative">O período terminou. Você gastou mais %1$s . Veja mais detalhes.</string>
     <string name="notification_period_end_message_neutral">O período terminou. Você não passou nada. Veja mais detalhes.</string>
-    <string name="notification_recurrent_due_today_title">Seu pagamento de \"%1$s\" vence hoje</string>
-    <string name="notification_recurrent_charged_weekly">Sua despesa semanal de %1$s será cobrada.</string>
-    <string name="notification_recurrent_charged_biweekly">Sua despesa quinzenal de %1$s será cobrada.</string>
-    <string name="notification_recurrent_charged_monthly">Sua despesa mensal de %1$s será cobrada.</string>
+    <string name="notification_recurrent_expense_title">Despesas recorrentes</string>
+    <string name="notification_recurrent_expense_message_with_comment">Seu custo recorrente de \"%1$s\" para \"%2$s\" é hoje.</string>
+    <string name="notification_recurrent_expense_message_without_comment">Sua despesa recorrente com um total de \"%1$s\" é hoje.</string>
     <string name="notification_tomorrow">Amanhã</string>
     <string name="notification_in_days">em %1$d dias</string>
-    <string name="notification_upcoming_subscription_title">Próxima despesa</string>
+    <string name="notification_upcoming_subscription_title">Próxima assinatura</string>
     <string name="notification_upcoming_subscription_message_with_comment">Sua assinatura \"%1$s\" de \"%2$s\" será cobrada %3$s. Prepare-se para a cobrança.</string>
     <string name="notification_upcoming_subscription_message_without_comment">Você tem uma assinatura de \"%1$s\" que será cobrado em %2$s.</string>
     <string name="notification_credit_cutoff_title">Próximo pagamento com cartão de crédito</string>
@@ -652,7 +557,7 @@
     <string name="ticket_recurrent_expense">EXPÊNCIA DO RECURSO</string>
     <!-- Past Periods -->
     <string name="past_periods_title">Períodos anteriores</string>
-    <string name="past_periods_subtitle">Toque em um período para ver o detalhamento completo. Toque e segure para excluí-lo.</string>
+    <string name="past_periods_subtitle">Toque em um período para ver o detalhamento completo.</string>
     <string name="past_periods_empty">Nenhum período arquivado foi encontrado</string>
     <string name="past_periods_spent_label">Gasto</string>
     <string name="past_periods_limit_label">Limitar</string>
@@ -665,8 +570,8 @@
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">Tendências de gastos</string>
     <string name="analytics_tutorial_minmax_desc">Estes cartões mostram as suas despesas mínimas e máximas. À medida que adiciona mais transações, estas serão atualizadas para ajudar a identificar valores discrepantes.</string>
-    <string name="analytics_tutorial_header_title">Histórico de períodos</string>
-    <string name="analytics_tutorial_header_desc">Todos os períodos que você encerrou ficam atrás deste ícone. Toque em um para reabrir as análises completas; os totais são recalculados na hora da leitura, então editar uma despesa antiga atualiza o período a que ela pertence. Mantenha um período pressionado e confirme com sua digital para excluí-lo de vez.</string>
+    <string name="analytics_tutorial_header_title">Períodos históricos</string>
+    <string name="analytics_tutorial_header_desc">Toque no ícone para ver seus últimos períodos de orçamento e revisar seu desempenho.</string>
     <string name="analytics_tutorial_budget_title">Situação do orçamento</string>
     <string name="analytics_tutorial_budget_desc">Verifique o seu orçamento total e veja os dias no total.</string>
     <string name="analytics_tutorial_heatmap_title">Intensidade de Gastos</string>
@@ -675,8 +580,6 @@
     <string name="analytics_tutorial_charts_desc">Veja quais categorias estão comendo seu orçamento. Toque em qualquer fatia ou categoria para obter detalhes.</string>
     <string name="analytics_tutorial_savings_title">Recomendação de Poupança</string>
     <string name="analytics_tutorial_savings_desc">Com base na regra 50/30/20, sugerimos quanto você idealmente deve poupar. Isto pode ser alterado nas configurações.</string>
-    <string name="analytics_no_period_title">Ainda não há período de orçamento</string>
-    <string name="analytics_no_period_body">Crie um período de orçamento e seus gastos, categorias e economias aparecerão aqui.</string>
     <string name="analytics_tutorial_credit_title">Gerenciamento de Cartões de Crédito</string>
     <string name="analytics_tutorial_credit_desc">Toque no cartão de crédito para ver todas as transações CC, marcá-las como pagas ou ajustar a data do cubo de cobrança para evitar juros.</string>
     <string name="analytics_tutorial_history_title">Histórico de transações</string>
@@ -685,6 +588,8 @@
     <string name="budget_graph_header_spending">Gastos</string>
     <string name="budget_graph_legend_current">Atual</string>
     <string name="budget_graph_legend_previous">Anterior</string>
+    <string name="budget_graph_view_mode_cumulative">Tendência</string>
+    <string name="budget_graph_view_mode_categories">Categorias</string>
     <string name="budget_graph_nav_prev">Anterior</string>
     <string name="budget_graph_nav_next">Próximo</string>
     <string name="graph_granularity_days">Dias</string>
@@ -694,48 +599,4 @@
     <string name="graph_granularity_total">Total</string>
     <string name="unit_thousands">K</string>
     <string name="unit_millions">M</string>
-    <string name="budget_pill_calc_added">%1$s será adicionado</string>
-    <string name="budget_pill_calc_subtracted">%1$s será subtraído</string>
-    <string name="no_name_income">Receita sem nome</string>
-    <string name="expand_numpad">Expandir teclado numérico</string>
-    <string name="delete_category">Excluir categoria</string>
-    <string name="add_extra_note">Nota adicional</string>
-    <string name="extra_note_label">Nota</string>
-    <string name="budget_graph_view_mode_cumulative">Tendência</string>
-    <string name="budget_graph_view_mode_categories">Categorias</string>
-    <string name="settings_widgets_pin_not_supported">Seu dispositivo não suporta a adição de widgets desta forma. Pressione e segure sua tela inicial e procure por Minus.</string>
-    <string name="widget_complete_budget_title">Orçamento completo</string>
-    <string name="widget_average_spend_title">Gasto médio</string>
-    <string name="widget_days_countdown_title">Contagem regressiva de dias</string>
-    <string name="widget_expense_title">Resumo de despesas</string>
-    <string name="widget_heatmap_title">Mapa de calor de gastos</string>
-    <string name="widget_min_max_spent_title">Gasto Mín/Máx</string>
-    <string name="widget_month_heatmap_title">Mapa de calor mensal</string>
-    <string name="widget_complete_budget_description">Acompanhe gastos, orçamento total e dias restantes — com adição rápida para uma nova despesa</string>
-    <string name="unlock_past_period">Desbloquear para editar</string>
-    <string name="biometric_prompt_title">Desbloquear período anterior</string>
-    <string name="biometric_prompt_subtitle">Autentique-se com sua impressão digital para modificar despesas anteriores</string>
-    <string name="past_period_unlocked_message">Edição do período anterior desbloqueada com sucesso</string>
-    <string name="past_period_edit_confirm_title">Modificar despesa de período anterior?</string>
-    <string name="past_period_edit_confirm_message">Tem certeza de que deseja editar ou excluir esta despesa de um período anterior? A autenticação biométrica será necessária.</string>
-    <string name="past_period_delete_confirm_title">Excluir período anterior?</string>
-    <string name="past_period_delete_confirm_message">Isso exclui permanentemente o período %1$s – %2$s e suas despesas. As assinaturas são mantidas. Será necessária autenticação biométrica.</string>
-    <string name="dialog_yes">Sim</string>
-    <string name="loading">Carregando…</string>
-    <string name="widget_budget_pill_title">Pílula de orçamento</string>
-    <string name="widget_budget_pill_description">O restante do modo de visualização escolhido — diário, semanal, quinzenal ou mensal — numa barra fina</string>
-
-    <!-- Tutorial hints -->
-    <string name="tutorial_history_budget_title">O período num relance</string>
-    <string name="tutorial_history_budget_description">Quanto você gastou e quanto resta no período atual, incluindo o que ainda está devendo no cartão de crédito.</string>
-    <string name="tutorial_history_transaction_title">Editar ou excluir uma despesa</string>
-    <string name="tutorial_history_transaction_description">Toque em uma despesa para expandi-la e ver todos os detalhes. Deslize para a direita para editar valor, data, categoria ou nota; deslize para a esquerda para excluí-la, com alguns segundos para desfazer.</string>
-    <string name="tutorial_history_recurrent_title">Próximos pagamentos</string>
-    <string name="tutorial_history_recurrent_description">As cobranças recorrentes que vencem neste período ficam aqui antes de serem pagas. Marque uma como paga quando ela chegar, ou exclua só aquela ocorrência para pulá-la desta vez sem cancelar a série.</string>
-    <string name="tutorial_history_past_period_title">Período anterior</string>
-    <string name="tutorial_history_past_period_description">Despesas do período anterior a este, guardadas fora do caminho. Você pode desativar esta seção em Configurações, em Recursos adicionais.</string>
-    <string name="analytics_tutorial_recurrent_title">Cobranças recorrentes</string>
-    <string name="analytics_tutorial_recurrent_desc">Tudo o que se repete, com quanto custa por período. Abra para ver a próxima data de vencimento de cada uma ou para encerrar uma série que você não paga mais.</string>
-    <string name="analytics_tutorial_income_title">Dinheiro devolvido</string>
-    <string name="analytics_tutorial_income_desc">Tudo o que você registrou começando com + — um salário, um reembolso, uma transferência recebida. É somado a este período em vez de contar como gasto, então seu orçamento restante aumenta.</string>
 </resources>
