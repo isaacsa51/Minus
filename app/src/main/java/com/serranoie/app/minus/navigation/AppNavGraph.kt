@@ -38,6 +38,7 @@ import com.serranoie.app.minus.presentation.ui.settings.SettingsScreen
 import com.serranoie.app.minus.presentation.ui.settings.SettingsViewModel
 import com.serranoie.app.minus.presentation.ui.settings.appearance.AppearanceOptionsScreen
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportScreen
+import com.serranoie.app.minus.presentation.ui.settings.features.CsvSyncGuideScreen
 import com.serranoie.app.minus.presentation.ui.settings.features.FeatureLabScreen
 import com.serranoie.app.minus.presentation.ui.subscriptions.SubscriptionsScreen
 import logcat.logcat
@@ -227,6 +228,20 @@ fun AppNavGraph(
                 onExtraNoteToggle = viewModel::onExtraNoteToggle,
                 onReserveUpcomingChargesToggle = viewModel::onReserveUpcomingChargesToggle,
                 onNewCategoryTagToggle = viewModel::onNewCategoryTagToggle,
+                onNavigateToCsvSyncGuide = {
+                    navController.navigate(Screen.CsvSyncGuide.route)
+                },
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        screen(Screen.CsvSyncGuide.route, popDirection, animated) {
+            val viewModel: SettingsViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            CsvSyncGuideScreen(
+                syncFolderName = uiState.syncFolderName,
+                onSyncFolderResult = viewModel::onSyncFolderResult,
                 onBack = { navController.popBackStack() },
             )
         }

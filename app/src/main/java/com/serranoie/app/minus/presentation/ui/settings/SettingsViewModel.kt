@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.provider.DocumentsContract
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -14,6 +15,7 @@ import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.app.minus.data.csv.CsvSyncWorker
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.AppColorScheme
@@ -33,6 +35,7 @@ import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferManager
 import com.serranoie.app.minus.presentation.util.CensorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +43,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 import android.provider.Settings as AndroidSettings
@@ -70,6 +74,7 @@ data class SettingsUiState(
     val periodMappingMode: PeriodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
     val creditCardCutoffDay: Int? = null,
+    val syncFolderName: String? = null,
 )
 
 sealed interface SettingsUiEffect {
@@ -87,13 +92,15 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _notificationPermissionGranted = MutableStateFlow(false)
+    private val _syncFolderName = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<SettingsUiState> = combine(
         settingsRepository.observeSettings(),
         budgetRepository.getBudgetSettings(),
         censorManager.isCensored,
-        _notificationPermissionGranted
-    ) { settings, budgetSettings, isCensored, permissionGranted ->
+        _notificationPermissionGranted,
+        _syncFolderName
+    ) { settings, budgetSettings, isCensored, permissionGranted, syncFolderName ->
         SettingsUiState(
             currentTheme = when (settings.themeMode) {
                 ThemeMode.LIGHT -> "Light"
@@ -135,7 +142,8 @@ class SettingsViewModel @Inject constructor(
             isCensored = isCensored,
             periodMappingMode = settings.periodMappingMode,
             savingsPreferences = settings.savingsPreferences,
-            creditCardCutoffDay = budgetSettings?.creditCardCutoffDay
+            creditCardCutoffDay = budgetSettings?.creditCardCutoffDay,
+            syncFolderName = syncFolderName
         )
     }.stateIn(
         scope = viewModelScope,
@@ -151,6 +159,38 @@ class SettingsViewModel @Inject constructor(
 
     init {
         refreshNotificationPermission()
+        viewModelScope.launch {
+            _syncFolderName.value = folderDisplayName(
+                settingsRepository.getString(CsvSyncWorker.SYNC_FOLDER_URI_KEY)
+            )
+        }
+    }
+
+    private suspend fun folderDisplayName(treeUri: String?): String? {
+        val uri = treeUri?.ifBlank { null }?.toUri() ?: return null
+
+        return withContext(Dispatchers.IO) {
+            val fallback = uri.lastPathSegment
+                ?.substringAfterLast(':')
+                ?.substringAfterLast('/')
+                ?.ifBlank { null }
+
+            runCatching {
+                val document = DocumentsContract.buildDocumentUriUsingTree(
+                    uri,
+                    DocumentsContract.getTreeDocumentId(uri)
+                )
+                context.contentResolver.query(
+                    document,
+                    arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME),
+                    null,
+                    null,
+                    null
+                )?.use { cursor ->
+                    if (cursor.moveToFirst()) cursor.getString(0) else null
+                }
+            }.getOrNull()?.ifBlank { null } ?: fallback
+        }
     }
 
     fun refreshNotificationPermission() {
@@ -371,6 +411,26 @@ class SettingsViewModel @Inject constructor(
 
     fun onImportCsv() {
         importLauncher?.launch(arrayOf("text/*", "text/csv", "application/csv"))
+    }
+
+    fun onSyncFolderResult(uri: Uri?) {
+        uri ?: return
+        viewModelScope.launch {
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                )
+            }.onFailure { return@launch }
+
+            settingsRepository.setString(
+                CsvSyncWorker.SYNC_FOLDER_URI_KEY,
+                uri.toString()
+            )
+            _syncFolderName.value = folderDisplayName(uri.toString())
+            CsvSyncWorker.syncNow(context)
+        }
     }
 
     fun onImportResult(uri: Uri?) {

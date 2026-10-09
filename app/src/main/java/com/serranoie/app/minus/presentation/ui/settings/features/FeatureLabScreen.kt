@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.rounded.CreditCard
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.NewLabel
 import androidx.compose.material.icons.rounded.Sell
+import androidx.compose.material.icons.rounded.Terminal
 import androidx.compose.material.icons.rounded.YoutubeSearchedFor
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -45,7 +47,9 @@ import com.serranoie.app.minus.presentation.ui.settings.SettingsUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
+import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
+import com.serranoie.app.minus.presentation.ui.theme.component.SettingsLeadingIcon
 import com.serranoie.app.minus.presentation.ui.theme.component.SettingsToggleItem
 
 @Composable
@@ -58,6 +62,7 @@ fun FeatureLabScreen(
     onExtraNoteToggle: () -> Unit,
     onReserveUpcomingChargesToggle: () -> Unit,
     onNewCategoryTagToggle: () -> Unit,
+    onNavigateToCsvSyncGuide: () -> Unit = {},
     onBack: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -157,6 +162,36 @@ fun FeatureLabScreen(
                         position = PaddedListItemPosition.Last,
                         modifier = Modifier.testTag("FeatureLabReserveUpcomingCharges"),
                     )
+                }
+            }
+
+            item {
+                PaddedListGroup {
+                    CustomPaddedListItem(
+                        onClick = onNavigateToCsvSyncGuide,
+                        position = PaddedListItemPosition.Single,
+                        modifier = Modifier.testTag("FeatureLabCsvSyncGuide"),
+                    ) {
+                        SettingsLeadingIcon(icon = Icons.Rounded.Terminal)
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_feature_csv_sync_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_feature_csv_sync_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
 

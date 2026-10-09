@@ -3,6 +3,7 @@ package com.serranoie.app.minus
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.serranoie.app.minus.data.csv.CsvSyncWorker
 import com.serranoie.app.minus.domain.usecase.BackfillOrphanedPeriodsUseCase
 import com.serranoie.app.minus.domain.usecase.FoldCarryIntoTotalBudgetUseCase
 import com.serranoie.app.minus.wearsync.PhoneWearMessageListener
@@ -39,6 +40,8 @@ class MinusApplication : Application(), Configuration.Provider {
         AndroidLogcatLogger.installOnDebuggableApp(this, minPriority = LogPriority.VERBOSE)
 
         phoneWearMessageListener.start()
+
+        CsvSyncWorker.schedule(this)
 
         CoroutineScope(Dispatchers.IO).launch {
             backfillOrphanedPeriodsUseCase()
