@@ -187,9 +187,9 @@ class MinusCsvParser {
                 try {
                     BudgetSplitMode.valueOf(it)
                 } catch (_: Exception) {
-                    BudgetSplitMode.STATIC
+                    BudgetSplitMode.DYNAMIC
                 }
-            } ?: BudgetSplitMode.STATIC
+            } ?: BudgetSplitMode.DYNAMIC
 
         return CsvBackupMetadata(
             budgetSettings = BudgetSettings(

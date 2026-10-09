@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation
 
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -41,6 +42,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.data.csv.CsvSyncWorker
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.data.wearable.WearableService
 import com.serranoie.app.minus.domain.model.AppColorScheme
@@ -132,12 +134,25 @@ class MainActivity : AppCompatActivity() {
         censorManager.stop()
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleSyncIntent(intent)
+    }
+
+    private fun handleSyncIntent(intent: Intent?) {
+        if (intent?.action == CsvSyncWorker.ACTION_SYNC_NOW) {
+            CsvSyncWorker.syncNow(this)
+        }
+    }
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        handleSyncIntent(intent)
 
         val iconAnimationEndsAt = SystemClock.uptimeMillis() + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             resources.getInteger(R.integer.splash_icon_animation_duration).toLong()
