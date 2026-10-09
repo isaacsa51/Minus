@@ -195,7 +195,7 @@ fun LeftoverChoiceList(
                     Column {
                         val amountText = currencyFormat.format(today)
                         val amountAnnotated =
-                            if (isLargeCurrency) {
+                            if (isLargeCurrency && (isSymbolAtEnd || amountText.startsWith(currencySymbol))) {
                                 val amountOnly = if (isSymbolAtEnd) {
                                     amountText.removeSuffix(trimmedSymbol).removeSuffix(currencySymbol).trim()
                                 } else {

@@ -324,8 +324,12 @@ data class SupportedCurrencyData(
         )
 
         private fun fractionDigits(code: String): Int =
-            runCatching { Currency.getInstance(code).defaultFractionDigits }
-                .getOrElse { 2 }
+            if (code == "IRT") {
+                0
+            } else {
+                runCatching { Currency.getInstance(code).defaultFractionDigits }
+                    .getOrElse { 2 }
+            }
 
         val BY_CODE: Map<String, SupportedCurrencyData> =
             SUPPORTED_CODES.associate { (code, position) ->
