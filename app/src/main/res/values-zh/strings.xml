@@ -452,7 +452,7 @@
     <string name="savings_recommendation_current_savings_format">当前存款：%1$s</string>
     <string name="savings_recommendation_recurrent_expenses_label">定期支出</string>
     <string name="savings_recommendation_one_time_expenses_label">一次性支出</string>
-    <string name="savings_recommendation_six_month_example_intro" formatted="false">连续 6 个月左右每周期存下 20%，你可以：</string>
+    <string name="savings_recommendation_six_month_example_intro" formatted="false">连续 6 个月左右每周期存下 %1$d%%，你可以：</string>
     <string name="savings_recommendation_goal_format" formatted="false">要在 %2$d 月内达到 %1$s，每周期需要存下 %3$s。</string>
     <string name="savings_recommendation_goal_disabled" formatted="false">正在显示默认的 %1$d%% 示例。请在设置中设置一个包含具体金额的存款目标。</string>
     <!-- Settings: Savings Preferences -->
@@ -491,7 +491,7 @@
     <string name="currency_selected">已选择</string>
     <!-- Remaining Budget Strategy -->
     <string name="strategy_dialog_title">预算结余</string>
-    <string name="strategy_dialog_description" formatted="false">你可以选择一天结束时如何分配你的预算余额。\n\n比如你每天有 500 的预算但昨天只花了 400，剩下的 100 就可以在剩余的日子里平分或直接加入今天的预算变成 600（每日预算 + 上一周期结余）。</string>
+    <string name="strategy_dialog_description" formatted="false">你可以选择预算周期结束时如何分配剩余预算。\n\n比如本周期预算为 500，但周期结束时只花了 400，剩下的 100 就可以在新周期的所有日期中平分，或直接加入新周期首日的预算。如果新周期首日的预算为 500，加上这笔结余后就变成 600。</string>
     <string name="strategy_ask_always">总是询问</string>
     <string name="strategy_ask_always_desc">周期结束时我们会询问你如何处理结余</string>
     <string name="strategy_split_equally">平均分配</string>
