@@ -145,7 +145,7 @@ class BudgetRepositoryImpl @Inject constructor(
             splitMode = try {
                 BudgetSplitMode.valueOf(this.splitMode)
             } catch (_: Exception) {
-                BudgetSplitMode.STATIC
+                BudgetSplitMode.DYNAMIC
             },
             rollOverAppliedDate = this.rollOverAppliedDate?.let { LocalDate.ofEpochDay(it / 86400000) },
         )

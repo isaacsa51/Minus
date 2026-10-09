@@ -134,7 +134,7 @@ fun BudgetPill(
     onOpenBudgetSheet: () -> Unit = {},
     bigVariant: Boolean = false,
     centerRemainingAmount: Boolean = false,
-    splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
+    splitMode: BudgetSplitMode = BudgetSplitMode.DYNAMIC,
     calculationPreview: String? = null,
     draftAmount: BigDecimal? = null,
     hasUnresolvedSurplus: Boolean = false,
@@ -222,26 +222,52 @@ fun BudgetPill(
     val symbolStyle = MaterialTheme.typography.titleSmallCondensed.toSpanStyle()
     val annotatedAmount = remember(amountText, currencyCode, symbolStyle, isNoBudget) {
         val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: ""
-        if (!isNoBudget && currencySymbol.length > 2 && amountText.startsWith(currencySymbol)) {
-            val amount = amountText.removePrefix(currencySymbol).trim()
-            AnnotatedString.Builder().apply {
-                pushStyle(
-                    symbolStyle.copy(
-                        fontSize = 16.sp * 0.75f,
-                        fontWeight = FontWeight.Bold,
-                        baselineShift = BaselineShift(0f)
+        val isSymbolAtEnd = SupportedCurrency.findByCode(currencyCode)?.symbolPosition == SymbolPosition.END
+        val trimmedSymbol = currencySymbol.trim()
+        if (!isNoBudget && currencySymbol.length > 2) {
+            if (isSymbolAtEnd && amountText.endsWith(trimmedSymbol)) {
+                val amount = amountText.removeSuffix(trimmedSymbol).removeSuffix(currencySymbol).trim()
+                AnnotatedString.Builder().apply {
+                    pushStyle(
+                        SpanStyle(
+                            fontWeight = FontWeight.Light
+                        )
                     )
-                )
-                append(currencySymbol)
-                pop()
-                pushStyle(
-                    SpanStyle(
-                        fontWeight = FontWeight.Light
+                    append(amount)
+                    pop()
+                    pushStyle(
+                        symbolStyle.copy(
+                            fontSize = 16.sp * 0.75f,
+                            fontWeight = FontWeight.Bold,
+                            baselineShift = BaselineShift(0f)
+                        )
                     )
-                )
-                append(amount)
-                pop()
-            }.toAnnotatedString()
+                    append(" $trimmedSymbol")
+                    pop()
+                }.toAnnotatedString()
+            } else if (amountText.startsWith(currencySymbol)) {
+                val amount = amountText.removePrefix(currencySymbol).trim()
+                AnnotatedString.Builder().apply {
+                    pushStyle(
+                        symbolStyle.copy(
+                            fontSize = 16.sp * 0.75f,
+                            fontWeight = FontWeight.Bold,
+                            baselineShift = BaselineShift(0f)
+                        )
+                    )
+                    append(currencySymbol)
+                    pop()
+                    pushStyle(
+                        SpanStyle(
+                            fontWeight = FontWeight.Light
+                        )
+                    )
+                    append(amount)
+                    pop()
+                }.toAnnotatedString()
+            } else {
+                AnnotatedString(amountText)
+            }
         } else {
             AnnotatedString(amountText)
         }
@@ -253,26 +279,52 @@ fun BudgetPill(
     val annotatedCalculationPreview = remember(calculationPreview, currencyCode, symbolStyle) {
         if (calculationPreview == null) return@remember null
         val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: ""
-        if (currencySymbol.length > 2 && calculationPreview.startsWith(currencySymbol)) {
-            val rest = calculationPreview.removePrefix(currencySymbol)
-            AnnotatedString.Builder().apply {
-                pushStyle(
-                    symbolStyle.copy(
-                        fontSize = 16.sp * 0.75f,
-                        fontWeight = FontWeight.Bold,
-                        baselineShift = BaselineShift(0f)
+        val isSymbolAtEnd = SupportedCurrency.findByCode(currencyCode)?.symbolPosition == SymbolPosition.END
+        val trimmedSymbol = currencySymbol.trim()
+        if (currencySymbol.length > 2) {
+            if (isSymbolAtEnd && calculationPreview.endsWith(trimmedSymbol)) {
+                val rest = calculationPreview.removeSuffix(trimmedSymbol).removeSuffix(currencySymbol).trim()
+                AnnotatedString.Builder().apply {
+                    pushStyle(
+                        SpanStyle(
+                            fontWeight = FontWeight.Light
+                        )
                     )
-                )
-                append(currencySymbol)
-                pop()
-                pushStyle(
-                    SpanStyle(
-                        fontWeight = FontWeight.Light
+                    append(rest)
+                    pop()
+                    pushStyle(
+                        symbolStyle.copy(
+                            fontSize = 16.sp * 0.75f,
+                            fontWeight = FontWeight.Bold,
+                            baselineShift = BaselineShift(0f)
+                        )
                     )
-                )
-                append(rest)
-                pop()
-            }.toAnnotatedString()
+                    append(" $trimmedSymbol")
+                    pop()
+                }.toAnnotatedString()
+            } else if (calculationPreview.startsWith(currencySymbol)) {
+                val rest = calculationPreview.removePrefix(currencySymbol)
+                AnnotatedString.Builder().apply {
+                    pushStyle(
+                        symbolStyle.copy(
+                            fontSize = 16.sp * 0.75f,
+                            fontWeight = FontWeight.Bold,
+                            baselineShift = BaselineShift(0f)
+                        )
+                    )
+                    append(currencySymbol)
+                    pop()
+                    pushStyle(
+                        SpanStyle(
+                            fontWeight = FontWeight.Light
+                        )
+                    )
+                    append(rest)
+                    pop()
+                }.toAnnotatedString()
+            } else {
+                AnnotatedString(calculationPreview)
+            }
         } else {
             AnnotatedString(calculationPreview)
         }

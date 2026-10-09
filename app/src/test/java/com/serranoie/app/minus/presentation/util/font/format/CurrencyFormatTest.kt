@@ -93,4 +93,16 @@ class CurrencyFormatTest {
         assertThat(symbolOnlyCurrencyFormat("VND").format(BigDecimal("1000")))
             .isEqualTo("1,000₫")
     }
+
+    @Test
+    fun `Iranian Rial (IRR) places symbol at the start`() {
+        assertThat(formatCurrencySymbolOnly(BigDecimal("10000"), "IRR"))
+            .isEqualTo("﷼10,000")
+    }
+
+    @Test
+    fun `Iranian Toman (IRT) places symbol at the end with a space`() {
+        assertThat(formatCurrencySymbolOnly(BigDecimal("10000"), "IRT"))
+            .isEqualTo("10,000 تومان")
+    }
 }

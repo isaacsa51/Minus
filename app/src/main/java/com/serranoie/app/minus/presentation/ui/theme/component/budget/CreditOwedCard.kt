@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.SupportedCurrency
+import com.serranoie.app.minus.domain.model.SymbolPosition
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
@@ -46,7 +45,6 @@ import com.serranoie.app.minus.presentation.util.censor
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import java.math.BigDecimal
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CreditOwedCard(
     owed: BigDecimal,
@@ -56,8 +54,14 @@ fun CreditOwedCard(
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currency)
     val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: "$"
+    val isSymbolAtEnd = SupportedCurrency.findByCode(currency)?.symbolPosition == SymbolPosition.END
+    val trimmedSymbol = currencySymbol.trim()
     val formattedValue = currencyFormat.format(owed)
-    val formattedAmount = formattedValue.removePrefix(currencySymbol)
+    val formattedAmount = if (isSymbolAtEnd) {
+        formattedValue.removeSuffix(trimmedSymbol).removeSuffix(currencySymbol).trim()
+    } else {
+        formattedValue.removePrefix(currencySymbol).removePrefix(trimmedSymbol).trim()
+    }
 
     val valueFontSize = MaterialTheme.typography.titleMedium.fontSize
     val useAnnotatedValue = currencySymbol.length > 2
@@ -125,7 +129,7 @@ fun CreditOwedCard(
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    if (useAnnotatedValue) {
+                    if (useAnnotatedValue && !isSymbolAtEnd) {
                         Text(
                             text = currencySymbol,
                             style = MaterialTheme.typography.titleSmallCondensed.copy(fontWeight = FontWeight.Bold),
@@ -144,6 +148,16 @@ fun CreditOwedCard(
                         modifier = Modifier.censor(),
                         textAlign = TextAlign.Center
                     )
+
+                    if (useAnnotatedValue && isSymbolAtEnd) {
+                        Text(
+                            text = " $trimmedSymbol",
+                            style = MaterialTheme.typography.titleSmallCondensed.copy(fontWeight = FontWeight.Bold),
+                            fontSize = valueFontSize * 0.65f,
+                            color = LocalContentColor.current.copy(alpha = 0.8f),
+                            modifier = Modifier.padding(bottom = 2.dp)
+                        )
+                    }
                 }
 
                 Text(
