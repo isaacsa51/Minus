@@ -235,7 +235,7 @@
     <string name="changelog_close">关闭</string>
     <string name="changelog_previous_versions">上一版本</string>
     <string name="changelog_updated_to">已更新至：%1$s</string>
-    <string name="changelog_see_changes">See below all the changes to not miss any new feature</string>
+    <string name="changelog_see_changes">查看下方的变更日志以跟进最新功能</string>
     <!-- Finish Date Selector -->
     <string name="onboarding_finish_date_selector_title">选择周期</string>
     <string name="onboarding_finish_date_selector_days_range">%1$d 天 · %2$s - %3$s</string>
@@ -243,20 +243,20 @@
     <!-- Settings -->
     <string name="settings_title">设置</string>
     <string name="settings_section_appearance">外观</string>
-    <string name="settings_section_language">Language</string>
-    <string name="settings_language_header">App Language</string>
-    <string name="settings_language_currently_format">Currently: %1$s</string>
-    <string name="settings_language_disclaimer">Language translations might be incorrect.</string>
-    <string name="settings_theme_system">System</string>
-    <string name="settings_theme_light">Light</string>
-    <string name="settings_theme_dark">Dark</string>
-    <string name="settings_contrast_title">Contrast</string>
-    <string name="settings_contrast_normal">Normal</string>
-    <string name="settings_contrast_medium">Medium</string>
-    <string name="settings_contrast_high">High</string>
-    <string name="settings_typography_condensed">Condensed</string>
+    <string name="settings_section_language">语言</string>
+    <string name="settings_language_header">应用语言</string>
+    <string name="settings_language_currently_format">当前：%1$s</string>
+    <string name="settings_language_disclaimer">跨语言翻译可能会有错误。</string>
+    <string name="settings_theme_system">系统</string>
+    <string name="settings_theme_light">浅色</string>
+    <string name="settings_theme_dark">深色</string>
+    <string name="settings_contrast_title">反差</string>
+    <string name="settings_contrast_normal">正常</string>
+    <string name="settings_contrast_medium">中</string>
+    <string name="settings_contrast_high">高</string>
+    <string name="settings_typography_condensed">紧凑</string>
     <string name="settings_typography_expressive">Expressive</string>
-    <string name="settings_color_scheme_title">Colorscheme</string>
+    <string name="settings_color_scheme_title">色彩方案</string>
     <string name="settings_section_notifications">通知</string>
     <string name="settings_section_features">功能</string>
     <string name="settings_section_app_info">应用信息</string>
@@ -265,13 +265,13 @@
     <string name="settings_section_savings">存钱</string>
     <string name="settings_theme_title">主题</string>
     <string name="settings_theme_subtitle">更改应用主题风格</string>
-    <string name="settings_appearance_title">Theming and color</string>
-    <string name="settings_appearance_subtitle">Change the color and appearance of the app</string>
-    <string name="settings_widgets_title">Widgets</string>
-    <string name="settings_widgets_subtitle">Explore and see widgets to use on your home screen</string>
+    <string name="settings_appearance_title">主题与色彩</string>
+    <string name="settings_appearance_subtitle">更改应用的颜色和外观</string>
+    <string name="settings_widgets_title">小组件</string>
+    <string name="settings_widgets_subtitle">探索可用于你主屏幕的小组件</string>
     <string name="settings_typography_title">排版</string>
     <string name="settings_typography_subtitle">更改应用的排版风格</string>
-    <string name="settings_rounded_font_title">Rounded font style</string>
+    <string name="settings_rounded_font_title">圆体字体样式</string>
     <string name="settings_material_you_title">Material You</string>
     <string name="settings_material_you_subtitle">基于壁纸颜色的动态应用主题</string>
     <string name="settings_censor_mode_title">隐私模式</string>
@@ -286,8 +286,8 @@
     <string name="settings_category_picker_direct_popup_description">点击类别区域时打开包含已保存类别的建议弹窗。关闭时，建议弹窗仅在你输入时出现。</string>
     <string name="settings_category_grid_mode_switch_label">显示为列表（实验性）</string>
     <string name="settings_category_grid_mode_description">点击类别标签后会以网格视图展开已保存类别，而不是进入內联编辑模式。开启该选项时也会关闭数字键盘计算器。</string>
-    <string name="settings_feature_show_past_transactions_title">Show past transactions</string>
-    <string name="settings_feature_show_past_transactions_subtitle">Load transactions from past periods</string>
+    <string name="settings_feature_show_past_transactions_title">显示交易历史</string>
+    <string name="settings_feature_show_past_transactions_subtitle">从以前的周期加载交易</string>
     <string name="settings_recurrent_payments_view_mode_title">定期支出视图</string>
     <string name="settings_recurrent_payments_view_mode_subtitle">更改显示类型来查看你的定期支出</string>
     <string name="settings_recurrent_payments_view_mode_dialog_title">定期支出视图</string>
@@ -312,7 +312,7 @@
     <string name="settings_about_subtitle">了解更多应用和开发信息</string>
     <string name="settings_bug_report_title">遇到 bug？</string>
     <string name="settings_bug_report_subtitle">创建问题报告，我们将尽快修复</string>
-    <string name="settings_what_is_this_for">What is this for?</string>
+    <string name="settings_what_is_this_for">这是什么？</string>
     <string name="settings_version_title">版本</string>
     <string name="settings_version_metadata_copied">应用与设备信息已复制至剪贴板</string>
     <!-- Bug Report -->
@@ -356,7 +356,7 @@
     <string name="bug_report_upload_assets">上传素材</string>
     <string name="bug_report_upload_assets_subtitle">截图或视频（最多 10MB）</string>
     <string name="bug_report_upload_assets_selected_count">已选择 %1$d 个附件</string>
-    <string name="bug_report_remove_attachment">Remove attachment</string>
+    <string name="bug_report_remove_attachment">移除附件</string>
     <string name="settings_backup_title">备份数据</string>
     <string name="settings_backup_subtitle">备份数据至 minus_export.csv</string>
     <string name="settings_import_csv_title">导入 CSV</string>
@@ -380,7 +380,7 @@
     <string name="expand">展开</string>
     <string name="collapse">折叠</string>
     <!-- Budget Pill -->
-    <string name="budget_pill_over_budget">Budget amount exceeded</string>
+    <string name="budget_pill_over_budget">已超出预算金额</string>
     <string name="budget_pill_no_budget">没有预算</string>
     <string name="budget_pill_no_budget_action">设置预算</string>
     <string name="budget_pill_calc_added">%1$s will be added</string>
@@ -511,7 +511,7 @@
     <string name="no_name">没有名称</string>
     <string name="no_name_income">Unnamed income</string>
     <string name="description">购买原因</string>
-    <string name="adjustment_reason">Reason</string>
+    <string name="adjustment_reason">原因</string>
     <string name="date">日期</string>
     <string name="frequency">频率</string>
     <string name="charge_day">计费日期</string>
@@ -543,7 +543,7 @@
     <string name="notification_upcoming_subscription_message_with_comment">你「%2$s」中的「%1$s」订阅将收费 %3$s，请准备付款。</string>
     <string name="notification_upcoming_subscription_message_without_comment">你有一项名为「%1$s」的订阅将收费 %2$s。</string>
     <string name="notification_credit_cutoff_title">即将到来的信用卡付款</string>
-    <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="notification_credit_cutoff_message">你的支付到期日是 %1$s。建议支付 %2$s 来避免产生利息。</string>
     <string name="credit_owed_label">总负债</string>
     <string name="debt_adjusted_balance_label">经调整的余额</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s 信用债务</string>
@@ -554,16 +554,16 @@
     <string name="ticket_recurrent_expense">周期性支出</string>
     <!-- Past Periods -->
     <string name="past_periods_title">以往周期</string>
-    <string name="past_periods_subtitle">Tap a period to see its full breakdown.</string>
+    <string name="past_periods_subtitle">点击一个周期来查看完整的分析。</string>
     <string name="past_periods_empty">未找到归档的周期</string>
     <string name="past_periods_spent_label">已支出</string>
     <string name="past_periods_limit_label">限额</string>
     <string name="past_periods_status_on_track">追踪中</string>
     <string name="past_periods_status_over_budget">超出预算</string>
-    <string name="past_periods_status_estimated">Estimated</string>
-    <string name="past_periods_estimated_divider">Estimated periods below</string>
+    <string name="past_periods_status_estimated">预计</string>
+    <string name="past_periods_estimated_divider">下方预计周期</string>
     <string name="past_periods_status_saved">节约 %1$s</string>
-    <string name="past_periods_saved_label">Money Saved</string>
+    <string name="past_periods_saved_label">已节省金额</string>
     <!-- Analytics Tutorial -->
     <string name="analytics_tutorial_minmax_title">支出趋势</string>
     <string name="analytics_tutorial_minmax_desc">此处展示你的最低与最高支出。\n随记账实时更新，轻松识别异常开支</string>
@@ -582,18 +582,18 @@
     <string name="analytics_tutorial_history_title">账单明细</string>
     <string name="analytics_tutorial_history_desc">点击查看本期全部支出。</string>
     <string name="skip_tutorial">跳过教程</string>
-    <string name="budget_graph_header_spending">Spending</string>
-    <string name="budget_graph_legend_current">Current</string>
-    <string name="budget_graph_legend_previous">Previous</string>
-    <string name="budget_graph_view_mode_cumulative">Trend</string>
-    <string name="budget_graph_view_mode_categories">Categories</string>
-    <string name="budget_graph_nav_prev">Previous</string>
-    <string name="budget_graph_nav_next">Next</string>
-    <string name="graph_granularity_days">Days</string>
-    <string name="graph_granularity_week">Week</string>
-    <string name="graph_granularity_biweek">Biweek</string>
-    <string name="graph_granularity_month">Month</string>
-    <string name="graph_granularity_total">Total</string>
-    <string name="unit_thousands">K</string>
-    <string name="unit_millions">M</string>
+    <string name="budget_graph_header_spending">支出</string>
+    <string name="budget_graph_legend_current">当前</string>
+    <string name="budget_graph_legend_previous">上一个</string>
+    <string name="budget_graph_view_mode_cumulative">趋势</string>
+    <string name="budget_graph_view_mode_categories">类别</string>
+    <string name="budget_graph_nav_prev">上一个</string>
+    <string name="budget_graph_nav_next">下一个</string>
+    <string name="graph_granularity_days">天</string>
+    <string name="graph_granularity_week">周</string>
+    <string name="graph_granularity_biweek">每两周</string>
+    <string name="graph_granularity_month">月</string>
+    <string name="graph_granularity_total">总计</string>
+    <string name="unit_thousands">千</string>
+    <string name="unit_millions">百万</string>
 </resources>
