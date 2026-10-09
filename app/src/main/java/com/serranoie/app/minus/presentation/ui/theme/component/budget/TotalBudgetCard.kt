@@ -49,6 +49,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.SupportedCurrency
+import com.serranoie.app.minus.domain.model.SymbolPosition
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
@@ -110,8 +111,14 @@ fun TotalBudgetCard(
     val finalDisplayBudget = if (hasCCDebt) totalBudgetAdjusted else displayBudget
 
     val currencySymbol = SupportedCurrency.findByCode(currencyCode)?.symbol ?: "$"
+    val isSymbolAtEnd = SupportedCurrency.findByCode(currencyCode)?.symbolPosition == SymbolPosition.END
+    val trimmedSymbol = currencySymbol.trim()
     val formattedValue = currencyFormat.format(finalDisplayBudget)
-    val formattedAmount = formattedValue.removePrefix(currencySymbol)
+    val formattedAmount = if (isSymbolAtEnd) {
+        formattedValue.removeSuffix(trimmedSymbol).removeSuffix(currencySymbol).trim()
+    } else {
+        formattedValue.removePrefix(currencySymbol).removePrefix(trimmedSymbol).trim()
+    }
 
     val valueFontSize = if (bigVariant) {
         MaterialTheme.typography.headlineLarge.fontSize
@@ -121,23 +128,43 @@ fun TotalBudgetCard(
     val useAnnotatedValue = currencySymbol.length > 2
     val annotatedDisplayValue: AnnotatedString? = if (useAnnotatedValue) {
         AnnotatedString.Builder().run {
-            pushStyle(
-                MaterialTheme.typography.titleSmallCondensed.toSpanStyle().copy(
-                    fontSize = valueFontSize * 0.65f,
-                    fontWeight = FontWeight.Bold,
-                    baselineShift = BaselineShift(0f)
+            if (isSymbolAtEnd) {
+                pushStyle(
+                    SpanStyle(
+                        fontSize = valueFontSize,
+                        fontWeight = FontWeight.Light
+                    )
                 )
-            )
-            append(currencySymbol)
-            pop()
-            pushStyle(
-                SpanStyle(
-                    fontSize = valueFontSize,
-                    fontWeight = FontWeight.Light
+                append(formattedAmount)
+                pop()
+                pushStyle(
+                    MaterialTheme.typography.titleSmallCondensed.toSpanStyle().copy(
+                        fontSize = valueFontSize * 0.65f,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(0f)
+                    )
                 )
-            )
-            append(formattedAmount)
-            pop()
+                append(" $trimmedSymbol")
+                pop()
+            } else {
+                pushStyle(
+                    MaterialTheme.typography.titleSmallCondensed.toSpanStyle().copy(
+                        fontSize = valueFontSize * 0.65f,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(0f)
+                    )
+                )
+                append(currencySymbol)
+                pop()
+                pushStyle(
+                    SpanStyle(
+                        fontSize = valueFontSize,
+                        fontWeight = FontWeight.Light
+                    )
+                )
+                append(formattedAmount)
+                pop()
+            }
             toAnnotatedString()
         }
     } else null

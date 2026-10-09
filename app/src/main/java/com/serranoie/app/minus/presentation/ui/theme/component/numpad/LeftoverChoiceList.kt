@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.SupportedCurrency
+import com.serranoie.app.minus.domain.model.SymbolPosition
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
@@ -83,6 +84,9 @@ fun LeftoverChoiceList(
     val currencyFormat = remember(currencyCode) { symbolOnlyCurrencyFormat(currencyCode) }
     val currencySymbol =
         remember(currencyCode) { SupportedCurrency.findByCode(currencyCode)?.symbol.orEmpty() }
+    val isSymbolAtEnd =
+        remember(currencyCode) { SupportedCurrency.findByCode(currencyCode)?.symbolPosition == SymbolPosition.END }
+    val trimmedSymbol = currencySymbol.trim()
     val isLargeCurrency = currencySymbol.length > 2 || currencyCode.length > 3
     val amountStyle = MaterialTheme.typography.titleLargeEmphasized
     val symbolCondensedSpanStyle = MaterialTheme.typography.titleLargeCondensed.toSpanStyle()
@@ -191,18 +195,37 @@ fun LeftoverChoiceList(
                     Column {
                         val amountText = currencyFormat.format(today)
                         val amountAnnotated =
-                            if (isLargeCurrency && amountText.startsWith(currencySymbol)) {
+                            if (isLargeCurrency) {
+                                val amountOnly = if (isSymbolAtEnd) {
+                                    amountText.removeSuffix(trimmedSymbol).removeSuffix(currencySymbol).trim()
+                                } else {
+                                    amountText.removePrefix(currencySymbol).removePrefix(trimmedSymbol).trim()
+                                }
                                 buildAnnotatedString {
-                                    withStyle(
-                                        symbolCondensedSpanStyle.copy(
-                                            fontSize = amountStyle.fontSize * 0.75f,
-                                            fontWeight = FontWeight.Bold,
-                                        )
-                                    ) {
-                                        append(currencySymbol)
-                                    }
-                                    withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
-                                        append(amountText.removePrefix(currencySymbol))
+                                    if (isSymbolAtEnd) {
+                                        withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
+                                            append(amountOnly)
+                                        }
+                                        withStyle(
+                                            symbolCondensedSpanStyle.copy(
+                                                fontSize = amountStyle.fontSize * 0.75f,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                        ) {
+                                            append(" $trimmedSymbol")
+                                        }
+                                    } else {
+                                        withStyle(
+                                            symbolCondensedSpanStyle.copy(
+                                                fontSize = amountStyle.fontSize * 0.75f,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                        ) {
+                                            append(currencySymbol)
+                                        }
+                                        withStyle(SpanStyle(fontWeight = FontWeight.Light)) {
+                                            append(amountOnly)
+                                        }
                                     }
                                 }
                             } else {

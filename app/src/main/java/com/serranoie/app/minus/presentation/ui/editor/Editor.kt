@@ -268,7 +268,7 @@ fun Editor(
                 viewPeriod = selectedViewPeriod ?: BudgetPeriod.DAILY,
                 currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
                 centerRemainingAmount = animState == AnimState.EDITING,
-                splitMode = uiState.budgetSettings?.splitMode ?: BudgetSplitMode.STATIC,
+                splitMode = uiState.budgetSettings?.splitMode ?: BudgetSplitMode.DYNAMIC,
                 calculationPreview = uiState.calculationPreview,
                 draftAmount = uiState.numpadDraftAmount,
                 hasUnresolvedSurplus = periodSurplus || pendingLeftover != null,

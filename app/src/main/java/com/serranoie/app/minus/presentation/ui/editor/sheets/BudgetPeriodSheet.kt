@@ -535,7 +535,7 @@ private fun ViewBudgetContent(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            val splitMode = budgetSettings?.splitMode ?: BudgetSplitMode.STATIC
+            val splitMode = budgetSettings?.splitMode ?: BudgetSplitMode.DYNAMIC
             val formulaTip = stringResource(R.string.budget_formula_tip_hold_pill)
             val openFormula = if (onShowFormula != null && budgetState != null) {
                 val request = BudgetFormulaRequest(
@@ -687,7 +687,7 @@ fun EditBudgetContent(
     val currentCurrency = budgetSettings?.currencyCode ?: "USD"
     val currentStrategy =
         budgetSettings?.remainingBudgetStrategy ?: RemainingBudgetStrategy.ASK_ALWAYS
-    val currentSplitMode = budgetSettings?.splitMode ?: BudgetSplitMode.STATIC
+    val currentSplitMode = budgetSettings?.splitMode ?: BudgetSplitMode.DYNAMIC
 
     val previousPeriodDays =
         remember(currentStart, currentEnd) {

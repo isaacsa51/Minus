@@ -45,9 +45,10 @@ data class SupportedCurrency(
     val code: String,
     val symbol: String,
     val symbolPosition: SymbolPosition = SymbolPosition.START,
+    val customDisplayName: String? = null,
 ) {
     fun displayName(locale: Locale = Locale.getDefault()): String =
-        runCatching { Currency.getInstance(code).getDisplayName(locale) }
+        customDisplayName ?: runCatching { Currency.getInstance(code).getDisplayName(locale) }
             .getOrDefault(code)
 
     @Composable
@@ -148,7 +149,9 @@ data class SupportedCurrency(
             SupportedCurrency("GEL", "₾"),
             SupportedCurrency("QAR", "QAR"),
             SupportedCurrency("AED", "AED"),
-            SupportedCurrency("CRC", "₡")
+            SupportedCurrency("CRC", "₡"),
+            SupportedCurrency("IRR", "﷼"),
+            SupportedCurrency("IRT", " تومان", SymbolPosition.END, customDisplayName = "Iranian Toman"),
         )
 
         fun findByCode(code: String): SupportedCurrency? =
@@ -168,7 +171,7 @@ data class BudgetSettings(
     val rollOverCarryForward: Boolean = false,
     val remainingBudgetStrategy: RemainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
     val creditCardCutoffDay: Int? = null,
-    val splitMode: BudgetSplitMode = BudgetSplitMode.STATIC,
+    val splitMode: BudgetSplitMode = BudgetSplitMode.DYNAMIC,
     val rollOverAppliedDate: LocalDate? = null,
 ) {
     fun getDaysForPeriod(): Int {
@@ -206,7 +209,7 @@ data class BudgetSettings(
             rollOverCarryForward = false,
             remainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
             creditCardCutoffDay = null,
-            splitMode = BudgetSplitMode.STATIC,
+            splitMode = BudgetSplitMode.DYNAMIC,
         )
     }
 }
@@ -232,6 +235,8 @@ data class SupportedCurrencyData(
             "COP", // Colombian Peso
             "PKR", // Pakistani Rupee
             "VND", // Vietnamese Dong
+            "IRR", // Iranian Rial
+            "IRT", // Iranian Toman
         )
 
         private val SUPPORTED_CODES: List<Pair<String, SymbolPosition>> = listOf(
@@ -314,6 +319,8 @@ data class SupportedCurrencyData(
             "QAR" to SymbolPosition.START,
             "AED" to SymbolPosition.START,
             "CRC" to SymbolPosition.START,
+            "IRR" to SymbolPosition.START,
+            "IRT" to SymbolPosition.END,
         )
 
         private fun fractionDigits(code: String): Int =

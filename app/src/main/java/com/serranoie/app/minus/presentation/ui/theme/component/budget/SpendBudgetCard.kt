@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.SupportedCurrency
+import com.serranoie.app.minus.domain.model.SymbolPosition
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelMediumCondensed
@@ -202,27 +203,54 @@ fun SpendBudgetCard(
                 val formattedAmountValue = numberFormat(context, spend, currency)
                 val annotatedSpend = remember(formattedAmountValue, currency, valueFontSize, symbolStyle) {
                     val currencySymbol = SupportedCurrency.findByCode(currency)?.symbol ?: ""
-                    if (currencySymbol.length > 2 && formattedAmountValue.startsWith(currencySymbol)) {
-                        val amount = formattedAmountValue.removePrefix(currencySymbol).trim()
-                        AnnotatedString.Builder().apply {
-                            pushStyle(
-                                symbolStyle.copy(
-                                    fontSize = valueFontSize * 0.65f,
-                                    fontWeight = FontWeight.Bold,
-                                    baselineShift = BaselineShift(0f)
+                    val isSymbolAtEnd = SupportedCurrency.findByCode(currency)?.symbolPosition == SymbolPosition.END
+                    val trimmedSymbol = currencySymbol.trim()
+                    if (currencySymbol.length > 2) {
+                        if (isSymbolAtEnd) {
+                            val amount = formattedAmountValue.removeSuffix(trimmedSymbol).removeSuffix(currencySymbol).trim()
+                            AnnotatedString.Builder().apply {
+                                pushStyle(
+                                    SpanStyle(
+                                        fontSize = valueFontSize,
+                                        fontWeight = FontWeight.Light
+                                    )
                                 )
-                            )
-                            append(currencySymbol)
-                            pop()
-                            pushStyle(
-                                SpanStyle(
-                                    fontSize = valueFontSize,
-                                    fontWeight = FontWeight.Light
+                                append(amount)
+                                pop()
+                                pushStyle(
+                                    symbolStyle.copy(
+                                        fontSize = valueFontSize * 0.65f,
+                                        fontWeight = FontWeight.Bold,
+                                        baselineShift = BaselineShift(0f)
+                                    )
                                 )
-                            )
-                            append(amount)
-                            pop()
-                        }.toAnnotatedString()
+                                append(" $trimmedSymbol")
+                                pop()
+                            }.toAnnotatedString()
+                        } else if (formattedAmountValue.startsWith(currencySymbol)) {
+                            val amount = formattedAmountValue.removePrefix(currencySymbol).trim()
+                            AnnotatedString.Builder().apply {
+                                pushStyle(
+                                    symbolStyle.copy(
+                                        fontSize = valueFontSize * 0.65f,
+                                        fontWeight = FontWeight.Bold,
+                                        baselineShift = BaselineShift(0f)
+                                    )
+                                )
+                                append(currencySymbol)
+                                pop()
+                                pushStyle(
+                                    SpanStyle(
+                                        fontSize = valueFontSize,
+                                        fontWeight = FontWeight.Light
+                                    )
+                                )
+                                append(amount)
+                                pop()
+                            }.toAnnotatedString()
+                        } else {
+                            AnnotatedString(formattedAmountValue)
+                        }
                     } else {
                         AnnotatedString(formattedAmountValue)
                     }
