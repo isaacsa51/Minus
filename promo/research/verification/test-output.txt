@@ -1,0 +1,9 @@
+PROMO STATIC dailyBudget=100.00 remainingToday=100.00 pending=0
+PROMO DYNAMIC dailyBudget=103.08 remainingToday=103.08 pending=0
+PROMO CARRY_OVER dailyBudget=100.00 remainingToday=140.00 pending=0
+PROMO ASK_ME pending dailyBudget=100.00 remainingToday=100.00 pending=40.00
+PROMO ASK_ME spread dailyBudget=103.08 remainingToday=103.08 pending=0.00
+PROMO ASK_ME carry dailyBudget=100.00 remainingToday=140.00 pending=0.00
+PROMO SURPLUS spread day1 dailyBudget=105.00 remainingToday=105.00 pending=0
+PROMO SURPLUS lump day1 dailyBudget=100.00 remainingToday=170.00 pending=0
+PROMO SURPLUS lump day2 dailyBudget=100.00 remainingToday=100.00 pending=0
