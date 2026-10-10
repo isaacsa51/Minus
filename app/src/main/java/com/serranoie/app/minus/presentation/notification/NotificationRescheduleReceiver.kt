@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.presentation.notification.scan.ExpenseNotificationListener
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -27,6 +28,7 @@ class NotificationRescheduleReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 logcat { "Rescheduling notifications after system event: ${intent.action}" }
+                ExpenseNotificationListener.requestRebindIfGranted(context.applicationContext)
                 val entryPoint = EntryPointAccessors.fromApplication(
                     context.applicationContext,
                     NotificationRescheduleReceiverEntryPoint::class.java

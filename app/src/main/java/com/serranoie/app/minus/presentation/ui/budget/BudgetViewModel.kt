@@ -17,6 +17,7 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.calculatePaymentDueDate
+import com.serranoie.app.minus.domain.notification.PENDING_QUICK_ADD_AMOUNT_KEY_NAME
 import com.serranoie.app.minus.domain.time.MidnightTransitionManager
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.FinishBudgetEarlyUseCase
@@ -57,6 +58,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -227,6 +229,14 @@ class BudgetViewModel @Inject constructor(
             uiState.collect { baseState ->
                 budgetWidgetUpdater.update(baseState)
             }
+        }
+        viewModelScope.launch {
+            settingsRepository.observeString(PENDING_QUICK_ADD_AMOUNT_KEY_NAME)
+                .filter { !it.isNullOrBlank() }
+                .collect { amount ->
+                    numpadController.setInput(amount.orEmpty())
+                    settingsRepository.setString(PENDING_QUICK_ADD_AMOUNT_KEY_NAME, "")
+                }
         }
     }
 

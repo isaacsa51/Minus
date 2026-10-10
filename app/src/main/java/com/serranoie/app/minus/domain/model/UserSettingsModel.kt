@@ -26,6 +26,8 @@ data class UserSettings(
     val extraNoteEnabled: Boolean = false,
     val reserveUpcomingChargesEnabled: Boolean = false,
     val newCategoryTagEnabled: Boolean = false,
+    val notificationScanEnabled: Boolean = false,
+    val notificationScanPackages: Set<String> = emptySet(),
     val tutorialBoxCompleted: Boolean = false,
     val firstLaunchTutorialStage: FirstLaunchTutorialStage = FirstLaunchTutorialStage.COMPLETED,
     val analyticsTutorialCompleted: Boolean = false,

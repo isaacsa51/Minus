@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.presentation.MainActivity
+import com.serranoie.app.minus.presentation.notification.scan.ExpenseScanActionReceiver
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import logcat.logcat
@@ -30,10 +31,13 @@ class NotificationHelper @Inject constructor(
         const val CHANNEL_PERIOD_END = "budget_period_end"
         const val CHANNEL_RECURRENT = "recurrent_expenses"
         const val CHANNEL_CREDIT = "credit_expenses"
+        const val CHANNEL_SPEND_DETECTED = "spend_detected"
 
         const val NOTIFICATION_ID_PERIOD_END = 1001
         const val NOTIFICATION_ID_RECURRENT = 1002
         const val NOTIFICATION_ID_CREDIT = 1003
+
+        private const val SPEND_SAVED_TIMEOUT_MS = 15_000L
     }
 
     init {
@@ -73,7 +77,17 @@ class NotificationHelper @Inject constructor(
 
         notificationManager.createNotificationChannel(periodEndChannel)
         notificationManager.createNotificationChannel(recurrentChannel)
+        val spendDetectedChannel = NotificationChannel(
+            CHANNEL_SPEND_DETECTED,
+            context.getString(R.string.notification_channel_spend_detected_name),
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = context.getString(R.string.notification_channel_spend_detected_description)
+            enableVibration(true)
+        }
+
         notificationManager.createNotificationChannel(creditChannel)
+        notificationManager.createNotificationChannel(spendDetectedChannel)
         logcat { "Notification channels created" }
     }
 
@@ -358,6 +372,117 @@ class NotificationHelper @Inject constructor(
             .build()
 
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_CREDIT, notification)
+    }
+
+    fun spendDetectedNotificationId(sourceLabel: String, amount: String): Int =
+        "spend_${sourceLabel}_$amount".hashCode()
+
+    fun showSpendDetectedNotification(
+        amount: BigDecimal,
+        currency: String,
+        sourceLabel: String,
+    ) {
+        if (!checkNotificationPermission()) return
+
+        val plainAmount = amount.toPlainString()
+        val notificationId = spendDetectedNotificationId(sourceLabel, plainAmount)
+        val formattedAmount = formatAmount(plainAmount, currency)
+        val message = context.getString(R.string.notification_scan_detected_message, formattedAmount)
+
+        val openIntent = Intent(context, MainActivity::class.java).apply {
+            action = ExpenseScanActionReceiver.ACTION_QUICK_ADD
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(ExpenseScanActionReceiver.EXTRA_AMOUNT, plainAmount)
+            putExtra(ExpenseScanActionReceiver.EXTRA_NOTIFICATION_ID, notificationId)
+        }
+        val openPendingIntent = PendingIntent.getActivity(
+            context,
+            notificationId,
+            openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        val quickSaveIntent = Intent(context, ExpenseScanActionReceiver::class.java).apply {
+            action = ExpenseScanActionReceiver.ACTION_QUICK_SAVE
+            putExtra(ExpenseScanActionReceiver.EXTRA_AMOUNT, plainAmount)
+            putExtra(ExpenseScanActionReceiver.EXTRA_SOURCE_LABEL, sourceLabel)
+            putExtra(ExpenseScanActionReceiver.EXTRA_NOTIFICATION_ID, notificationId)
+        }
+        val quickSavePendingIntent = PendingIntent.getBroadcast(
+            context,
+            notificationId + 1,
+            quickSaveIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_SPEND_DETECTED)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(sourceLabel)
+            .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(openPendingIntent)
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .addAction(0, context.getString(R.string.notification_scan_action_minus_it), openPendingIntent)
+            .addAction(0, context.getString(R.string.notification_scan_action_quick_save), quickSavePendingIntent)
+            .build()
+
+        NotificationManagerCompat.from(context).notify(notificationId, notification)
+        logcat { "Spend detected notification shown for $sourceLabel" }
+    }
+
+    fun showSpendSavedNotification(
+        notificationId: Int,
+        amount: String,
+        currency: String,
+        transactionId: Long,
+        queuedForNextPeriod: Boolean,
+    ) {
+        if (!checkNotificationPermission()) {
+            cancelSpendNotification(notificationId)
+            return
+        }
+
+        val formattedAmount = formatAmount(amount, currency)
+        val message = if (queuedForNextPeriod) {
+            context.getString(R.string.notification_scan_queued_message, formattedAmount)
+        } else {
+            context.getString(R.string.notification_scan_saved_message, formattedAmount)
+        }
+
+        val builder = NotificationCompat.Builder(context, CHANNEL_SPEND_DETECTED)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.notification_scan_saved_title))
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(true)
+            .setTimeoutAfter(SPEND_SAVED_TIMEOUT_MS)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
+
+        if (transactionId > 0L) {
+            val undoIntent = Intent(context, ExpenseScanActionReceiver::class.java).apply {
+                action = ExpenseScanActionReceiver.ACTION_UNDO
+                putExtra(ExpenseScanActionReceiver.EXTRA_TRANSACTION_ID, transactionId)
+                putExtra(ExpenseScanActionReceiver.EXTRA_NOTIFICATION_ID, notificationId)
+            }
+            builder.addAction(
+                0,
+                context.getString(R.string.notification_scan_action_undo),
+                PendingIntent.getBroadcast(
+                    context,
+                    notificationId + 2,
+                    undoIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                ),
+            )
+        }
+
+        NotificationManagerCompat.from(context).notify(notificationId, builder.build())
+    }
+
+    fun cancelSpendNotification(notificationId: Int) {
+        NotificationManagerCompat.from(context).cancel(notificationId)
     }
 
     fun cancelAllNotifications() {

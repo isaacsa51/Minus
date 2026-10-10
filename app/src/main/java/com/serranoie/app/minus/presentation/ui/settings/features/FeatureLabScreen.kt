@@ -3,23 +3,21 @@
 package com.serranoie.app.minus.presentation.ui.settings.features
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ViewList
-import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.NewLabel
+import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Sell
 import androidx.compose.material.icons.rounded.Terminal
 import androidx.compose.material.icons.rounded.YoutubeSearchedFor
@@ -35,7 +33,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
@@ -45,9 +42,9 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.presentation.ui.settings.SettingsUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
+import com.serranoie.app.minus.presentation.ui.theme.component.HelpBanner
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 import com.serranoie.app.minus.presentation.ui.theme.component.SettingsLeadingIcon
 import com.serranoie.app.minus.presentation.ui.theme.component.SettingsToggleItem
@@ -63,6 +60,7 @@ fun FeatureLabScreen(
     onReserveUpcomingChargesToggle: () -> Unit,
     onNewCategoryTagToggle: () -> Unit,
     onNavigateToCsvSyncGuide: () -> Unit = {},
+    onNavigateToNotificationScan: () -> Unit = {},
     onBack: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -78,7 +76,12 @@ fun FeatureLabScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            item { FeatureLabIntro() }
+            item {
+                HelpBanner(
+                    text = stringResource(R.string.settings_feature_lab_header),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
 
             item {
                 PaddedListGroup(
@@ -166,7 +169,41 @@ fun FeatureLabScreen(
             }
 
             item {
-                PaddedListGroup {
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_feature_group_notifications)
+                ) {
+                    CustomPaddedListItem(
+                        onClick = onNavigateToNotificationScan,
+                        position = PaddedListItemPosition.Single,
+                        modifier = Modifier.testTag("FeatureLabNotificationScan"),
+                    ) {
+                        SettingsLeadingIcon(icon = Icons.Rounded.NotificationsActive)
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_feature_notification_scan_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_feature_notification_scan_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
+            item {
+                PaddedListGroup(
+                    title = stringResource(R.string.settings_feature_group_experimental)
+                ) {
                     CustomPaddedListItem(
                         onClick = onNavigateToCsvSyncGuide,
                         position = PaddedListItemPosition.Single,
@@ -197,34 +234,6 @@ fun FeatureLabScreen(
 
             item { Spacer(modifier = Modifier.height(24.dp)) }
         }
-    }
-}
-
-@Composable
-private fun FeatureLabIntro() {
-    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Outlined.Help,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.settings_what_is_this_for),
-                style = MaterialTheme.typography.bodySmallCondensed,
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = stringResource(R.string.settings_feature_lab_header),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 

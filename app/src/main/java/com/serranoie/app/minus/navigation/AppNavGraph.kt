@@ -19,7 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.preferredFrameRate
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
@@ -40,6 +43,8 @@ import com.serranoie.app.minus.presentation.ui.settings.appearance.AppearanceOpt
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.BugReportScreen
 import com.serranoie.app.minus.presentation.ui.settings.features.CsvSyncGuideScreen
 import com.serranoie.app.minus.presentation.ui.settings.features.FeatureLabScreen
+import com.serranoie.app.minus.presentation.ui.settings.features.NotificationScanScreen
+import com.serranoie.app.minus.presentation.ui.settings.features.NotificationScanViewModel
 import com.serranoie.app.minus.presentation.ui.subscriptions.SubscriptionsScreen
 import logcat.logcat
 
@@ -231,6 +236,30 @@ fun AppNavGraph(
                 onNavigateToCsvSyncGuide = {
                     navController.navigate(Screen.CsvSyncGuide.route)
                 },
+                onNavigateToNotificationScan = {
+                    navController.navigate(Screen.NotificationScan.route)
+                },
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        screen(Screen.NotificationScan.route, popDirection, animated) {
+            val viewModel: NotificationScanViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val lifecycleOwner = LocalLifecycleOwner.current
+
+            LaunchedEffect(lifecycleOwner) {
+                lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                    viewModel.refreshAccess()
+                }
+            }
+
+            NotificationScanScreen(
+                state = uiState,
+                onEnabledToggle = viewModel::onEnabledToggle,
+                onAppToggle = viewModel::onAppToggle,
+                onQueryChange = viewModel::onQueryChange,
+                onOpenAccessSettings = viewModel::openAccessSettings,
                 onBack = { navController.popBackStack() },
             )
         }
