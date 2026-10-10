@@ -439,6 +439,35 @@
     <string name="settings_feature_group_categories">Categories</string>
     <string name="settings_feature_group_transactions">Transactions</string>
     <string name="settings_feature_group_budget">Budget &amp; payments</string>
+    <string name="settings_feature_group_notifications">Notifications</string>
+    <string name="settings_feature_group_experimental">Experimental</string>
+    <string name="settings_feature_experimental_label">Experimental</string>
+
+    <string name="settings_feature_notification_scan_title">Spend reminders from notifications</string>
+    <string name="settings_feature_notification_scan_description">Watches the notifications of the apps you pick and, when one looks like a charge, reminds you to log it in Minus.</string>
+    <string name="notification_scan_screen_title">Spend reminders</string>
+    <string name="notification_scan_header">Minus reads the notifications of the apps you pick, on your device only, and looks for an amount in your currency. Nothing is stored or sent anywhere until you save it yourself.</string>
+    <string name="notification_scan_access_title">Notification access</string>
+    <string name="notification_scan_access_missing">Android needs your permission before Minus can read notifications. You can revoke it at any time.</string>
+    <string name="notification_scan_access_button">Open notification access</string>
+    <string name="notification_scan_enable_title">Watch notifications</string>
+    <string name="notification_scan_enable_description">Turns the reminder on. Minus only looks at the apps selected below and ignores every other notification.</string>
+    <string name="notification_scan_apps_title">Apps to watch</string>
+    <string name="notification_scan_apps_empty">No app matches your search.</string>
+    <string name="notification_scan_apps_none_selected">Pick at least one app, like your bank, for the reminder to do anything.</string>
+    <string name="notification_scan_search_label">Search apps</string>
+    <string name="notification_scan_selected_count">%1$d selected</string>
+    <string name="notification_channel_spend_detected_name">Spend reminders</string>
+    <string name="notification_channel_spend_detected_description">Reminders to log a charge Minus spotted in another app\'s notification.</string>
+    <string name="notification_scan_detected_message">Seems like you just spent %1$s. Don\'t forget to minus it.</string>
+    <string name="notification_scan_action_minus_it">Minus it</string>
+    <string name="notification_scan_action_quick_save">Save as is</string>
+    <string name="notification_scan_action_undo">Undo</string>
+    <string name="notification_scan_saved_title">Saved to Minus</string>
+    <string name="notification_scan_saved_message">%1$s saved without a category.</string>
+    <string name="notification_scan_queued_message">%1$s saved for your next period.</string>
+    <!-- Comma separated, lowercase. Words that mean a notification is NOT a charge: refunds, incoming money, balances and promotions. Matched as plain substrings, so avoid short words that appear inside longer ones. -->
+    <string name="notification_scan_deny_words">refund,refunded,credited,deposit,deposited,balance,cashback,otp,one-time code,verification code,discount,promo</string>
     <string name="settings_feature_experimental">Experimental</string>
     <string name="settings_feature_state_on">On</string>
     <string name="settings_feature_state_off">Off</string>

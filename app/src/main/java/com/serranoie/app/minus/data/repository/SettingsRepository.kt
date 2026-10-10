@@ -75,6 +75,10 @@ interface SettingsRepository {
 
     suspend fun setNewCategoryTagEnabled(enabled: Boolean)
 
+    suspend fun setNotificationScanEnabled(enabled: Boolean)
+
+    suspend fun setNotificationScanPackages(packages: Set<String>)
+
     suspend fun setTutorialBoxCompleted(completed: Boolean)
 
     suspend fun setAnalyticsTutorialCompleted(completed: Boolean)

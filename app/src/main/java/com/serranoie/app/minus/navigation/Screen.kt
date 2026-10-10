@@ -27,4 +27,6 @@ sealed class Screen(val route: String) {
     data object FeatureLab : Screen("feature_lab")
 
     data object CsvSyncGuide : Screen("csv_sync_guide")
+
+    data object NotificationScan : Screen("notification_scan")
 }

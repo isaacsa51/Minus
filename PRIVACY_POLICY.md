@@ -27,6 +27,15 @@ The Service Provider may use the information you provide to send important infor
 
 For a better experience while using the Application, the Service Provider may require you to provide certain personally identifiable information, including but not limited to serranoie99@gmail.com, +526691659043\. The information the Service Provider requests will be retained and used as described in this privacy policy.
 
+**Notification Access (optional)**
+
+Minus offers an optional feature, off by default, that reminds you to log a charge after another app notifies you about one. If you turn it on, you grant Android's notification access permission and choose which apps Minus may look at.
+
+*   Minus reads the text of notifications only from the apps you select, and ignores every notification from every other app.
+*   All matching happens on your device. The Service Provider never receives, stores, or transmits notification content, and notification text is never written to disk.
+*   The only thing Minus keeps is the amount you choose to save, as a transaction in your own local data, together with the name of the app it came from.
+*   You can revoke notification access at any time in your device settings, or turn the feature off inside Minus, and no further notifications will be read.
+
 **Third Party Access**
 
 Only aggregated, anonymized data is periodically transmitted to external services to aid the Service Provider in improving the Application and their service. The Service Provider may share your information with third parties in the ways that are described in this privacy statement.

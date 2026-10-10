@@ -109,6 +109,7 @@ import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportI
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiIntent
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.mvi.BugReportUiState
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.theme.component.HelpBanner
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.util.Utils.confirmFeedback
 import kotlinx.coroutines.delay
@@ -171,10 +172,32 @@ fun BugReportForm(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 14.dp, vertical = 16.dp)
         ) {
+            val helpAccentColor = MaterialTheme.colorScheme.primary
+            val helpMessagePrefix = stringResource(R.string.bug_report_help_message_prefix)
+            val helpLinkLabel = stringResource(R.string.bug_report_help_github_issues)
+            val helpMessageSuffix = stringResource(R.string.bug_report_help_message_suffix)
+            val githubIssuesUrl = stringResource(R.string.bug_report_github_issues_url)
+
             HelpBanner(
+                text = buildAnnotatedString {
+                    append(helpMessagePrefix)
+                    withLink(
+                        LinkAnnotation.Url(
+                            url = githubIssuesUrl,
+                            styles = TextLinkStyles(
+                                style = SpanStyle(
+                                    color = helpAccentColor,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            )
+                        )
+                    ) {
+                        append(helpLinkLabel)
+                    }
+                    append(helpMessageSuffix)
+                },
+                title = stringResource(R.string.bug_report_help_title),
                 modifier = Modifier.fillMaxWidth(),
-                backgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
-                accentColor = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -399,62 +422,6 @@ private fun IssueTypeSelector(
                 Text(label, modifier = Modifier.basicMarquee())
             }
         }
-    }
-}
-
-@Composable
-private fun HelpBanner(
-    backgroundColor: Color,
-    accentColor: Color,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(backgroundColor)
-            .padding(horizontal = 16.dp, vertical = 13.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Outlined.Help,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.bug_report_help_title),
-                style = MaterialTheme.typography.bodySmallCondensed,
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
-
-        val helpMessagePrefix = stringResource(R.string.bug_report_help_message_prefix)
-        val helpLinkLabel = stringResource(R.string.bug_report_help_github_issues)
-        val helpMessageSuffix = stringResource(R.string.bug_report_help_message_suffix)
-        val githubIssuesUrl = stringResource(R.string.bug_report_github_issues_url)
-
-        Text(
-            text = buildAnnotatedString {
-                append(helpMessagePrefix)
-                withLink(
-                    LinkAnnotation.Url(
-                        url = githubIssuesUrl,
-                        styles = TextLinkStyles(
-                            style = SpanStyle(color = accentColor, fontWeight = FontWeight.Bold)
-                        )
-                    )
-                ) {
-                    append(helpLinkLabel)
-                }
-                append(helpMessageSuffix)
-            },
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            lineHeight = 14.sp,
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
 

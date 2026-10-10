@@ -540,7 +540,7 @@
     <string name="savings_recommendation_one_time_expenses_label">Despesas únicas</string>
     <string name="savings_recommendation_six_month_example_intro" formatted="false">Se você economizar %1$d%% por cerca de 6 meses, você pode construir:</string>
     <string name="savings_recommendation_goal_format" formatted="false">Para alcançar %1$s em %2$d meses, economize %3$s por período.</string>
-    <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando o exemplo padrão %1$d%. Defina um objetivo de poupança nas configurações para atingir um valor específico.</string>
+    <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando o exemplo padrão %1$d%%. Defina um objetivo de poupança nas configurações para atingir um valor específico.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Preferências de poupança</string>
     <string name="settings_savings_preferences_subtitle">Personalize a divisão 50/30/20 e defina um objetivo de poupança opcional</string>
@@ -738,4 +738,60 @@
     <string name="analytics_tutorial_recurrent_desc">Tudo o que se repete, com quanto custa por período. Abra para ver a próxima data de vencimento de cada uma ou para encerrar uma série que você não paga mais.</string>
     <string name="analytics_tutorial_income_title">Dinheiro devolvido</string>
     <string name="analytics_tutorial_income_desc">Tudo o que você registrou começando com + — um salário, um reembolso, uma transferência recebida. É somado a este período em vez de contar como gasto, então seu orçamento restante aumenta.</string>
+    <string name="settings_feature_group_notifications">Notificações</string>
+    <string name="settings_feature_group_experimental">Experimental</string>
+    <string name="settings_feature_experimental_label">Experimental</string>
+    <string name="settings_feature_notification_scan_title">Lembretes de gasto por notificação</string>
+    <string name="settings_feature_notification_scan_description">Observa as notificações dos apps que você escolher e, quando uma parece uma cobrança, lembra você de registrá-la no Minus.</string>
+    <string name="notification_scan_screen_title">Lembretes de gasto</string>
+    <string name="notification_scan_header">O Minus lê as notificações apenas dos apps que você escolher, somente no seu dispositivo, e procura um valor na sua moeda. Nada é armazenado nem enviado a lugar algum até você mesmo salvar.</string>
+    <string name="notification_scan_access_title">Acesso às notificações</string>
+    <string name="notification_scan_access_missing">O Android precisa da sua permissão antes de o Minus poder ler notificações. Você pode revogá-la a qualquer momento.</string>
+    <string name="notification_scan_access_button">Abrir acesso às notificações</string>
+    <string name="notification_scan_enable_title">Observar notificações</string>
+    <string name="notification_scan_enable_description">Ativa o lembrete. O Minus olha apenas os apps selecionados abaixo e ignora todas as outras notificações.</string>
+    <string name="notification_scan_apps_title">Apps a observar</string>
+    <string name="notification_scan_apps_empty">Nenhum app corresponde à sua busca.</string>
+    <string name="notification_scan_apps_none_selected">Escolha pelo menos um app, como o do seu banco, para o lembrete fazer algo.</string>
+    <string name="notification_scan_search_label">Buscar apps</string>
+    <string name="notification_scan_selected_count">%1$d selecionados</string>
+    <string name="notification_channel_spend_detected_name">Lembretes de gasto</string>
+    <string name="notification_channel_spend_detected_description">Lembretes para registrar uma cobrança que o Minus encontrou na notificação de outro app.</string>
+    <string name="notification_scan_detected_message">Parece que você acabou de gastar %1$s. Não esqueça de subtrair.</string>
+    <string name="notification_scan_action_minus_it">Subtrair</string>
+    <string name="notification_scan_action_quick_save">Salvar como está</string>
+    <string name="notification_scan_action_undo">Desfazer</string>
+    <string name="notification_scan_saved_title">Salvo no Minus</string>
+    <string name="notification_scan_saved_message">%1$s salvo sem categoria.</string>
+    <string name="notification_scan_queued_message">%1$s salvo para o seu próximo período.</string>
+    <string name="notification_scan_deny_words">reembolso,reembolsado,estorno,crédito de,depósito,saldo,cashback,otp,código de verificação,desconto,promoção</string>
+    <string name="settings_sync_folder_title">Pasta de sincronização</string>
+    <string name="settings_sync_folder_subtitle">Escolha uma pasta para manter uma cópia em CSV</string>
+    <string name="settings_sync_folder_subtitle_set">Sincronizando com %1$s a cada 2 horas</string>
+    <string name="csv_sync_status_never">Nenhuma sincronização foi executada ainda</string>
+    <string name="csv_sync_status_ok">Última sincronização %1$s, %2$s linhas importadas</string>
+    <string name="csv_sync_status_restored">Restaurado a partir da pasta %1$s</string>
+    <string name="csv_sync_status_rejected">A última sincronização %1$s manteve estes arquivos; algumas linhas foram rejeitadas: %2$s</string>
+    <string name="csv_sync_status_error">A última sincronização falhou %1$s: %2$s</string>
+    <string name="csv_sync_status_no_access">O acesso à pasta foi revogado, escolha a pasta novamente</string>
+    <string name="settings_feature_csv_sync_title">Guia de sincronização por pasta CSV</string>
+    <string name="settings_feature_csv_sync_description">Como ler e gravar os dados do Minus a partir de um script externo</string>
+    <string name="csv_sync_guide_title">Sincronização por pasta CSV</string>
+    <string name="csv_sync_guide_intro">O Minus pode manter uma cópia em CSV dos seus dados em uma pasta que você escolher e importar os arquivos CSV que você colocar nessa mesma pasta. Ferramentas externas ganham acesso de leitura e gravação sem mexer diretamente no banco de dados.\n\nO banco de dados privado continua sendo a fonte da verdade. A pasta guarda um espelho em CSV, não o arquivo do banco de dados.</string>
+    <string name="csv_sync_guide_setup_title">Configuração</string>
+    <string name="csv_sync_guide_setup_body">Escolha uma pasta acima. A partir daí o Minus sincroniza a cada duas horas, e nada na pasta é apagado, exceto os backups antigos dele mesmo.\n\nCada execução importa primeiro e exporta depois, então o arquivo que você lê sempre reflete o que você acabou de enviar.\n\n1. Importa todos os arquivos chamados minus_import_*.csv, renomeando cada um para .imported ou .rejected depois de lido.\n2. Grava minus_synced.csv, mantendo ao lado as cinco exportações anteriores como cópias minus_backup- datadas.\n\nO Android agrupa o trabalho em segundo plano durante o Doze e o mínimo de agendamento é de 15 minutos, então duas horas é uma meta, não uma garantia. Use o acionador manual quando precisar agora.</string>
+    <string name="csv_sync_guide_adb_title">Comandos adb</string>
+    <string name="csv_sync_guide_adb_push_label">Enviar novas transações</string>
+    <string name="csv_sync_guide_adb_trigger_label">Sincronizar imediatamente em vez de esperar</string>
+    <string name="csv_sync_guide_adb_pull_label">Ler o estado atual</string>
+    <string name="csv_sync_guide_adb_body">Substitua o caminho da pasta pelo que você escolheu. O comando acima já indica o pacote com que esta compilação é instalada, então funciona tanto em uma versão final quanto em uma beta.\n\nO acionador traz o app para o primeiro plano; não há variante sem interface. Ele não carrega nenhum caminho de arquivo nem URI, apenas diz ao app para varrer a pasta à qual você já deu acesso, por isso não precisa de permissão de armazenamento.\n\nVocê também pode apontar a pasta para um diretório do Syncthing ou do Dropbox e dispensar o adb por completo.</string>
+    <string name="csv_sync_guide_export_title">Os arquivos que o Minus grava</string>
+    <string name="csv_sync_guide_export_body">minus_synced.csv traz o cabeçalho completo de 26 colunas e é reescrito a cada execução. As cinco exportações anteriores ficam ao lado dele como arquivos minus_backup- marcados com a hora em que foram substituídas, então uma exportação ruim nunca deixa você sem cópia.\n\nTrês tipos de linha aparecem em uma exportação, distinguidos pela primeira coluna:\n\n__META__ são as configurações do orçamento e o período atual. Uma linha, a primeira se estiver presente.\n__ARCHIVED__ é uma linha por período de orçamento encerrado.\nUm timestamp é uma transação.\n\nUm leitor que queira apenas transações precisa pular as duas linhas marcadoras. O valor current_period_id na linha __META__ é o que você devolve em period_id ao gravar novas transações.\n\nSe você reinstalar e apontar o Minus para uma pasta que já tem um minus_synced.csv, ele restaura a partir desse arquivo em vez de sobrescrevê-lo.</string>
+    <string name="csv_sync_guide_script_title">O arquivo que o seu script grava</string>
+    <string name="csv_sync_guide_script_body">Seu arquivo precisa se chamar minus_import_&lt;qualquer coisa&gt;.csv. O Minus ignora todos os outros arquivos da pasta, então uma pasta compartilhada fica intocada.\n\nO analisador lê o cabeçalho que o seu arquivo declarar e trata toda coluna ausente como vazia, então você não precisa das 26. Este é um arquivo completo e válido.</string>
+    <string name="csv_sync_guide_columns_body">date é obrigatório, exatamente yyyy-MM-dd HH:mm. Qualquer outro formato descarta a linha.\namount é obrigatório, um decimal simples maior que zero. As linhas do Minus são despesas.\ncategory é texto livre opcional, correspondido por nome e criado se for novo. Em branco cai para Descategorizado.\nextra_note é texto livre opcional. Bom lugar para o id da transação de origem.\nperiod_id é recomendado, copiado de current_period_id na linha __META__. Em branco significa 0.\nid deve ser omitido. Um valor diferente de zero sobrescreve uma transação existente.\nis_recurrent é 1 ou 0. Se for 1, defina frequency como WEEKLY, BIWEEKLY ou MONTHLY.\nis_credit é 1 ou 0.\n\nAs linhas que o analisador rejeita são ignoradas uma a uma; o resto do arquivo é importado normalmente.</string>
+    <string name="csv_sync_guide_rules_title">Regras a respeitar</string>
+    <string name="csv_sync_guide_rules_body">Nomeie os arquivos de entrada como minus_import_*.csv. Qualquer outro é deixado em paz, inclusive minus_synced.csv e as rotações minus_backup-. É isso que torna seguro apontar a sincronização para uma pasta compartilhada com outras ferramentas.\n\nNada do que você colocar ali é apagado. Depois de lido, o arquivo é renomeado para .imported, ou para .rejected se alguma de suas linhas falhar na análise, mantendo o conteúdo para você ver o que deu errado. Nenhum dos dois nomes é lido de novo.\n\nNunca grave um id diferente de zero. Linhas com id maior que zero substituem a transação que tem aquele id; linhas com id em branco ou zero são inseridas como novas. Como a exportação carrega os ids reais das linhas, reenviar uma exportação sem alterações sobrescreve em vez de duplicar. Você não pode usar uma exportação como modelo para novas linhas sem antes limpar a coluna id.\n\nDefina period_id. Os totais são calculados a partir das datas, então uma linha com period_id 0 ainda aparece corretamente em todo lugar. O custo, mais restrito, é que ela não pode ser atribuída a um período e sobrevive à limpeza executada quando um período arquivado é excluído.\n\nA importação não é idempotente. O Minus insere cada linha que lê sem verificar se existe uma transação equivalente. A renomeação após a importação impede que o mesmo arquivo seja lido duas vezes, mas enviar as mesmas linhas com outro nome vai contá-las em dobro, então remova duplicatas comparando com minus_synced.csv antes de gravar.\n\nApenas despesas. Valores de zero ou menos são rejeitados. Receitas e totais do orçamento ficam na linha __META__, e reescrevê-los dispara uma restauração completa das configurações, então trate este canal como somente de acréscimo para transações.</string>
+    <string name="csv_sync_guide_pluggy_title">Mapear um feed de Open Finance</string>
+    <string name="csv_sync_guide_pluggy_body">Mapeie a data do provedor para date, reformatada como yyyy-MM-dd HH:mm. Mapeie o valor para amount como valor absoluto, ignorando entradas de dinheiro. Mapeie a categoria do provedor, ou a sua própria regra, para category, normalizando os nomes ou você vai acumular quase duplicatas. Coloque o id da transação do provedor em extra_note para que ele fique visível no app e dê à sua deduplicação uma referência estável.\n\nUm ciclo de duas horas fica assim:\n\n1. Baixe minus_synced.csv.\n2. Analise o arquivo, pulando as linhas __META__ e __ARCHIVED__, e anote current_period_id.\n3. Busque as novas transações do provedor. Para cada uma, verifique se o arquivo baixado já tem uma com o mesmo valor dentro da sua janela de tempo, ou o mesmo id do provedor em extra_note.\n4. Grave as não correspondentes em um arquivo minus_import_ com as quatro colunas acima mais period_id.\n5. Envie o arquivo e então acione o gatilho de sincronização.\n\nO passo 3 é onde a deduplicação precisa acontecer. O Minus não vai fazer isso por você.</string>
 </resources>

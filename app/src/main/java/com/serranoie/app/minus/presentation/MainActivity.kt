@@ -50,10 +50,13 @@ import com.serranoie.app.minus.domain.model.ContrastMode
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
+import com.serranoie.app.minus.domain.notification.PENDING_QUICK_ADD_AMOUNT_KEY_NAME
 import com.serranoie.app.minus.domain.time.MidnightTransitionManager
 import com.serranoie.app.minus.navigation.AppNavGraph
 import com.serranoie.app.minus.navigation.Screen
+import com.serranoie.app.minus.presentation.notification.NotificationHelper
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
+import com.serranoie.app.minus.presentation.notification.scan.ExpenseScanActionReceiver
 import com.serranoie.app.minus.presentation.permission.PermissionHandler
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.ThemeManager
@@ -92,6 +95,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var notificationScheduler: NotificationScheduler
+
+    @Inject
+    lateinit var notificationHelper: NotificationHelper
 
     @Inject
     lateinit var settingsRepository: SettingsRepository
@@ -137,11 +143,28 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleSyncIntent(intent)
+        handleQuickAddIntent(intent)
     }
 
     private fun handleSyncIntent(intent: Intent?) {
         if (intent?.action == CsvSyncWorker.ACTION_SYNC_NOW) {
             CsvSyncWorker.syncNow(this)
+        }
+    }
+
+    private fun handleQuickAddIntent(intent: Intent?) {
+        if (intent?.action != ExpenseScanActionReceiver.ACTION_QUICK_ADD) return
+        val amount = intent.getStringExtra(ExpenseScanActionReceiver.EXTRA_AMOUNT)
+            ?.takeIf { it.isNotBlank() } ?: return
+        val notificationId = intent.getIntExtra(ExpenseScanActionReceiver.EXTRA_NOTIFICATION_ID, 0)
+        intent.removeExtra(ExpenseScanActionReceiver.EXTRA_AMOUNT)
+        if (notificationId != 0) {
+            notificationHelper.cancelSpendNotification(notificationId)
+        }
+        lifecycleScope.launch {
+            runCatching {
+                settingsRepository.setString(PENDING_QUICK_ADD_AMOUNT_KEY_NAME, amount)
+            }.onFailure { logcat { "Could not stage quick add amount: ${it.asLog()}" } }
         }
     }
 
@@ -153,6 +176,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         handleSyncIntent(intent)
+        handleQuickAddIntent(intent)
 
         val iconAnimationEndsAt = SystemClock.uptimeMillis() + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             resources.getInteger(R.integer.splash_icon_animation_duration).toLong()
