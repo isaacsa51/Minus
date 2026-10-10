@@ -765,7 +765,7 @@
     <string name="notification_scan_saved_title">Minus에 저장됨</string>
     <string name="notification_scan_saved_message">%1$s이(가) 카테고리 없이 저장되었습니다.</string>
     <string name="notification_scan_queued_message">%1$s이(가) 다음 기간으로 저장되었습니다.</string>
-    <string name="notification_scan_deny_words">환불,취소,입금,이체,잔액,캐시백,otp,인증번호,할인,이벤트</string>
+    <string name="notification_scan_deny_words">환불,취소,입금,이체입금,잔액,캐시백,otp,인증번호,할인,이벤트</string>
     <string name="settings_sync_folder_title">동기화 폴더</string>
     <string name="settings_sync_folder_subtitle">CSV 복사본을 보관할 폴더를 선택하세요</string>
     <string name="settings_sync_folder_subtitle_set">2시간마다 %1$s로 동기화 중</string>

@@ -79,6 +79,12 @@ interface SettingsRepository {
 
     suspend fun setNotificationScanPackages(packages: Set<String>)
 
+    /**
+     * Adds [packageName] to the scanned apps, or removes it if it is already there, reading and
+     * writing the stored set in one atomic step so concurrent toggles cannot undo each other.
+     */
+    suspend fun toggleNotificationScanPackage(packageName: String)
+
     suspend fun setTutorialBoxCompleted(completed: Boolean)
 
     suspend fun setAnalyticsTutorialCompleted(completed: Boolean)

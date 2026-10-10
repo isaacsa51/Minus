@@ -421,6 +421,17 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun toggleNotificationScanPackage(packageName: String) {
+        dataStore.edit { preferences ->
+            val current = preferences[NOTIFICATION_SCAN_PACKAGES] ?: emptySet()
+            preferences[NOTIFICATION_SCAN_PACKAGES] = if (packageName in current) {
+                current - packageName
+            } else {
+                current + packageName
+            }
+        }
+    }
+
     override suspend fun setTutorialBoxCompleted(completed: Boolean) {
         dataStore.edit { preferences ->
             preferences[TUTORIAL_BOX_COMPLETED] = completed

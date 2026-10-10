@@ -107,6 +107,13 @@ class ExpenseNotificationListener : NotificationListenerService() {
                     denyWords = getString(R.string.notification_scan_deny_words).split(","),
                 ) ?: return@launch
 
+                // Checked before admit() so a dropped notification does not burn this spend's
+                // dedup/rate budget: nothing is counted that cannot be shown.
+                if (!notificationHelper.canPostNotifications()) {
+                    logcat { "Skipping scanned spend: cannot post notifications" }
+                    return@launch
+                }
+
                 if (!admit(sbn.packageName, amount)) return@launch
 
                 notificationHelper.showSpendDetectedNotification(

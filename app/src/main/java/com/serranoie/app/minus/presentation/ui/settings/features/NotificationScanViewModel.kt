@@ -87,10 +87,8 @@ class NotificationScanViewModel @Inject constructor(
     }
 
     fun onAppToggle(packageName: String) {
-        val current = uiState.value.selectedPackages
-        val updated = if (packageName in current) current - packageName else current + packageName
         viewModelScope.launch {
-            settingsRepository.setNotificationScanPackages(updated)
+            settingsRepository.toggleNotificationScanPackage(packageName)
         }
     }
 
