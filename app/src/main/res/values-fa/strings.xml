@@ -193,10 +193,6 @@
     <string name="budget_period_label_this_week">این هفته</string>
     <string name="budget_period_label_this_biweek">این دو هفته</string>
     <string name="budget_period_label_this_month">این ماه</string>
-    <string name="budget_pill_label_per_daily">Per day</string>
-    <string name="budget_pill_label_per_weekly">Per week</string>
-    <string name="budget_pill_label_per_biweekly">دو هفته يکبار</string>
-    <string name="budget_pill_label_per_monthly">هر ماه</string>
     <string name="budget_pill_label_daily_exceeded">عبور از حد مجاز روزانه</string>
     <string name="budget_pill_label_weekly_exceeded">عبور از حد مجاز هفتگی</string>
     <string name="budget_pill_label_biweekly_exceeded">عبور از حد مجاز دوهفته‌ای</string>
@@ -293,13 +289,6 @@
     <string name="settings_category_grid_mode_description">با ضربه روی تگ دسته‌بندی، به‌جای حالت ویرایش خطی، شبکه‌ای از دسته‌بندی‌های ذخیره‌شده شما باز می‌شود. در زمان فعال بودن این حالت، عملکرد ماشین‌حساب صفحه اعداد نیز غیرفعال می‌شود.</string>
     <string name="settings_feature_show_past_transactions_title">نمایش تراکنش‌های گذشته</string>
     <string name="settings_feature_show_past_transactions_subtitle">بارگذاری تراکنش‌های دوره‌های گذشته</string>
-    <string name="settings_recurrent_payments_view_mode_title">حالت نمایش پرداخت‌های دوره‌ای</string>
-    <string name="settings_recurrent_payments_view_mode_subtitle">نحوه نمایش پرداخت‌های دوره‌ای خود را تغییر دهید</string>
-    <string name="settings_recurrent_payments_view_mode_dialog_title">حالت نمایش پرداخت‌های دوره‌ای</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_title">افقی</string>
-    <string name="settings_recurrent_payments_view_mode_horizontal_subtitle">نمایش پرداخت‌های دوره‌ای به‌صورت کارت‌های افقی</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_title">عمودی</string>
-    <string name="settings_recurrent_payments_view_mode_vertical_subtitle">نمایش پرداخت‌های دوره‌ای به‌صورت یک لیست هزینه معمولی</string>
     <string name="settings_period_end_time_title">زمان پایان دوره</string>
     <string name="settings_period_end_time_subtitle">اعلان در روز پایان دوره و در این ساعت نمایش داده می‌شود</string>
     <string name="settings_recurrent_notification_time_title">زمان پرداخت‌های دوره‌ای</string>
@@ -431,9 +420,6 @@
     <string name="recurrent_ticket_weekly_unnamed">اشتراک هفتگی بدون نام</string>
     <string name="recurrent_ticket_biweekly_unnamed">اشتراک دوهفته‌ای بدون نام</string>
     <string name="recurrent_ticket_monthly_unnamed">اشتراک ماهانه بدون نام</string>
-    <string name="recurrent_ticket_frequency_weekly">هفتگی</string>
-    <string name="recurrent_ticket_frequency_biweekly">دوهفته‌ای</string>
-    <string name="recurrent_ticket_frequency_monthly">ماهانه</string>
     <!-- Rollover Dialog (component local) -->
     <string name="rollover_dialog_period_finished_title">دوره به پایان رسید</string>
     <string name="rollover_dialog_question">می‌خواهید با پول باقی‌مانده چه کنید؟</string>
@@ -487,7 +473,6 @@
     <string name="wavy_divider_show_all_past_period_expenses">نمایش تمام هزینه‌های دوره قبلی…</string>
     <!-- Edit Budget Settings -->
     <string name="use_previous_period_days">استفاده از %d روز</string>
-    <string name="remaining_budget_label">باقیمانده</string>
     <string name="currency_label">واحد پول</string>
     <string name="select_currency">انتخاب واحد پول</string>
     <string name="search_currency">جستجوی واحد پول…</string>
@@ -495,18 +480,8 @@
     <string name="currency_no_results">واحد پولی یافت نشد</string>
     <string name="currency_selected">انتخاب شد</string>
     <!-- Remaining Budget Strategy -->
-    <string name="strategy_dialog_title">Budget surplus</string>
-    <string name="strategy_dialog_description" formatted="false">You can choose how to distribute your budget balance at the end of each day.\n\nFor example, you have a budget of 500 per day, and yesterday you spent 400: you can spread the 100 across the remaining days, or spend 600 today (daily budget + surplus from previous period).</string>
-    <string name="strategy_ask_always">Ask me always</string>
-    <string name="strategy_ask_always_desc">At the end of the period we will ask you what to do with the surplus</string>
-    <string name="strategy_split_equally">Spread across all days</string>
-    <string name="strategy_split_equally_desc">The surplus is divided equally among all days of the new period</string>
-    <string name="strategy_add_to_first_day">Add to first day</string>
-    <string name="strategy_add_to_first_day_desc">All surplus is added to the first day of the new period</string>
     <!-- Budget Split Mode -->
     <string name="split_mode_label">حالت تقسیم</string>
-    <string name="split_mode_dialog_title">How should we split your budget?</string>
-    <string name="split_mode_dialog_description" formatted="false">Choose how the per-period amount is calculated.</string>
     <string name="split_mode_static">ثابت</string>
     <string name="split_mode_static_desc">کل بودجه بدون در نظر گرفتن اینکه چقدر خرج می‌کنید یا نه، به‌طور مساوی در بین تمام روزها تقسیم می‌شود.</string>
     <string name="split_mode_dynamic">پخش در تمام روزها</string>
@@ -539,9 +514,6 @@
     <string name="notification_period_end_message_positive">دوره با %1$s باقیمانده به پایان رسید. برای جزئیات ضربه بزنید.</string>
     <string name="notification_period_end_message_negative">دوره به پایان رسید. شما مبلغ %1$s بیشتر خرج کرده‌اید. برای جزئیات ضربه بزنید.</string>
     <string name="notification_period_end_message_neutral">دوره به پایان رسید. هیچ هزینه‌ای ثبت نکردید. برای جزئیات ضربه بزنید.</string>
-    <string name="notification_recurrent_expense_title">Recurring expense</string>
-    <string name="notification_recurrent_expense_message_with_comment">Your recurring expense of \"%1$s\" for \"%2$s\" is today.</string>
-    <string name="notification_recurrent_expense_message_without_comment">Your recurring expense with a total of \"%1$s\" is today.</string>
     <string name="notification_tomorrow">فردا</string>
     <string name="notification_in_days">تا %1$d روز دیگر</string>
     <string name="notification_upcoming_subscription_title">هزینه پیش‌رو</string>

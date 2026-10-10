@@ -108,7 +108,7 @@ private fun InformationContent(versionName: String) {
             style = MaterialTheme.typography.titleMediumCondensed.copy(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
-            textAlign = TextAlign.Justify,
+            textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
 
