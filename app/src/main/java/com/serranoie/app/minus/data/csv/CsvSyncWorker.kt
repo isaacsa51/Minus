@@ -17,6 +17,7 @@ import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.LocalDateTime
@@ -47,8 +48,13 @@ class CsvSyncWorker @AssistedInject constructor(
                 ?: error("Could not list the sync folder")
             val children = migrateLegacyMirror(resolver, folder, listing)
 
-            if (restoreFromMirror(resolver, children)) {
+            val restored = restoreFromMirror(resolver, children)
+            if (restored != null && restored.imported > 0) {
                 recordStatus(STATUS_RESTORED)
+                return Result.success()
+            }
+            if (restored != null && restored.errors.isNotEmpty()) {
+                recordStatus(STATUS_REJECTED, EXPORT_FILE_NAME)
                 return Result.success()
             }
 
@@ -64,6 +70,8 @@ class CsvSyncWorker @AssistedInject constructor(
                 else -> recordStatus(STATUS_OK, outcome.imported.toString())
             }
             Result.success()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: SecurityException) {
             settingsRepository.setString(SYNC_FOLDER_URI_KEY, "")
             recordStatus(STATUS_NO_ACCESS)
@@ -95,15 +103,13 @@ class CsvSyncWorker @AssistedInject constructor(
     private suspend fun restoreFromMirror(
         resolver: ContentResolver,
         children: List<Pair<Uri, String>>,
-    ): Boolean {
+    ): CsvImportResult? {
         val mirror = children.firstOrNull { (_, name) -> name == EXPORT_FILE_NAME }?.first
-            ?: return false
-        if (!csvService.hasNoLocalData()) return false
+            ?: return null
+        if (!csvService.hasNoLocalData()) return null
 
-        val result = resolver.openInputStream(mirror)?.use { csvService.importTransactions(it) }
+        return resolver.openInputStream(mirror)?.use { csvService.importTransactions(it) }
             ?: error("Could not open $EXPORT_FILE_NAME for reading")
-
-        return result.imported > 0
     }
 
     private suspend fun ingest(
@@ -121,11 +127,13 @@ class CsvSyncWorker @AssistedInject constructor(
                     name + SUFFIX_IN_PROGRESS
                 ) ?: error("Could not claim $name for import")
 
-                val result = runCatching {
+                val result = try {
                     resolver.openInputStream(claimed)?.use { csvService.importTransactions(it) }
                         ?: error("Could not open $name for reading")
-                }.getOrElse { failure ->
-                    DocumentsContract.renameDocument(resolver, claimed, name)
+                } catch (cancellation: CancellationException) {
+                    throw cancellation
+                } catch (failure: Exception) {
+                    DocumentsContract.renameDocument(resolver, claimed, name + SUFFIX_REJECTED)
                     throw failure
                 }
 
