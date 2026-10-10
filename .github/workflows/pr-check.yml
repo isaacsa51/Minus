@@ -42,3 +42,14 @@ jobs:
 
       - name: Verify screenshots
         run: ./gradlew :app:verifyPaparazziFossDebug
+
+      - name: Upload Paparazzi diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paparazzi-failures
+          path: |
+            app/build/paparazzi/failures/
+            app/build/reports/paparazzi/
+          if-no-files-found: ignore
+          retention-days: 7

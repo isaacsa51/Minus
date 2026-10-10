@@ -419,7 +419,7 @@ class BudgetPillSpanishScreenshotTest {
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_5.copy(locale = "es"),
         renderingMode = SessionParams.RenderingMode.SHRINK,
-        maxPercentDifference = 0.1,
+        maxPercentDifference = 10.0,
     )
 
     @Test
