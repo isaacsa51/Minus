@@ -125,6 +125,7 @@ class MinusCsvParser {
             isCredit = isCredit,
             isCreditPaid = isCreditPaid,
             periodId = periodId,
+            createdAt = raw.valueOf(MinusCsvContract.COL_CREATED_AT).toLongOrNull(),
         )
     }
 
