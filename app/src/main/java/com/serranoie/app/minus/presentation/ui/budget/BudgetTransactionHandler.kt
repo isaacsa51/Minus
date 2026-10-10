@@ -27,6 +27,7 @@ sealed interface ApplyTransactionResult {
 
     data class Added(
         val normalizedInput: String,
+        val transactionId: Long = 0L,
     ) : ApplyTransactionResult
 
     data object InvalidInput : ApplyTransactionResult
@@ -122,8 +123,11 @@ class BudgetTransactionHandler @Inject constructor(
                 isCredit = isCreditEnabled,
                 isAdjustment = isAdjustment
             )
-            addTransactionUseCase(transaction)
-            ApplyTransactionResult.Added(normalizedInput = normalizedInput)
+            val transactionId = addTransactionUseCase(transaction)
+            ApplyTransactionResult.Added(
+                normalizedInput = normalizedInput,
+                transactionId = transactionId,
+            )
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

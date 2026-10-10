@@ -44,7 +44,7 @@ class MinusCsvServiceTest {
             Category(id = CATEGORY_IDS[name] ?: 99L, name = name)
         }
         coEvery { repository.upsertTransactions(capture(upsertedTransactions)) } just Runs
-        coEvery { repository.addTransaction(capture(addedTransactions)) } just Runs
+        coEvery { repository.addTransaction(capture(addedTransactions)) } returns 1L
         coEvery { repository.upsertArchivedBudgets(capture(upsertedArchives)) } just Runs
     }
 

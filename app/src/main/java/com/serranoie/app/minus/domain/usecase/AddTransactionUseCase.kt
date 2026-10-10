@@ -7,7 +7,7 @@ import javax.inject.Inject
 class AddTransactionUseCase @Inject constructor(
     private val budgetRepository: BudgetRepository
 ) {
-    suspend operator fun invoke(transaction: Transaction) {
+    /** Returns the id the inserted row was given. */
+    suspend operator fun invoke(transaction: Transaction): Long =
         budgetRepository.addTransaction(transaction)
-    }
 }

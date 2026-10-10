@@ -32,8 +32,9 @@ For a better experience while using the Application, the Service Provider may re
 Minus offers an optional feature, off by default, that reminds you to log a charge after another app notifies you about one. If you turn it on, you grant Android's notification access permission and choose which apps Minus may look at.
 
 *   Minus reads the text of notifications only from the apps you select, and ignores every notification from every other app.
-*   All matching happens on your device. The Service Provider never receives, stores, or transmits notification content, and notification text is never written to disk.
-*   The only thing Minus keeps is the amount you choose to save, as a transaction in your own local data, together with the name of the app it came from.
+*   All matching happens on your device. Raw notification text is never received, stored, or transmitted by the Service Provider, and it is never written to disk.
+*   If you choose Quick Add, Minus temporarily stores only the extracted amount on your device, so it can prefill the amount field, and clears it once that field has been filled. No other part of the notification is kept.
+*   The only thing Minus keeps is the amount you choose to save, as a transaction in your own local data. Quick Save also records the name of the app the charge came from; Quick Add does not.
 *   You can revoke notification access at any time in your device settings, or turn the feature off inside Minus, and no further notifications will be read.
 
 **Third Party Access**

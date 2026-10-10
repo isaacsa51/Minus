@@ -244,6 +244,31 @@ class SettingsRepositoryImplTest {
     }
 
     @Test
+    fun `toggling a scanned package flips only that package in the stored set`() = runTest {
+        repo.setNotificationScanPackages(setOf("com.bank.one"))
+
+        repo.toggleNotificationScanPackage("com.bank.two")
+        assertThat(repo.getSettings().notificationScanPackages)
+            .containsExactly("com.bank.one", "com.bank.two")
+
+        repo.toggleNotificationScanPackage("com.bank.one")
+        assertThat(repo.getSettings().notificationScanPackages).containsExactly("com.bank.two")
+    }
+
+    @Test
+    fun `toggling a scanned package reads the persisted set, not a stale copy`() = runTest {
+        repo.setNotificationScanPackages(setOf("com.bank.one"))
+        val stale = repo.getSettings().notificationScanPackages
+
+        repo.toggleNotificationScanPackage("com.bank.two")
+        repo.toggleNotificationScanPackage("com.bank.three")
+
+        assertThat(stale).containsExactly("com.bank.one")
+        assertThat(repo.getSettings().notificationScanPackages)
+            .containsExactly("com.bank.one", "com.bank.two", "com.bank.three")
+    }
+
+    @Test
     fun `observeSettings reflects a write made after the first read`() = runTest {
         assertThat(repo.observeSettings().first().onboardingCompleted).isFalse()
 

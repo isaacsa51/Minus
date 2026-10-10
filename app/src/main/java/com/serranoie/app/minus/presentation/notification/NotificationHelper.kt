@@ -91,7 +91,12 @@ class NotificationHelper @Inject constructor(
         logcat { "Notification channels created" }
     }
 
-    private fun checkNotificationPermission(): Boolean {
+    /**
+     * Whether this app may post notifications. Callers that detect something worth notifying about
+     * should check this first, so nothing is consumed on the way to a notification that Android
+     * would silently drop.
+     */
+    fun canPostNotifications(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val granted = ContextCompat.checkSelfPermission(
                 context,
@@ -106,7 +111,7 @@ class NotificationHelper @Inject constructor(
     }
 
     fun showPeriodEndNotification(remainingBudget: String, currency: String) {
-        val hasPermission = checkNotificationPermission()
+        val hasPermission = canPostNotifications()
         if (!hasPermission) {
             logcat { "Cannot show notification - permission not granted" }
             return
@@ -214,7 +219,7 @@ class NotificationHelper @Inject constructor(
         transactionId: Long? = null,
         occurrenceDate: LocalDate? = null,
     ) {
-        val hasPermission = checkNotificationPermission()
+        val hasPermission = canPostNotifications()
         if (!hasPermission) {
             logcat { "Cannot show notification - permission not granted" }
             return
@@ -270,7 +275,7 @@ class NotificationHelper @Inject constructor(
         transactionId: Long? = null,
         occurrenceDate: LocalDate? = null,
     ) {
-        val hasPermission = checkNotificationPermission()
+        val hasPermission = canPostNotifications()
         if (!hasPermission) {
             logcat { "Cannot show notification - permission not granted" }
             return
@@ -335,7 +340,7 @@ class NotificationHelper @Inject constructor(
         dueDateText: String,
         currency: String
     ) {
-        val hasPermission = checkNotificationPermission()
+        val hasPermission = canPostNotifications()
         if (!hasPermission) {
             logcat { "Cannot show credit notification - permission not granted" }
             return
@@ -382,7 +387,7 @@ class NotificationHelper @Inject constructor(
         currency: String,
         sourceLabel: String,
     ) {
-        if (!checkNotificationPermission()) return
+        if (!canPostNotifications()) return
 
         val plainAmount = amount.toPlainString()
         val notificationId = spendDetectedNotificationId(sourceLabel, plainAmount)
@@ -439,7 +444,7 @@ class NotificationHelper @Inject constructor(
         transactionId: Long,
         queuedForNextPeriod: Boolean,
     ) {
-        if (!checkNotificationPermission()) {
+        if (!canPostNotifications()) {
             cancelSpendNotification(notificationId)
             return
         }

@@ -764,7 +764,7 @@
     <string name="notification_scan_saved_title">Minus に保存しました</string>
     <string name="notification_scan_saved_message">%1$s をカテゴリなしで保存しました。</string>
     <string name="notification_scan_queued_message">%1$s を次の期間に保存しました。</string>
-    <string name="notification_scan_deny_words">返金,払い戻し,入金,振込,残高,キャッシュバック,otp,認証コード,割引,キャンペーン</string>
+    <string name="notification_scan_deny_words">返金,払い戻し,入金,振込入金,残高,キャッシュバック,otp,認証コード,割引,キャンペーン</string>
     <string name="settings_sync_folder_title">同期フォルダ</string>
     <string name="settings_sync_folder_subtitle">CSV のコピーを保存するフォルダを選択</string>
     <string name="settings_sync_folder_subtitle_set">2 時間ごとに %1$s へ同期中</string>

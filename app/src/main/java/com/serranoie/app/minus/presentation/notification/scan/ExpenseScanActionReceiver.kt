@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.asLog
 import logcat.logcat
-import java.time.LocalDate
+import java.util.concurrent.ConcurrentHashMap
 
 class ExpenseScanActionReceiver : BroadcastReceiver() {
     companion object {
@@ -33,7 +33,14 @@ class ExpenseScanActionReceiver : BroadcastReceiver() {
         const val EXTRA_TRANSACTION_ID = "scan_transaction_id"
         const val EXTRA_NOTIFICATION_ID = "scan_notification_id"
 
-        private const val RECENT_LOOKUP_LIMIT = 10
+        /**
+         * Notification ids with a quick save in flight. Claiming an id is atomic, so two
+         * broadcasts for the same notification — a double tap, or a redelivery — can never both
+         * insert a transaction, while a quick save for any other notification still proceeds.
+         * The id is released once the save finishes, because ids repeat for a later charge of the
+         * same amount from the same app.
+         */
+        private val quickSavesInFlight = ConcurrentHashMap.newKeySet<Int>()
     }
 
     @EntryPoint
@@ -76,61 +83,49 @@ class ExpenseScanActionReceiver : BroadcastReceiver() {
         intent: Intent,
         notificationId: Int,
     ) {
-        val amount = intent.getStringExtra(EXTRA_AMOUNT)?.takeIf { it.isNotBlank() } ?: return
-        val sourceLabel = intent.getStringExtra(EXTRA_SOURCE_LABEL).orEmpty()
-        val budgetRepository = entryPoint.budgetRepository()
-        val budgetSettings = budgetRepository.getBudgetSettingsSync()
-
-        val result = entryPoint.budgetTransactionHandler().applyTransaction(
-            input = amount,
-            isCalculation = false,
-            isRecurrentEnabled = false,
-            isCreditEnabled = false,
-            comment = "",
-            note = sourceLabel,
-            budgetSettings = budgetSettings,
-            resolveActivePeriodId = { entryPoint.getCurrentPeriodIdUseCase().invoke() },
-        )
-
-        val notificationHelper = entryPoint.notificationHelper()
-        when (result) {
-            is ApplyTransactionResult.Added,
-            is ApplyTransactionResult.QueuedForNextPeriod -> {
-                val savedId = if (result is ApplyTransactionResult.Added) {
-                    findSavedTransactionId(budgetRepository, amount)
-                } else {
-                    0L
-                }
-                notificationHelper.showSpendSavedNotification(
-                    notificationId = notificationId,
-                    amount = amount,
-                    currency = budgetSettings?.currencyCode ?: "USD",
-                    transactionId = savedId,
-                    queuedForNextPeriod = result is ApplyTransactionResult.QueuedForNextPeriod,
-                )
-            }
-
-            else -> {
-                logcat { "Scan quick save rejected: $result" }
-                notificationHelper.cancelSpendNotification(notificationId)
-            }
+        if (!quickSavesInFlight.add(notificationId)) {
+            logcat { "Ignoring concurrent quick save for notification $notificationId" }
+            return
         }
-    }
 
-    private suspend fun findSavedTransactionId(
-        budgetRepository: BudgetRepository,
-        amount: String,
-    ): Long {
-        val savedAmount = amount.toBigDecimalOrNull() ?: return 0L
-        return budgetRepository.getRecentTransactions(RECENT_LOOKUP_LIMIT)
-            .firstOrNull {
-                !it.isRecurrent &&
-                    !it.isDeleted &&
-                    it.amount.compareTo(savedAmount) == 0 &&
-                    it.date?.toLocalDate() == LocalDate.now()
+        try {
+            val amount = intent.getStringExtra(EXTRA_AMOUNT)?.takeIf { it.isNotBlank() } ?: return
+            val sourceLabel = intent.getStringExtra(EXTRA_SOURCE_LABEL).orEmpty()
+            val budgetRepository = entryPoint.budgetRepository()
+            val budgetSettings = budgetRepository.getBudgetSettingsSync()
+
+            val result = entryPoint.budgetTransactionHandler().applyTransaction(
+                input = amount,
+                isCalculation = false,
+                isRecurrentEnabled = false,
+                isCreditEnabled = false,
+                comment = "",
+                note = sourceLabel,
+                budgetSettings = budgetSettings,
+                resolveActivePeriodId = { entryPoint.getCurrentPeriodIdUseCase().invoke() },
+            )
+
+            val notificationHelper = entryPoint.notificationHelper()
+            when (result) {
+                is ApplyTransactionResult.Added,
+                is ApplyTransactionResult.QueuedForNextPeriod -> {
+                    notificationHelper.showSpendSavedNotification(
+                        notificationId = notificationId,
+                        amount = amount,
+                        currency = budgetSettings?.currencyCode ?: "USD",
+                        transactionId = (result as? ApplyTransactionResult.Added)?.transactionId ?: 0L,
+                        queuedForNextPeriod = result is ApplyTransactionResult.QueuedForNextPeriod,
+                    )
+                }
+
+                else -> {
+                    logcat { "Scan quick save rejected: $result" }
+                    notificationHelper.cancelSpendNotification(notificationId)
+                }
             }
-            ?.id
-            ?: 0L
+        } finally {
+            quickSavesInFlight.remove(notificationId)
+        }
     }
 
     private suspend fun undo(
