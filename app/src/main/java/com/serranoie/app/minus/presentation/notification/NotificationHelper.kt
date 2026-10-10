@@ -92,30 +92,42 @@ class NotificationHelper @Inject constructor(
     }
 
     /**
-     * Whether this app may post notifications. Callers that detect something worth notifying about
-     * should check this first, so nothing is consumed on the way to a notification that Android
-     * would silently drop.
+     * Whether Android would actually show a notification posted by this app: the runtime
+     * permission on Android 13+, notifications not turned off for the app as a whole, and — when
+     * [channelId] is given — that channel not turned off either. Callers that detect something
+     * worth notifying about should check this first, so nothing is consumed on the way to a
+     * notification that Android would silently drop.
      */
-    fun canPostNotifications(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val granted = ContextCompat.checkSelfPermission(
+    fun canPostNotifications(channelId: String? = null): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
                 context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-            logcat { "Notification permission (Android 13+): $granted" }
-            granted
-        } else {
-            logcat { "Notification permission: granted (pre-Android 13)" }
-            true
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            logcat { "Cannot post notifications: POST_NOTIFICATIONS is not granted" }
+            return false
         }
+
+        val manager = NotificationManagerCompat.from(context)
+        if (!manager.areNotificationsEnabled()) {
+            logcat { "Cannot post notifications: turned off for the whole app" }
+            return false
+        }
+
+        if (channelId == null) return true
+
+        // A channel this app has not created yet cannot have been turned off.
+        val channel = manager.getNotificationChannelCompat(channelId) ?: return true
+        if (channel.importance == NotificationManagerCompat.IMPORTANCE_NONE) {
+            logcat { "Cannot post notifications: channel $channelId is turned off" }
+            return false
+        }
+        return true
     }
 
     fun showPeriodEndNotification(remainingBudget: String, currency: String) {
-        val hasPermission = canPostNotifications()
-        if (!hasPermission) {
-            logcat { "Cannot show notification - permission not granted" }
-            return
-        }
+        if (!canPostNotifications(CHANNEL_PERIOD_END)) return
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -219,11 +231,7 @@ class NotificationHelper @Inject constructor(
         transactionId: Long? = null,
         occurrenceDate: LocalDate? = null,
     ) {
-        val hasPermission = canPostNotifications()
-        if (!hasPermission) {
-            logcat { "Cannot show notification - permission not granted" }
-            return
-        }
+        if (!canPostNotifications(CHANNEL_RECURRENT)) return
         val notificationId = transactionId?.let { recurrentNotificationId(it) } ?: NOTIFICATION_ID_RECURRENT
 
         val intent = Intent(context, MainActivity::class.java).apply {
@@ -275,11 +283,7 @@ class NotificationHelper @Inject constructor(
         transactionId: Long? = null,
         occurrenceDate: LocalDate? = null,
     ) {
-        val hasPermission = canPostNotifications()
-        if (!hasPermission) {
-            logcat { "Cannot show notification - permission not granted" }
-            return
-        }
+        if (!canPostNotifications(CHANNEL_RECURRENT)) return
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -340,11 +344,7 @@ class NotificationHelper @Inject constructor(
         dueDateText: String,
         currency: String
     ) {
-        val hasPermission = canPostNotifications()
-        if (!hasPermission) {
-            logcat { "Cannot show credit notification - permission not granted" }
-            return
-        }
+        if (!canPostNotifications(CHANNEL_CREDIT)) return
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -387,7 +387,7 @@ class NotificationHelper @Inject constructor(
         currency: String,
         sourceLabel: String,
     ) {
-        if (!canPostNotifications()) return
+        if (!canPostNotifications(CHANNEL_SPEND_DETECTED)) return
 
         val plainAmount = amount.toPlainString()
         val notificationId = spendDetectedNotificationId(sourceLabel, plainAmount)
@@ -444,7 +444,7 @@ class NotificationHelper @Inject constructor(
         transactionId: Long,
         queuedForNextPeriod: Boolean,
     ) {
-        if (!canPostNotifications()) {
+        if (!canPostNotifications(CHANNEL_SPEND_DETECTED)) {
             cancelSpendNotification(notificationId)
             return
         }
