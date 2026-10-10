@@ -392,7 +392,7 @@
     <string name="notification_scan_queued_message">%1$s 已保存到下一个周期。</string>
     <!-- Comma separated, lowercase. Words that mean a notification is NOT a charge: refunds, incoming money, balances and promotions. Matched as plain substrings, so avoid short words that appear inside longer ones. -->
     <string name="notification_scan_deny_words">退款,退回,入账,存入,余额,返现,otp,验证码,折扣,优惠</string>
-    <string name="settings_feature_experimental">实验性</string>
+    <string name="settings_feature_experimental">实验性功能</string>
     <string name="settings_feature_state_on">已开启</string>
     <string name="settings_feature_state_off">已关闭</string>
     <string name="settings_period_end_time_title">周期结束时间</string>
@@ -407,7 +407,7 @@
     <string name="settings_exact_alarm_enabled_subtitle">打开以在选定时间精确推送通知</string>
     <string name="settings_exact_alarm_disabled_subtitle">已关闭；Android 系统可能会有通知延迟</string>
     <string name="settings_time_picker_cancel">取消</string>
-    <string name="settings_time_picker_confirm">确认</string>
+    <string name="settings_time_picker_confirm">确定</string>
     <string name="settings_about_title">关于</string>
     <string name="settings_about_subtitle">了解更多应用和开发信息</string>
     <string name="settings_bug_report_title">遇到 bug？</string>
@@ -521,7 +521,7 @@
     <string name="budget_pill_exhausted_double">%1$s 和 %2$s 预算已用完</string>
     <string name="budget_pill_exhausted_triple">%1$s、%2$s 和 %3$s 预算已用完</string>
     <!-- Spend Budget Card -->
-    <string name="spend_budget_card_spent_label">支出</string>
+    <string name="spend_budget_card_spent_label">已支出</string>
     <string name="spend_budget_card_available_percent_format">可用：%1$s%%</string>
     <!-- Categories Chart -->
     <string name="categories_chart_uncategorized">未分类</string>
@@ -591,7 +591,7 @@
     <string name="subscriptions_item_due_in_days">%1$d 天后 (%2$s)</string>
     <string name="subscriptions_item_due_in_weeks">%1$d 周后 (%2$s)</string>
     <!-- Rollover Dialog (component local) -->
-    <string name="rollover_dialog_period_finished_title">周期完成</string>
+    <string name="rollover_dialog_period_finished_title">已完成周期</string>
     <string name="rollover_dialog_question">剩余的钱你想如何规划？</string>
     <string name="rollover_dialog_split_equally_title">平均分配</string>
     <string name="rollover_dialog_split_equally_desc">将 %1$s 平均分配到下个预算的每一天</string>
@@ -603,7 +603,7 @@
     <string name="rollover_dialog_pending_label">来自上一周期</string>
     <string name="unresolved_surplus_tap_to_manage">点击管理</string>
     <!-- Finished Period Header -->
-    <string name="finished_period_header_title">周期完成</string>
+    <string name="finished_period_header_title">已完成周期</string>
     <string name="finished_period_header_no_spends">嗯？这个周期你竟然一毛不拔</string>
     <string name="finished_period_header_over_budget">注意了！本周期你已超预算</string>
     <string name="finished_period_header_summary">以下是你所有支出的统计数据</string>
@@ -674,7 +674,7 @@
     <string name="split_mode_carry_over_desc">每天没花完的钱会加到第二天的预算里，并不断累积。</string>
     <string name="split_mode_ask_me">每天你来定</string>
     <string name="split_mode_ask_me_desc">每天由你决定昨天没用完的预算：平摊到剩余天数，或结转到今天。超支总会平摊到剩余天数，因此每日金额会减少。</string>
-    <string name="leftover_choice_spread">平摊到剩余天数</string>
+    <string name="leftover_choice_spread">分摊到剩余天数</string>
     <string name="leftover_choice_carry">全部加到今天</string>
     <string name="leftover_choice_spread_desc">将所有未使用的剩余预算平摊到剩下的每一天。</string>
     <string name="leftover_choice_carry_desc">只把未使用的预算结转到明天。</string>
@@ -685,7 +685,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">没有日期</string>
     <string name="no_name">没有名称</string>
-    <string name="no_name_income">未具名收入</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">购买原因</string>
     <string name="adjustment_reason">原因</string>
     <string name="date">日期</string>
@@ -769,12 +769,12 @@
     <string name="analytics_tutorial_credit_desc">点击卡片可查看信用卡账单、标记已还款或修改账单日来避免产生利息。</string>
     <string name="analytics_tutorial_history_title">账单明细</string>
     <string name="analytics_tutorial_history_desc">点击查看本期全部支出。</string>
-    <string name="skip_tutorial">跳过教程</string>
+    <string name="skip_tutorial">跳过</string>
     <string name="budget_graph_header_spending">Spending</string>
     <string name="budget_graph_legend_current">Current</string>
     <string name="budget_graph_legend_previous">Previous</string>
     <string name="budget_graph_view_mode_cumulative">趋势</string>
-    <string name="budget_graph_view_mode_categories">分类</string>
+    <string name="budget_graph_view_mode_categories">类别</string>
     <string name="budget_graph_nav_prev">Previous</string>
     <string name="budget_graph_nav_next">继续</string>
     <string name="graph_granularity_days">Days</string>
