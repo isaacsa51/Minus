@@ -1,0 +1,5 @@
+- feat: introduce notification spend scanning reminders
+- feat: add automated CSV folder sync and guide screen
+- fix: correct IRT fraction digits and leftover currency formatting
+- feat: add persian currency
+- feat: translations for Persian
