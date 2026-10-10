@@ -561,6 +561,10 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun observeString(key: String): Flow<String?> {
+        return dataStore.data.map { it[stringPreferencesKey(key)] }
+    }
+
     override suspend fun getString(key: String): String? {
         return dataStore.data.first()[stringPreferencesKey(key)]
     }

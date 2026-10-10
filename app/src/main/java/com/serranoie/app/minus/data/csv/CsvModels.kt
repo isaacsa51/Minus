@@ -20,7 +20,8 @@ data class CsvTransactionRow(
     val subscriptionDay: Int?,
     val isCredit: Boolean,
     val isCreditPaid: Boolean,
-    val periodId: Long
+    val periodId: Long,
+    val createdAt: Long? = null
 )
 
 data class CsvBackupMetadata(
@@ -57,7 +58,8 @@ fun CsvTransactionRow.toDomainTransaction(categoryId: Long? = null): Transaction
         subscriptionDay = subscriptionDay,
         categoryId = categoryId,
         isCredit = isCredit,
-        isCreditPaid = isCreditPaid
+        isCreditPaid = isCreditPaid,
+        createdAt = createdAt ?: System.currentTimeMillis()
     )
 }
 

@@ -118,6 +118,8 @@ interface SettingsRepository {
 
     suspend fun resetTutorials()
 
+    fun observeString(key: String): Flow<String?>
+
     suspend fun getString(key: String): String?
 
     suspend fun setString(key: String, value: String)

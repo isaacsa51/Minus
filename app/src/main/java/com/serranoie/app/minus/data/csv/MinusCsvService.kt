@@ -49,6 +49,11 @@ class MinusCsvService @Inject constructor(
         exporter.export(transactions, archivedBudgets, metadata, outputStream)
     }
 
+    suspend fun hasNoLocalData(): Boolean {
+        return repository.getBudgetSettingsSync() == null &&
+                repository.getRecentTransactions(1).isEmpty()
+    }
+
     suspend fun importTransactions(inputStream: InputStream): CsvImportResult {
         val payload = parser.parse(inputStream)
         val rows = payload.rows

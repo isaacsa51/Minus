@@ -3,6 +3,7 @@
 package com.serranoie.app.minus.presentation.ui.settings.features
 
 import android.net.Uri
+import android.text.format.DateUtils
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -40,6 +42,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.data.csv.CsvSyncWorker
+import com.serranoie.app.minus.presentation.ui.settings.SyncStatus
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
@@ -50,6 +54,7 @@ import com.serranoie.app.minus.presentation.util.Utils.toggleFeedback
 @Composable
 fun CsvSyncGuideScreen(
     syncFolderName: String? = null,
+    syncStatus: SyncStatus? = null,
     onSyncFolderResult: (Uri?) -> Unit = {},
     onBack: () -> Unit,
 ) {
@@ -104,6 +109,7 @@ fun CsvSyncGuideScreen(
                         }
                     }
                 }
+                SyncStatusLine(syncStatus)
                 GuideBody(stringResource(R.string.csv_sync_guide_setup_body))
             }
 
@@ -112,7 +118,12 @@ fun CsvSyncGuideScreen(
                 GuideLabel(stringResource(R.string.csv_sync_guide_adb_push_label))
                 GuideCode(stringResource(R.string.csv_sync_guide_adb_push))
                 GuideLabel(stringResource(R.string.csv_sync_guide_adb_trigger_label))
-                GuideCode(stringResource(R.string.csv_sync_guide_adb_trigger))
+                GuideCode(
+                    stringResource(
+                        R.string.csv_sync_guide_adb_trigger,
+                        LocalContext.current.packageName
+                    )
+                )
                 GuideLabel(stringResource(R.string.csv_sync_guide_adb_pull_label))
                 GuideCode(stringResource(R.string.csv_sync_guide_adb_pull))
                 GuideBody(stringResource(R.string.csv_sync_guide_adb_body))
@@ -149,6 +160,49 @@ fun CsvSyncGuideScreen(
             item { Spacer(modifier = Modifier.height(32.dp)) }
         }
     }
+}
+
+@Composable
+private fun SyncStatusLine(status: SyncStatus?) {
+    val when_ = status?.atMillis?.takeIf { it > 0L }?.let {
+        DateUtils.getRelativeTimeSpanString(
+            it,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS
+        ).toString()
+    }.orEmpty()
+
+    val text = when (status?.code) {
+        null -> stringResource(R.string.csv_sync_status_never)
+        CsvSyncWorker.STATUS_OK -> stringResource(
+            R.string.csv_sync_status_ok, when_, status.detail.ifBlank { "0" }
+        )
+
+        CsvSyncWorker.STATUS_RESTORED -> stringResource(
+            R.string.csv_sync_status_restored, when_
+        )
+
+        CsvSyncWorker.STATUS_REJECTED -> stringResource(
+            R.string.csv_sync_status_rejected, when_, status.detail
+        )
+
+        CsvSyncWorker.STATUS_NO_ACCESS -> stringResource(R.string.csv_sync_status_no_access)
+        else -> stringResource(R.string.csv_sync_status_error, when_, status.detail)
+    }
+
+    val isProblem = status?.code == CsvSyncWorker.STATUS_NO_ACCESS ||
+            status?.code == CsvSyncWorker.STATUS_ERROR
+
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = if (isProblem) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp),
+    )
 }
 
 @Composable

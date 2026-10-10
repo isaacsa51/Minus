@@ -198,6 +198,16 @@ class MinusCsvRoundTripTest {
     }
 
     @Test
+    fun `createdAt survives the round trip`() {
+        val original = tx(id = 900001L).copy(createdAt = 1_791_454_052_227L)
+
+        val parsed = roundTrip(transactions = listOf(original)).rows.single()
+
+        assertThat(parsed.createdAt).isEqualTo(1_791_454_052_227L)
+        assertThat(parsed.toDomainTransaction().createdAt).isEqualTo(1_791_454_052_227L)
+    }
+
+    @Test
     fun `an archived budget survives the round trip`() {
         val archive = ArchivedBudget(
             periodId = 101L,

@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,6 +76,13 @@ data class SettingsUiState(
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
     val creditCardCutoffDay: Int? = null,
     val syncFolderName: String? = null,
+    val syncStatus: SyncStatus? = null,
+)
+
+data class SyncStatus(
+    val code: String,
+    val atMillis: Long,
+    val detail: String,
 )
 
 sealed interface SettingsUiEffect {
@@ -92,15 +100,21 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _notificationPermissionGranted = MutableStateFlow(false)
-    private val _syncFolderName = MutableStateFlow<String?>(null)
+    private val syncFolderLabel = settingsRepository
+        .observeString(CsvSyncWorker.SYNC_FOLDER_URI_KEY)
+        .map { folderDisplayName(it) }
+
+    private val syncStatus = settingsRepository
+        .observeString(CsvSyncWorker.SYNC_STATUS_KEY)
+        .map { raw -> raw?.ifBlank { null }?.let(::parseSyncStatus) }
 
     val uiState: StateFlow<SettingsUiState> = combine(
         settingsRepository.observeSettings(),
         budgetRepository.getBudgetSettings(),
         censorManager.isCensored,
         _notificationPermissionGranted,
-        _syncFolderName
-    ) { settings, budgetSettings, isCensored, permissionGranted, syncFolderName ->
+        combine(syncFolderLabel, syncStatus) { label, status -> label to status }
+    ) { settings, budgetSettings, isCensored, permissionGranted, sync ->
         SettingsUiState(
             currentTheme = when (settings.themeMode) {
                 ThemeMode.LIGHT -> "Light"
@@ -143,7 +157,8 @@ class SettingsViewModel @Inject constructor(
             periodMappingMode = settings.periodMappingMode,
             savingsPreferences = settings.savingsPreferences,
             creditCardCutoffDay = budgetSettings?.creditCardCutoffDay,
-            syncFolderName = syncFolderName
+            syncFolderName = sync.first,
+            syncStatus = sync.second
         )
     }.stateIn(
         scope = viewModelScope,
@@ -159,11 +174,16 @@ class SettingsViewModel @Inject constructor(
 
     init {
         refreshNotificationPermission()
-        viewModelScope.launch {
-            _syncFolderName.value = folderDisplayName(
-                settingsRepository.getString(CsvSyncWorker.SYNC_FOLDER_URI_KEY)
-            )
-        }
+    }
+
+    private fun parseSyncStatus(raw: String): SyncStatus? {
+        val parts = raw.split(CsvSyncWorker.STATUS_SEPARATOR)
+        val code = parts.getOrNull(0)?.ifBlank { null } ?: return null
+        return SyncStatus(
+            code = code,
+            atMillis = parts.getOrNull(1)?.toLongOrNull() ?: 0L,
+            detail = parts.drop(2).joinToString(CsvSyncWorker.STATUS_SEPARATOR),
+        )
     }
 
     private suspend fun folderDisplayName(treeUri: String?): String? {
@@ -428,7 +448,6 @@ class SettingsViewModel @Inject constructor(
                 CsvSyncWorker.SYNC_FOLDER_URI_KEY,
                 uri.toString()
             )
-            _syncFolderName.value = folderDisplayName(uri.toString())
             CsvSyncWorker.syncNow(context)
         }
     }

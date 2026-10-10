@@ -51,6 +51,7 @@ class SettingsViewModelTest {
         every { censorManager.isCensored } returns censored
         every { censorManager.setCensored(any()) } just Runs
         every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT)
+        every { settingsRepository.observeString(any()) } returns flowOf(null)
         every { budgetRepository.getBudgetSettings() } returns flowOf(null)
         every { context.getSystemService(Context.ALARM_SERVICE) } returns alarmManager
         every { alarmManager.canScheduleExactAlarms() } returns true

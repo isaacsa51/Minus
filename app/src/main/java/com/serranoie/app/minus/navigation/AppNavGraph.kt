@@ -241,6 +241,7 @@ fun AppNavGraph(
 
             CsvSyncGuideScreen(
                 syncFolderName = uiState.syncFolderName,
+                syncStatus = uiState.syncStatus,
                 onSyncFolderResult = viewModel::onSyncFolderResult,
                 onBack = { navController.popBackStack() },
             )
