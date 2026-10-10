@@ -109,7 +109,7 @@ class ExpenseNotificationListener : NotificationListenerService() {
 
                 // Checked before admit() so a dropped notification does not burn this spend's
                 // dedup/rate budget: nothing is counted that cannot be shown.
-                if (!notificationHelper.canPostNotifications()) {
+                if (!notificationHelper.canPostNotifications(NotificationHelper.CHANNEL_SPEND_DETECTED)) {
                     logcat { "Skipping scanned spend: cannot post notifications" }
                     return@launch
                 }
