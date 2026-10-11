@@ -148,6 +148,9 @@
     <string name="history_snackbar_mark_paid_failed">거래를 결제 완료로 표시할 수 없습니다</string>
     <string name="history_snackbar_restore_transaction_failed">거래를 복원할 수 없습니다</string>
     <string name="expense_queued_for_next_period">지출이 다음 기간으로 예약되었습니다</string>
+    <string name="budget_load_failed">Could not load your budget</string>
+    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
+    <string name="budget_load_retry">Retry</string>
     <string name="add_new_category">카테고리</string>
     <string name="add_new_category_action">새 카테고리 추가</string>
     <string name="new_category">새 카테고리</string>
