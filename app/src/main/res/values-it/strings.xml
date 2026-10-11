@@ -149,6 +149,9 @@
     <string name="history_snackbar_mark_paid_failed">Impossibile contrassegnare la transazione come pagata</string>
     <string name="history_snackbar_restore_transaction_failed">Impossibile ripristinare la transazione</string>
     <string name="expense_queued_for_next_period">Spesa in coda per il prossimo periodo</string>
+    <string name="budget_load_failed">Could not load your budget</string>
+    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
+    <string name="budget_load_retry">Retry</string>
     <string name="add_new_category">Categoria</string>
     <string name="add_new_category_action">Aggiungi Nuova Categoria</string>
     <string name="new_category">Nuova categoria</string>
