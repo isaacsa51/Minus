@@ -149,6 +149,9 @@
     <string name="history_snackbar_mark_paid_failed">Impossible de marquer la transaction comme payée</string>
     <string name="history_snackbar_restore_transaction_failed">Impossible de restaurer la transaction</string>
     <string name="expense_queued_for_next_period">Dépense mise en attente pour la prochaine période</string>
+    <string name="budget_load_failed">Could not load your budget</string>
+    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
+    <string name="budget_load_retry">Retry</string>
     <string name="add_new_category">Catégorie</string>
     <string name="add_new_category_action">Ajouter une nouvelle catégorie</string>
     <string name="new_category">Nouvelle catégorie</string>
