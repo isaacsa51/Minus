@@ -148,6 +148,9 @@
     <string name="history_snackbar_mark_paid_failed">取引を支払い済みにできませんでした</string>
     <string name="history_snackbar_restore_transaction_failed">取引を復元できませんでした</string>
     <string name="expense_queued_for_next_period">支出は次の期間に繰り越されます</string>
+    <string name="budget_load_failed">Could not load your budget</string>
+    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
+    <string name="budget_load_retry">Retry</string>
     <string name="add_new_category">カテゴリ</string>
     <string name="add_new_category_action">新しいカテゴリを追加</string>
     <string name="new_category">新しいカテゴリ</string>
