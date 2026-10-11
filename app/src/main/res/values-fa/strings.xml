@@ -149,6 +149,9 @@
     <string name="history_snackbar_mark_paid_failed">ثبت تراکنش به‌عنوان پرداخت‌شده با خطا مواجه شد</string>
     <string name="history_snackbar_restore_transaction_failed">تراکنش بازگردانی نشد</string>
     <string name="expense_queued_for_next_period">هزینه برای دوره بعدی در صف قرار گرفت</string>
+    <string name="budget_load_failed">Could not load your budget</string>
+    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
+    <string name="budget_load_retry">Retry</string>
     <string name="add_new_category">دسته‌بندی</string>
     <string name="add_new_category_action">افزودن دسته‌بندی جدید</string>
     <string name="new_category">دسته‌بندی جدید</string>
