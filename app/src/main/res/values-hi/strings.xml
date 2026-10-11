@@ -149,6 +149,9 @@
     <string name="history_snackbar_mark_paid_failed">लेन-देन को भुगतान किया हुआ चिह्नित नहीं किया जा सका</string>
     <string name="history_snackbar_restore_transaction_failed">लेन-देन को वापस नहीं लाया जा सका</string>
     <string name="expense_queued_for_next_period">खर्च अगली अवधि के लिए कतार में है</string>
+    <string name="budget_load_failed">Could not load your budget</string>
+    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
+    <string name="budget_load_retry">Retry</string>
     <string name="add_new_category">कैटेगरी</string>
     <string name="add_new_category_action">नई कैटेगरी जोड़ें</string>
     <string name="new_category">नई कैटेगरी</string>
