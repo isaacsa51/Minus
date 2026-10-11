@@ -149,6 +149,9 @@
     <string name="history_snackbar_mark_paid_failed">Транзакцията не можа да бъде отбелязана като платена</string>
     <string name="history_snackbar_restore_transaction_failed">Транзакцията не можа да бъде възстановена</string>
     <string name="expense_queued_for_next_period">Разходът е насрочен за следващия период</string>
+    <string name="budget_load_failed">Could not load your budget</string>
+    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
+    <string name="budget_load_retry">Retry</string>
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавяне на нова категория</string>
     <string name="new_category">Нова категория</string>
