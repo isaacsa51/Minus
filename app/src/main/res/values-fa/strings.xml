@@ -151,7 +151,7 @@
     <string name="expense_queued_for_next_period">هزینه برای دوره بعدی در صف قرار گرفت</string>
     <string name="budget_load_failed">Could not load your budget</string>
     <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
-    <string name="budget_load_retry">Retry</string>
+    <string name="budget_load_retry">تلاش مجدد</string>
     <string name="add_new_category">دسته‌بندی</string>
     <string name="add_new_category_action">افزودن دسته‌بندی جدید</string>
     <string name="new_category">دسته‌بندی جدید</string>
@@ -168,7 +168,7 @@
     <string name="analytics_title">آمار و ارقام</string>
     <plurals name="days">
         <item quantity="one">%d روز</item>
-        <item quantity="other">%d days</item>
+        <item quantity="other">%d روز</item>
     </plurals>
     <plurals name="analytics_days_left">
         <item quantity="one">%d روز</item>
@@ -255,16 +255,16 @@
     <string name="budget_formula_tip_hold_pill">نکته: در صفحه اصلی نوار بودجه را نگه دارید تا هر زمان این را ببینید</string>
     <string name="budget_formula_tip_tap_card">نکته: می‌توانید روی مبلغ محاسبه‌شده در برگه دوره هم بزنید</string>
     <plurals name="budget_formula_weeks">
-        <item quantity="one">%d week</item>
-        <item quantity="other">%d weeks</item>
+        <item quantity="one">%d هفته</item>
+        <item quantity="other">%dهفته</item>
     </plurals>
     <plurals name="budget_formula_biweeks">
-        <item quantity="one">%d biweek</item>
-        <item quantity="other">%d biweeks</item>
+        <item quantity="one">%d دو هفته</item>
+        <item quantity="other">%d دو هفته</item>
     </plurals>
     <plurals name="budget_formula_months">
-        <item quantity="one">%d month</item>
-        <item quantity="other">%d months</item>
+        <item quantity="one">%d ماه</item>
+        <item quantity="other">%d ماه</item>
     </plurals>
     <string name="day_total_format">مجموع: %1$s</string>
     <string name="onboarding_welcome_title">به Minus خوش آمدید</string>
