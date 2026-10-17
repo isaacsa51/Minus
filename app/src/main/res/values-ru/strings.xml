@@ -151,9 +151,9 @@
     <string name="history_snackbar_mark_paid_failed">Не удалось отметить операцию как оплаченную</string>
     <string name="history_snackbar_restore_transaction_failed">Не удалось восстановить транзакцию</string>
     <string name="expense_queued_for_next_period">Расход перенесён в следующий период</string>
-    <string name="budget_load_failed">Could not load your budget</string>
-    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
-    <string name="budget_load_retry">Retry</string>
+    <string name="budget_load_failed">Не удалось загрузить ваш бюджет</string>
+    <string name="budget_load_corrupt_data">Некоторые сохраненные данные о бюджете не могут быть прочитаны</string>
+    <string name="budget_load_retry">Повторить</string>
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавить категорию</string>
     <string name="new_category">Новая категория</string>
