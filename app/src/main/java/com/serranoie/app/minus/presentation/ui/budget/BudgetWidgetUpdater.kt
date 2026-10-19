@@ -4,6 +4,8 @@ import android.content.Context
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.time.CalendarSystem
+import com.serranoie.app.minus.presentation.island.IslandBudgetSnapshot
+import com.serranoie.app.minus.presentation.island.IslandBudgetStore
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.calculateBudgetMetrics
 import com.serranoie.app.minus.presentation.widget.DailySpending
 import com.serranoie.app.minus.presentation.widget.MonthHeatmapData
@@ -31,6 +33,8 @@ class BudgetWidgetUpdater @Inject constructor(
         val currency = baseState.budgetSettings?.currencyCode ?: "USD"
         // Pushed first: unlike the others, the pill has a "set up your budget" face to show.
         updateBudgetPill(baseState, currency)
+
+        if (baseState !== BudgetUiState.INITIAL) updateIsland(baseState, currency)
 
         val budget = baseState.budgetState ?: return
         val totalSpent = budget.totalSpentInPeriod.toInt()
@@ -93,6 +97,41 @@ class BudgetWidgetUpdater @Inject constructor(
             isOverBudget = metrics.isCurrentPeriodOverBudget,
             isOverPeriodAllocation = metrics.isOverCurrentSubPeriod,
             nextAllocation = metrics.nextPeriodAllocation,
+        )
+    }
+
+    /*
+    * [!INFO]
+    * This syncs budget period inside the island
+    * from the saameraw/essentials app.
+    */
+    private fun updateIsland(baseState: BudgetUiState, currency: String) {
+        val settings = baseState.budgetSettings
+        val budgetState = baseState.budgetState
+        if (settings == null || budgetState == null) {
+            IslandBudgetStore.update(context, null)
+            return
+        }
+        val viewPeriod = baseState.selectedViewPeriod ?: settings.period
+        val metrics = calculateBudgetMetrics(state = budgetState, period = viewPeriod, splitMode = settings.splitMode)
+        IslandBudgetStore.update(
+            context,
+            IslandBudgetSnapshot(
+                date = LocalDate.now(),
+                currency = currency,
+                viewPeriod = viewPeriod,
+                splitRemaining = metrics.periodRemaining,
+                isOverBudget = metrics.isCurrentPeriodOverBudget,
+                isOverSplit = metrics.isOverCurrentSubPeriod,
+                periodLeft = budgetState.totalBudget - budgetState.totalSpentInPeriod,
+                daysLeft = budgetState.daysRemaining,
+                totalBudget = budgetState.totalBudget,
+                settingsTotalBudget = settings.totalBudget,
+                rollOverLimit = settings.rollOverLimit,
+                creditOwed = baseState.creditOwed,
+                startDate = settings.startDate,
+                finishDate = settings.getPeriodEndDate(),
+            ),
         )
     }
 

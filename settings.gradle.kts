@@ -25,3 +25,4 @@ if (providers.gradleProperty("minus.includeWearModule").orNull != "false") {
 	include(":wear")
 }
 include(":sync-contract")
+include(":island-sdk")

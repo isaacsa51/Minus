@@ -351,14 +351,14 @@ private val Context.isNightMode: Boolean
 
 private fun String.toBigDecimalOrNull(): BigDecimal? = runCatching { BigDecimal(this) }.getOrNull()
 
-private fun BudgetPeriod.periodLabelRes(): Int = when (this) {
+internal fun BudgetPeriod.periodLabelRes(): Int = when (this) {
     BudgetPeriod.DAILY -> R.string.budget_period_label_today
     BudgetPeriod.WEEKLY -> R.string.budget_period_label_this_week
     BudgetPeriod.BIWEEKLY -> R.string.budget_period_label_this_biweek
     BudgetPeriod.MONTHLY -> R.string.budget_period_label_this_month
 }
 
-private fun BudgetPeriod.exceededLabelRes(): Int = when (this) {
+internal fun BudgetPeriod.exceededLabelRes(): Int = when (this) {
     BudgetPeriod.DAILY -> R.string.budget_pill_label_daily_exceeded
     BudgetPeriod.WEEKLY -> R.string.budget_pill_label_weekly_exceeded
     BudgetPeriod.BIWEEKLY -> R.string.budget_pill_label_biweekly_exceeded

@@ -14,6 +14,7 @@
 /.kotlin
 /.minimax
 /sync-contract/build
+/island-sdk/build
 
 # Release signing artifacts
 *.jks

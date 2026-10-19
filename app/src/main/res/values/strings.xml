@@ -928,4 +928,8 @@
     <string name="widget_budget_pill_title">Budget Pill</string>
     <string name="widget_budget_pill_description">Remaining for the view mode you picked — daily, weekly, biweekly or monthly — in a slim bar</string>
     <string name="widget_budget_pill_preview_amount" translatable="false">$110.00</string>
+    <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
+    <string name="island_brief_days_short">%1$dd</string>
+    <string name="island_brief_stale">left in period - open Minus to update</string>
+    <string name="island_page_period_left">Period left</string>
 </resources>

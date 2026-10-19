@@ -108,6 +108,21 @@
                 android:value="true" />
         </service>
 
+        <!-- Essentials island provider -->
+        <service
+            android:name=".presentation.island.MinusIslandService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.sameerasw.island.PROVIDER" />
+            </intent-filter>
+            <meta-data
+                android:name="com.sameerasw.island.provider.label"
+                android:value="@string/app_name" />
+            <meta-data
+                android:name="com.sameerasw.island.provider.description"
+                android:value="@string/island_provider_description" />
+        </service>
+
         <!-- Quick Settings Tile -->
         <service
             android:name=".presentation.tile.NewTransactionTileService"

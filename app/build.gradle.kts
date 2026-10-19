@@ -267,6 +267,7 @@ androidComponents {
 
 dependencies {
     implementation(project(":sync-contract"))
+    implementation(project(":island-sdk"))
 
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.20") {
