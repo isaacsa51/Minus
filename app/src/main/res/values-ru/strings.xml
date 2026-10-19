@@ -810,4 +810,8 @@
     <string name="unit_millions">млн</string>
     <string name="widget_budget_pill_title">Бюджетная полоса</string>
     <string name="widget_budget_pill_description">Остаток за выбранный режим просмотра — день, неделя, две недели или месяц — в узкой полосе</string>
+    <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
+    <string name="island_brief_days_short">%1$dd</string>
+    <string name="island_brief_stale">left in period - open Minus to update</string>
+    <string name="island_page_period_left">Period left</string>
 </resources>
