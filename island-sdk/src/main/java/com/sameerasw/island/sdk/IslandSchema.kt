@@ -10,7 +10,8 @@ object IslandSchema {
     const val META_SETTINGS_ACTIVITY = "com.sameerasw.island.provider.settings"
 
     const val DEFAULT_HOST_PACKAGE = "com.sameerasw.essentials"
-    val ALLOWED_HOSTS = setOf(DEFAULT_HOST_PACKAGE)
+    val TRUSTED_HOST_FINGERPRINTS = mapOf(DEFAULT_HOST_PACKAGE to "")
+    val ALLOWED_HOSTS = TRUSTED_HOST_FINGERPRINTS.keys
 }
 
 object IslandSurfaceKey {

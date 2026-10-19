@@ -51,9 +51,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 /**
  * Island provider for Essentials: a budget card in the island Brief, plus the page it opens.
@@ -67,7 +71,15 @@ class MinusIslandService : ComposeIslandProviderService() {
     override fun onAttached(host: IslandHostHandle, info: HostInfo) {
         publishing?.cancel()
         publishing = scope.launch {
-            IslandBudgetStore.observe(applicationContext).collect { publish(host, it) }
+            IslandBudgetStore.observe(applicationContext).collectLatest {
+                publish(host, it)
+                if (it == null) return@collectLatest
+                while (true) {
+                    val now = LocalDateTime.now()
+                    delay(Duration.between(now, now.toLocalDate().plusDays(1).atStartOfDay()).toMillis() + 1000)
+                    publish(host, it)
+                }
+            }
         }
     }
 

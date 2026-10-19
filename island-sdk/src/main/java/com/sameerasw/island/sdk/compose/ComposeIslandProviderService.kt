@@ -1,5 +1,6 @@
 package com.sameerasw.island.sdk.compose
 
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
@@ -40,6 +41,10 @@ abstract class ComposeIslandProviderService : IslandProviderService() {
         request: SurfaceRequest,
         deliver: (SurfaceControlViewHost.SurfacePackage?) -> Unit,
     ) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            deliver(null)
+            return
+        }
         main.post {
             surfaces.remove(itemKey)?.release()
             if (!hasExpandedContent(itemKey)) {
@@ -75,6 +80,7 @@ abstract class ComposeIslandProviderService : IslandProviderService() {
     }
 
     override fun onDestroy() {
+        main.removeCallbacksAndMessages(null)
         surfaces.values.forEach { it.release() }
         surfaces.clear()
         super.onDestroy()

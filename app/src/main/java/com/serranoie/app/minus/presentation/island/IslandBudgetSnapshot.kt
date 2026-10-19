@@ -43,7 +43,7 @@ object IslandBudgetStore {
 
     fun update(context: Context, snapshot: IslandBudgetSnapshot?) {
         loaded = true
-        if (state.value == snapshot) return
+        if (snapshot != null && state.value == snapshot) return
         state.value = snapshot
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit {
             clear()

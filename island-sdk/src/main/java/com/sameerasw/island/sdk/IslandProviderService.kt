@@ -34,6 +34,7 @@ abstract class IslandProviderService : Service() {
             val hostPackage = callerHost() ?: return false
             if (!onHostGrantRequested(hostPackage)) return false
             val fingerprint = IslandIdentity.fingerprint(this@IslandProviderService, hostPackage) ?: return false
+            if (fingerprint != IslandSchema.TRUSTED_HOST_FINGERPRINTS[hostPackage]) return false
             HostGrantStore(this@IslandProviderService).grant(hostPackage, fingerprint)
             return true
         }

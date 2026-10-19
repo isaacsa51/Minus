@@ -2,6 +2,8 @@ package com.sameerasw.island.sdk.compose
 
 import android.content.Context
 import android.hardware.display.DisplayManager
+import android.os.Build
+import androidx.annotation.RequiresApi
 import android.view.MotionEvent
 import android.view.SurfaceControlViewHost
 import androidx.compose.runtime.Composable
@@ -17,6 +19,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.sameerasw.island.sdk.SurfaceRequest
 
+@RequiresApi(Build.VERSION_CODES.R)
 class IslandSurface(
     context: Context,
     request: SurfaceRequest,
