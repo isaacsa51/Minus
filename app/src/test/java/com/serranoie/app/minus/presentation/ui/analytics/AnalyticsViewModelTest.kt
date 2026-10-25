@@ -215,6 +215,40 @@ class AnalyticsViewModelTest {
     }
 
     @Test
+    fun `current period spends count every past-due recurring occurrence, not just the template row`() = runTest {
+        val periodStart = LocalDate.now().minusDays(20)
+        settingsFlow.value = BudgetSettings(
+            totalBudget = BigDecimal("1000"),
+            period = BudgetPeriod.MONTHLY,
+            startDate = periodStart,
+            endDate = LocalDate.now().plusDays(10),
+            currencyCode = "USD",
+        )
+        transactionsFlow.value = listOf(
+            Transaction(
+                id = 1L,
+                amount = BigDecimal("100.00"),
+                comment = "Rent",
+                isRecurrent = true,
+                recurrentFrequency = RecurrentFrequency.WEEKLY,
+                date = periodStart.atTime(10, 0),
+                periodId = 1L,
+            ),
+            Transaction(id = 2L, amount = BigDecimal("50.00"), comment = "DoorDash", date = periodStart.plusDays(1).atTime(9, 0), periodId = 1L),
+        )
+
+        val viewModel = createViewModel()
+        viewModel.uiState.test {
+            skipItems(1)
+            val display = awaitItem().displayState
+
+            assertThat(display.spends.sumOf { it.amount }).isEqualTo(BigDecimal("350.00"))
+            assertThat(display.chartSpends.sumOf { it.amount }).isEqualTo(BigDecimal("350.00"))
+            assertThat(display.spends.count { it.comment == "Rent" }).isEqualTo(3)
+        }
+    }
+
+    @Test
     fun `reconstructed virtual period total matches what opening it recomputes`() = runTest {
         val baseAnchor = LocalDate.now().withDayOfMonth(10)
         val netflixAnchor = baseAnchor.minusMonths(2)
