@@ -545,6 +545,9 @@ private fun ReceiptCameraHost(
         currencyCode = budgetUiState.budgetSettings?.currencyCode ?: "USD",
         onClose = scanner.close,
         onCapture = scanner.capture,
+        onPickImage = scanner.pickImage,
+        onSwitchCamera = scanner.switchCamera,
+        onToggleTorch = scanner.toggleTorch,
         preview = scanner.preview,
         modifier = Modifier.zIndex(2f),
     )

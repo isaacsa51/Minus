@@ -80,6 +80,9 @@ class ReceiptScannerState(
     val launch: () -> Unit,
     val close: () -> Unit,
     val capture: () -> Unit,
+    val pickImage: () -> Unit,
+    val switchCamera: () -> Unit,
+    val toggleTorch: () -> Unit,
     val preview: @Composable (Modifier) -> Unit,
 )
 
@@ -99,13 +102,23 @@ fun rememberReceiptScanner(
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
-        isScanning = true
+        val fromSheet = isOpen
+        if (fromSheet) camera = camera.capturing() else isScanning = true
         scope.launch {
             val scan = runCatching { ReceiptParser.parse(ReceiptOcr.read(context, uri)) }
                 .onFailure { logcat(TAG) { "Receipt scan failed\n${it.asLog()}" } }
                 .getOrNull()
-            isScanning = false
-            if (scan != null) currentOnScanned(scan) else currentOnFailed()
+            if (fromSheet) {
+                val (next, result) = camera.pickedImage(scan)
+                camera = next
+                if (result != null && isOpen) {
+                    isOpen = false
+                    currentOnScanned(result)
+                }
+            } else {
+                isScanning = false
+                if (scan != null) currentOnScanned(scan) else currentOnFailed()
+            }
         }
     }
 
@@ -151,9 +164,21 @@ fun rememberReceiptScanner(
                 }
             }
         },
+        pickImage = pickImage@{
+            if (camera.isCapturing) return@pickImage
+            openPicker()
+        },
+        switchCamera = switch@{
+            if (camera.isCapturing) return@switch
+            camera = camera.switchCamera()
+        },
+        toggleTorch = { camera = camera.toggleTorch() },
         preview = { modifier ->
             ReceiptCameraPreview(
                 modifier = modifier,
+                usingFrontCamera = camera.usingFrontCamera,
+                torchOn = camera.torchOn,
+                onCameraReady = { hasFlash, canSwitch -> camera = camera.cameraReady(hasFlash, canSwitch) },
                 onSession = { session = it },
                 onFrame = { scan -> camera = camera.withFrame(scan) },
                 onUnavailable = {
@@ -168,6 +193,9 @@ fun rememberReceiptScanner(
 @Composable
 private fun ReceiptCameraPreview(
     modifier: Modifier,
+    usingFrontCamera: Boolean,
+    torchOn: Boolean,
+    onCameraReady: (hasFlash: Boolean, canSwitch: Boolean) -> Unit,
     onSession: (ReceiptCameraSession?) -> Unit,
     onFrame: (ReceiptScan?) -> Unit,
     onUnavailable: () -> Unit,
@@ -196,7 +224,12 @@ private fun ReceiptCameraPreview(
         }
     }
 
-    LaunchedEffect(session) {
+    LaunchedEffect(camera, torchOn) {
+        val active = camera ?: return@LaunchedEffect
+        if (active.cameraInfo.hasFlashUnit()) active.cameraControl.enableTorch(torchOn)
+    }
+
+    LaunchedEffect(session, usingFrontCamera) {
         runCatching {
             val provider = suspendCancellableCoroutine { continuation ->
                 val future = ProcessCameraProvider.getInstance(context)
@@ -209,15 +242,23 @@ private fun ReceiptCameraPreview(
                 .setResolutionSelector(session.previewResolution)
                 .build()
                 .also { it.setSurfaceProvider(previewView.surfaceProvider) }
+            val selector =
+                if (usingFrontCamera) CameraSelector.DEFAULT_FRONT_CAMERA else CameraSelector.DEFAULT_BACK_CAMERA
             provider.unbindAll()
-            camera = provider.bindToLifecycle(
+            val bound = provider.bindToLifecycle(
                 lifecycleOwner,
-                CameraSelector.DEFAULT_BACK_CAMERA,
+                selector,
                 preview,
                 session.analysis,
                 session.imageCapture,
             )
+            camera = bound
             session.provider = provider
+            val canSwitch = runCatching {
+                provider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) &&
+                    provider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)
+            }.getOrDefault(false)
+            onCameraReady(bound.cameraInfo.hasFlashUnit(), canSwitch)
         }.onFailure {
             logcat(TAG) { "Could not start camera\n${it.asLog()}" }
             onUnavailable()

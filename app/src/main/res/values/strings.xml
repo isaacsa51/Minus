@@ -185,6 +185,9 @@
     <string name="receipt_camera_retry">No total found, try again</string>
     <string name="receipt_camera_close">Close camera</string>
     <string name="receipt_camera_capture">Capture receipt</string>
+    <string name="receipt_camera_gallery">Choose a photo</string>
+    <string name="receipt_camera_switch">Switch camera</string>
+    <string name="receipt_camera_flash">Flash</string>
 
     <plurals name="days">
         <item quantity="one">%d day</item>
