@@ -78,7 +78,7 @@ object ExpenseNotificationParser {
         return ranges
     }
 
-    private fun normalize(token: String): BigDecimal? {
+    internal fun normalize(token: String): BigDecimal? {
         val cleaned = token.trimStart('+', '-').filterNot { it.isWhitespace() || it == '\u00A0' }
         val lastSeparator = cleaned.indexOfLast { it == '.' || it == ',' }
         return runCatching {

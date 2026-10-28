@@ -50,10 +50,12 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
@@ -100,6 +102,7 @@ fun Numpad(
     onBackspaceLongPress: () -> Unit = {},
     onDelete: () -> Unit = {},
     onApply: () -> Unit = {},
+    onApplyLongPress: (() -> Unit)? = null,
     isCalculation: Boolean = false,
     onCalculationModeChanged: (Boolean) -> Unit = {},
     onOperatorInput: (Char) -> Unit = {},
@@ -217,7 +220,8 @@ fun Numpad(
                 onBackspace = onBackspace,
                 onBackspaceLongPress = onBackspaceLongPress,
                 onDelete = onDelete,
-                onApply = onApply
+                onApply = onApply,
+                onApplyLongPress = onApplyLongPress,
             )
         } else {
             if (effectiveDragProgress > 0.01f || isCalculation) {
@@ -305,6 +309,7 @@ fun Numpad(
                             onApply()
                         }
                     },
+                    onApplyLongPress = onApplyLongPress,
                     onEqualsInput = onEqualsInput,
                     applyHintAnchorModifier = applyHintAnchorModifier
                 )
@@ -324,8 +329,10 @@ private fun CompactHardwareLayout(
     onBackspaceLongPress: () -> Unit,
     onDelete: () -> Unit,
     onApply: () -> Unit,
+    onApplyLongPress: (() -> Unit)?,
 ) {
     val haptic = LocalHapticFeedback.current
+    val scanReceiptLabel = stringResource(R.string.receipt_scan_button)
     Column(
         Modifier
             .fillMaxWidth()
@@ -419,7 +426,14 @@ private fun CompactHardwareLayout(
                     onClick = {
                         if (targetIsDelete) onDelete() else onApply()
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    }
+                    },
+                    onLongClick = onApplyLongPress?.takeUnless { targetIsDelete }?.let { scan ->
+                        {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            scan()
+                        }
+                    },
+                    onLongClickLabel = scanReceiptLabel.takeUnless { targetIsDelete || onApplyLongPress == null },
                 )
             }
         }
@@ -624,10 +638,12 @@ private fun RowScope.ActionButtonsColumn(
     onBackspaceLongPress: () -> Unit,
     onDelete: () -> Unit,
     onApply: () -> Unit,
+    onApplyLongPress: (() -> Unit)?,
     onEqualsInput: () -> Unit = {},
     applyHintAnchorModifier: Modifier
 ) {
     val haptic = LocalHapticFeedback.current
+    val scanReceiptLabel = stringResource(R.string.receipt_scan_button)
     Column(
         Modifier
             .fillMaxHeight()
@@ -674,7 +690,14 @@ private fun RowScope.ActionButtonsColumn(
                 onClick = {
                     if (isDelete) onDelete() else onApply()
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
+                },
+                onLongClick = onApplyLongPress?.takeUnless { isDelete }?.let { scan ->
+                    {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        scan()
+                    }
+                },
+                onLongClickLabel = scanReceiptLabel.takeUnless { isDelete || onApplyLongPress == null },
             )
         }
 

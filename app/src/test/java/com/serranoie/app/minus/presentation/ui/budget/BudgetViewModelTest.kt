@@ -187,6 +187,33 @@ class BudgetViewModelTest {
         }
 
     @Test
+    fun receipt_scanned_prefills_numpad_amount_and_merchant_note() = runTest {
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.numpadInput == "" }
+            viewModel.processIntent(BudgetEditorIntent.ReceiptScanned(amount = "39.50", merchant = "OXXO"))
+            val state = awaitCondition { it.numpadInput == "39.50" && it.currentNote == "OXXO" }
+            assertThat(state.animState).isEqualTo(AnimState.EDITING)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun receipt_scanned_without_merchant_keeps_existing_note() = runTest {
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.numpadInput == "" }
+            viewModel.processIntent(BudgetEditorIntent.NoteUpdated("lunch"))
+            viewModel.processIntent(BudgetEditorIntent.ReceiptScanned(amount = "12.00", merchant = null))
+            val state = awaitCondition { it.numpadInput == "12.00" }
+            assertThat(state.currentNote).isEqualTo("lunch")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun when_number_tapped_intent_is_processed_then_numpad_input_is_updated() = runTest {
         val viewModel = newViewModel()
 

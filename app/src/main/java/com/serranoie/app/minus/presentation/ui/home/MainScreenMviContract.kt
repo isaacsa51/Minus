@@ -7,6 +7,7 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
+import com.serranoie.app.minus.presentation.ui.editor.receipt.ReceiptScannerState
 
 sealed interface MainScreenUiIntent {
     data class QueueDeleteWithUndo(
@@ -89,6 +90,7 @@ data class MainScreenActions(
     val onLeftoverChoice: (LeftoverChoice) -> Unit = {},
     val onCreateCategory: suspend (String) -> Boolean = { false },
     val onRetryBudgetLoad: () -> Unit = {},
+    val receiptScanner: ReceiptScannerState? = null,
 )
 
 data class MainScreenFeatureFlags(

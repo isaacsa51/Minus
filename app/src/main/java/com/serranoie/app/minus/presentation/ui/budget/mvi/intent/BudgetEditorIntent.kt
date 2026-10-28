@@ -28,4 +28,5 @@ sealed interface BudgetEditorIntent : BudgetUiIntent {
     ) : BudgetEditorIntent
     data class CreditCutoffDayConfirmed(val cutoffDay: Int) : BudgetEditorIntent
     data object FinishBudgetEarly : BudgetEditorIntent
+    data class ReceiptScanned(val amount: String, val merchant: String?) : BudgetEditorIntent
 }

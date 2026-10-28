@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.home
 
 import android.os.Build
+import android.widget.Toast
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,10 +13,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
+import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetSystemIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetTransactionIntent
 import com.serranoie.app.minus.presentation.ui.changelog.ChangelogGate
+import com.serranoie.app.minus.presentation.ui.editor.receipt.rememberReceiptScanner
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.BudgetFormulaHost
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialTooltip
@@ -39,6 +42,20 @@ fun MainScreen(
 
     val tutorialStage = mainScreenState.tutorialStage
     val tutorialBoxCompleted = mainScreenState.tutorialBoxCompleted
+
+    val receiptScanner = rememberReceiptScanner(
+        onScanned = { scan ->
+            budgetViewModel.processIntent(
+                BudgetEditorIntent.ReceiptScanned(
+                    amount = scan.total.toPlainString(),
+                    merchant = scan.merchant,
+                ),
+            )
+        },
+        onFailed = {
+            Toast.makeText(context, R.string.receipt_scan_failed, Toast.LENGTH_SHORT).show()
+        },
+    )
 
     val effectiveSelectedPeriod =
         mainScreenState.selectedViewPeriod ?: budgetUiState.budgetSettings?.period
@@ -202,6 +219,7 @@ fun MainScreen(
                             onUnresolvedSurplusBannerClick = budgetViewModel::onUnresolvedSurplusBannerClicked,
                             onLeftoverChoice = budgetViewModel::onLeftoverChoice,
                             onCreateCategory = budgetViewModel::createCategory,
+                            receiptScanner = receiptScanner,
                             onRetryBudgetLoad = {
                                 budgetViewModel.processIntent(BudgetSystemIntent.RetryLoad)
                             },

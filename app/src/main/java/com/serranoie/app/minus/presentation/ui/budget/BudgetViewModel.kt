@@ -529,7 +529,17 @@ class BudgetViewModel @Inject constructor(
 
             is BudgetEditorIntent.CreditCutoffDayConfirmed -> handleCreditCutoffDayConfirmed(intent.cutoffDay)
             is BudgetEditorIntent.FinishBudgetEarly -> handleFinishBudgetEarly()
+            is BudgetEditorIntent.ReceiptScanned -> handleReceiptScanned(intent.amount, intent.merchant)
         }
+    }
+
+    private fun handleReceiptScanned(amount: String, merchant: String?) {
+        numpadController.setInput(amount)
+        if (merchant.isNullOrBlank()) return
+        editorStateController.process(
+            EditorIntent.NoteUpdated(merchant),
+            hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
+        )
     }
 
     private fun handleSystemIntent(intent: BudgetSystemIntent) {
