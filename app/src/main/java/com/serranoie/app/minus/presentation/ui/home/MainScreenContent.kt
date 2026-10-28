@@ -92,6 +92,7 @@ import androidx.wear.compose.material.rememberSwipeableState
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.LeftoverChoice
@@ -104,6 +105,8 @@ import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorInt
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.Editor
+import com.serranoie.app.minus.presentation.ui.editor.receipt.ReceiptCameraSheet
+import com.serranoie.app.minus.presentation.ui.editor.receipt.ReceiptScannerState
 import com.serranoie.app.minus.presentation.ui.history.HistoryScreen
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
@@ -497,6 +500,15 @@ fun MainScreenContent(
                     )
                 }
 
+                if (windowSizeClass == WindowWidthSizeClass.Expanded) {
+                    ReceiptCameraHost(
+                        scanner = actions.receiptScanner,
+                        budgetUiState = budgetUiState,
+                        selectedViewPeriod = selectedViewPeriod,
+                        startHeightPx = 0f,
+                    )
+                }
+
                 SnackbarHost(
                     hostState = snackbarHostState,
                     modifier =
@@ -513,6 +525,29 @@ fun MainScreenContent(
             }
         }
     }
+}
+
+@Composable
+private fun ReceiptCameraHost(
+    scanner: ReceiptScannerState?,
+    budgetUiState: BudgetUiState,
+    selectedViewPeriod: BudgetPeriod?,
+    startHeightPx: Float,
+) {
+    if (scanner == null) return
+    ReceiptCameraSheet(
+        visible = scanner.isOpen,
+        state = scanner.camera,
+        startHeightPx = startHeightPx,
+        budgetState = budgetUiState.budgetState,
+        viewPeriod = selectedViewPeriod ?: BudgetPeriod.DAILY,
+        splitMode = budgetUiState.budgetSettings?.splitMode ?: BudgetSplitMode.DYNAMIC,
+        currencyCode = budgetUiState.budgetSettings?.currencyCode ?: "USD",
+        onClose = scanner.close,
+        onCapture = scanner.capture,
+        preview = scanner.preview,
+        modifier = Modifier.zIndex(2f),
+    )
 }
 
 @Composable
@@ -1107,6 +1142,13 @@ private fun PhoneLayout(
             },
         )
 
+        ReceiptCameraHost(
+            scanner = actions.receiptScanner,
+            budgetUiState = budgetUiState,
+            selectedViewPeriod = budgetPeriodState.selectedViewPeriod,
+            startHeightPx = editorHeightAnimatedState.value,
+        )
+
         LaunchedEffect(budgetUiState.isCalculation) {
             localDragProgress = 0f
             externalSheetDragOffset = 0f
@@ -1461,6 +1503,7 @@ private fun MainScreenNumpadSection(
             )
         },
         onShowSnackbar = actions.onShowSnackbar,
+        onApplyLongPress = actions.receiptScanner?.launch,
         onTestNotifications = {
             actions.onProcessIntent(
                 MainScreenUiIntent.ProcessBudgetNumpadIntent(

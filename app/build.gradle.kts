@@ -178,16 +178,28 @@ android {
         buildConfig = true
     }
 
+    splits {
+        abi {
+            isEnable = gradle.startParameter.taskNames.any {
+                it.contains("assemble", ignoreCase = true) && it.contains("Release", ignoreCase = true)
+            }
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            isUniversalApk = true
+        }
+    }
+
     applicationVariants.all {
         val versionLabel = appVersionName + (buildType.versionNameSuffix ?: "")
         outputs.all {
             val output = this as? BaseVariantOutputImpl
             if (output != null) {
                 val flavorName = name.replaceFirstChar { it.titlecase() }
+                val abiSuffix = output.getFilter("ABI")?.let { "-$it" }.orEmpty()
                 output.outputFileName = if (flavorName.contains("wear", ignoreCase = true)) {
-                    "Minus-WearOS-v$versionLabel.apk"
+                    "Minus-WearOS-v$versionLabel$abiSuffix.apk"
                 } else {
-                    "Minus-v$versionLabel.apk"
+                    "Minus-v$versionLabel$abiSuffix.apk"
                 }
             }
         }
@@ -343,6 +355,10 @@ dependencies {
     implementation(libs.commons.csv)
     implementation(libs.coil.compose)
     implementation(libs.coil.gif)
+    implementation(libs.tesseract4android)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
     ksp(libs.androidx.room.compiler)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.dagger.compiler)

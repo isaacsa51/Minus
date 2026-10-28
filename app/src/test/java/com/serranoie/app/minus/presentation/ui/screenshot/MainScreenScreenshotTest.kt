@@ -1,9 +1,13 @@
 package com.serranoie.app.minus.presentation.ui.screenshot
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
@@ -17,6 +21,8 @@ import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
+import com.serranoie.app.minus.presentation.ui.editor.receipt.ReceiptCameraUiState
+import com.serranoie.app.minus.presentation.ui.editor.receipt.ReceiptScannerState
 import com.serranoie.app.minus.presentation.ui.home.MainScreenActions
 import com.serranoie.app.minus.presentation.ui.home.MainScreenContent
 import com.serranoie.app.minus.presentation.ui.home.MainScreenUiState
@@ -64,16 +70,39 @@ class MainScreenScreenshotTest {
             )
         }
     }
+
+    @Test
+    fun mainScreenPhoneReceiptCameraOpen() {
+        Locale.setDefault(Locale.US)
+
+        paparazzi.snapshot {
+            MainScreenPreviewContent(
+                budgetUiState = sampleMainBudgetUiState().copy(numpadInput = ""),
+                windowSizeClass = WindowWidthSizeClass.Compact,
+                receiptScanner = ReceiptScannerState(
+                    isOpen = true,
+                    isScanning = false,
+                    camera = ReceiptCameraUiState(),
+                    launch = {},
+                    close = {},
+                    capture = {},
+                    preview = { modifier -> Box(modifier.background(Color(0xFF5B83C9))) },
+                ),
+            )
+        }
+    }
 }
 
 @Composable
 private fun MainScreenPreviewContent(
     budgetUiState: BudgetUiState,
     windowSizeClass: WindowWidthSizeClass,
+    receiptScanner: ReceiptScannerState? = null,
 ) {
     CompositionLocalProvider(
         LocalWindowSize provides windowSizeClass,
         LocalWindowInsets provides PaddingValues(0.dp),
+        LocalInspectionMode provides true,
     ) {
         MinusTheme {
             MainScreenContent(
@@ -93,6 +122,7 @@ private fun MainScreenPreviewContent(
                     MainScreenActions(
                         onProcessIntent = {},
                         onAdvanceTutorial = {},
+                        receiptScanner = receiptScanner,
                     ),
                 openWalletOnStart = false,
             )

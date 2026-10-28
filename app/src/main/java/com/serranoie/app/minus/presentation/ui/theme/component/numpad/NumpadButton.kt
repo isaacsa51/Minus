@@ -66,6 +66,7 @@ fun NumpadButton(
     icon: ImageVector? = null,
     onClick: () -> Unit = {},
     onLongClick: (() -> Unit)? = null,
+    onLongClickLabel: String? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     animateTextSize: Boolean = true,
     content: (@Composable (contentColor: Color, textStyle: TextStyle) -> Unit)? = null,
@@ -114,6 +115,7 @@ fun NumpadButton(
             indication = ripple(),
             onClick = onClick,
             onLongClick = onLongClick,
+            onLongClickLabel = onLongClickLabel,
         )
     } else {
         Modifier.clickable(
