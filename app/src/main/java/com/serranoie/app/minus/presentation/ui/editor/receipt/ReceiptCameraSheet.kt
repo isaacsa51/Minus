@@ -17,10 +17,13 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,7 +34,11 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Cameraswitch
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.FlashOff
+import androidx.compose.material.icons.rounded.FlashOn
+import androidx.compose.material.icons.rounded.PhotoLibrary
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,6 +60,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
@@ -96,6 +104,9 @@ fun ReceiptCameraSheet(
     currencyCode: String,
     onClose: () -> Unit,
     onCapture: () -> Unit,
+    onPickImage: () -> Unit,
+    onSwitchCamera: () -> Unit,
+    onToggleTorch: () -> Unit,
     preview: @Composable (Modifier) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -130,6 +141,9 @@ fun ReceiptCameraSheet(
         currencyCode = currencyCode,
         onClose = onClose,
         onCapture = onCapture,
+        onPickImage = onPickImage,
+        onSwitchCamera = onSwitchCamera,
+        onToggleTorch = onToggleTorch,
         preview = { previewModifier -> if (visible) preview(previewModifier) },
         modifier = modifier,
     )
@@ -148,6 +162,9 @@ fun ReceiptCameraSheetContent(
     onCapture: () -> Unit,
     preview: @Composable (Modifier) -> Unit,
     modifier: Modifier = Modifier,
+    onPickImage: () -> Unit = {},
+    onSwitchCamera: () -> Unit = {},
+    onToggleTorch: () -> Unit = {},
 ) {
     val density = LocalDensity.current
     val revealed = progress.coerceIn(0f, 1f)
@@ -205,6 +222,17 @@ fun ReceiptCameraSheetContent(
                     modifier = Modifier.weight(1f),
                 )
             }
+
+            if (state.hasFlash) {
+                FlashToggle(
+                    torchOn = state.torchOn,
+                    onToggle = onToggleTorch,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                        .graphicsLayer { alpha = revealed },
+                )
+            }
         }
 
         Box(
@@ -216,10 +244,91 @@ fun ReceiptCameraSheetContent(
                 .graphicsLayer { alpha = revealed },
             contentAlignment = Alignment.Center,
         ) {
-            ShutterButton(isCapturing = state.isCapturing, onCapture = onCapture)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(36.dp),
+            ) {
+                SideButton(
+                    icon = Icons.Rounded.PhotoLibrary,
+                    description = stringResource(R.string.receipt_camera_gallery),
+                    enabled = !state.isCapturing,
+                    onClick = onPickImage,
+                )
+                ShutterButton(isCapturing = state.isCapturing, onCapture = onCapture)
+                if (state.canSwitchCamera) {
+                    SideButton(
+                        icon = Icons.Rounded.Cameraswitch,
+                        description = stringResource(R.string.receipt_camera_switch),
+                        enabled = !state.isCapturing,
+                        onClick = onSwitchCamera,
+                    )
+                } else {
+                    Spacer(Modifier.size(SideButtonSize))
+                }
+            }
         }
     }
 }
+
+@Composable
+private fun SideButton(
+    icon: ImageVector,
+    description: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .size(SideButtonSize)
+            .clip(CircleShape)
+            .background(Color.White.copy(alpha = 0.16f))
+            .clickable(enabled = enabled, role = Role.Button, onClickLabel = description, onClick = onClick)
+            .graphicsLayer { alpha = if (enabled) 1f else 0.4f },
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = description,
+            tint = Color.White,
+            modifier = Modifier.size(26.dp),
+        )
+    }
+}
+
+@Composable
+private fun FlashToggle(
+    torchOn: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val container by animateColorAsState(
+        if (torchOn) Color.White else Color.Black.copy(alpha = 0.45f),
+        tween(180),
+        label = "flashContainer",
+    )
+    val content by animateColorAsState(
+        if (torchOn) Color(0xFF1B1B1B) else Color.White,
+        tween(180),
+        label = "flashContent",
+    )
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .clip(CircleShape)
+            .background(container)
+            .toggleable(value = torchOn, role = Role.Switch, onValueChange = { onToggle() }),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = if (torchOn) Icons.Rounded.FlashOn else Icons.Rounded.FlashOff,
+            contentDescription = stringResource(R.string.receipt_camera_flash),
+            tint = content,
+            modifier = Modifier.size(24.dp),
+        )
+    }
+}
+
+private val SideButtonSize = 56.dp
 
 @Composable
 private fun DetectionPill(

@@ -82,10 +82,13 @@ class MainScreenScreenshotTest {
                 receiptScanner = ReceiptScannerState(
                     isOpen = true,
                     isScanning = false,
-                    camera = ReceiptCameraUiState(),
+                    camera = ReceiptCameraUiState(hasFlash = true, canSwitchCamera = true),
                     launch = {},
                     close = {},
                     capture = {},
+                    pickImage = {},
+                    switchCamera = {},
+                    toggleTorch = {},
                     preview = { modifier -> Box(modifier.background(Color(0xFF5B83C9))) },
                 ),
             )

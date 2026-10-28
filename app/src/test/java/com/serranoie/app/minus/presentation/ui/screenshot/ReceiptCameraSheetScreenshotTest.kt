@@ -68,6 +68,16 @@ class ReceiptCameraSheetScreenshotTest {
     @Test
     fun halfwayPullingDown() = snapshot(ReceiptCameraUiState(), progress = 0.5f)
 
+    @Test
+    fun allControlsWithTorchOn() = snapshot(
+        ReceiptCameraUiState(hasFlash = true, canSwitchCamera = true, torchOn = true),
+    )
+
+    @Test
+    fun selfieCameraWithoutFlash() = snapshot(
+        ReceiptCameraUiState(usingFrontCamera = true, hasFlash = false, canSwitchCamera = true),
+    )
+
     private fun snapshot(
         state: ReceiptCameraUiState,
         progress: Float = 1f,
