@@ -3,6 +3,7 @@ package com.serranoie.app.minus.presentation.ui.editor.receipt
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -57,6 +58,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.googlecode.tesseract.android.TessBaseAPI
 import com.serranoie.app.minus.domain.receipt.ReceiptParser
 import com.serranoie.app.minus.domain.receipt.ReceiptScan
+import com.serranoie.app.minus.domain.receipt.receiptOcrLanguages
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -388,12 +390,21 @@ private class ReceiptCameraSession(
     }
 }
 
-private class ReceiptOcrEngine(private val context: Context) {
+private class ReceiptOcrEngine(
+    private val context: Context,
+    private val languages: List<String> = ReceiptOcr.languagesFor(context),
+) {
     private var tess: TessBaseAPI? = null
 
     fun read(bitmap: Bitmap): String {
         val api = tess ?: TessBaseAPI().also { api ->
-            check(api.init(ReceiptOcr.installTessdata(context), ReceiptOcr.LANGUAGES)) { "Tesseract init failed" }
+            val dataPath = ReceiptOcr.installTessdata(context, languages)
+            val joined = languages.joinToString("+")
+            logcat(TAG) { "Starting OCR with $joined" }
+            if (!api.init(dataPath, joined)) {
+                logcat(TAG) { "OCR init failed for $joined, falling back to English" }
+                check(api.init(dataPath, ReceiptOcr.FALLBACK_LANGUAGE)) { "Tesseract init failed" }
+            }
             api.pageSegMode = TessBaseAPI.PageSegMode.PSM_SINGLE_COLUMN
             tess = api
         }
@@ -415,9 +426,15 @@ private class ReceiptOcrEngine(private val context: Context) {
 }
 
 object ReceiptOcr {
-    const val LANGUAGES = "spa+eng"
+    const val FALLBACK_LANGUAGE = "eng"
     private const val MAX_SIDE_PX = 2400
-    private val TESSDATA_FILES = listOf("eng.traineddata", "spa.traineddata")
+
+    fun languagesFor(context: Context): List<String> {
+        val app = context.resources.configuration.locales
+        val system = Resources.getSystem().configuration.locales
+        val locales = (0 until app.size()).map(app::get) + (0 until system.size()).map(system::get)
+        return receiptOcrLanguages(locales)
+    }
 
     suspend fun read(context: Context, uri: Uri): String = withContext(Dispatchers.Default) {
         val bitmap = decodeUpright(context, uri) ?: return@withContext ""
@@ -429,10 +446,10 @@ object ReceiptOcr {
         }
     }
 
-    fun installTessdata(context: Context): String {
+    fun installTessdata(context: Context, languages: List<String>): String {
         val root = File(context.filesDir, "tesseract")
         val tessdata = File(root, "tessdata").apply { mkdirs() }
-        TESSDATA_FILES.forEach { name ->
+        (languages + FALLBACK_LANGUAGE).distinct().map { "$it.traineddata" }.forEach { name ->
             val target = File(tessdata, name)
             if (target.exists()) return@forEach
             val partial = File(tessdata, "$name.part")
