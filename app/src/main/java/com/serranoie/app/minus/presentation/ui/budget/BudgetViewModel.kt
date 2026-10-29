@@ -561,13 +561,14 @@ class BudgetViewModel @Inject constructor(
 
     private fun handleApply() {
         viewModelScope.launch {
+            val extraNoteEnabled = settingsRepository.observeSettings().first().extraNoteEnabled
             val actions = transactionActionsController.apply(
                 input = numpadController.input.value,
                 isCalculation = numpadController.isCalculation.value,
                 isRecurrentEnabled = uiState.value.isRecurrentEnabled,
                 isCreditEnabled = uiState.value.isCreditEnabled,
                 comment = uiState.value.currentComment,
-                note = uiState.value.currentNote,
+                note = if (extraNoteEnabled) uiState.value.currentNote else "",
                 budgetSettings = uiState.value.budgetSettings,
                 resolveActivePeriodId = ::resolveActivePeriodId,
             )

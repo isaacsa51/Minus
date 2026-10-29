@@ -214,6 +214,66 @@ class BudgetViewModelTest {
     }
 
     @Test
+    fun applying_a_scanned_receipt_drops_the_merchant_note_when_extra_note_is_off() = runTest {
+        coEvery {
+            transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
+        } returns ApplyTransactionResult.Added(normalizedInput = "39.50", transactionId = 1L)
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.numpadInput == "" }
+            viewModel.processIntent(BudgetEditorIntent.ReceiptScanned(amount = "39.50", merchant = "OXXO"))
+            awaitCondition { it.numpadInput == "39.50" && it.currentNote == "OXXO" }
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            awaitCondition { it.numpadInput == "" }
+            cancelAndIgnoreRemainingEvents()
+        }
+        coVerify {
+            transactionHandler.applyTransaction(
+                input = "39.50",
+                isCalculation = any(),
+                isRecurrentEnabled = any(),
+                isCreditEnabled = any(),
+                comment = any(),
+                note = "",
+                budgetSettings = any(),
+                resolveActivePeriodId = any(),
+            )
+        }
+    }
+
+    @Test
+    fun applying_a_scanned_receipt_keeps_the_merchant_note_when_extra_note_is_on() = runTest {
+        every { settingsRepository.observeSettings() } returns
+            MutableStateFlow(UserSettings.DEFAULT.copy(extraNoteEnabled = true))
+        coEvery {
+            transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
+        } returns ApplyTransactionResult.Added(normalizedInput = "39.50", transactionId = 1L)
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.numpadInput == "" }
+            viewModel.processIntent(BudgetEditorIntent.ReceiptScanned(amount = "39.50", merchant = "OXXO"))
+            awaitCondition { it.numpadInput == "39.50" && it.currentNote == "OXXO" }
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            awaitCondition { it.numpadInput == "" }
+            cancelAndIgnoreRemainingEvents()
+        }
+        coVerify {
+            transactionHandler.applyTransaction(
+                input = "39.50",
+                isCalculation = any(),
+                isRecurrentEnabled = any(),
+                isCreditEnabled = any(),
+                comment = any(),
+                note = "OXXO",
+                budgetSettings = any(),
+                resolveActivePeriodId = any(),
+            )
+        }
+    }
+
+    @Test
     fun when_number_tapped_intent_is_processed_then_numpad_input_is_updated() = runTest {
         val viewModel = newViewModel()
 

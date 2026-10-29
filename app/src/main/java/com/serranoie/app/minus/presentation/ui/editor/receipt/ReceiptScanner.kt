@@ -59,6 +59,7 @@ import com.googlecode.tesseract.android.TessBaseAPI
 import com.serranoie.app.minus.domain.receipt.ReceiptParser
 import com.serranoie.app.minus.domain.receipt.ReceiptScan
 import com.serranoie.app.minus.domain.receipt.receiptOcrLanguages
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -99,20 +100,28 @@ fun rememberReceiptScanner(
     var isScanning by remember { mutableStateOf(false) }
     var camera by remember { mutableStateOf(ReceiptCameraUiState()) }
     var session by remember { mutableStateOf<ReceiptCameraSession?>(null) }
+    val generation = remember { ReceiptScanGeneration() }
+
+    fun closeSheet() {
+        generation.close()
+        isOpen = false
+    }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         val fromSheet = isOpen
+        val token = generation.current
         if (fromSheet) camera = camera.capturing() else isScanning = true
         scope.launch {
             val scan = runCatching { ReceiptParser.parse(ReceiptOcr.read(context, uri)) }
                 .onFailure { logcat(TAG) { "Receipt scan failed\n${it.asLog()}" } }
                 .getOrNull()
             if (fromSheet) {
+                if (!generation.isCurrent(token)) return@launch
                 val (next, result) = camera.pickedImage(scan)
                 camera = next
-                if (result != null && isOpen) {
-                    isOpen = false
+                if (result != null) {
+                    closeSheet()
                     currentOnScanned(result)
                 }
             } else {
@@ -124,6 +133,7 @@ fun rememberReceiptScanner(
 
     fun openCamera() {
         camera = ReceiptCameraUiState()
+        generation.open()
         isOpen = true
     }
 
@@ -150,16 +160,19 @@ fun rememberReceiptScanner(
                 PackageManager.PERMISSION_GRANTED
             if (granted) openCamera() else permission.launch(Manifest.permission.CAMERA)
         },
-        close = { isOpen = false },
+        close = ::closeSheet,
         capture = capture@{
             val active = session ?: return@capture
             if (camera.isCapturing) return@capture
+            val token = generation.current
             camera = camera.capturing()
             scope.launch {
-                val (next, result) = camera.captured(active.capture())
+                val captured = active.capture()
+                if (!generation.isCurrent(token)) return@launch
+                val (next, result) = camera.captured(captured)
                 camera = next
-                if (result != null && isOpen) {
-                    isOpen = false
+                if (result != null) {
+                    closeSheet()
                     currentOnScanned(result)
                 }
             }
@@ -182,7 +195,7 @@ fun rememberReceiptScanner(
                 onSession = { session = it },
                 onFrame = { scan -> camera = camera.withFrame(scan) },
                 onUnavailable = {
-                    isOpen = false
+                    closeSheet()
                     currentOnFailed()
                 },
             )
@@ -260,6 +273,7 @@ private fun ReceiptCameraPreview(
             }.getOrDefault(false)
             onCameraReady(bound.cameraInfo.hasFlashUnit(), canSwitch)
         }.onFailure {
+            if (it is CancellationException) throw it
             logcat(TAG) { "Could not start camera\n${it.asLog()}" }
             onUnavailable()
         }
@@ -438,17 +452,10 @@ private class ReceiptOcrEngine(
     private var tess: TessBaseAPI? = null
 
     fun read(bitmap: Bitmap): String {
-        val api = tess ?: TessBaseAPI().also { api ->
-            val dataPath = ReceiptOcr.installTessdata(context, languages)
-            val joined = languages.joinToString("+")
-            logcat(TAG) { "Starting OCR with $joined" }
-            if (!api.init(dataPath, joined)) {
-                logcat(TAG) { "OCR init failed for $joined, falling back to English" }
-                check(api.init(dataPath, ReceiptOcr.FALLBACK_LANGUAGE)) { "Tesseract init failed" }
-            }
-            api.pageSegMode = TessBaseAPI.PageSegMode.PSM_SINGLE_COLUMN
-            tess = api
-        }
+        val api = tess ?: runCatching { createApi() }
+            .onFailure { bitmap.recycle() }
+            .getOrThrow()
+            .also { tess = it }
         return try {
             api.setImage(bitmap)
             api.getUTF8Text().orEmpty().also { text ->
@@ -457,6 +464,24 @@ private class ReceiptOcrEngine(
         } finally {
             api.clear()
             bitmap.recycle()
+        }
+    }
+
+    private fun createApi(): TessBaseAPI {
+        val api = TessBaseAPI()
+        try {
+            val dataPath = ReceiptOcr.installTessdata(context, languages)
+            val joined = languages.joinToString("+")
+            logcat(TAG) { "Starting OCR with $joined" }
+            if (!api.init(dataPath, joined)) {
+                logcat(TAG) { "OCR init failed for $joined, falling back to English" }
+                check(api.init(dataPath, ReceiptOcr.FALLBACK_LANGUAGE)) { "Tesseract init failed" }
+            }
+            api.pageSegMode = TessBaseAPI.PageSegMode.PSM_SINGLE_COLUMN
+            return api
+        } catch (failure: Throwable) {
+            api.recycle()
+            throw failure
         }
     }
 
