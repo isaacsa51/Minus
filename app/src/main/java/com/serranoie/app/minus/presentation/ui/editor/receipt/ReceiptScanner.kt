@@ -114,7 +114,10 @@ fun rememberReceiptScanner(
         if (fromSheet) camera = camera.capturing() else isScanning = true
         scope.launch {
             val scan = runCatching { ReceiptParser.parse(ReceiptOcr.read(context, uri)) }
-                .onFailure { logcat(TAG) { "Receipt scan failed\n${it.asLog()}" } }
+                .onFailure {
+                    if (it is CancellationException) throw it
+                    logcat(TAG) { "Receipt scan failed\n${it.asLog()}" }
+                }
                 .getOrNull()
             if (fromSheet) {
                 if (!generation.isCurrent(token)) return@launch
@@ -187,16 +190,23 @@ fun rememberReceiptScanner(
         },
         toggleTorch = { camera = camera.toggleTorch() },
         preview = { modifier ->
+            val token = remember { generation.current }
             ReceiptCameraPreview(
                 modifier = modifier,
                 usingFrontCamera = camera.usingFrontCamera,
                 torchOn = camera.torchOn,
-                onCameraReady = { hasFlash, canSwitch -> camera = camera.cameraReady(hasFlash, canSwitch) },
+                onCameraReady = { hasFlash, canSwitch ->
+                    if (generation.isCurrent(token)) camera = camera.cameraReady(hasFlash, canSwitch)
+                },
                 onSession = { session = it },
-                onFrame = { scan -> camera = camera.withFrame(scan) },
+                onFrame = { scan ->
+                    if (generation.isCurrent(token)) camera = camera.withFrame(scan)
+                },
                 onUnavailable = {
-                    closeSheet()
-                    currentOnFailed()
+                    if (generation.isCurrent(token)) {
+                        closeSheet()
+                        currentOnFailed()
+                    }
                 },
             )
         },
