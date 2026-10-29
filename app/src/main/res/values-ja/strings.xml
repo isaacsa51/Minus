@@ -181,8 +181,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
-    <string name="receipt_scan_hint_action">Try it</string>
+    <string name="receipt_scan_hint">ヒント：✓を長押しするとレシートをスキャンできます</string>
+    <string name="receipt_scan_hint_action">試す</string>
     <plurals name="days">
         <item quantity="other">%d 日</item>
     </plurals>
@@ -642,6 +642,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">デフォルトの %1$d%%の例を表示します。特定の金額を目標に設定します。</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">保存設定</string>
+    <string name="settings_savings_reminder_title">貯蓄リマインダー</string>
+    <string name="settings_savings_reminder_subtitle">新しい期間が始まったら、取り分ける金額を通知する</string>
     <string name="settings_savings_preferences_subtitle">50/30/20の分割をカスタマイズし、オプションの貯蓄目標を設定します</string>
     <string name="settings_savings_dialog_split_label">予算分割</string>
     <string name="settings_savings_dialog_split_hint">3 つの値は最大 100%% まで追加する必要があります。</string>
@@ -742,6 +744,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">\"%1$s\" のサブスクリプションがあります。このサブスクリプションは %2$s となります。</string>
     <string name="notification_credit_cutoff_title">今後のクレジットカードでの支払い</string>
     <string name="notification_credit_cutoff_message">あなたのカットオフ日は %1$sです。利息を避けるために %2$s を支払うことをお勧めします。</string>
+    <string name="notification_channel_savings_name">貯蓄リマインダー</string>
+    <string name="notification_channel_savings_description">新しい予算期間が始まったときに、お金を取り分けるよう通知します</string>
+    <string name="notification_savings_reminder_title">新しい期間：貯蓄のタイミングです</string>
+    <string name="notification_savings_reminder_message">この期間から%1$sを貯蓄に回しましょう。</string>
     <string name="credit_owed_label">支払済合計</string>
     <string name="debt_adjusted_balance_label">借金調整残高</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s クレジット</string>
