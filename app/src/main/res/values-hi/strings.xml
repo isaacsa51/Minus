@@ -182,6 +182,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
+    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
+    <string name="receipt_scan_hint_action">Try it</string>
     <plurals name="days">
         <item quantity="one">%d दिन</item>
         <item quantity="other">%d दिन</item>
