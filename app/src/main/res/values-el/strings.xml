@@ -168,6 +168,12 @@
     <string name="analytics_title">Αναλύσεις</string>
     <string name="receipt_scan_button">Scan receipt</string>
     <string name="receipt_scan_failed">Couldn\'t read a total from the receipt</string>
+    <string name="quick_add_amount_label">Amount</string>
+    <string name="quick_add_no_categories">No categories yet. You can save without one.</string>
+    <string name="quick_add_save_failed">Couldn\'t save the expense. Try again.</string>
+    <string name="quick_add_needs_budget">Set up a budget in Minus before adding expenses here.</string>
+    <string name="quick_add_open_app">Open Minus</string>
+    <string name="quick_add_saved">%1$s saved</string>
     <string name="receipt_camera_point_at_total">Point at the total</string>
     <string name="receipt_camera_detected">%1$s detected</string>
     <string name="receipt_camera_retry">No total found, try again</string>
