@@ -131,6 +131,15 @@
                 android:value="@string/island_provider_description" />
         </service>
 
+        <activity
+            android:name=".presentation.ui.quickadd.QuickExpenseActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Minus.Translucent"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- Quick Settings Tile -->
         <service
             android:name=".presentation.tile.NewTransactionTileService"

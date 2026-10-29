@@ -6,7 +6,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.serranoie.app.minus.R
-import com.serranoie.app.minus.presentation.MainActivity
+import com.serranoie.app.minus.presentation.ui.quickadd.QuickExpenseActivity
 
 class NewTransactionTileService : TileService() {
 
@@ -23,16 +23,16 @@ class NewTransactionTileService : TileService() {
 
     override fun onClick() {
         super.onClick()
-        val launchApp = Runnable { openApp() }
+        val launchSheet = Runnable { openQuickExpense() }
         if (isLocked) {
-            unlockAndRun(launchApp)
+            unlockAndRun(launchSheet)
         } else {
-            launchApp.run()
+            launchSheet.run()
         }
     }
 
-    private fun openApp() {
-        val intent = Intent(this, MainActivity::class.java).apply {
+    private fun openQuickExpense() {
+        val intent = Intent(this, QuickExpenseActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -40,7 +40,7 @@ class NewTransactionTileService : TileService() {
                 this,
                 0,
                 intent,
-                PendingIntent.FLAG_IMMUTABLE,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
             )
             startActivityAndCollapse(pendingIntent)
         } else {

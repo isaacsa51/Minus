@@ -47,6 +47,37 @@ class LauncherShortcutTest {
     }
 
     @Test
+    fun `quick add lists recent categories first, then the most used, without repeats`() {
+        val categories = listOf(
+            Category(name = "Rent", usageCount = 9, lastUsedAt = 100),
+            Category(name = "Coffee", usageCount = 2, lastUsedAt = 500),
+            Category(name = "Hidden", isHidden = true, usageCount = 40, lastUsedAt = 900),
+            Category(name = "Gym", usageCount = 7, lastUsedAt = 50),
+            Category(name = "Groceries", usageCount = 5, lastUsedAt = 400),
+            Category(name = "Fuel", usageCount = 1, lastUsedAt = 300),
+            Category(name = "Fresh", usageCount = 0, lastUsedAt = null),
+        )
+
+        assertThat(quickAddCategories(categories))
+            .containsExactly("Coffee", "Groceries", "Fuel", "Rent", "Gym", "Fresh")
+            .inOrder()
+    }
+
+    @Test
+    fun `quick add caps the list at ten`() {
+        val categories = (1..15).map { Category(name = "C$it", usageCount = it) }
+
+        assertThat(quickAddCategories(categories)).hasSize(10)
+    }
+
+    @Test
+    fun `quick amount accepts a comma decimal and drops anything that is not a number`() {
+        assertThat(normalizeQuickAmount("12,50")).isEqualTo("12.50")
+        assertThat(normalizeQuickAmount("1 200.5.3")).isEqualTo("1200.53")
+        assertThat(normalizeQuickAmount("-+7")).isEqualTo("7")
+    }
+
+    @Test
     fun `recent categories is empty when nothing was used`() {
         assertThat(recentShortcutCategories(listOf(Category(name = "New")))).isEmpty()
     }

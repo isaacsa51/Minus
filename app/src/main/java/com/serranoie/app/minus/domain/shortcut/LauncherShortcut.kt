@@ -3,6 +3,7 @@ package com.serranoie.app.minus.domain.shortcut
 import com.serranoie.app.minus.domain.model.Category as BudgetCategory
 
 private const val MAX_CATEGORY_SHORTCUTS = 3
+private const val MAX_QUICK_ADD_CATEGORIES = 10
 
 sealed interface LauncherShortcut {
     data object ScanReceipt : LauncherShortcut
@@ -20,6 +21,20 @@ sealed interface LauncherShortcut {
             else -> null
         }
     }
+}
+
+fun quickAddCategories(categories: List<BudgetCategory>): List<String> {
+    val mostUsed = categories
+        .filter { !it.isHidden }
+        .sortedWith(compareByDescending<BudgetCategory> { it.usageCount }.thenBy { it.name })
+        .map { it.name }
+    return (recentShortcutCategories(categories) + mostUsed).distinct().take(MAX_QUICK_ADD_CATEGORIES)
+}
+
+fun normalizeQuickAmount(raw: String): String {
+    val unified = raw.replace(',', '.').filter { it.isDigit() || it == '.' }
+    val dot = unified.indexOf('.')
+    return if (dot < 0) unified else unified.substring(0, dot + 1) + unified.substring(dot + 1).replace(".", "")
 }
 
 fun recentShortcutCategories(categories: List<BudgetCategory>): List<String> = categories
