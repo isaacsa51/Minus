@@ -182,8 +182,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
-    <string name="receipt_scan_hint_action">Try it</string>
+    <string name="receipt_scan_hint">Συμβουλή: πατήστε παρατεταμένα το ✓ για σάρωση απόδειξης</string>
+    <string name="receipt_scan_hint_action">Δοκιμάστε το</string>
     <plurals name="days">
         <item quantity="one">%d ημέρα</item>
         <item quantity="other">%d ημέρες</item>
@@ -649,6 +649,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Εμφανίζεται το προεπιλεγμένο παράδειγμα %1$d%%. Ορίστε έναν στόχο εξοικονόμησης στις Ρυθμίσεις για να στοχεύσετε ένα συγκεκριμένο ποσό.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Προτιμήσεις αποταμίευσης</string>
+    <string name="settings_savings_reminder_title">Υπενθύμιση αποταμίευσης</string>
+    <string name="settings_savings_reminder_subtitle">Θύμισέ μου πόσα να βάλω στην άκρη όταν ξεκινά νέα περίοδος</string>
     <string name="settings_savings_preferences_subtitle">Προσαρμόστε το διαχωρισμό 50/30/20 και ορίστε έναν προαιρετικό στόχο εξοικονόμησης</string>
     <string name="settings_savings_dialog_split_label">Διαίρεση του προϋπολογισμού</string>
     <string name="settings_savings_dialog_split_hint">Οι τρεις τιμές πρέπει να προστεθούν έως 100%%.</string>
@@ -749,6 +751,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">Έχετε μια συνδρομή του \"%1$s\" που θα χρεωθεί %2$s.</string>
     <string name="notification_credit_cutoff_title">Επερχόμενη πληρωμή με πιστωτική κάρτα</string>
     <string name="notification_credit_cutoff_message">Η ημερομηνία περικοπής σας είναι %1$s. Συνιστάται να πληρώσετε %2$s για να αποφύγετε οποιοδήποτε ενδιαφέρον.</string>
+    <string name="notification_channel_savings_name">Υπενθυμίσεις αποταμίευσης</string>
+    <string name="notification_channel_savings_description">Υπενθύμιση να βάλετε χρήματα στην άκρη όταν ξεκινά νέα περίοδος προϋπολογισμού</string>
+    <string name="notification_savings_reminder_title">Νέα περίοδος: ώρα για αποταμίευση</string>
+    <string name="notification_savings_reminder_message">Βάλτε στην άκρη %1$s από αυτή την περίοδο για τις αποταμιεύσεις σας.</string>
     <string name="credit_owed_label">Σύνολο οφειλόμενων</string>
     <string name="debt_adjusted_balance_label">Υπόλοιπο Προσαρμοσμένου Χρέους</string>
     <string name="debt_adjusted_label_format">%1$s - Πιστωτικό χρέος %2$s</string>
