@@ -7,6 +7,7 @@ import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.calculator.rankCategoriesForEntry
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Category
@@ -77,6 +78,7 @@ import logcat.asLog
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.Locale
 import javax.inject.Inject
 
@@ -196,7 +198,12 @@ class BudgetViewModel @Inject constructor(
             animState = if (numpadInput.isNotEmpty()) AnimState.EDITING else AnimState.IDLE,
             currentComment = editorState.currentComment,
             currentNote = editorState.currentNote,
-            tags = categories.map { it.name },
+            tags = rankCategoriesForEntry(
+                categories = categories.map { it.name },
+                history = transactions,
+                amount = numpadInput.toBigDecimalOrNull(),
+                now = LocalDateTime.now(),
+            ),
             isFirstLaunch = settings == null,
             isRecurrentEnabled = editorState.isRecurrentEnabled,
             isCreditEnabled = editorState.isCreditEnabled,

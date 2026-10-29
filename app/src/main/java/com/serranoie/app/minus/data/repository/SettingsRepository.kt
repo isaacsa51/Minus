@@ -91,6 +91,8 @@ interface SettingsRepository {
 
     suspend fun setHistoryTutorialCompleted(completed: Boolean)
 
+    suspend fun setReceiptScanHintShown(shown: Boolean)
+
     suspend fun setAnalyticsSpendsTutorialCompleted(completed: Boolean)
 
     suspend fun setPeriodMappingMode(mode: PeriodMappingMode)

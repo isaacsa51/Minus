@@ -210,6 +210,22 @@ fun MainScreenContent(
         }
     }
 
+    val receiptScanHintMessage = stringResource(R.string.receipt_scan_hint)
+    val receiptScanHintAction = stringResource(R.string.receipt_scan_hint_action)
+
+    LaunchedEffect(mainScreenState.showReceiptScanHint) {
+        if (!mainScreenState.showReceiptScanHint) return@LaunchedEffect
+        actions.onProcessIntent(MainScreenUiIntent.ReceiptScanHintShown)
+        coroutineScope.launch {
+            val result = snackbarHostState.showSnackbar(
+                message = receiptScanHintMessage,
+                actionLabel = receiptScanHintAction,
+                duration = SnackbarDuration.Long,
+            )
+            if (result == SnackbarResult.ActionPerformed) actions.receiptScanner?.launch?.invoke()
+        }
+    }
+
     val budgetLoadFailedMessage = stringResource(R.string.budget_load_failed)
     val budgetCorruptDataMessage = stringResource(R.string.budget_load_corrupt_data)
     val budgetRetryLabel = stringResource(R.string.budget_load_retry)
@@ -1487,11 +1503,15 @@ private fun MainScreenNumpadSection(
                 closeLeftoverChoice()
             } else {
                 Log.d("MainScreen", "Numpad check/save button pressed")
+                val savesNewExpense = budgetUiState.editMode == EditorEditMode.ADD && budgetUiState.isNumpadValid
                 actions.onProcessIntent(
                     MainScreenUiIntent.ProcessBudgetNumpadIntent(
                         BudgetNumpadIntent.ApplyTapped,
                     ),
                 )
+                if (savesNewExpense && actions.receiptScanner != null) {
+                    actions.onProcessIntent(MainScreenUiIntent.ExpenseApplied)
+                }
                 actions.onAdvanceTutorial(FirstLaunchTutorialStage.TAP_DONE_SAVE)
             }
         },

@@ -57,6 +57,11 @@ class MainScreenViewModel @Inject constructor(
             showBudgetPeriodSheet = local.showBudgetPeriodSheet,
             forceBudgetPeriodSheetSetup = local.forceBudgetPeriodSheetSetup,
             walletSheetOpened = local.walletSheetOpened,
+            showReceiptScanHint = local.receiptScanHintRequested &&
+                !settings.receiptScanHintShown &&
+                settings.onboardingCompleted &&
+                settings.tutorialBoxCompleted &&
+                settings.firstLaunchTutorialStage == FirstLaunchTutorialStage.COMPLETED,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -80,6 +85,12 @@ class MainScreenViewModel @Inject constructor(
             is MainScreenUiIntent.SetTutorialBoxCompleted -> setTutorialBoxCompleted(intent.completed)
             is MainScreenUiIntent.SetHistoryTutorialCompleted ->
                 setHistoryTutorialCompleted(intent.completed)
+
+            is MainScreenUiIntent.ExpenseApplied ->
+                if (currentTutorialStage == FirstLaunchTutorialStage.COMPLETED) {
+                    _localState.update { it.copy(receiptScanHintRequested = true) }
+                }
+            is MainScreenUiIntent.ReceiptScanHintShown -> markReceiptScanHintShown()
 
             is MainScreenUiIntent.ProcessBudgetTransactionIntent -> { /* caller */ }
             is MainScreenUiIntent.ProcessBudgetEditorIntent -> { /* caller */ }
@@ -217,6 +228,13 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
+    private fun markReceiptScanHintShown() {
+        _localState.update { it.copy(receiptScanHintRequested = false) }
+        viewModelScope.launch {
+            settingsRepository.setReceiptScanHintShown(true)
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         autoDismissJob?.cancel()
@@ -234,4 +252,5 @@ private data class MainScreenLocalState(
     val showBudgetPeriodSheet: Boolean = false,
     val forceBudgetPeriodSheetSetup: Boolean = false,
     val walletSheetOpened: Boolean = false,
+    val receiptScanHintRequested: Boolean = false,
 )

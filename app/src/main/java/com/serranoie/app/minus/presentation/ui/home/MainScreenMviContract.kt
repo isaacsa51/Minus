@@ -35,6 +35,9 @@ sealed interface MainScreenUiIntent {
 
     data class SetHistoryTutorialCompleted(val completed: Boolean) : MainScreenUiIntent
 
+    data object ExpenseApplied : MainScreenUiIntent
+    data object ReceiptScanHintShown : MainScreenUiIntent
+
     data class ProcessBudgetTransactionIntent(val intent: BudgetTransactionIntent) : MainScreenUiIntent
     data class ProcessBudgetEditorIntent(val intent: BudgetEditorIntent) : MainScreenUiIntent
     data class ProcessBudgetNumpadIntent(val intent: BudgetNumpadIntent) : MainScreenUiIntent
@@ -67,6 +70,7 @@ data class MainScreenUiState(
     val forceBudgetPeriodSheetSetup: Boolean = false,
     val selectedViewPeriod: BudgetPeriod? = null,
     val walletSheetOpened: Boolean = false,
+    val showReceiptScanHint: Boolean = false,
 
     val onboardingCompleted: Boolean = false,
     val tutorialStage: FirstLaunchTutorialStage = FirstLaunchTutorialStage.COMPLETED,

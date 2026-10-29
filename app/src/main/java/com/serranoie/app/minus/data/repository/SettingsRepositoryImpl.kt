@@ -70,6 +70,7 @@ const val TUTORIAL_BOX_COMPLETED_KEY_NAME = "tutorial_box_completed"
 const val ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME = "analytics_tutorial_completed"
 const val ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME = "analytics_spends_tutorial_completed"
 const val HISTORY_TUTORIAL_COMPLETED_KEY_NAME = "history_tutorial_completed"
+const val RECEIPT_SCAN_HINT_SHOWN_KEY_NAME = "receipt_scan_hint_shown"
 
 private val ONBOARDING_COMPLETED = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NAME)
 private val EARLY_FINISH_ACTIVE = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
@@ -133,6 +134,7 @@ private val PERIOD_MAPPING_MODE = stringPreferencesKey("period_mapping_mode")
 private val ANALYTICS_TUTORIAL_COMPLETED = booleanPreferencesKey(ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME)
 private val ANALYTICS_SPENDS_TUTORIAL_COMPLETED = booleanPreferencesKey(ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME)
 private val HISTORY_TUTORIAL_COMPLETED = booleanPreferencesKey(HISTORY_TUTORIAL_COMPLETED_KEY_NAME)
+private val RECEIPT_SCAN_HINT_SHOWN = booleanPreferencesKey(RECEIPT_SCAN_HINT_SHOWN_KEY_NAME)
 private val BUDGET_SPLIT_VIEW_PERIOD = stringPreferencesKey(BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME)
 private val SAVINGS_PRESET = stringPreferencesKey(SAVINGS_PRESET_KEY_NAME)
 private val SAVINGS_NEEDS_PCT = intPreferencesKey(SAVINGS_NEEDS_PCT_KEY_NAME)
@@ -190,6 +192,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 analyticsTutorialCompleted = preferences[ANALYTICS_TUTORIAL_COMPLETED] ?: false,
                 analyticsSpendsTutorialCompleted = preferences[ANALYTICS_SPENDS_TUTORIAL_COMPLETED] ?: false,
                 historyTutorialCompleted = preferences[HISTORY_TUTORIAL_COMPLETED] ?: false,
+                receiptScanHintShown = preferences[RECEIPT_SCAN_HINT_SHOWN] ?: false,
                 periodMappingMode = try {
                     PeriodMappingMode.valueOf(preferences[PERIOD_MAPPING_MODE] ?: "")
                 } catch (_: Exception) {
@@ -456,6 +459,12 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setReceiptScanHintShown(shown: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[RECEIPT_SCAN_HINT_SHOWN] = shown
+        }
+    }
+
     override suspend fun setPeriodMappingMode(mode: PeriodMappingMode) {
         dataStore.edit { preferences ->
             preferences[PERIOD_MAPPING_MODE] = mode.name
@@ -587,6 +596,7 @@ class SettingsRepositoryImpl @Inject constructor(
             preferences[ANALYTICS_TUTORIAL_COMPLETED] = false
             preferences[ANALYTICS_SPENDS_TUTORIAL_COMPLETED] = false
             preferences[HISTORY_TUTORIAL_COMPLETED] = false
+            preferences[RECEIPT_SCAN_HINT_SHOWN] = false
             preferences[FIRST_LAUNCH_TUTORIAL_STAGE] = FirstLaunchTutorialStage.TAP_ANY_NUMBER.name
         }
     }

@@ -8,6 +8,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -308,4 +309,69 @@ class MainScreenViewModelTest {
                 uiTurbine.cancelAndIgnoreRemainingEvents()
             }
         }
+
+    private val hintEligibleSettings = UserSettings(
+        onboardingCompleted = true,
+        tutorialBoxCompleted = true,
+        firstLaunchTutorialStage = FirstLaunchTutorialStage.COMPLETED,
+        receiptScanHintShown = false,
+    )
+
+    @Test
+    fun when_expense_is_applied_by_an_eligible_user_then_receipt_scan_hint_shows() = runTest {
+        settingsFlow.value = hintEligibleSettings
+        val viewModel = newViewModel()
+        viewModel.uiState.test {
+            awaitCondition { it.onboardingCompleted && !it.showReceiptScanHint }
+
+            viewModel.processIntent(MainScreenUiIntent.ExpenseApplied, FirstLaunchTutorialStage.COMPLETED)
+
+            awaitCondition { it.showReceiptScanHint }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun when_receipt_scan_hint_was_already_shown_then_expense_applied_keeps_it_hidden() = runTest {
+        settingsFlow.value = hintEligibleSettings.copy(receiptScanHintShown = true)
+        val viewModel = newViewModel()
+        viewModel.uiState.test {
+            awaitCondition { it.onboardingCompleted }
+
+            viewModel.processIntent(MainScreenUiIntent.ExpenseApplied, FirstLaunchTutorialStage.COMPLETED)
+
+            assertThat(viewModel.uiState.value.showReceiptScanHint).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun when_first_launch_tutorial_is_running_then_receipt_scan_hint_waits() = runTest {
+        settingsFlow.value = hintEligibleSettings.copy(firstLaunchTutorialStage = FirstLaunchTutorialStage.TAP_DONE_SAVE)
+        val viewModel = newViewModel()
+        viewModel.uiState.test {
+            awaitCondition { it.onboardingCompleted }
+
+            viewModel.processIntent(MainScreenUiIntent.ExpenseApplied, FirstLaunchTutorialStage.TAP_DONE_SAVE)
+
+            assertThat(viewModel.uiState.value.showReceiptScanHint).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun when_receipt_scan_hint_is_shown_then_it_is_persisted_and_cleared() = runTest {
+        settingsFlow.value = hintEligibleSettings
+        val viewModel = newViewModel()
+        viewModel.uiState.test {
+            viewModel.processIntent(MainScreenUiIntent.ExpenseApplied, FirstLaunchTutorialStage.COMPLETED)
+            awaitCondition { it.showReceiptScanHint }
+
+            viewModel.processIntent(MainScreenUiIntent.ReceiptScanHintShown, FirstLaunchTutorialStage.COMPLETED)
+
+            awaitCondition { !it.showReceiptScanHint }
+            coVerify { settingsRepository.setReceiptScanHintShown(true) }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
