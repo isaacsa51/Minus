@@ -40,8 +40,22 @@ jobs:
       - name: Compile App
         run: ./gradlew :app:compileFossDebugKotlin :app:compileWearDebugKotlin :wear:compileDebugKotlin :sync-contract:compileKotlin
 
+      - name: Run unit tests
+        run: ./gradlew :app:testFossDebugUnitTest :sync-contract:test
+
       - name: Verify screenshots
         run: ./gradlew :app:verifyPaparazziFossDebug
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-reports
+          path: |
+            app/build/reports/tests/
+            sync-contract/build/reports/tests/
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Upload Paparazzi diffs
         if: failure()
