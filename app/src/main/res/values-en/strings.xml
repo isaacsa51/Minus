@@ -649,6 +649,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Showing the default %1$d%% example. Set a savings goal in Settings to target a specific amount.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Savings preferences</string>
+    <string name="settings_savings_reminder_title">Savings reminder</string>
+    <string name="settings_savings_reminder_subtitle">Remind me what to set aside when a new period starts</string>
     <string name="settings_savings_preferences_subtitle">Customize the 50/30/20 split and set an optional savings goal</string>
     <string name="settings_savings_dialog_split_label">Budget split</string>
     <string name="settings_savings_dialog_split_hint">The three values must add up to 100%%.</string>
@@ -749,6 +751,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">You have a subscription of \"%1$s\" that will be charged %2$s.</string>
     <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
     <string name="notification_credit_cutoff_message">Your cutoff date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+    <string name="notification_channel_savings_name">Savings reminders</string>
+    <string name="notification_channel_savings_description">A reminder to set money aside when a new budget period starts</string>
+    <string name="notification_savings_reminder_title">New period: time to save</string>
+    <string name="notification_savings_reminder_message">Set aside %1$s from this period for your savings.</string>
     <string name="credit_owed_label">Total owed</string>
     <string name="debt_adjusted_balance_label">Debt-Adjusted Balance</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s credit debt</string>
