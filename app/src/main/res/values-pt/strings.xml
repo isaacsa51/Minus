@@ -182,8 +182,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
-    <string name="receipt_scan_hint_action">Try it</string>
+    <string name="receipt_scan_hint">Dica: toque e segure ✓ para escanear um recibo</string>
+    <string name="receipt_scan_hint_action">Experimentar</string>
     <plurals name="days">
         <item quantity="one">%d dia</item>
         <item quantity="other">%d dias</item>
@@ -649,6 +649,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando o exemplo padrão %1$d%%. Defina um objetivo de poupança nas configurações para atingir um valor específico.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Preferências de poupança</string>
+    <string name="settings_savings_reminder_title">Lembrete de poupança</string>
+    <string name="settings_savings_reminder_subtitle">Lembrar quanto separar quando um novo período começar</string>
     <string name="settings_savings_preferences_subtitle">Personalize a divisão 50/30/20 e defina um objetivo de poupança opcional</string>
     <string name="settings_savings_dialog_split_label">Divisão de orçamento</string>
     <string name="settings_savings_dialog_split_hint">Os três valores devem somar até 100%%.</string>
@@ -749,6 +751,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">Você tem uma assinatura de \"%1$s\" que será cobrado em %2$s.</string>
     <string name="notification_credit_cutoff_title">Próximo pagamento com cartão de crédito</string>
     <string name="notification_credit_cutoff_message">Sua data de câmbio é %1$s. Recomenda-se pagar %2$s para evitar quaisquer juros.</string>
+    <string name="notification_channel_savings_name">Lembretes de poupança</string>
+    <string name="notification_channel_savings_description">Um lembrete para separar dinheiro quando um novo período de orçamento começar</string>
+    <string name="notification_savings_reminder_title">Novo período: hora de poupar</string>
+    <string name="notification_savings_reminder_message">Separe %1$s deste período para a sua poupança.</string>
     <string name="credit_owed_label">Total devedor</string>
     <string name="debt_adjusted_balance_label">Saldo Débt-Ajustado</string>
     <string name="debt_adjusted_label_format">Dívida %1$s - %2$s</string>
