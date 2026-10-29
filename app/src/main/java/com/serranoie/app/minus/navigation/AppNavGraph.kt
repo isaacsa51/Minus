@@ -35,6 +35,7 @@ import androidx.navigation.navArgument
 import com.serranoie.app.minus.presentation.ui.analytics.AnalyticsScreen
 import com.serranoie.app.minus.presentation.ui.changelog.ChangelogHistoryScreen
 import com.serranoie.app.minus.presentation.ui.changelog.ChangelogHistoryViewModel
+import com.serranoie.app.minus.domain.shortcut.LauncherShortcut
 import com.serranoie.app.minus.presentation.ui.home.MainScreen
 import com.serranoie.app.minus.presentation.ui.onboarding.OnboardingScreen
 import com.serranoie.app.minus.presentation.ui.settings.SettingsScreen
@@ -94,6 +95,8 @@ fun AppNavGraph(
     onOnboardingComplete: () -> Unit,
     onRequestNotificationPermission: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
+    pendingShortcut: LauncherShortcut? = null,
+    onShortcutHandled: () -> Unit = {},
 ) {
     val tag = TAG
     logcat(tag) { "Created with startDestination: $startDestination" }
@@ -195,6 +198,8 @@ fun AppNavGraph(
                     navController.navigate(Screen.Settings.route)
                 },
                 onRequestNotificationPermission = onRequestNotificationPermission,
+                pendingShortcut = pendingShortcut,
+                onShortcutHandled = onShortcutHandled,
             )
         }
 

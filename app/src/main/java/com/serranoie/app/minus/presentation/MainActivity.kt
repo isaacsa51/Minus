@@ -44,6 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.data.csv.CsvSyncWorker
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.wearable.WearableService
 import com.serranoie.app.minus.domain.model.AppColorScheme
 import com.serranoie.app.minus.domain.model.ContrastMode
@@ -51,6 +52,8 @@ import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.notification.PENDING_QUICK_ADD_AMOUNT_KEY_NAME
+import com.serranoie.app.minus.domain.shortcut.LauncherShortcut
+import com.serranoie.app.minus.domain.shortcut.recentShortcutCategories
 import com.serranoie.app.minus.domain.time.MidnightTransitionManager
 import com.serranoie.app.minus.navigation.AppNavGraph
 import com.serranoie.app.minus.navigation.Screen
@@ -58,6 +61,7 @@ import com.serranoie.app.minus.presentation.notification.NotificationHelper
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.notification.scan.ExpenseScanActionReceiver
 import com.serranoie.app.minus.presentation.permission.PermissionHandler
+import com.serranoie.app.minus.presentation.shortcut.publishLauncherShortcuts
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.ThemeManager
 import com.serranoie.app.minus.presentation.ui.theme.component.RolloverDialog
@@ -65,8 +69,12 @@ import com.serranoie.app.minus.presentation.util.CensorManager
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.font.format.formatLocalized
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.asLog
@@ -118,6 +126,11 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var midnightTransitionManager: MidnightTransitionManager
 
+    @Inject
+    lateinit var budgetRepository: BudgetRepository
+
+    private val pendingShortcut = MutableStateFlow<LauncherShortcut?>(null)
+
     private val requestNotificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
@@ -145,12 +158,33 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         handleSyncIntent(intent)
         handleQuickAddIntent(intent)
+        handleLauncherShortcutIntent(intent)
     }
 
     private fun handleSyncIntent(intent: Intent?) {
         if (intent?.action == CsvSyncWorker.ACTION_SYNC_NOW) {
             CsvSyncWorker.syncNow(this)
         }
+    }
+
+    private fun handleLauncherShortcutIntent(intent: Intent?) {
+        val shortcut = LauncherShortcut.from(
+            action = intent?.action,
+            category = intent?.getStringExtra(LauncherShortcut.EXTRA_CATEGORY),
+        ) ?: return
+        pendingShortcut.value = shortcut
+    }
+
+    private fun observeLauncherShortcutCategories() {
+        budgetRepository.getActiveCategories()
+            .map(::recentShortcutCategories)
+            .distinctUntilChanged()
+            .onEach { categories ->
+                runCatching { publishLauncherShortcuts(this, categories) }
+                    .onFailure { logcat { "Could not publish launcher shortcuts: ${it.asLog()}" } }
+            }
+            .catch { logcat { "Launcher shortcut categories failed: ${it.asLog()}" } }
+            .launchIn(lifecycleScope)
     }
 
     private fun handleQuickAddIntent(intent: Intent?) {
@@ -178,6 +212,8 @@ class MainActivity : AppCompatActivity() {
 
         handleSyncIntent(intent)
         handleQuickAddIntent(intent)
+        if (savedInstanceState == null) handleLauncherShortcutIntent(intent)
+        observeLauncherShortcutCategories()
 
         val iconAnimationEndsAt = SystemClock.uptimeMillis() + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             resources.getInteger(R.integer.splash_icon_animation_duration).toLong()
@@ -311,6 +347,8 @@ class MainActivity : AppCompatActivity() {
                                 onRequestNotificationPermission = {
                                     checkAndRequestNotificationPermission()
                                 },
+                                pendingShortcut = pendingShortcut.collectAsStateWithLifecycle().value,
+                                onShortcutHandled = { pendingShortcut.value = null },
                             )
 
                             MidnightRolloverDialogHost(navController)

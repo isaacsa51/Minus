@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.shortcut.LauncherShortcut
 import com.serranoie.app.minus.presentation.ui.budget.BudgetViewModel
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetEditorIntent
 import com.serranoie.app.minus.presentation.ui.budget.mvi.intent.BudgetNumpadIntent
@@ -33,6 +34,8 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit = {},
     openWalletOnStart: Boolean = false,
     onRequestNotificationPermission: () -> Unit = {},
+    pendingShortcut: LauncherShortcut? = null,
+    onShortcutHandled: () -> Unit = {},
     budgetViewModel: BudgetViewModel = hiltViewModel(),
     mainScreenViewModel: MainScreenViewModel = hiltViewModel(),
 ) {
@@ -63,6 +66,17 @@ fun MainScreen(
 
     LaunchedEffect(Unit) {
         onRequestNotificationPermission()
+    }
+
+    LaunchedEffect(pendingShortcut) {
+        when (val shortcut = pendingShortcut) {
+            null -> return@LaunchedEffect
+            LauncherShortcut.ScanReceipt -> receiptScanner.launch()
+            is LauncherShortcut.Category -> budgetViewModel.processIntent(
+                BudgetEditorIntent.CommentUpdated(shortcut.name),
+            )
+        }
+        onShortcutHandled()
     }
 
     LaunchedEffect(openWalletOnStart, mainScreenState.walletSheetOpened) {
