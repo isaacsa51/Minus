@@ -817,5 +817,14 @@
     <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
     <string name="island_brief_days_short">%1$dd</string>
     <string name="island_brief_stale">left in period - open Minus to update</string>
+    <string name="island_page_spent_of">%1$s of %2$s spent</string>
     <string name="island_page_period_left">Period left</string>
+    <plurals name="island_page_days_left">
+        <item quantity="one">day left</item>
+        <item quantity="other">days left</item>
+    </plurals>
+    <string name="island_charge_today">%1$s — %2$s due today</string>
+    <string name="island_charge_tomorrow">%1$s — %2$s due tomorrow</string>
+    <string name="island_charge_unnamed">Recurring payment</string>
+    <string name="island_credit_owed">%1$s owed on credit</string>
 </resources>
