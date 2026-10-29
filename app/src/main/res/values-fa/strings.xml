@@ -182,8 +182,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
-    <string name="receipt_scan_hint_action">Try it</string>
+    <string name="receipt_scan_hint">نکته: برای اسکن رسید، ✓ را نگه دارید</string>
+    <string name="receipt_scan_hint_action">امتحان کنید</string>
     <plurals name="days">
         <item quantity="one">%d روز</item>
         <item quantity="other">%d روز</item>
@@ -651,6 +651,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">نمونه پیش‌فرض %1$d%% نشان داده می‌شود. برای هدف‌گذاری مبلغی مشخص، در تنظیمات یک هدف پس‌انداز تعیین کنید.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">تنظیمات پس‌انداز</string>
+    <string name="settings_savings_reminder_title">یادآور پس‌انداز</string>
+    <string name="settings_savings_reminder_subtitle">وقتی دوره جدید شروع می‌شود، یادم بینداز چقدر کنار بگذارم</string>
     <string name="settings_savings_preferences_subtitle">تقسیم‌بندی ۵۰/۳۰/۲۰ را شخصی‌سازی کنید و در صورت تمایل یک هدف پس‌انداز تعیین کنید</string>
     <string name="settings_savings_dialog_split_label">تقسیم بودجه</string>
     <string name="settings_savings_dialog_split_hint">مجموع این سه مقدار باید ۱۰۰%% باشد.</string>
@@ -751,6 +753,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">شما اشتراک \"%1$s\" را دارید که مبلغ %2$s بابت آن کسر خواهد شد.</string>
     <string name="notification_credit_cutoff_title">پرداخت پیش‌روی کارت اعتباری</string>
     <string name="notification_credit_cutoff_message">تاریخ سررسید پرداخت شما %1$s است. برای جلوگیری از جریمه، پرداخت %2$s پیشنهاد می‌شود.</string>
+    <string name="notification_channel_savings_name">یادآورهای پس‌انداز</string>
+    <string name="notification_channel_savings_description">یادآوری برای کنار گذاشتن پول هنگام شروع دوره بودجه جدید</string>
+    <string name="notification_savings_reminder_title">دوره جدید: وقت پس‌انداز است</string>
+    <string name="notification_savings_reminder_message">%1$s از این دوره را برای پس‌اندازتان کنار بگذارید.</string>
     <string name="credit_owed_label">مجموع بدهی</string>
     <string name="debt_adjusted_balance_label">موجودی کسر از بدهی</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s بدهی اعتباری</string>
