@@ -182,8 +182,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
-    <string name="receipt_scan_hint_action">Try it</string>
+    <string name="receipt_scan_hint">Съвет: задръжте ✓, за да сканирате касова бележка</string>
+    <string name="receipt_scan_hint_action">Опитайте</string>
     <plurals name="days">
         <item quantity="one">%d ден</item>
         <item quantity="other">%d дни</item>
@@ -649,6 +649,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Показва се примерът по подразбиране %1$d%%. Задайте цел за спестяване в Настройки, за да се насочите към конкретна сума.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Предпочитания за спестявания</string>
+    <string name="settings_savings_reminder_title">Напомняне за спестяване</string>
+    <string name="settings_savings_reminder_subtitle">Напомни ми колко да отделя, когато започне нов период</string>
     <string name="settings_savings_preferences_subtitle">Персонализирайте разпределението 50/30/20 и задайте незадължителна цел за спестяване</string>
     <string name="settings_savings_dialog_split_label">Разпределение на бюджета</string>
     <string name="settings_savings_dialog_split_hint">Трите стойности трябва да дават общо 100%%.</string>
@@ -749,6 +751,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">Имате абонамент за „%1$s“, който ще бъде таксуван на %2$s.</string>
     <string name="notification_credit_cutoff_title">Предстоящо плащане по кредитна карта</string>
     <string name="notification_credit_cutoff_message">Датата ви на отчитане е %1$s. Препоръчително е да платите %2$s, за да избегнете лихви.</string>
+    <string name="notification_channel_savings_name">Напомняния за спестяване</string>
+    <string name="notification_channel_savings_description">Напомняне да отделите пари, когато започне нов бюджетен период</string>
+    <string name="notification_savings_reminder_title">Нов период: време е за спестяване</string>
+    <string name="notification_savings_reminder_message">Отделете %1$s от този период за спестяванията си.</string>
     <string name="credit_owed_label">Общо дължима сума</string>
     <string name="debt_adjusted_balance_label">Баланс, коригиран с дълга</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s дълг по кредитна карта</string>
