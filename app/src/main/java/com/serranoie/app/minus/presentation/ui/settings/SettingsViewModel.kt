@@ -74,6 +74,7 @@ data class SettingsUiState(
     val isCensored: Boolean = false,
     val periodMappingMode: PeriodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
+    val savingsReminderEnabled: Boolean = false,
     val creditCardCutoffDay: Int? = null,
     val syncFolderName: String? = null,
     val syncStatus: SyncStatus? = null,
@@ -156,6 +157,7 @@ class SettingsViewModel @Inject constructor(
             isCensored = isCensored,
             periodMappingMode = settings.periodMappingMode,
             savingsPreferences = settings.savingsPreferences,
+            savingsReminderEnabled = settings.savingsReminderEnabled,
             creditCardCutoffDay = budgetSettings?.creditCardCutoffDay,
             syncFolderName = sync.first,
             syncStatus = sync.second
@@ -407,6 +409,12 @@ class SettingsViewModel @Inject constructor(
     fun onSavingsPreferencesChange(prefs: SavingsPreferences) {
         viewModelScope.launch {
             settingsRepository.setSavingsPreferences(prefs)
+        }
+    }
+
+    fun onSavingsReminderToggle(enabled: Boolean) {
+        viewModelScope.launch {
+            updateNotificationTimeUseCase.setSavingsReminderEnabled(enabled)
         }
     }
 

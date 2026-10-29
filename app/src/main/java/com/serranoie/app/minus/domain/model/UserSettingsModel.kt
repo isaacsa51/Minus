@@ -34,6 +34,7 @@ data class UserSettings(
     val analyticsSpendsTutorialCompleted: Boolean = false,
     val historyTutorialCompleted: Boolean = false,
     val receiptScanHintShown: Boolean = false,
+    val savingsReminderEnabled: Boolean = false,
     val showPastTransactions: Boolean = false,
     val isRoundedFontEnabled: Boolean = true,
     val isAmoledEnabled: Boolean = false,

@@ -762,6 +762,8 @@
 
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Savings preferences</string>
+    <string name="settings_savings_reminder_title">Savings reminder</string>
+    <string name="settings_savings_reminder_subtitle">Remind me what to set aside when a new period starts</string>
     <string name="settings_savings_preferences_subtitle">Customize the 50/30/20 split and set an optional savings goal</string>
     <string name="settings_savings_dialog_split_label">Budget split</string>
     <string name="settings_savings_dialog_split_format" translatable="false">%1$d / %2$d / %3$d</string>
@@ -874,6 +876,11 @@
 
     <string name="notification_credit_cutoff_title">Upcoming credit card payment</string>
     <string name="notification_credit_cutoff_message">Your payment due date is %1$s. It is recommended to pay %2$s to avoid any interest.</string>
+
+    <string name="notification_channel_savings_name">Savings reminders</string>
+    <string name="notification_channel_savings_description">A reminder to set money aside when a new budget period starts</string>
+    <string name="notification_savings_reminder_title">New period: time to save</string>
+    <string name="notification_savings_reminder_message">Set aside %1$s from this period for your savings.</string>
 
     <string name="credit_owed_label">Total owed</string>
     <string name="debt_adjusted_balance_label">Debt-Adjusted Balance</string>

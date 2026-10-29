@@ -793,4 +793,13 @@
     <string name="csv_sync_guide_rules_body">把传入的文件命名为 minus_import_*.csv。其他一切都不会被触碰，包括 minus_synced.csv 和 minus_backup- 轮换文件。正因如此，把同步指向一个你与其他工具共享的文件夹才是安全的。\n\n你放进去的内容都不会被删除。文件读取后会被重命名为 .imported，若其中任何一行解析失败则重命名为 .rejected，内容会保留下来，方便你查看出了什么问题。这两种名称都不会再被读取。\n\n绝不要写入非零的 id。id 大于零的行会替换持有该 id 的交易；id 为空或为零的行会作为新记录插入。由于导出携带真实的行 id，重新推送一份未修改的导出会变成覆盖而不是重复。除非先清空 id 列，否则你无法把导出当作新行的模板。\n\n请设置 period_id。合计是按日期计算的，所以 period_id 为 0 的行在各处依然显示正确。较小的代价是它无法归属到某个周期，并且会在删除已归档周期时运行的清理中残留下来。\n\n导入不是幂等的。Minus 会插入它读到的每一行，而不检查是否已有等价的交易。导入后的重命名可以避免同一文件被读取两次，但用新名称推送相同的行会导致重复计入，所以写入前请对照 minus_synced.csv 去重。\n\n仅支持支出。金额为零或更小会被拒绝。收入和预算合计位于 __META__ 行，重写它们会触发完整的设置恢复，所以请把这个通道视为只能追加交易。</string>
     <string name="csv_sync_guide_pluggy_title">映射 Open Finance 数据源</string>
     <string name="csv_sync_guide_pluggy_body">把提供方的日期映射到 date，并重新格式化为 yyyy-MM-dd HH:mm。把金额以绝对值映射到 amount，跳过入账。把提供方的分类，或你自己的规则，映射到 category，并对名称做归一化，否则你会积累大量近似重复项。把提供方的交易 id 放进 extra_note，这样它在应用里仍然可见，也为你的去重提供稳定的依据。\n\n一个两小时的循环大致如下：\n\n1. 拉取 minus_synced.csv。\n2. 解析它，跳过 __META__ 和 __ARCHIVED__ 行，并记下 current_period_id。\n3. 获取提供方的新交易。对每一笔，检查拉取到的文件中是否已有在你的时间窗口内金额相同的记录，或 extra_note 中有相同的提供方 id。\n4. 把未匹配的写入一个 minus_import_ 文件，包含上面四列再加 period_id。\n5. 推送文件，然后触发同步。\n\n第 3 步才是去重必须发生的地方。Minus 不会替你完成。</string>
+
+    <string name="receipt_scan_hint">提示：长按 ✓ 可扫描收据</string>
+    <string name="receipt_scan_hint_action">试试看</string>
+    <string name="settings_savings_reminder_title">存钱提醒</string>
+    <string name="settings_savings_reminder_subtitle">新周期开始时提醒我该存多少</string>
+    <string name="notification_channel_savings_name">存钱提醒</string>
+    <string name="notification_channel_savings_description">新的预算周期开始时，提醒你留出一笔钱存起来</string>
+    <string name="notification_savings_reminder_title">新周期：该存钱了</string>
+    <string name="notification_savings_reminder_message">从本周期中留出 %1$s 存起来。</string>
 </resources>

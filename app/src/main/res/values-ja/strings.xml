@@ -794,4 +794,13 @@
     <string name="csv_sync_guide_rules_body">取り込むファイルは minus_import_*.csv という名前にしてください。それ以外は minus_synced.csv や minus_backup- のローテーションも含め、一切触りません。だからこそ、他のツールと共有しているフォルダに同期を向けても安全です。\n\n置いたものは削除されません。読み取り後、ファイルは .imported に、いずれかの行の解析に失敗した場合は .rejected に名前が変わり、内容はそのまま残るので何が問題だったか確認できます。どちらの名前も再度読み込まれることはありません。\n\n0 以外の id は絶対に書かないでください。id が 0 より大きい行は、その id を持つ取引を置き換えます。id が空または 0 の行は新規として挿入されます。エクスポートには実際の行 id が含まれるため、変更していないエクスポートを再送すると重複ではなく上書きになります。id 列を空にしない限り、エクスポートを新規行のテンプレートとして使うことはできません。\n\nperiod_id を設定してください。合計は日付から計算されるため、period_id が 0 の行でもどこでも正しく表示されます。より限定的な代償は、期間に紐づけられないことと、アーカイブ済み期間を削除したときに走るクリーンアップで残ってしまうことです。\n\nインポートは冪等ではありません。Minus は同等の取引があるか確認せず、読み取った行をすべて挿入します。インポート後の名前変更によって同じファイルが二度読まれることは防げますが、同じ行を別の名前で送れば二重に計上されるため、書き出す前に minus_synced.csv と照合して重複を除いてください。\n\n支出のみです。0 以下の金額は拒否されます。収入と予算の合計は __META__ 行にあり、それを書き換えると設定の完全復元が走るため、このチャネルは取引の追加専用として扱ってください。</string>
     <string name="csv_sync_guide_pluggy_title">Open Finance フィードのマッピング</string>
     <string name="csv_sync_guide_pluggy_body">プロバイダーの日付を yyyy-MM-dd HH:mm に整形して date にマッピングします。金額は絶対値として amount にマッピングし、入金は飛ばします。プロバイダーのカテゴリ、または独自のルールを category にマッピングし、名前を正規化してください。そうしないとほぼ同じカテゴリが積み上がります。プロバイダーの取引 id は extra_note に入れると、アプリ上で見えたままになり、重複排除の安定した手がかりになります。\n\n2 時間ごとのループはこうなります。\n\n1. minus_synced.csv を取得します。\n2. __META__ と __ARCHIVED__ の行を飛ばして解析し、current_period_id を記録します。\n3. プロバイダーから新しい取引を取得します。それぞれについて、取得したファイルに同じ金額のものが自分の時間枠内にあるか、または extra_note に同じプロバイダー id があるかを確認します。\n4. 一致しなかったものを、上記 4 列に period_id を加えた minus_import_ ファイルに書き出します。\n5. ファイルを送り、同期トリガーを実行します。\n\n重複排除が必要なのは手順 3 です。Minus が代わりに行うことはありません。</string>
+
+    <string name="receipt_scan_hint">ヒント：✓を長押しするとレシートをスキャンできます</string>
+    <string name="receipt_scan_hint_action">試す</string>
+    <string name="settings_savings_reminder_title">貯蓄リマインダー</string>
+    <string name="settings_savings_reminder_subtitle">新しい期間が始まったら、取り分ける金額を通知する</string>
+    <string name="notification_channel_savings_name">貯蓄リマインダー</string>
+    <string name="notification_channel_savings_description">新しい予算期間が始まったときに、お金を取り分けるよう通知します</string>
+    <string name="notification_savings_reminder_title">新しい期間：貯蓄のタイミングです</string>
+    <string name="notification_savings_reminder_message">この期間から%1$sを貯蓄に回しましょう。</string>
 </resources>

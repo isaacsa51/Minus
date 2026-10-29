@@ -776,4 +776,13 @@
     <string name="analytics_no_period_body">یک دوره بودجه بسازید تا خرج‌ها، دسته‌بندی‌ها و پس‌انداز شما اینجا نمایان شود.</string>
     <string name="widget_budget_pill_title">نوار بودجه</string>
     <string name="widget_budget_pill_description">باقی‌مانده برای حالت نمایشی که انتخاب کرده‌اید — روزانه، هفتگی، دوهفتگی یا ماهانه — در یک نوار باریک</string>
+
+    <string name="receipt_scan_hint">نکته: برای اسکن رسید، ✓ را نگه دارید</string>
+    <string name="receipt_scan_hint_action">امتحان کنید</string>
+    <string name="settings_savings_reminder_title">یادآور پس‌انداز</string>
+    <string name="settings_savings_reminder_subtitle">وقتی دوره جدید شروع می‌شود، یادم بینداز چقدر کنار بگذارم</string>
+    <string name="notification_channel_savings_name">یادآورهای پس‌انداز</string>
+    <string name="notification_channel_savings_description">یادآوری برای کنار گذاشتن پول هنگام شروع دوره بودجه جدید</string>
+    <string name="notification_savings_reminder_title">دوره جدید: وقت پس‌انداز است</string>
+    <string name="notification_savings_reminder_message">%1$s از این دوره را برای پس‌اندازتان کنار بگذارید.</string>
 </resources>

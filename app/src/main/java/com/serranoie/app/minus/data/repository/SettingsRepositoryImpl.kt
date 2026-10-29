@@ -71,6 +71,7 @@ const val ANALYTICS_TUTORIAL_COMPLETED_KEY_NAME = "analytics_tutorial_completed"
 const val ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME = "analytics_spends_tutorial_completed"
 const val HISTORY_TUTORIAL_COMPLETED_KEY_NAME = "history_tutorial_completed"
 const val RECEIPT_SCAN_HINT_SHOWN_KEY_NAME = "receipt_scan_hint_shown"
+const val SAVINGS_REMINDER_ENABLED_KEY_NAME = "savings_reminder_enabled"
 
 private val ONBOARDING_COMPLETED = booleanPreferencesKey(ONBOARDING_COMPLETED_KEY_NAME)
 private val EARLY_FINISH_ACTIVE = booleanPreferencesKey(EARLY_FINISH_ACTIVE_KEY_NAME)
@@ -135,6 +136,7 @@ private val ANALYTICS_TUTORIAL_COMPLETED = booleanPreferencesKey(ANALYTICS_TUTOR
 private val ANALYTICS_SPENDS_TUTORIAL_COMPLETED = booleanPreferencesKey(ANALYTICS_SPENDS_TUTORIAL_COMPLETED_KEY_NAME)
 private val HISTORY_TUTORIAL_COMPLETED = booleanPreferencesKey(HISTORY_TUTORIAL_COMPLETED_KEY_NAME)
 private val RECEIPT_SCAN_HINT_SHOWN = booleanPreferencesKey(RECEIPT_SCAN_HINT_SHOWN_KEY_NAME)
+private val SAVINGS_REMINDER_ENABLED = booleanPreferencesKey(SAVINGS_REMINDER_ENABLED_KEY_NAME)
 private val BUDGET_SPLIT_VIEW_PERIOD = stringPreferencesKey(BUDGET_SPLIT_VIEW_PERIOD_KEY_NAME)
 private val SAVINGS_PRESET = stringPreferencesKey(SAVINGS_PRESET_KEY_NAME)
 private val SAVINGS_NEEDS_PCT = intPreferencesKey(SAVINGS_NEEDS_PCT_KEY_NAME)
@@ -193,6 +195,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 analyticsSpendsTutorialCompleted = preferences[ANALYTICS_SPENDS_TUTORIAL_COMPLETED] ?: false,
                 historyTutorialCompleted = preferences[HISTORY_TUTORIAL_COMPLETED] ?: false,
                 receiptScanHintShown = preferences[RECEIPT_SCAN_HINT_SHOWN] ?: false,
+                savingsReminderEnabled = preferences[SAVINGS_REMINDER_ENABLED] ?: false,
                 periodMappingMode = try {
                     PeriodMappingMode.valueOf(preferences[PERIOD_MAPPING_MODE] ?: "")
                 } catch (_: Exception) {
@@ -462,6 +465,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setReceiptScanHintShown(shown: Boolean) {
         dataStore.edit { preferences ->
             preferences[RECEIPT_SCAN_HINT_SHOWN] = shown
+        }
+    }
+
+    override suspend fun setSavingsReminderEnabled(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[SAVINGS_REMINDER_ENABLED] = enabled
         }
     }
 

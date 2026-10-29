@@ -84,6 +84,7 @@ class ChangelogE2ETest {
                     onOpenNotificationSettings = {},
                     periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
                     onPeriodMappingModeChange = {},
+                    onSavingsReminderToggle = {},
                     onExportCsv = {},
                     onImportCsv = {},
                     onResetTutorial = {},

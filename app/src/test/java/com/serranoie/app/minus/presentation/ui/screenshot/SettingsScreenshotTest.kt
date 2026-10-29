@@ -79,6 +79,7 @@ class SettingsScreenshotTest {
                 onOpenExactAlarmSettings = {},
                 periodMappingMode = periodMappingMode,
                 onPeriodMappingModeChange = {},
+                onSavingsReminderToggle = {},
                 onExportCsv = {},
                 onImportCsv = {},
                 onResetTutorial = {},

@@ -17,6 +17,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -504,6 +505,38 @@ class BudgetPeriodManagerTest {
 
             assertThat(userSettings.earlyFinishActive).isFalse()
             assertThat(userSettings.periodEndAlreadyHandled).isFalse()
+        }
+
+    @Test
+    fun `when a budget is saved then the savings reminder is rescheduled for its start day`() =
+        runTest {
+            val today = LocalDate.now()
+            coEvery { budgetRepository.getBudgetSettingsSync() } returns null
+            coEvery { budgetRepository.getTransactions() } returns flowOf(emptyList())
+
+            periodManager.persistBudgetSettings(
+                budget(strategy = RemainingBudgetStrategy.SPLIT_EQUALLY, startDate = today, endDate = today.plusDays(27)),
+                forceNewPeriodBoundary = false,
+            )
+
+            verify { notificationScheduler.scheduleSavingsReminder() }
+        }
+
+    @Test
+    fun `toggling the savings reminder persists it and reschedules`() =
+        runTest {
+            periodManager.setSavingsReminderEnabled(true)
+
+            coVerify { settingsRepository.setSavingsReminderEnabled(true) }
+            verify { notificationScheduler.scheduleSavingsReminder() }
+        }
+
+    @Test
+    fun `changing the alert time also moves the savings reminder`() =
+        runTest {
+            periodManager.updatePeriodEndNotificationTime(8, 30)
+
+            verify { notificationScheduler.scheduleSavingsReminder() }
         }
 
     @Test

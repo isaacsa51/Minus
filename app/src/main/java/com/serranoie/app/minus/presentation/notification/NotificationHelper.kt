@@ -32,10 +32,12 @@ class NotificationHelper @Inject constructor(
         const val CHANNEL_RECURRENT = "recurrent_expenses"
         const val CHANNEL_CREDIT = "credit_expenses"
         const val CHANNEL_SPEND_DETECTED = "spend_detected"
+        const val CHANNEL_SAVINGS = "savings_reminder"
 
         const val NOTIFICATION_ID_PERIOD_END = 1001
         const val NOTIFICATION_ID_RECURRENT = 1002
         const val NOTIFICATION_ID_CREDIT = 1003
+        const val NOTIFICATION_ID_SAVINGS = 1004
 
         private const val SPEND_SAVED_TIMEOUT_MS = 15_000L
     }
@@ -88,6 +90,15 @@ class NotificationHelper @Inject constructor(
 
         notificationManager.createNotificationChannel(creditChannel)
         notificationManager.createNotificationChannel(spendDetectedChannel)
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_SAVINGS,
+                context.getString(R.string.notification_channel_savings_name),
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = context.getString(R.string.notification_channel_savings_description)
+            }
+        )
         logcat { "Notification channels created" }
     }
 
@@ -377,6 +388,35 @@ class NotificationHelper @Inject constructor(
             .build()
 
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_CREDIT, notification)
+    }
+
+    fun showSavingsReminderNotification(amount: String, currency: String) {
+        if (!canPostNotifications(CHANNEL_SAVINGS)) return
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            4,
+            Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val message = context.getString(
+            R.string.notification_savings_reminder_message,
+            formatAmount(amount, currency)
+        )
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_SAVINGS)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.notification_savings_reminder_title))
+            .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .build()
+
+        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_SAVINGS, notification)
     }
 
     fun spendDetectedNotificationId(sourceLabel: String, amount: String): Int =

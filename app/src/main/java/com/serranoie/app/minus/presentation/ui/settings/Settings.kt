@@ -55,6 +55,7 @@ import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Publish
 import androidx.compose.material.icons.rounded.QuestionMark
 import androidx.compose.material.icons.rounded.Repeat
@@ -77,6 +78,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -151,6 +153,8 @@ fun Settings(
     onPeriodMappingModeChange: (PeriodMappingMode) -> Unit,
     savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
     onSavingsPreferencesChange: (SavingsPreferences) -> Unit = {},
+    savingsReminderEnabled: Boolean = false,
+    onSavingsReminderToggle: (Boolean) -> Unit,
     onExportCsv: () -> Unit = {},
     onImportCsv: () -> Unit = {},
     onResetTutorial: () -> Unit = {},
@@ -385,7 +389,7 @@ fun Settings(
                     CustomPaddedExpandableItem(
                         isExpanded = isSavingsExpanded,
                         onToggleExpanded = { isSavingsExpanded = !isSavingsExpanded },
-                        position = PaddedListItemPosition.Single,
+                        position = PaddedListItemPosition.First,
                         modifier = Modifier.testTag("SettingsSavingsPreferencesItem"),
                         defaultContent = {
                             SettingsLeadingIcon(icon = Icons.Rounded.Savings)
@@ -423,6 +427,32 @@ fun Settings(
                             )
                         },
                     )
+
+                    CustomPaddedListItem(
+                        onClick = { onSavingsReminderToggle(!savingsReminderEnabled) },
+                        position = PaddedListItemPosition.Last,
+                        modifier = Modifier.testTag("SettingsSavingsReminderItem"),
+                    ) {
+                        SettingsLeadingIcon(icon = Icons.Rounded.NotificationsActive)
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_savings_reminder_title),
+                                style = MaterialTheme.typography.bodyMediumEmphasized,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_savings_reminder_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Switch(
+                            checked = savingsReminderEnabled,
+                            onCheckedChange = onSavingsReminderToggle,
+                        )
+                    }
                 }
             }
 
@@ -779,6 +809,7 @@ private fun PreviewSettings() {
             onOpenNotificationSettings = {},
             periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
             onPeriodMappingModeChange = {},
+            onSavingsReminderToggle = {},
             onNavigateToAppearance = {})
     }
 }

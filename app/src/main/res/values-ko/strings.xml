@@ -795,4 +795,13 @@
     <string name="csv_sync_guide_rules_body">들어오는 파일 이름은 minus_import_*.csv로 지으세요. minus_synced.csv와 minus_backup- 순환 파일을 포함해 그 밖의 모든 것은 건드리지 않습니다. 그래서 다른 도구와 공유하는 폴더로 동기화를 지정해도 안전합니다.\n\n넣어 둔 것은 삭제되지 않습니다. 읽은 뒤 파일 이름은 .imported로, 어떤 행이 파싱에 실패했다면 .rejected로 바뀌며, 내용은 그대로 남아 무엇이 잘못됐는지 확인할 수 있습니다. 두 이름 모두 다시 읽히지 않습니다.\n\n0이 아닌 id는 절대 기록하지 마세요. id가 0보다 큰 행은 그 id를 가진 거래를 대체하고, id가 비었거나 0인 행은 새로 삽입됩니다. 내보내기에는 실제 행 id가 담겨 있으므로, 수정하지 않은 내보내기를 다시 보내면 중복이 아니라 덮어쓰기가 됩니다. id 열을 먼저 비우지 않으면 내보내기를 새 행의 템플릿으로 쓸 수 없습니다.\n\nperiod_id를 설정하세요. 합계는 날짜로 계산되므로 period_id가 0인 행도 모든 화면에서 올바르게 표시됩니다. 더 좁은 대가는 기간에 귀속되지 않고, 보관된 기간을 삭제할 때 실행되는 정리에서 살아남는다는 점입니다.\n\n가져오기는 멱등하지 않습니다. Minus는 동등한 거래가 있는지 확인하지 않고 읽은 모든 행을 삽입합니다. 가져오기 후 이름 변경으로 같은 파일이 두 번 읽히는 일은 막지만, 같은 행을 새 이름으로 보내면 두 번 집계되므로 기록하기 전에 minus_synced.csv와 비교해 중복을 제거하세요.\n\n지출만 가능합니다. 0 이하 금액은 거부됩니다. 수입과 예산 합계는 __META__ 행에 있고, 그것을 다시 쓰면 설정 전체 복원이 실행되므로 이 경로는 거래 추가 전용으로 다루세요.</string>
     <string name="csv_sync_guide_pluggy_title">Open Finance 피드 매핑</string>
     <string name="csv_sync_guide_pluggy_body">제공자의 날짜를 yyyy-MM-dd HH:mm으로 다시 포맷해 date에 매핑하세요. 금액은 절댓값으로 amount에 매핑하고 입금은 건너뜁니다. 제공자의 카테고리 또는 직접 만든 규칙을 category에 매핑하되 이름을 정규화하세요. 그러지 않으면 거의 같은 이름이 쌓입니다. 제공자의 거래 id는 extra_note에 넣어 두면 앱에서 계속 보이고, 중복 제거에 안정적인 기준이 됩니다.\n\n두 시간 주기는 이렇게 돌아갑니다.\n\n1. minus_synced.csv를 받습니다.\n2. __META__와 __ARCHIVED__ 행을 건너뛰고 파싱한 뒤 current_period_id를 기록합니다.\n3. 제공자에서 새 거래를 가져옵니다. 각각에 대해, 받은 파일에 같은 금액이 설정한 시간 범위 안에 이미 있는지, 또는 extra_note에 같은 제공자 id가 있는지 확인합니다.\n4. 일치하지 않은 것들을 위의 네 열에 period_id를 더해 minus_import_ 파일로 기록합니다.\n5. 파일을 보낸 뒤 동기화 트리거를 실행합니다.\n\n중복 제거가 일어나야 하는 곳은 3단계입니다. Minus가 대신 해 주지 않습니다.</string>
+
+    <string name="receipt_scan_hint">팁: ✓를 길게 눌러 영수증을 스캔하세요</string>
+    <string name="receipt_scan_hint_action">사용해 보기</string>
+    <string name="settings_savings_reminder_title">저축 알림</string>
+    <string name="settings_savings_reminder_subtitle">새 기간이 시작되면 따로 모아둘 금액을 알려줘요</string>
+    <string name="notification_channel_savings_name">저축 알림</string>
+    <string name="notification_channel_savings_description">새 예산 기간이 시작될 때 돈을 따로 모아두도록 알려주는 알림</string>
+    <string name="notification_savings_reminder_title">새 기간: 저축할 시간이에요</string>
+    <string name="notification_savings_reminder_message">이번 기간에서 %1$s을(를) 저축용으로 따로 모아두세요.</string>
 </resources>

@@ -245,4 +245,22 @@ class SettingsViewModelTest {
 
         assertThat(vm.effects.value).isEqualTo(SettingsUiEffect.NavigateBack)
     }
+
+    @Test
+    fun `savings reminder flag is exposed in the ui state`() = runTest {
+        every { settingsRepository.observeSettings() } returns
+            flowOf(UserSettings.DEFAULT.copy(savingsReminderEnabled = true))
+
+        newViewModel().uiState.test {
+            awaitCondition { it.savingsReminderEnabled }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `toggling the savings reminder goes through the period manager use case`() = runTest {
+        newViewModel().onSavingsReminderToggle(true)
+
+        coVerify { updateNotificationTimeUseCase.setSavingsReminderEnabled(true) }
+    }
 }

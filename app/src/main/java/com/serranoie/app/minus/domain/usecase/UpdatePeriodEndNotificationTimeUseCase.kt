@@ -13,4 +13,8 @@ class UpdatePeriodEndNotificationTimeUseCase @Inject constructor(
     suspend fun updateRecurrentNotificationTime(hour: Int, minute: Int) {
         periodManager.updateRecurrentNotificationTime(hour, minute)
     }
+
+    suspend fun setSavingsReminderEnabled(enabled: Boolean) {
+        periodManager.setSavingsReminderEnabled(enabled)
+    }
 }

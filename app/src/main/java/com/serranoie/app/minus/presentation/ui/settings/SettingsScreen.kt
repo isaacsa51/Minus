@@ -94,6 +94,8 @@ fun SettingsScreen(
         onPeriodMappingModeChange = viewModel::onPeriodMappingModeChange,
         savingsPreferences = uiState.savingsPreferences,
         onSavingsPreferencesChange = viewModel::onSavingsPreferencesChange,
+        savingsReminderEnabled = uiState.savingsReminderEnabled,
+        onSavingsReminderToggle = viewModel::onSavingsReminderToggle,
         onExportCsv = viewModel::onExportCsv,
         onImportCsv = viewModel::onImportCsv,
         onResetTutorial = viewModel::onResetTutorial,
