@@ -166,6 +166,16 @@
     <string name="budget_less_than_one_day_validation">Das Budget muss für mindestens einen Tag gelten</string>
     <!--  Analytics  -->
     <string name="analytics_title">Analytics</string>
+    <string name="receipt_scan_button">Scan receipt</string>
+    <string name="receipt_scan_failed">Couldn\'t read a total from the receipt</string>
+    <string name="receipt_camera_point_at_total">Point at the total</string>
+    <string name="receipt_camera_detected">%1$s detected</string>
+    <string name="receipt_camera_retry">No total found, try again</string>
+    <string name="receipt_camera_close">Close camera</string>
+    <string name="receipt_camera_capture">Capture receipt</string>
+    <string name="receipt_camera_gallery">Choose a photo</string>
+    <string name="receipt_camera_switch">Switch camera</string>
+    <string name="receipt_camera_flash">Flash</string>
     <plurals name="days">
         <item quantity="one">%d Tag</item>
         <item quantity="other">%d Tage</item>
