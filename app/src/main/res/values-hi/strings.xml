@@ -182,8 +182,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
-    <string name="receipt_scan_hint_action">Try it</string>
+    <string name="receipt_scan_hint">सुझाव: रसीद स्कैन करने के लिए ✓ को दबाकर रखें</string>
+    <string name="receipt_scan_hint_action">आज़माएं</string>
     <plurals name="days">
         <item quantity="one">%d दिन</item>
         <item quantity="other">%d दिन</item>
@@ -649,6 +649,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">डिफ़ॉल्ट %1$d%% उदाहरण दिखाया जा रहा है। किसी खास रकम का लक्ष्य तय करने के लिए सेटिंग में बचत का लक्ष्य सेट करें।</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">बचत की प्राथमिकताएं</string>
+    <string name="settings_savings_reminder_title">बचत रिमाइंडर</string>
+    <string name="settings_savings_reminder_subtitle">नई अवधि शुरू होने पर याद दिलाएं कि कितना अलग रखना है</string>
     <string name="settings_savings_preferences_subtitle">50/30/20 के बंटवारे को कस्टमाइज़ करें और बचत का एक वैकल्पिक लक्ष्य सेट करें</string>
     <string name="settings_savings_dialog_split_label">बजट का बंटवारा</string>
     <string name="settings_savings_dialog_split_hint">तीनों वैल्यू का जोड़ 100%% होना चाहिए।</string>
@@ -749,6 +751,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">आपका \"%1$s\" का सब्सक्रिप्शन है जिसके लिए %2$s चार्ज किया जाएगा।</string>
     <string name="notification_credit_cutoff_title">आने वाला क्रेडिट कार्ड पेमेंट</string>
     <string name="notification_credit_cutoff_message">आपके पेमेंट की तारीख %1$s है। ब्याज से बचने के लिए %2$s का पेमेंट करने की सलाह दी जाती है।</string>
+    <string name="notification_channel_savings_name">बचत रिमाइंडर</string>
+    <string name="notification_channel_savings_description">नई बजट अवधि शुरू होने पर पैसे अलग रखने का रिमाइंडर</string>
+    <string name="notification_savings_reminder_title">नई अवधि: बचत का समय</string>
+    <string name="notification_savings_reminder_message">अपनी बचत के लिए इस अवधि से %1$s अलग रखें।</string>
     <string name="credit_owed_label">कुल बकाया</string>
     <string name="debt_adjusted_balance_label">कर्ज़-एडजस्टेड बैलेंस</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s क्रेडिट कर्ज़</string>
