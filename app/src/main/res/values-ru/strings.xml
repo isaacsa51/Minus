@@ -184,8 +184,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
-    <string name="receipt_scan_hint_action">Try it</string>
+    <string name="receipt_scan_hint">Совет: удерживайте ✓, чтобы отсканировать чек</string>
+    <string name="receipt_scan_hint_action">Попробовать</string>
     <plurals name="days">
         <item quantity="one">%d день</item>
         <item quantity="few">%d дня</item>
@@ -663,6 +663,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Показан пример по умолчанию (%1$d%%). Задайте цель накоплений в настройках, чтобы считать конкретную сумму.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Настройки накоплений</string>
+    <string name="settings_savings_reminder_title">Напоминание о накоплениях</string>
+    <string name="settings_savings_reminder_subtitle">Напоминать, сколько отложить в начале нового периода</string>
     <string name="settings_savings_preferences_subtitle">Своё распределение 50/30/20 и необязательная цель накоплений</string>
     <string name="settings_savings_dialog_split_label">Распределение бюджета</string>
     <string name="settings_savings_dialog_split_hint">Три доли в сумме должны давать 100%%.</string>
@@ -763,6 +765,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">Подписка на сумму «%1$s» спишется %2$s.</string>
     <string name="notification_credit_cutoff_title">Скоро платёж по кредитной карте</string>
     <string name="notification_credit_cutoff_message">Срок платежа — %1$s. Чтобы не платить проценты, рекомендуется внести %2$s.</string>
+    <string name="notification_channel_savings_name">Напоминания о накоплениях</string>
+    <string name="notification_channel_savings_description">Напоминание отложить деньги в начале нового бюджетного периода</string>
+    <string name="notification_savings_reminder_title">Новый период: пора откладывать</string>
+    <string name="notification_savings_reminder_message">Отложите %1$s из этого периода на накопления.</string>
     <string name="credit_owed_label">Всего к оплате</string>
     <string name="debt_adjusted_balance_label">Остаток с учётом долга</string>
     <string name="debt_adjusted_label_format">%1$s − %2$s долг по карте</string>
