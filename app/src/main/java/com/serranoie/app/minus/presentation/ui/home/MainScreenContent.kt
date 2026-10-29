@@ -1506,7 +1506,7 @@ private fun MainScreenNumpadSection(
             )
         },
         onShowSnackbar = actions.onShowSnackbar,
-        onApplyLongPress = actions.receiptScanner?.launch,
+        onApplyLongPress = if (choosingLeftover) null else actions.receiptScanner?.launch,
         onTestNotifications = {
             actions.onProcessIntent(
                 MainScreenUiIntent.ProcessBudgetNumpadIntent(

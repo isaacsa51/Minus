@@ -48,7 +48,9 @@ object ReceiptParser {
         val keyed = lines.indices
             .filter { isTotalLine(lines[it]) }
             .flatMap { i ->
-                totalAmountsIn(lines[i]).ifEmpty { lines.getOrNull(i + 1)?.let(::totalAmountsIn).orEmpty() }
+                totalAmountsIn(lines[i]).ifEmpty {
+                    lines.getOrNull(i + 1)?.takeIf(::isFallbackLine)?.let(::totalAmountsIn).orEmpty()
+                }
             }
         val candidates = keyed.ifEmpty { fallbackAmounts(lines) }
         return candidates.filter { it.signum() > 0 }.maxOrNull()

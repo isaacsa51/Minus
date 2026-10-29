@@ -65,6 +65,24 @@ class ReceiptParserTest {
     }
 
     @Test
+    fun total_line_without_amount_does_not_take_cash_from_the_next_line() {
+        val text = """
+            Tienda
+            Tacos          45.00
+            TOTAL
+            EFECTIVO      100.00
+        """.trimIndent()
+
+        assertEquals(BigDecimal("45.00"), ReceiptParser.parse(text)?.total)
+    }
+
+    @Test
+    fun total_line_without_amount_does_not_take_tax_or_subtotal_from_the_next_line() {
+        assertEquals(BigDecimal("50.00"), ReceiptParser.parse("Tienda\nCafe 50.00\nTOTAL\nIVA 8.00")?.total)
+        assertEquals(BigDecimal("50.00"), ReceiptParser.parse("Tienda\nCafe 50.00\nTOTAL\nSubtotal 43.10")?.total)
+    }
+
+    @Test
     fun falls_back_to_largest_amount_ignoring_cash_and_change() {
         val text = """
             La Esquina
