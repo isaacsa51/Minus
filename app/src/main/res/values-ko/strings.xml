@@ -181,8 +181,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
-    <string name="receipt_scan_hint_action">Try it</string>
+    <string name="receipt_scan_hint">팁: ✓를 길게 눌러 영수증을 스캔하세요</string>
+    <string name="receipt_scan_hint_action">사용해 보기</string>
     <plurals name="days">
         <item quantity="other">%d일</item>
     </plurals>
@@ -642,6 +642,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">기본값인 %1$d%% 예시를 보여줍니다. 특정 금액을 목표로 하려면 설정에서 저축 목표를 지정하세요.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">저축 설정</string>
+    <string name="settings_savings_reminder_title">저축 알림</string>
+    <string name="settings_savings_reminder_subtitle">새 기간이 시작되면 따로 모아둘 금액을 알려줘요</string>
     <string name="settings_savings_preferences_subtitle">50/30/20 배분 비율을 조정하고 저축 목표를 설정합니다.</string>
     <string name="settings_savings_dialog_split_label">예산 배분</string>
     <string name="settings_savings_dialog_split_hint">세 가지 항목의 합계가 100%%가 되어야 합니다.</string>
@@ -742,6 +744,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">\"%1$s\" 구독료 중 %2$s가 청구될 예정입니다.</string>
     <string name="notification_credit_cutoff_title">신용카드 결제 예정</string>
     <string name="notification_credit_cutoff_message">결제 예정일은 %1$s입니다. 이자 발생을 피하려면 %2$s를 납부하는 것이 좋습니다.</string>
+    <string name="notification_channel_savings_name">저축 알림</string>
+    <string name="notification_channel_savings_description">새 예산 기간이 시작될 때 돈을 따로 모아두도록 알려주는 알림</string>
+    <string name="notification_savings_reminder_title">새 기간: 저축할 시간이에요</string>
+    <string name="notification_savings_reminder_message">이번 기간에서 %1$s을(를) 저축용으로 따로 모아두세요.</string>
     <string name="credit_owed_label">총 미결제 금액</string>
     <string name="debt_adjusted_balance_label">부채 반영 잔액</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s 신용카드 부채</string>
