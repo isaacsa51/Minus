@@ -1,11 +1,13 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
 import android.content.Context
+import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.time.CalendarSystem
 import com.serranoie.app.minus.presentation.island.IslandBudgetSnapshot
 import com.serranoie.app.minus.presentation.island.IslandBudgetStore
+import com.serranoie.app.minus.presentation.island.nextIslandCharge
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.calculateBudgetMetrics
 import com.serranoie.app.minus.presentation.widget.DailySpending
 import com.serranoie.app.minus.presentation.widget.MonthHeatmapData
@@ -19,6 +21,10 @@ import com.serranoie.app.minus.presentation.widget.updateHeatmapWidget
 import com.serranoie.app.minus.presentation.widget.updateMinMaxSpentWidget
 import com.serranoie.app.minus.presentation.widget.updateMonthHeatmapWidget
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
+import logcat.asLog
+import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
@@ -27,11 +33,11 @@ import javax.inject.Inject
 
 class BudgetWidgetUpdater @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val budgetRepository: BudgetRepository,
 ) {
 
     suspend fun update(baseState: BudgetUiState) {
         val currency = baseState.budgetSettings?.currencyCode ?: "USD"
-        // Pushed first: unlike the others, the pill has a "set up your budget" face to show.
         updateBudgetPill(baseState, currency)
 
         if (baseState !== BudgetUiState.INITIAL) updateIsland(baseState, currency)
@@ -105,7 +111,7 @@ class BudgetWidgetUpdater @Inject constructor(
     * This syncs budget period inside the island
     * from the saameraw/essentials app.
     */
-    private fun updateIsland(baseState: BudgetUiState, currency: String) {
+    private suspend fun updateIsland(baseState: BudgetUiState, currency: String) {
         val settings = baseState.budgetSettings
         val budgetState = baseState.budgetState
         if (settings == null || budgetState == null) {
@@ -114,21 +120,29 @@ class BudgetWidgetUpdater @Inject constructor(
         }
         val viewPeriod = baseState.selectedViewPeriod ?: settings.period
         val metrics = calculateBudgetMetrics(state = budgetState, period = viewPeriod, splitMode = settings.splitMode)
+        val today = LocalDate.now()
+        val paidOccurrences = runCatching { budgetRepository.getPaidRecurrentOccurrences().first() }
+            .onFailure {
+                if (it is CancellationException) throw it
+                logcat { "Island could not read paid occurrences: ${it.asLog()}" }
+            }
+            .getOrDefault(emptySet())
         IslandBudgetStore.update(
             context,
             IslandBudgetSnapshot(
-                date = LocalDate.now(),
+                date = today,
                 currency = currency,
                 viewPeriod = viewPeriod,
                 splitRemaining = metrics.periodRemaining,
+                splitSpent = metrics.periodSpent,
+                splitBudget = metrics.periodBudget,
+                spendProgress = metrics.spendProgress,
                 isOverBudget = metrics.isCurrentPeriodOverBudget,
                 isOverSplit = metrics.isOverCurrentSubPeriod,
                 periodLeft = budgetState.totalBudget - budgetState.totalSpentInPeriod,
                 daysLeft = budgetState.daysRemaining,
-                totalBudget = budgetState.totalBudget,
-                settingsTotalBudget = settings.totalBudget,
-                rollOverLimit = settings.rollOverLimit,
                 creditOwed = baseState.creditOwed,
+                nextCharge = nextIslandCharge(baseState.transactions, paidOccurrences, today),
                 startDate = settings.startDate,
                 finishDate = settings.getPeriodEndDate(),
             ),

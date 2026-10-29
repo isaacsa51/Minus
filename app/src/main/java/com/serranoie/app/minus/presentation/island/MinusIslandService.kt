@@ -1,30 +1,10 @@
 package com.serranoie.app.minus.presentation.island
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.sameerasw.island.sdk.BriefCardPayload
@@ -36,16 +16,7 @@ import com.sameerasw.island.sdk.IslandTone
 import com.sameerasw.island.sdk.compose.ComposeIslandProviderService
 import com.sameerasw.island.sdk.compose.islandSnapshot
 import com.serranoie.app.minus.R
-import com.serranoie.app.minus.domain.model.BudgetSettings
-import com.serranoie.app.minus.domain.model.BudgetState
-import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
-import com.serranoie.app.minus.presentation.ui.theme.component.StatCard
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.TotalBudgetCard
-import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
 import com.serranoie.app.minus.presentation.util.font.format.formatLocalized
-import com.serranoie.app.minus.presentation.util.font.format.toDate
-import com.serranoie.app.minus.presentation.widget.exceededLabelRes
-import com.serranoie.app.minus.presentation.widget.periodLabelRes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -54,7 +25,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -102,15 +72,15 @@ class MinusIslandService : ComposeIslandProviderService() {
             if (s.date != LocalDate.now()) {
                 BriefCardPayload(
                     key = CARD_KEY,
-                    title = money(s.periodLeft, s.currency),
+                    title = islandMoney(s.periodLeft, s.currency),
                     subtitle = getString(R.string.island_brief_stale) + "\n" + range,
                     iconId = ICON,
                 )
             } else {
                 BriefCardPayload(
                     key = CARD_KEY,
-                    title = money(s.splitRemaining, s.currency),
-                    subtitle = getString(splitLabel(s)) + "\n" + range,
+                    title = islandMoney(s.splitRemaining, s.currency),
+                    subtitle = getString(islandSplitLabel(s)) + "\n" + range,
                     iconId = ICON,
                     tone = if (s.isAlert) IslandTone.ALERT else IslandTone.ACCENT,
                     trailingText = getString(R.string.island_brief_days_short, s.daysLeft),
@@ -127,74 +97,15 @@ class MinusIslandService : ComposeIslandProviderService() {
     override fun ExpandedContent(itemKey: String) {
         val snapshot by IslandBudgetStore.observe(applicationContext).collectAsState()
         val s = snapshot ?: return
-        val info = hostInfoState.value
-        val density = LocalDensity.current
-        fun px(value: Int?) = with(density) { (value ?: 0).toDp() }
-        val sidePadding = px((info?.outsetPx ?: 0) + (info?.expandedPaddingPx ?: 0))
-
-        MinusTheme(darkTheme = false) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(align = Alignment.Top, unbounded = true)
-                    .onSizeChanged { host?.resize(itemKey, it.height) }
-                    .islandSnapshot { host?.snapshot(itemKey, it) }
-                    .clip(RoundedCornerShape(px(info?.cornerPx)))
-                    .background(Color.Black)
-                    .clickable { host?.openApp(itemKey) },
-            ) {
-                Column(Modifier.padding(start = sidePadding, end = sidePadding, bottom = sidePadding)) {
-                    Spacer(Modifier.height(px(info?.cameraClearancePx)))
-                    TotalBudgetCard(
-                        budget = s.settingsTotalBudget,
-                        budgetState = BudgetState.EMPTY.copy(totalBudget = s.totalBudget),
-                        budgetSettings = BudgetSettings(
-                            totalBudget = s.settingsTotalBudget,
-                            period = s.viewPeriod,
-                            startDate = s.startDate,
-                            currencyCode = s.currency,
-                            rollOverLimit = s.rollOverLimit,
-                        ),
-                        currencyCode = s.currency,
-                        startDate = s.startDate.toDate(),
-                        finishDate = s.finishDate.toDate(),
-                        creditOwed = s.creditOwed,
-                    )
-                    Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        val colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.onSurface,
-                            contentColor = MaterialTheme.colorScheme.surfaceVariant,
-                        )
-                        StatCard(
-                            modifier = Modifier.weight(1f),
-                            label = stringResource(splitLabel(s)),
-                            value = money(s.splitRemaining, s.currency),
-                            colors = if (s.isAlert) {
-                                colors.copy(contentColor = MaterialTheme.colorScheme.errorContainer)
-                            } else {
-                                colors
-                            },
-                        )
-                        StatCard(
-                            modifier = Modifier.weight(1f),
-                            label = stringResource(R.string.island_page_period_left),
-                            value = money(s.periodLeft, s.currency),
-                            colors = colors,
-                        )
-                    }
-                }
-            }
-        }
+        IslandBudgetPage(
+            snapshot = s,
+            info = hostInfoState.value,
+            onOpen = { host?.openApp(itemKey) },
+            modifier = Modifier
+                .onSizeChanged { host?.resize(itemKey, it.height) }
+                .islandSnapshot { host?.snapshot(itemKey, it) },
+        )
     }
-
-    private fun splitLabel(s: IslandBudgetSnapshot): Int = when {
-        s.isOverBudget -> R.string.budget_pill_over_budget
-        s.isOverSplit -> s.viewPeriod.exceededLabelRes()
-        else -> s.viewPeriod.periodLabelRes()
-    }
-
-    private fun money(value: BigDecimal, currency: String): String =
-        if (value < BigDecimal.ZERO) "−" + formatCurrencySymbolOnly(value.negate(), currency) else formatCurrencySymbolOnly(value, currency)
 
     private companion object {
         const val CARD_KEY = "budget"
