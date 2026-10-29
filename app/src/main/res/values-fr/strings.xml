@@ -182,8 +182,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
-    <string name="receipt_scan_hint_action">Try it</string>
+    <string name="receipt_scan_hint">Astuce : appuyez longuement sur ✓ pour scanner un ticket</string>
+    <string name="receipt_scan_hint_action">Essayer</string>
     <plurals name="days">
         <item quantity="one">%d jour</item>
         <item quantity="other">%d jours</item>
@@ -649,6 +649,8 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Affichage de l\'exemple par défaut %1$d%%. Définissez un objectif d\'épargne dans les Paramètres pour cibler un montant précis.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Préférences d\'épargne</string>
+    <string name="settings_savings_reminder_title">Rappel d\'épargne</string>
+    <string name="settings_savings_reminder_subtitle">Me rappeler combien mettre de côté au début d\'une nouvelle période</string>
     <string name="settings_savings_preferences_subtitle">Personnalisez la répartition 50/30/20 et définissez un objectif d\'épargne facultatif</string>
     <string name="settings_savings_dialog_split_label">Répartition du budget</string>
     <string name="settings_savings_dialog_split_hint">Les trois valeurs doivent totaliser 100 %%.</string>
@@ -749,6 +751,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">Vous avez un abonnement \"%1$s\" qui sera facturé %2$s.</string>
     <string name="notification_credit_cutoff_title">Paiement à venir par carte de crédit</string>
     <string name="notification_credit_cutoff_message">Votre date limite est %1$s. Il est recommandé de payer %2$s pour éviter tout intérêt.</string>
+    <string name="notification_channel_savings_name">Rappels d\'épargne</string>
+    <string name="notification_channel_savings_description">Un rappel pour mettre de l\'argent de côté au début d\'une nouvelle période budgétaire</string>
+    <string name="notification_savings_reminder_title">Nouvelle période : place à l\'épargne</string>
+    <string name="notification_savings_reminder_message">Mettez %1$s de côté sur cette période pour votre épargne.</string>
     <string name="credit_owed_label">Total dû</string>
     <string name="debt_adjusted_balance_label">Solde ajusté de la dette</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s Crédit</string>
