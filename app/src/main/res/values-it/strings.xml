@@ -649,6 +649,27 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando l\'esempio predefinito %1$d%%. Impostare un obiettivo di risparmio in Impostazioni per raggiungere un importo specifico.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Preferenze di risparmio</string>
+    <string name="category_limit_set">Imposta limite</string>
+    <string name="category_limit_dialog_title">Limite per %1$s</string>
+    <string name="category_limit_amount_label">Importo del limite</string>
+    <string name="category_limit_unit_weekly">Settimanale</string>
+    <string name="category_limit_unit_period">Per periodo</string>
+    <string name="category_limit_remove">Rimuovi limite</string>
+    <string name="category_limit_progress">%1$s di %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s di %2$s questa settimana</string>
+    <string name="category_limit_would_exceed">Così superi il limite di %1$s</string>
+    <string name="category_limit_over">%1$s oltre</string>
+    <string name="category_limit_left">%1$s rimasti</string>
+    <string name="category_limit_ahead">Sopra il ritmo</string>
+    <string name="category_limit_on_track">In linea</string>
+    <string name="analytics_category_limits_title">Limiti per categoria</string>
+    <string name="settings_category_limits_title">Limiti per categoria</string>
+    <string name="settings_category_limits_subtitle_empty">Limita quanto spendi in una categoria ogni settimana o periodo</string>
+    <string name="settings_category_limits_subtitle_count">%1$d categorie su %2$d hanno un limite</string>
+    <string name="settings_category_limits_no_categories">Le categorie che usi appariranno qui.</string>
+    <string name="category_limit_none">Nessun limite</string>
+    <string name="category_limit_summary_weekly">%1$s a settimana</string>
+    <string name="category_limit_summary_period">%1$s per periodo</string>
     <string name="settings_savings_reminder_title">Promemoria di risparmio</string>
     <string name="settings_savings_reminder_subtitle">Ricordami quanto mettere da parte quando inizia un nuovo periodo</string>
     <string name="settings_savings_preferences_subtitle">Personalizza la divisione 50/30/20 e imposta un obiettivo di risparmio opzionale</string>
