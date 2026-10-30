@@ -642,6 +642,27 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">デフォルトの %1$d%%の例を表示します。特定の金額を目標に設定します。</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">保存設定</string>
+    <string name="category_limit_set">上限を設定</string>
+    <string name="category_limit_dialog_title">%1$sの上限</string>
+    <string name="category_limit_amount_label">上限額</string>
+    <string name="category_limit_unit_weekly">毎週</string>
+    <string name="category_limit_unit_period">期間ごと</string>
+    <string name="category_limit_remove">上限を削除</string>
+    <string name="category_limit_progress">%2$s中%1$s</string>
+    <string name="category_limit_progress_weekly">今週 %2$s中%1$s</string>
+    <string name="category_limit_would_exceed">上限を%1$s超えます</string>
+    <string name="category_limit_over">%1$s超過</string>
+    <string name="category_limit_left">残り%1$s</string>
+    <string name="category_limit_ahead">ペースが速め</string>
+    <string name="category_limit_on_track">順調</string>
+    <string name="analytics_category_limits_title">カテゴリの上限</string>
+    <string name="settings_category_limits_title">カテゴリの上限</string>
+    <string name="settings_category_limits_subtitle_empty">カテゴリごとに週または期間の支出上限を設定します</string>
+    <string name="settings_category_limits_subtitle_count">%2$d件中%1$d件のカテゴリに上限があります</string>
+    <string name="settings_category_limits_no_categories">使ったカテゴリがここに表示されます。</string>
+    <string name="category_limit_none">上限なし</string>
+    <string name="category_limit_summary_weekly">週%1$s</string>
+    <string name="category_limit_summary_period">期間ごとに%1$s</string>
     <string name="settings_savings_reminder_title">貯蓄リマインダー</string>
     <string name="settings_savings_reminder_subtitle">新しい期間が始まったら、取り分ける金額を通知する</string>
     <string name="settings_savings_preferences_subtitle">50/30/20の分割をカスタマイズし、オプションの貯蓄目標を設定します</string>
