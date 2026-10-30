@@ -649,6 +649,27 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Mostrando o exemplo padrão %1$d%%. Defina um objetivo de poupança nas configurações para atingir um valor específico.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Preferências de poupança</string>
+    <string name="category_limit_set">Definir limite</string>
+    <string name="category_limit_dialog_title">Limite para %1$s</string>
+    <string name="category_limit_amount_label">Valor do limite</string>
+    <string name="category_limit_unit_weekly">Semanal</string>
+    <string name="category_limit_unit_period">Por período</string>
+    <string name="category_limit_remove">Remover limite</string>
+    <string name="category_limit_progress">%1$s de %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s de %2$s nesta semana</string>
+    <string name="category_limit_would_exceed">Isso passa %1$s do limite</string>
+    <string name="category_limit_over">%1$s acima</string>
+    <string name="category_limit_left">Restam %1$s</string>
+    <string name="category_limit_ahead">Acima do ritmo</string>
+    <string name="category_limit_on_track">No ritmo</string>
+    <string name="analytics_category_limits_title">Limites por categoria</string>
+    <string name="settings_category_limits_title">Limites por categoria</string>
+    <string name="settings_category_limits_subtitle_empty">Limite quanto você gasta em uma categoria por semana ou período</string>
+    <string name="settings_category_limits_subtitle_count">%1$d de %2$d categorias têm limite</string>
+    <string name="settings_category_limits_no_categories">As categorias que você usa aparecerão aqui.</string>
+    <string name="category_limit_none">Sem limite</string>
+    <string name="category_limit_summary_weekly">%1$s por semana</string>
+    <string name="category_limit_summary_period">%1$s por período</string>
     <string name="settings_savings_reminder_title">Lembrete de poupança</string>
     <string name="settings_savings_reminder_subtitle">Lembrar quanto separar quando um novo período começar</string>
     <string name="settings_savings_preferences_subtitle">Personalize a divisão 50/30/20 e defina um objetivo de poupança opcional</string>
