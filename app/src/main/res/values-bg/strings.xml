@@ -649,6 +649,27 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Показва се примерът по подразбиране %1$d%%. Задайте цел за спестяване в Настройки, за да се насочите към конкретна сума.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Предпочитания за спестявания</string>
+    <string name="category_limit_set">Задай лимит</string>
+    <string name="category_limit_dialog_title">Лимит за %1$s</string>
+    <string name="category_limit_amount_label">Сума на лимита</string>
+    <string name="category_limit_unit_weekly">Седмично</string>
+    <string name="category_limit_unit_period">За период</string>
+    <string name="category_limit_remove">Премахни лимита</string>
+    <string name="category_limit_progress">%1$s от %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s от %2$s тази седмица</string>
+    <string name="category_limit_would_exceed">Така надвишавате лимита с %1$s</string>
+    <string name="category_limit_over">%1$s над лимита</string>
+    <string name="category_limit_left">Остават %1$s</string>
+    <string name="category_limit_ahead">Пред темпото</string>
+    <string name="category_limit_on_track">В рамките</string>
+    <string name="analytics_category_limits_title">Лимити по категории</string>
+    <string name="settings_category_limits_title">Лимити по категории</string>
+    <string name="settings_category_limits_subtitle_empty">Ограничете разходите в категория за седмица или период</string>
+    <string name="settings_category_limits_subtitle_count">%1$d от %2$d категории имат лимит</string>
+    <string name="settings_category_limits_no_categories">Категориите, които използвате, ще се появят тук.</string>
+    <string name="category_limit_none">Без лимит</string>
+    <string name="category_limit_summary_weekly">%1$s на седмица</string>
+    <string name="category_limit_summary_period">%1$s за период</string>
     <string name="settings_savings_reminder_title">Напомняне за спестяване</string>
     <string name="settings_savings_reminder_subtitle">Напомни ми колко да отделя, когато започне нов период</string>
     <string name="settings_savings_preferences_subtitle">Персонализирайте разпределението 50/30/20 и задайте незадължителна цел за спестяване</string>
