@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -31,9 +32,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
+import com.serranoie.app.minus.presentation.ui.editor.category.CategoryLimitBar
+import com.serranoie.app.minus.presentation.ui.editor.category.CategoryLimitsUi
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
 
 private val MinCategoryItemHeight = 52.dp
+private val MinCategoryItemHeightWithLimit = 76.dp
 
 private data class CornerRadii(
     val topStart: Dp,
@@ -56,7 +60,9 @@ fun SavedCategoriesGrid(
     onCategorySelected: (String) -> Unit,
     selectedCategory: String? = null,
     applyWindowInsets: Boolean = true,
+    limits: CategoryLimitsUi? = null,
 ) {
+    val minItemHeight = if (limits?.statuses.isNullOrEmpty()) MinCategoryItemHeight else MinCategoryItemHeightWithLimit
     val baseModifier = if (applyWindowInsets) {
         modifier
             .fillMaxSize()
@@ -70,7 +76,7 @@ fun SavedCategoriesGrid(
 
     BoxWithConstraints(baseModifier) {
         val wouldSquash = tags.isNotEmpty() &&
-                (maxHeight / tags.size) < MinCategoryItemHeight
+                (maxHeight / tags.size) < minItemHeight
 
         if (wouldSquash) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -80,9 +86,10 @@ fun SavedCategoriesGrid(
                         isSelected = tag == selectedCategory,
                         position = positionFor(index, tags.lastIndex),
                         onClick = { onCategorySelected(tag) },
+                        limits = limits,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = MinCategoryItemHeight),
+                            .heightIn(min = minItemHeight),
                     )
                 }
             }
@@ -94,6 +101,7 @@ fun SavedCategoriesGrid(
                         isSelected = tag == selectedCategory,
                         position = positionFor(index, tags.lastIndex),
                         onClick = { onCategorySelected(tag) },
+                        limits = limits,
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -109,6 +117,7 @@ private fun CategoryListItem(
     isSelected: Boolean,
     position: PaddedListItemPosition,
     onClick: () -> Unit,
+    limits: CategoryLimitsUi? = null,
 ) {
     val (targetTopStart, targetTopEnd, targetBottomStart, targetBottomEnd) = when {
         isSelected || position == PaddedListItemPosition.Single -> CornerRadii(
@@ -168,9 +177,9 @@ private fun CategoryListItem(
         color = containerColor,
         contentColor = contentColor,
     ) {
-        Row(
+        Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = label,
@@ -178,6 +187,15 @@ private fun CategoryListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            val status = limits?.statuses?.get(label)
+            if (status != null) {
+                CategoryLimitBar(
+                    status = status,
+                    currencyCode = limits.currencyCode,
+                    pendingAmount = limits.pendingAmount,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
         }
     }
 }

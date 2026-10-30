@@ -61,6 +61,7 @@ import androidx.compose.material.icons.rounded.QuestionMark
 import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.Savings
 import androidx.compose.material.icons.rounded.Science
+import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.TipsAndUpdates
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -102,13 +103,17 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.serranoie.app.minus.BuildConfig
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.model.Category
+import com.serranoie.app.minus.domain.model.CategoryLimitUnit
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.model.SavingsPreferences
+import com.serranoie.app.minus.presentation.ui.editor.category.CategoryLimitDialog
 import com.serranoie.app.minus.presentation.ui.settings.bugreport.buildAppEnvironmentMetadata
 import com.serranoie.app.minus.presentation.ui.settings.components.NotificationPermissionItem
 import com.serranoie.app.minus.presentation.ui.settings.savings.SavingsPreferencesEditor
@@ -116,21 +121,26 @@ import com.serranoie.app.minus.presentation.ui.settings.savings.savingsPreferenc
 import com.serranoie.app.minus.presentation.ui.settings.widgets.WidgetGallerySheet
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
-import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedExpandableItem
 import com.serranoie.app.minus.presentation.ui.theme.component.CustomPaddedListItem
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListGroup
+import com.serranoie.app.minus.presentation.ui.theme.component.PaddedExpandableList
 import com.serranoie.app.minus.presentation.ui.theme.component.PaddedListItemPosition
+import com.serranoie.app.minus.presentation.ui.theme.component.SelectablePaddedItem
 import com.serranoie.app.minus.presentation.ui.theme.component.SettingsLeadingIcon
 import com.serranoie.app.minus.presentation.ui.theme.component.SettingsToggleItem
 import com.serranoie.app.minus.presentation.ui.theme.labelLargeCondensed
+import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.Utils
 import com.serranoie.app.minus.presentation.util.Utils.toggleFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
-import kotlinx.coroutines.launch
+import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil
+import java.math.BigDecimal
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -154,6 +164,9 @@ fun Settings(
     savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
     onSavingsPreferencesChange: (SavingsPreferences) -> Unit = {},
     savingsReminderEnabled: Boolean = false,
+    categories: List<Category> = emptyList(),
+    currencyCode: String = "USD",
+    onSetCategoryLimit: (String, BigDecimal?, CategoryLimitUnit) -> Unit,
     onSavingsReminderToggle: (Boolean) -> Unit,
     onExportCsv: () -> Unit = {},
     onImportCsv: () -> Unit = {},
@@ -168,6 +181,8 @@ fun Settings(
     var showWidgetsSheet by remember { mutableStateOf(false) }
     val widgetsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isSavingsExpanded by remember { mutableStateOf(false) }
+    var isLimitsExpanded by remember { mutableStateOf(false) }
+    var limitTarget by remember { mutableStateOf<Category?>(null) }
     val dismissNotificationTimePicker = { showNotificationTimePicker = false }
     val dismissRecurrentNotificationTimePicker = { showRecurrentNotificationTimePicker = false }
     val scrollBehavior =
@@ -388,7 +403,10 @@ fun Settings(
                 ) {
                     CustomPaddedExpandableItem(
                         isExpanded = isSavingsExpanded,
-                        onToggleExpanded = { isSavingsExpanded = !isSavingsExpanded },
+                        onToggleExpanded = {
+                            isSavingsExpanded = !isSavingsExpanded
+                            view.weakHapticFeedback()
+                        },
                         position = PaddedListItemPosition.First,
                         modifier = Modifier.testTag("SettingsSavingsPreferencesItem"),
                         defaultContent = {
@@ -428,8 +446,59 @@ fun Settings(
                         },
                     )
 
+                    val limitedCount = categories.count { it.limit != null }
+                    PaddedExpandableList(
+                        isExpanded = isLimitsExpanded,
+                        onToggleExpanded = {
+                            isLimitsExpanded = !isLimitsExpanded
+                            view.weakHapticFeedback()
+                        },
+                        headerLabel = stringResource(R.string.settings_category_limits_title),
+                        containerPosition = PaddedListItemPosition.Middle,
+                        headerSubtitle = if (limitedCount == 0) {
+                            stringResource(R.string.settings_category_limits_subtitle_empty)
+                        } else {
+                            stringResource(
+                                R.string.settings_category_limits_subtitle_count,
+                                limitedCount,
+                                categories.size,
+                            )
+                        },
+                        leadingIcon = { SettingsLeadingIcon(icon = Icons.Rounded.Speed) },
+                        modifier = Modifier.testTag("SettingsCategoryLimitsItem"),
+                        expandedContent = {
+                            if (categories.isEmpty()) {
+                                SelectablePaddedItem(
+                                    label = stringResource(R.string.settings_category_limits_no_categories),
+                                    isActive = false,
+                                    onClick = {},
+                                )
+                            }
+                            categories.forEach { category ->
+                                SelectablePaddedItem(
+                                    label = category.name,
+                                    isActive = category.limit != null,
+                                    onClick = { limitTarget = category },
+                                    subtitle = category.limit?.let { limit ->
+                                        stringResource(
+                                            if (limit.unit == CategoryLimitUnit.WEEKLY) {
+                                                R.string.category_limit_summary_weekly
+                                            } else {
+                                                R.string.category_limit_summary_period
+                                            },
+                                            formatCurrencySymbolOnly(limit.amount, currencyCode),
+                                        )
+                                    } ?: stringResource(R.string.category_limit_none),
+                                )
+                            }
+                        },
+                    )
+
                     CustomPaddedListItem(
-                        onClick = { onSavingsReminderToggle(!savingsReminderEnabled) },
+                        onClick = {
+                            onSavingsReminderToggle(!savingsReminderEnabled)
+                            view.toggleFeedback()
+                        },
                         position = PaddedListItemPosition.Last,
                         modifier = Modifier.testTag("SettingsSavingsReminderItem"),
                     ) {
@@ -770,6 +839,17 @@ fun Settings(
             }
         }
 
+        limitTarget?.let { target ->
+            CategoryLimitDialog(
+                categoryName = target.name,
+                current = target.limit,
+                onDismiss = { limitTarget = null },
+                onSave = { amount, unit ->
+                    onSetCategoryLimit(target.name, amount, unit)
+                    limitTarget = null
+                },
+            )
+        }
     }
 }
 
@@ -810,6 +890,7 @@ private fun PreviewSettings() {
             periodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
             onPeriodMappingModeChange = {},
             onSavingsReminderToggle = {},
+            onSetCategoryLimit = { _, _, _ -> },
             onNavigateToAppearance = {})
     }
 }

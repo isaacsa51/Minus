@@ -142,6 +142,7 @@ class SplitModeE2ETest {
             CompositionLocalProvider {
                 MinusTheme {
                     Editor(
+                        onSetCategoryLimit = null,
                         uiState = budgetUiState,
                         animState = AnimState.IDLE,
                         modifier = Modifier.fillMaxSize(),

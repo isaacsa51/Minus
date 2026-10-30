@@ -31,6 +31,9 @@ interface CategoryDao {
     @Query("UPDATE category SET isHidden = 0 WHERE name = :name")
     suspend fun unhideCategory(name: String)
 
+    @Query("UPDATE category SET limitAmount = :amount, limitUnit = :unit WHERE name = :name")
+    suspend fun setLimit(name: String, amount: String?, unit: String?)
+
     @Query("UPDATE category SET usageCount = usageCount + 1, lastUsedAt = :timestamp WHERE name = :name")
     suspend fun incrementUsage(name: String, timestamp: Long = System.currentTimeMillis())
 }

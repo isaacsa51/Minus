@@ -785,4 +785,25 @@
     <string name="notification_channel_savings_description">یادآوری برای کنار گذاشتن پول هنگام شروع دوره بودجه جدید</string>
     <string name="notification_savings_reminder_title">دوره جدید: وقت پس‌انداز است</string>
     <string name="notification_savings_reminder_message">%1$s از این دوره را برای پس‌اندازتان کنار بگذارید.</string>
+    <string name="category_limit_set">تعیین سقف</string>
+    <string name="category_limit_dialog_title">سقف برای %1$s</string>
+    <string name="category_limit_amount_label">مبلغ سقف</string>
+    <string name="category_limit_unit_weekly">هفتگی</string>
+    <string name="category_limit_unit_period">برای هر دوره</string>
+    <string name="category_limit_remove">حذف سقف</string>
+    <string name="category_limit_progress">%1$s از %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s از %2$s در این هفته</string>
+    <string name="category_limit_would_exceed">با این مبلغ %1$s از سقف بیشتر می‌شود</string>
+    <string name="category_limit_over">%1$s بیشتر از سقف</string>
+    <string name="category_limit_left">%1$s باقی‌مانده</string>
+    <string name="category_limit_ahead">جلوتر از برنامه</string>
+    <string name="category_limit_on_track">طبق برنامه</string>
+    <string name="analytics_category_limits_title">سقف دسته‌بندی‌ها</string>
+    <string name="settings_category_limits_title">سقف دسته‌بندی‌ها</string>
+    <string name="settings_category_limits_subtitle_empty">برای خرج هر دسته‌بندی در هفته یا دوره سقف بگذارید</string>
+    <string name="settings_category_limits_subtitle_count">%1$d از %2$d دسته‌بندی سقف دارند</string>
+    <string name="settings_category_limits_no_categories">دسته‌بندی‌هایی که استفاده می‌کنید اینجا نشان داده می‌شوند.</string>
+    <string name="category_limit_none">بدون سقف</string>
+    <string name="category_limit_summary_weekly">%1$s در هفته</string>
+    <string name="category_limit_summary_period">%1$s در هر دوره</string>
 </resources>

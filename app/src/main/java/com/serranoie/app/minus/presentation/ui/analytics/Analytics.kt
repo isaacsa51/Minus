@@ -80,6 +80,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.fragment.app.FragmentActivity
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.calculator.categoryLimitStatuses
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -131,8 +132,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
+import java.time.temporal.WeekFields
 import java.util.Date
+import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
 private val STABLE_DEFAULT_DATE = Date(0)
@@ -530,6 +534,29 @@ fun Analytics(
                             bringIntoViewRequesters = bringIntoViewRequesters,
                             markIfInOrder = markIfInOrder,
                         )
+                        val limitStatuses = remember(shown) {
+                            val settings = shown.budgetSettingsForDisplay
+                            if (shown.isHistoricalView || settings == null) {
+                                emptyList()
+                            } else {
+                                categoryLimitStatuses(
+                                    categories = shown.categories,
+                                    transactions = shown.allTransactions,
+                                    periodStart = settings.startDate,
+                                    periodEnd = settings.getPeriodEndDate(),
+                                    today = LocalDate.now(),
+                                    firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek,
+                                ).values.sortedByDescending { it.spent.divide(it.limit.amount, 4, RoundingMode.HALF_UP) }
+                            }
+                        }
+                        if (limitStatuses.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            CategoryLimitsCard(
+                                statuses = limitStatuses,
+                                currencyCode = shown.currencyCode,
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                            )
+                        }
                         if (shown.wholeBudget > BigDecimal.ZERO) {
                             Spacer(modifier = Modifier.height(16.dp))
                             SavingsRecommendationCard(

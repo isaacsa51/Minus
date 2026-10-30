@@ -803,4 +803,25 @@
     <string name="notification_channel_savings_description">新しい予算期間が始まったときに、お金を取り分けるよう通知します</string>
     <string name="notification_savings_reminder_title">新しい期間：貯蓄のタイミングです</string>
     <string name="notification_savings_reminder_message">この期間から%1$sを貯蓄に回しましょう。</string>
+    <string name="category_limit_set">上限を設定</string>
+    <string name="category_limit_dialog_title">%1$sの上限</string>
+    <string name="category_limit_amount_label">上限額</string>
+    <string name="category_limit_unit_weekly">毎週</string>
+    <string name="category_limit_unit_period">期間ごと</string>
+    <string name="category_limit_remove">上限を削除</string>
+    <string name="category_limit_progress">%2$s中%1$s</string>
+    <string name="category_limit_progress_weekly">今週 %2$s中%1$s</string>
+    <string name="category_limit_would_exceed">上限を%1$s超えます</string>
+    <string name="category_limit_over">%1$s超過</string>
+    <string name="category_limit_left">残り%1$s</string>
+    <string name="category_limit_ahead">ペースが速め</string>
+    <string name="category_limit_on_track">順調</string>
+    <string name="analytics_category_limits_title">カテゴリの上限</string>
+    <string name="settings_category_limits_title">カテゴリの上限</string>
+    <string name="settings_category_limits_subtitle_empty">カテゴリごとに週または期間の支出上限を設定します</string>
+    <string name="settings_category_limits_subtitle_count">%2$d件中%1$d件のカテゴリに上限があります</string>
+    <string name="settings_category_limits_no_categories">使ったカテゴリがここに表示されます。</string>
+    <string name="category_limit_none">上限なし</string>
+    <string name="category_limit_summary_weekly">週%1$s</string>
+    <string name="category_limit_summary_period">期間ごとに%1$s</string>
 </resources>

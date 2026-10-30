@@ -121,6 +121,7 @@ import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditorStat
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.LeftoverChoiceList
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.Numpad
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.SavedCategoriesGrid
+import com.serranoie.app.minus.presentation.ui.editor.category.CategoryLimitsUi
 import com.serranoie.app.minus.presentation.ui.theme.isNightMode
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBoxState
 import com.serranoie.app.minus.presentation.ui.tutorial.TutorialBox
@@ -1396,6 +1397,18 @@ private fun MainScreenNumpadSection(
                         )
                     },
                     applyWindowInsets = false,
+                    limits = CategoryLimitsUi(
+                        statuses = budgetUiState.categoryLimits,
+                        pendingAmount = budgetUiState.numpadInput.toBigDecimalOrNull(),
+                        currencyCode = budgetUiState.budgetSettings?.currencyCode ?: "USD",
+                        onSetLimit = { name, amount, unit ->
+                            actions.onProcessIntent(
+                                MainScreenUiIntent.ProcessBudgetEditorIntent(
+                                    BudgetEditorIntent.SetCategoryLimit(name, amount, unit),
+                                ),
+                            )
+                        },
+                    ),
                 )
             }
         } else {
@@ -1630,6 +1643,13 @@ private fun MainScreenEditorSection(
             actions.onProcessIntent(
                 MainScreenUiIntent.ProcessBudgetEditorIntent(
                     BudgetEditorIntent.DeleteTag(tag),
+                ),
+            )
+        },
+        onSetCategoryLimit = { name, amount, unit ->
+            actions.onProcessIntent(
+                MainScreenUiIntent.ProcessBudgetEditorIntent(
+                    BudgetEditorIntent.SetCategoryLimit(name, amount, unit),
                 ),
             )
         },

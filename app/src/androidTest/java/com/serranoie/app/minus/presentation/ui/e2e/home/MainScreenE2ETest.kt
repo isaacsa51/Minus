@@ -169,6 +169,7 @@ class MainScreenE2ETest {
         composeTestRule.setContent {
             MinusTheme {
                 Editor(
+                    onSetCategoryLimit = null,
                     uiState = budgetUiState,
                     animState = animState,
                     modifier = Modifier.fillMaxSize(),

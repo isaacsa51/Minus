@@ -21,6 +21,9 @@ import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.AppColorScheme
 import com.serranoie.app.minus.domain.model.ContrastMode
 import com.serranoie.app.minus.domain.model.PeriodMappingMode
+import com.serranoie.app.minus.domain.model.Category
+import com.serranoie.app.minus.domain.model.CategoryLimit
+import com.serranoie.app.minus.domain.model.CategoryLimitUnit
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
@@ -46,6 +49,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.math.BigDecimal
 import javax.inject.Inject
 import android.provider.Settings as AndroidSettings
 
@@ -75,6 +79,8 @@ data class SettingsUiState(
     val periodMappingMode: PeriodMappingMode = PeriodMappingMode.ACTIVE_BUDGET,
     val savingsPreferences: SavingsPreferences = SavingsPreferences.DEFAULT,
     val savingsReminderEnabled: Boolean = false,
+    val categories: List<Category> = emptyList(),
+    val currencyCode: String = "USD",
     val creditCardCutoffDay: Int? = null,
     val syncFolderName: String? = null,
     val syncStatus: SyncStatus? = null,
@@ -111,11 +117,13 @@ class SettingsViewModel @Inject constructor(
 
     val uiState: StateFlow<SettingsUiState> = combine(
         settingsRepository.observeSettings(),
-        budgetRepository.getBudgetSettings(),
+        combine(budgetRepository.getBudgetSettings(), budgetRepository.getActiveCategories()) { budget, categories ->
+            budget to categories
+        },
         censorManager.isCensored,
         _notificationPermissionGranted,
         combine(syncFolderLabel, syncStatus) { label, status -> label to status }
-    ) { settings, budgetSettings, isCensored, permissionGranted, sync ->
+    ) { settings, (budgetSettings, categories), isCensored, permissionGranted, sync ->
         SettingsUiState(
             currentTheme = when (settings.themeMode) {
                 ThemeMode.LIGHT -> "Light"
@@ -158,6 +166,8 @@ class SettingsViewModel @Inject constructor(
             periodMappingMode = settings.periodMappingMode,
             savingsPreferences = settings.savingsPreferences,
             savingsReminderEnabled = settings.savingsReminderEnabled,
+            categories = categories,
+            currencyCode = budgetSettings?.currencyCode ?: "USD",
             creditCardCutoffDay = budgetSettings?.creditCardCutoffDay,
             syncFolderName = sync.first,
             syncStatus = sync.second
@@ -410,6 +420,11 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.setSavingsPreferences(prefs)
         }
+    }
+
+    fun onSetCategoryLimit(name: String, amount: BigDecimal?, unit: CategoryLimitUnit) {
+        val limit = amount?.takeIf { it.signum() > 0 }?.let { CategoryLimit(it, unit) }
+        viewModelScope.launch { budgetRepository.setCategoryLimit(name, limit) }
     }
 
     fun onSavingsReminderToggle(enabled: Boolean) {

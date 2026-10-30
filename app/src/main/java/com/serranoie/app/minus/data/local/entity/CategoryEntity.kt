@@ -15,5 +15,7 @@ data class CategoryEntity(
     val isHidden: Boolean = false,
     val usageCount: Int = 0,
     val lastUsedAt: Long? = null,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val limitAmount: String? = null,
+    val limitUnit: String? = null,
 )

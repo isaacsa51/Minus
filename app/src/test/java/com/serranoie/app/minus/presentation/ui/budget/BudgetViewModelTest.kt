@@ -630,4 +630,55 @@ class BudgetViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `category limits for the current period are exposed in the ui state`() = runTest {
+        val today = LocalDate.now()
+        settingsFlow.value = sampleSettings().copy(startDate = today, endDate = today.plusDays(29))
+        categoriesFlow.value = listOf(
+            com.serranoie.app.minus.domain.model.Category(
+                name = "Coffee",
+                limit = com.serranoie.app.minus.domain.model.CategoryLimit(BigDecimal("50"), com.serranoie.app.minus.domain.model.CategoryLimitUnit.PERIOD),
+            ),
+            com.serranoie.app.minus.domain.model.Category(name = "Gifts"),
+        )
+        transactionsFlow.value = listOf(
+            Transaction(amount = BigDecimal("48"), comment = "Coffee", date = today.atTime(9, 0)),
+        )
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitCondition { it.categoryLimits.isNotEmpty() }
+            assertThat(state.categoryLimits.keys).containsExactly("Coffee")
+            assertThat(state.categoryLimits.getValue("Coffee").spent).isEqualTo(BigDecimal("48"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `setting a category limit is persisted through the repository`() = runTest {
+        val viewModel = newViewModel()
+
+        viewModel.processIntent(
+            BudgetEditorIntent.SetCategoryLimit("Coffee", BigDecimal("50"), com.serranoie.app.minus.domain.model.CategoryLimitUnit.WEEKLY),
+        )
+
+        coVerify {
+            budgetRepository.setCategoryLimit(
+                "Coffee",
+                com.serranoie.app.minus.domain.model.CategoryLimit(BigDecimal("50"), com.serranoie.app.minus.domain.model.CategoryLimitUnit.WEEKLY),
+            )
+        }
+    }
+
+    @Test
+    fun `clearing a category limit stores null`() = runTest {
+        val viewModel = newViewModel()
+
+        viewModel.processIntent(
+            BudgetEditorIntent.SetCategoryLimit("Coffee", null, com.serranoie.app.minus.domain.model.CategoryLimitUnit.PERIOD),
+        )
+
+        coVerify { budgetRepository.setCategoryLimit("Coffee", null) }
+    }
 }

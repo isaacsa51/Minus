@@ -80,6 +80,7 @@ class SettingsScreenshotTest {
                 periodMappingMode = periodMappingMode,
                 onPeriodMappingModeChange = {},
                 onSavingsReminderToggle = {},
+                onSetCategoryLimit = { _, _, _ -> },
                 onExportCsv = {},
                 onImportCsv = {},
                 onResetTutorial = {},

@@ -762,6 +762,27 @@
 
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Savings preferences</string>
+    <string name="category_limit_set">Set limit</string>
+    <string name="category_limit_dialog_title">Limit for %1$s</string>
+    <string name="category_limit_amount_label">Limit amount</string>
+    <string name="category_limit_unit_weekly">Weekly</string>
+    <string name="category_limit_unit_period">Per period</string>
+    <string name="category_limit_remove">Remove limit</string>
+    <string name="category_limit_progress">%1$s of %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s of %2$s this week</string>
+    <string name="category_limit_would_exceed">This goes %1$s over the limit</string>
+    <string name="category_limit_over">%1$s over</string>
+    <string name="category_limit_left">%1$s left</string>
+    <string name="category_limit_ahead">Ahead of pace</string>
+    <string name="category_limit_on_track">On track</string>
+    <string name="analytics_category_limits_title">Category limits</string>
+    <string name="settings_category_limits_title">Category limits</string>
+    <string name="settings_category_limits_subtitle_empty">Cap what you spend in a category each week or period</string>
+    <string name="settings_category_limits_subtitle_count">%1$d of %2$d categories have a limit</string>
+    <string name="settings_category_limits_no_categories">Categories you use will show up here.</string>
+    <string name="category_limit_none">No limit</string>
+    <string name="category_limit_summary_weekly">%1$s per week</string>
+    <string name="category_limit_summary_period">%1$s per period</string>
     <string name="settings_savings_reminder_title">Savings reminder</string>
     <string name="settings_savings_reminder_subtitle">Remind me what to set aside when a new period starts</string>
     <string name="settings_savings_preferences_subtitle">Customize the 50/30/20 split and set an optional savings goal</string>

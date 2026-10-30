@@ -802,4 +802,25 @@
     <string name="notification_channel_savings_description">新的预算周期开始时，提醒你留出一笔钱存起来</string>
     <string name="notification_savings_reminder_title">新周期：该存钱了</string>
     <string name="notification_savings_reminder_message">从本周期中留出 %1$s 存起来。</string>
+    <string name="category_limit_set">设置限额</string>
+    <string name="category_limit_dialog_title">%1$s 的限额</string>
+    <string name="category_limit_amount_label">限额金额</string>
+    <string name="category_limit_unit_weekly">每周</string>
+    <string name="category_limit_unit_period">每个周期</string>
+    <string name="category_limit_remove">移除限额</string>
+    <string name="category_limit_progress">%1$s / %2$s</string>
+    <string name="category_limit_progress_weekly">本周 %1$s / %2$s</string>
+    <string name="category_limit_would_exceed">这将超出限额 %1$s</string>
+    <string name="category_limit_over">超出 %1$s</string>
+    <string name="category_limit_left">剩余 %1$s</string>
+    <string name="category_limit_ahead">花得偏快</string>
+    <string name="category_limit_on_track">进度正常</string>
+    <string name="analytics_category_limits_title">类别限额</string>
+    <string name="settings_category_limits_title">类别限额</string>
+    <string name="settings_category_limits_subtitle_empty">为某个类别设置每周或每个周期的支出上限</string>
+    <string name="settings_category_limits_subtitle_count">%2$d 个类别中有 %1$d 个设置了限额</string>
+    <string name="settings_category_limits_no_categories">你使用的类别会显示在这里。</string>
+    <string name="category_limit_none">无限额</string>
+    <string name="category_limit_summary_weekly">每周 %1$s</string>
+    <string name="category_limit_summary_period">每个周期 %1$s</string>
 </resources>

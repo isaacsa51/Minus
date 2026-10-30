@@ -1,10 +1,12 @@
 package com.serranoie.app.minus.presentation.ui.budget.mvi.intent
 
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.CategoryLimitUnit
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.presentation.ui.budget.mvi.BudgetUiIntent
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.EditMode
+import java.math.BigDecimal
 import java.time.LocalDate
 
 sealed interface BudgetEditorIntent : BudgetUiIntent {
@@ -15,6 +17,11 @@ sealed interface BudgetEditorIntent : BudgetUiIntent {
     data class CommentUpdated(val comment: String) : BudgetEditorIntent
     data class NoteUpdated(val note: String) : BudgetEditorIntent
     data class DeleteTag(val tag: String) : BudgetEditorIntent
+    data class SetCategoryLimit(
+        val name: String,
+        val amount: BigDecimal?,
+        val unit: CategoryLimitUnit,
+    ) : BudgetEditorIntent
     data class CreateCategory(val name: String) : BudgetEditorIntent
     data class SetRecurrentEnabled(val enabled: Boolean) : BudgetEditorIntent
     data class SetCreditEnabled(val enabled: Boolean) : BudgetEditorIntent

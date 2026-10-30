@@ -3,6 +3,7 @@ package com.serranoie.app.minus.data.repository
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
+import com.serranoie.app.minus.domain.model.CategoryLimit
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.Transaction
@@ -66,6 +67,8 @@ interface BudgetRepository {
     suspend fun hideCategory(name: String)
 
     suspend fun incrementCategoryUsage(name: String)
+
+    suspend fun setCategoryLimit(name: String, limit: CategoryLimit?)
 
     suspend fun getPeriodCount(): Int
 

@@ -20,6 +20,8 @@ import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
+import com.serranoie.app.minus.domain.model.CategoryLimit
+import com.serranoie.app.minus.domain.model.CategoryLimitUnit
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
@@ -180,7 +182,10 @@ class BudgetRepositoryImpl @Inject constructor(
         isHidden = this.isHidden,
         usageCount = this.usageCount,
         lastUsedAt = this.lastUsedAt,
-        createdAt = this.createdAt
+        createdAt = this.createdAt,
+        limit = this.limitAmount?.toBigDecimalOrNull()?.let {
+            CategoryLimit(it, CategoryLimitUnit.from(this.limitUnit))
+        },
     )
 
     private fun Category.toEntity(): CategoryEntity = CategoryEntity(
@@ -189,7 +194,9 @@ class BudgetRepositoryImpl @Inject constructor(
         isHidden = this.isHidden,
         usageCount = this.usageCount,
         lastUsedAt = this.lastUsedAt,
-        createdAt = this.createdAt
+        createdAt = this.createdAt,
+        limitAmount = this.limit?.amount?.toPlainString(),
+        limitUnit = this.limit?.unit?.name,
     )
 
     private fun ArchivedBudgetEntity.toDomain(): ArchivedBudget = ArchivedBudget(
@@ -397,6 +404,10 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun incrementCategoryUsage(name: String) {
         categoryDao.incrementUsage(name)
+    }
+
+    override suspend fun setCategoryLimit(name: String, limit: CategoryLimit?) {
+        categoryDao.setLimit(name, limit?.amount?.toPlainString(), limit?.unit?.name)
     }
 
     override suspend fun getPeriodCount(): Int {

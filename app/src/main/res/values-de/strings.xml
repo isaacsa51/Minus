@@ -803,4 +803,25 @@
     <string name="notification_channel_savings_description">Eine Erinnerung, Geld zurückzulegen, wenn eine neue Budgetperiode beginnt</string>
     <string name="notification_savings_reminder_title">Neue Periode: Zeit zum Sparen</string>
     <string name="notification_savings_reminder_message">Lege %1$s aus dieser Periode für deine Ersparnisse zurück.</string>
+    <string name="category_limit_set">Limit festlegen</string>
+    <string name="category_limit_dialog_title">Limit für %1$s</string>
+    <string name="category_limit_amount_label">Limitbetrag</string>
+    <string name="category_limit_unit_weekly">Wöchentlich</string>
+    <string name="category_limit_unit_period">Pro Zeitraum</string>
+    <string name="category_limit_remove">Limit entfernen</string>
+    <string name="category_limit_progress">%1$s von %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s von %2$s diese Woche</string>
+    <string name="category_limit_would_exceed">Damit liegst du %1$s über dem Limit</string>
+    <string name="category_limit_over">%1$s drüber</string>
+    <string name="category_limit_left">%1$s übrig</string>
+    <string name="category_limit_ahead">Schneller als geplant</string>
+    <string name="category_limit_on_track">Im Plan</string>
+    <string name="analytics_category_limits_title">Kategorielimits</string>
+    <string name="settings_category_limits_title">Kategorielimits</string>
+    <string name="settings_category_limits_subtitle_empty">Begrenze, was du pro Woche oder Zeitraum in einer Kategorie ausgibst</string>
+    <string name="settings_category_limits_subtitle_count">%1$d von %2$d Kategorien haben ein Limit</string>
+    <string name="settings_category_limits_no_categories">Kategorien, die du nutzt, erscheinen hier.</string>
+    <string name="category_limit_none">Kein Limit</string>
+    <string name="category_limit_summary_weekly">%1$s pro Woche</string>
+    <string name="category_limit_summary_period">%1$s pro Zeitraum</string>
 </resources>

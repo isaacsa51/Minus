@@ -3,12 +3,16 @@ package com.serranoie.app.minus.data.repository
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.local.dao.CategoryDao
 import com.serranoie.app.minus.data.local.entity.CategoryEntity
+import com.serranoie.app.minus.domain.model.CategoryLimit
+import com.serranoie.app.minus.domain.model.CategoryLimitUnit
 import io.mockk.mockk
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import java.math.BigDecimal
 
 class BudgetRepositoryImplCategoryTest {
 
@@ -42,6 +46,9 @@ class BudgetRepositoryImplCategoryTest {
 
         override suspend fun incrementUsage(name: String, timestamp: Long) =
             replace(name) { it.copy(usageCount = it.usageCount + 1, lastUsedAt = timestamp) }
+
+        override suspend fun setLimit(name: String, amount: String?, unit: String?) =
+            replace(name) { it.copy(limitAmount = amount, limitUnit = unit) }
 
         private fun replace(name: String, transform: (CategoryEntity) -> CategoryEntity) {
             val index = rows.indexOfFirst { it.name == name }
@@ -98,5 +105,31 @@ class BudgetRepositoryImplCategoryTest {
         val row = categoryDao.rows.single()
         assertThat(row.id).isEqualTo(1L)
         assertThat(row.usageCount).isEqualTo(2)
+    }
+
+    @Test
+    fun `a category limit round-trips through the entity`() = runTest {
+        repo.createCategory("Coffee")
+
+        repo.setCategoryLimit("Coffee", CategoryLimit(BigDecimal("50.00"), CategoryLimitUnit.WEEKLY))
+
+        val row = categoryDao.rows.single()
+        assertThat(row.limitAmount).isEqualTo("50.00")
+        assertThat(row.limitUnit).isEqualTo("WEEKLY")
+        assertThat(repo.getAllCategories().first().single().limit)
+            .isEqualTo(CategoryLimit(BigDecimal("50.00"), CategoryLimitUnit.WEEKLY))
+    }
+
+    @Test
+    fun `clearing a category limit removes both columns`() = runTest {
+        repo.createCategory("Coffee")
+        repo.setCategoryLimit("Coffee", CategoryLimit(BigDecimal("50"), CategoryLimitUnit.PERIOD))
+
+        repo.setCategoryLimit("Coffee", null)
+
+        val row = categoryDao.rows.single()
+        assertThat(row.limitAmount).isNull()
+        assertThat(row.limitUnit).isNull()
+        assertThat(repo.getAllCategories().first().single().limit).isNull()
     }
 }

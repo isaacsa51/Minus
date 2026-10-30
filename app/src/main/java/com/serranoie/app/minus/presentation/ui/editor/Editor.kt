@@ -4,13 +4,16 @@ package com.serranoie.app.minus.presentation.ui.editor
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -92,15 +95,18 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.CategoryLimitUnit
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.SymbolPosition
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.calculation.evaluateCalculation
+import com.serranoie.app.minus.presentation.ui.editor.category.CategoryLimitsUi
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
-import com.serranoie.app.minus.presentation.ui.editor.category.NewCategoryTag
 import com.serranoie.app.minus.presentation.ui.editor.category.EditableCategoryTag
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
+import com.serranoie.app.minus.presentation.ui.editor.category.NewCategoryTag
+import com.serranoie.app.minus.presentation.ui.editor.category.SelectedCategoryLimitCard
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.RecurrentExpenseDialog
 import com.serranoie.app.minus.presentation.ui.editor.note.EditableNoteTag
@@ -109,8 +115,8 @@ import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.colorButton
 import com.serranoie.app.minus.presentation.ui.theme.component.AutoResizeBasicTextField
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.formula.LocalBudgetFormulaHost
-import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BUDGET_PILL_FORMULA_KEY
+import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.BudgetPill
 import com.serranoie.app.minus.presentation.ui.theme.component.numpad.EditStage
 import com.serranoie.app.minus.presentation.ui.theme.displayLargeCondensed
 import com.serranoie.app.minus.presentation.ui.theme.titleSmallCondensed
@@ -119,13 +125,13 @@ import com.serranoie.app.minus.presentation.ui.tutorial.markForTutorial
 import com.serranoie.app.minus.presentation.util.LocalCensorMode
 import com.serranoie.app.minus.presentation.util.Utils.strongHapticFeedback
 import com.serranoie.app.minus.presentation.util.Utils.weakHapticFeedback
-import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performUIHaptic
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.serranoie.app.minus.presentation.util.haptic.HapticUtil.performUIHaptic
 import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private val EditorFontSize = 96.sp
 private const val EditorSymbolScale = 0.45f
@@ -166,6 +172,7 @@ fun Editor(
     onCommentUpdate: (String) -> Unit = {},
     onNoteUpdate: (String) -> Unit = {},
     onDeleteTag: (String) -> Unit = {},
+    onSetCategoryLimit: ((String, BigDecimal?, CategoryLimitUnit) -> Unit)?,
     onCreateCategory: suspend (String) -> Boolean = { true },
     onCategoryEditingChanged: (Boolean) -> Unit = {},
     onRecurrentToggle: (Boolean) -> Unit = {},
@@ -544,6 +551,14 @@ fun Editor(
                     onCommentUpdate = onCommentUpdate,
                     onNoteUpdate = onNoteUpdate,
                     onDeleteTag = onDeleteTag,
+                    limits = onSetCategoryLimit?.let { onSetLimit ->
+                        CategoryLimitsUi(
+                            statuses = uiState.categoryLimits,
+                            pendingAmount = uiState.numpadInput.toBigDecimalOrNull(),
+                            currencyCode = uiState.budgetSettings?.currencyCode ?: "USD",
+                            onSetLimit = onSetLimit,
+                        )
+                    },
                     onCategoryEditingChanged = onCategoryEditingChanged,
                     editorFocusController = editorFocusController,
                     directCategoryPopupEnabled = directCategoryPopupEnabled,
@@ -627,6 +642,7 @@ private fun EditingContent(
     onCommentUpdate: (String) -> Unit,
     onNoteUpdate: (String) -> Unit = {},
     onDeleteTag: (String) -> Unit,
+    limits: CategoryLimitsUi?,
     onCategoryEditingChanged: (Boolean) -> Unit = {},
     editorFocusController: FocusController,
     directCategoryPopupEnabled: Boolean = false,
@@ -930,6 +946,24 @@ private fun EditingContent(
                 }
             }
 
+            val selectedLimit = limits?.statuses?.get(currentComment.trim())
+            var shownLimit by remember { mutableStateOf(selectedLimit) }
+            if (selectedLimit != null) shownLimit = selectedLimit
+            AnimatedVisibility(
+                visible = selectedLimit != null,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
+                shownLimit?.let { status ->
+                    SelectedCategoryLimitCard(
+                        status = status,
+                        pendingAmount = limits?.pendingAmount,
+                        currencyCode = currencyCode,
+                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 12.dp),
+                    )
+                }
+            }
+
             if (categoryGridModeEnabled) {
                 var isInlineNoteEditing by remember { mutableStateOf(false) }
                 var isInlineCategoryEditing by remember { mutableStateOf(false) }
@@ -982,6 +1016,7 @@ private fun EditingContent(
                             onShowCategoryGrid = onShowCategoryGrid,
                             onHideCategoryGrid = onHideCategoryGrid,
                             onDisableCalculationMode = onDisableCalculationMode,
+                            limits = limits,
                         )
                     }
                 }
@@ -1004,6 +1039,7 @@ private fun EditingContent(
                     onShowCategoryGrid = onShowCategoryGrid,
                     onHideCategoryGrid = onHideCategoryGrid,
                     onDisableCalculationMode = onDisableCalculationMode,
+                    limits = limits,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 26.dp)
@@ -1082,6 +1118,7 @@ private fun IdleContent(
 fun EditorPreview_Idle() {
     MinusTheme {
         Editor(
+            onSetCategoryLimit = null,
             uiState = BudgetUiState(
                 budgetSettings = BudgetSettings(
                     totalBudget = BigDecimal("500.00"),
@@ -1126,6 +1163,7 @@ fun EditorPreview_Idle() {
 fun EditorPreview_Editing() {
     MinusTheme {
         Editor(
+            onSetCategoryLimit = null,
             uiState = BudgetUiState(
                 budgetSettings = BudgetSettings(
                     totalBudget = BigDecimal("500.00"),
@@ -1171,6 +1209,7 @@ fun EditorPreview_Editing() {
 private fun EditorPreview_Editing_WithCredit() {
     MinusTheme {
         Editor(
+            onSetCategoryLimit = null,
             uiState = BudgetUiState(
                 budgetSettings = BudgetSettings(
                     totalBudget = BigDecimal("500.00"),

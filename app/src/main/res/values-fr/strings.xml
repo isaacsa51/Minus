@@ -803,4 +803,25 @@
     <string name="notification_channel_savings_description">Un rappel pour mettre de l\'argent de côté au début d\'une nouvelle période budgétaire</string>
     <string name="notification_savings_reminder_title">Nouvelle période : place à l\'épargne</string>
     <string name="notification_savings_reminder_message">Mettez %1$s de côté sur cette période pour votre épargne.</string>
+    <string name="category_limit_set">Définir une limite</string>
+    <string name="category_limit_dialog_title">Limite pour %1$s</string>
+    <string name="category_limit_amount_label">Montant de la limite</string>
+    <string name="category_limit_unit_weekly">Hebdomadaire</string>
+    <string name="category_limit_unit_period">Par période</string>
+    <string name="category_limit_remove">Supprimer la limite</string>
+    <string name="category_limit_progress">%1$s sur %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s sur %2$s cette semaine</string>
+    <string name="category_limit_would_exceed">Cela dépasse la limite de %1$s</string>
+    <string name="category_limit_over">%1$s de trop</string>
+    <string name="category_limit_left">%1$s restants</string>
+    <string name="category_limit_ahead">En avance sur le rythme</string>
+    <string name="category_limit_on_track">Dans les clous</string>
+    <string name="analytics_category_limits_title">Limites par catégorie</string>
+    <string name="settings_category_limits_title">Limites par catégorie</string>
+    <string name="settings_category_limits_subtitle_empty">Plafonnez vos dépenses dans une catégorie chaque semaine ou période</string>
+    <string name="settings_category_limits_subtitle_count">%1$d catégories sur %2$d ont une limite</string>
+    <string name="settings_category_limits_no_categories">Les catégories que vous utilisez apparaîtront ici.</string>
+    <string name="category_limit_none">Aucune limite</string>
+    <string name="category_limit_summary_weekly">%1$s par semaine</string>
+    <string name="category_limit_summary_period">%1$s par période</string>
 </resources>

@@ -33,6 +33,7 @@ class EditorScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 Editor(
+                    onSetCategoryLimit = null,
                     uiState = sampleBudgetUiState(),
                     animState = AnimState.IDLE,
                     onFocus = {},
@@ -53,6 +54,7 @@ class EditorScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 Editor(
+                    onSetCategoryLimit = null,
                     uiState = sampleBudgetUiState().copy(
                         numpadInput = "24.50",
                         isNumpadValid = true,
@@ -86,6 +88,7 @@ class EditorScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 Editor(
+                    onSetCategoryLimit = null,
                     uiState = sampleBudgetUiState().copy(
                         numpadInput = "24.50",
                         isNumpadValid = true,
@@ -117,6 +120,7 @@ class EditorScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 Editor(
+                    onSetCategoryLimit = null,
                     uiState = sampleBudgetUiState().copy(
                         numpadInput = "24.50",
                         isNumpadValid = true,
@@ -148,6 +152,7 @@ class EditorScreenshotTest {
         paparazzi.snapshot {
             MinusTheme {
                 Editor(
+                    onSetCategoryLimit = null,
                     uiState = sampleBudgetUiState().copy(
                         numpadInput = "18.50+6.25",
                         isNumpadValid = true,

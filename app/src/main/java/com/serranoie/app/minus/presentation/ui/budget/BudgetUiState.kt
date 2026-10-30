@@ -1,5 +1,6 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
+import com.serranoie.app.minus.domain.calculator.CategoryLimitStatus
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -24,6 +25,7 @@ data class BudgetUiState(
     val currentComment: String = "",
     val currentNote: String = "",
     val tags: List<String> = emptyList(),
+    val categoryLimits: Map<String, CategoryLimitStatus> = emptyMap(),
     val isFirstLaunch: Boolean = true,
     val isRecurrentEnabled: Boolean = false,
     val isCreditEnabled: Boolean = false,

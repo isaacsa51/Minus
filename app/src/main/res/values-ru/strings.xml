@@ -831,4 +831,25 @@
     <string name="notification_channel_savings_description">Напоминание отложить деньги в начале нового бюджетного периода</string>
     <string name="notification_savings_reminder_title">Новый период: пора откладывать</string>
     <string name="notification_savings_reminder_message">Отложите %1$s из этого периода на накопления.</string>
+    <string name="category_limit_set">Задать лимит</string>
+    <string name="category_limit_dialog_title">Лимит для %1$s</string>
+    <string name="category_limit_amount_label">Сумма лимита</string>
+    <string name="category_limit_unit_weekly">В неделю</string>
+    <string name="category_limit_unit_period">За период</string>
+    <string name="category_limit_remove">Удалить лимит</string>
+    <string name="category_limit_progress">%1$s из %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s из %2$s на этой неделе</string>
+    <string name="category_limit_would_exceed">Это превышает лимит на %1$s</string>
+    <string name="category_limit_over">Сверх на %1$s</string>
+    <string name="category_limit_left">Осталось %1$s</string>
+    <string name="category_limit_ahead">Быстрее плана</string>
+    <string name="category_limit_on_track">В рамках плана</string>
+    <string name="analytics_category_limits_title">Лимиты категорий</string>
+    <string name="settings_category_limits_title">Лимиты категорий</string>
+    <string name="settings_category_limits_subtitle_empty">Ограничьте расходы в категории на неделю или период</string>
+    <string name="settings_category_limits_subtitle_count">Лимит есть у %1$d из %2$d категорий</string>
+    <string name="settings_category_limits_no_categories">Здесь появятся категории, которые вы используете.</string>
+    <string name="category_limit_none">Без лимита</string>
+    <string name="category_limit_summary_weekly">%1$s в неделю</string>
+    <string name="category_limit_summary_period">%1$s за период</string>
 </resources>

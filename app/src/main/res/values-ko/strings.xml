@@ -804,4 +804,25 @@
     <string name="notification_channel_savings_description">새 예산 기간이 시작될 때 돈을 따로 모아두도록 알려주는 알림</string>
     <string name="notification_savings_reminder_title">새 기간: 저축할 시간이에요</string>
     <string name="notification_savings_reminder_message">이번 기간에서 %1$s을(를) 저축용으로 따로 모아두세요.</string>
+    <string name="category_limit_set">한도 설정</string>
+    <string name="category_limit_dialog_title">%1$s 한도</string>
+    <string name="category_limit_amount_label">한도 금액</string>
+    <string name="category_limit_unit_weekly">매주</string>
+    <string name="category_limit_unit_period">기간별</string>
+    <string name="category_limit_remove">한도 삭제</string>
+    <string name="category_limit_progress">%2$s 중 %1$s</string>
+    <string name="category_limit_progress_weekly">이번 주 %2$s 중 %1$s</string>
+    <string name="category_limit_would_exceed">한도를 %1$s 초과합니다</string>
+    <string name="category_limit_over">%1$s 초과</string>
+    <string name="category_limit_left">%1$s 남음</string>
+    <string name="category_limit_ahead">예상보다 빠름</string>
+    <string name="category_limit_on_track">순조로움</string>
+    <string name="analytics_category_limits_title">카테고리 한도</string>
+    <string name="settings_category_limits_title">카테고리 한도</string>
+    <string name="settings_category_limits_subtitle_empty">카테고리별로 주간 또는 기간 지출 한도를 정하세요</string>
+    <string name="settings_category_limits_subtitle_count">%2$d개 중 %1$d개 카테고리에 한도가 있습니다</string>
+    <string name="settings_category_limits_no_categories">사용하는 카테고리가 여기에 표시됩니다.</string>
+    <string name="category_limit_none">한도 없음</string>
+    <string name="category_limit_summary_weekly">주당 %1$s</string>
+    <string name="category_limit_summary_period">기간당 %1$s</string>
 </resources>

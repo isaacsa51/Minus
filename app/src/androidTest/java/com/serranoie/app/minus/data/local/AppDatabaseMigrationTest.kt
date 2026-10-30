@@ -155,4 +155,22 @@ class AppDatabaseMigrationTest {
             MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
         )
     }
+
+    @Test
+    fun migrate21To22_addsNullableCategoryLimitColumns_andKeepsExistingCategories() {
+        helper.createDatabase(testDb, 21).apply {
+            execSQL("INSERT INTO category (name, isHidden, usageCount, lastUsedAt, createdAt) VALUES ('Food', 0, 3, NULL, 0)")
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(testDb, 22, true)
+
+        assertThat(db.columnNames("category")).containsAtLeast("limitAmount", "limitUnit")
+        db.query("SELECT name, limitAmount, limitUnit FROM category").use { c ->
+            assertThat(c.moveToFirst()).isTrue()
+            assertThat(c.getString(0)).isEqualTo("Food")
+            assertThat(c.isNull(1)).isTrue()
+            assertThat(c.isNull(2)).isTrue()
+        }
+    }
 }

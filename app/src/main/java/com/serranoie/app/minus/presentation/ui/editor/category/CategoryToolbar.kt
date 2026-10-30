@@ -107,6 +107,7 @@ fun CategoryToolbar(
     onHideCategoryGrid: () -> Unit = {},
     onDisableCalculationMode: () -> Unit = {},
     onEditingChanged: (Boolean) -> Unit = {},
+    limits: CategoryLimitsUi? = null,
     modifier: Modifier = Modifier
 ) {
     val localDensity = LocalDensity.current
@@ -255,6 +256,7 @@ fun CategoryToolbar(
                     onShowCategoryGrid = onShowCategoryGrid,
                     onHideCategoryGrid = onHideCategoryGrid,
                     onDisableCalculationMode = onDisableCalculationMode,
+                    limits = limits,
                 )
             }
         }

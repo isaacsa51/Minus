@@ -41,6 +41,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.Sell
 import androidx.compose.material.icons.rounded.SortByAlpha
+import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -106,7 +107,9 @@ fun EditableCategoryTag(
     onHideCategoryGrid: () -> Unit = {},
     onDisableCalculationMode: () -> Unit = {},
     startInEditMode: Boolean = false,
+    limits: CategoryLimitsUi? = null,
 ) {
+    var limitTarget by remember { mutableStateOf<String?>(null) }
     val focusManager = LocalFocusManager.current
     val localDensity = LocalDensity.current
     val scope = rememberCoroutineScope()
@@ -387,6 +390,13 @@ fun EditableCategoryTag(
                                         filteredItems.forEach { item ->
                                             itemSuggest(
                                                 name = item,
+                                                limits = limits,
+                                                onSetLimit = limits?.let {
+                                                    {
+                                                        dismissEvent.value = true
+                                                        limitTarget = item
+                                                    }
+                                                },
                                                 onClick = {
                                                     dismissEvent.value = true
                                                     value = TextFieldValue(
@@ -416,12 +426,26 @@ fun EditableCategoryTag(
 
         }
     }
+
+    limitTarget?.let { target ->
+        CategoryLimitDialog(
+            categoryName = target,
+            current = limits?.statuses?.get(target)?.limit,
+            onDismiss = { limitTarget = null },
+            onSave = { amount, unit ->
+                limits?.onSetLimit?.invoke(target, amount, unit)
+                limitTarget = null
+            },
+        )
+    }
 }
 
 fun LazyListScope.itemSuggest(
     name: String,
     onClick: () -> Unit,
     onDelete: () -> Unit,
+    limits: CategoryLimitsUi? = null,
+    onSetLimit: (() -> Unit)? = null,
 ) {
     item(name) {
         var showDelete by remember { mutableStateOf(false) }
@@ -444,12 +468,38 @@ fun LazyListScope.itemSuggest(
                 .heightIn(42.dp)
                 .padding(start = 24.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
         ) {
-            Text(
-                text = name,
-                overflow = TextOverflow.Ellipsis,
-                softWrap = false,
-                modifier = Modifier.weight(1f)
-            )
+            val status = limits?.statuses?.get(name)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = name,
+                    overflow = TextOverflow.Ellipsis,
+                    softWrap = false,
+                )
+                if (status != null) {
+                    CategoryLimitBar(
+                        status = status,
+                        currencyCode = limits.currencyCode,
+                        pendingAmount = limits.pendingAmount,
+                        modifier = Modifier.padding(top = 4.dp, end = 8.dp),
+                    )
+                }
+            }
+
+            if (showDelete && onSetLimit != null) {
+                IconButton(
+                    onClick = {
+                        onSetLimit()
+                        showDelete = false
+                    },
+                    modifier = Modifier.size(28.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Speed,
+                        contentDescription = stringResource(R.string.category_limit_set),
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
+            }
 
             if (showDelete) {
                 IconButton(
