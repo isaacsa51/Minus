@@ -649,6 +649,27 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">डिफ़ॉल्ट %1$d%% उदाहरण दिखाया जा रहा है। किसी खास रकम का लक्ष्य तय करने के लिए सेटिंग में बचत का लक्ष्य सेट करें।</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">बचत की प्राथमिकताएं</string>
+    <string name="category_limit_set">सीमा तय करें</string>
+    <string name="category_limit_dialog_title">%1$s के लिए सीमा</string>
+    <string name="category_limit_amount_label">सीमा की राशि</string>
+    <string name="category_limit_unit_weekly">साप्ताहिक</string>
+    <string name="category_limit_unit_period">प्रति अवधि</string>
+    <string name="category_limit_remove">सीमा हटाएं</string>
+    <string name="category_limit_progress">%2$s में से %1$s</string>
+    <string name="category_limit_progress_weekly">इस हफ़्ते %2$s में से %1$s</string>
+    <string name="category_limit_would_exceed">इससे सीमा %1$s से पार हो जाएगी</string>
+    <string name="category_limit_over">%1$s ज़्यादा</string>
+    <string name="category_limit_left">%1$s बाकी</string>
+    <string name="category_limit_ahead">रफ़्तार से आगे</string>
+    <string name="category_limit_on_track">सही रास्ते पर</string>
+    <string name="analytics_category_limits_title">कैटेगरी सीमाएं</string>
+    <string name="settings_category_limits_title">कैटेगरी सीमाएं</string>
+    <string name="settings_category_limits_subtitle_empty">हर हफ़्ते या अवधि में किसी कैटेगरी पर खर्च की सीमा तय करें</string>
+    <string name="settings_category_limits_subtitle_count">%2$d में से %1$d कैटेगरी की सीमा है</string>
+    <string name="settings_category_limits_no_categories">आप जिन कैटेगरी का इस्तेमाल करते हैं, वे यहां दिखेंगी।</string>
+    <string name="category_limit_none">कोई सीमा नहीं</string>
+    <string name="category_limit_summary_weekly">%1$s प्रति हफ़्ता</string>
+    <string name="category_limit_summary_period">%1$s प्रति अवधि</string>
     <string name="settings_savings_reminder_title">बचत रिमाइंडर</string>
     <string name="settings_savings_reminder_subtitle">नई अवधि शुरू होने पर याद दिलाएं कि कितना अलग रखना है</string>
     <string name="settings_savings_preferences_subtitle">50/30/20 के बंटवारे को कस्टमाइज़ करें और बचत का एक वैकल्पिक लक्ष्य सेट करें</string>
