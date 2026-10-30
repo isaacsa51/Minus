@@ -148,6 +148,12 @@
     <string name="history_snackbar_mark_paid_failed">거래를 결제 완료로 표시할 수 없습니다</string>
     <string name="history_snackbar_restore_transaction_failed">거래를 복원할 수 없습니다</string>
     <string name="expense_queued_for_next_period">지출이 다음 기간으로 예약되었습니다</string>
+    <string name="split_expense_mismatch">Amounts and categories don\'t match (%1$d vs %2$d)</string>
+    <string name="split_expense_not_recurring">Split expenses can\'t be recurring</string>
+    <string name="split_category_remove">Remove %1$s</string>
+    <plurals name="split_expense_saved">
+        <item quantity="other">Saved %d expenses</item>
+    </plurals>
     <string name="budget_load_failed">Could not load your budget</string>
     <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
     <string name="budget_load_retry">Retry</string>
