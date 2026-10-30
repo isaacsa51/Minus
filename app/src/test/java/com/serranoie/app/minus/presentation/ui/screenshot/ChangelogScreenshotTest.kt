@@ -72,6 +72,23 @@ class ChangelogScreenshotTest {
     }
 
     @Test
+    fun changelogItemCardFeatureWithMedia() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                ChangelogItemCard(
+                    modifier = Modifier.fillMaxSize(),
+                    item = ChangelogItem(
+                        title = "Add persian calendar support and RTL view",
+                        type = ReleaseType.FEATURE,
+                        media = "changelog/persian_calendar.webp",
+                    ),
+                )
+            }
+        }
+    }
+
+    @Test
     fun changelogItemCardImprovement() {
         Locale.setDefault(Locale.US)
         paparazzi.snapshot {

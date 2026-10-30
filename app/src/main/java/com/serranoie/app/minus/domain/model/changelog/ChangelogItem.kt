@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class ChangelogItem(
     val title: String,
     val type: ReleaseType,
+    val media: String? = null,
 )

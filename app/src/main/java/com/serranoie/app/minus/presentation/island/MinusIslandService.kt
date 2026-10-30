@@ -16,7 +16,6 @@ import com.sameerasw.island.sdk.IslandTone
 import com.sameerasw.island.sdk.compose.ComposeIslandProviderService
 import com.sameerasw.island.sdk.compose.islandSnapshot
 import com.serranoie.app.minus.R
-import com.serranoie.app.minus.presentation.util.font.format.formatLocalized
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -65,29 +64,9 @@ class MinusIslandService : ComposeIslandProviderService() {
 
     override fun hasExpandedContent(itemKey: String) = itemKey == pageKey
 
-    /** The Brief row is drawn by Essentials, so it mirrors the budget pill: split remaining, then the period. */
+    /** The Brief row is drawn by Essentials, so it mirrors the budget pill: split remaining and its label. */
     private fun publish(host: IslandHostHandle, snapshot: IslandBudgetSnapshot?) {
-        val card = snapshot?.let { s ->
-            val range = "${s.startDate.formatLocalized(DATE_PATTERN)} → ${s.finishDate.formatLocalized(DATE_PATTERN)}"
-            if (s.date != LocalDate.now()) {
-                BriefCardPayload(
-                    key = CARD_KEY,
-                    title = islandMoney(s.periodLeft, s.currency),
-                    subtitle = getString(R.string.island_brief_stale) + "\n" + range,
-                    iconId = ICON,
-                )
-            } else {
-                BriefCardPayload(
-                    key = CARD_KEY,
-                    title = islandMoney(s.splitRemaining, s.currency),
-                    subtitle = getString(islandSplitLabel(s)) + "\n" + range,
-                    iconId = ICON,
-                    tone = if (s.isAlert) IslandTone.ALERT else IslandTone.ACCENT,
-                    trailingText = getString(R.string.island_brief_days_short, s.daysLeft),
-                    pageHeightDp = PAGE_HEIGHT_DP,
-                )
-            }
-        }
+        val card = snapshot?.let { islandBriefCard(it, LocalDate.now()) { res, args -> getString(res, *args) } }
         host.publish(IslandPayload(briefCards = listOfNotNull(card)), mapOf(ICON to icon()))
     }
 
@@ -108,10 +87,35 @@ class MinusIslandService : ComposeIslandProviderService() {
     }
 
     private companion object {
-        const val CARD_KEY = "budget"
-        const val ICON = "minus"
         const val ICON_PX = 96
-        const val PAGE_HEIGHT_DP = 240
-        const val DATE_PATTERN = "dd MMM"
+    }
+}
+
+private const val CARD_KEY = "budget"
+private const val ICON = "minus"
+private const val PAGE_HEIGHT_DP = 240
+
+internal fun islandBriefCard(
+    s: IslandBudgetSnapshot,
+    today: LocalDate,
+    text: (Int, Array<out Any>) -> String,
+): BriefCardPayload {
+    return if (s.date != today) {
+        BriefCardPayload(
+            key = CARD_KEY,
+            title = islandMoney(s.periodLeft, s.currency),
+            subtitle = text(R.string.island_brief_stale, emptyArray()),
+            iconId = ICON,
+        )
+    } else {
+        BriefCardPayload(
+            key = CARD_KEY,
+            title = islandMoney(s.splitRemaining, s.currency),
+            subtitle = text(islandSplitLabel(s), emptyArray()),
+            iconId = ICON,
+            tone = if (s.isAlert) IslandTone.ALERT else IslandTone.ACCENT,
+            trailingText = text(R.string.island_brief_days_short, arrayOf(s.daysLeft)),
+            pageHeightDp = PAGE_HEIGHT_DP,
+        )
     }
 }

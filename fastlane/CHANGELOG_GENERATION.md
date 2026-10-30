@@ -164,6 +164,27 @@ Crucially, **no `.txt` is rewritten at build time** — Izzy's clean
 checkout produces the same APK byte-for-byte.
 
 ---
+## Feature media (images / GIFs)
+
+Optional, latest release only. Drop files into
+`app/src/main/assets/changelog/`, named after 2–3 words of the bullet
+they illustrate (`_` or `-` = space, case ignored):
+
+```
+persian_calendar.webp → "- feat: add persian calendar support and RTL view"
+island_sdk.webp       → "- feat: integrate Essentials island SDK and ..."
+```
+
+- First bullet that contains the words gets the file; one file per bullet.
+- `ChangelogMediaTest` fails if a file matches no bullet (typo, reworded
+  bullet, or a leftover from the previous release).
+- **Empty the folder when starting the next release** so old media stops
+  shipping in the APK.
+- Prefer animated WebP over GIF (much smaller, same decoder). PNG/JPG
+  work too. The block is full width, 160–360dp tall, letterboxed.
+
+---
+
 ## How bullets get classified
 
 The Gradle parser in `app/build.gradle.kts` walks each `- bullet` line and

@@ -1,8 +1,13 @@
 package com.serranoie.app.minus.presentation.ui.changelog.components
 
 import android.content.res.Configuration
+import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -10,7 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
@@ -18,11 +25,14 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.serranoie.app.minus.domain.model.changelog.ChangelogItem
 import com.serranoie.app.minus.domain.model.changelog.ReleaseType
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
@@ -46,6 +56,10 @@ internal fun ChangelogItemCard(
                 style = MaterialTheme.typography.bodySmallEmphasized,
                 color = MaterialTheme.colorScheme.onSurface,
             )
+            item.media?.let { media ->
+                Spacer(modifier = Modifier.height(12.dp))
+                ChangelogItemMedia(path = media)
+            }
         }
         if (showDivider) {
             HorizontalDivider(
@@ -54,6 +68,34 @@ internal fun ChangelogItemCard(
             )
         }
     }
+}
+
+@Composable
+private fun ChangelogItemMedia(path: String) {
+    val context = LocalContext.current
+    val imageLoader = remember(context) {
+        ImageLoader.Builder(context)
+            .components {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(GifDecoder.Factory())
+                }
+            }
+            .build()
+    }
+
+    AsyncImage(
+        model = "file:///android_asset/$path",
+        imageLoader = imageLoader,
+        contentDescription = null,
+        contentScale = ContentScale.Fit,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 160.dp, max = 360.dp)
+            .clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+    )
 }
 
 @Composable
