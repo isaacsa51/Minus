@@ -649,6 +649,27 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Es wird das Standardbeispiel mit %1$d%% gezeigt. Lege in den Einstellungen ein Sparziel fest, um einen konkreten Betrag anzustreben.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Spar-Einstellungen</string>
+    <string name="category_limit_set">Limit festlegen</string>
+    <string name="category_limit_dialog_title">Limit für %1$s</string>
+    <string name="category_limit_amount_label">Limitbetrag</string>
+    <string name="category_limit_unit_weekly">Wöchentlich</string>
+    <string name="category_limit_unit_period">Pro Zeitraum</string>
+    <string name="category_limit_remove">Limit entfernen</string>
+    <string name="category_limit_progress">%1$s von %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s von %2$s diese Woche</string>
+    <string name="category_limit_would_exceed">Damit liegst du %1$s über dem Limit</string>
+    <string name="category_limit_over">%1$s drüber</string>
+    <string name="category_limit_left">%1$s übrig</string>
+    <string name="category_limit_ahead">Schneller als geplant</string>
+    <string name="category_limit_on_track">Im Plan</string>
+    <string name="analytics_category_limits_title">Kategorielimits</string>
+    <string name="settings_category_limits_title">Kategorielimits</string>
+    <string name="settings_category_limits_subtitle_empty">Begrenze, was du pro Woche oder Zeitraum in einer Kategorie ausgibst</string>
+    <string name="settings_category_limits_subtitle_count">%1$d von %2$d Kategorien haben ein Limit</string>
+    <string name="settings_category_limits_no_categories">Kategorien, die du nutzt, erscheinen hier.</string>
+    <string name="category_limit_none">Kein Limit</string>
+    <string name="category_limit_summary_weekly">%1$s pro Woche</string>
+    <string name="category_limit_summary_period">%1$s pro Zeitraum</string>
     <string name="settings_savings_reminder_title">Spar-Erinnerung</string>
     <string name="settings_savings_reminder_subtitle">Erinnere mich, was ich zu Beginn einer neuen Periode zurücklegen soll</string>
     <string name="settings_savings_preferences_subtitle">Passe die 50/30/20-Aufteilung an und setze ein optionales Sparziel</string>
