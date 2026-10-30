@@ -181,8 +181,8 @@
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
     <string name="receipt_camera_flash">Flash</string>
-    <string name="receipt_scan_hint">提示：长按 ✓ 可扫描收据</string>
-    <string name="receipt_scan_hint_action">试试看</string>
+    <string name="receipt_scan_hint">Tip: long-press ✓ to scan a receipt</string>
+    <string name="receipt_scan_hint_action">Try it</string>
     <plurals name="days">
         <item quantity="other">%d 天</item>
     </plurals>
@@ -413,7 +413,7 @@
     <string name="notification_scan_queued_message">%1$s 已保存到下一个周期。</string>
     <!-- Comma separated, lowercase. Words that mean a notification is NOT a charge: refunds, incoming money, balances and promotions. Matched as plain substrings, so avoid short words that appear inside longer ones. -->
     <string name="notification_scan_deny_words">退款,退回,入账,存入,余额,返现,otp,验证码,折扣,优惠</string>
-    <string name="settings_feature_experimental">实验性</string>
+    <string name="settings_feature_experimental">实验性功能</string>
     <string name="settings_feature_state_on">已开启</string>
     <string name="settings_feature_state_off">已关闭</string>
     <string name="settings_period_end_time_title">周期结束时间</string>
@@ -428,7 +428,7 @@
     <string name="settings_exact_alarm_enabled_subtitle">打开以在选定时间精确推送通知</string>
     <string name="settings_exact_alarm_disabled_subtitle">已关闭；Android 系统可能会有通知延迟</string>
     <string name="settings_time_picker_cancel">取消</string>
-    <string name="settings_time_picker_confirm">确认</string>
+    <string name="settings_time_picker_confirm">确定</string>
     <string name="settings_about_title">关于</string>
     <string name="settings_about_subtitle">了解更多应用和开发信息</string>
     <string name="settings_bug_report_title">遇到 bug？</string>
@@ -542,7 +542,7 @@
     <string name="budget_pill_exhausted_double">%1$s 和 %2$s 预算已用完</string>
     <string name="budget_pill_exhausted_triple">%1$s、%2$s 和 %3$s 预算已用完</string>
     <!-- Spend Budget Card -->
-    <string name="spend_budget_card_spent_label">支出</string>
+    <string name="spend_budget_card_spent_label">已支出</string>
     <string name="spend_budget_card_available_percent_format">可用：%1$s%%</string>
     <!-- Categories Chart -->
     <string name="categories_chart_uncategorized">未分类</string>
@@ -612,7 +612,7 @@
     <string name="subscriptions_item_due_in_days">%1$d 天后 (%2$s)</string>
     <string name="subscriptions_item_due_in_weeks">%1$d 周后 (%2$s)</string>
     <!-- Rollover Dialog (component local) -->
-    <string name="rollover_dialog_period_finished_title">周期完成</string>
+    <string name="rollover_dialog_period_finished_title">已完成周期</string>
     <string name="rollover_dialog_question">剩余的钱你想如何规划？</string>
     <string name="rollover_dialog_split_equally_title">平均分配</string>
     <string name="rollover_dialog_split_equally_desc">将 %1$s 平均分配到下个预算的每一天</string>
@@ -624,7 +624,7 @@
     <string name="rollover_dialog_pending_label">来自上一周期</string>
     <string name="unresolved_surplus_tap_to_manage">点击管理</string>
     <!-- Finished Period Header -->
-    <string name="finished_period_header_title">周期完成</string>
+    <string name="finished_period_header_title">已完成周期</string>
     <string name="finished_period_header_no_spends">嗯？这个周期你竟然一毛不拔</string>
     <string name="finished_period_header_over_budget">注意了！本周期你已超预算</string>
     <string name="finished_period_header_summary">以下是你所有支出的统计数据</string>
@@ -642,8 +642,29 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">正在显示默认的 %1$d%% 示例。请在设置中设置一个包含具体金额的存款目标。</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">存款偏好</string>
-    <string name="settings_savings_reminder_title">存钱提醒</string>
-    <string name="settings_savings_reminder_subtitle">新周期开始时提醒我该存多少</string>
+    <string name="category_limit_set">Set limit</string>
+    <string name="category_limit_dialog_title">Limit for %1$s</string>
+    <string name="category_limit_amount_label">Limit amount</string>
+    <string name="category_limit_unit_weekly">每周</string>
+    <string name="category_limit_unit_period">Per period</string>
+    <string name="category_limit_remove">Remove limit</string>
+    <string name="category_limit_progress">%1$s of %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s of %2$s this week</string>
+    <string name="category_limit_would_exceed">This goes %1$s over the limit</string>
+    <string name="category_limit_over">%1$s over</string>
+    <string name="category_limit_left">%1$s left</string>
+    <string name="category_limit_ahead">Ahead of pace</string>
+    <string name="category_limit_on_track">On track</string>
+    <string name="analytics_category_limits_title">Category limits</string>
+    <string name="settings_category_limits_title">Category limits</string>
+    <string name="settings_category_limits_subtitle_empty">Cap what you spend in a category each week or period</string>
+    <string name="settings_category_limits_subtitle_count">%1$d of %2$d categories have a limit</string>
+    <string name="settings_category_limits_no_categories">Categories you use will show up here.</string>
+    <string name="category_limit_none">No limit</string>
+    <string name="category_limit_summary_weekly">%1$s per week</string>
+    <string name="category_limit_summary_period">%1$s per period</string>
+    <string name="settings_savings_reminder_title">Savings reminder</string>
+    <string name="settings_savings_reminder_subtitle">Remind me what to set aside when a new period starts</string>
     <string name="settings_savings_preferences_subtitle">自定义 50/30/20 拆分方案并设置一个可选存款目标</string>
     <string name="settings_savings_dialog_split_label">预算拆分</string>
     <string name="settings_savings_dialog_split_hint">三项数值相加必须为 100%%。</string>
@@ -697,7 +718,7 @@
     <string name="split_mode_carry_over_desc">每天没花完的钱会加到第二天的预算里，并不断累积。</string>
     <string name="split_mode_ask_me">每天你来定</string>
     <string name="split_mode_ask_me_desc">每天由你决定昨天没用完的预算：平摊到剩余天数，或结转到今天。超支总会平摊到剩余天数，因此每日金额会减少。</string>
-    <string name="leftover_choice_spread">平摊到剩余天数</string>
+    <string name="leftover_choice_spread">分摊到剩余天数</string>
     <string name="leftover_choice_carry">全部加到今天</string>
     <string name="leftover_choice_spread_desc">将所有未使用的剩余预算平摊到剩下的每一天。</string>
     <string name="leftover_choice_carry_desc">只把未使用的预算结转到明天。</string>
@@ -708,7 +729,7 @@
     <!-- Transaction Detail -->
     <string name="without_date">没有日期</string>
     <string name="no_name">没有名称</string>
-    <string name="no_name_income">未具名收入</string>
+    <string name="no_name_income">Unnamed income</string>
     <string name="description">购买原因</string>
     <string name="adjustment_reason">原因</string>
     <string name="date">日期</string>
@@ -744,10 +765,10 @@
     <string name="notification_upcoming_subscription_message_without_comment">你有一项名为「%1$s」的订阅将收费 %2$s。</string>
     <string name="notification_credit_cutoff_title">即将到来的信用卡付款</string>
     <string name="notification_credit_cutoff_message">你的账单日期是 %1$s。推荐支付 %2$s 来避免利息产生。</string>
-    <string name="notification_channel_savings_name">存钱提醒</string>
-    <string name="notification_channel_savings_description">新的预算周期开始时，提醒你留出一笔钱存起来</string>
-    <string name="notification_savings_reminder_title">新周期：该存钱了</string>
-    <string name="notification_savings_reminder_message">从本周期中留出 %1$s 存起来。</string>
+    <string name="notification_channel_savings_name">Savings reminders</string>
+    <string name="notification_channel_savings_description">A reminder to set money aside when a new budget period starts</string>
+    <string name="notification_savings_reminder_title">New period: time to save</string>
+    <string name="notification_savings_reminder_message">Set aside %1$s from this period for your savings.</string>
     <string name="credit_owed_label">总负债</string>
     <string name="debt_adjusted_balance_label">经调整的余额</string>
     <string name="debt_adjusted_label_format">%1$s - %2$s 信用债务</string>
@@ -796,12 +817,12 @@
     <string name="analytics_tutorial_credit_desc">点击卡片可查看信用卡账单、标记已还款或修改账单日来避免产生利息。</string>
     <string name="analytics_tutorial_history_title">账单明细</string>
     <string name="analytics_tutorial_history_desc">点击查看本期全部支出。</string>
-    <string name="skip_tutorial">跳过教程</string>
+    <string name="skip_tutorial">跳过</string>
     <string name="budget_graph_header_spending">Spending</string>
     <string name="budget_graph_legend_current">Current</string>
     <string name="budget_graph_legend_previous">Previous</string>
     <string name="budget_graph_view_mode_cumulative">趋势</string>
-    <string name="budget_graph_view_mode_categories">分类</string>
+    <string name="budget_graph_view_mode_categories">类别</string>
     <string name="budget_graph_nav_prev">Previous</string>
     <string name="budget_graph_nav_next">继续</string>
     <string name="graph_granularity_days">Days</string>
