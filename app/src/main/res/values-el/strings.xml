@@ -649,6 +649,27 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Εμφανίζεται το προεπιλεγμένο παράδειγμα %1$d%%. Ορίστε έναν στόχο εξοικονόμησης στις Ρυθμίσεις για να στοχεύσετε ένα συγκεκριμένο ποσό.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Προτιμήσεις αποταμίευσης</string>
+    <string name="category_limit_set">Ορισμός ορίου</string>
+    <string name="category_limit_dialog_title">Όριο για %1$s</string>
+    <string name="category_limit_amount_label">Ποσό ορίου</string>
+    <string name="category_limit_unit_weekly">Εβδομαδιαίο</string>
+    <string name="category_limit_unit_period">Ανά περίοδο</string>
+    <string name="category_limit_remove">Αφαίρεση ορίου</string>
+    <string name="category_limit_progress">%1$s από %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s από %2$s αυτή την εβδομάδα</string>
+    <string name="category_limit_would_exceed">Αυτό ξεπερνά το όριο κατά %1$s</string>
+    <string name="category_limit_over">%1$s πάνω</string>
+    <string name="category_limit_left">Απομένουν %1$s</string>
+    <string name="category_limit_ahead">Πάνω από τον ρυθμό</string>
+    <string name="category_limit_on_track">Εντός πλάνου</string>
+    <string name="analytics_category_limits_title">Όρια κατηγοριών</string>
+    <string name="settings_category_limits_title">Όρια κατηγοριών</string>
+    <string name="settings_category_limits_subtitle_empty">Βάλτε ανώτατο όριο στα έξοδα μιας κατηγορίας ανά εβδομάδα ή περίοδο</string>
+    <string name="settings_category_limits_subtitle_count">%1$d από %2$d κατηγορίες έχουν όριο</string>
+    <string name="settings_category_limits_no_categories">Οι κατηγορίες που χρησιμοποιείτε θα εμφανιστούν εδώ.</string>
+    <string name="category_limit_none">Χωρίς όριο</string>
+    <string name="category_limit_summary_weekly">%1$s την εβδομάδα</string>
+    <string name="category_limit_summary_period">%1$s ανά περίοδο</string>
     <string name="settings_savings_reminder_title">Υπενθύμιση αποταμίευσης</string>
     <string name="settings_savings_reminder_subtitle">Θύμισέ μου πόσα να βάλω στην άκρη όταν ξεκινά νέα περίοδος</string>
     <string name="settings_savings_preferences_subtitle">Προσαρμόστε το διαχωρισμό 50/30/20 και ορίστε έναν προαιρετικό στόχο εξοικονόμησης</string>
