@@ -13,8 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +42,7 @@ import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
 import com.serranoie.app.minus.presentation.ui.theme.labelSmallCondensed
 import com.serranoie.app.minus.presentation.util.censor
+import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -119,163 +123,177 @@ fun SavingsRecommendationCard(
     val projectedSavingsSixMonths = metrics.projectedSavingsSixMonths
     val spendingCeiling = preferences.spendingCeilingPct
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = combineColors(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.surfaceVariant,
+                t = 0.3f,
+            ),
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.savings_recommendation_title),
-                    style = MaterialTheme.typography.bodySmallCondensed,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            }
-            Text(
-                text = stringResource(
-                    R.string.savings_recommendation_method_brief,
-                    preferences.needsPct,
-                    preferences.wantsPct,
-                    preferences.savingsPct,
-                ),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f)
-            )
-
-            val goalAmount = preferences.savingsGoalAmount
-            val goalMonths = preferences.savingsGoalMonths
-            if (metrics.goalPerPeriod != null && goalAmount != null && goalMonths != null) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.savings_recommendation_title),
+                        style = MaterialTheme.typography.bodySmallCondensed,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
                 Text(
                     text = stringResource(
-                        R.string.savings_recommendation_goal_format,
-                        formatCurrencySymbolOnly(goalAmount, currency),
-                        goalMonths,
-                        formatCurrencySymbolOnly(metrics.goalPerPeriod, currency),
-                    ),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
-                )
-            } else {
-                Text(
-                    text = stringResource(
-                        R.string.savings_recommendation_six_month_example_intro,
+                        R.string.savings_recommendation_method_brief,
+                        preferences.needsPct,
+                        preferences.wantsPct,
                         preferences.savingsPct,
                     ),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f)
                 )
-                Text(
-                    text = stringResource(
-                        R.string.savings_recommendation_six_month_example_equation,
-                        formatCurrencySymbolOnly(idealSavingsPerPeriod, currency),
-                        formatCurrencySymbolOnly(projectedSavingsSixMonths, currency)
-                    ),
-                    style = MaterialTheme.typography.labelSmallCondensed,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            }
-        }
 
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Column {
+                val goalAmount = preferences.savingsGoalAmount
+                val goalMonths = preferences.savingsGoalMonths
+                if (metrics.goalPerPeriod != null && goalAmount != null && goalMonths != null) {
                     Text(
-                        text = stringResource(R.string.savings_recommendation_current_savings_label),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = stringResource(
+                            R.string.savings_recommendation_goal_format,
+                            formatCurrencySymbolOnly(goalAmount, currency),
+                            goalMonths,
+                            formatCurrencySymbolOnly(metrics.goalPerPeriod, currency),
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
+                    )
+                } else {
+                    Text(
+                        text = stringResource(
+                            R.string.savings_recommendation_six_month_example_intro,
+                            preferences.savingsPct,
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f)
                     )
                     Text(
-                        text = "$savingsPct%",
-                        style = MaterialTheme.typography.headlineSmallEmphasized,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = if (savingsPct >= preferences.savingsPct) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.error
+                        text = stringResource(
+                            R.string.savings_recommendation_six_month_example_equation,
+                            formatCurrencySymbolOnly(idealSavingsPerPeriod, currency),
+                            formatCurrencySymbolOnly(projectedSavingsSixMonths, currency)
+                        ),
+                        style = MaterialTheme.typography.labelSmallCondensed,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.outline
                     )
                 }
             }
 
-            LinearSavingsBar(
-                recurrentPct = recurrentPct,
-                variablePct = variablePct,
-                spendingCeilingPct = spendingCeiling,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(16.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Text(
-                    modifier = Modifier.censor(),
-                    text = stringResource(
-                        R.string.savings_recommendation_available_format,
-                        formatCurrencySymbolOnly(savings, currency)
-                    ),
-                    style = MaterialTheme.typography.labelSmallCondensed.copy(fontWeight = FontWeight.Light),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Column(horizontalAlignment = Alignment.End) {
-                    val idealLabel = metrics.goalPerPeriod ?: idealSavingsPerPeriod
-                    Text(
-                        modifier = Modifier.censor(),
-                        text = stringResource(
-                            R.string.savings_recommendation_ideal_savings_format,
-                            formatCurrencySymbolOnly(idealLabel, currency)
-                        ), style = MaterialTheme.typography.labelSmallCondensed.copy(
-                            fontWeight = FontWeight.Light,
-                            textDecoration = if (savingsPct < preferences.savingsPct) TextDecoration.LineThrough
-                            else TextDecoration.None
-                        ), color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    if (savingsPct < preferences.savingsPct) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Column {
                         Text(
-                            text = stringResource(
-                                R.string.savings_recommendation_current_savings_format,
-                                formatCurrencySymbolOnly(savings, currency)
-                            ),
-                            style = MaterialTheme.typography.labelSmallCondensed.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.error
+                            text = stringResource(R.string.savings_recommendation_current_savings_label),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "$savingsPct%",
+                            style = MaterialTheme.typography.headlineSmallEmphasized,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (savingsPct >= preferences.savingsPct) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.error
                         )
                     }
                 }
+
+                LinearSavingsBar(
+                    recurrentPct = recurrentPct,
+                    variablePct = variablePct,
+                    spendingCeilingPct = spendingCeiling,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(16.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        modifier = Modifier.censor(),
+                        text = stringResource(
+                            R.string.savings_recommendation_available_format,
+                            formatCurrencySymbolOnly(savings, currency)
+                        ),
+                        style = MaterialTheme.typography.labelSmallCondensed.copy(fontWeight = FontWeight.Light),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Column(horizontalAlignment = Alignment.End) {
+                        val idealLabel = metrics.goalPerPeriod ?: idealSavingsPerPeriod
+                        Text(
+                            modifier = Modifier.censor(),
+                            text = stringResource(
+                                R.string.savings_recommendation_ideal_savings_format,
+                                formatCurrencySymbolOnly(idealLabel, currency)
+                            ), style = MaterialTheme.typography.labelSmallCondensed.copy(
+                                fontWeight = FontWeight.Light,
+                                textDecoration = if (savingsPct < preferences.savingsPct) TextDecoration.LineThrough
+                                else TextDecoration.None
+                            ), color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        if (savingsPct < preferences.savingsPct) {
+                            Text(
+                                text = stringResource(
+                                    R.string.savings_recommendation_current_savings_format,
+                                    formatCurrencySymbolOnly(savings, currency)
+                                ),
+                                style = MaterialTheme.typography.labelSmallCondensed.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
             }
-        }
 
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            RecommendationItem(
-                label = stringResource(R.string.savings_recommendation_recurrent_expenses_label),
-                value = formatCurrencySymbolOnly(metrics.recurrentSpent, currency),
-                percentage = recurrentPct,
-                target = preferences.needsPct,
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                RecommendationItem(
+                    label = stringResource(R.string.savings_recommendation_recurrent_expenses_label),
+                    value = formatCurrencySymbolOnly(metrics.recurrentSpent, currency),
+                    percentage = recurrentPct,
+                    target = preferences.needsPct,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
 
-            RecommendationItem(
-                label = stringResource(R.string.savings_recommendation_one_time_expenses_label),
-                value = formatCurrencySymbolOnly(metrics.variableSpent, currency),
-                percentage = variablePct,
-                target = preferences.wantsPct,
-                color = MaterialTheme.colorScheme.primary
-            )
+                RecommendationItem(
+                    label = stringResource(R.string.savings_recommendation_one_time_expenses_label),
+                    value = formatCurrencySymbolOnly(metrics.variableSpent, currency),
+                    percentage = variablePct,
+                    target = preferences.wantsPct,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

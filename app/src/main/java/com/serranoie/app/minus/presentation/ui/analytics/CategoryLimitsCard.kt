@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Speed
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,6 +33,7 @@ import com.serranoie.app.minus.presentation.ui.editor.category.CategoryLimitBar
 import com.serranoie.app.minus.presentation.ui.editor.category.categoryLimitColor
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodySmallCondensed
+import com.serranoie.app.minus.presentation.util.combineColors
 import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -41,55 +45,69 @@ fun CategoryLimitsCard(
     modifier: Modifier = Modifier,
 ) {
     if (statuses.isEmpty()) return
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = combineColors(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.surfaceVariant,
+                t = 0.3f,
+            ),
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Rounded.Speed,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(18.dp),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.analytics_category_limits_title),
-                style = MaterialTheme.typography.bodySmallCondensed,
-                color = MaterialTheme.colorScheme.outline,
-            )
-        }
-        statuses.forEach { status ->
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = status.name,
-                        style = MaterialTheme.typography.bodyMediumEmphasized,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Text(
-                        text = when (status.pace) {
-                            CategoryLimitPace.OVER -> stringResource(
-                                R.string.category_limit_over,
-                                formatCurrencySymbolOnly(status.spent.subtract(status.limit.amount), currencyCode),
-                            )
-                            CategoryLimitPace.AHEAD -> stringResource(R.string.category_limit_ahead)
-                            CategoryLimitPace.ON_TRACK -> stringResource(R.string.category_limit_on_track)
-                        },
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (status.pace == CategoryLimitPace.ON_TRACK) {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        } else {
-                            categoryLimitColor(status.pace)
-                        },
-                    )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Rounded.Speed,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.analytics_category_limits_title),
+                    style = MaterialTheme.typography.bodySmallCondensed,
+                    color = MaterialTheme.colorScheme.outline,
+                )
+            }
+            statuses.forEach { status ->
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = status.name,
+                            style = MaterialTheme.typography.bodyMediumEmphasized,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            text = when (status.pace) {
+                                CategoryLimitPace.OVER -> stringResource(
+                                    R.string.category_limit_over,
+                                    formatCurrencySymbolOnly(status.spent.subtract(status.limit.amount), currencyCode),
+                                )
+                                CategoryLimitPace.AHEAD -> stringResource(R.string.category_limit_ahead)
+                                CategoryLimitPace.ON_TRACK -> stringResource(R.string.category_limit_on_track)
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (status.pace == CategoryLimitPace.ON_TRACK) {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            } else {
+                                categoryLimitColor(status.pace)
+                            },
+                        )
+                    }
+                    CategoryLimitBar(status = status, currencyCode = currencyCode)
                 }
-                CategoryLimitBar(status = status, currencyCode = currencyCode)
             }
         }
     }
