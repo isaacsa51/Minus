@@ -649,6 +649,27 @@
     <string name="savings_recommendation_goal_disabled" formatted="false">Affichage de l\'exemple par défaut %1$d%%. Définissez un objectif d\'épargne dans les Paramètres pour cibler un montant précis.</string>
     <!-- Settings: Savings Preferences -->
     <string name="settings_savings_preferences_title">Préférences d\'épargne</string>
+    <string name="category_limit_set">Définir une limite</string>
+    <string name="category_limit_dialog_title">Limite pour %1$s</string>
+    <string name="category_limit_amount_label">Montant de la limite</string>
+    <string name="category_limit_unit_weekly">Hebdomadaire</string>
+    <string name="category_limit_unit_period">Par période</string>
+    <string name="category_limit_remove">Supprimer la limite</string>
+    <string name="category_limit_progress">%1$s sur %2$s</string>
+    <string name="category_limit_progress_weekly">%1$s sur %2$s cette semaine</string>
+    <string name="category_limit_would_exceed">Cela dépasse la limite de %1$s</string>
+    <string name="category_limit_over">%1$s de trop</string>
+    <string name="category_limit_left">%1$s restants</string>
+    <string name="category_limit_ahead">En avance sur le rythme</string>
+    <string name="category_limit_on_track">Dans les clous</string>
+    <string name="analytics_category_limits_title">Limites par catégorie</string>
+    <string name="settings_category_limits_title">Limites par catégorie</string>
+    <string name="settings_category_limits_subtitle_empty">Plafonnez vos dépenses dans une catégorie chaque semaine ou période</string>
+    <string name="settings_category_limits_subtitle_count">%1$d catégories sur %2$d ont une limite</string>
+    <string name="settings_category_limits_no_categories">Les catégories que vous utilisez apparaîtront ici.</string>
+    <string name="category_limit_none">Aucune limite</string>
+    <string name="category_limit_summary_weekly">%1$s par semaine</string>
+    <string name="category_limit_summary_period">%1$s par période</string>
     <string name="settings_savings_reminder_title">Rappel d\'épargne</string>
     <string name="settings_savings_reminder_subtitle">Me rappeler combien mettre de côté au début d\'une nouvelle période</string>
     <string name="settings_savings_preferences_subtitle">Personnalisez la répartition 50/30/20 et définissez un objectif d\'épargne facultatif</string>
