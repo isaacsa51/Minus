@@ -1017,6 +1017,8 @@ private fun EditingContent(
                             onHideCategoryGrid = onHideCategoryGrid,
                             onDisableCalculationMode = onDisableCalculationMode,
                             limits = limits,
+                            splitInput = input,
+                            currencyCode = currencyCode,
                         )
                     }
                 }
@@ -1040,6 +1042,8 @@ private fun EditingContent(
                     onHideCategoryGrid = onHideCategoryGrid,
                     onDisableCalculationMode = onDisableCalculationMode,
                     limits = limits,
+                    splitInput = input,
+                    currencyCode = currencyCode,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 26.dp)

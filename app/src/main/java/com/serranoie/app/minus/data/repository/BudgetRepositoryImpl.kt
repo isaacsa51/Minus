@@ -244,6 +244,9 @@ class BudgetRepositoryImpl @Inject constructor(
     override suspend fun addTransaction(transaction: Transaction): Long =
         transactionDao.insert(transaction.toEntity())
 
+    override suspend fun addTransactions(transactions: List<Transaction>): List<Long> =
+        appDatabase.withTransaction { transactions.map { transactionDao.insert(it.toEntity()) } }
+
     override suspend fun addQueuedTransaction(transaction: Transaction) {
         queuedTransactionDao.insert(transaction.toQueuedEntity())
     }

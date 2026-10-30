@@ -21,6 +21,11 @@ class TransactionActionsControllerTest {
     private val context: Context = mockk {
         every { getString(R.string.expense_queued_for_next_period) } returns "Expense queued for next period"
         every { getString(R.string.history_snackbar_save_transaction_failed) } returns "Could not save transaction"
+        every { getString(R.string.split_expense_mismatch, 3, 2) } returns "Amounts and categories don't match (3 vs 2)"
+        every { getString(R.string.split_expense_not_recurring) } returns "Split expenses can't be recurring"
+        every { resources } returns mockk {
+            every { getQuantityString(R.plurals.split_expense_saved, 3, 3) } returns "Saved 3 expenses"
+        }
     }
 
     private class FakeHandler : TransactionHandler {
@@ -197,6 +202,72 @@ class TransactionActionsControllerTest {
 
         assertThat(actions).containsExactly(
             TransactionAction.ShowMessage("Could not save transaction"),
+        )
+    }
+
+    @Test
+    fun `when_handler_saves_a_split_then_the_saved_count_is_shown`() = runTest {
+        val controller = newController(
+            FakeHandler().apply { applyResult = ApplyTransactionResult.Added(normalizedInput = "", splitCount = 3) }
+        )
+
+        val actions = controller.apply(
+            input = "15+125+66",
+            isCalculation = true,
+            isRecurrentEnabled = false,
+            isCreditEnabled = false,
+            comment = "uber+food+coffee",
+            budgetSettings = sampleSettings(),
+            resolveActivePeriodId = { 1L },
+        )
+
+        assertThat(actions).containsExactly(
+            TransactionAction.ClearInput,
+            TransactionAction.ClearEditorFlags,
+            TransactionAction.TransactionAdded,
+            TransactionAction.ShowMessage("Saved 3 expenses"),
+        ).inOrder()
+    }
+
+    @Test
+    fun `when_handler_returns_split_mismatch_then_input_is_kept_and_counts_are_shown`() = runTest {
+        val controller = newController(
+            FakeHandler().apply { applyResult = ApplyTransactionResult.SplitMismatch(amounts = 3, categories = 2) }
+        )
+
+        val actions = controller.apply(
+            input = "15+125+66",
+            isCalculation = true,
+            isRecurrentEnabled = false,
+            isCreditEnabled = false,
+            comment = "uber+food",
+            budgetSettings = sampleSettings(),
+            resolveActivePeriodId = { 1L },
+        )
+
+        assertThat(actions).containsExactly(
+            TransactionAction.ShowMessage("Amounts and categories don't match (3 vs 2)"),
+        )
+    }
+
+    @Test
+    fun `when_handler_refuses_a_recurring_split_then_input_is_kept_and_reason_is_shown`() = runTest {
+        val controller = newController(
+            FakeHandler().apply { applyResult = ApplyTransactionResult.SplitWithRecurrent }
+        )
+
+        val actions = controller.apply(
+            input = "15+125",
+            isCalculation = true,
+            isRecurrentEnabled = true,
+            isCreditEnabled = false,
+            comment = "uber+food",
+            budgetSettings = sampleSettings(),
+            resolveActivePeriodId = { 1L },
+        )
+
+        assertThat(actions).containsExactly(
+            TransactionAction.ShowMessage("Split expenses can't be recurring"),
         )
     }
 

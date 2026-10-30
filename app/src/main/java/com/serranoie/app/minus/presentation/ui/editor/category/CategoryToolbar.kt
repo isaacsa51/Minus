@@ -15,18 +15,23 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -35,9 +40,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -51,14 +56,17 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -108,6 +116,8 @@ fun CategoryToolbar(
     onDisableCalculationMode: () -> Unit = {},
     onEditingChanged: (Boolean) -> Unit = {},
     limits: CategoryLimitsUi? = null,
+    splitInput: String = "",
+    currencyCode: String = "USD",
     modifier: Modifier = Modifier
 ) {
     val localDensity = LocalDensity.current
@@ -257,6 +267,8 @@ fun CategoryToolbar(
                     onHideCategoryGrid = onHideCategoryGrid,
                     onDisableCalculationMode = onDisableCalculationMode,
                     limits = limits,
+                    splitInput = splitInput,
+                    currencyCode = currencyCode,
                 )
             }
         }
@@ -316,6 +328,8 @@ fun CommentEditor(
     onChange: (comment: TextFieldValue) -> Unit,
     onApply: () -> Unit,
     placeholder: String? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    highlightTags: List<String> = emptyList(),
 ) {
     var focusIsTracking by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
@@ -323,73 +337,98 @@ fun CommentEditor(
     val configuration = LocalConfiguration.current
     val hasHardKeyboard = configuration.keyboard == Configuration.KEYBOARD_QWERTY
     val view = LocalView.current
-
-    TextField(
-        modifier = modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester)
-            .onFocusChanged { focusState ->
-                if (focusState.isFocused && hasHardKeyboard) {
-                    keyboardController?.hide()
-                }
-                if (!focusState.hasFocus && focusIsTracking) {
-                    onApply()
-                }
-            },
-        value = value,
-        onValueChange = {
-            onChange(it)
-        },
-        placeholder = placeholder?.let {
-            {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        },
-        trailingIcon = {
-            IconButton(
-                modifier = Modifier.padding(end = 4.dp),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ),
-                onClick = {
-                    performConfirmHaptic(view)
-                    onApply()
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                )
-            }
-        },
-        textStyle = MaterialTheme.typography.bodyLarge,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Sentences,
-            imeAction = ImeAction.Done,
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
+    val interactionSource = remember { MutableInteractionSource() }
+    var textLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
+    val pillColor = MaterialTheme.colorScheme.secondaryContainer
+    val colors = TextFieldDefaults.colors(
+        focusedContainerColor = MaterialTheme.colorScheme.surface,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+        disabledContainerColor = MaterialTheme.colorScheme.surface,
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedIndicatorColor = Color.Transparent,
+        disabledIndicatorColor = Color.Transparent,
+        errorIndicatorColor = Color.Transparent,
+    )
+    val placeholderContent: (@Composable () -> Unit)? = placeholder?.let {
+        {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+    val applyButton: @Composable () -> Unit = {
+        IconButton(
+            modifier = Modifier.padding(end = 4.dp),
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+            onClick = {
                 performConfirmHaptic(view)
                 onApply()
-            }
-        ),
-        shape = RoundedCornerShape(24.dp),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            disabledContainerColor = MaterialTheme.colorScheme.surface,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            errorIndicatorColor = Color.Transparent,
-        ),
-    )
+            },
+        ) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+            )
+        }
+    }
+
+    CompositionLocalProvider(LocalTextSelectionColors provides colors.textSelectionColors) {
+        BasicTextField(
+            modifier = modifier
+                .fillMaxWidth()
+                .defaultMinSize(minWidth = TextFieldDefaults.MinWidth, minHeight = TextFieldDefaults.MinHeight)
+                .focusRequester(focusRequester)
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused && hasHardKeyboard) {
+                        keyboardController?.hide()
+                    }
+                    if (!focusState.hasFocus && focusIsTracking) {
+                        onApply()
+                    }
+                },
+            value = value,
+            onValueChange = onChange,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            visualTransformation = visualTransformation,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    performConfirmHaptic(view)
+                    onApply()
+                }
+            ),
+            interactionSource = interactionSource,
+            onTextLayout = { textLayout = it },
+            decorationBox = { innerTextField ->
+                TextFieldDefaults.DecorationBox(
+                    value = value.text,
+                    innerTextField = {
+                        Box(Modifier.categoryPills(value.text, highlightTags, { textLayout }, pillColor)) {
+                            innerTextField()
+                        }
+                    },
+                    enabled = true,
+                    singleLine = true,
+                    visualTransformation = visualTransformation,
+                    interactionSource = interactionSource,
+                    placeholder = placeholderContent,
+                    trailingIcon = applyButton,
+                    shape = RoundedCornerShape(24.dp),
+                    colors = colors,
+                )
+            },
+        )
+    }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()

@@ -80,6 +80,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.calculator.lastCategoryQuery
+import com.serranoie.app.minus.domain.calculator.pickSuggestion
+import com.serranoie.app.minus.domain.calculator.previewSplit
+import com.serranoie.app.minus.domain.calculator.removeCategoryAt
+import com.serranoie.app.minus.domain.calculator.singlePlus
+import com.serranoie.app.minus.domain.calculator.splitCategories
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.theme.bodyMediumCondensed
@@ -108,6 +114,8 @@ fun EditableCategoryTag(
     onDisableCalculationMode: () -> Unit = {},
     startInEditMode: Boolean = false,
     limits: CategoryLimitsUi? = null,
+    splitInput: String = "",
+    currencyCode: String = "USD",
 ) {
     var limitTarget by remember { mutableStateOf<String?>(null) }
     val focusManager = LocalFocusManager.current
@@ -256,11 +264,35 @@ fun EditableCategoryTag(
                         renderPopup = true
                     }
 
+                    val splitPreview = remember(targetLabel, splitInput, tags) {
+                        if (targetLabel == null || targetLabel.trim() in tags) {
+                            emptyList()
+                        } else {
+                            previewSplit(splitInput, targetLabel)
+                        }
+                    }
                     if (targetLabel == null) {
                         CommentEditor(
                             value = value,
-                            onChange = { value = it },
-                            onApply = { close() })
+                            onChange = { changed ->
+                                val cleaned = singlePlus(changed.text)
+                                value = if (cleaned == changed.text) {
+                                    changed
+                                } else {
+                                    TextFieldValue(cleaned, TextRange(cleaned.length))
+                                }
+                            },
+                            onApply = { close() },
+                            visualTransformation = rememberCategoryHighlight(tags),
+                            highlightTags = tags,
+                        )
+                    } else if (splitPreview.isNotEmpty()) {
+                        SplitCategoryPills(
+                            preview = splitPreview,
+                            currencyCode = currencyCode,
+                            showErrors = splitInput.isNotBlank(),
+                            onRemove = { index -> onCommentUpdate(removeCategoryAt(targetLabel, index)) },
+                        )
                     } else if (!onlyIcon || targetLabel.isNotEmpty()) {
                         Text(
                             modifier = Modifier
@@ -281,11 +313,15 @@ fun EditableCategoryTag(
 
         val trimmedValue = value.text.trim()
         val filteredItems = remember(trimmedValue, tags, directCategoryPopupEnabled, sortAlphabetically) {
+            val query = lastCategoryQuery(trimmedValue)
+            val picked = splitCategories(trimmedValue.substringBeforeLast('+', ""))
             val baseFiltered = if (trimmedValue.isBlank()) {
                 if (directCategoryPopupEnabled) tags else emptyList()
+            } else if (query.isEmpty()) {
+                emptyList()
             } else {
                 tags.filter { tag ->
-                    tag.contains(trimmedValue, ignoreCase = true) && tag != trimmedValue
+                    tag.contains(query, ignoreCase = true) && tag != query && tag !in picked
                 }
             }
             if (sortAlphabetically) {
@@ -399,9 +435,10 @@ fun EditableCategoryTag(
                                                 },
                                                 onClick = {
                                                     dismissEvent.value = true
+                                                    val completed = pickSuggestion(value.text, item, splitInput)
                                                     value = TextFieldValue(
-                                                        item,
-                                                        TextRange(item.length),
+                                                        completed,
+                                                        TextRange(completed.length),
                                                     )
                                                 },
                                                 onDelete = {

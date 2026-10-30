@@ -1,6 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.budget
 
 import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.domain.calculator.ExpenseSplit
+import com.serranoie.app.minus.domain.calculator.SplitOutcome
+import com.serranoie.app.minus.domain.calculator.splitExpense
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
@@ -10,6 +13,7 @@ import com.serranoie.app.minus.domain.usecase.DeleteTransactionUseCase
 import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -29,9 +33,12 @@ sealed interface ApplyTransactionResult {
     data class Added(
         val normalizedInput: String,
         val transactionId: Long = 0L,
+        val splitCount: Int = 1,
     ) : ApplyTransactionResult
 
     data object InvalidInput : ApplyTransactionResult
+    data class SplitMismatch(val amounts: Int, val categories: Int) : ApplyTransactionResult
+    data object SplitWithRecurrent : ApplyTransactionResult
     data class Failed(val cause: Throwable? = null) : ApplyTransactionResult
 }
 
@@ -57,6 +64,27 @@ class BudgetTransactionHandler @Inject constructor(
         budgetSettings: BudgetSettings?,
         resolveActivePeriodId: suspend () -> Long,
     ): ApplyTransactionResult {
+        if ('+' in comment) {
+            val split = try {
+                if (isExistingCategory(comment)) SplitOutcome.NotSplit else splitExpense(input, comment)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                errorLogRecorder.record("BudgetTransactionHandler.applyTransaction split", e)
+                return ApplyTransactionResult.Failed(e)
+            }
+            when (split) {
+                SplitOutcome.NotSplit -> Unit
+                SplitOutcome.InvalidAmount -> return ApplyTransactionResult.InvalidInput
+                is SplitOutcome.Mismatch -> return ApplyTransactionResult.SplitMismatch(split.amounts, split.categories)
+                is SplitOutcome.Split -> return if (isRecurrentEnabled) {
+                    ApplyTransactionResult.SplitWithRecurrent
+                } else {
+                    applySplit(split.parts, isCreditEnabled, note, budgetSettings, resolveActivePeriodId)
+                }
+            }
+        }
+
         var normalizedInput = input
 
         if (isCalculation && normalizedInput.any { it in "+-×÷" }) {
@@ -135,6 +163,50 @@ class BudgetTransactionHandler @Inject constructor(
             errorLogRecorder.record("BudgetTransactionHandler.applyTransaction", e)
             ApplyTransactionResult.Failed(e)
         }
+    }
+
+    private suspend fun isExistingCategory(comment: String): Boolean {
+        val name = comment.trim()
+        return budgetRepository.getAllCategories().first().any { it.name == name }
+    }
+
+    private suspend fun applySplit(
+        parts: List<ExpenseSplit>,
+        isCreditEnabled: Boolean,
+        note: String,
+        budgetSettings: BudgetSettings?,
+        resolveActivePeriodId: suspend () -> Long,
+    ): ApplyTransactionResult = try {
+        val now = LocalDateTime.now()
+        val isQueued = budgetSettings != null && now.toLocalDate().isAfter(budgetSettings.getPeriodEndDate())
+        val periodId = if (isQueued) 0L else resolveActivePeriodId()
+        val transactions = parts.map { part ->
+            Transaction.create(
+                amount = part.amount,
+                comment = part.category,
+                note = note.trim(),
+                date = now,
+                periodId = periodId,
+                categoryId = budgetRepository.findOrCreateCategory(part.category).id,
+                isCredit = isCreditEnabled,
+            )
+        }
+        if (isQueued) {
+            transactions.forEach { budgetRepository.addQueuedTransaction(it) }
+            ApplyTransactionResult.QueuedForNextPeriod(normalizedInput = "")
+        } else {
+            val ids = budgetRepository.addTransactions(transactions)
+            ApplyTransactionResult.Added(
+                normalizedInput = "",
+                transactionId = ids.firstOrNull() ?: 0L,
+                splitCount = transactions.size,
+            )
+        }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        errorLogRecorder.record("BudgetTransactionHandler.applySplit", e)
+        ApplyTransactionResult.Failed(e)
     }
 
     suspend fun applyRecurrentExpense(

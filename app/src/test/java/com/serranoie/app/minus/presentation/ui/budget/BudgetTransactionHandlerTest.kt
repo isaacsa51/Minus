@@ -2,6 +2,8 @@ package com.serranoie.app.minus.presentation.ui.budget
 
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.repository.BudgetRepository
+import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
@@ -12,9 +14,11 @@ import com.serranoie.app.minus.presentation.notification.NotificationScheduler
 import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -183,5 +187,105 @@ class BudgetTransactionHandlerTest {
         )
 
         assertThat(date).isEqualTo(LocalDateTime.of(2026, 10, 18, 10, 30))
+    }
+
+    private suspend fun applySplit(
+        input: String,
+        comment: String,
+        isRecurrentEnabled: Boolean = false,
+        budgetSettings: BudgetSettings? = null,
+    ): ApplyTransactionResult {
+        every { budgetRepository.getAllCategories() } returns flowOf(listOf(Category(id = 9L, name = "Food+Drinks")))
+        coEvery { budgetRepository.findOrCreateCategory(any()) } answers {
+            val name = firstArg<String>()
+            Category(id = name.length.toLong(), name = name)
+        }
+        return handler.applyTransaction(
+            input = input,
+            isCalculation = true,
+            isRecurrentEnabled = isRecurrentEnabled,
+            isCreditEnabled = true,
+            comment = comment,
+            note = "lunch run",
+            budgetSettings = budgetSettings,
+            resolveActivePeriodId = { 7L },
+        )
+    }
+
+    @Test
+    fun `split categories save one transaction per typed amount in a single write`() = runTest {
+        val saved = slot<List<Transaction>>()
+
+        val result = applySplit(input = "15+125+66", comment = "uber+food+coffee")
+
+        assertThat(result).isInstanceOf(ApplyTransactionResult.Added::class.java)
+        assertThat((result as ApplyTransactionResult.Added).splitCount).isEqualTo(3)
+        coVerify(exactly = 1) { budgetRepository.addTransactions(capture(saved)) }
+        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+        val transactions = saved.captured
+        assertThat(transactions.map { it.comment }).containsExactly("uber", "food", "coffee").inOrder()
+        assertThat(transactions.map { it.amount }).containsExactly(BigDecimal("15"), BigDecimal("125"), BigDecimal("66")).inOrder()
+        assertThat(transactions.map { it.categoryId }).containsExactly(4L, 4L, 6L).inOrder()
+        assertThat(transactions.map { it.periodId }.toSet()).containsExactly(7L)
+        assertThat(transactions.map { it.date }.toSet()).hasSize(1)
+        assertThat(transactions.all { it.isCredit && it.note == "lunch run" }).isTrue()
+    }
+
+    @Test
+    fun `split with mismatched counts saves nothing and reports both counts`() = runTest {
+        val result = applySplit(input = "15+125+66", comment = "uber+food")
+
+        assertThat(result).isEqualTo(ApplyTransactionResult.SplitMismatch(amounts = 3, categories = 2))
+        coVerify(exactly = 0) { budgetRepository.addTransactions(any()) }
+        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+    }
+
+    @Test
+    fun `split is refused while recurring is enabled`() = runTest {
+        val result = applySplit(input = "15+125", comment = "uber+food", isRecurrentEnabled = true)
+
+        assertThat(result).isEqualTo(ApplyTransactionResult.SplitWithRecurrent)
+        coVerify(exactly = 0) { budgetRepository.addTransactions(any()) }
+    }
+
+    @Test
+    fun `an existing category whose name has a plus is saved whole`() = runTest {
+        val saved = slot<Transaction>()
+
+        applySplit(input = "15+125", comment = "Food+Drinks")
+
+        coVerify { budgetRepository.addTransaction(capture(saved)) }
+        assertThat(saved.captured.amount).isEqualTo(BigDecimal("140"))
+        assertThat(saved.captured.comment).isEqualTo("Food+Drinks")
+    }
+
+    @Test
+    fun `a single category still saves the total`() = runTest {
+        val saved = slot<Transaction>()
+
+        applySplit(input = "15+125+66", comment = "food")
+
+        coVerify { budgetRepository.addTransaction(capture(saved)) }
+        assertThat(saved.captured.amount).isEqualTo(BigDecimal("206"))
+        coVerify(exactly = 0) { budgetRepository.addTransactions(any()) }
+    }
+
+    @Test
+    fun `split after the period ended queues every part`() = runTest {
+        val ended = BudgetSettings(
+            totalBudget = BigDecimal("1000"),
+            period = BudgetPeriod.MONTHLY,
+            startDate = LocalDate.now().minusDays(30),
+            endDate = LocalDate.now().minusDays(1),
+        )
+        val queued = mutableListOf<Transaction>()
+        coEvery { budgetRepository.addQueuedTransaction(capture(queued)) } returns Unit
+
+        val result = applySplit(input = "15+125", comment = "uber+food", budgetSettings = ended)
+
+        assertThat(result).isInstanceOf(ApplyTransactionResult.QueuedForNextPeriod::class.java)
+        assertThat(queued.map { it.comment to it.amount })
+            .containsExactly("uber" to BigDecimal("15"), "food" to BigDecimal("125")).inOrder()
+        coVerify(exactly = 0) { budgetRepository.addTransactions(any()) }
     }
 }

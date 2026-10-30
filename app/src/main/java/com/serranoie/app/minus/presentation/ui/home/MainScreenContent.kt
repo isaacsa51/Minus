@@ -90,6 +90,7 @@ import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.SwipeableState
 import androidx.wear.compose.material.rememberSwipeableState
 import com.serranoie.app.minus.R
+import com.serranoie.app.minus.domain.calculator.pickCategory
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetSplitMode
@@ -1390,9 +1391,14 @@ private fun MainScreenNumpadSection(
                     tags = budgetUiState.tags,
                     selectedCategory = budgetUiState.currentComment,
                     onCategorySelected = { category ->
+                        val comment = pickCategory(
+                            comment = budgetUiState.currentComment,
+                            tag = category,
+                            input = budgetUiState.numpadInput,
+                        )
                         actions.onProcessIntent(
                             MainScreenUiIntent.ProcessBudgetEditorIntent(
-                                BudgetEditorIntent.CommentUpdated(category),
+                                BudgetEditorIntent.CommentUpdated(comment),
                             ),
                         )
                     },

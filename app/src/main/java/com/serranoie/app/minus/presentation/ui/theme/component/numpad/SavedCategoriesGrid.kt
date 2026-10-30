@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.serranoie.app.minus.domain.calculator.splitCategories
 import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryLimitBar
 import com.serranoie.app.minus.presentation.ui.editor.category.CategoryLimitsUi
@@ -63,6 +65,9 @@ fun SavedCategoriesGrid(
     limits: CategoryLimitsUi? = null,
 ) {
     val minItemHeight = if (limits?.statuses.isNullOrEmpty()) MinCategoryItemHeight else MinCategoryItemHeightWithLimit
+    val selected = remember(selectedCategory) {
+        selectedCategory?.let { splitCategories(it).toSet() + it }.orEmpty()
+    }
     val baseModifier = if (applyWindowInsets) {
         modifier
             .fillMaxSize()
@@ -83,7 +88,7 @@ fun SavedCategoriesGrid(
                 itemsIndexed(tags, key = { _, tag -> tag }) { index, tag ->
                     CategoryListItem(
                         label = tag,
-                        isSelected = tag == selectedCategory,
+                        isSelected = tag in selected,
                         position = positionFor(index, tags.lastIndex),
                         onClick = { onCategorySelected(tag) },
                         limits = limits,
@@ -98,7 +103,7 @@ fun SavedCategoriesGrid(
                 tags.forEachIndexed { index, tag ->
                     CategoryListItem(
                         label = tag,
-                        isSelected = tag == selectedCategory,
+                        isSelected = tag in selected,
                         position = positionFor(index, tags.lastIndex),
                         onClick = { onCategorySelected(tag) },
                         limits = limits,
