@@ -1,0 +1,12 @@
+- feat: implement media showcase into changelog
+- feat: category concat when detected calculation
+- feat: add category limits feature and settings
+- feat: add a reminder to save calculated amount on period start
+- feat: enhance category suggestion by usage and recurrence
+- ci: add unit tests and report uploads to PR check workflow
+- feat: update expanded island brief component
+- feat: update tile functionality to add expenses on the go
+- feat: add launcher shortcuts for receipt scanner
+- feat: add receipt scanning with camera and OCR
+- feat: add AZN currency
+- fix: account for recurring payments on analytics

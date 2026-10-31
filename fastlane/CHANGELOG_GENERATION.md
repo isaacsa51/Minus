@@ -164,6 +164,15 @@ Crucially, **no `.txt` is rewritten at build time** — Izzy's clean
 checkout produces the same APK byte-for-byte.
 
 ---
+## Tags gate releases
+
+A `.txt` only becomes a release once its `vX.Y.Z` tag exists locally (the
+tag also supplies the release date). The local `v*` tag list is an input
+of `:app:generateChangelogKotlin`, so tagging after writing the `.txt`
+regenerates on the next build — no `--rerun` needed.
+
+---
+
 ## Feature media (images / GIFs)
 
 Optional, latest release only. Drop files into

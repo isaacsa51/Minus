@@ -439,6 +439,7 @@ val generateChangelogKotlin by tasks.registering {
     val outputDir = layout.buildDirectory.dir("generated/source/changelog")
 
     inputs.dir(fastlaneDir).withPropertyName("fastlaneChangelogDir")
+    inputs.property("versionTags", gitOutput("tag", "--list", "v*").orEmpty())
     outputs.dir(outputDir).withPropertyName("generatedChangelogDir")
 
     doLast {
