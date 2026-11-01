@@ -151,7 +151,7 @@
     <string name="expense_queued_for_next_period">هزینه برای دوره بعدی در صف قرار گرفت</string>
     <string name="split_expense_mismatch">Amounts and categories don\'t match (%1$d vs %2$d)</string>
     <string name="split_expense_not_recurring">Split expenses can\'t be recurring</string>
-    <string name="split_category_remove">Remove %1$s</string>
+    <string name="split_category_remove">حذف %1$s</string>
     <plurals name="split_expense_saved">
         <item quantity="one">Saved %d expense</item>
         <item quantity="other">Saved %d expenses</item>
@@ -188,7 +188,7 @@
     <string name="receipt_camera_capture">Capture receipt</string>
     <string name="receipt_camera_gallery">Choose a photo</string>
     <string name="receipt_camera_switch">Switch camera</string>
-    <string name="receipt_camera_flash">Flash</string>
+    <string name="receipt_camera_flash">فلش</string>
     <string name="receipt_scan_hint">نکته: برای اسکن رسید، ✓ را نگه دارید</string>
     <string name="receipt_scan_hint_action">امتحان کنید</string>
     <plurals name="days">
