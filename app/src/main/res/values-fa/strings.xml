@@ -186,8 +186,8 @@
     <string name="receipt_camera_retry">No total found, try again</string>
     <string name="receipt_camera_close">Close camera</string>
     <string name="receipt_camera_capture">Capture receipt</string>
-    <string name="receipt_camera_gallery">Choose a photo</string>
-    <string name="receipt_camera_switch">Switch camera</string>
+    <string name="receipt_camera_gallery">یک عکس انتخاب کنید</string>
+    <string name="receipt_camera_switch">تغییر دوربین</string>
     <string name="receipt_camera_flash">فلش</string>
     <string name="receipt_scan_hint">نکته: برای اسکن رسید، ✓ را نگه دارید</string>
     <string name="receipt_scan_hint_action">امتحان کنید</string>
