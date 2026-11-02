@@ -175,16 +175,16 @@
     <string name="analytics_title">آمار و ارقام</string>
     <string name="receipt_scan_button">Scan receipt</string>
     <string name="receipt_scan_failed">Couldn\'t read a total from the receipt</string>
-    <string name="quick_add_amount_label">Amount</string>
+    <string name="quick_add_amount_label">مبلغ</string>
     <string name="quick_add_no_categories">No categories yet. You can save without one.</string>
     <string name="quick_add_save_failed">Couldn\'t save the expense. Try again.</string>
     <string name="quick_add_needs_budget">Set up a budget in Minus before adding expenses here.</string>
-    <string name="quick_add_open_app">Open Minus</string>
-    <string name="quick_add_saved">%1$s saved</string>
+    <string name="quick_add_open_app">باز کردن Minus</string>
+    <string name="quick_add_saved">%1$s ذخیره شد</string>
     <string name="receipt_camera_point_at_total">Point at the total</string>
     <string name="receipt_camera_detected">%1$s detected</string>
     <string name="receipt_camera_retry">No total found, try again</string>
-    <string name="receipt_camera_close">Close camera</string>
+    <string name="receipt_camera_close">بستن دوربین</string>
     <string name="receipt_camera_capture">Capture receipt</string>
     <string name="receipt_camera_gallery">یک عکس انتخاب کنید</string>
     <string name="receipt_camera_switch">تغییر دوربین</string>
@@ -851,16 +851,16 @@
     <string name="widget_budget_pill_title">نوار بودجه</string>
     <string name="widget_budget_pill_description">باقی‌مانده برای حالت نمایشی که انتخاب کرده‌اید — روزانه، هفتگی، دوهفتگی یا ماهانه — در یک نوار باریک</string>
     <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
-    <string name="island_brief_days_short">%1$dd</string>
+    <string name="island_brief_days_short">%1$d روز</string>
     <string name="island_brief_stale">left in period - open Minus to update</string>
     <string name="island_page_spent_of">%1$s of %2$s spent</string>
     <string name="island_page_period_left">Period left</string>
     <plurals name="island_page_days_left">
-        <item quantity="one">day left</item>
-        <item quantity="other">days left</item>
+        <item quantity="one">روز باقیمانده</item>
+        <item quantity="other">روز های باقیمانده</item>
     </plurals>
     <string name="island_charge_today">%1$s — %2$s due today</string>
     <string name="island_charge_tomorrow">%1$s — %2$s due tomorrow</string>
-    <string name="island_charge_unnamed">Recurring payment</string>
+    <string name="island_charge_unnamed">پرداخت دوره ای</string>
     <string name="island_credit_owed">%1$s owed on credit</string>
 </resources>
