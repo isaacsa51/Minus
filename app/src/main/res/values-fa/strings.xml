@@ -182,7 +182,7 @@
     <string name="quick_add_open_app">باز کردن Minus</string>
     <string name="quick_add_saved">%1$s ذخیره شد</string>
     <string name="receipt_camera_point_at_total">Point at the total</string>
-    <string name="receipt_camera_detected">%1$s detected</string>
+    <string name="receipt_camera_detected">%1$s تشخیص داده شد</string>
     <string name="receipt_camera_retry">No total found, try again</string>
     <string name="receipt_camera_close">بستن دوربین</string>
     <string name="receipt_camera_capture">Capture receipt</string>
