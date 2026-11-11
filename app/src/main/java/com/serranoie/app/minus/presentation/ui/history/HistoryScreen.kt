@@ -28,8 +28,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -52,6 +55,7 @@ import com.serranoie.app.minus.presentation.ui.history.edit.TransactionEditScree
 import com.serranoie.app.minus.presentation.ui.history.sections.budgetDisplaySection
 import com.serranoie.app.minus.presentation.ui.history.sections.currentPeriodRecurrentSection
 import com.serranoie.app.minus.presentation.ui.history.sections.futureRecurrentSection
+import com.serranoie.app.minus.presentation.ui.history.sections.historySearchSection
 import com.serranoie.app.minus.presentation.ui.history.sections.pastPeriodToggleSection
 import com.serranoie.app.minus.presentation.ui.history.sections.pastTransactionDateSections
 import com.serranoie.app.minus.presentation.ui.history.sections.transactionDateSections
@@ -335,6 +339,8 @@ private fun HistoryListContent(
     LaunchedEffect(showTutorial) { reportVisibility.value(showTutorial) }
     DisposableEffect(Unit) { onDispose { reportVisibility.value(false) } }
 
+    var searchText by rememberSaveable { mutableStateOf(uiState.searchQuery) }
+
     val currentOnCollapseDragDelta = rememberUpdatedState(onCollapseDragDelta)
     val density = LocalDensity.current
     val threshold = remember(density) { with(density) { 128.dp.toPx() } }
@@ -383,6 +389,19 @@ private fun HistoryListContent(
                 creditOwed = uiState.creditOwed,
                 hintModifier = tutorialBoxState.hintAt(0),
             )
+
+            if (uiState.transactions.isNotEmpty() && !showTutorial) {
+                historySearchSection(
+                    query = searchText,
+                    appliedQuery = uiState.searchQuery,
+                    resultCount = uiState.searchResultCount,
+                    resultTotal = currencyFormat.format(uiState.searchResultTotal),
+                    onQueryChange = {
+                        searchText = it
+                        onProcessIntent(HistoryUiIntent.SetSearchQuery(it))
+                    },
+                )
+            }
 
             currentPeriodRecurrentSection(
                 upcomingRecurrentInPeriod = uiState.upcomingRecurrentInPeriod,

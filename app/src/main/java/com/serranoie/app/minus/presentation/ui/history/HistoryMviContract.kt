@@ -26,6 +26,8 @@ sealed interface HistoryUiIntent {
     data class SetLockSwipeable(val locked: Boolean) : HistoryUiIntent
 
     data class UpdateCreditCutoffDay(val day: Int) : HistoryUiIntent
+
+    data class SetSearchQuery(val query: String) : HistoryUiIntent
 }
 
 sealed interface HistoryUiEffect {
@@ -60,6 +62,9 @@ data class HistoryUiState(
     val showOutOfPeriodSubscriptions: Boolean = false,
     val showUpcomingRecurrentInPeriod: Boolean = true,
     val lockSwipeable: Boolean = true,
+    val searchQuery: String = "",
+    val searchResultCount: Int = 0,
+    val searchResultTotal: BigDecimal = BigDecimal.ZERO,
 
     val displayTransactions: List<Transaction> = emptyList(),
     val groupedCurrentTransactions: Map<LocalDate?, List<Transaction>> = emptyMap(),

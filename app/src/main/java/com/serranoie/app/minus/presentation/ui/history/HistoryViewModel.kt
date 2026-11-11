@@ -17,6 +17,7 @@ import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import com.serranoie.app.minus.presentation.ui.budget.BudgetTransactionHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,12 +27,15 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.Locale
 import javax.inject.Inject
 
 private const val TAG = "HistoryViewModel"
@@ -58,6 +62,12 @@ class HistoryViewModel @Inject constructor(
     private val _lockSwipeable = MutableStateFlow(true)
     private val _expandedTransactionId = MutableStateFlow<Long?>(null)
     private val _pendingRemovedTransactions = MutableStateFlow(emptyMap<Long, Transaction>())
+    private val _searchQuery = MutableStateFlow("")
+
+    @OptIn(FlowPreview::class)
+    private val appliedSearchQuery = _searchQuery
+        .debounce { if (it.isBlank()) 0L else SEARCH_DEBOUNCE_MS }
+        .distinctUntilChanged()
 
     private val _effects = MutableSharedFlow<HistoryUiEffect>()
     val effects: SharedFlow<HistoryUiEffect> = _effects.asSharedFlow()
@@ -76,7 +86,8 @@ class HistoryViewModel @Inject constructor(
             _showUpcomingRecurrentInPeriod,
             _lockSwipeable,
             _expandedTransactionId,
-            _pendingRemovedTransactions
+            _pendingRemovedTransactions,
+            appliedSearchQuery,
         )
     ) { array ->
         UIInputs(
@@ -90,7 +101,8 @@ class HistoryViewModel @Inject constructor(
             showUpcomingRecurrentInPeriod = array[7] as Boolean,
             lockSwipeable = array[8] as Boolean,
             expandedTransactionId = array[9] as Long?,
-            pendingRemovedTransactions = array[10] as Map<Long, Transaction>
+            pendingRemovedTransactions = array[10] as Map<Long, Transaction>,
+            searchQuery = array[11] as String,
         )
     }
 
@@ -155,6 +167,7 @@ class HistoryViewModel @Inject constructor(
             is HistoryUiIntent.SetLockSwipeable -> _lockSwipeable.value = intent.locked
             is HistoryUiIntent.ToggleExpandedTransaction -> toggleExpandedTransaction(intent.transactionId)
             is HistoryUiIntent.UpdateCreditCutoffDay -> updateCreditCutoffDay(intent.day)
+            is HistoryUiIntent.SetSearchQuery -> _searchQuery.value = intent.query
         }
     }
 
@@ -243,6 +256,7 @@ class HistoryViewModel @Inject constructor(
     }
 
     private fun toggleExpandedDate(date: LocalDate) {
+        if (uiState.value.searchQuery.isNotBlank()) return
         _expandedDates.update { expanded ->
             val base = expanded ?: uiState.value.expandedDates
             if (base.contains(date)) base - date else base + date
@@ -318,6 +332,13 @@ class HistoryViewModel @Inject constructor(
         val autoExpanded = inputs.expandedDates
             ?: groupedCurrent.keys.filterNotNull().sortedDescending().take(1).toSet()
 
+        val query = inputs.searchQuery.trim()
+        val searchResults = query.takeIf { it.isNotEmpty() }?.let { q ->
+            groupTransactionsByDate(
+                (groupedCurrent.values.flatten() + pastPeriodTx).filter(historySearchMatcher(q, Locale.getDefault()))
+            )
+        }
+
         return HistoryUiState(
             budgetSettings = budgetSettings,
             budgetState = budgetState,
@@ -338,16 +359,21 @@ class HistoryViewModel @Inject constructor(
             recurrentToEdit = inputs.recurrentToEdit,
             showDeleteRecurrentDialog = inputs.showDeleteRecurrentDialog,
             expandedTransactionId = inputs.expandedTransactionId,
-            expandedDates = autoExpanded,
+            expandedDates = searchResults?.keys?.filterNotNull()?.toSet() ?: autoExpanded,
             showPastPeriod = inputs.showPastPeriod,
             showOutOfPeriodSubscriptions = inputs.showOutOfPeriodSubscriptions,
             showUpcomingRecurrentInPeriod = inputs.showUpcomingRecurrentInPeriod,
             lockSwipeable = inputs.lockSwipeable,
+            searchQuery = inputs.searchQuery,
+            searchResultCount = searchResults?.values?.sumOf { it.size } ?: 0,
+            searchResultTotal = searchResults?.values?.flatten().orEmpty()
+                .filter { it.amount > BigDecimal.ZERO }
+                .sumOf { it.amount },
             displayTransactions = displayTx,
-            groupedCurrentTransactions = groupedCurrent,
-            groupedPastTransactions = groupedPast,
-            upcomingRecurrentInPeriod = upcomingInPeriod,
-            futureRecurrentOutOfPeriod = futureOutOfPeriod,
+            groupedCurrentTransactions = searchResults ?: groupedCurrent,
+            groupedPastTransactions = if (searchResults != null) emptyMap() else groupedPast,
+            upcomingRecurrentInPeriod = if (searchResults != null) emptyList() else upcomingInPeriod,
+            futureRecurrentOutOfPeriod = if (searchResults != null) emptyList() else futureOutOfPeriod,
             creditOwed = creditOwed,
             debtAdjustedBalance = debtAdjustedBalance,
         )
@@ -364,11 +390,13 @@ class HistoryViewModel @Inject constructor(
         val showUpcomingRecurrentInPeriod: Boolean,
         val lockSwipeable: Boolean,
         val expandedTransactionId: Long?,
-        val pendingRemovedTransactions: Map<Long, Transaction>
+        val pendingRemovedTransactions: Map<Long, Transaction>,
+        val searchQuery: String,
     )
 
     companion object {
         private const val EXIT_ANIMATION_DURATION_MS = 600L
+        private const val SEARCH_DEBOUNCE_MS = 225L
     }
 
     override fun onCleared() {
