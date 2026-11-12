@@ -335,7 +335,9 @@ class HistoryViewModel @Inject constructor(
         val query = inputs.searchQuery.trim()
         val searchResults = query.takeIf { it.isNotEmpty() }?.let { q ->
             groupTransactionsByDate(
-                (groupedCurrent.values.flatten() + pastPeriodTx).filter(historySearchMatcher(q, Locale.getDefault()))
+                (groupedCurrent.values.flatten() + pastPeriodTx).filter(
+                    historySearchMatcher(q, Locale.getDefault(), categories.associate { it.id to it.name })
+                )
             )
         }
 

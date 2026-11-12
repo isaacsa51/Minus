@@ -8,6 +8,7 @@ import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Locale
+import java.util.TimeZone
 
 class LocalizedDateFormatTest {
     @get:Rule
@@ -55,6 +56,31 @@ class LocalizedDateFormatTest {
     fun `date time keeps its time of day`() {
         assertThat(LocalDateTime.of(2026, 10, 13, 23, 45).formatLocalized("dd MMM HH:mm", Locale.US))
             .isEqualTo("13 Oct 23:45")
+    }
+
+    @Test
+    fun `interleaved patterns and locales never borrow each other's format`() {
+        val persian = Locale.forLanguageTag("fa-IR")
+        repeat(3) {
+            assertThat(date.formatLocalized("dd MMMM yyyy", Locale.US)).isEqualTo("13 October 2026")
+            assertThat(date.formatLocalized("d MMMM yyyy", persian)).isEqualTo("۲۱ مهر ۱۴۰۵")
+            assertThat(date.formatLocalized("yyyy", Locale.US)).isEqualTo("2026")
+            assertThat(date.formatLocalized("dd MMMM", Locale.forLanguageTag("es-MX"))).isEqualTo("13 octubre")
+        }
+    }
+
+    @Test
+    fun `a time zone change after formatting keeps the local time of day`() {
+        val original = TimeZone.getDefault()
+        try {
+            val time = LocalDateTime.of(2026, 10, 13, 23, 45)
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+            assertThat(time.formatLocalized("dd MMM HH:mm", Locale.US)).isEqualTo("13 Oct 23:45")
+            TimeZone.setDefault(TimeZone.getTimeZone("Asia/Tokyo"))
+            assertThat(time.formatLocalized("dd MMM HH:mm", Locale.US)).isEqualTo("13 Oct 23:45")
+        } finally {
+            TimeZone.setDefault(original)
+        }
     }
 
     @Test

@@ -9,6 +9,7 @@ import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
@@ -364,6 +365,24 @@ class HistoryViewModelTest {
                 LocalDate.of(2026, 1, 12),
                 LocalDate.of(2025, 12, 20),
             )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `search matches the category name of an expense`() = runTest {
+        every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
+        every { budgetRepository.getActiveCategories() } returns flowOf(listOf(Category(id = 9L, name = "Dining")))
+        every { budgetRepository.getTransactions() } returns flowOf(
+            searchFixture().map { if (it.id == 2L) it.copy(categoryId = 9L) else it }
+        )
+        val vm = newViewModel()
+
+        vm.uiState.test {
+            vm.processIntent(HistoryUiIntent.SetSearchQuery("dining"))
+            val state = awaitCondition { it.searchQuery == "dining" && it.budgetSettings != null }
+
+            assertThat(state.groupedCurrentTransactions.values.flatten().map { it.id }).containsExactly(2L)
             cancelAndIgnoreRemainingEvents()
         }
     }
