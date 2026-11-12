@@ -19,18 +19,36 @@ private val AMOUNT_EXACT = Regex("^(?:\\p{L}{0,3}\\p{Sc}([\\d.,]+)|([\\d.,]+)\\p
 private val COMBINING_MARKS = Regex("\\p{Mn}+")
 private val NUMERIC_DATE = Regex("^\\d{1,4}([/.-])\\d{1,4}(\\1\\d{1,4})?$")
 private val NUMERIC_DATE_SEPARATOR = Regex("[/.-]")
+private val QUOTED = Regex("[\"“”„«»]([^\"“”„«»]*)[\"“”„«»]")
+private val DATE_COMPARE = Regex("^([<>]=?)(.+)$")
+private const val RANGE_DOTS = ".."
 private const val MIN_MONTH_PREFIX = 3
 private const val THOUSANDS_GROUP = 3
 private const val MONTH_NAME_YEAR = 2000
+private const val MONTH_SAMPLES = 26
+private const val MONTH_SAMPLE_STEP_DAYS = 15L
+private const val YEAR_DIGITS = 4
+private const val MAX_DAY = 31
+private const val MAX_MONTH = 12
+private const val TWO_DIGIT_YEAR = 100
+private const val NO_DAY_LOW = 0
+private const val NO_DAY_HIGH = 99
+private const val MONTH_KEY = 100
+private const val YEAR_KEY = 10_000
 
 private val searchDates = ConcurrentHashMap<Pair<Locale, LocalDate>, SearchDate>()
 private val gregorianMonthNames = ConcurrentHashMap<Pair<Locale, Int>, List<String>>()
+private val monthLookups = ConcurrentHashMap<Locale, List<Pair<Int, List<String>>>>()
 
 private val CONNECTOR_WORDS = setOf(
     "on", "at", "in", "of", "the", "from",
     "de", "del", "el", "la", "en", "a", "do", "da", "di", "le", "du", "au", "em", "no", "na", "il",
     "am", "im", "vom", "von", "der", "den",
     "в", "от", "на", "στις", "στο", "της",
+)
+
+private val RANGE_WORDS = setOf(
+    RANGE_DOTS, "to", "until", "till", "a", "al", "hasta", "ate", "bis", "fino", "au", "по", "до", "εως", "تا",
 )
 
 private class AmountFilter(val operator: String, val value: BigDecimal) {
@@ -53,31 +71,180 @@ private class SearchDate(
     val monthNames: List<String>,
 )
 
-internal fun historySearchMatcher(query: String, locale: Locale): (Transaction) -> Boolean {
-    val allTokens = query.searchNormalized(locale)
+private class PartialDate(val year: Int?, val month: Int?, val day: Int?)
+
+private class DateBound(val year: Int?, val month: Int, val day: Int?)
+
+private class DateFilter(
+    val low: DateBound?,
+    val lowStrict: Boolean,
+    val high: DateBound?,
+    val highStrict: Boolean,
+) {
+    private val yearly = low?.year != null || high?.year != null
+
+    fun matches(date: SearchDate): Boolean {
+        val key = (if (yearly) date.year * YEAR_KEY else 0) + date.month * MONTH_KEY + date.day
+        val aboveLow = low?.let { if (lowStrict) key > it.key(NO_DAY_HIGH) else key >= it.key(NO_DAY_LOW) } ?: true
+        val belowHigh = high?.let { if (highStrict) key < it.key(NO_DAY_LOW) else key <= it.key(NO_DAY_HIGH) } ?: true
+        val wraps = !yearly && low != null && high != null && low.key(NO_DAY_LOW) > high.key(NO_DAY_HIGH)
+        return if (wraps) aboveLow || belowHigh else aboveLow && belowHigh
+    }
+
+    private fun DateBound.key(missingDay: Int) =
+        (if (yearly) (year ?: 0) * YEAR_KEY else 0) + month * MONTH_KEY + (day ?: missingDay)
+}
+
+private class DateContext(
+    val locale: Locale,
+    val order: List<Char>,
+    val months: List<Pair<Int, List<String>>>,
+)
+
+internal fun historySearchMatcher(
+    query: String,
+    locale: Locale,
+    categoryNames: Map<Long, String> = emptyMap(),
+): (Transaction) -> Boolean {
+    val normalized = query.searchNormalized(locale)
+    val phrases = QUOTED.findAll(normalized).map { it.groupValues[1].trim() }.filter { it.isNotEmpty() }.toList()
+    val allTokens = normalized.replace(QUOTED, " ")
+        .replace(RANGE_DOTS, " $RANGE_DOTS ")
         .replace(AMOUNT_GLUE, "$1")
         .split(TOKEN_SEPARATOR)
         .map { it.trimEnd(',') }
         .filter { it.isNotEmpty() }
-    val tokens = allTokens.filterNot { it in CONNECTOR_WORDS }.ifEmpty { allTokens }
+    val context = DateContext(locale, numericDateOrder(locale), monthLookup(locale))
+    val (ranges, remaining) = extractDateRanges(allTokens, context)
+    val tokens = remaining.filterNot { it in CONNECTOR_WORDS || it == RANGE_DOTS }
+        .ifEmpty { if (ranges.isEmpty() && phrases.isEmpty()) remaining else emptyList() }
     val amountFilters = tokens.mapNotNull { token -> token.toAmountFilter()?.let { token to it } }.toMap()
-    val numericOrder = numericDateOrder(locale)
+    val dateCompares = tokens.filterNot { it in amountFilters }
+        .mapNotNull { token -> token.toDateCompare(context)?.let { token to it } }
+        .toMap()
+    val categories = categoryNames.mapValues { it.value.searchNormalized(locale) }
 
     return { transaction ->
-        val text = "${transaction.comment} ${transaction.note}".searchNormalized(locale)
+        val category = transaction.categoryId?.let(categories::get).orEmpty()
+        val text = "${transaction.comment} ${transaction.note}".searchNormalized(locale) + " " + category
         val date by lazy { transaction.date?.toLocalDate()?.let { searchDate(it, locale) } }
-        tokens.all { token ->
-            val amountFilter = amountFilters[token]
-            when {
-                amountFilter != null -> amountFilter.matches(transaction.amount)
-                NUMERIC_DATE.matches(token) -> date?.matchesNumeric(token, numericOrder) == true
-                token.all { it.isDigit() } -> text.contains(token) ||
-                    date?.let { d -> token.toIntOrNull().let { it == d.day || it == d.year } } == true
-                else -> text.contains(token) ||
-                    token.length >= MIN_MONTH_PREFIX && date?.monthNames?.any { it.startsWith(token) } == true
+        phrases.all { text.contains(it) } &&
+            ranges.all { range -> date?.let(range::matches) == true } &&
+            tokens.all { token ->
+                val amountFilter = amountFilters[token]
+                val dateCompare = dateCompares[token]
+                when {
+                    amountFilter != null -> amountFilter.matches(transaction.amount)
+                    dateCompare != null -> date?.let(dateCompare::matches) == true
+                    NUMERIC_DATE.matches(token) -> date?.matchesNumeric(token, context.order) == true
+                    token.all { it.isDigit() } -> text.contains(token) ||
+                        date?.let { d -> token.toIntOrNull().let { it == d.day || it == d.year } } == true
+                    else -> text.contains(token) ||
+                        token.length >= MIN_MONTH_PREFIX && date?.monthNames?.any { it.startsWith(token) } == true
+                }
             }
-        }
     }
+}
+
+private fun extractDateRanges(tokens: List<String>, context: DateContext): Pair<List<DateFilter>, List<String>> {
+    val used = mutableSetOf<Int>()
+    val ranges = mutableListOf<DateFilter>()
+    for (index in tokens.indices) {
+        if (index in used || tokens[index] !in RANGE_WORDS) continue
+        val left = scanDate(tokens, (index - 1 downTo 0).filterNot { it in used }, context) ?: continue
+        val right = scanDate(tokens, (index + 1 until tokens.size).filterNot { it in used }, context) ?: continue
+        val range = rangeOf(left.first, right.first) ?: continue
+        ranges += range
+        used += index
+        used += left.second
+        used += right.second
+    }
+    return ranges to tokens.filterIndexed { index, _ -> index !in used }
+}
+
+private fun scanDate(tokens: List<String>, indices: List<Int>, context: DateContext): Pair<PartialDate, List<Int>>? {
+    var year: Int? = null
+    var month: Int? = null
+    var day: Int? = null
+    val consumed = mutableListOf<Int>()
+    val pending = mutableListOf<Int>()
+    for (index in indices) {
+        val token = tokens[index]
+        val number = token.toIntOrNull()
+        val monthNumber = if (number == null) context.monthOf(token) else null
+        when {
+            token in CONNECTOR_WORDS || token in RANGE_WORDS -> {
+                pending += index
+                continue
+            }
+            consumed.isEmpty() && NUMERIC_DATE.matches(token) ->
+                return token.toNumericDate(context)?.let { it to listOf(index) }
+            number != null && token.length == YEAR_DIGITS && year == null -> year = number
+            number != null && number in 1..MAX_DAY && day == null -> day = number
+            monthNumber != null && month == null -> month = monthNumber
+            else -> break
+        }
+        consumed += pending
+        consumed += index
+        pending.clear()
+    }
+    return if (consumed.isEmpty()) null else PartialDate(year, month, day) to consumed
+}
+
+private fun rangeOf(start: PartialDate, end: PartialDate): DateFilter? {
+    val startMonth = start.month ?: end.month ?: return null
+    val endMonth = end.month ?: startMonth
+    val wraps = startMonth * MONTH_KEY + (start.day ?: NO_DAY_LOW) > endMonth * MONTH_KEY + (end.day ?: NO_DAY_HIGH)
+    val startYear = start.year ?: end.year?.let { if (wraps) it - 1 else it }
+    val endYear = end.year ?: start.year?.let { if (wraps) it + 1 else it }
+    return DateFilter(
+        low = DateBound(startYear, startMonth, start.day),
+        lowStrict = false,
+        high = DateBound(endYear, endMonth, end.day),
+        highStrict = false,
+    )
+}
+
+private fun String.toDateCompare(context: DateContext): DateFilter? {
+    val match = DATE_COMPARE.matchEntire(this) ?: return null
+    val operator = match.groupValues[1]
+    val value = match.groupValues[2]
+    val numeric = if (NUMERIC_DATE.matches(value)) value.toNumericDate(context) else null
+    val bound = numeric?.month?.let { DateBound(numeric.year, it, numeric.day) }
+        ?: context.monthOf(value)?.let { DateBound(null, it, null) }
+        ?: return null
+    return if (operator.startsWith(">")) {
+        DateFilter(low = bound, lowStrict = operator == ">", high = null, highStrict = false)
+    } else {
+        DateFilter(low = null, lowStrict = false, high = bound, highStrict = operator == "<")
+    }
+}
+
+private fun String.toNumericDate(context: DateContext): PartialDate? {
+    val parts = split(NUMERIC_DATE_SEPARATOR).map { it.toInt() }
+    val order = if (parts.size == 2) context.order - 'y' else context.order
+    val fields = parts.zip(order).associate { (value, field) -> field to value }
+    val day = fields['d']?.takeIf { it in 1..MAX_DAY } ?: return null
+    val month = fields['M']?.takeIf { it in 1..MAX_MONTH } ?: return null
+    val year = fields['y']?.let { if (it < TWO_DIGIT_YEAR) it + context.century() else it }
+    return PartialDate(year, month, day)
+}
+
+private fun DateContext.century(): Int =
+    searchDate(LocalDate.now(), locale).year / TWO_DIGIT_YEAR * TWO_DIGIT_YEAR
+
+private fun DateContext.monthOf(token: String): Int? =
+    if (token.length < MIN_MONTH_PREFIX) {
+        null
+    } else {
+        months.firstOrNull { (_, names) -> names.any { it.startsWith(token) } }?.first
+    }
+
+private fun monthLookup(locale: Locale): List<Pair<Int, List<String>>> = monthLookups.getOrPut(locale) {
+    (0 until MONTH_SAMPLES)
+        .map { searchDate(LocalDate.of(MONTH_NAME_YEAR, 1, 1).plusDays(it * MONTH_SAMPLE_STEP_DAYS), locale) }
+        .distinctBy { it.month }
+        .map { it.month to it.monthNames }
 }
 
 private fun String.toAmountFilter(): AmountFilter? {

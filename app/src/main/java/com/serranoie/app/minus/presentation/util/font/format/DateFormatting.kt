@@ -1,6 +1,7 @@
 ﻿package com.serranoie.app.minus.presentation.util.font.format
 
 import android.icu.text.SimpleDateFormat as IcuSimpleDateFormat
+import android.icu.util.TimeZone as IcuTimeZone
 import android.icu.util.ULocale
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
@@ -20,6 +21,8 @@ import java.time.temporal.WeekFields
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.ceil
 
 const val DAY = 24 * 60 * 60 * 1000
@@ -39,10 +42,19 @@ fun LocalDate.formatLocalized(pattern: String, locale: Locale = Locale.getDefaul
 fun LocalDateTime.formatLocalized(pattern: String, locale: Locale = Locale.getDefault()): String =
     toDate().formatLocalized(pattern, locale)
 
+private data class IcuFormatKey(val pattern: String, val locale: Locale, val timeZone: String)
+
+private val icuFormats = ConcurrentHashMap<IcuFormatKey, IcuSimpleDateFormat>()
+private val timeFormatters = ConcurrentHashMap<Pair<String, Locale>, DateTimeFormatter>()
+
 fun Date.formatLocalized(pattern: String, locale: Locale = Locale.getDefault()): String {
-    val calendar = if (CalendarSystem.of(locale) == CalendarSystem.PERSIAN) "persian" else "gregorian"
-    val uLocale = ULocale.forLocale(locale).setKeywordValue("calendar", calendar)
-    return IcuSimpleDateFormat(pattern, uLocale).format(this)
+    val key = IcuFormatKey(pattern, locale, TimeZone.getDefault().id)
+    val format = icuFormats.getOrPut(key) {
+        val calendar = if (CalendarSystem.of(locale) == CalendarSystem.PERSIAN) "persian" else "gregorian"
+        val uLocale = ULocale.forLocale(locale).setKeywordValue("calendar", calendar)
+        IcuSimpleDateFormat(pattern, uLocale).apply { timeZone = IcuTimeZone.getTimeZone(key.timeZone) }
+    }
+    return synchronized(format) { format.format(this) }
 }
 
 fun localizedFormatter(pattern: String, locale: Locale = Locale.getDefault()): (LocalDate) -> String =
@@ -136,22 +148,18 @@ fun prettyDate(
     val locale = LocalConfiguration.current.locales[0]
 
     val dateWithMonthPattern = if (shortMonth) "dd MMM" else "dd MMMM"
-    val timeFormatter = if (DateFormat.is24HourFormat(LocalContext.current)) {
-        DateTimeFormatter.ofPattern("HH:mm", locale)
-    } else {
-        DateTimeFormatter.ofPattern("hh:mm a", locale)
-    }
+    val timePattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm a"
+    val timeFormatter = timeFormatters.getOrPut(timePattern to locale) { DateTimeFormatter.ofPattern(timePattern, locale) }
 
 
     val currentLocalDate = LocalDate.now()
     val isToday = date?.toLocalDate() == currentLocalDate
 
-    val currentYear = currentLocalDate.formatLocalized("yyyy", locale)
-    val convertedYear = date?.formatLocalized("yyyy", locale)
-
     val datePart = if (human && isToday) {
         stringResource(R.string.today)
     } else if (!forceHideDate && (!isToday || !showTime || forceShowDate)) {
+        val currentYear = currentLocalDate.formatLocalized("yyyy", locale)
+        val convertedYear = date?.formatLocalized("yyyy", locale)
         var dp = date?.formatLocalized(dateWithMonthPattern, locale).orEmpty()
         if (convertedYear != currentYear || forceShowYear) {
             dp += " $convertedYear"

@@ -66,6 +66,9 @@ import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyF
 import java.text.NumberFormat
 import java.time.LocalDate
 
+private val COLLAPSE_OVERSCROLL = 128.dp
+private val SEARCH_COLLAPSE_OVERSCROLL = 320.dp
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun HistoryScreen(
@@ -340,11 +343,20 @@ private fun HistoryListContent(
     DisposableEffect(Unit) { onDispose { reportVisibility.value(false) } }
 
     var searchText by rememberSaveable { mutableStateOf(uiState.searchQuery) }
+    LaunchedEffect(Unit) {
+        if (searchText.isNotEmpty()) onProcessIntent(HistoryUiIntent.SetSearchQuery(searchText))
+    }
+    val currentOnProcessIntent = rememberUpdatedState(onProcessIntent)
+    DisposableEffect(Unit) {
+        onDispose { currentOnProcessIntent.value(HistoryUiIntent.SetSearchQuery("")) }
+    }
 
     val currentOnCollapseDragDelta = rememberUpdatedState(onCollapseDragDelta)
     val density = LocalDensity.current
-    val threshold = remember(density) { with(density) { 128.dp.toPx() } }
-    val nestedScrollConnection = remember(scrollState, threshold) {
+    val threshold = rememberUpdatedState(
+        with(density) { (if (searchText.isEmpty()) COLLAPSE_OVERSCROLL else SEARCH_COLLAPSE_OVERSCROLL).toPx() },
+    )
+    val nestedScrollConnection = remember(scrollState) {
         var accumulatedCollapseDelta = 0f
         object : NestedScrollConnection {
             override fun onPostScroll(
@@ -359,7 +371,7 @@ private fun HistoryListContent(
                     !scrollState.canScrollForward
                 ) {
                     accumulatedCollapseDelta += available.y
-                    if (accumulatedCollapseDelta < -threshold) {
+                    if (accumulatedCollapseDelta < -threshold.value) {
                         collapseDelta(available.y)
                         return available
                     }
