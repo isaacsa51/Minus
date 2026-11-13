@@ -25,7 +25,7 @@
     <string name="tutorial_history_transaction_title">Editar o eliminar un gasto</string>
     <string name="tutorial_history_transaction_description">Toca un gasto para desplegarlo y ver todo el detalle. Deslízalo a la derecha para editar el importe, la fecha, la categoría o la nota; deslízalo a la izquierda para eliminarlo, con unos segundos para deshacer.</string>
     <string name="tutorial_history_recurrent_title">Próximos pagos</string>
-    <string name="tutorial_history_recurrent_description">Los cargos recurrentes que vencen en este período aparecen aquí antes de pagarse. Marca uno como pagado cuando llegue, o elimina solo esa ocurrencia para saltártela esta vez sin cancelar la serie.</string>
+    <string name="tutorial_history_recurrent_description">Los cargos previstos y recurrentes que vencen en este período aparecen aquí antes de pagarse. Marca uno como pagado cuando llegue, o elimina solo esa ocurrencia para saltártela esta vez sin cancelar la serie.</string>
     <string name="tutorial_history_past_period_title">Período anterior</string>
     <string name="tutorial_history_past_period_description">Gastos del período anterior a este, apartados para no estorbar. Puedes desactivar esta sección en Ajustes, en Funciones adicionales.</string>
     <string name="analytics_tutorial_recurrent_title">Cargos recurrentes</string>
@@ -54,11 +54,15 @@
     <string name="previous_values">Valores anteriores</string>
     <string name="budget">Presupuesto</string>
     <string name="recurrent_expense">Gasto recurrente</string>
+    <string name="planned_expense_title">Gasto previsto</string>
+    <string name="planned_expenses_title">Gastos previstos</string>
+    <string name="planned_on_date_label">Fecha</string>
     <string name="recurrent_expense_details">Definamos el gasto recurrente</string>
     <string name="recurrent_expense_frequency_subtitle">¿Con qué frecuencia desea pagar este gasto?</string>
     <string name="recurrent_frequency_weekly">Semanal</string>
     <string name="recurrent_frequency_biweekly">Quincenal</string>
     <string name="recurrent_frequency_monthly">Mensual</string>
+    <string name="recurrent_frequency_once">Una vez</string>
     <string name="previous_day">Día anterior</string>
     <string name="next_day">Día siguiente</string>
     <string name="monthly_on_day_format">Día %1$d de cada mes</string>
@@ -66,6 +70,10 @@
     <string name="date_placeholder">Fecha</string>
     <string name="change_date">Cambiar fecha</string>
     <string name="summary_weekly_format">Se cobrará todas las semanas hasta %1$s.</string>
+    <string name="summary_once_format">Se cobrará una sola vez el %1$s.</string>
+    <string name="planned_preview_held">Monto apartado y deducido del presupuesto al momento que se confirme este gasto.</string>
+    <string name="planned_preview_changes_to">%1$s cambia a %2$s</string>
+    <string name="planned_preview_other_period">Se aparta en el periodo que incluye el %1$s.</string>
     <string name="summary_biweekly_format">Se cobrará cada dos semanas hasta %1$s.</string>
     <string name="summary_monthly_format">Se cobrará todos los meses en el día %1$d hasta %2$s.</string>
     <string name="credit_cutoff_dialog_title">Fecha de corte de tarjeta</string>
@@ -139,8 +147,8 @@
     <string name="generic_expense">Gasto</string>
     <string name="expense_item_unnamed_expense">Gasto sin nombre</string>
     <string name="expense_item_recurrent_subtitle_format">Gasto recurrente — %1$s</string>
-    <string name="hide_subscriptions_outside_period">Ocultar suscripciones fuera del período</string>
-    <string name="show_subscriptions_outside_period">Mostrar suscripciones fuera del periodo</string>
+    <string name="hide_subscriptions_outside_period">Ocultar transacciones previstas fuera de este periodo</string>
+    <string name="show_subscriptions_outside_period">Mostrar transacciones previstas fuera de este periodo</string>
     <string name="hide_past_period_expenses">Ocultar gastos del período pasado</string>
     <string name="show_past_period_expenses">Mostrar gastos del período pasado</string>
     <string name="history_snackbar_delete_transaction_failed">No se pudo eliminar la transacción</string>
@@ -285,7 +293,7 @@
     <string name="budget_formula_caption_spread_leftover">Sobrantes que elegiste repartir</string>
     <string name="budget_formula_label_budget">Presupuesto restante</string>
     <string name="budget_formula_label_carried">Acumulado</string>
-    <string name="budget_formula_label_recurring">Pagos recurrentes cargados</string>
+    <string name="budget_formula_label_recurring">Pagos previstos cargados</string>
     <string name="budget_formula_label_rebalanced">Repartido entre los días restantes</string>
     <string name="budget_formula_label_spent">Lo que has gastado</string>
     <string name="budget_formula_label_total">Total</string>
@@ -537,7 +545,7 @@
     <string name="csv_sync_guide_export_body">minus_synced.csv lleva el encabezado completo de 26 columnas y se reescribe en cada ejecución. Las cinco exportaciones anteriores se conservan junto a él como archivos minus_backup- marcados con la hora en que fueron reemplazadas, así que una exportación defectuosa nunca te deja sin copia.\n\nEn una exportación aparecen tres tipos de fila, distinguidos por la primera columna:\n\n__META__ son los ajustes del presupuesto y el período actual. Una sola fila, la primera si está presente.\n__ARCHIVED__ es una fila por cada período de presupuesto cerrado.\nUna marca de tiempo es una transacción.\n\nUn lector que solo quiera transacciones debe omitir las dos filas marcadoras. El valor current_period_id de la fila __META__ es el que debes devolver en period_id al escribir transacciones nuevas.\n\nSi reinstalas y apuntas Minus a una carpeta que ya contiene un minus_synced.csv, restaura desde ese archivo en lugar de sobrescribirlo.</string>
     <string name="csv_sync_guide_script_title">El archivo que escribe tu script</string>
     <string name="csv_sync_guide_script_body">Tu archivo debe llamarse minus_import_&lt;cualquier cosa&gt;.csv. Minus ignora todos los demás archivos de la carpeta, así que una carpeta compartida queda intacta.\n\nEl analizador lee el encabezado que declare tu archivo y trata como vacía cada columna ausente, así que no necesitas las 26. Este es un archivo completo y válido.</string>
-    <string name="csv_sync_guide_columns_body">date es obligatorio, exactamente yyyy-MM-dd HH:mm. Cualquier otro formato descarta la fila.\namount es obligatorio, un decimal simple mayor que cero. Las filas de Minus son gastos.\ncategory es texto libre opcional, se busca por nombre y se crea si es nuevo. En blanco pasa a Sin categoría.\nextra_note es texto libre opcional. Buen lugar para el id de la transacción de origen.\nperiod_id es recomendable, copiado de current_period_id en la fila __META__. En blanco significa 0.\nid debe omitirse. Un valor distinto de cero sobrescribe una transacción existente.\nis_recurrent es 1 o 0. Si es 1, pon frequency en WEEKLY, BIWEEKLY o MONTHLY.\nis_credit es 1 o 0.\n\nLas filas que el analizador rechaza se omiten una por una; el resto del archivo se importa igualmente.</string>
+    <string name="csv_sync_guide_columns_body">date es obligatorio, exactamente yyyy-MM-dd HH:mm. Cualquier otro formato descarta la fila.\namount es obligatorio, un decimal simple mayor que cero. Las filas de Minus son gastos.\ncategory es texto libre opcional, se busca por nombre y se crea si es nuevo. En blanco pasa a Sin categoría.\nextra_note es texto libre opcional. Buen lugar para el id de la transacción de origen.\nperiod_id es recomendable, copiado de current_period_id en la fila __META__. En blanco significa 0.\nid debe omitirse. Un valor distinto de cero sobrescribe una transacción existente.\nis_recurrent es 1 o 0. Si es 1, pon frequency en ONCE, WEEKLY, BIWEEKLY o MONTHLY.\nis_credit es 1 o 0.\n\nLas filas que el analizador rechaza se omiten una por una; el resto del archivo se importa igualmente.</string>
     <string name="csv_sync_guide_rules_title">Reglas que respetar</string>
     <string name="csv_sync_guide_rules_body">Nombra los archivos entrantes minus_import_*.csv. Cualquier otro se deja intacto, incluidos minus_synced.csv y las rotaciones minus_backup-. Esto es lo que hace seguro apuntar la sincronización a una carpeta que compartes con otras herramientas.\n\nNada de lo que dejes ahí se elimina. Después de leer un archivo se renombra a .imported, o a .rejected si alguna de sus filas no se pudo analizar, conservando su contenido para que veas qué salió mal. Ninguno de los dos nombres se vuelve a procesar.\n\nNunca escribas un id distinto de cero. Las filas con id mayor que cero reemplazan la transacción que tiene ese id; las filas con id en blanco o cero se insertan como nuevas. Como la exportación lleva los ids reales de las filas, volver a enviar una exportación sin modificar sobrescribe en lugar de duplicar. No puedes usar una exportación como plantilla para filas nuevas sin vaciar antes la columna id.\n\nDefine period_id. Los totales se calculan a partir de las fechas, así que una fila con period_id 0 se muestra correctamente en todas partes. El coste, más limitado, es que no se puede atribuir a un período y sobrevive a la limpieza que se ejecuta al eliminar un período archivado.\n\nLa importación no es idempotente. Minus inserta todas las filas que lee sin comprobar si existe una transacción equivalente. El renombrado posterior a la importación evita que el mismo archivo se lea dos veces, pero enviar las mismas filas con otro nombre las contará dos veces, así que elimina duplicados comparando con minus_synced.csv antes de escribir.\n\nSolo gastos. Los importes de cero o menos se rechazan. Los ingresos y los totales del presupuesto viven en la fila __META__, y reescribirlos activa una restauración completa de los ajustes, así que trata este canal como solo de adición para transacciones.</string>
     <string name="csv_sync_guide_pluggy_title">Asignar un feed de Open Finance</string>
@@ -590,8 +598,8 @@
     <string name="no_transactions_title">No hay gastos registrados</string>
     <string name="no_transactions_subtitle">Agregue un gasto para comenzar</string>
     <!-- Recurrent Payments Divider -->
-    <string name="recurrent_payments_divider_title_upcoming">Próximos pagos recurrentes</string>
-    <string name="recurrent_payments_divider_title_current_period">Pagos recurrentes en este periodo</string>
+    <string name="recurrent_payments_divider_title_upcoming">Transacciones previstas fuera de este periodo</string>
+    <string name="recurrent_payments_divider_title_current_period">Transacciones previstas en este periodo</string>
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">Hoy</string>
     <string name="upcoming_recurrent_tomorrow">Mañana</string>
@@ -607,8 +615,9 @@
     <string name="recurrent_ticket_weekly_unnamed">Suscripción semanal sin nombre</string>
     <string name="recurrent_ticket_biweekly_unnamed">Suscripción quincenal sin nombre</string>
     <string name="recurrent_ticket_monthly_unnamed">Suscripción sin nombre</string>
+    <string name="recurrent_ticket_once_unnamed">Pago previsto sin nombre</string>
     <!-- Subscriptions screen -->
-    <string name="subscriptions_title">Suscripciones</string>
+    <string name="subscriptions_title">Previstos</string>
     <string name="subscriptions_analytics_card_label">Recurrente</string>
     <string name="subscriptions_monthly_commitment_label">Compromiso mensual</string>
     <string name="subscriptions_per_month_suffix">/mes</string>
@@ -619,8 +628,8 @@
     <string name="subscriptions_due_today_label">Vence hoy</string>
     <string name="subscriptions_mark_as_paid">Marcar como pagado</string>
     <string name="subscriptions_skip_this_cycle">Omitir este período</string>
-    <string name="subscriptions_empty_title">Aún no hay suscripciones</string>
-    <string name="subscriptions_empty_body">Marca un gasto como recurrente y aparecerá aquí con su fecha de vencimiento y el tiempo restante.</string>
+    <string name="subscriptions_empty_title">Aún no hay nada previsto</string>
+    <string name="subscriptions_empty_body">Marca un gasto como recurrente o único y aparecerá aquí con su fecha de vencimiento y el tiempo restante.</string>
     <string name="subscriptions_snackbar_confirm_failed">No se pudo confirmar este pago</string>
     <string name="subscriptions_snackbar_skip_failed">No se pudo omitir este pago</string>
     <string name="subscriptions_status_paid">Pagado</string>
@@ -790,6 +799,7 @@
     <string name="notification_recurrent_charged_weekly">Tu gasto semanal de %1$s será cobrado.</string>
     <string name="notification_recurrent_charged_biweekly">Tu gasto quincenal de %1$s será cobrado.</string>
     <string name="notification_recurrent_charged_monthly">Tu gasto mensual de %1$s será cobrado.</string>
+    <string name="notification_recurrent_charged_once">Tu gasto previsto de %1$s será cobrado.</string>
     <string name="notification_tomorrow">mañana</string>
     <string name="notification_in_days">en %1$d días</string>
     <string name="notification_upcoming_subscription_title">Próximo gasto</string>
