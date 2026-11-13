@@ -616,4 +616,112 @@ class BudgetStateCalculatorTest {
 
         assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal("100.00"))
     }
+
+    private fun planned(day: LocalDate, amount: String = "300.00") = Transaction(
+        id = 70L,
+        amount = BigDecimal(amount),
+        comment = "Rent",
+        date = day.atTime(8, 0),
+        periodId = 1L,
+        isRecurrent = true,
+        recurrentFrequency = RecurrentFrequency.ONCE,
+        recurrentEndDate = day.atTime(8, 0),
+    )
+
+    private fun plannedState(
+        mode: BudgetSplitMode,
+        today: LocalDate,
+        plannedOn: LocalDate = LocalDate.of(2026, 7, 8),
+        reserve: Boolean = false,
+        paid: Set<PaidRecurrentOccurrence> = emptySet(),
+    ) = calculator.calculateBudgetState(
+        settings = settings(
+            totalBudget = BigDecimal("1000"),
+            start = LocalDate.of(2026, 7, 1),
+            end = LocalDate.of(2026, 7, 10),
+            splitMode = mode,
+        ),
+        transactions = emptyList(),
+        currentDate = today,
+        paidOccurrences = paid,
+        allTransactions = listOf(planned(plannedOn)),
+        reserveUpcomingCharges = reserve,
+    )
+
+    @Test
+    fun `dynamic - a planned one-off later in the period is held from today without the reserve setting`() {
+        val state = plannedState(BudgetSplitMode.DYNAMIC, LocalDate.of(2026, 7, 3))
+
+        assertThat(state.dailyBudget).isEqualTo(BigDecimal("87.50"))
+        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal("300.00"))
+        assertThat(state.totalSpentToday).isEqualTo(BigDecimal.ZERO)
+        assertThat(state.reservedCharges.map { it.comment }).containsExactly("Rent")
+    }
+
+    @Test
+    fun `dynamic - a planned one-off is held the same with the reserve setting on`() {
+        val state = plannedState(BudgetSplitMode.DYNAMIC, LocalDate.of(2026, 7, 3), reserve = true)
+
+        assertThat(state.dailyBudget).isEqualTo(BigDecimal("87.50"))
+        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal("300.00"))
+    }
+
+    @Test
+    fun `a planned one-off counts as spent on its day and only once afterwards`() {
+        val onTheDay = plannedState(BudgetSplitMode.DYNAMIC, LocalDate.of(2026, 7, 8))
+        val dayAfter = plannedState(BudgetSplitMode.DYNAMIC, LocalDate.of(2026, 7, 9))
+
+        assertThat(onTheDay.totalSpentToday).isEqualTo(BigDecimal("300.00"))
+        assertThat(onTheDay.totalSpentInPeriod).isEqualTo(BigDecimal("300.00"))
+        assertThat(dayAfter.totalSpentToday).isEqualTo(BigDecimal.ZERO)
+        assertThat(dayAfter.totalSpentInPeriod).isEqualTo(BigDecimal("300.00"))
+    }
+
+    @Test
+    fun `a skipped planned one-off gives the money back`() {
+        val state = plannedState(
+            BudgetSplitMode.DYNAMIC,
+            LocalDate.of(2026, 7, 3),
+            paid = setOf(PaidRecurrentOccurrence(70L, LocalDate.of(2026, 7, 8))),
+        )
+
+        assertThat(state.dailyBudget).isEqualTo(BigDecimal("125.00"))
+        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal.ZERO)
+    }
+
+    @Test
+    fun `a planned one-off dated in the next period does not touch this one`() {
+        val state = plannedState(
+            BudgetSplitMode.DYNAMIC,
+            LocalDate.of(2026, 7, 3),
+            plannedOn = LocalDate.of(2026, 7, 15),
+        )
+
+        assertThat(state.dailyBudget).isEqualTo(BigDecimal("125.00"))
+        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal.ZERO)
+    }
+
+    @Test
+    fun `static - a planned one-off keeps the even daily split and lowers the period balance`() {
+        val state = plannedState(BudgetSplitMode.STATIC, LocalDate.of(2026, 7, 3))
+
+        assertThat(state.dailyBudget).isEqualTo(BigDecimal("100.00"))
+        assertThat(state.remainingToday).isEqualTo(BigDecimal("100.00"))
+        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal("300.00"))
+    }
+
+    @Test
+    fun `carry over - a planned one-off comes out of the carried balance from today`() {
+        val state = plannedState(BudgetSplitMode.CARRY_OVER, LocalDate.of(2026, 7, 3))
+
+        assertThat(state.remainingToday).isEqualTo(BigDecimal("0.00"))
+    }
+
+    @Test
+    fun `ask me - a planned one-off is held in the period total but does not hit todays slice early`() {
+        val state = plannedState(BudgetSplitMode.ASK_ME, LocalDate.of(2026, 7, 3))
+
+        assertThat(state.totalSpentInPeriod).isEqualTo(BigDecimal("300.00"))
+        assertThat(state.remainingToday).isEqualTo(BigDecimal("100.00"))
+    }
 }

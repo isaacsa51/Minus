@@ -259,6 +259,7 @@ class SubscriptionsViewModel @Inject constructor(
                 dates += chargeDate
             }
             chargeDate = when (frequency) {
+                RecurrentFrequency.ONCE -> LocalDate.MAX
                 RecurrentFrequency.WEEKLY -> chargeDate.plusWeeks(1)
                 RecurrentFrequency.BIWEEKLY -> chargeDate.plusWeeks(2)
                 RecurrentFrequency.MONTHLY -> {

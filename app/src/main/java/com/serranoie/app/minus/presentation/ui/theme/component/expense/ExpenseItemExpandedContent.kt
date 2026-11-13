@@ -70,6 +70,7 @@ fun ExpenseItemExpandedContent(
         prettyDate(date, showTime = true, forceHideDate = false, human = true)
     } ?: withoutDate
     val recurrenceLabel = when (transaction.recurrentFrequency) {
+        RecurrentFrequency.ONCE -> stringResource(R.string.recurrent_frequency_once)
         RecurrentFrequency.WEEKLY -> stringResource(R.string.recurrent_frequency_weekly)
         RecurrentFrequency.BIWEEKLY -> stringResource(R.string.recurrent_frequency_biweekly)
         RecurrentFrequency.MONTHLY -> stringResource(R.string.recurrent_frequency_monthly)

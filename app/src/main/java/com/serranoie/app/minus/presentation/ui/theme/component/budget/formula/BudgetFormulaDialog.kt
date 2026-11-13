@@ -428,6 +428,7 @@ private fun FormulaLabel.textRes(): Int = when (this) {
 private fun FormulaTerm.Charge.label(): String = transaction.comment.ifBlank {
     stringResource(
         when (transaction.recurrentFrequency) {
+            RecurrentFrequency.ONCE -> R.string.recurrent_ticket_once_unnamed
             RecurrentFrequency.WEEKLY -> R.string.recurrent_ticket_weekly_unnamed
             RecurrentFrequency.BIWEEKLY -> R.string.recurrent_ticket_biweekly_unnamed
             else -> R.string.recurrent_ticket_monthly_unnamed

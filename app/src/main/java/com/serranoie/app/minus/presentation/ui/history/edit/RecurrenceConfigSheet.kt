@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -75,6 +76,7 @@ internal fun RecurrenceConfigSheet(
         isRecurrent: Boolean, frequency: RecurrentFrequency, subscriptionDay: Int, endDate: LocalDate
     ) -> Unit,
     onDismiss: () -> Unit,
+    onceDate: LocalDate = recurrentEndDate,
 ) {
     var showEndDatePicker by remember { mutableStateOf(false) }
     var localIsRecurrent by remember(isRecurrent) { mutableStateOf(isRecurrent) }
@@ -113,11 +115,13 @@ internal fun RecurrenceConfigSheet(
             )
 
             val options = listOf(
+                stringResource(R.string.recurrent_frequency_once),
                 stringResource(R.string.recurrent_frequency_weekly),
                 stringResource(R.string.recurrent_frequency_biweekly),
                 stringResource(R.string.recurrent_frequency_monthly)
             )
             val frequencies = listOf(
+                RecurrentFrequency.ONCE,
                 RecurrentFrequency.WEEKLY,
                 RecurrentFrequency.BIWEEKLY,
                 RecurrentFrequency.MONTHLY,
@@ -129,13 +133,14 @@ internal fun RecurrenceConfigSheet(
                 horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
             ) {
                 val modifiers =
-                    listOf(Modifier.weight(1f), Modifier.weight(1.5f), Modifier.weight(1f))
+                    listOf(Modifier.weight(1f), Modifier.weight(1f), Modifier.weight(1.25f), Modifier.weight(1.1f))
 
                 options.forEachIndexed { index, label ->
                     ToggleButton(
                         checked = selectedIndex == index,
                         onCheckedChange = { localSelectedFrequency = frequencies[index] },
                         modifier = modifiers[index].semantics { role = Role.RadioButton },
+                        contentPadding = PaddingValues(horizontal = 4.dp),
                         shapes = when (index) {
                             0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
                             options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
@@ -157,6 +162,7 @@ internal fun RecurrenceConfigSheet(
                 Spacer(Modifier.height(16.dp))
             }
 
+            if (localSelectedFrequency != RecurrentFrequency.ONCE) {
             Text(
                 text = stringResource(R.string.limit_date),
                 style = MaterialTheme.typography.labelMediumCondensed,
@@ -187,6 +193,7 @@ internal fun RecurrenceConfigSheet(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
             )
+            }
 
             OutlinedCard(
                 modifier = Modifier
@@ -216,7 +223,11 @@ internal fun RecurrenceConfigSheet(
                         text = buildRecurrentSummary(
                             frequency = localSelectedFrequency,
                             selectedDay = localSubscriptionDay,
-                            selectedEndDate = localRecurrentEndDate,
+                            selectedEndDate = if (localSelectedFrequency == RecurrentFrequency.ONCE) {
+                                onceDate
+                            } else {
+                                localRecurrentEndDate
+                            },
                             formatter = dateFormatter,
                         ),
                         style = MaterialTheme.typography.bodySmallCondensed,
@@ -329,6 +340,7 @@ private fun buildRecurrentSummary(
 ): String {
     val formattedDate = selectedEndDate.let(formatter)
     return when (frequency) {
+        RecurrentFrequency.ONCE -> stringResource(R.string.summary_once_format, formattedDate)
         RecurrentFrequency.WEEKLY -> stringResource(R.string.summary_weekly_format, formattedDate)
         RecurrentFrequency.BIWEEKLY -> stringResource(
             R.string.summary_biweekly_format, formattedDate

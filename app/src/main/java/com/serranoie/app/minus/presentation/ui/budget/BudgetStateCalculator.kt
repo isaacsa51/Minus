@@ -6,6 +6,7 @@ import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.LeftoverChoice
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.sheets.split.earnedAllowance
 import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
@@ -54,12 +55,22 @@ class BudgetStateCalculator @Inject constructor() {
         val originalTotalDays = ChronoUnit.DAYS.between(settings.startDate, periodEnd).toInt() + 1
 
         val activeTransactions = transactions.filter { !it.isDeleted && !it.isRecurrent }
+        val (plannedAll, repeatingAll) = allTransactions.partition { it.recurrentFrequency == RecurrentFrequency.ONCE }
+        val (plannedFiltered, repeatingFiltered) =
+            transactions.partition { it.recurrentFrequency == RecurrentFrequency.ONCE }
         val unpaidRecurringCharges = splitRecurringAndOneTime(
-            allTransactions = allTransactions,
-            filteredTransactions = transactions,
+            allTransactions = repeatingAll,
+            filteredTransactions = repeatingFiltered,
             periodStart = settings.startDate,
             periodEnd = periodEnd,
             today = if (reserveUpcomingCharges) periodEnd else currentDate,
+            paidOccurrences = paidOccurrences,
+        ).first + splitRecurringAndOneTime(
+            allTransactions = plannedAll,
+            filteredTransactions = plannedFiltered,
+            periodStart = settings.startDate,
+            periodEnd = periodEnd,
+            today = periodEnd,
             paidOccurrences = paidOccurrences,
         ).first
         val totalExpensesInPeriod = activeTransactions
@@ -85,7 +96,10 @@ class BudgetStateCalculator @Inject constructor() {
         val leftovers = if (settings.splitMode == BudgetSplitMode.ASK_ME) {
             replayLeftovers(
                 settings, splitBudget, carry, originalTotalDays, currentDate,
-                activeTransactions + unpaidRecurringCharges, leftoverChoices,
+                activeTransactions + unpaidRecurringCharges.filterNot {
+                    it.recurrentFrequency == RecurrentFrequency.ONCE && it.date?.toLocalDate()?.isAfter(currentDate) == true
+                },
+                leftoverChoices,
             )
         } else {
             null

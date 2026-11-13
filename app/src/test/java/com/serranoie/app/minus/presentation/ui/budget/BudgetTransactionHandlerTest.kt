@@ -288,4 +288,27 @@ class BudgetTransactionHandlerTest {
             .containsExactly("uber" to BigDecimal("15"), "food" to BigDecimal("125")).inOrder()
         coVerify(exactly = 0) { budgetRepository.addTransactions(any()) }
     }
+
+    @Test
+    fun `a planned one-off is saved once, dated on its planned day`() = runTest {
+        val plannedDay = LocalDate.now().plusDays(5)
+        val captured = slot<Transaction>()
+        coEvery { budgetRepository.addTransaction(capture(captured)) } returns 9L
+
+        val saved = handler.applyRecurrentExpense(
+            pendingAmount = BigDecimal("300"),
+            pendingComment = "Rent",
+            frequency = RecurrentFrequency.ONCE,
+            endDate = plannedDay,
+            subscriptionDay = null,
+            resolveActivePeriodId = { 3L },
+            fallbackComment = "Planned",
+        )
+
+        assertThat(saved).isTrue()
+        assertThat(captured.captured.date?.toLocalDate()).isEqualTo(plannedDay)
+        assertThat(captured.captured.recurrentEndDate?.toLocalDate()).isEqualTo(plannedDay)
+        assertThat(captured.captured.recurrentFrequency).isEqualTo(RecurrentFrequency.ONCE)
+        coVerify { notificationScheduler.rescheduleRecurrentExpenseNotifications() }
+    }
 }

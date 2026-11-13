@@ -66,7 +66,7 @@ fun RecurringSummaryCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = stringResource(R.string.recurrent_expense),
+                    text = stringResource(R.string.planned_expenses_title),
                     modifier = Modifier
                         .fillMaxWidth()
                         .basicMarquee(),

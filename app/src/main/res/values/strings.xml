@@ -26,7 +26,7 @@
     <string name="tutorial_history_transaction_title">Edit or delete an expense</string>
     <string name="tutorial_history_transaction_description">Tap an expense to expand it and see the full detail. Swipe it right to edit the amount, date, category or note; swipe it left to delete it, with a few seconds to undo.</string>
     <string name="tutorial_history_recurrent_title">Upcoming payments</string>
-    <string name="tutorial_history_recurrent_description">Recurring charges due in this period sit here before they are paid. Mark one as paid when it lands, or delete just that occurrence to skip it this time without cancelling the series.</string>
+    <string name="tutorial_history_recurrent_description">Planned and recurring charges due in this period sit here before they are paid. Mark one as paid when it lands, or delete just that occurrence to skip it this time without cancelling the series.</string>
     <string name="tutorial_history_past_period_title">Last period</string>
     <string name="tutorial_history_past_period_description">Expenses from the period before this one, kept out of the way. Turn this section off again in Settings, under Feature Lab.</string>
 
@@ -59,11 +59,15 @@
     <string name="previous_values">Previous values</string>
     <string name="budget">Budget</string>
     <string name="recurrent_expense">Recurrent Expense</string>
+    <string name="planned_expense_title">Planned Expense</string>
+    <string name="planned_expenses_title">Planned Expenses</string>
+    <string name="planned_on_date_label">On</string>
     <string name="recurrent_expense_details">Let\'s define the recurrent expense</string>
     <string name="recurrent_expense_frequency_subtitle">How often do you want to pay this expense?</string>
     <string name="recurrent_frequency_weekly">Weekly</string>
     <string name="recurrent_frequency_biweekly">Biweekly</string>
     <string name="recurrent_frequency_monthly">Monthly</string>
+    <string name="recurrent_frequency_once">Once</string>
     <string name="previous_day">Previous day</string>
     <string name="next_day">Next day</string>
     <string name="monthly_on_day_format">Day %1$d of each month</string>
@@ -71,6 +75,10 @@
     <string name="date_placeholder">Date</string>
     <string name="change_date">Change date</string>
     <string name="summary_weekly_format">It will be charged every week until %1$s.</string>
+    <string name="summary_once_format">It will be charged once on %1$s.</string>
+    <string name="planned_preview_held">Amount set aside and deducted from the budget as soon as you confirm this expense.</string>
+    <string name="planned_preview_changes_to">%1$s changes to %2$s</string>
+    <string name="planned_preview_other_period">Held in the period that includes %1$s.</string>
     <string name="summary_biweekly_format">It will be charged every two weeks until %1$s.</string>
     <string name="summary_monthly_format">It will be charged every month on day %1$d until %2$s.</string>
     <string name="credit_cutoff_dialog_title">Credit card cutoff date</string>
@@ -149,8 +157,8 @@
     <string name="expense_item_unnamed_expense">Unnamed expense</string>
     <string name="expense_item_unnamed_income" translatable="false">Unnamed income</string>
     <string name="expense_item_recurrent_subtitle_format">Recurrent expense — %1$s</string>
-    <string name="hide_subscriptions_outside_period">Hide subscriptions outside of the period</string>
-    <string name="show_subscriptions_outside_period">Show subscriptions outside of the period</string>
+    <string name="hide_subscriptions_outside_period">Hide planned transactions outside this period</string>
+    <string name="show_subscriptions_outside_period">Show planned transactions outside this period</string>
     <string name="hide_past_period_expenses">Hide past period expenses</string>
     <string name="show_past_period_expenses">Show past period expenses</string>
     <string name="history_snackbar_delete_transaction_failed">Could not delete transaction</string>
@@ -336,7 +344,7 @@
     <string name="budget_formula_caption_spread_leftover">Leftovers you chose to spread</string>
     <string name="budget_formula_label_budget">Budget remaining</string>
     <string name="budget_formula_label_carried">Carried over</string>
-    <string name="budget_formula_label_recurring">Recurring payments charged</string>
+    <string name="budget_formula_label_recurring">Planned payments charged</string>
     <string name="budget_formula_label_rebalanced">Spread over the days left</string>
     <string name="budget_formula_label_spent">What you spent</string>
     <string name="budget_formula_label_total">Total</string>
@@ -617,7 +625,7 @@
     <string name="csv_sync_guide_export_body">minus_synced.csv carries the full 26 column header and is rewritten every run. The five previous exports are kept beside it as minus_backup- files stamped with the time they were replaced, so a bad export never leaves you without a copy.\n\nThree kinds of row appear in an export, told apart by the first column:\n\n__META__ is budget settings and the current period. One row, first if present.\n__ARCHIVED__ is one row per closed budget period.\nA timestamp is a transaction.\n\nA reader that only wants transactions must skip the two marker rows. The current_period_id value in the __META__ row is what you echo back in period_id when writing new transactions.\n\nIf you reinstall and point Minus at a folder that already holds a minus_synced.csv, it restores from that file instead of overwriting it.</string>
     <string name="csv_sync_guide_script_title">The file your script writes</string>
     <string name="csv_sync_guide_script_body">Your file must be named minus_import_&lt;anything&gt;.csv. Minus ignores every other file in the folder, so a shared folder stays untouched.\n\nThe parser reads whatever header your file declares and treats every missing column as empty, so you do not need all 26. This is a complete, valid file.</string>
-    <string name="csv_sync_guide_columns_body">date is required, exactly yyyy-MM-dd HH:mm. Any other shape discards the row.\namount is required, a plain decimal greater than zero. Minus rows are expenses.\ncategory is optional free text, matched by name and created if new. Blank falls back to Uncategorized.\nextra_note is optional free text. Good place for the upstream transaction id.\nperiod_id is recommended, copied from current_period_id in the __META__ row. Blank means 0.\nid should be left out. A non-zero value overwrites an existing transaction.\nis_recurrent is 1 or 0. If 1, set frequency to WEEKLY, BIWEEKLY or MONTHLY.\nis_credit is 1 or 0.\n\nRows the parser rejects are skipped one by one; the rest of the file still imports.</string>
+    <string name="csv_sync_guide_columns_body">date is required, exactly yyyy-MM-dd HH:mm. Any other shape discards the row.\namount is required, a plain decimal greater than zero. Minus rows are expenses.\ncategory is optional free text, matched by name and created if new. Blank falls back to Uncategorized.\nextra_note is optional free text. Good place for the upstream transaction id.\nperiod_id is recommended, copied from current_period_id in the __META__ row. Blank means 0.\nid should be left out. A non-zero value overwrites an existing transaction.\nis_recurrent is 1 or 0. If 1, set frequency to ONCE, WEEKLY, BIWEEKLY or MONTHLY.\nis_credit is 1 or 0.\n\nRows the parser rejects are skipped one by one; the rest of the file still imports.</string>
     <string name="csv_sync_guide_rules_title">Rules to respect</string>
     <string name="csv_sync_guide_rules_body">Name inbound files minus_import_*.csv. Anything else is left alone, including minus_synced.csv and the minus_backup- rotations. This is what makes it safe to point the sync at a folder you share with other tools.\n\nNothing you drop in is deleted. After a file is read it is renamed to .imported, or to .rejected if any of its rows failed to parse, keeping its contents so you can see what went wrong. Neither name is picked up again.\n\nNever write a non-zero id. Rows with id greater than zero replace the transaction holding that id; rows with id blank or zero insert as new. Because the export carries real row ids, re-pushing an unmodified export overwrites rather than duplicates. You cannot use an export as a template for new rows without clearing the id column first.\n\nSet period_id. Totals are computed from dates, so a row with period_id 0 still shows correctly everywhere. The narrower cost is that it is not attributable to a period and survives the cleanup that runs when an archived period is deleted.\n\nImport is not idempotent. Minus inserts every row it reads without checking for an equivalent transaction. The rename after import stops the same file being read twice, but pushing the same rows under a new name will double-count them, so dedup against minus_synced.csv before you write.\n\nExpenses only. Amounts of zero or less are rejected. Income and budget totals live in the __META__ row, and rewriting those triggers a full settings restore, so treat this channel as append-only for transactions.</string>
     <string name="csv_sync_guide_pluggy_title">Mapping an Open Finance feed</string>
@@ -693,8 +701,8 @@
     <string name="no_transactions_subtitle">Add an expense to get started</string>
 
     <!-- Recurrent Payments Divider -->
-    <string name="recurrent_payments_divider_title_upcoming">Upcoming recurrent payments</string>
-    <string name="recurrent_payments_divider_title_current_period">Recurrent Payments on this period</string>
+    <string name="recurrent_payments_divider_title_upcoming">Planned transactions outside this period</string>
+    <string name="recurrent_payments_divider_title_current_period">Planned transactions on this period</string>
 
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">Today</string>
@@ -712,9 +720,10 @@
     <string name="recurrent_ticket_weekly_unnamed">Weekly subscription without name</string>
     <string name="recurrent_ticket_biweekly_unnamed">Biweekly subscription without name</string>
     <string name="recurrent_ticket_monthly_unnamed">Monthly subscription without name</string>
+    <string name="recurrent_ticket_once_unnamed">Planned payment without name</string>
 
     <!-- Subscriptions screen -->
-    <string name="subscriptions_title">Subscriptions</string>
+    <string name="subscriptions_title">Planned</string>
     <string name="subscriptions_analytics_card_label">Recurring</string>
     <string name="subscriptions_monthly_commitment_label">Monthly commitment</string>
     <string name="subscriptions_per_month_suffix">/mo</string>
@@ -725,8 +734,8 @@
     <string name="subscriptions_due_today_label">Due today</string>
     <string name="subscriptions_mark_as_paid">Mark as paid</string>
     <string name="subscriptions_skip_this_cycle">Skip on this period</string>
-    <string name="subscriptions_empty_title">No subscriptions yet</string>
-    <string name="subscriptions_empty_body">Mark an expense as recurring and it shows up here with its due date and time left.</string>
+    <string name="subscriptions_empty_title">Nothing planned yet</string>
+    <string name="subscriptions_empty_body">Mark an expense as recurring or once and it shows up here with its due date and time left.</string>
     <string name="subscriptions_snackbar_confirm_failed">Could not confirm this payment</string>
     <string name="subscriptions_snackbar_skip_failed">Could not skip this payment</string>
     <string name="subscriptions_status_paid">Paid</string>
@@ -914,6 +923,7 @@
     <string name="notification_recurrent_charged_weekly">Your weekly expense of %1$s is going to be charged.</string>
     <string name="notification_recurrent_charged_biweekly">Your biweekly expense of %1$s is going to be charged.</string>
     <string name="notification_recurrent_charged_monthly">Your monthly expense of %1$s is going to be charged.</string>
+    <string name="notification_recurrent_charged_once">Your planned expense of %1$s is going to be charged.</string>
     <string name="notification_tomorrow">tomorrow</string>
     <string name="notification_in_days">in %1$d days</string>
     <string name="notification_upcoming_subscription_title">Upcoming expense</string>
