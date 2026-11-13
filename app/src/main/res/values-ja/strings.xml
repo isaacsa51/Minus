@@ -25,7 +25,7 @@
     <string name="tutorial_history_transaction_title">支出の編集と削除</string>
     <string name="tutorial_history_transaction_description">支出をタップすると展開し、詳細をすべて確認できます。右にスワイプすると金額・日付・カテゴリ・メモを編集でき、左にスワイプすると削除されます。数秒間は取り消せます。</string>
     <string name="tutorial_history_recurrent_title">今後の支払い</string>
-    <string name="tutorial_history_recurrent_description">この期間に支払期日が来る繰り返しの支出は、支払うまでここに表示されます。支払ったら支払い済みにするか、その回だけ削除すると、シリーズを解除せずに今回だけ見送れます。</string>
+    <string name="tutorial_history_recurrent_description">この期間に支払期日が来る予定の支出と繰り返しの支出は、支払うまでここに表示されます。支払ったら支払い済みにするか、その回だけ削除すると、シリーズを解除せずに今回だけ見送れます。</string>
     <string name="tutorial_history_past_period_title">前の期間</string>
     <string name="tutorial_history_past_period_description">ひとつ前の期間の支出をまとめています。この欄は設定の「追加機能」から再び非表示にできます。</string>
     <string name="analytics_tutorial_recurrent_title">繰り返しの支出</string>
@@ -54,11 +54,15 @@
     <string name="previous_values">前の値</string>
     <string name="budget">予算</string>
     <string name="recurrent_expense">反復費用</string>
+    <string name="planned_expense_title">予定支出</string>
+    <string name="planned_expenses_title">予定支出</string>
+    <string name="planned_on_date_label">日付</string>
     <string name="recurrent_expense_details">再発費用を定義しましょう</string>
     <string name="recurrent_expense_frequency_subtitle">この費用はどのくらいの頻度で支払いますか？</string>
     <string name="recurrent_frequency_weekly">毎週</string>
     <string name="recurrent_frequency_biweekly">隔週</string>
     <string name="recurrent_frequency_monthly">月ごと</string>
+    <string name="recurrent_frequency_once">1回</string>
     <string name="previous_day">前の日</string>
     <string name="next_day">翌日、</string>
     <string name="monthly_on_day_format">毎月、 %1$d 日</string>
@@ -66,6 +70,10 @@
     <string name="date_placeholder">日付</string>
     <string name="change_date">日付の変更</string>
     <string name="summary_weekly_format">%1$sまで毎週課金されます。</string>
+    <string name="summary_once_format">%1$s に1回だけ請求されます。</string>
+    <string name="planned_preview_held">この支出を確定すると、金額が確保され予算から差し引かれます。</string>
+    <string name="planned_preview_changes_to">%1$s から %2$s に変わります</string>
+    <string name="planned_preview_other_period">%1$s を含む期間で確保されます。</string>
     <string name="summary_biweekly_format">%1$sまで2週間ごとに課金されます。</string>
     <string name="summary_monthly_format">毎月 %1$d %2$s まで請求されます。</string>
     <string name="credit_cutoff_dialog_title">クレジットカードのカットオフ日</string>
@@ -138,8 +146,8 @@
     <string name="generic_expense">費用</string>
     <string name="expense_item_unnamed_expense">無名の費用</string>
     <string name="expense_item_recurrent_subtitle_format">繰り返しの費用 — %1$s</string>
-    <string name="hide_subscriptions_outside_period">期間外のサブスクリプションを非表示</string>
-    <string name="show_subscriptions_outside_period">期間外のサブスクリプションを表示</string>
+    <string name="hide_subscriptions_outside_period">この期間外の予定取引を非表示</string>
+    <string name="show_subscriptions_outside_period">この期間外の予定取引を表示</string>
     <string name="hide_past_period_expenses">過去の経費を非表示</string>
     <string name="show_past_period_expenses">過去の経費を表示</string>
     <string name="history_snackbar_delete_transaction_failed">取引を削除できませんでした</string>
@@ -280,7 +288,7 @@
     <string name="budget_formula_caption_spread_leftover">分散を選んだ残額</string>
     <string name="budget_formula_label_budget">残りの予算</string>
     <string name="budget_formula_label_carried">繰り越し</string>
-    <string name="budget_formula_label_recurring">請求される定期支払い</string>
+    <string name="budget_formula_label_recurring">請求される予定支払い</string>
     <string name="budget_formula_label_rebalanced">残り日数に配分</string>
     <string name="budget_formula_label_spent">使った金額</string>
     <string name="budget_formula_label_total">合計</string>
@@ -529,7 +537,7 @@
     <string name="csv_sync_guide_export_body">minus_synced.csv は 26 列のヘッダー全体を含み、実行ごとに書き直されます。直前 5 件のエクスポートは、置き換えられた時刻を付けた minus_backup- ファイルとして隣に保持されるため、エクスポートが壊れてもコピーがなくなることはありません。\n\nエクスポートには 3 種類の行が現れ、先頭の列で区別できます。\n\n__META__ は予算設定と現在の期間です。1 行のみで、ある場合は先頭に来ます。\n__ARCHIVED__ は終了した予算期間ごとに 1 行です。\nタイムスタンプは取引です。\n\n取引だけを読みたい場合は、この 2 つのマーカー行を飛ばす必要があります。__META__ 行の current_period_id の値が、新しい取引を書くときに period_id へ返す値です。\n\n再インストールして、すでに minus_synced.csv がある フォルダを Minus に指定すると、上書きではなくそのファイルから復元します。</string>
     <string name="csv_sync_guide_script_title">スクリプトが書き出すファイル</string>
     <string name="csv_sync_guide_script_body">ファイル名は minus_import_&lt;任意&gt;.csv にしてください。Minus はフォルダ内の他のファイルをすべて無視するため、共有フォルダはそのまま保たれます。\n\nパーサーはファイルが宣言したヘッダーを読み取り、欠けている列はすべて空として扱うため、26 列すべては必要ありません。これは完全で有効なファイルです。</string>
-    <string name="csv_sync_guide_columns_body">date は必須で、厳密に yyyy-MM-dd HH:mm です。他の形式はその行を破棄します。\namount は必須で、0 より大きい単純な小数です。Minus の行は支出です。\ncategory は任意の自由テキストで、名前で照合され、新しければ作成されます。空欄は未分類になります。\nextra_note は任意の自由テキストです。元システムの取引 id を入れる場所に適しています。\nperiod_id は推奨で、__META__ 行の current_period_id からコピーします。空欄は 0 を意味します。\nid は省略してください。0 以外の値は既存の取引を上書きします。\nis_recurrent は 1 か 0 です。1 の場合は frequency を WEEKLY、BIWEEKLY、MONTHLY のいずれかにしてください。\nis_credit は 1 か 0 です。\n\nパーサーが拒否した行は 1 行ずつ飛ばされ、ファイルの残りはそのままインポートされます。</string>
+    <string name="csv_sync_guide_columns_body">date は必須で、厳密に yyyy-MM-dd HH:mm です。他の形式はその行を破棄します。\namount は必須で、0 より大きい単純な小数です。Minus の行は支出です。\ncategory は任意の自由テキストで、名前で照合され、新しければ作成されます。空欄は未分類になります。\nextra_note は任意の自由テキストです。元システムの取引 id を入れる場所に適しています。\nperiod_id は推奨で、__META__ 行の current_period_id からコピーします。空欄は 0 を意味します。\nid は省略してください。0 以外の値は既存の取引を上書きします。\nis_recurrent は 1 か 0 です。1 の場合は frequency を ONCE、WEEKLY、BIWEEKLY、MONTHLY のいずれかにしてください。\nis_credit は 1 か 0 です。\n\nパーサーが拒否した行は 1 行ずつ飛ばされ、ファイルの残りはそのままインポートされます。</string>
     <string name="csv_sync_guide_rules_title">守るべきルール</string>
     <string name="csv_sync_guide_rules_body">取り込むファイルは minus_import_*.csv という名前にしてください。それ以外は minus_synced.csv や minus_backup- のローテーションも含め、一切触りません。だからこそ、他のツールと共有しているフォルダに同期を向けても安全です。\n\n置いたものは削除されません。読み取り後、ファイルは .imported に、いずれかの行の解析に失敗した場合は .rejected に名前が変わり、内容はそのまま残るので何が問題だったか確認できます。どちらの名前も再度読み込まれることはありません。\n\n0 以外の id は絶対に書かないでください。id が 0 より大きい行は、その id を持つ取引を置き換えます。id が空または 0 の行は新規として挿入されます。エクスポートには実際の行 id が含まれるため、変更していないエクスポートを再送すると重複ではなく上書きになります。id 列を空にしない限り、エクスポートを新規行のテンプレートとして使うことはできません。\n\nperiod_id を設定してください。合計は日付から計算されるため、period_id が 0 の行でもどこでも正しく表示されます。より限定的な代償は、期間に紐づけられないことと、アーカイブ済み期間を削除したときに走るクリーンアップで残ってしまうことです。\n\nインポートは冪等ではありません。Minus は同等の取引があるか確認せず、読み取った行をすべて挿入します。インポート後の名前変更によって同じファイルが二度読まれることは防げますが、同じ行を別の名前で送れば二重に計上されるため、書き出す前に minus_synced.csv と照合して重複を除いてください。\n\n支出のみです。0 以下の金額は拒否されます。収入と予算の合計は __META__ 行にあり、それを書き換えると設定の完全復元が走るため、このチャネルは取引の追加専用として扱ってください。</string>
     <string name="csv_sync_guide_pluggy_title">Open Finance フィードのマッピング</string>
@@ -582,8 +590,8 @@
     <string name="no_transactions_title">記録された費用はありません</string>
     <string name="no_transactions_subtitle">始めるには費用を追加してください</string>
     <!-- Recurrent Payments Divider -->
-    <string name="recurrent_payments_divider_title_upcoming">今後の定期的な支払い</string>
-    <string name="recurrent_payments_divider_title_current_period">この期間の繰り返し支払い</string>
+    <string name="recurrent_payments_divider_title_upcoming">この期間外の予定取引</string>
+    <string name="recurrent_payments_divider_title_current_period">この期間の予定取引</string>
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">今日</string>
     <string name="upcoming_recurrent_tomorrow">明日</string>
@@ -599,8 +607,9 @@
     <string name="recurrent_ticket_weekly_unnamed">ウィークリーサブスクリプションに名前がありません</string>
     <string name="recurrent_ticket_biweekly_unnamed">名前なしで隔週サブスクリプション</string>
     <string name="recurrent_ticket_monthly_unnamed">月間サブスクリプションに名前がありません</string>
+    <string name="recurrent_ticket_once_unnamed">名前のない予定支払い</string>
     <!-- Subscriptions screen -->
-    <string name="subscriptions_title">サブスクリプション</string>
+    <string name="subscriptions_title">予定</string>
     <string name="subscriptions_analytics_card_label">定期支払い</string>
     <string name="subscriptions_monthly_commitment_label">月々の支払い</string>
     <string name="subscriptions_per_month_suffix">/月</string>
@@ -611,8 +620,8 @@
     <string name="subscriptions_due_today_label">本日支払い</string>
     <string name="subscriptions_mark_as_paid">支払い済みにする</string>
     <string name="subscriptions_skip_this_cycle">この期間はスキップ</string>
-    <string name="subscriptions_empty_title">サブスクリプションはまだありません</string>
-    <string name="subscriptions_empty_body">支出を定期支払いとしてマークすると、支払い日と残り時間とともにここに表示されます。</string>
+    <string name="subscriptions_empty_title">予定はまだありません</string>
+    <string name="subscriptions_empty_body">支出を定期支払いまたは1回きりとしてマークすると、支払い日と残り時間とともにここに表示されます。</string>
     <string name="subscriptions_snackbar_confirm_failed">この支払いを確認できませんでした</string>
     <string name="subscriptions_snackbar_skip_failed">この支払いをスキップできませんでした</string>
     <string name="subscriptions_status_paid">支払い済み</string>
@@ -781,6 +790,7 @@
     <string name="notification_recurrent_charged_weekly">毎週の支出 %1$s が請求される予定です。</string>
     <string name="notification_recurrent_charged_biweekly">隔週の支出 %1$s が請求される予定です。</string>
     <string name="notification_recurrent_charged_monthly">毎月の支出 %1$s が請求される予定です。</string>
+    <string name="notification_recurrent_charged_once">予定の支出 %1$s が請求される予定です。</string>
     <string name="notification_tomorrow">明日</string>
     <string name="notification_in_days">%1$d 日</string>
     <string name="notification_upcoming_subscription_title">今後の支出</string>
