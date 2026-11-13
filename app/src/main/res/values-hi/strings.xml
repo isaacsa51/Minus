@@ -25,7 +25,7 @@
     <string name="tutorial_history_transaction_title">खर्च बदलें या हटाएं</string>
     <string name="tutorial_history_transaction_description">पूरा ब्योरा देखने के लिए किसी खर्च पर टैप करके उसे खोलें। रकम, तारीख, कैटेगरी या नोट बदलने के लिए उसे दाएं स्वाइप करें; हटाने के लिए बाएं स्वाइप करें, कुछ सेकंड तक पूर्ववत करने का विकल्प रहेगा।</string>
     <string name="tutorial_history_recurrent_title">आने वाले पेमेंट</string>
-    <string name="tutorial_history_recurrent_description">इस अवधि में देय बार-बार होने वाले खर्च भुगतान से पहले यहां रहते हैं। आने पर इसे भुगतान किया हुआ चिह्नित करें, या पूरी सीरीज़ रद्द किए बिना इस बार छोड़ने के लिए सिर्फ़ उसी बार को हटाएं।</string>
+    <string name="tutorial_history_recurrent_description">इस अवधि में देय प्लान किए गए और बार-बार होने वाले खर्च भुगतान से पहले यहां रहते हैं। आने पर इसे भुगतान किया हुआ चिह्नित करें, या पूरी सीरीज़ रद्द किए बिना इस बार छोड़ने के लिए सिर्फ़ उसी बार को हटाएं।</string>
     <string name="tutorial_history_past_period_title">पिछली अवधि</string>
     <string name="tutorial_history_past_period_description">इससे पहले की अवधि के खर्च, अलग रखे गए। इस हिस्से को सेटिंग्स में, अतिरिक्त फ़ीचर के तहत, फिर से बंद किया जा सकता है।</string>
     <string name="analytics_tutorial_recurrent_title">बार-बार होने वाले खर्च</string>
@@ -54,11 +54,15 @@
     <string name="previous_values">पिछली वैल्यूज़</string>
     <string name="budget">बजट</string>
     <string name="recurrent_expense">बार-बार होने वाला खर्च</string>
+    <string name="planned_expense_title">प्लान किया गया खर्च</string>
+    <string name="planned_expenses_title">प्लान किए गए खर्च</string>
+    <string name="planned_on_date_label">तारीख</string>
     <string name="recurrent_expense_details">आइए बार-बार होने वाले खर्च को तय करें</string>
     <string name="recurrent_expense_frequency_subtitle">आप यह खर्च कितनी बार करना चाहते हैं?</string>
     <string name="recurrent_frequency_weekly">हर हफ़्ते</string>
     <string name="recurrent_frequency_biweekly">हर दो हफ़्ते में</string>
     <string name="recurrent_frequency_monthly">हर महीने</string>
+    <string name="recurrent_frequency_once">एक बार</string>
     <string name="previous_day">पिछला दिन</string>
     <string name="next_day">अगला दिन</string>
     <string name="monthly_on_day_format">हर महीने का %1$d दिन</string>
@@ -66,6 +70,10 @@
     <string name="date_placeholder">तारीख</string>
     <string name="change_date">तारीख बदलें</string>
     <string name="summary_weekly_format">यह %1$s तक हर हफ़्ते चार्ज किया जाएगा।</string>
+    <string name="summary_once_format">यह %1$s को एक बार चार्ज किया जाएगा।</string>
+    <string name="planned_preview_held">यह खर्च कन्फ़र्म करते ही राशि अलग रखी जाएगी और बजट से घटा दी जाएगी।</string>
+    <string name="planned_preview_changes_to">%1$s बदलकर %2$s हो जाएगा</string>
+    <string name="planned_preview_other_period">उस अवधि में अलग रखा जाएगा जिसमें %1$s आता है।</string>
     <string name="summary_biweekly_format">इसका चार्ज हर दो हफ़्ते में %1$s तक लिया जाएगा।</string>
     <string name="summary_monthly_format">यह %2$s तक हर महीने %1$d तारीख को चार्ज किया जाएगा।</string>
     <string name="credit_cutoff_dialog_title">क्रेडिट कार्ड कट-ऑफ़ तारीख</string>
@@ -139,8 +147,8 @@
     <string name="generic_expense">खर्च</string>
     <string name="expense_item_unnamed_expense">बिना नाम वाला खर्च</string>
     <string name="expense_item_recurrent_subtitle_format">बार-बार होने वाला खर्च — %1$s</string>
-    <string name="hide_subscriptions_outside_period">अवधि के बाहर के सब्सक्रिप्शन छिपाएँ</string>
-    <string name="show_subscriptions_outside_period">समय-सीमा के बाहर के सब्सक्रिप्शन दिखाएं</string>
+    <string name="hide_subscriptions_outside_period">इस अवधि के बाहर प्लान किए गए ट्रांज़ैक्शन छिपाएं</string>
+    <string name="show_subscriptions_outside_period">इस अवधि के बाहर प्लान किए गए ट्रांज़ैक्शन दिखाएं</string>
     <string name="hide_past_period_expenses">पिछली अवधि के खर्च छिपाएँ</string>
     <string name="show_past_period_expenses">पिछले समय के खर्च दिखाएं</string>
     <string name="history_snackbar_delete_transaction_failed">लेन-देन हटाया नहीं जा सका</string>
@@ -285,7 +293,7 @@
     <string name="budget_formula_caption_spread_leftover">बची रकम जिसे आपने बांटना चुना</string>
     <string name="budget_formula_label_budget">बचा हुआ बजट</string>
     <string name="budget_formula_label_carried">कैरी ओवर</string>
-    <string name="budget_formula_label_recurring">लगाए गए आवर्ती भुगतान</string>
+    <string name="budget_formula_label_recurring">लगाए गए प्लान किए गए भुगतान</string>
     <string name="budget_formula_label_rebalanced">बचे दिनों में बाँटा गया</string>
     <string name="budget_formula_label_spent">आपने जो खर्च किया</string>
     <string name="budget_formula_label_total">कुल</string>
@@ -537,7 +545,7 @@
     <string name="csv_sync_guide_export_body">minus_synced.csv में पूरे 26 कॉलम का हेडर होता है और यह हर रन में फिर से लिखी जाती है। पिछले पाँच एक्सपोर्ट उसके साथ minus_backup- फ़ाइलों के रूप में रहते हैं, जिन पर उन्हें बदले जाने का समय अंकित होता है, ताकि एक खराब एक्सपोर्ट आपको कभी बिना कॉपी न छोड़े।\n\nएक्सपोर्ट में तीन तरह की पंक्तियाँ आती हैं, जो पहले कॉलम से पहचानी जाती हैं:\n\n__META__ बजट सेटिंग्स और मौजूदा अवधि है। एक पंक्ति, मौजूद हो तो सबसे पहले।\n__ARCHIVED__ हर बंद हुई बजट अवधि के लिए एक पंक्ति है।\nटाइमस्टैम्प एक ट्रांज़ैक्शन है।\n\nजिसे सिर्फ़ ट्रांज़ैक्शन चाहिए उसे ये दो मार्कर पंक्तियाँ छोड़नी होंगी। __META__ पंक्ति में current_period_id की वैल्यू ही वह है जो आप नए ट्रांज़ैक्शन लिखते समय period_id में वापस देते हैं।\n\nअगर आप फिर से इंस्टॉल करके Minus को ऐसे फ़ोल्डर पर सेट करते हैं जिसमें पहले से minus_synced.csv है, तो वह उसे ओवरराइट करने के बजाय उसी फ़ाइल से रिस्टोर करता है।</string>
     <string name="csv_sync_guide_script_title">आपकी स्क्रिप्ट जो फ़ाइल लिखती है</string>
     <string name="csv_sync_guide_script_body">आपकी फ़ाइल का नाम minus_import_&lt;कुछ भी&gt;.csv होना चाहिए। Minus फ़ोल्डर की हर दूसरी फ़ाइल को नज़रअंदाज़ करता है, इसलिए साझा फ़ोल्डर अछूता रहता है।\n\nपार्सर आपकी फ़ाइल में घोषित हेडर पढ़ता है और हर गायब कॉलम को खाली मानता है, इसलिए आपको सभी 26 की ज़रूरत नहीं। यह एक पूरी और मान्य फ़ाइल है।</string>
-    <string name="csv_sync_guide_columns_body">date ज़रूरी है, ठीक yyyy-MM-dd HH:mm। कोई भी दूसरा रूप पंक्ति को हटा देता है।\namount ज़रूरी है, शून्य से बड़ा एक साधारण दशमलव। Minus की पंक्तियाँ खर्च होती हैं।\ncategory वैकल्पिक मुक्त टेक्स्ट है, नाम से मिलाया जाता है और नया हो तो बना दिया जाता है। खाली होने पर बिना कैटेगरी वाले में चला जाता है।\nextra_note वैकल्पिक मुक्त टेक्स्ट है। स्रोत ट्रांज़ैक्शन की id रखने की अच्छी जगह।\nperiod_id सुझाया जाता है, __META__ पंक्ति के current_period_id से कॉपी किया गया। खाली का मतलब 0।\nid को छोड़ देना चाहिए। शून्य से अलग वैल्यू मौजूदा ट्रांज़ैक्शन को ओवरराइट कर देती है।\nis_recurrent 1 या 0 है। 1 हो तो frequency को WEEKLY, BIWEEKLY या MONTHLY पर सेट करें।\nis_credit 1 या 0 है।\n\nपार्सर जिन पंक्तियों को अस्वीकार करता है उन्हें एक-एक कर छोड़ दिया जाता है; बाकी फ़ाइल फिर भी इंपोर्ट होती है।</string>
+    <string name="csv_sync_guide_columns_body">date ज़रूरी है, ठीक yyyy-MM-dd HH:mm। कोई भी दूसरा रूप पंक्ति को हटा देता है।\namount ज़रूरी है, शून्य से बड़ा एक साधारण दशमलव। Minus की पंक्तियाँ खर्च होती हैं।\ncategory वैकल्पिक मुक्त टेक्स्ट है, नाम से मिलाया जाता है और नया हो तो बना दिया जाता है। खाली होने पर बिना कैटेगरी वाले में चला जाता है।\nextra_note वैकल्पिक मुक्त टेक्स्ट है। स्रोत ट्रांज़ैक्शन की id रखने की अच्छी जगह।\nperiod_id सुझाया जाता है, __META__ पंक्ति के current_period_id से कॉपी किया गया। खाली का मतलब 0।\nid को छोड़ देना चाहिए। शून्य से अलग वैल्यू मौजूदा ट्रांज़ैक्शन को ओवरराइट कर देती है।\nis_recurrent 1 या 0 है। 1 हो तो frequency को ONCE, WEEKLY, BIWEEKLY या MONTHLY पर सेट करें।\nis_credit 1 या 0 है।\n\nपार्सर जिन पंक्तियों को अस्वीकार करता है उन्हें एक-एक कर छोड़ दिया जाता है; बाकी फ़ाइल फिर भी इंपोर्ट होती है।</string>
     <string name="csv_sync_guide_rules_title">मानने योग्य नियम</string>
     <string name="csv_sync_guide_rules_body">आने वाली फ़ाइलों का नाम minus_import_*.csv रखें। बाकी सब कुछ छुआ नहीं जाता, जिसमें minus_synced.csv और minus_backup- रोटेशन शामिल हैं। इसी वजह से सिंक को उस फ़ोल्डर पर सेट करना सुरक्षित है जिसे आप दूसरे टूल्स के साथ साझा करते हैं।\n\nआप जो भी डालते हैं वह मिटाया नहीं जाता। पढ़ने के बाद फ़ाइल का नाम .imported हो जाता है, या .rejected अगर उसकी कोई पंक्ति पार्स नहीं हो पाई, और उसका कंटेंट बना रहता है ताकि आप देख सकें कि क्या गड़बड़ हुई। इन दोनों नामों को दोबारा नहीं पढ़ा जाता।\n\nशून्य से अलग id कभी न लिखें। शून्य से बड़ी id वाली पंक्तियाँ उस id वाले ट्रांज़ैक्शन की जगह ले लेती हैं; खाली या शून्य id वाली पंक्तियाँ नई के रूप में जुड़ती हैं। चूँकि एक्सपोर्ट में असली पंक्ति id होती हैं, बिना बदलाव वाला एक्सपोर्ट दोबारा भेजने पर वह डुप्लिकेट नहीं बनाता बल्कि ओवरराइट करता है। आप एक्सपोर्ट को नई पंक्तियों के टेम्पलेट के रूप में इस्तेमाल नहीं कर सकते जब तक पहले id कॉलम खाली न कर दें।\n\nperiod_id सेट करें। कुल योग तारीखों से निकाले जाते हैं, इसलिए period_id 0 वाली पंक्ति भी हर जगह सही दिखती है। सीमित नुकसान यह है कि उसे किसी अवधि से नहीं जोड़ा जा सकता और संग्रहित अवधि हटाने पर चलने वाली सफ़ाई में वह बची रहती है।\n\nइंपोर्ट idempotent नहीं है। Minus हर पढ़ी गई पंक्ति को जोड़ देता है, यह जाँचे बिना कि कोई समान ट्रांज़ैक्शन है या नहीं। इंपोर्ट के बाद नाम बदलने से वही फ़ाइल दो बार नहीं पढ़ी जाती, लेकिन वही पंक्तियाँ नए नाम से भेजने पर वे दो बार गिनी जाएँगी, इसलिए लिखने से पहले minus_synced.csv से मिलाकर डुप्लिकेट हटाएँ।\n\nसिर्फ़ खर्च। शून्य या उससे कम रकम अस्वीकार होती है। आय और बजट के कुल योग __META__ पंक्ति में रहते हैं, और उन्हें फिर से लिखने पर पूरी सेटिंग्स रिस्टोर हो जाती हैं, इसलिए इस रास्ते को ट्रांज़ैक्शन जोड़ने के लिए ही मानें।</string>
     <string name="csv_sync_guide_pluggy_title">Open Finance फ़ीड को मैप करना</string>
@@ -590,8 +598,8 @@
     <string name="no_transactions_title">कोई खर्च दर्ज नहीं किया गया</string>
     <string name="no_transactions_subtitle">खर्च जोड़ने के लिए शुरू किया गया</string>
     <!-- Recurrent Payments Divider -->
-    <string name="recurrent_payments_divider_title_upcoming">आने वाले बार-बार होने वाले पेमेंट</string>
-    <string name="recurrent_payments_divider_title_current_period">इस अवधि में बार-बार होने वाले पेमेंट</string>
+    <string name="recurrent_payments_divider_title_upcoming">इस अवधि के बाहर प्लान किए गए ट्रांज़ैक्शन</string>
+    <string name="recurrent_payments_divider_title_current_period">इस अवधि में प्लान किए गए ट्रांज़ैक्शन</string>
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">आज</string>
     <string name="upcoming_recurrent_tomorrow">कल</string>
@@ -607,8 +615,9 @@
     <string name="recurrent_ticket_weekly_unnamed">बिना नाम वाला हर हफ़्ते का सब्सक्रिप्शन</string>
     <string name="recurrent_ticket_biweekly_unnamed">बिना नाम वाला हर दो हफ़्ते का सब्सक्रिप्शन</string>
     <string name="recurrent_ticket_monthly_unnamed">बिना नाम वाला हर महीने का सब्सक्रिप्शन</string>
+    <string name="recurrent_ticket_once_unnamed">बिना नाम का प्लान किया गया भुगतान</string>
     <!-- Subscriptions screen -->
-    <string name="subscriptions_title">सब्सक्रिप्शन</string>
+    <string name="subscriptions_title">प्लान किए गए</string>
     <string name="subscriptions_analytics_card_label">रिकरिंग</string>
     <string name="subscriptions_monthly_commitment_label">महीने की प्रतिबद्धता</string>
     <string name="subscriptions_per_month_suffix">/माह</string>
@@ -619,8 +628,8 @@
     <string name="subscriptions_due_today_label">आज ड्यू है</string>
     <string name="subscriptions_mark_as_paid">पेड के रूप में मार्क करें</string>
     <string name="subscriptions_skip_this_cycle">इस पीरियड के लिए स्किप करें</string>
-    <string name="subscriptions_empty_title">अभी तक कोई सब्सक्रिप्शन नहीं</string>
-    <string name="subscriptions_empty_body">किसी खर्च को रिकरिंग के तौर पर मार्क करें और यह यहाँ अपनी ड्यू डेट और बचे हुए समय के साथ दिखेगा।</string>
+    <string name="subscriptions_empty_title">अभी तक कुछ भी प्लान नहीं किया गया</string>
+    <string name="subscriptions_empty_body">किसी खर्च को रिकरिंग या एक बार के तौर पर मार्क करें और यह यहाँ अपनी ड्यू डेट और बचे हुए समय के साथ दिखेगा।</string>
     <string name="subscriptions_snackbar_confirm_failed">यह पेमेंट कन्फर्म नहीं हो पाया</string>
     <string name="subscriptions_snackbar_skip_failed">यह पेमेंट स्किप नहीं हो पाया</string>
     <string name="subscriptions_status_paid">पेड</string>
@@ -790,6 +799,7 @@
     <string name="notification_recurrent_charged_weekly">आपका %1$s का साप्ताहिक खर्च काटा जाने वाला है।</string>
     <string name="notification_recurrent_charged_biweekly">आपका %1$s का पाक्षिक खर्च काटा जाने वाला है।</string>
     <string name="notification_recurrent_charged_monthly">आपका %1$s का मासिक खर्च काटा जाने वाला है।</string>
+    <string name="notification_recurrent_charged_once">आपका %1$s का प्लान किया गया खर्च काटा जाने वाला है।</string>
     <string name="notification_tomorrow">कल</string>
     <string name="notification_in_days">%1$d दिनों में</string>
     <string name="notification_upcoming_subscription_title">आने वाला खर्च</string>
