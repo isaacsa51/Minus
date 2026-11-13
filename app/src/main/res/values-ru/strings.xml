@@ -25,7 +25,7 @@
     <string name="tutorial_history_transaction_title">Изменить или удалить расход</string>
     <string name="tutorial_history_transaction_description">Нажмите на расход, чтобы развернуть его и увидеть подробности. Проведите вправо, чтобы изменить сумму, дату, категорию или заметку; проведите влево, чтобы удалить, — несколько секунд будет доступна отмена.</string>
     <string name="tutorial_history_recurrent_title">Ближайшие платежи</string>
-    <string name="tutorial_history_recurrent_description">Регулярные списания, которые должны пройти в этом периоде, ждут здесь до оплаты. Отметьте платёж оплаченным, когда он пройдёт, или удалите только это списание, чтобы пропустить его на этот раз, не отменяя всю серию.</string>
+    <string name="tutorial_history_recurrent_description">Запланированные и регулярные списания, которые должны пройти в этом периоде, ждут здесь до оплаты. Отметьте платёж оплаченным, когда он пройдёт, или удалите только это списание, чтобы пропустить его на этот раз, не отменяя всю серию.</string>
     <string name="tutorial_history_past_period_title">Прошлый период</string>
     <string name="tutorial_history_past_period_description">Расходы периода, предшествующего текущему, убраны в отдельный раздел. Отключить его снова можно в настройках, в разделе «Дополнительные функции».</string>
     <string name="analytics_tutorial_recurrent_title">Регулярные списания</string>
@@ -54,11 +54,15 @@
     <string name="previous_values">Предыдущие значения</string>
     <string name="budget">Бюджет</string>
     <string name="recurrent_expense">Регулярный расход</string>
+    <string name="planned_expense_title">Запланированный расход</string>
+    <string name="planned_expenses_title">Запланированные расходы</string>
+    <string name="planned_on_date_label">Дата</string>
     <string name="recurrent_expense_details">Задайте параметры регулярного расхода</string>
     <string name="recurrent_expense_frequency_subtitle">Как часто списывать этот расход?</string>
     <string name="recurrent_frequency_weekly">Раз в неделю</string>
     <string name="recurrent_frequency_biweekly">Раз в две недели</string>
     <string name="recurrent_frequency_monthly">Раз в месяц</string>
+    <string name="recurrent_frequency_once">Однократно</string>
     <string name="previous_day">Предыдущий день</string>
     <string name="next_day">Следующий день</string>
     <string name="monthly_on_day_format">%1$d-е число каждого месяца</string>
@@ -66,6 +70,10 @@
     <string name="date_placeholder">Дата</string>
     <string name="change_date">Изменить дату</string>
     <string name="summary_weekly_format">Будет списываться каждую неделю до %1$s.</string>
+    <string name="summary_once_format">Будет списано один раз %1$s.</string>
+    <string name="planned_preview_held">Сумма откладывается и вычитается из бюджета, как только вы подтвердите этот расход.</string>
+    <string name="planned_preview_changes_to">%1$s станет %2$s</string>
+    <string name="planned_preview_other_period">Будет отложено в периоде, который включает %1$s.</string>
     <string name="summary_biweekly_format">Будет списываться раз в две недели до %1$s.</string>
     <string name="summary_monthly_format">Будет списываться каждый месяц %1$d-го числа до %2$s.</string>
     <string name="credit_cutoff_dialog_title">Дата закрытия кредитного периода</string>
@@ -141,8 +149,8 @@
     <string name="generic_expense">Расход</string>
     <string name="expense_item_unnamed_expense">Расход без названия</string>
     <string name="expense_item_recurrent_subtitle_format">Регулярный расход — %1$s</string>
-    <string name="hide_subscriptions_outside_period">Скрыть подписки вне периода</string>
-    <string name="show_subscriptions_outside_period">Показать подписки вне периода</string>
+    <string name="hide_subscriptions_outside_period">Скрыть запланированные операции вне этого периода</string>
+    <string name="show_subscriptions_outside_period">Показать запланированные операции вне этого периода</string>
     <string name="hide_past_period_expenses">Скрыть расходы прошлых периодов</string>
     <string name="show_past_period_expenses">Показать расходы прошлых периодов</string>
     <string name="history_snackbar_delete_transaction_failed">Не удалось удалить операцию</string>
@@ -295,7 +303,7 @@
     <string name="budget_formula_caption_spread_leftover">Остатки, которые вы решили распределить</string>
     <string name="budget_formula_label_budget">Остаток бюджета</string>
     <string name="budget_formula_label_carried">Перенесено</string>
-    <string name="budget_formula_label_recurring">Списанные регулярные платежи</string>
+    <string name="budget_formula_label_recurring">Списанные запланированные платежи</string>
     <string name="budget_formula_label_rebalanced">Распределено на оставшиеся дни</string>
     <string name="budget_formula_label_spent">Ваши траты</string>
     <string name="budget_formula_label_total">Итого</string>
@@ -553,7 +561,7 @@
     <string name="csv_sync_guide_export_body">minus_synced.csv содержит полный заголовок из 26 столбцов и перезаписывается при каждом запуске. Пять предыдущих экспортов хранятся рядом как файлы minus_backup- с отметкой времени замены, поэтому неудачный экспорт никогда не оставит вас без копии.\n\nВ экспорте встречаются три типа строк, различаемых по первому столбцу:\n\n__META__ — настройки бюджета и текущий период. Одна строка, первая, если она есть.\n__ARCHIVED__ — по одной строке на каждый закрытый период бюджета.\nМетка времени — это операция.\n\nЧитатель, которому нужны только операции, должен пропустить две служебные строки. Значение current_period_id из строки __META__ — это то, что вы возвращаете в period_id при записи новых операций.\n\nЕсли вы переустановите приложение и укажете Minus папку, в которой уже есть minus_synced.csv, он восстановится из этого файла, а не перезапишет его.</string>
     <string name="csv_sync_guide_script_title">Файл, который записывает ваш скрипт</string>
     <string name="csv_sync_guide_script_body">Ваш файл должен называться minus_import_&lt;что угодно&gt;.csv. Minus игнорирует все остальные файлы в папке, поэтому общая папка остаётся нетронутой.\n\nПарсер читает тот заголовок, который объявлен в вашем файле, и считает каждый отсутствующий столбец пустым, так что все 26 не нужны. Вот полный и корректный файл.</string>
-    <string name="csv_sync_guide_columns_body">date обязателен, строго yyyy-MM-dd HH:mm. Любой другой формат отбрасывает строку.\namount обязателен, обычное десятичное число больше нуля. Строки Minus — это расходы.\ncategory — необязательный произвольный текст, сопоставляется по имени и создаётся, если новый. Пустое значение даёт Без категории.\nextra_note — необязательный произвольный текст. Хорошее место для id операции во внешней системе.\nperiod_id рекомендуется, копируется из current_period_id в строке __META__. Пустое значение означает 0.\nid следует не указывать. Значение, отличное от нуля, перезаписывает существующую операцию.\nis_recurrent — 1 или 0. Если 1, задайте frequency как WEEKLY, BIWEEKLY или MONTHLY.\nis_credit — 1 или 0.\n\nСтроки, отклонённые парсером, пропускаются по одной; остальная часть файла всё равно импортируется.</string>
+    <string name="csv_sync_guide_columns_body">date обязателен, строго yyyy-MM-dd HH:mm. Любой другой формат отбрасывает строку.\namount обязателен, обычное десятичное число больше нуля. Строки Minus — это расходы.\ncategory — необязательный произвольный текст, сопоставляется по имени и создаётся, если новый. Пустое значение даёт Без категории.\nextra_note — необязательный произвольный текст. Хорошее место для id операции во внешней системе.\nperiod_id рекомендуется, копируется из current_period_id в строке __META__. Пустое значение означает 0.\nid следует не указывать. Значение, отличное от нуля, перезаписывает существующую операцию.\nis_recurrent — 1 или 0. Если 1, задайте frequency как ONCE, WEEKLY, BIWEEKLY или MONTHLY.\nis_credit — 1 или 0.\n\nСтроки, отклонённые парсером, пропускаются по одной; остальная часть файла всё равно импортируется.</string>
     <string name="csv_sync_guide_rules_title">Правила, которые нужно соблюдать</string>
     <string name="csv_sync_guide_rules_body">Называйте входящие файлы minus_import_*.csv. Всё остальное не трогается, включая minus_synced.csv и ротации minus_backup-. Именно поэтому безопасно направлять синхронизацию в папку, которую вы делите с другими инструментами.\n\nНичего из того, что вы положили, не удаляется. После прочтения файл переименовывается в .imported или в .rejected, если какая-то из строк не разобралась, с сохранением содержимого, чтобы вы увидели, что пошло не так. Ни одно из этих имён больше не читается.\n\nНикогда не записывайте id, отличный от нуля. Строки с id больше нуля заменяют операцию с этим id; строки с пустым или нулевым id добавляются как новые. Поскольку экспорт содержит реальные id строк, повторная отправка неизменённого экспорта перезаписывает, а не дублирует. Нельзя использовать экспорт как шаблон для новых строк, не очистив сначала столбец id.\n\nЗадавайте period_id. Итоги считаются по датам, поэтому строка с period_id 0 всё равно отображается верно везде. Более узкая цена в том, что её нельзя отнести к периоду и она выживает при очистке, которая выполняется при удалении архивного периода.\n\nИмпорт не идемпотентен. Minus вставляет каждую прочитанную строку, не проверяя, нет ли равнозначной операции. Переименование после импорта не даёт прочитать один и тот же файл дважды, но отправка тех же строк под новым именем посчитает их повторно, поэтому удаляйте дубликаты по minus_synced.csv перед записью.\n\nТолько расходы. Суммы, равные нулю или меньше, отклоняются. Доходы и итоги бюджета находятся в строке __META__, и их перезапись запускает полное восстановление настроек, поэтому считайте этот канал только добавляющим операции.</string>
     <string name="csv_sync_guide_pluggy_title">Сопоставление потока Open Finance</string>
@@ -606,8 +614,8 @@
     <string name="no_transactions_title">Расходов пока нет</string>
     <string name="no_transactions_subtitle">Добавьте первый расход, чтобы начать</string>
     <!-- Recurrent Payments Divider -->
-    <string name="recurrent_payments_divider_title_upcoming">Предстоящие регулярные платежи</string>
-    <string name="recurrent_payments_divider_title_current_period">Регулярные платежи в этом периоде</string>
+    <string name="recurrent_payments_divider_title_upcoming">Запланированные операции вне этого периода</string>
+    <string name="recurrent_payments_divider_title_current_period">Запланированные операции в этом периоде</string>
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">Сегодня</string>
     <string name="upcoming_recurrent_tomorrow">Завтра</string>
@@ -623,8 +631,9 @@
     <string name="recurrent_ticket_weekly_unnamed">Еженедельная подписка без названия</string>
     <string name="recurrent_ticket_biweekly_unnamed">Двухнедельная подписка без названия</string>
     <string name="recurrent_ticket_monthly_unnamed">Ежемесячная подписка без названия</string>
+    <string name="recurrent_ticket_once_unnamed">Запланированный платёж без названия</string>
     <!-- Subscriptions screen -->
-    <string name="subscriptions_title">Подписки</string>
+    <string name="subscriptions_title">Запланированные</string>
     <string name="subscriptions_analytics_card_label">Регулярные</string>
     <string name="subscriptions_monthly_commitment_label">Ежемесячные обязательства</string>
     <string name="subscriptions_per_month_suffix">/мес</string>
@@ -635,8 +644,8 @@
     <string name="subscriptions_due_today_label">Списание сегодня</string>
     <string name="subscriptions_mark_as_paid">Отметить как оплачено</string>
     <string name="subscriptions_skip_this_cycle">Пропустить в этом периоде</string>
-    <string name="subscriptions_empty_title">Пока нет подписок</string>
-    <string name="subscriptions_empty_body">Отметьте расход как повторяющийся, и он появится здесь с датой списания и оставшимся временем.</string>
+    <string name="subscriptions_empty_title">Пока ничего не запланировано</string>
+    <string name="subscriptions_empty_body">Отметьте расход как повторяющийся или разовый, и он появится здесь с датой списания и оставшимся временем.</string>
     <string name="subscriptions_snackbar_confirm_failed">Не удалось подтвердить этот платёж</string>
     <string name="subscriptions_snackbar_skip_failed">Не удалось пропустить этот платёж</string>
     <string name="subscriptions_status_paid">Оплачено</string>
@@ -808,6 +817,7 @@
     <string name="notification_recurrent_charged_weekly">Ваш еженедельный расход %1$s будет списан.</string>
     <string name="notification_recurrent_charged_biweekly">Ваш двухнедельный расход %1$s будет списан.</string>
     <string name="notification_recurrent_charged_monthly">Ваш ежемесячный расход %1$s будет списан.</string>
+    <string name="notification_recurrent_charged_once">Ваш запланированный расход %1$s будет списан.</string>
     <string name="notification_tomorrow">завтра</string>
     <string name="notification_in_days">через %1$d дн.</string>
     <string name="notification_upcoming_subscription_title">Скоро спишется подписка</string>
