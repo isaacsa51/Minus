@@ -25,7 +25,7 @@
     <string name="tutorial_history_transaction_title">Επεξεργασία ή διαγραφή εξόδου</string>
     <string name="tutorial_history_transaction_description">Πατήστε ένα έξοδο για να το αναπτύξετε και να δείτε όλες τις λεπτομέρειες. Σύρετέ το δεξιά για να αλλάξετε ποσό, ημερομηνία, κατηγορία ή σημείωση· σύρετέ το αριστερά για να το διαγράψετε, με λίγα δευτερόλεπτα αναίρεσης.</string>
     <string name="tutorial_history_recurrent_title">Επερχόμενες πληρωμές</string>
-    <string name="tutorial_history_recurrent_description">Οι επαναλαμβανόμενες χρεώσεις που λήγουν σε αυτήν την περίοδο βρίσκονται εδώ πριν πληρωθούν. Σημειώστε μία ως πληρωμένη όταν έρθει ή διαγράψτε μόνο αυτήν την εμφάνιση για να την παραλείψετε αυτήν τη φορά χωρίς να ακυρώσετε τη σειρά.</string>
+    <string name="tutorial_history_recurrent_description">Οι προγραμματισμένες και επαναλαμβανόμενες χρεώσεις που λήγουν σε αυτήν την περίοδο βρίσκονται εδώ πριν πληρωθούν. Σημειώστε μία ως πληρωμένη όταν έρθει ή διαγράψτε μόνο αυτήν την εμφάνιση για να την παραλείψετε αυτήν τη φορά χωρίς να ακυρώσετε τη σειρά.</string>
     <string name="tutorial_history_past_period_title">Προηγούμενη περίοδος</string>
     <string name="tutorial_history_past_period_description">Έξοδα από την περίοδο πριν από αυτήν, φυλαγμένα στην άκρη. Μπορείτε να απενεργοποιήσετε ξανά αυτήν την ενότητα στις Ρυθμίσεις, στις Επιπλέον λειτουργίες.</string>
     <string name="analytics_tutorial_recurrent_title">Επαναλαμβανόμενες χρεώσεις</string>
@@ -54,11 +54,15 @@
     <string name="previous_values">Προηγούμενες τιμές</string>
     <string name="budget">Προϋπολογισμός</string>
     <string name="recurrent_expense">Επαναλαμβανόμενα Έξοδα</string>
+    <string name="planned_expense_title">Προγραμματισμένο Έξοδο</string>
+    <string name="planned_expenses_title">Προγραμματισμένα Έξοδα</string>
+    <string name="planned_on_date_label">Ημερομηνία</string>
     <string name="recurrent_expense_details">Ας ορίσουμε το επαναλαμβανόμενο έξοδο</string>
     <string name="recurrent_expense_frequency_subtitle">Πόσο συχνά θέλετε να πληρώσετε αυτό το κόστος</string>
     <string name="recurrent_frequency_weekly">Εβδομαδιαία</string>
     <string name="recurrent_frequency_biweekly">Ανά δύο εβδομάδες</string>
     <string name="recurrent_frequency_monthly">Μηνιαία</string>
+    <string name="recurrent_frequency_once">Μία φορά</string>
     <string name="previous_day">Προηγούμενη ημέρα</string>
     <string name="next_day">Επόμενη ημέρα</string>
     <string name="monthly_on_day_format">Μέρα %1$d κάθε μήνα</string>
@@ -66,6 +70,10 @@
     <string name="date_placeholder">Ημερομηνία</string>
     <string name="change_date">Αλλαγή ημερομηνίας</string>
     <string name="summary_weekly_format">Θα χρεώνεται κάθε εβδομάδα μέχρι το %1$s.</string>
+    <string name="summary_once_format">Θα χρεωθεί μία φορά στις %1$s.</string>
+    <string name="planned_preview_held">Το ποσό δεσμεύεται και αφαιρείται από τον προϋπολογισμό μόλις επιβεβαιώσετε αυτό το έξοδο.</string>
+    <string name="planned_preview_changes_to">%1$s γίνεται %2$s</string>
+    <string name="planned_preview_other_period">Δεσμεύεται στην περίοδο που περιλαμβάνει την %1$s.</string>
     <string name="summary_biweekly_format">Θα χρεώνεται κάθε δύο εβδομάδες μέχρι το %1$s.</string>
     <string name="summary_monthly_format">Θα χρεώνεται κάθε μήνα τη ημέρα %1$d μέχρι τη %2$s.</string>
     <string name="credit_cutoff_dialog_title">Ημερομηνία διακοπής πιστωτικής κάρτας</string>
@@ -139,8 +147,8 @@
     <string name="generic_expense">Έξοδα</string>
     <string name="expense_item_unnamed_expense">Χωρίς όνομα δαπάνη</string>
     <string name="expense_item_recurrent_subtitle_format">Επαναλαμβανόμενες δαπάνες — %1$s</string>
-    <string name="hide_subscriptions_outside_period">Απόκρυψη συνδρομών εκτός περιόδου</string>
-    <string name="show_subscriptions_outside_period">Εμφάνιση συνδρομών εκτός της περιόδου</string>
+    <string name="hide_subscriptions_outside_period">Απόκρυψη προγραμματισμένων συναλλαγών εκτός αυτής της περιόδου</string>
+    <string name="show_subscriptions_outside_period">Εμφάνιση προγραμματισμένων συναλλαγών εκτός αυτής της περιόδου</string>
     <string name="hide_past_period_expenses">Απόκρυψη προηγούμενων εξόδων περιόδου</string>
     <string name="show_past_period_expenses">Εμφάνιση προηγούμενων εξόδων περιόδου</string>
     <string name="history_snackbar_delete_transaction_failed">Δεν ήταν δυνατή η διαγραφή της συναλλαγής</string>
@@ -285,7 +293,7 @@
     <string name="budget_formula_caption_spread_leftover">Υπόλοιπα που επιλέξατε να κατανείμετε</string>
     <string name="budget_formula_label_budget">Υπόλοιπο προϋπολογισμού</string>
     <string name="budget_formula_label_carried">Μεταφορά</string>
-    <string name="budget_formula_label_recurring">Χρεωμένες επαναλαμβανόμενες πληρωμές</string>
+    <string name="budget_formula_label_recurring">Χρεωμένες προγραμματισμένες πληρωμές</string>
     <string name="budget_formula_label_rebalanced">Κατανομή στις υπόλοιπες ημέρες</string>
     <string name="budget_formula_label_spent">Όσα ξοδέψατε</string>
     <string name="budget_formula_label_total">Σύνολο</string>
@@ -537,7 +545,7 @@
     <string name="csv_sync_guide_export_body">Το minus_synced.csv φέρει την πλήρη κεφαλίδα 26 στηλών και ξαναγράφεται σε κάθε εκτέλεση. Οι πέντε προηγούμενες εξαγωγές κρατούνται δίπλα ως αρχεία minus_backup- με σφραγίδα της ώρας που αντικαταστάθηκαν, ώστε μια κακή εξαγωγή να μη σας αφήνει ποτέ χωρίς αντίγραφο.\n\nΣε μια εξαγωγή εμφανίζονται τρία είδη γραμμής, που ξεχωρίζουν από την πρώτη στήλη:\n\n__META__ είναι οι ρυθμίσεις του προϋπολογισμού και η τρέχουσα περίοδος. Μία γραμμή, πρώτη εφόσον υπάρχει.\n__ARCHIVED__ είναι μία γραμμή για κάθε κλειστή περίοδο προϋπολογισμού.\nΜια χρονοσφραγίδα είναι μια συναλλαγή.\n\nΈνας αναγνώστης που θέλει μόνο συναλλαγές πρέπει να προσπεράσει τις δύο γραμμές δείκτες. Η τιμή current_period_id στη γραμμή __META__ είναι αυτή που επιστρέφετε στο period_id όταν γράφετε νέες συναλλαγές.\n\nΑν επανεγκαταστήσετε και στρέψετε το Minus σε φάκελο που περιέχει ήδη ένα minus_synced.csv, κάνει επαναφορά από εκείνο το αρχείο αντί να το αντικαταστήσει.</string>
     <string name="csv_sync_guide_script_title">Το αρχείο που γράφει το script σας</string>
     <string name="csv_sync_guide_script_body">Το αρχείο σας πρέπει να ονομάζεται minus_import_&lt;οτιδήποτε&gt;.csv. Το Minus αγνοεί κάθε άλλο αρχείο στον φάκελο, άρα ένας κοινόχρηστος φάκελος μένει ανέπαφος.\n\nΟ αναλυτής διαβάζει όποια κεφαλίδα δηλώνει το αρχείο σας και θεωρεί κάθε απούσα στήλη κενή, άρα δεν χρειάζεστε και τις 26. Αυτό είναι ένα πλήρες, έγκυρο αρχείο.</string>
-    <string name="csv_sync_guide_columns_body">Το date είναι υποχρεωτικό, ακριβώς yyyy-MM-dd HH:mm. Κάθε άλλη μορφή απορρίπτει τη γραμμή.\nΤο amount είναι υποχρεωτικό, ένας απλός δεκαδικός μεγαλύτερος του μηδενός. Οι γραμμές του Minus είναι έξοδα.\nΤο category είναι προαιρετικό ελεύθερο κείμενο, αντιστοιχίζεται με το όνομα και δημιουργείται αν είναι νέο. Κενό καταλήγει σε Αταξινόμητο.\nΤο extra_note είναι προαιρετικό ελεύθερο κείμενο. Καλό σημείο για το id της συναλλαγής από την πηγή.\nΤο period_id συνιστάται, αντιγραμμένο από το current_period_id στη γραμμή __META__. Κενό σημαίνει 0.\nΤο id πρέπει να παραλείπεται. Τιμή διάφορη του μηδενός αντικαθιστά μια υπάρχουσα συναλλαγή.\nΤο is_recurrent είναι 1 ή 0. Αν είναι 1, ορίστε το frequency σε WEEKLY, BIWEEKLY ή MONTHLY.\nΤο is_credit είναι 1 ή 0.\n\nΟι γραμμές που απορρίπτει ο αναλυτής προσπερνιούνται μία προς μία· το υπόλοιπο αρχείο εισάγεται κανονικά.</string>
+    <string name="csv_sync_guide_columns_body">Το date είναι υποχρεωτικό, ακριβώς yyyy-MM-dd HH:mm. Κάθε άλλη μορφή απορρίπτει τη γραμμή.\nΤο amount είναι υποχρεωτικό, ένας απλός δεκαδικός μεγαλύτερος του μηδενός. Οι γραμμές του Minus είναι έξοδα.\nΤο category είναι προαιρετικό ελεύθερο κείμενο, αντιστοιχίζεται με το όνομα και δημιουργείται αν είναι νέο. Κενό καταλήγει σε Αταξινόμητο.\nΤο extra_note είναι προαιρετικό ελεύθερο κείμενο. Καλό σημείο για το id της συναλλαγής από την πηγή.\nΤο period_id συνιστάται, αντιγραμμένο από το current_period_id στη γραμμή __META__. Κενό σημαίνει 0.\nΤο id πρέπει να παραλείπεται. Τιμή διάφορη του μηδενός αντικαθιστά μια υπάρχουσα συναλλαγή.\nΤο is_recurrent είναι 1 ή 0. Αν είναι 1, ορίστε το frequency σε ONCE, WEEKLY, BIWEEKLY ή MONTHLY.\nΤο is_credit είναι 1 ή 0.\n\nΟι γραμμές που απορρίπτει ο αναλυτής προσπερνιούνται μία προς μία· το υπόλοιπο αρχείο εισάγεται κανονικά.</string>
     <string name="csv_sync_guide_rules_title">Κανόνες που πρέπει να σεβαστείτε</string>
     <string name="csv_sync_guide_rules_body">Ονομάστε τα εισερχόμενα αρχεία minus_import_*.csv. Οτιδήποτε άλλο μένει ανέπαφο, συμπεριλαμβανομένων του minus_synced.csv και των εναλλαγών minus_backup-. Αυτό είναι που κάνει ασφαλές να στρέψετε τον συγχρονισμό σε φάκελο που μοιράζεστε με άλλα εργαλεία.\n\nΤίποτα από όσα αφήνετε δεν διαγράφεται. Αφού διαβαστεί, ένα αρχείο μετονομάζεται σε .imported, ή σε .rejected αν κάποια από τις γραμμές του απέτυχε να αναλυθεί, διατηρώντας το περιεχόμενό του για να δείτε τι πήγε λάθος. Κανένα από τα δύο ονόματα δεν ξαναδιαβάζεται.\n\nΜην γράφετε ποτέ id διάφορο του μηδενός. Οι γραμμές με id μεγαλύτερο του μηδενός αντικαθιστούν τη συναλλαγή που έχει αυτό το id· οι γραμμές με κενό ή μηδενικό id εισάγονται ως νέες. Επειδή η εξαγωγή φέρει τα πραγματικά id των γραμμών, η επαναποστολή μιας αμετάβλητης εξαγωγής αντικαθιστά αντί να διπλασιάζει. Δεν μπορείτε να χρησιμοποιήσετε μια εξαγωγή ως πρότυπο για νέες γραμμές χωρίς να αδειάσετε πρώτα τη στήλη id.\n\nΟρίστε το period_id. Τα σύνολα υπολογίζονται από τις ημερομηνίες, άρα μια γραμμή με period_id 0 εμφανίζεται σωστά παντού. Το στενότερο κόστος είναι ότι δεν αποδίδεται σε περίοδο και επιβιώνει του καθαρισμού που εκτελείται όταν διαγράφεται μια αρχειοθετημένη περίοδος.\n\nΗ εισαγωγή δεν είναι ιδεοδύναμη. Το Minus εισάγει κάθε γραμμή που διαβάζει χωρίς να ελέγχει για αντίστοιχη συναλλαγή. Η μετονομασία μετά την εισαγωγή εμποδίζει το ίδιο αρχείο να διαβαστεί δύο φορές, αλλά η αποστολή των ίδιων γραμμών με νέο όνομα θα τις μετρήσει διπλά, γι’ αυτό αφαιρέστε τα διπλότυπα συγκρίνοντας με το minus_synced.csv πριν γράψετε.\n\nΜόνο έξοδα. Ποσά μηδέν ή μικρότερα απορρίπτονται. Τα έσοδα και τα σύνολα του προϋπολογισμού βρίσκονται στη γραμμή __META__, και η επανεγγραφή τους πυροδοτεί πλήρη επαναφορά των ρυθμίσεων, γι’ αυτό αντιμετωπίστε αυτό το κανάλι ως μόνο για προσθήκη συναλλαγών.</string>
     <string name="csv_sync_guide_pluggy_title">Αντιστοίχιση ροής Open Finance</string>
@@ -590,8 +598,8 @@
     <string name="no_transactions_title">Χωρίς καταγεγραμμένα έξοδα</string>
     <string name="no_transactions_subtitle">Προσθέστε μια δαπάνη για να ξεκινήσετε</string>
     <!-- Recurrent Payments Divider -->
-    <string name="recurrent_payments_divider_title_upcoming">Επερχόμενες επαναλαμβανόμενες πληρωμές</string>
-    <string name="recurrent_payments_divider_title_current_period">Επαναλαμβανόμενες πληρωμές σε αυτήν την περίοδο</string>
+    <string name="recurrent_payments_divider_title_upcoming">Προγραμματισμένες συναλλαγές εκτός αυτής της περιόδου</string>
+    <string name="recurrent_payments_divider_title_current_period">Προγραμματισμένες συναλλαγές σε αυτήν την περίοδο</string>
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">Σήμερα</string>
     <string name="upcoming_recurrent_tomorrow">Αύριο</string>
@@ -607,8 +615,9 @@
     <string name="recurrent_ticket_weekly_unnamed">Εβδομαδιαία συνδρομή χωρίς όνομα</string>
     <string name="recurrent_ticket_biweekly_unnamed">Δύο εβδομάδες συνδρομή χωρίς όνομα</string>
     <string name="recurrent_ticket_monthly_unnamed">Μηνιαία συνδρομή χωρίς όνομα</string>
+    <string name="recurrent_ticket_once_unnamed">Προγραμματισμένη πληρωμή χωρίς όνομα</string>
     <!-- Subscriptions screen -->
-    <string name="subscriptions_title">Συνδρομές</string>
+    <string name="subscriptions_title">Προγραμματισμένα</string>
     <string name="subscriptions_analytics_card_label">Επαναλαμβανόμενα</string>
     <string name="subscriptions_monthly_commitment_label">Μηνιαία δέσμευση</string>
     <string name="subscriptions_per_month_suffix">/μήνα</string>
@@ -619,8 +628,8 @@
     <string name="subscriptions_due_today_label">Λήγει σήμερα</string>
     <string name="subscriptions_mark_as_paid">Επισήμανση ως πληρωμένο</string>
     <string name="subscriptions_skip_this_cycle">Παράλειψη για αυτήν την περίοδο</string>
-    <string name="subscriptions_empty_title">Δεν υπάρχουν ακόμη συνδρομές</string>
-    <string name="subscriptions_empty_body">Επισημάνετε ένα έξοδο ως επαναλαμβανόμενο και θα εμφανιστεί εδώ με την ημερομηνία λήξης και τον χρόνο που απομένει.</string>
+    <string name="subscriptions_empty_title">Δεν υπάρχει τίποτα προγραμματισμένο ακόμη</string>
+    <string name="subscriptions_empty_body">Επισημάνετε ένα έξοδο ως επαναλαμβανόμενο ή εφάπαξ και θα εμφανιστεί εδώ με την ημερομηνία λήξης και τον χρόνο που απομένει.</string>
     <string name="subscriptions_snackbar_confirm_failed">Δεν ήταν δυνατή η επιβεβαίωση αυτής της πληρωμής</string>
     <string name="subscriptions_snackbar_skip_failed">Δεν ήταν δυνατή η παράλειψη αυτής της πληρωμής</string>
     <string name="subscriptions_status_paid">Πληρωμένο</string>
@@ -790,6 +799,7 @@
     <string name="notification_recurrent_charged_weekly">Το εβδομαδιαίο σας έξοδο %1$s πρόκειται να χρεωθεί.</string>
     <string name="notification_recurrent_charged_biweekly">Το δεκαπενθήμερο σας έξοδο %1$s πρόκειται να χρεωθεί.</string>
     <string name="notification_recurrent_charged_monthly">Το μηνιαίο σας έξοδο %1$s πρόκειται να χρεωθεί.</string>
+    <string name="notification_recurrent_charged_once">Το προγραμματισμένο σας έξοδο %1$s πρόκειται να χρεωθεί.</string>
     <string name="notification_tomorrow">αύριο</string>
     <string name="notification_in_days">σε %1$d ημέρες</string>
     <string name="notification_upcoming_subscription_title">Επερχόμενο έξοδο</string>
