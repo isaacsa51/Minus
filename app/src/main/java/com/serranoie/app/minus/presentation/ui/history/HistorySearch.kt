@@ -18,6 +18,8 @@ private val AMOUNT_COMPARE = Regex("^([<>]=?)\\p{L}{0,3}\\p{Sc}?([\\d.,]+)\\p{Sc
 private val AMOUNT_EXACT = Regex("^(?:\\p{L}{0,3}\\p{Sc}([\\d.,]+)|([\\d.,]+)\\p{Sc})$")
 private val COMBINING_MARKS = Regex("\\p{Mn}+")
 private val NUMERIC_DATE = Regex("^\\d{1,4}([/.-])\\d{1,4}(\\1\\d{1,4})?$")
+private val FULL_DATE_COMPARE = Regex("^[<>]=?\\d{1,4}([/.-])\\d{1,4}\\1\\d{1,4}$")
+private val EXAMPLE_LABEL = Regex("^[^:：\"“”„«»]{1,24}[:：]\\s+")
 private val NUMERIC_DATE_SEPARATOR = Regex("[/.-]")
 private val QUOTED = Regex("[\"“”„«»]([^\"“”„«»]*)[\"“”„«»]")
 private val DATE_COMPARE = Regex("^([<>]=?)(.+)$")
@@ -106,7 +108,7 @@ internal fun historySearchMatcher(
     locale: Locale,
     categoryNames: Map<Long, String> = emptyMap(),
 ): (Transaction) -> Boolean {
-    val normalized = query.searchNormalized(locale)
+    val normalized = query.searchNormalized(locale).replace(EXAMPLE_LABEL, "")
     val phrases = QUOTED.findAll(normalized).map { it.groupValues[1].trim() }.filter { it.isNotEmpty() }.toList()
     val allTokens = normalized.replace(QUOTED, " ")
         .replace(RANGE_DOTS, " $RANGE_DOTS ")
@@ -118,8 +120,13 @@ internal fun historySearchMatcher(
     val (ranges, remaining) = extractDateRanges(allTokens, context)
     val tokens = remaining.filterNot { it in CONNECTOR_WORDS || it == RANGE_DOTS }
         .ifEmpty { if (ranges.isEmpty() && phrases.isEmpty()) remaining else emptyList() }
-    val amountFilters = tokens.mapNotNull { token -> token.toAmountFilter()?.let { token to it } }.toMap()
-    val dateCompares = tokens.filterNot { it in amountFilters }
+    val fullDateCompares = tokens.filter { FULL_DATE_COMPARE.matches(it) }
+        .mapNotNull { token -> token.toDateCompare(context)?.let { token to it } }
+        .toMap()
+    val amountFilters = tokens.filterNot { it in fullDateCompares }
+        .mapNotNull { token -> token.toAmountFilter()?.let { token to it } }
+        .toMap()
+    val dateCompares = fullDateCompares + tokens.filterNot { it in amountFilters || it in fullDateCompares }
         .mapNotNull { token -> token.toDateCompare(context)?.let { token to it } }
         .toMap()
     val categories = categoryNames.mapValues { it.value.searchNormalized(locale) }

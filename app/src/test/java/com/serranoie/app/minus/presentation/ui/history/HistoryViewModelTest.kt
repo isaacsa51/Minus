@@ -60,6 +60,7 @@ class HistoryViewModelTest {
         every { budgetRepository.getTransactions() } returns flowOf(emptyList())
         every { budgetRepository.getBudgetSettings() } returns flowOf(null)
         every { budgetRepository.getActiveCategories() } returns flowOf(emptyList())
+        every { budgetRepository.getAllCategories() } returns flowOf(emptyList())
         every { budgetRepository.getPaidRecurrentOccurrences() } returns flowOf(emptySet())
         every { observeCurrentPeriodBoundaryUseCase.invoke() } returns flowOf(0L to 0L)
         every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT)
@@ -350,6 +351,7 @@ class HistoryViewModelTest {
     @Test
     fun `search matches description and note ignoring case across current and past periods`() = runTest {
         every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
+        every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT.copy(showPastTransactions = true))
         every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
         val vm = newViewModel()
 
@@ -370,9 +372,26 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `search matches the category name of an expense`() = runTest {
+    fun `search leaves out past periods when they are hidden`() = runTest {
         every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
-        every { budgetRepository.getActiveCategories() } returns flowOf(listOf(Category(id = 9L, name = "Dining")))
+        every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT.copy(showPastTransactions = false))
+        every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
+        val vm = newViewModel()
+
+        vm.uiState.test {
+            vm.processIntent(HistoryUiIntent.SetSearchQuery("coffee"))
+            val state = awaitCondition { it.searchQuery == "coffee" && it.budgetSettings != null }
+
+            assertThat(state.groupedCurrentTransactions.values.flatten().map { it.id }).containsExactly(1L, 2L)
+            assertThat(state.searchResultCount).isEqualTo(2)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `search matches the category name of an expense, even a hidden category`() = runTest {
+        every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
+        every { budgetRepository.getAllCategories() } returns flowOf(listOf(Category(id = 9L, name = "Dining")))
         every { budgetRepository.getTransactions() } returns flowOf(
             searchFixture().map { if (it.id == 2L) it.copy(categoryId = 9L) else it }
         )
@@ -496,6 +515,7 @@ class HistoryViewModelTest {
 
     @Test
     fun `search waits for typing to pause 225 ms before filtering`() = runTest {
+        every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT.copy(showPastTransactions = true))
         every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
         every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
         val vm = newViewModel()
@@ -538,6 +558,7 @@ class HistoryViewModelTest {
 
     @Test
     fun `search reports how many expenses matched and their total`() = runTest {
+        every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT.copy(showPastTransactions = true))
         every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
         every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
         val vm = newViewModel()
@@ -554,6 +575,7 @@ class HistoryViewModelTest {
 
     @Test
     fun `search total leaves out income adjustments like the day total`() = runTest {
+        every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT.copy(showPastTransactions = true))
         val income = Transaction(
             id = 7L,
             amount = BigDecimal("-100.00"),

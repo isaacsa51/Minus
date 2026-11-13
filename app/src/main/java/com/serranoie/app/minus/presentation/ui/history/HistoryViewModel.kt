@@ -112,6 +112,7 @@ class HistoryViewModel @Inject constructor(
         observeCurrentPeriodBoundaryUseCase(),
         settingsRepository.observeSettings(),
         budgetTransactionHandler.budgetRepository.getActiveCategories(),
+        budgetTransactionHandler.budgetRepository.getAllCategories(),
         budgetTransactionHandler.budgetRepository.getPaidRecurrentOccurrences(),
         uiInputs
     ) { array ->
@@ -123,8 +124,10 @@ class HistoryViewModel @Inject constructor(
         @Suppress("UNCHECKED_CAST")
         val categories = array[4] as List<Category>
         @Suppress("UNCHECKED_CAST")
-        val paidOccurrences = array[5] as Set<PaidRecurrentOccurrence>
-        val inputs = array[6] as UIInputs
+        val allCategories = array[5] as List<Category>
+        @Suppress("UNCHECKED_CAST")
+        val paidOccurrences = array[6] as Set<PaidRecurrentOccurrence>
+        val inputs = array[7] as UIInputs
 
         calculateHistoryUiState(
             transactions = transactions,
@@ -133,6 +136,7 @@ class HistoryViewModel @Inject constructor(
             currentPeriodId = periodBoundary.second,
             userSettings = userSettings,
             categories = categories,
+            allCategories = allCategories,
             paidOccurrences = paidOccurrences,
             inputs = inputs
         )
@@ -270,6 +274,7 @@ class HistoryViewModel @Inject constructor(
         currentPeriodId: Long,
         userSettings: UserSettings?,
         categories: List<Category>,
+        allCategories: List<Category>,
         paidOccurrences: Set<PaidRecurrentOccurrence>,
         inputs: UIInputs
     ): HistoryUiState {
@@ -335,8 +340,8 @@ class HistoryViewModel @Inject constructor(
         val query = inputs.searchQuery.trim()
         val searchResults = query.takeIf { it.isNotEmpty() }?.let { q ->
             groupTransactionsByDate(
-                (groupedCurrent.values.flatten() + pastPeriodTx).filter(
-                    historySearchMatcher(q, Locale.getDefault(), categories.associate { it.id to it.name })
+                (groupedCurrent.values.flatten() + groupedPast.values.flatten()).filter(
+                    historySearchMatcher(q, Locale.getDefault(), allCategories.associate { it.id to it.name })
                 )
             )
         }

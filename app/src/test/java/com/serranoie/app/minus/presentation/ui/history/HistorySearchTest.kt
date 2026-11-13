@@ -218,4 +218,22 @@ class HistorySearchTest {
         assertThat(matches("rent", english, tacos, categories)).isFalse()
         assertThat(matches("food", english, txn("Tacos", categoryId = 6L), categories)).isFalse()
     }
+
+    @Test
+    fun `a full dotted date after an operator compares dates, not amounts`() {
+        val spanish = Locale.forLanguageTag("es-MX")
+        assertThat(matches(">12.10.2026", spanish, on(10, 20))).isTrue()
+        assertThat(matches(">12.10.2026", spanish, on(10, 1))).isFalse()
+        assertThat(matches(">1.234.567", english, txn("Car", amount = "2000000"))).isTrue()
+    }
+
+    @Test
+    fun `the example label in front of a query is ignored`() {
+        val uber = txn("Uber", amount = "150")
+        assertThat(matches("Range: 1 oct to 20 oct", english, on(10, 12))).isTrue()
+        assertThat(matches("Amount: Uber $150", english, uber)).isTrue()
+        assertThat(matches("More than: Uber >100", english, uber)).isTrue()
+        assertThat(matches("Text only: \"Uber\"", english, uber)).isTrue()
+        assertThat(matches("Amount: Taxi", english, uber)).isFalse()
+    }
 }
