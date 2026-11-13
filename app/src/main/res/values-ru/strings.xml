@@ -150,6 +150,26 @@
     <string name="history_snackbar_delete_recurrent_failed">Не удалось удалить регулярный платёж</string>
     <string name="history_snackbar_mark_paid_failed">Не удалось отметить операцию как оплаченную</string>
     <string name="history_snackbar_restore_transaction_failed">Не удалось восстановить транзакцию</string>
+    <string name="history_search_placeholder">Name, note, date or amount</string>
+    <string-array name="history_search_examples">
+        <item>Range: 19 nov to 30 nov</item>
+        <item>Day: Food 12 oct</item>
+        <item>Months: oct to dec</item>
+        <item>Amount: Uber $150</item>
+        <item>More than: Food &gt;200</item>
+        <item>Category: Groceries</item>
+        <item>Notes: coffee with Ana</item>
+        <item>After a date: &gt;10/1</item>
+        <item>Text only: \"Tacos\"</item>
+    </string-array>
+    <string name="history_search_clear">Clear search</string>
+    <string name="history_search_no_results">No expenses match \"%1$s\"</string>
+    <plurals name="history_search_results_summary">
+        <item quantity="one">%1$d match · %2$s spent</item>
+        <item quantity="few">%1$d matches · %2$s spent</item>
+        <item quantity="many">%1$d matches · %2$s spent</item>
+        <item quantity="other">%1$d matches · %2$s spent</item>
+    </plurals>
     <string name="expense_queued_for_next_period">Расход перенесён в следующий период</string>
     <string name="split_expense_mismatch">Суммы и категории не совпадают (%1$d и %2$d)</string>
     <string name="split_expense_not_recurring">Разделённые расходы не могут быть регулярными</string>
