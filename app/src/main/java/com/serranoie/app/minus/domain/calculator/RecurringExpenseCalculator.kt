@@ -20,6 +20,7 @@ class RecurringExpenseCalculator @Inject constructor() {
         return recurrentTransactions.sumOf { transaction ->
             val frequency = transaction.recurrentFrequency ?: return@sumOf BigDecimal.ZERO
             val multiplier = when (frequency) {
+                RecurrentFrequency.ONCE -> BigDecimal.ZERO
                 RecurrentFrequency.WEEKLY -> WEEKLY_TO_MONTHLY_MULTIPLIER
                 RecurrentFrequency.BIWEEKLY -> BIWEEKLY_TO_MONTHLY_MULTIPLIER
                 RecurrentFrequency.MONTHLY -> BigDecimal.ONE
@@ -46,6 +47,8 @@ class RecurringExpenseCalculator @Inject constructor() {
         }
 
         return when (frequency) {
+            RecurrentFrequency.ONCE -> today == startDate
+
             RecurrentFrequency.WEEKLY -> {
                 val daysBetween = ChronoUnit.DAYS.between(startDate, today).toInt()
                 daysBetween >= 0 && daysBetween % 7 == 0

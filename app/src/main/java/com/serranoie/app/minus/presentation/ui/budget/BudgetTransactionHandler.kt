@@ -227,9 +227,11 @@ class BudgetTransactionHandler @Inject constructor(
 
             val finalComment = rawComment.ifEmpty { fallbackComment }
             val activePeriodId = resolveActivePeriodId()
-            val transactionDate = resolveRecurrentTransactionDate(
-                frequency = frequency, subscriptionDay = subscriptionDay, now = now
-            )
+            val transactionDate = if (frequency == RecurrentFrequency.ONCE) {
+                endDate.atTime(now.toLocalTime())
+            } else {
+                resolveRecurrentTransactionDate(frequency = frequency, subscriptionDay = subscriptionDay, now = now)
+            }
 
             if (transactionDate.toLocalDate().isAfter(endDate)) {
                 return false

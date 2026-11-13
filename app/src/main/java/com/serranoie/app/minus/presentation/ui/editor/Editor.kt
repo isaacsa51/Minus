@@ -234,7 +234,10 @@ fun Editor(
             budgetSettings = uiState.budgetSettings,
             onDismiss = onDismissRecurrentDialog,
             onConfirm = onRecurrentExpenseConfirm,
+            budgetState = uiState.budgetState,
+            amount = uiState.pendingRecurrentAmount,
             fallbackComments = mapOf(
+                RecurrentFrequency.ONCE to stringResource(R.string.recurrent_ticket_once_unnamed),
                 RecurrentFrequency.WEEKLY to stringResource(R.string.recurrent_ticket_weekly_unnamed),
                 RecurrentFrequency.BIWEEKLY to stringResource(R.string.recurrent_ticket_biweekly_unnamed),
                 RecurrentFrequency.MONTHLY to stringResource(R.string.recurrent_ticket_monthly_unnamed),

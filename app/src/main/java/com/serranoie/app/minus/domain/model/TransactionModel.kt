@@ -65,7 +65,8 @@ data class Transaction(
 enum class RecurrentFrequency {
     WEEKLY,
     BIWEEKLY,
-    MONTHLY
+    MONTHLY,
+    ONCE,
 }
 
 enum class RecurrentOccurrenceStatus {

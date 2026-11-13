@@ -281,4 +281,22 @@ class NotificationSchedulerTest {
         )
         assertThat(result).isEqualTo(LocalDateTime.of(2026, 10, 24, 9, 0))
     }
+
+    @Test
+    fun `a planned one-off notifies on its day and never again`() {
+        val once = recurringTx(LocalDateTime.of(2026, 3, 20, 8, 0), RecurrentFrequency.ONCE)
+
+        assertThat(scheduler.nextOccurrenceDateTime(once, LocalDateTime.of(2026, 3, 9, 12, 0), notifyAt9))
+            .isEqualTo(LocalDateTime.of(2026, 3, 20, 9, 0))
+        assertThat(scheduler.nextOccurrenceDateTime(once, LocalDateTime.of(2026, 3, 20, 10, 0), notifyAt9))
+            .isNull()
+        assertThat(
+            scheduler.nextOccurrenceDateTime(
+                once, LocalDateTime.of(2026, 3, 9, 12, 0), notifyAt9, paidDates = setOf(d(2026, 3, 20)),
+            )
+        ).isNull()
+        assertThat(
+            scheduler.nextOccurrenceDateTime(once, LocalDateTime.of(2026, 3, 9, 12, 0), notifyAt9, leadDays = 3)
+        ).isEqualTo(LocalDateTime.of(2026, 3, 17, 9, 0))
+    }
 }

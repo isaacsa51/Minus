@@ -261,6 +261,7 @@ class NotificationHelper @Inject constructor(
         val title = context.getString(R.string.notification_recurrent_due_today_title, name)
         val message = context.getString(
             when (frequency) {
+                RecurrentFrequency.ONCE -> R.string.notification_recurrent_charged_once
                 RecurrentFrequency.WEEKLY -> R.string.notification_recurrent_charged_weekly
                 RecurrentFrequency.BIWEEKLY -> R.string.notification_recurrent_charged_biweekly
                 RecurrentFrequency.MONTHLY -> R.string.notification_recurrent_charged_monthly

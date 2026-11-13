@@ -226,7 +226,7 @@ fun TransactionEditScreen(
                                 editedDate.atTime(editedTime),
                                 isRecurrent,
                                 if (isRecurrent) selectedFrequency else null,
-                                if (isRecurrent) recurrentEndDate else null,
+                                if (isRecurrent) endDateFor(selectedFrequency, recurrentEndDate, editedDate) else null,
                                 if (isRecurrent && selectedFrequency == RecurrentFrequency.MONTHLY) subscriptionDay else null,
                                 isCredit
                             )
@@ -402,7 +402,7 @@ fun TransactionEditScreen(
             onApply = {
                 val newAmount = editedAmount.toBigDecimalOrNull() ?: transaction.amount
                 val frequency = if (isRecurrent) selectedFrequency else null
-                val endDate = if (isRecurrent) recurrentEndDate else null
+                val endDate = if (isRecurrent) endDateFor(selectedFrequency, recurrentEndDate, editedDate) else null
                 val subDay = if (isRecurrent && selectedFrequency == RecurrentFrequency.MONTHLY) {
                     subscriptionDay
                 } else {
@@ -486,6 +486,7 @@ fun TransactionEditScreen(
                 selectedFrequency = selectedFrequency,
                 subscriptionDay = subscriptionDay,
                 recurrentEndDate = recurrentEndDate,
+                onceDate = editedDate,
                 onSaveConfiguration = { newIsRecurrent, newFrequency, newSubscriptionDay, newEndDate ->
                     isRecurrent = newIsRecurrent
                     selectedFrequency = newFrequency
@@ -561,3 +562,6 @@ fun TransactionEditScreenRecurringPreview() {
         )
     }
 }
+
+private fun endDateFor(frequency: RecurrentFrequency, endDate: LocalDate, date: LocalDate): LocalDate =
+    if (frequency == RecurrentFrequency.ONCE) date else endDate

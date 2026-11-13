@@ -97,4 +97,17 @@ class MinusCsvParserTest {
         assertEquals(BigDecimal("1000.00"), meta?.budgetSettings?.totalBudget)
         assertEquals(BudgetSplitMode.DYNAMIC, meta?.budgetSettings?.splitMode)
     }
+
+    @Test
+    fun parse_onceFrequency_isRead() {
+        val csv = """
+            date,amount,comment,is_recurrent,frequency,end_date,sub_day,id,is_credit,is_credit_paid,period_id
+            2026-03-20 08:00,300.00,Rent,1,ONCE,2026-03-20,,1,0,0,7
+        """.trimIndent()
+
+        val rows = parser.parse(ByteArrayInputStream(csv.toByteArray(StandardCharsets.UTF_8))).rows
+
+        assertEquals(1, rows.size)
+        assertEquals("ONCE", rows[0].frequency?.name)
+    }
 }

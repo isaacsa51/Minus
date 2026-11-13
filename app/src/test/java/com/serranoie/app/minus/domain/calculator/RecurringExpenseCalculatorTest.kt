@@ -89,4 +89,22 @@ class RecurringExpenseCalculatorTest {
         assertFalse(calculator.isRecurringDueToday(tx, LocalDate.of(2026, 2, 27)))
         assertTrue(calculator.isRecurringDueToday(tx, LocalDate.of(2026, 10, 22), CalendarSystem.PERSIAN))
     }
+
+    @Test
+    fun onceRecurring_isNotAMonthlyCommitment() {
+        val once = recurrentTransaction(LocalDate.of(2026, 3, 20), RecurrentFrequency.ONCE, amount = BigDecimal("300.00"))
+        val monthly = recurrentTransaction(LocalDate.of(2026, 3, 1), RecurrentFrequency.MONTHLY)
+
+        assertEquals(BigDecimal("10.00"), calculator.calculateMonthlyEquivalent(listOf(once, monthly)))
+    }
+
+    @Test
+    fun onceRecurring_isDueOnlyOnItsDay() {
+        val day = LocalDate.of(2026, 3, 20)
+        val once = recurrentTransaction(day, RecurrentFrequency.ONCE)
+
+        assertTrue(calculator.isRecurringDueToday(once, day))
+        assertFalse(calculator.isRecurringDueToday(once, day.plusDays(7)))
+        assertFalse(calculator.isRecurringDueToday(once, day.plusDays(14)))
+    }
 }

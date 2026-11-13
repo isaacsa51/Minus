@@ -42,11 +42,15 @@
     <string name="previous_values">先前值</string>
     <string name="budget">预算</string>
     <string name="recurrent_expense">定期支出</string>
+    <string name="planned_expense_title">计划支出</string>
+    <string name="planned_expenses_title">计划支出</string>
+    <string name="planned_on_date_label">日期</string>
     <string name="recurrent_expense_details">我们来确认定期支出吧</string>
     <string name="recurrent_expense_frequency_subtitle">你多久为这笔支出支付一次？</string>
     <string name="recurrent_frequency_weekly">每周</string>
     <string name="recurrent_frequency_biweekly">每半个月</string>
     <string name="recurrent_frequency_monthly">每月</string>
+    <string name="recurrent_frequency_once">一次</string>
     <string name="previous_day">前一天</string>
     <string name="next_day">后一天</string>
     <string name="monthly_on_day_format">每个月的第 %1$d 天</string>
@@ -54,6 +58,10 @@
     <string name="date_placeholder">日期</string>
     <string name="change_date">更改日期</string>
     <string name="summary_weekly_format">将在 %1$s 前每周计费一次。</string>
+    <string name="summary_once_format">将在 %1$s 扣款一次。</string>
+    <string name="planned_preview_held">确认这笔支出后，该金额会立即预留并从预算中扣除。</string>
+    <string name="planned_preview_changes_to">%1$s 变为 %2$s</string>
+    <string name="planned_preview_other_period">将在包含 %1$s 的周期中预留。</string>
     <string name="summary_biweekly_format">将在 %1$s 前每半个月计费一次。</string>
     <string name="summary_monthly_format">将在 %2$s 前的每月第 %1$d 天计费一次。</string>
     <string name="credit_cutoff_dialog_title">信用卡账单日</string>
@@ -123,8 +131,8 @@
     <string name="generic_expense">支出</string>
     <string name="expense_item_unnamed_expense">未命名支出</string>
     <string name="expense_item_recurrent_subtitle_format">定期支出 - %1$s</string>
-    <string name="hide_subscriptions_outside_period">隐藏周期外的订阅</string>
-    <string name="show_subscriptions_outside_period">显示周期外的订阅</string>
+    <string name="hide_subscriptions_outside_period">隐藏本周期外的计划交易</string>
+    <string name="show_subscriptions_outside_period">显示本周期外的计划交易</string>
     <string name="hide_past_period_expenses">隐藏上一周期支出</string>
     <string name="show_past_period_expenses">显示上一周期支出</string>
     <string name="history_snackbar_delete_transaction_failed">无法删除交易</string>
@@ -210,7 +218,7 @@
     <string name="budget_formula_caption_spread_leftover">你选择平摊的结余</string>
     <string name="budget_formula_label_budget">剩余预算</string>
     <string name="budget_formula_label_carried">结转</string>
-    <string name="budget_formula_label_recurring">已计入的定期支出</string>
+    <string name="budget_formula_label_recurring">已计入的计划支出</string>
     <string name="budget_formula_label_rebalanced">分摊到剩余天数</string>
     <string name="budget_formula_label_spent">已花费</string>
     <string name="budget_formula_label_total">合计</string>
@@ -457,8 +465,8 @@
     <string name="no_transactions_title">没有记录的支出</string>
     <string name="no_transactions_subtitle">添加支出以开始</string>
     <!-- Recurrent Payments Divider -->
-    <string name="recurrent_payments_divider_title_upcoming">即将到来的定期支出</string>
-    <string name="recurrent_payments_divider_title_current_period">该周期的定期支出</string>
+    <string name="recurrent_payments_divider_title_upcoming">本周期外的计划交易</string>
+    <string name="recurrent_payments_divider_title_current_period">本周期的计划交易</string>
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">今日</string>
     <string name="upcoming_recurrent_tomorrow">明天</string>
@@ -474,8 +482,9 @@
     <string name="recurrent_ticket_weekly_unnamed">未命名的每周订阅</string>
     <string name="recurrent_ticket_biweekly_unnamed">未命名的每两周订阅</string>
     <string name="recurrent_ticket_monthly_unnamed">未命名的月度订阅</string>
+    <string name="recurrent_ticket_once_unnamed">未命名的计划支出</string>
     <!-- Subscriptions screen -->
-    <string name="subscriptions_title">订阅</string>
+    <string name="subscriptions_title">计划</string>
     <string name="subscriptions_analytics_card_label">定期扣费</string>
     <string name="subscriptions_monthly_commitment_label">每月支出</string>
     <string name="subscriptions_per_month_suffix">/月</string>
@@ -486,8 +495,8 @@
     <string name="subscriptions_due_today_label">今天到期</string>
     <string name="subscriptions_mark_as_paid">标记为已付款</string>
     <string name="subscriptions_skip_this_cycle">本期跳过</string>
-    <string name="subscriptions_empty_title">暂无订阅</string>
-    <string name="subscriptions_empty_body">将一笔支出标记为定期后，它会显示在这里，包含到期日和剩余时间。</string>
+    <string name="subscriptions_empty_title">暂无计划</string>
+    <string name="subscriptions_empty_body">将一笔支出标记为定期或一次性后，它会显示在这里，包含到期日和剩余时间。</string>
     <string name="subscriptions_snackbar_confirm_failed">无法确认此笔付款</string>
     <string name="subscriptions_snackbar_skip_failed">无法跳过此笔付款</string>
     <string name="subscriptions_status_paid">已付款</string>
@@ -637,6 +646,7 @@
     <string name="notification_recurrent_charged_weekly">您的每周支出 %1$s 即将扣款。</string>
     <string name="notification_recurrent_charged_biweekly">您的每两周支出 %1$s 即将扣款。</string>
     <string name="notification_recurrent_charged_monthly">您的每月支出 %1$s 即将扣款。</string>
+    <string name="notification_recurrent_charged_once">您的计划支出 %1$s 即将扣款。</string>
     <string name="notification_tomorrow">明天</string>
     <string name="notification_in_days">%1$d 天内</string>
     <string name="notification_upcoming_subscription_title">即将到来的支出</string>
@@ -730,7 +740,7 @@
     <string name="tutorial_history_transaction_title">编辑或删除支出</string>
     <string name="tutorial_history_transaction_description">点击支出可展开查看完整明细。向右滑动可编辑金额、日期、分类或备注；向左滑动可删除，并有几秒钟可以撤销。</string>
     <string name="tutorial_history_recurrent_title">即将到期的支出</string>
-    <string name="tutorial_history_recurrent_description">本周期内到期的定期支出在付款前会显示在这里。到期后可标记为已付，也可只删除这一次以跳过本次，而不取消整个周期。</string>
+    <string name="tutorial_history_recurrent_description">本周期内到期的计划支出和定期支出在付款前会显示在这里。到期后可标记为已付，也可只删除这一次以跳过本次，而不取消整个周期。</string>
     <string name="tutorial_history_past_period_title">上一周期</string>
     <string name="tutorial_history_past_period_description">上一个周期的支出，单独收起。可在设置的附加功能中再次关闭这一区块。</string>
     <string name="analytics_tutorial_recurrent_title">定期支出</string>
@@ -788,7 +798,7 @@
     <string name="csv_sync_guide_export_body">minus_synced.csv 带有完整的 26 列表头，每次运行都会重写。此前五次导出会以标记了被替换时间的 minus_backup- 文件保留在旁边，所以一次糟糕的导出绝不会让你没有副本。\n\n导出中会出现三种行，通过第一列区分：\n\n__META__ 是预算设置和当前周期。只有一行，若存在则排在最前。\n__ARCHIVED__ 是每个已结束预算周期一行。\n时间戳则表示一笔交易。\n\n只想读取交易的程序必须跳过这两行标记行。__META__ 行中的 current_period_id 就是你写入新交易时要回填到 period_id 的值。\n\n如果你重新安装并把 Minus 指向一个已经包含 minus_synced.csv 的文件夹，它会从该文件恢复，而不是覆盖它。</string>
     <string name="csv_sync_guide_script_title">你的脚本写出的文件</string>
     <string name="csv_sync_guide_script_body">你的文件必须命名为 minus_import_&lt;任意内容&gt;.csv。Minus 会忽略文件夹中的其他所有文件，所以共享文件夹不会被动到。\n\n解析器会读取你的文件所声明的表头，并把每个缺失的列视为空，所以你不需要全部 26 列。下面就是一个完整有效的文件。</string>
-    <string name="csv_sync_guide_columns_body">date 为必填，必须正好是 yyyy-MM-dd HH:mm。其他任何格式都会丢弃该行。\namount 为必填，是大于零的普通小数。Minus 的行都是支出。\ncategory 为可选的自由文本，按名称匹配，若为新名称则创建。留空则归为未分类。\nextra_note 为可选的自由文本。适合放上游交易的 id。\nperiod_id 建议填写，从 __META__ 行的 current_period_id 复制。留空表示 0。\nid 应当省略。非零值会覆盖已存在的交易。\nis_recurrent 为 1 或 0。若为 1，请把 frequency 设为 WEEKLY、BIWEEKLY 或 MONTHLY。\nis_credit 为 1 或 0。\n\n解析器拒绝的行会被逐行跳过；文件的其余部分照常导入。</string>
+    <string name="csv_sync_guide_columns_body">date 为必填，必须正好是 yyyy-MM-dd HH:mm。其他任何格式都会丢弃该行。\namount 为必填，是大于零的普通小数。Minus 的行都是支出。\ncategory 为可选的自由文本，按名称匹配，若为新名称则创建。留空则归为未分类。\nextra_note 为可选的自由文本。适合放上游交易的 id。\nperiod_id 建议填写，从 __META__ 行的 current_period_id 复制。留空表示 0。\nid 应当省略。非零值会覆盖已存在的交易。\nis_recurrent 为 1 或 0。若为 1，请把 frequency 设为 ONCE、WEEKLY、BIWEEKLY 或 MONTHLY。\nis_credit 为 1 或 0。\n\n解析器拒绝的行会被逐行跳过；文件的其余部分照常导入。</string>
     <string name="csv_sync_guide_rules_title">需要遵守的规则</string>
     <string name="csv_sync_guide_rules_body">把传入的文件命名为 minus_import_*.csv。其他一切都不会被触碰，包括 minus_synced.csv 和 minus_backup- 轮换文件。正因如此，把同步指向一个你与其他工具共享的文件夹才是安全的。\n\n你放进去的内容都不会被删除。文件读取后会被重命名为 .imported，若其中任何一行解析失败则重命名为 .rejected，内容会保留下来，方便你查看出了什么问题。这两种名称都不会再被读取。\n\n绝不要写入非零的 id。id 大于零的行会替换持有该 id 的交易；id 为空或为零的行会作为新记录插入。由于导出携带真实的行 id，重新推送一份未修改的导出会变成覆盖而不是重复。除非先清空 id 列，否则你无法把导出当作新行的模板。\n\n请设置 period_id。合计是按日期计算的，所以 period_id 为 0 的行在各处依然显示正确。较小的代价是它无法归属到某个周期，并且会在删除已归档周期时运行的清理中残留下来。\n\n导入不是幂等的。Minus 会插入它读到的每一行，而不检查是否已有等价的交易。导入后的重命名可以避免同一文件被读取两次，但用新名称推送相同的行会导致重复计入，所以写入前请对照 minus_synced.csv 去重。\n\n仅支持支出。金额为零或更小会被拒绝。收入和预算合计位于 __META__ 行，重写它们会触发完整的设置恢复，所以请把这个通道视为只能追加交易。</string>
     <string name="csv_sync_guide_pluggy_title">映射 Open Finance 数据源</string>

@@ -7,6 +7,7 @@ import com.serranoie.app.minus.domain.model.RecurrentFrequency
 
 @Composable
 internal fun frequencyText(frequency: RecurrentFrequency?): String = when (frequency) {
+    RecurrentFrequency.ONCE -> stringResource(R.string.recurrent_frequency_once)
     RecurrentFrequency.WEEKLY -> stringResource(R.string.recurrent_frequency_weekly)
     RecurrentFrequency.BIWEEKLY -> stringResource(R.string.recurrent_frequency_biweekly)
     RecurrentFrequency.MONTHLY -> stringResource(R.string.recurrent_frequency_monthly)

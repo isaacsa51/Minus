@@ -131,6 +131,7 @@ object TransactionPeriodMapper {
         subscriptionDay: Int?
     ): LocalDate {
         return when (frequency) {
+            RecurrentFrequency.ONCE -> LocalDate.MAX
             RecurrentFrequency.WEEKLY -> date.plusWeeks(1)
             RecurrentFrequency.BIWEEKLY -> date.plusWeeks(2)
             RecurrentFrequency.MONTHLY -> {

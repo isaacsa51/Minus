@@ -42,11 +42,15 @@
     <string name="previous_values">이전 값</string>
     <string name="budget">예산</string>
     <string name="recurrent_expense">반복 지출</string>
+    <string name="planned_expense_title">예정 지출</string>
+    <string name="planned_expenses_title">예정 지출</string>
+    <string name="planned_on_date_label">날짜</string>
     <string name="recurrent_expense_details">반복 지출 설정하기</string>
     <string name="recurrent_expense_frequency_subtitle">얼마나 자주 지출하시겠습니까?</string>
     <string name="recurrent_frequency_weekly">매주</string>
     <string name="recurrent_frequency_biweekly">격주</string>
     <string name="recurrent_frequency_monthly">매월</string>
+    <string name="recurrent_frequency_once">1회</string>
     <string name="previous_day">전날</string>
     <string name="next_day">다음 날</string>
     <string name="monthly_on_day_format">매월 %1$d일</string>
@@ -54,6 +58,10 @@
     <string name="date_placeholder">날짜</string>
     <string name="change_date">날짜 변경</string>
     <string name="summary_weekly_format">%1$s까지 매주 청구됩니다.</string>
+    <string name="summary_once_format">%1$s에 한 번 청구됩니다.</string>
+    <string name="planned_preview_held">이 지출을 확인하는 즉시 금액이 확보되어 예산에서 차감됩니다.</string>
+    <string name="planned_preview_changes_to">%1$s에서 %2$s(으)로 바뀝니다</string>
+    <string name="planned_preview_other_period">%1$s이(가) 포함된 기간에 확보됩니다.</string>
     <string name="summary_biweekly_format">%1$s까지 2주마다 청구됩니다.</string>
     <string name="summary_monthly_format">%2$s까지 매월 %1$d일에 청구됩니다.</string>
     <string name="credit_cutoff_dialog_title">신용카드 결제일</string>
@@ -123,8 +131,8 @@
     <string name="generic_expense">지출</string>
     <string name="expense_item_unnamed_expense">이름 없는 지출</string>
     <string name="expense_item_recurrent_subtitle_format">반복 지출 — %1$s</string>
-    <string name="hide_subscriptions_outside_period">기간 외 구독 숨기기</string>
-    <string name="show_subscriptions_outside_period">해당 기간 외 구독 내역 표시</string>
+    <string name="hide_subscriptions_outside_period">이번 기간 외의 예정된 거래 숨기기</string>
+    <string name="show_subscriptions_outside_period">이번 기간 외의 예정된 거래 표시</string>
     <string name="hide_past_period_expenses">지난 기간 지출 숨기기</string>
     <string name="show_past_period_expenses">지난 기간 지출 내역 표시</string>
     <string name="history_snackbar_delete_transaction_failed">거래를 삭제할 수 없습니다</string>
@@ -208,7 +216,7 @@
     <string name="budget_formula_caption_spread_leftover">분배하기로 선택한 잔액</string>
     <string name="budget_formula_label_budget">남은 예산</string>
     <string name="budget_formula_label_carried">이월</string>
-    <string name="budget_formula_label_recurring">청구된 정기 결제</string>
+    <string name="budget_formula_label_recurring">청구된 예정 결제</string>
     <string name="budget_formula_label_rebalanced">남은 날짜에 분배</string>
     <string name="budget_formula_label_spent">지출한 금액</string>
     <string name="budget_formula_label_total">합계</string>
@@ -455,8 +463,8 @@
     <string name="no_transactions_title">기록된 지출 없음</string>
     <string name="no_transactions_subtitle">지출을 추가하여 시작하세요 시작됨</string>
     <!-- Recurrent Payments Divider -->
-    <string name="recurrent_payments_divider_title_upcoming">예정된 반복 지출</string>
-    <string name="recurrent_payments_divider_title_current_period">이번 기간의 반복 지출</string>
+    <string name="recurrent_payments_divider_title_upcoming">이번 기간 외의 예정된 거래</string>
+    <string name="recurrent_payments_divider_title_current_period">이번 기간의 예정된 거래</string>
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">오늘</string>
     <string name="upcoming_recurrent_tomorrow">내일</string>
@@ -472,8 +480,9 @@
     <string name="recurrent_ticket_weekly_unnamed">이름 없는 주간 구독</string>
     <string name="recurrent_ticket_biweekly_unnamed">이름 없는 격주 구독</string>
     <string name="recurrent_ticket_monthly_unnamed">이름 없는 월간 구독</string>
+    <string name="recurrent_ticket_once_unnamed">이름 없는 예정 결제</string>
     <!-- Subscriptions screen -->
-    <string name="subscriptions_title">구독</string>
+    <string name="subscriptions_title">예정</string>
     <string name="subscriptions_analytics_card_label">정기 결제</string>
     <string name="subscriptions_monthly_commitment_label">월 정기 지출</string>
     <string name="subscriptions_per_month_suffix">/월</string>
@@ -484,8 +493,8 @@
     <string name="subscriptions_due_today_label">오늘 결제 예정</string>
     <string name="subscriptions_mark_as_paid">결제 완료로 표시</string>
     <string name="subscriptions_skip_this_cycle">이번 기간 건너뛰기</string>
-    <string name="subscriptions_empty_title">아직 구독이 없습니다</string>
-    <string name="subscriptions_empty_body">지출을 정기 결제로 표시하면 결제일과 남은 시간과 함께 여기에 표시됩니다.</string>
+    <string name="subscriptions_empty_title">아직 예정된 항목이 없습니다</string>
+    <string name="subscriptions_empty_body">지출을 정기 결제 또는 1회로 표시하면 결제일과 남은 시간과 함께 여기에 표시됩니다.</string>
     <string name="subscriptions_snackbar_confirm_failed">이 결제를 확인하지 못했습니다</string>
     <string name="subscriptions_snackbar_skip_failed">이 결제를 건너뛰지 못했습니다</string>
     <string name="subscriptions_status_paid">결제 완료</string>
@@ -634,6 +643,7 @@
     <string name="notification_recurrent_charged_weekly">주간 지출 %1$s이(가) 청구될 예정입니다.</string>
     <string name="notification_recurrent_charged_biweekly">2주 단위 지출 %1$s이(가) 청구될 예정입니다.</string>
     <string name="notification_recurrent_charged_monthly">월간 지출 %1$s이(가) 청구될 예정입니다.</string>
+    <string name="notification_recurrent_charged_once">예정 지출 %1$s이(가) 청구될 예정입니다.</string>
     <string name="notification_tomorrow">내일</string>
     <string name="notification_in_days">%1$d일 후</string>
     <string name="notification_upcoming_subscription_title">예정된 지출</string>
@@ -732,7 +742,7 @@
     <string name="tutorial_history_transaction_title">지출 수정 또는 삭제</string>
     <string name="tutorial_history_transaction_description">지출을 탭하면 펼쳐져 자세한 내용을 볼 수 있습니다. 오른쪽으로 쓸면 금액, 날짜, 카테고리, 메모를 수정하고, 왼쪽으로 쓸면 삭제됩니다. 몇 초 동안 실행취소할 수 있습니다.</string>
     <string name="tutorial_history_recurrent_title">예정된 결제</string>
-    <string name="tutorial_history_recurrent_description">이번 기간에 결제일이 오는 반복 지출이 결제 전까지 여기에 있습니다. 결제되면 완료로 표시하거나, 해당 회차만 삭제하면 전체 반복을 해지하지 않고 이번만 건너뜁니다.</string>
+    <string name="tutorial_history_recurrent_description">이번 기간에 결제일이 오는 예정 지출과 반복 지출이 결제 전까지 여기에 있습니다. 결제되면 완료로 표시하거나, 해당 회차만 삭제하면 전체 반복을 해지하지 않고 이번만 건너뜁니다.</string>
     <string name="tutorial_history_past_period_title">지난 기간</string>
     <string name="tutorial_history_past_period_description">바로 앞 기간의 지출을 따로 모아 둔 곳입니다. 설정의 추가 기능에서 이 섹션을 다시 끌 수 있습니다.</string>
     <string name="analytics_tutorial_recurrent_title">반복 지출</string>
@@ -790,7 +800,7 @@
     <string name="csv_sync_guide_export_body">minus_synced.csv는 26개 열 전체 헤더를 담고 있으며 실행마다 다시 기록됩니다. 이전 다섯 개의 내보내기는 교체된 시각이 찍힌 minus_backup- 파일로 옆에 보관되므로, 잘못된 내보내기 때문에 복사본이 없어지는 일은 없습니다.\n\n내보내기에는 세 종류의 행이 나타나며 첫 번째 열로 구분됩니다.\n\n__META__는 예산 설정과 현재 기간입니다. 한 행이며, 있으면 맨 앞에 옵니다.\n__ARCHIVED__는 종료된 예산 기간마다 한 행입니다.\n타임스탬프는 거래입니다.\n\n거래만 필요한 쪽은 이 두 표식 행을 건너뛰어야 합니다. __META__ 행의 current_period_id 값이 새 거래를 기록할 때 period_id로 되돌려 줄 값입니다.\n\n다시 설치한 뒤 이미 minus_synced.csv가 있는 폴더를 Minus에 지정하면, 덮어쓰지 않고 그 파일에서 복원합니다.</string>
     <string name="csv_sync_guide_script_title">스크립트가 기록하는 파일</string>
     <string name="csv_sync_guide_script_body">파일 이름은 minus_import_&lt;아무거나&gt;.csv여야 합니다. Minus는 폴더의 다른 모든 파일을 무시하므로 공유 폴더는 그대로 유지됩니다.\n\n파서는 파일이 선언한 헤더를 읽고 빠진 열은 모두 비어 있는 것으로 처리하므로 26개 전부가 필요하지는 않습니다. 다음은 완전하고 유효한 파일입니다.</string>
-    <string name="csv_sync_guide_columns_body">date는 필수이며 정확히 yyyy-MM-dd HH:mm 형식입니다. 다른 형태는 그 행을 버립니다.\namount는 필수이며 0보다 큰 단순 소수입니다. Minus의 행은 지출입니다.\ncategory는 선택적 자유 텍스트로, 이름으로 대조되고 새 이름이면 생성됩니다. 비어 있으면 미분류로 처리됩니다.\nextra_note는 선택적 자유 텍스트입니다. 원본 거래 id를 넣기에 좋은 자리입니다.\nperiod_id는 권장되며, __META__ 행의 current_period_id에서 복사합니다. 비어 있으면 0입니다.\nid는 넣지 않는 것이 좋습니다. 0이 아닌 값은 기존 거래를 덮어씁니다.\nis_recurrent는 1 또는 0입니다. 1이면 frequency를 WEEKLY, BIWEEKLY, MONTHLY 중 하나로 지정하세요.\nis_credit는 1 또는 0입니다.\n\n파서가 거부한 행은 하나씩 건너뛰고, 파일의 나머지는 그대로 가져옵니다.</string>
+    <string name="csv_sync_guide_columns_body">date는 필수이며 정확히 yyyy-MM-dd HH:mm 형식입니다. 다른 형태는 그 행을 버립니다.\namount는 필수이며 0보다 큰 단순 소수입니다. Minus의 행은 지출입니다.\ncategory는 선택적 자유 텍스트로, 이름으로 대조되고 새 이름이면 생성됩니다. 비어 있으면 미분류로 처리됩니다.\nextra_note는 선택적 자유 텍스트입니다. 원본 거래 id를 넣기에 좋은 자리입니다.\nperiod_id는 권장되며, __META__ 행의 current_period_id에서 복사합니다. 비어 있으면 0입니다.\nid는 넣지 않는 것이 좋습니다. 0이 아닌 값은 기존 거래를 덮어씁니다.\nis_recurrent는 1 또는 0입니다. 1이면 frequency를 ONCE, WEEKLY, BIWEEKLY, MONTHLY 중 하나로 지정하세요.\nis_credit는 1 또는 0입니다.\n\n파서가 거부한 행은 하나씩 건너뛰고, 파일의 나머지는 그대로 가져옵니다.</string>
     <string name="csv_sync_guide_rules_title">지켜야 할 규칙</string>
     <string name="csv_sync_guide_rules_body">들어오는 파일 이름은 minus_import_*.csv로 지으세요. minus_synced.csv와 minus_backup- 순환 파일을 포함해 그 밖의 모든 것은 건드리지 않습니다. 그래서 다른 도구와 공유하는 폴더로 동기화를 지정해도 안전합니다.\n\n넣어 둔 것은 삭제되지 않습니다. 읽은 뒤 파일 이름은 .imported로, 어떤 행이 파싱에 실패했다면 .rejected로 바뀌며, 내용은 그대로 남아 무엇이 잘못됐는지 확인할 수 있습니다. 두 이름 모두 다시 읽히지 않습니다.\n\n0이 아닌 id는 절대 기록하지 마세요. id가 0보다 큰 행은 그 id를 가진 거래를 대체하고, id가 비었거나 0인 행은 새로 삽입됩니다. 내보내기에는 실제 행 id가 담겨 있으므로, 수정하지 않은 내보내기를 다시 보내면 중복이 아니라 덮어쓰기가 됩니다. id 열을 먼저 비우지 않으면 내보내기를 새 행의 템플릿으로 쓸 수 없습니다.\n\nperiod_id를 설정하세요. 합계는 날짜로 계산되므로 period_id가 0인 행도 모든 화면에서 올바르게 표시됩니다. 더 좁은 대가는 기간에 귀속되지 않고, 보관된 기간을 삭제할 때 실행되는 정리에서 살아남는다는 점입니다.\n\n가져오기는 멱등하지 않습니다. Minus는 동등한 거래가 있는지 확인하지 않고 읽은 모든 행을 삽입합니다. 가져오기 후 이름 변경으로 같은 파일이 두 번 읽히는 일은 막지만, 같은 행을 새 이름으로 보내면 두 번 집계되므로 기록하기 전에 minus_synced.csv와 비교해 중복을 제거하세요.\n\n지출만 가능합니다. 0 이하 금액은 거부됩니다. 수입과 예산 합계는 __META__ 행에 있고, 그것을 다시 쓰면 설정 전체 복원이 실행되므로 이 경로는 거래 추가 전용으로 다루세요.</string>
     <string name="csv_sync_guide_pluggy_title">Open Finance 피드 매핑</string>

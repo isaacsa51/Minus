@@ -66,7 +66,6 @@ data class SubscriptionsActions(
     val onConfirmDelete: (Transaction) -> Unit = {},
 )
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun Subscriptions(
     state: SubscriptionsUiState = SubscriptionsUiState(),
@@ -92,7 +91,7 @@ fun Subscriptions(
             MediumTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.subscriptions_title),
+                        text = stringResource(R.string.planned_expenses_title),
                         style = MaterialTheme.typography.titleLargeEmphasized,
                     )
                 },
