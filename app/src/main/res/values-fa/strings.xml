@@ -25,7 +25,7 @@
     <string name="tutorial_history_transaction_title">ویرایش یا حذف یک هزینه</string>
     <string name="tutorial_history_transaction_description">روی یک هزینه بزنید تا باز شود و جزئیات کامل را ببینید. برای ویرایش مبلغ، تاریخ، دسته‌بندی یا یادداشت آن را به راست بکشید؛ برای حذف به چپ بکشید، با چند ثانیه فرصت برای واگرد.</string>
     <string name="tutorial_history_recurrent_title">پرداخت‌های پیش‌رو</string>
-    <string name="tutorial_history_recurrent_description">برداشت‌های دوره‌ای که در این دوره موعدشان می‌رسد، پیش از پرداخت اینجا قرار می‌گیرند. وقتی انجام شد آن را پرداخت‌شده علامت بزنید، یا تنها همان نوبت را حذف کنید تا این بار رد شود بدون اینکه کل سری لغو شود.</string>
+    <string name="tutorial_history_recurrent_description">برداشت‌های برنامه‌ریزی‌شده و دوره‌ای که در این دوره موعدشان می‌رسد، پیش از پرداخت اینجا قرار می‌گیرند. وقتی انجام شد آن را پرداخت‌شده علامت بزنید، یا تنها همان نوبت را حذف کنید تا این بار رد شود بدون اینکه کل سری لغو شود.</string>
     <string name="tutorial_history_past_period_title">دوره گذشته</string>
     <string name="tutorial_history_past_period_description">هزینه‌های دوره پیش از این، که از سر راه کنار گذاشته شده‌اند. این بخش را می‌توانید در تنظیمات، زیر قابلیت‌های اضافی، دوباره خاموش کنید.</string>
     <string name="analytics_tutorial_recurrent_title">برداشت‌های دوره‌ای</string>
@@ -54,11 +54,15 @@
     <string name="previous_values">مقادیر قبلی</string>
     <string name="budget">بودجه</string>
     <string name="recurrent_expense">هزینه دوره‌ای</string>
+    <string name="planned_expense_title">هزینه برنامه‌ریزی‌شده</string>
+    <string name="planned_expenses_title">هزینه‌های برنامه‌ریزی‌شده</string>
+    <string name="planned_on_date_label">تاریخ</string>
     <string name="recurrent_expense_details">بیایید هزینه دوره‌ای را مشخص کنیم</string>
     <string name="recurrent_expense_frequency_subtitle">هر چند وقت یک‌بار می‌خواهید این هزینه را بپردازید؟</string>
     <string name="recurrent_frequency_weekly">هفتگی</string>
     <string name="recurrent_frequency_biweekly">دوهفته‌ای</string>
     <string name="recurrent_frequency_monthly">ماهانه</string>
+    <string name="recurrent_frequency_once">یک‌بار</string>
     <string name="previous_day">روز قبل</string>
     <string name="next_day">روز بعد</string>
     <string name="monthly_on_day_format">روز %1$d هر ماه</string>
@@ -66,6 +70,10 @@
     <string name="date_placeholder">تاریخ</string>
     <string name="change_date">تغییر تاریخ</string>
     <string name="summary_weekly_format">این مبلغ هر هفته تا %1$s کسر خواهد شد.</string>
+    <string name="summary_once_format">این مبلغ یک‌بار در تاریخ %1$s کسر خواهد شد.</string>
+    <string name="planned_preview_held">مبلغ به محض تأیید این هزینه کنار گذاشته شده و از بودجه کسر می‌شود.</string>
+    <string name="planned_preview_changes_to">%1$s به %2$s تغییر می‌کند</string>
+    <string name="planned_preview_other_period">در دوره‌ای که %1$s را شامل می‌شود کنار گذاشته می‌شود.</string>
     <string name="summary_biweekly_format">این مبلغ هر دو هفته یک‌بار تا %1$s کسر خواهد شد.</string>
     <string name="summary_monthly_format">این مبلغ هر ماه در روز %1$d تا تاریخ %2$s کسر خواهد شد.</string>
     <string name="credit_cutoff_dialog_title">تاریخ صورت‌حساب کارت اعتباری</string>
@@ -139,8 +147,8 @@
     <string name="generic_expense">هزینه</string>
     <string name="expense_item_unnamed_expense">هزینه بدون نام</string>
     <string name="expense_item_recurrent_subtitle_format">هزینه دوره‌ای — %1$s</string>
-    <string name="hide_subscriptions_outside_period">مخفی کردن اشتراک‌های خارج از دوره</string>
-    <string name="show_subscriptions_outside_period">نمایش اشتراک‌های خارج از دوره</string>
+    <string name="hide_subscriptions_outside_period">مخفی کردن تراکنش‌های برنامه‌ریزی‌شده خارج از این دوره</string>
+    <string name="show_subscriptions_outside_period">نمایش تراکنش‌های برنامه‌ریزی‌شده خارج از این دوره</string>
     <string name="hide_past_period_expenses">مخفی کردن هزینه‌های دوره‌های قبل</string>
     <string name="show_past_period_expenses">نمایش هزینه‌های دوره گذشته</string>
     <string name="history_snackbar_delete_transaction_failed">حذف تراکنش با خطا مواجه شد</string>
@@ -287,7 +295,7 @@
     <string name="budget_formula_caption_spread_leftover">مانده‌هایی که انتخاب کردید پخش شوند</string>
     <string name="budget_formula_label_budget">بودجه باقی‌مانده</string>
     <string name="budget_formula_label_carried">منتقل‌شده</string>
-    <string name="budget_formula_label_recurring">پرداخت‌های دوره‌ای برداشت‌شده</string>
+    <string name="budget_formula_label_recurring">پرداخت‌های برنامه‌ریزی‌شده برداشت‌شده</string>
     <string name="budget_formula_label_rebalanced">پخش‌شده روی روزهای باقی‌مانده</string>
     <string name="budget_formula_label_spent">آنچه خرج کردید</string>
     <string name="budget_formula_label_total">مجموع</string>
@@ -539,7 +547,7 @@
     <string name="csv_sync_guide_export_body">فایل minus_synced.csv سرستون کامل ۲۶ ستونی را دارد و در هر اجرا بازنویسی می‌شود. پنج صادرات پیشین در کنارش به‌صورت فایل‌های minus_backup- با زمان جایگزینی نگه داشته می‌شوند، پس یک صادرات خراب هرگز شما را بی‌نسخه نمی‌گذارد.\n\nدر یک صادرات سه نوع ردیف دیده می‌شود که از ستون اول تشخیص داده می‌شوند:\n\n__META__ تنظیمات بودجه و دوره جاری است. یک ردیف، در صورت وجود نخستین ردیف.\n__ARCHIVED__ برای هر دوره بودجه بسته‌شده یک ردیف است.\nیک برچسب زمانی یعنی یک تراکنش.\n\nخواننده‌ای که فقط تراکنش می‌خواهد باید دو ردیف نشانه را رد کند. مقدار current_period_id در ردیف __META__ همان است که هنگام نوشتن تراکنش‌های جدید در period_id بازمی‌گردانید.\n\nاگر برنامه را دوباره نصب کنید و Minus را به پوشه‌ای نشانه بگیرید که از قبل minus_synced.csv دارد، به جای بازنویسی از همان فایل بازگردانی می‌کند.</string>
     <string name="csv_sync_guide_script_title">فایلی که اسکریپت شما می‌نویسد</string>
     <string name="csv_sync_guide_script_body">نام فایل شما باید minus_import_&lt;هر چیزی&gt;.csv باشد. Minus هر فایل دیگری در پوشه را نادیده می‌گیرد، پس یک پوشه مشترک دست‌نخورده می‌ماند.\n\nتحلیلگر هر سرستونی را که فایل شما اعلام کند می‌خواند و هر ستون نبوده را خالی در نظر می‌گیرد، پس به همه ۲۶ ستون نیازی ندارید. این یک فایل کامل و معتبر است.</string>
-    <string name="csv_sync_guide_columns_body">مقدار date الزامی است، دقیقاً yyyy-MM-dd HH:mm. هر شکل دیگری ردیف را دور می‌اندازد.\nمقدار amount الزامی است، یک عدد اعشاری ساده بزرگ‌تر از صفر. ردیف‌های Minus هزینه هستند.\nمقدار category متن آزاد اختیاری است، با نام تطبیق می‌شود و اگر جدید باشد ساخته می‌شود. خالی بودن به دسته‌بندی‌نشده می‌رسد.\nمقدار extra_note متن آزاد اختیاری است. جای خوبی برای شناسه تراکنش سیستم مبدأ.\nمقدار period_id توصیه می‌شود و از current_period_id در ردیف __META__ کپی می‌شود. خالی یعنی ۰.\nمقدار id را باید نگذارید. مقدار غیرصفر یک تراکنش موجود را بازنویسی می‌کند.\nمقدار is_recurrent یک یا صفر است. اگر یک بود، frequency را روی WEEKLY، BIWEEKLY یا MONTHLY بگذارید.\nمقدار is_credit یک یا صفر است.\n\nردیف‌هایی که تحلیلگر رد می‌کند یکی‌یکی کنار گذاشته می‌شوند؛ بقیه فایل همچنان وارد می‌شود.</string>
+    <string name="csv_sync_guide_columns_body">مقدار date الزامی است، دقیقاً yyyy-MM-dd HH:mm. هر شکل دیگری ردیف را دور می‌اندازد.\nمقدار amount الزامی است، یک عدد اعشاری ساده بزرگ‌تر از صفر. ردیف‌های Minus هزینه هستند.\nمقدار category متن آزاد اختیاری است، با نام تطبیق می‌شود و اگر جدید باشد ساخته می‌شود. خالی بودن به دسته‌بندی‌نشده می‌رسد.\nمقدار extra_note متن آزاد اختیاری است. جای خوبی برای شناسه تراکنش سیستم مبدأ.\nمقدار period_id توصیه می‌شود و از current_period_id در ردیف __META__ کپی می‌شود. خالی یعنی ۰.\nمقدار id را باید نگذارید. مقدار غیرصفر یک تراکنش موجود را بازنویسی می‌کند.\nمقدار is_recurrent یک یا صفر است. اگر یک بود، frequency را روی ONCE، WEEKLY، BIWEEKLY یا MONTHLY بگذارید.\nمقدار is_credit یک یا صفر است.\n\nردیف‌هایی که تحلیلگر رد می‌کند یکی‌یکی کنار گذاشته می‌شوند؛ بقیه فایل همچنان وارد می‌شود.</string>
     <string name="csv_sync_guide_rules_title">قاعده‌هایی که باید رعایت شوند</string>
     <string name="csv_sync_guide_rules_body">فایل‌های ورودی را minus_import_*.csv نام بگذارید. هر چیز دیگری دست‌نخورده می‌ماند، از جمله minus_synced.csv و چرخش‌های minus_backup-. همین است که نشانه گرفتن همگام‌سازی به پوشه‌ای که با ابزارهای دیگر مشترک است را بی‌خطر می‌کند.\n\nهیچ چیزی که می‌گذارید حذف نمی‌شود. پس از خواندن، نام فایل به .imported تغییر می‌کند، یا به .rejected اگر هر یک از ردیف‌هایش تحلیل نشد، و محتوایش می‌ماند تا ببینید چه چیزی اشتباه بوده. هیچ‌یک از این دو نام دوباره خوانده نمی‌شود.\n\nهرگز id غیرصفر نگذارید. ردیف‌هایی با id بزرگ‌تر از صفر، تراکنشی را که آن id را دارد جایگزین می‌کنند؛ ردیف‌هایی با id خالی یا صفر به‌عنوان جدید درج می‌شوند. چون صادرات شناسه‌های واقعی ردیف‌ها را دارد، فرستادن دوباره یک صادرات تغییرنیافته بازنویسی می‌کند نه تکرار. نمی‌توانید از یک صادرات به‌عنوان قالب ردیف‌های جدید استفاده کنید مگر اینکه نخست ستون id را خالی کنید.\n\nمقدار period_id را بگذارید. مجموع‌ها از تاریخ‌ها محاسبه می‌شوند، پس ردیفی با period_id صفر همه‌جا درست نشان داده می‌شود. هزینه محدودترش این است که به هیچ دوره‌ای نسبت داده نمی‌شود و از پاک‌سازی‌ای که هنگام حذف یک دوره بایگانی‌شده اجرا می‌شود جان سالم به در می‌برد.\n\nورود داده خودتوان نیست. Minus هر ردیفی را که می‌خواند درج می‌کند، بدون بررسی وجود تراکنش هم‌ارز. تغییر نام پس از ورود جلوی دوباره خواندن همان فایل را می‌گیرد، اما فرستادن همان ردیف‌ها با نامی تازه آن‌ها را دو بار می‌شمارد، پس پیش از نوشتن، تکراری‌ها را در برابر minus_synced.csv حذف کنید.\n\nفقط هزینه‌ها. مبالغ صفر یا کمتر رد می‌شوند. درآمد و مجموع‌های بودجه در ردیف __META__ هستند و بازنویسی آن‌ها یک بازگردانی کامل تنظیمات را راه می‌اندازد، پس این مسیر را برای تراکنش‌ها فقط افزودنی در نظر بگیرید.</string>
     <string name="csv_sync_guide_pluggy_title">نگاشت یک خوراک Open Finance</string>
@@ -592,8 +600,8 @@
     <string name="no_transactions_title">هیچ هزینه‌ای ثبت نشده است</string>
     <string name="no_transactions_subtitle">برای شروع یک هزینه اضافه کنید</string>
     <!-- Recurrent Payments Divider -->
-    <string name="recurrent_payments_divider_title_upcoming">پرداخت‌های دوره‌ای پیش‌رو</string>
-    <string name="recurrent_payments_divider_title_current_period">پرداخت‌های دوره‌ای در این دوره</string>
+    <string name="recurrent_payments_divider_title_upcoming">تراکنش‌های برنامه‌ریزی‌شده خارج از این دوره</string>
+    <string name="recurrent_payments_divider_title_current_period">تراکنش‌های برنامه‌ریزی‌شده در این دوره</string>
     <!-- Upcoming Recurrent Item -->
     <string name="upcoming_recurrent_today">امروز</string>
     <string name="upcoming_recurrent_tomorrow">فردا</string>
@@ -609,8 +617,9 @@
     <string name="recurrent_ticket_weekly_unnamed">اشتراک هفتگی بدون نام</string>
     <string name="recurrent_ticket_biweekly_unnamed">اشتراک دوهفته‌ای بدون نام</string>
     <string name="recurrent_ticket_monthly_unnamed">اشتراک ماهانه بدون نام</string>
+    <string name="recurrent_ticket_once_unnamed">پرداخت برنامه‌ریزی‌شده بدون نام</string>
     <!-- Subscriptions screen -->
-    <string name="subscriptions_title">اشتراک‌ها</string>
+    <string name="subscriptions_title">برنامه‌ریزی‌شده‌ها</string>
     <string name="subscriptions_analytics_card_label">دوره‌ای</string>
     <string name="subscriptions_monthly_commitment_label">تعهد ماهانه</string>
     <string name="subscriptions_per_month_suffix">/ماه</string>
@@ -621,8 +630,8 @@
     <string name="subscriptions_due_today_label">موعد امروز</string>
     <string name="subscriptions_mark_as_paid">علامت‌زدن به‌عنوان پرداخت‌شده</string>
     <string name="subscriptions_skip_this_cycle">رد کردن در این دوره</string>
-    <string name="subscriptions_empty_title">هنوز اشتراکی نیست</string>
-    <string name="subscriptions_empty_body">یک هزینه را دوره‌ای علامت بزنید و اینجا با موعد و زمان باقی‌مانده‌اش نمایان می‌شود.</string>
+    <string name="subscriptions_empty_title">هنوز چیزی برنامه‌ریزی نشده</string>
+    <string name="subscriptions_empty_body">یک هزینه را دوره‌ای یا یک‌باره علامت بزنید و اینجا با موعد و زمان باقی‌مانده‌اش نمایان می‌شود.</string>
     <string name="subscriptions_snackbar_confirm_failed">این پرداخت تأیید نشد</string>
     <string name="subscriptions_snackbar_skip_failed">این پرداخت رد نشد</string>
     <string name="subscriptions_status_paid">پرداخت‌شده</string>
@@ -792,6 +801,7 @@
     <string name="notification_recurrent_charged_weekly">هزینه هفتگی شما به مبلغ %1$s برداشت خواهد شد.</string>
     <string name="notification_recurrent_charged_biweekly">هزینه دوهفتگی شما به مبلغ %1$s برداشت خواهد شد.</string>
     <string name="notification_recurrent_charged_monthly">هزینه ماهانه شما به مبلغ %1$s برداشت خواهد شد.</string>
+    <string name="notification_recurrent_charged_once">هزینه برنامه‌ریزی‌شده شما به مبلغ %1$s برداشت خواهد شد.</string>
     <string name="notification_tomorrow">فردا</string>
     <string name="notification_in_days">تا %1$d روز دیگر</string>
     <string name="notification_upcoming_subscription_title">هزینه پیش‌رو</string>
