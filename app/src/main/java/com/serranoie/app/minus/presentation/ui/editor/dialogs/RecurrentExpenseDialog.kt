@@ -69,7 +69,7 @@ import com.serranoie.app.minus.presentation.util.font.format.localizedFormatter
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -101,11 +101,11 @@ fun RecurrentExpenseDialog(
     if (showDatePicker) {
         val maxSelectableDate = today.plusMonths(12)
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = (if (isOnce) plannedDate else selectedEndDate).atStartOfDay(ZoneId.systemDefault())
+            initialSelectedDateMillis = (if (isOnce) plannedDate else selectedEndDate).atStartOfDay(ZoneOffset.UTC)
                 .toInstant().toEpochMilli(),
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    val date = Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneId.systemDefault())
+                    val date = Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneOffset.UTC)
                         .toLocalDate()
                     return date.isAfter(today) && !date.isAfter(maxSelectableDate)
                 }
@@ -117,7 +117,7 @@ fun RecurrentExpenseDialog(
                 shapes = ButtonDefaults.shapes(),
                 onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
-                        val picked = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
+                        val picked = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
                         if (isOnce) plannedDate = picked else selectedEndDate = picked
                     }
                     showDatePicker = false
