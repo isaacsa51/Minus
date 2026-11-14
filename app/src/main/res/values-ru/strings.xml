@@ -158,7 +158,7 @@
     <string name="history_snackbar_delete_recurrent_failed">Не удалось удалить регулярный платёж</string>
     <string name="history_snackbar_mark_paid_failed">Не удалось отметить операцию как оплаченную</string>
     <string name="history_snackbar_restore_transaction_failed">Не удалось восстановить транзакцию</string>
-    <string name="history_search_placeholder">Name, note, date or amount</string>
+    <string name="history_search_placeholder">Название, заметка, дата или сумма</string>
     <string-array name="history_search_examples">
         <item>Range: 19 nov to 30 nov</item>
         <item>Day: Food 12 oct</item>
@@ -170,26 +170,26 @@
         <item>After a date: &gt;10/1</item>
         <item>Text only: \"Tacos\"</item>
     </string-array>
-    <string name="history_search_clear">Clear search</string>
-    <string name="history_search_no_results">No expenses match \"%1$s\"</string>
+    <string name="history_search_clear">Очистить поиск</string>
+    <string name="history_search_no_results">Нет расходов по запросу «%1$s»</string>
     <plurals name="history_search_results_summary">
-        <item quantity="one">%1$d match · %2$s spent</item>
-        <item quantity="few">%1$d matches · %2$s spent</item>
-        <item quantity="many">%1$d matches · %2$s spent</item>
-        <item quantity="other">%1$d matches · %2$s spent</item>
+        <item quantity="one">%1$d совпадение · потрачено %2$s</item>
+        <item quantity="few">%1$d совпадения · потрачено %2$s</item>
+        <item quantity="many">%1$d совпадений · потрачено %2$s</item>
+        <item quantity="other">%1$d совпадения · потрачено %2$s</item>
     </plurals>
     <string name="expense_queued_for_next_period">Расход перенесён в следующий период</string>
     <string name="split_expense_mismatch">Суммы и категории не совпадают (%1$d и %2$d)</string>
-    <string name="split_expense_not_recurring">Разделённые расходы не могут быть регулярными</string>
+    <string name="split_expense_not_recurring">Разделённые расходы не могут быть повторяющимися</string>
     <string name="split_category_remove">Удалить %1$s</string>
     <plurals name="split_expense_saved">
         <item quantity="one">Сохранён %d расход</item>
-        <item quantity="few">Сохранены %d расхода</item>
+        <item quantity="few">Сохранено %d расхода</item>
         <item quantity="many">Сохранено %d расходов</item>
         <item quantity="other">Сохранено %d расхода</item>
     </plurals>
-    <string name="budget_load_failed">Не удалось загрузить ваш бюджет</string>
-    <string name="budget_load_corrupt_data">Некоторые сохраненные данные о бюджете не могут быть прочитаны</string>
+    <string name="budget_load_failed">Не удалось загрузить бюджет</string>
+    <string name="budget_load_corrupt_data">Не удалось прочитать часть сохранённых данных бюджета</string>
     <string name="budget_load_retry">Повторить</string>
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавить категорию</string>
@@ -206,15 +206,15 @@
     <!--  Analytics  -->
     <string name="analytics_title">Аналитика</string>
     <string name="receipt_scan_button">Сканировать чек</string>
-    <string name="receipt_scan_failed">Не удалось считать итоговую сумму с чека</string>
+    <string name="receipt_scan_failed">Не удалось распознать итог на чеке</string>
     <string name="quick_add_amount_label">Сумма</string>
-    <string name="quick_add_no_categories">Категорий пока нет. Можно сохранить и без них.</string>
+    <string name="quick_add_no_categories">Категорий пока нет. Можно сохранить и без неё.</string>
     <string name="quick_add_save_failed">Не удалось сохранить расход. Попробуйте ещё раз.</string>
-    <string name="quick_add_needs_budget">Сначала задайте бюджет в Minus, затем добавляйте расходы здесь.</string>
+    <string name="quick_add_needs_budget">Настройте бюджет в Minus, прежде чем добавлять расходы здесь.</string>
     <string name="quick_add_open_app">Открыть Minus</string>
-    <string name="quick_add_saved">%1$s сохранено</string>
-    <string name="receipt_camera_point_at_total">Наведите на итоговую сумму</string>
-    <string name="receipt_camera_detected">Обнаружено: %1$s</string>
+    <string name="quick_add_saved">Сохранено: %1$s</string>
+    <string name="receipt_camera_point_at_total">Наведите на итог</string>
+    <string name="receipt_camera_detected">Распознано: %1$s</string>
     <string name="receipt_camera_retry">Итог не найден, попробуйте ещё раз</string>
     <string name="receipt_camera_close">Закрыть камеру</string>
     <string name="receipt_camera_capture">Сфотографировать чек</string>
@@ -715,6 +715,34 @@
     <string name="category_limit_ahead">Быстрее плана</string>
     <string name="category_limit_on_track">В рамках плана</string>
     <string name="analytics_category_limits_title">Лимиты категорий</string>
+    <string name="pockets_title">Копилки</string>
+    <string name="pockets_empty">Откладывайте деньги на цель. Они выходят из бюджета, пока вы их не заберёте.</string>
+    <string name="pockets_new">Новая копилка</string>
+    <string name="pockets_name_label">Название</string>
+    <string name="pockets_target_label">Целевая сумма (необязательно)</string>
+    <string name="pockets_amount_label">Сумма</string>
+    <string name="pockets_add_money">Пополнить</string>
+    <string name="pockets_take_out">Снять</string>
+    <string name="pockets_add_money_title">Пополнить «%1$s»</string>
+    <string name="pockets_take_out_title">Снять из «%1$s»</string>
+    <string name="pockets_take_out_max">До %1$s</string>
+    <string name="pockets_of_target">из %1$s</string>
+    <string name="pockets_of_target_by">из %1$s к %2$s</string>
+    <string name="pockets_goal_name">Сбережения</string>
+    <string name="pockets_set_aside">Отложить</string>
+    <string name="pockets_saved_to">%1$s отложено в «%2$s»</string>
+    <string name="pockets_set_aside_pick">Сначала выберите копилку</string>
+    <string name="pockets_set_aside_single_amount">Введите одну сумму, чтобы отложить</string>
+    <string name="pockets_delete">Удалить копилку</string>
+    <string name="pockets_period_title">Сбережения за период</string>
+    <string name="pockets_period_added">Вы отложили %1$s в копилки.</string>
+    <string name="pockets_period_withdrawn">Вы сняли %1$s из копилок.</string>
+    <string name="pockets_period_added_and_withdrawn">Вы отложили %1$s и сняли %2$s.</string>
+    <string name="pockets_delete_title">Удалить «%1$s»?</string>
+    <string name="pockets_delete_desc">Копилка пуста, поэтому деньги не потеряются.</string>
+    <string name="pockets_action_failed">Не удалось обновить копилку. Попробуйте ещё раз.</string>
+    <string name="rollover_dialog_save_to_pocket_title">Отложить в «%1$s»</string>
+    <string name="rollover_dialog_save_to_pocket_desc">Отложить %1$s в эту копилку</string>
     <string name="settings_category_limits_title">Лимиты категорий</string>
     <string name="settings_category_limits_subtitle_empty">Ограничьте расходы в категории на неделю или период</string>
     <string name="settings_category_limits_subtitle_count">Лимит есть у %1$d из %2$d категорий</string>
@@ -742,6 +770,7 @@
     <string name="settings_savings_dialog_savings_label">Накопления — %1$d%%</string>
     <string name="settings_savings_dialog_goal_section">Цель накоплений (необязательно)</string>
     <string name="settings_savings_dialog_goal_amount_label">Целевая сумма</string>
+    <string name="settings_savings_summary_goal_in">%1$s за %2$s</string>
     <string name="settings_savings_dialog_goal_months_label">Срок (месяцев)</string>
     <string name="settings_savings_dialog_goal_hint">Оставьте пустым, чтобы сохранить пример %1$d%% × 6.</string>
     <string name="settings_savings_dialog_reset">Сбросить настройки</string>
@@ -828,6 +857,10 @@
     <string name="notification_channel_savings_name">Напоминания о накоплениях</string>
     <string name="notification_channel_savings_description">Напоминание отложить деньги в начале нового бюджетного периода</string>
     <string name="notification_savings_reminder_title">Новый период: пора откладывать</string>
+    <string name="notification_savings_goal_title">Отложите %1$s на «%2$s»</string>
+    <string name="notification_savings_goal_message">До цели «%2$s» осталось %1$s. Нажмите, чтобы отложить.</string>
+    <string name="notification_savings_percent_title">Отложите %1$s в этом периоде</string>
+    <string name="notification_savings_no_goal_message">У вас не задана цель накоплений, но мы рекомендуем отложить %1$s в этом периоде.</string>
     <string name="notification_savings_reminder_message">Отложите %1$s из этого периода на накопления.</string>
     <string name="credit_owed_label">Всего к оплате</string>
     <string name="debt_adjusted_balance_label">Остаток с учётом долга</string>
@@ -894,19 +927,19 @@
     <string name="unit_millions">млн</string>
     <string name="widget_budget_pill_title">Бюджетная полоса</string>
     <string name="widget_budget_pill_description">Остаток за выбранный режим просмотра — день, неделя, две недели или месяц — в узкой полосе</string>
-    <string name="island_provider_description">Показывает остаток бюджета с разбивкой внутри острова Brief</string>
-    <string name="island_brief_days_short">%1$dд</string>
+    <string name="island_provider_description">Показывает остаток бюджета в island Brief</string>
+    <string name="island_brief_days_short">%1$d д</string>
     <string name="island_brief_stale">осталось в периоде — откройте Minus для обновления</string>
     <string name="island_page_spent_of">Потрачено %1$s из %2$s</string>
-    <string name="island_page_period_left">Осталось в периоде</string>
+    <string name="island_page_period_left">Осталось периода</string>
     <plurals name="island_page_days_left">
-        <item quantity="one">остался день</item>
-        <item quantity="few">осталось дня</item>
-        <item quantity="many">осталось дней</item>
-        <item quantity="other">осталось дня</item>
+        <item quantity="one">день остался</item>
+        <item quantity="few">дня осталось</item>
+        <item quantity="many">дней осталось</item>
+        <item quantity="other">дня осталось</item>
     </plurals>
     <string name="island_charge_today">%1$s — %2$s к оплате сегодня</string>
     <string name="island_charge_tomorrow">%1$s — %2$s к оплате завтра</string>
     <string name="island_charge_unnamed">Регулярный платёж</string>
-    <string name="island_credit_owed">%1$s долга по кредиту</string>
+    <string name="island_credit_owed">%1$s долг по кредиту</string>
 </resources>
