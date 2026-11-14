@@ -38,6 +38,7 @@ class MinusCsvService @Inject constructor(
         val transactions = repository.getTransactions().first()
         val archivedBudgets = repository.getArchivedBudgets().first()
         val paidOccurrences = repository.getPaidRecurrentOccurrences().first()
+        val pockets = repository.getSavingsPockets().first()
         val settings = repository.getBudgetSettingsSync()
         val userSettings = settingsRepository.getSettings()
         val metadata = settings?.let {
@@ -47,7 +48,7 @@ class MinusCsvService @Inject constructor(
                 currentPeriodId = userSettings.currentPeriodId,
             )
         }
-        exporter.export(transactions, archivedBudgets, metadata, paidOccurrences, outputStream)
+        exporter.export(transactions, archivedBudgets, metadata, paidOccurrences, outputStream, pockets)
     }
 
     suspend fun hasNoLocalData(): Boolean {
@@ -84,10 +85,12 @@ class MinusCsvService @Inject constructor(
             }
             repository.replaceAllTransactions(
                 transactions = reusable + fresh.map { it.copy(id = 0L) },
-                paidOccurrences = payload.paidOccurrences
+                paidOccurrences = payload.paidOccurrences,
+                pockets = payload.pockets,
             )
             repository.replaceAllArchivedBudgets(payload.archivedBudgets)
         } else {
+            payload.pockets.forEach { repository.saveSavingsPocket(it) }
             if (reusable.isNotEmpty()) {
                 repository.upsertTransactions(reusable)
             }

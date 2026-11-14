@@ -8,6 +8,9 @@ import com.serranoie.app.minus.data.local.AppDatabase
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
+import com.serranoie.app.minus.domain.model.Transaction
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -47,6 +50,7 @@ class BudgetRepositoryImplTest {
             categoryDao = database.categoryDao(),
             queuedTransactionDao = database.queuedTransactionDao(),
             paidRecurrentOccurrenceDao = database.paidRecurrentOccurrenceDao(),
+            savingsPocketDao = database.savingsPocketDao(),
         )
     }
 
@@ -89,5 +93,47 @@ class BudgetRepositoryImplTest {
         val reloaded = repository.getBudgetSettingsSync()
 
         assertThat(reloaded?.rollOverLimit).isNull()
+    }
+
+    @Test
+    fun deletingAnArchivedPeriodKeepsItsPocketRows() = runBlocking {
+        val day = LocalDate.now().minusMonths(1).atTime(12, 0)
+        repository.addTransaction(Transaction(amount = BigDecimal("100"), date = day, periodId = 10L))
+        repository.addTransaction(
+            Transaction(amount = BigDecimal("500"), date = day, periodId = 10L, isAdjustment = true, pocketId = 3L),
+        )
+
+        repository.deleteArchivedBudget(10L)
+        val remaining = repository.getTransactions().first()
+
+        assertThat(remaining.map { it.pocketId }).containsExactly(3L)
+    }
+
+    @Test
+    fun aWithdrawalAboveThePocketBalanceIsRejected() = runBlocking {
+        val day = LocalDate.now().atTime(12, 0)
+        repository.saveSavingsPocket(SavingsPocket(id = 3L, name = "Trip"))
+        repository.addTransaction(
+            Transaction(amount = BigDecimal("400"), date = day, periodId = 1L, isAdjustment = true, pocketId = 3L),
+        )
+        val withdrawal = Transaction(amount = BigDecimal("-400.01"), date = day, periodId = 1L, isAdjustment = true, pocketId = 3L)
+
+        assertThat(repository.addPocketWithdrawal(withdrawal)).isFalse()
+        assertThat(repository.addPocketWithdrawal(withdrawal.copy(amount = BigDecimal("-400")))).isTrue()
+        assertThat(repository.getTransactions().first()).hasSize(2)
+    }
+
+    @Test
+    fun aPocketThatReceivedMoneyIsNotDeletedAndADeletedPocketRejectsDeposits() = runBlocking {
+        val day = LocalDate.now().atTime(12, 0)
+        val pocketId = repository.saveSavingsPocket(SavingsPocket(name = "Trip"))
+        val deposit = Transaction(amount = BigDecimal("75"), date = day, periodId = 1L, isAdjustment = true, pocketId = pocketId)
+
+        assertThat(repository.addPocketDeposit(deposit)).isTrue()
+        assertThat(repository.deleteSavingsPocket(pocketId)).isFalse()
+        assertThat(repository.addPocketWithdrawal(deposit.copy(amount = BigDecimal("-75")))).isTrue()
+        assertThat(repository.deleteSavingsPocket(pocketId)).isTrue()
+        assertThat(repository.addPocketDeposit(deposit)).isFalse()
+        assertThat(repository.getTransactions().first()).hasSize(2)
     }
 }

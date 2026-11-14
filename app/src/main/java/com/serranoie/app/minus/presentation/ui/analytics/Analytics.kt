@@ -81,6 +81,8 @@ import androidx.compose.ui.zIndex
 import androidx.fragment.app.FragmentActivity
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.calculator.categoryLimitStatuses
+import com.serranoie.app.minus.domain.calculator.SavingsPocketStatus
+import com.serranoie.app.minus.domain.calculator.periodPocketFlow
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
@@ -191,6 +193,10 @@ data class AnalyticsActions(
     val onUpdateTransaction: (Transaction) -> Unit = {},
     val onDeleteTransaction: (Transaction) -> Unit = {},
     val onDeleteArchivedPeriod: (Long) -> Unit = {},
+    val onCreatePocket: (String, BigDecimal?) -> Unit = { _, _ -> },
+    val onPocketDeposit: (Long, BigDecimal) -> Unit = { _, _ -> },
+    val onPocketWithdraw: (Long, BigDecimal) -> Unit = { _, _ -> },
+    val onDeletePocket: (Long) -> Unit = {},
 )
 
 data class Size(val width: Dp, val height: Dp)
@@ -201,6 +207,7 @@ fun Analytics(
     state: AnalyticsState = AnalyticsState(),
     archivedBudgets: List<ArchivedBudget> = emptyList(),
     categories: List<Category> = emptyList(),
+    pockets: List<SavingsPocketStatus> = emptyList(),
     actions: AnalyticsActions = AnalyticsActions(),
     activityResultRegistryOwner: ActivityResultRegistryOwner? = null,
     showTutorialOverride: Boolean? = null,
@@ -473,105 +480,126 @@ fun Analytics(
                     )
                 }
 
-                AnimatedContent(
-                    targetState = state,
-                    contentKey = { it.periodKey },
-                    transitionSpec = {
-                        fadeIn(animationSpec = tween(500)) togetherWith fadeOut(
-                            animationSpec = tween(
-                                500
-                            )
-                        )
-                    }, label = "AnalyticsContentTransition"
-                ) { shown ->
-                    logcat("Analytics") { "Displaying state for: ${shown.periodKey}" }
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .onGloballyPositioned { scrollableContainerCoordinates = it }
-                            .verticalScroll(scrollState)) {
-                        if (shown.periodFinished) {
-                            FinishedPeriodHeader(
-                                scrollState = scrollState,
-                                hasSpends = shown.spends.isNotEmpty(),
-                                isOverBudget = shown.spends.sumOf { it.amount } > shown.wholeBudget,
-                            )
-                        }
-                        if (shown.budgetSettingsForDisplay == null) {
-                            AnalyticsNoPeriodState(modifier = Modifier.fillMaxWidth())
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-                        BudgetGraph(
-                            state = shown,
-                            onGranularityChanged = actions.onGranularityChanged,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                                .bringIntoViewRequester(bringIntoViewRequesters[2]!!)
-                                .markIfInOrder(2),
-                            onDayTap = openDaySheet,
-                            onSelectedDateChanged = { date -> selectedChartDate = date },
-                            selectedDate = selectedChartDate,
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        AnalyticsResponsiveLayout(
-                            useTabletLayout = useWideAnalyticsLayout,
-                            state = shown,
-                            categories = categories,
-                            selectedCategoryName = selectedCategory?.categoryName,
-                            onShowHistory = {
-                                showHistorySheet = true
-                                view.weakHapticFeedback()
-                            },
-                            onShowSubscriptions = actions.onNavigateToSubscriptions,
-                            onShowCreditDetails = { showCreditSheet = true },
-                            onCategoryClick = { categoryName, categorySpends ->
-                                selectedCategory = shown.toCategoryAnalyticsState(
-                                    categoryName, categorySpends
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .onGloballyPositioned { scrollableContainerCoordinates = it }
+                        .verticalScroll(scrollState)
+                ) {
+                    AnimatedContent(
+                        targetState = state,
+                        contentKey = { it.periodKey },
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(500)) togetherWith fadeOut(
+                                animationSpec = tween(
+                                    500
                                 )
-                                view.weakHapticFeedback()
-                            },
-                            onDayClick = onCalendarDayClick,
-                            bringIntoViewRequesters = bringIntoViewRequesters,
-                            markIfInOrder = markIfInOrder,
-                        )
-                        val limitStatuses = remember(shown) {
-                            val settings = shown.budgetSettingsForDisplay
-                            if (shown.isHistoricalView || settings == null) {
-                                emptyList()
-                            } else {
-                                categoryLimitStatuses(
-                                    categories = shown.categories,
-                                    transactions = shown.allTransactions,
-                                    periodStart = settings.startDate,
-                                    periodEnd = settings.getPeriodEndDate(),
-                                    today = LocalDate.now(),
-                                    firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek,
-                                ).values.sortedByDescending { it.spent.divide(it.limit.amount, 4, RoundingMode.HALF_UP) }
+                            )
+                        }, label = "AnalyticsContentTransition"
+                    ) { shown ->
+                        logcat("Analytics") { "Displaying state for: ${shown.periodKey}" }
+                        Column(Modifier.fillMaxWidth()) {
+                            if (shown.periodFinished) {
+                                FinishedPeriodHeader(
+                                    scrollState = scrollState,
+                                    hasSpends = shown.spends.isNotEmpty(),
+                                    isOverBudget = shown.spends.sumOf { it.amount } > shown.wholeBudget,
+                                )
                             }
-                        }
-                        if (limitStatuses.isNotEmpty()) {
+                            if (shown.budgetSettingsForDisplay == null) {
+                                AnalyticsNoPeriodState(modifier = Modifier.fillMaxWidth())
+                            }
+    
                             Spacer(modifier = Modifier.height(16.dp))
-                            CategoryLimitsCard(
-                                statuses = limitStatuses,
-                                currencyCode = shown.currencyCode,
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                            )
-                        }
-                        if (shown.wholeBudget > BigDecimal.ZERO) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            SavingsRecommendationCard(
-                                budget = shown.wholeBudget,
-                                recurringInPeriod = shown.recurringInPeriod,
-                                oneTimeSpends = shown.oneTimeSpends,
-                                currency = shown.currencyCode,
-                                preferences = shown.savingsPreferences,
+                            BudgetGraph(
+                                state = shown,
+                                onGranularityChanged = actions.onGranularityChanged,
                                 modifier = Modifier.padding(horizontal = 16.dp)
-                                    .bringIntoViewRequester(bringIntoViewRequesters[5]!!)
-                                    .markIfInOrder(5),
+                                    .bringIntoViewRequester(bringIntoViewRequesters[2]!!)
+                                    .markIfInOrder(2),
+                                onDayTap = openDaySheet,
+                                onSelectedDateChanged = { date -> selectedChartDate = date },
+                                selectedDate = selectedChartDate,
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            AnalyticsResponsiveLayout(
+                                useTabletLayout = useWideAnalyticsLayout,
+                                state = shown,
+                                categories = categories,
+                                selectedCategoryName = selectedCategory?.categoryName,
+                                onShowHistory = {
+                                    showHistorySheet = true
+                                    view.weakHapticFeedback()
+                                },
+                                onShowSubscriptions = actions.onNavigateToSubscriptions,
+                                onShowCreditDetails = { showCreditSheet = true },
+                                onCategoryClick = { categoryName, categorySpends ->
+                                    selectedCategory = shown.toCategoryAnalyticsState(
+                                        categoryName, categorySpends
+                                    )
+                                    view.weakHapticFeedback()
+                                },
+                                onDayClick = onCalendarDayClick,
+                                bringIntoViewRequesters = bringIntoViewRequesters,
+                                markIfInOrder = markIfInOrder,
+                            )
+                            val limitStatuses = remember(shown) {
+                                val settings = shown.budgetSettingsForDisplay
+                                if (shown.isHistoricalView || settings == null) {
+                                    emptyList()
+                                } else {
+                                    categoryLimitStatuses(
+                                        categories = shown.categories,
+                                        transactions = shown.allTransactions,
+                                        periodStart = settings.startDate,
+                                        periodEnd = settings.getPeriodEndDate(),
+                                        today = LocalDate.now(),
+                                        firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek,
+                                    ).values.sortedByDescending { it.spent.divide(it.limit.amount, 4, RoundingMode.HALF_UP) }
+                                }
+                            }
+                            if (limitStatuses.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                CategoryLimitsCard(
+                                    statuses = limitStatuses,
+                                    currencyCode = shown.currencyCode,
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                )
+                            }
+                            if (!shown.isHistoricalView) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                SavingsPocketsCard(
+                                    pockets = pockets,
+                                    currencyCode = shown.currencyCode,
+                                    canMoveMoney = !shown.periodFinished,
+                                    onCreatePocket = actions.onCreatePocket,
+                                    onDeposit = actions.onPocketDeposit,
+                                    onWithdraw = actions.onPocketWithdraw,
+                                    onDelete = actions.onDeletePocket,
+                                periodFlow = if (shown.periodFinished) {
+                                    remember(shown.transactions) { periodPocketFlow(shown.transactions) }
+                                } else {
+                                    null
+                                },
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                )
+                            }
+                            if (shown.wholeBudget > BigDecimal.ZERO) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                SavingsRecommendationCard(
+                                    budget = shown.wholeBudget,
+                                    recurringInPeriod = shown.recurringInPeriod,
+                                    oneTimeSpends = shown.oneTimeSpends,
+                                    currency = shown.currencyCode,
+                                    preferences = shown.savingsPreferences,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                        .bringIntoViewRequester(bringIntoViewRequesters[5]!!)
+                                        .markIfInOrder(5),
+                                )
+                            }
+    
+                            Spacer(modifier = Modifier.height(80.dp + navigationBarHeight))
                         }
-
-                        Spacer(modifier = Modifier.height(80.dp + navigationBarHeight))
                     }
                 }
 

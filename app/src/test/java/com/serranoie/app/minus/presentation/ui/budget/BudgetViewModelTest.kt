@@ -11,6 +11,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.time.MidnightTransitionManager
@@ -39,6 +40,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -89,18 +91,21 @@ class BudgetViewModelTest {
     private val paidOccurrencesFlow = MutableStateFlow<Set<PaidRecurrentOccurrence>>(emptySet())
     private val pendingRolloverFlow =
         MutableStateFlow(BigDecimal.ZERO to null as RemainingBudgetStrategy?)
+    private val pocketsFlow = MutableStateFlow<List<SavingsPocket>>(emptyList())
 
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         every { budgetRepository.getBudgetSettings() } returns settingsFlow
         every { budgetRepository.getTransactions() } returns transactionsFlow
+        coEvery { budgetRepository.addPocketDeposit(any()) } returns true
         every { budgetRepository.getQueuedTransactions() } returns queuedTransactionsFlow
         every { budgetRepository.getActiveCategories() } returns categoriesFlow
         every { budgetRepository.getPaidRecurrentOccurrences() } returns paidOccurrencesFlow
         every { observeCurrentPeriodBoundaryUseCase() } returns boundaryFlow
         every { observeCurrentPeriodRolloverUseCase() } returns rolloverFlow
         every { midnightTransitionManager.pendingRollover } returns pendingRolloverFlow
+        every { budgetRepository.getSavingsPockets() } returns pocketsFlow
         every { settingsRepository.observeSettings() } returns MutableStateFlow(UserSettings.DEFAULT)
         every { context.getString(R.string.expense_queued_for_next_period) } returns "Gasto en cola para el proximo periodo"
         every { context.getString(R.string.history_snackbar_delete_transaction_failed) } returns "Could not delete transaction"
@@ -680,5 +685,256 @@ class BudgetViewModelTest {
         )
 
         coVerify { budgetRepository.setCategoryLimit("Coffee", null) }
+    }
+
+    private val trip = SavingsPocket(id = 1, name = "Trip")
+    private val house = SavingsPocket(id = 2, name = "House")
+
+    private fun typeAmount(viewModel: BudgetViewModel, digits: String) {
+        digits.forEach { viewModel.processIntent(BudgetNumpadIntent.NumberTapped(it.toString())) }
+    }
+
+    @Test
+    fun `pockets are exposed so the numpad can offer set aside`() = runTest {
+        pocketsFlow.value = listOf(trip, house)
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitCondition { it.pockets.size == 2 }
+            assertThat(state.isSetAsideEnabled).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `set aside and recurrent switch each other off`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.isNotEmpty() }
+            viewModel.processIntent(BudgetEditorIntent.SetRecurrentEnabled(true))
+            awaitCondition { it.isRecurrentEnabled }
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            awaitCondition { it.isSetAsideEnabled && !it.isRecurrentEnabled }
+            viewModel.processIntent(BudgetEditorIntent.SetRecurrentEnabled(true))
+            awaitCondition { it.isRecurrentEnabled && !it.isSetAsideEnabled }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `applying with set aside on saves the amount into the only pocket instead of an expense`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        every { context.getString(R.string.pockets_saved_to, *anyVararg()) } returns "500 saved to Trip"
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.isNotEmpty() }
+            typeAmount(viewModel, "500")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            val ready = awaitCondition { it.isSetAsideEnabled && it.numpadInput == "500" }
+            assertThat(ready.selectedPocketId).isEqualTo(1L)
+
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            val done = awaitCondition { it.numpadInput == "" && !it.isSetAsideEnabled }
+            assertThat(done.calculationPreview).isEqualTo("500 saved to Trip")
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify {
+            budgetRepository.addPocketDeposit(
+                match { it.pocketId == 1L && it.isAdjustment && it.amount.compareTo(BigDecimal("500")) == 0 },
+            )
+        }
+        coVerify(exactly = 0) {
+            transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
+        }
+    }
+
+    @Test
+    fun `with several pockets the picked one receives the money`() = runTest {
+        pocketsFlow.value = listOf(trip, house)
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.size == 2 }
+            typeAmount(viewModel, "80")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            viewModel.processIntent(BudgetEditorIntent.PocketSelected(2L))
+            awaitCondition { it.selectedPocketId == 2L }
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            awaitCondition { it.numpadInput == "" }
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify { budgetRepository.addPocketDeposit(match { it.pocketId == 2L }) }
+    }
+
+    @Test
+    fun `with several pockets and none picked nothing is saved and a message asks for one`() = runTest {
+        pocketsFlow.value = listOf(trip, house)
+        every { context.getString(R.string.pockets_set_aside_pick) } returns "Pick a pocket"
+        val viewModel = newViewModel()
+
+        viewModel.effects.test {
+            viewModel.uiState.first { it.pockets.size == 2 }
+            typeAmount(viewModel, "80")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            assertThat(awaitItem()).isEqualTo(BudgetUiEffect.ShowMessage("Pick a pocket"))
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 0) { budgetRepository.addPocketDeposit(any()) }
+        assertThat(viewModel.uiState.value.numpadInput).isEqualTo("80")
+    }
+
+    @Test
+    fun `a split amount cannot be set aside`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        every { context.getString(R.string.pockets_set_aside_single_amount) } returns "One amount"
+        val viewModel = newViewModel()
+
+        viewModel.effects.test {
+            viewModel.uiState.first { it.pockets.isNotEmpty() }
+            typeAmount(viewModel, "15")
+            viewModel.processIntent(BudgetNumpadIntent.OperatorTapped('+'))
+            typeAmount(viewModel, "125")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            assertThat(awaitItem()).isEqualTo(BudgetUiEffect.ShowMessage("One amount"))
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 0) { budgetRepository.addPocketDeposit(any()) }
+    }
+
+    @Test
+    fun `clearing the numpad switches set aside off`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.isNotEmpty() }
+            typeAmount(viewModel, "50")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            awaitCondition { it.isSetAsideEnabled }
+            viewModel.processIntent(BudgetNumpadIntent.BackspaceTapped)
+            viewModel.processIntent(BudgetNumpadIntent.BackspaceTapped)
+            awaitCondition { it.numpadInput == "" && !it.isSetAsideEnabled }
+
+            typeAmount(viewModel, "7")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            awaitCondition { it.isSetAsideEnabled }
+            viewModel.processIntent(BudgetNumpadIntent.ResetInputTapped)
+            awaitCondition { it.numpadInput == "" && !it.isSetAsideEnabled }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `a staged set aside opens the numpad with the amount and the pocket picked`() = runTest {
+        pocketsFlow.value = listOf(trip, house)
+        val staged = MutableStateFlow<String?>(null)
+        every { settingsRepository.observeString(com.serranoie.app.minus.domain.calculator.PENDING_SET_ASIDE_KEY_NAME) } returns staged
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.size == 2 }
+            staged.value = "2|2000"
+            val state = awaitCondition { it.numpadInput == "2000" && it.isSetAsideEnabled }
+            assertThat(state.selectedPocketId).isEqualTo(2L)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify { settingsRepository.setString(com.serranoie.app.minus.domain.calculator.PENDING_SET_ASIDE_KEY_NAME, "") }
+    }
+
+    @Test
+    fun `a staged pocket that no longer exists asks for a pick instead of using another pocket`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        val staged = MutableStateFlow<String?>(null)
+        every { settingsRepository.observeString(com.serranoie.app.minus.domain.calculator.PENDING_SET_ASIDE_KEY_NAME) } returns staged
+        every { context.getString(R.string.pockets_set_aside_pick) } returns "Pick a pocket"
+        val viewModel = newViewModel()
+
+        viewModel.effects.test {
+            viewModel.uiState.first { it.pockets.isNotEmpty() }
+            staged.value = "9|50"
+            viewModel.uiState.first { it.numpadInput == "50" && it.isSetAsideEnabled }
+            assertThat(viewModel.uiState.value.selectedPocketId).isNull()
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            assertThat(awaitItem()).isEqualTo(BudgetUiEffect.ShowMessage("Pick a pocket"))
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 0) { budgetRepository.addPocketDeposit(any()) }
+    }
+
+    @Test
+    fun `a second apply while a set aside is saving is ignored`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        val release = CompletableDeferred<Unit>()
+        coEvery { budgetRepository.addPocketDeposit(any()) } coAnswers { release.await(); true }
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.isNotEmpty() }
+            typeAmount(viewModel, "50")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            awaitCondition { it.isSetAsideEnabled }
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            release.complete(Unit)
+            awaitCondition { it.numpadInput == "" }
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 1) { budgetRepository.addPocketDeposit(any()) }
+    }
+
+    @Test
+    fun `apply is ignored while a set aside save is pending even after set aside is switched off`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        val release = CompletableDeferred<Unit>()
+        coEvery { budgetRepository.addPocketDeposit(any()) } coAnswers { release.await(); true }
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.isNotEmpty() }
+            typeAmount(viewModel, "50")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            awaitCondition { it.isSetAsideEnabled }
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(false))
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            release.complete(Unit)
+            awaitCondition { it.numpadInput == "" }
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 0) {
+            transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
+        }
+    }
+
+    @Test
+    fun `a set aside into a pocket deleted meanwhile keeps the amount on the numpad`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        coEvery { budgetRepository.addPocketDeposit(any()) } returns false
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.isNotEmpty() }
+            typeAmount(viewModel, "50")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            awaitCondition { it.isSetAsideEnabled }
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            assertThat(viewModel.uiState.value.numpadInput).isEqualTo("50")
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
     }
 }

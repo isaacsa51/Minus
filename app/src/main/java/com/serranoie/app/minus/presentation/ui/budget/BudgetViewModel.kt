@@ -78,14 +78,31 @@ import kotlinx.coroutines.yield
 import kotlinx.serialization.SerializationException
 import logcat.asLog
 import logcat.logcat
+import com.serranoie.app.minus.domain.model.SavingsPocket
+import com.serranoie.app.minus.domain.calculator.PENDING_SET_ASIDE_KEY_NAME
+import com.serranoie.app.minus.domain.calculator.decodePendingSetAside
+import com.serranoie.app.minus.domain.calculator.pocketEntry
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.WeekFields
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 private const val TAG = "BudgetViewModel - ISAAC"
+private const val SET_ASIDE_CONFIRMATION_MILLIS = 3_000L
+
+private data class SetAsideState(
+    val enabled: Boolean = false,
+    val pocketId: Long? = null,
+    val confirmation: String? = null,
+) {
+    fun selectedPocket(pockets: List<SavingsPocket>): SavingsPocket? =
+        if (pocketId == null) pockets.singleOrNull() else pockets.firstOrNull { it.id == pocketId }
+}
 
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
@@ -131,6 +148,10 @@ class BudgetViewModel @Inject constructor(
 
     private val retryLoad = MutableStateFlow(0)
 
+    private val setAside = MutableStateFlow(SetAsideState())
+
+    private val setAsideSaving = AtomicBoolean(false)
+
     private var lastGoodState = BudgetUiState.INITIAL
 
     private fun observeBudgetUiState(): Flow<BudgetUiState> = combine(
@@ -147,6 +168,8 @@ class BudgetViewModel @Inject constructor(
         budgetRepository.getPaidRecurrentOccurrences(),
         midnightTransitionManager.pendingRollover,
         settingsRepository.observeSettings(),
+        budgetRepository.getSavingsPockets(),
+        setAside,
     ) { params ->
         val settings = params[0] as BudgetSettings?
         val transactions = params[1] as List<Transaction>
@@ -164,6 +187,9 @@ class BudgetViewModel @Inject constructor(
         val pendingRolloverPair = params[11] as Pair<BigDecimal, RemainingBudgetStrategy?>
         val (pendingSurplusAmount, pendingSurplusStrategy) = pendingRolloverPair
         val userSettings = params[12] as UserSettings
+        @Suppress("UNCHECKED_CAST")
+        val pockets = params[13] as List<SavingsPocket>
+        val setAsideState = params[14] as SetAsideState
 
         val settingsWithRollover = settings?.copy(
             rollOverLimit = if (rolloverAmount > BigDecimal.ZERO) rolloverAmount else null,
@@ -233,7 +259,8 @@ class BudgetViewModel @Inject constructor(
             pendingExpensesForNextPeriod = queuedTransactions,
             creditOwed = creditOwed,
             debtAdjustedBalance = debtAdjustedBalance,
-            calculationPreview = calculateCalculationPreview(numpadInput, settings?.currencyCode ?: "USD"),
+            calculationPreview = setAsideState.confirmation
+                ?: calculateCalculationPreview(numpadInput, settings?.currencyCode ?: "USD"),
             numpadDraftAmount = parseNumpadDraftAmount(numpadInput),
             hasUnresolvedRolloverSurplus = pendingSurplusAmount > BigDecimal.ZERO && pendingSurplusStrategy == null,
             unresolvedSurplusAmount = pendingSurplusAmount.takeIf {
@@ -241,6 +268,9 @@ class BudgetViewModel @Inject constructor(
             },
             lastLeftoverChoice = userSettings.leftoverChoices.maxByOrNull { it.key }?.value,
             selectedViewPeriod = userSettings.budgetSplitViewPeriod,
+            pockets = pockets,
+            isSetAsideEnabled = setAsideState.enabled && pockets.isNotEmpty(),
+            selectedPocketId = setAsideState.selectedPocket(pockets)?.id,
         )
     }
 
@@ -264,6 +294,17 @@ class BudgetViewModel @Inject constructor(
             uiState.filter { it.error == null }.collect { baseState ->
                 budgetWidgetUpdater.update(baseState)
             }
+        }
+        viewModelScope.launch {
+            settingsRepository.observeString(PENDING_SET_ASIDE_KEY_NAME)
+                .filter { !it.isNullOrBlank() }
+                .collect { raw ->
+                    decodePendingSetAside(raw.orEmpty())?.let { (pocketId, amount) ->
+                        numpadController.setInput(amount)
+                        setAside.value = SetAsideState(enabled = true, pocketId = pocketId)
+                    }
+                    settingsRepository.setString(PENDING_SET_ASIDE_KEY_NAME, "")
+                }
         }
         viewModelScope.launch {
             settingsRepository.observeString(PENDING_QUICK_ADD_AMOUNT_KEY_NAME)
@@ -463,6 +504,7 @@ class BudgetViewModel @Inject constructor(
             intent = controllerIntent,
             currentIsCalculation = uiState.value.isCalculation,
         )
+        if (numpadController.input.value.isEmpty()) setAside.update { it.copy(enabled = false) }
 
         if (intent is BudgetNumpadIntent.ApplyTapped) handleApply()
         if (intent is BudgetNumpadIntent.TriggerTestNotifications) triggerTestNotifications()
@@ -512,10 +554,13 @@ class BudgetViewModel @Inject constructor(
                 hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
-            is BudgetEditorIntent.SetRecurrentEnabled -> editorStateController.process(
-                EditorIntent.SetRecurrentEnabled(intent.enabled),
-                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
-            )
+            is BudgetEditorIntent.SetRecurrentEnabled -> {
+                if (intent.enabled) setAside.update { it.copy(enabled = false) }
+                editorStateController.process(
+                    EditorIntent.SetRecurrentEnabled(intent.enabled),
+                    hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
+                )
+            }
 
             is BudgetEditorIntent.SetCreditEnabled -> editorStateController.process(
                 EditorIntent.SetCreditEnabled(intent.enabled),
@@ -537,6 +582,8 @@ class BudgetViewModel @Inject constructor(
                 hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
             )
 
+            is BudgetEditorIntent.SetSetAsideEnabled -> handleSetAsideToggle(intent.enabled)
+            is BudgetEditorIntent.PocketSelected -> setAside.update { it.copy(pocketId = intent.pocketId) }
             is BudgetEditorIntent.UpdateSettings -> handleUpdateSettings(intent.settings)
             is BudgetEditorIntent.DeleteTag -> handleDeleteTag(intent.tag)
             is BudgetEditorIntent.SetCategoryLimit -> handleSetCategoryLimit(intent)
@@ -580,8 +627,75 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
+    private fun handleSetAsideToggle(enabled: Boolean) {
+        setAside.update { it.copy(enabled = enabled, confirmation = null) }
+        if (enabled) {
+            editorStateController.process(
+                EditorIntent.SetRecurrentEnabled(false),
+                hasCreditCardCutoffDay = uiState.value.budgetSettings?.creditCardCutoffDay != null,
+            )
+        }
+    }
+
+    private suspend fun applySetAside() {
+        val amount = numpadController.input.value.toBigDecimalOrNull()?.takeIf { it.signum() > 0 }
+        if (amount == null) {
+            _effects.emit(BudgetUiEffect.ShowMessage(context.getString(R.string.pockets_set_aside_single_amount)))
+            return
+        }
+        val pocket = setAside.value.selectedPocket(budgetRepository.getSavingsPockets().first())
+        if (pocket == null) {
+            _effects.emit(BudgetUiEffect.ShowMessage(context.getString(R.string.pockets_set_aside_pick)))
+            return
+        }
+        val name = pocket.name.ifBlank { context.getString(R.string.pockets_goal_name) }
+        val saved = try {
+            budgetRepository.addPocketDeposit(
+                pocketEntry(
+                    pocket = pocket,
+                    amount = amount,
+                    withdraw = false,
+                    periodId = resolveActivePeriodId(),
+                    date = LocalDateTime.now(),
+                    label = name,
+                ),
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            errorLogRecorder.record("BudgetViewModel.applySetAside", e)
+            false
+        }
+        if (!saved) {
+            _effects.emit(BudgetUiEffect.ShowMessage(context.getString(R.string.pockets_action_failed)))
+            return
+        }
+        val currencyCode = uiState.value.budgetSettings?.currencyCode ?: "USD"
+        val confirmation = context.getString(
+            R.string.pockets_saved_to,
+            symbolOnlyCurrencyFormat(currencyCode).format(amount),
+            name,
+        )
+        setAside.value = SetAsideState(confirmation = confirmation)
+        applyTransactionActions(listOf(TransactionAction.ClearInput))
+        viewModelScope.launch {
+            delay(SET_ASIDE_CONFIRMATION_MILLIS)
+            setAside.update { if (it.confirmation == confirmation) it.copy(confirmation = null) else it }
+        }
+    }
+
     private fun handleApply() {
         viewModelScope.launch {
+            if (setAsideSaving.get()) return@launch
+            if (setAside.value.enabled) {
+                if (!setAsideSaving.compareAndSet(false, true)) return@launch
+                try {
+                    applySetAside()
+                } finally {
+                    setAsideSaving.set(false)
+                }
+                return@launch
+            }
             val extraNoteEnabled = settingsRepository.observeSettings().first().extraNoteEnabled
             val actions = transactionActionsController.apply(
                 input = numpadController.input.value,

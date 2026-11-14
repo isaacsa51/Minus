@@ -2,8 +2,10 @@ package com.serranoie.app.minus.domain.time
 
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.calculator.pocketEntry
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,11 +13,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -52,6 +57,8 @@ class MidnightPeriodChecker @Inject constructor(
     val shouldShowTransitionDialog: StateFlow<Boolean> = _shouldShowTransitionDialog.asStateFlow()
 
     private val _needsBudgetSetup = MutableStateFlow(false)
+
+    private val settlementLock = Mutex()
     val needsBudgetSetup: StateFlow<Boolean> = _needsBudgetSetup.asStateFlow()
 
     suspend fun handleEndingPeriod() {
@@ -111,7 +118,7 @@ class MidnightPeriodChecker @Inject constructor(
 
         when (settings.remainingBudgetStrategy) {
             RemainingBudgetStrategy.ASK_ALWAYS -> {
-                settingsRepository.markSurplusUnresolved(endingPeriodState.remainingAmount)
+                markSurplusUnresolved(endingPeriodState.remainingAmount)
                 _midnightTransitionData.value = MidnightTransitionData(
                     periodStartDate = periodStartDate,
                     periodEndDate = lastPeriodEndDate,
@@ -249,7 +256,7 @@ class MidnightPeriodChecker @Inject constructor(
 
         when (settings.remainingBudgetStrategy) {
             RemainingBudgetStrategy.ASK_ALWAYS -> {
-                settingsRepository.markSurplusUnresolved(remainingAmount)
+                markSurplusUnresolved(remainingAmount)
                 _midnightTransitionData.value = MidnightTransitionData(
                     periodStartDate = settings.startDate,
                     periodEndDate = LocalDate.now(),
@@ -276,11 +283,16 @@ class MidnightPeriodChecker @Inject constructor(
     val pendingRollover: Flow<Pair<BigDecimal, RemainingBudgetStrategy?>> =
         settingsRepository.observePendingRollover()
 
-    suspend fun resolveUnresolvedSurplus(strategy: RemainingBudgetStrategy?) {
+    suspend fun resolveUnresolvedSurplus(strategy: RemainingBudgetStrategy?) = settlementLock.withLock {
         val (pendingAmount, _) = settingsRepository.getPendingRollover()
         if (pendingAmount <= BigDecimal.ZERO) {
             onTransitionDialogConfirmed()
-            return
+            return@withLock
+        }
+        if (alreadySwept()) {
+            settingsRepository.clearPendingRollover()
+            onTransitionDialogConfirmed()
+            return@withLock
         }
 
         val currentSettings = budgetRepository.getBudgetSettingsSync()
@@ -333,6 +345,31 @@ class MidnightPeriodChecker @Inject constructor(
         onTransitionDialogConfirmed()
     }
 
+    suspend fun sweepSurplusToPocket(pocket: SavingsPocket, label: String = pocket.name) = settlementLock.withLock {
+        val (pendingAmount, _) = settingsRepository.getPendingRollover()
+        if (pendingAmount > BigDecimal.ZERO) {
+            val now = LocalDateTime.now()
+            val periodEnd = budgetRepository.getBudgetSettingsSync()?.getPeriodEndDate()?.atTime(LocalTime.of(23, 59))
+            val sourcePeriodId = settingsRepository.getPendingRolloverPeriodId()?.takeIf { it > 0L }
+                ?: settingsRepository.getCurrentPeriodId()
+            val saved = budgetRepository.addPocketDeposit(
+                pocketEntry(
+                    pocket = pocket,
+                    amount = pendingAmount,
+                    withdraw = false,
+                    periodId = sourcePeriodId,
+                    date = if (periodEnd != null && periodEnd.isBefore(now)) periodEnd else now,
+                    label = label,
+                    clientGeneratedId = sweepId(),
+                ),
+            )
+            check(saved) { "Pocket ${pocket.id} no longer exists" }
+            settingsRepository.clearPendingRollover()
+            logcat { "Swept surplus into pocket ${pocket.id}: amount=$pendingAmount" }
+        }
+        onTransitionDialogConfirmed()
+    }
+
     suspend fun reopenUnresolvedSurplusDialog() {
         val (pendingAmount, strategy) = settingsRepository.getPendingRollover()
         if (pendingAmount <= BigDecimal.ZERO || strategy != null) return
@@ -365,7 +402,26 @@ class MidnightPeriodChecker @Inject constructor(
     private suspend fun enqueuePendingRollover(
         strategy: RemainingBudgetStrategy,
         remainingAmount: BigDecimal,
-    ) {
-        settingsRepository.setPendingRollover(remainingAmount, strategy)
+    ) = settlementLock.withLock {
+        settingsRepository.setPendingRollover(uncreditedEarlierSurplus().add(remainingAmount), strategy)
     }
+
+    private suspend fun markSurplusUnresolved(amount: BigDecimal) = settlementLock.withLock {
+        settingsRepository.markSurplusUnresolved(uncreditedEarlierSurplus().add(amount))
+    }
+
+    private suspend fun uncreditedEarlierSurplus(): BigDecimal {
+        val (pendingAmount, _) = settingsRepository.getPendingRollover()
+        if (pendingAmount <= BigDecimal.ZERO) return BigDecimal.ZERO
+        if (alreadySwept()) {
+            settingsRepository.clearPendingRollover()
+            return BigDecimal.ZERO
+        }
+        val sourcePeriodId = settingsRepository.getPendingRolloverPeriodId() ?: return BigDecimal.ZERO
+        return if (sourcePeriodId != settingsRepository.getCurrentPeriodId()) pendingAmount else BigDecimal.ZERO
+    }
+
+    private suspend fun sweepId() = "pocket-sweep-${settingsRepository.getOrCreatePendingRolloverId()}"
+
+    private suspend fun alreadySwept() = budgetRepository.existsTransactionByClientGeneratedId(sweepId())
 }

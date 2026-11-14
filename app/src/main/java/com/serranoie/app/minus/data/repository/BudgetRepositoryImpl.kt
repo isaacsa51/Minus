@@ -7,12 +7,14 @@ import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
 import com.serranoie.app.minus.data.local.dao.PaidRecurrentOccurrenceDao
 import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
+import com.serranoie.app.minus.data.local.dao.SavingsPocketDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import com.serranoie.app.minus.data.local.entity.ArchivedBudgetEntity
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
 import com.serranoie.app.minus.data.local.entity.CategoryEntity
 import com.serranoie.app.minus.data.local.entity.PaidRecurrentOccurrenceEntity
 import com.serranoie.app.minus.data.local.entity.QueuedTransactionEntity
+import com.serranoie.app.minus.data.local.entity.SavingsPocketEntity
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetPeriod
@@ -26,6 +28,7 @@ import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -46,6 +49,7 @@ class BudgetRepositoryImpl @Inject constructor(
     private val categoryDao: CategoryDao,
     private val queuedTransactionDao: QueuedTransactionDao,
     private val paidRecurrentOccurrenceDao: PaidRecurrentOccurrenceDao,
+    private val savingsPocketDao: SavingsPocketDao,
 ) : BudgetRepository {
     private fun TransactionEntity.toDomain(): Transaction = Transaction(
         id = this.id,
@@ -72,7 +76,8 @@ class BudgetRepositoryImpl @Inject constructor(
         categoryId = this.categoryId,
         isCredit = this.isCredit,
         isCreditPaid = this.isCreditPaid,
-        isAdjustment = this.isAdjustment
+        isAdjustment = this.isAdjustment,
+        pocketId = this.pocketId,
     )
 
     private fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
@@ -91,7 +96,8 @@ class BudgetRepositoryImpl @Inject constructor(
         categoryId = this.categoryId,
         isCredit = this.isCredit,
         isCreditPaid = this.isCreditPaid,
-        isAdjustment = this.isAdjustment
+        isAdjustment = this.isAdjustment,
+        pocketId = this.pocketId,
     )
 
     private fun QueuedTransactionEntity.toDomain(): Transaction = Transaction(
@@ -256,6 +262,35 @@ class BudgetRepositoryImpl @Inject constructor(
         return rowId != -1L
     }
 
+    override suspend fun addPocketWithdrawal(transaction: Transaction): Boolean {
+        val pocketId = transaction.pocketId ?: return false
+        return appDatabase.withTransaction {
+            if (!savingsPocketDao.exists(pocketId) || transaction.amount.abs() > pocketBalance(pocketId)) {
+                false
+            } else {
+                transactionDao.insert(transaction.toEntity())
+                true
+            }
+        }
+    }
+
+    override suspend fun addPocketDeposit(transaction: Transaction): Boolean {
+        val pocketId = transaction.pocketId ?: return false
+        return appDatabase.withTransaction {
+            when {
+                !savingsPocketDao.exists(pocketId) -> false
+                transactionDao.insertIgnore(transaction.toEntity()) != -1L -> true
+                else -> transaction.clientGeneratedId
+                    ?.let { transactionDao.getByClientGeneratedId(it) }
+                    ?.let { it.pocketId == pocketId && BigDecimal(it.amount).compareTo(transaction.amount) == 0 }
+                    ?: false
+            }
+        }
+    }
+
+    private suspend fun pocketBalance(pocketId: Long): BigDecimal =
+        transactionDao.getByPocketId(pocketId).sumOf { BigDecimal(it.amount) }
+
     override suspend fun updateTransaction(transaction: Transaction) {
         transactionDao.update(transaction.toEntity())
     }
@@ -284,11 +319,14 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun replaceAllTransactions(
         transactions: List<Transaction>,
-        paidOccurrences: List<PaidRecurrentOccurrence>
+        paidOccurrences: List<PaidRecurrentOccurrence>,
+        pockets: List<SavingsPocket>,
     ) {
         appDatabase.withTransaction {
             transactionDao.deleteAll()
             paidRecurrentOccurrenceDao.deleteAll()
+            savingsPocketDao.deleteAll()
+            pockets.forEach { savingsPocketDao.upsert(it.toEntity()) }
             val (fresh, reusable) = transactions.partition { it.id == 0L }
             transactionDao.insertAllOrReplace(reusable.map { it.toEntity() })
             val restoredIds = reusable.associate { it.id to it.id }.toMutableMap()
@@ -506,4 +544,38 @@ class BudgetRepositoryImpl @Inject constructor(
             archivedBudgetDao.deleteById(periodId)
         }
     }
+
+    override fun getSavingsPockets(): Flow<List<SavingsPocket>> =
+        savingsPocketDao.getAll().map { entities ->
+            entities.map { entity ->
+                SavingsPocket(
+                    id = entity.id,
+                    name = entity.name,
+                    target = entity.targetAmount?.toBigDecimalOrNull(),
+                    targetDate = entity.targetEpochDay?.let(LocalDate::ofEpochDay),
+                    createdAt = entity.createdAt,
+                )
+            }
+        }
+
+    override suspend fun saveSavingsPocket(pocket: SavingsPocket): Long =
+        savingsPocketDao.upsert(pocket.toEntity())
+
+    private fun SavingsPocket.toEntity() = SavingsPocketEntity(
+        id = id,
+        name = name,
+        targetAmount = target?.toPlainString(),
+        targetEpochDay = targetDate?.toEpochDay(),
+        createdAt = createdAt,
+    )
+
+    override suspend fun deleteSavingsPocket(pocketId: Long): Boolean =
+        appDatabase.withTransaction {
+            if (pocketBalance(pocketId).signum() != 0) {
+                false
+            } else {
+                savingsPocketDao.deleteById(pocketId)
+                true
+            }
+        }
 }

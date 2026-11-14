@@ -4,12 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.calculator.SavingsPocketStatus
+import com.serranoie.app.minus.domain.calculator.pocketEntry
+import com.serranoie.app.minus.domain.calculator.pocketStatuses
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
@@ -26,12 +30,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 import javax.inject.Inject
@@ -50,11 +56,13 @@ data class AnalyticsUiState(
     val rolloverAmount: BigDecimal = BigDecimal.ZERO,
     val rolloverCarryForward: Boolean = false,
     val graphGranularity: GraphGranularity = GraphGranularity.DAYS,
+    val pockets: List<SavingsPocketStatus> = emptyList(),
 )
 
 sealed interface AnalyticsUiEffect {
     data object NavigateToMainWithWallet : AnalyticsUiEffect
     data object NavigateToMain : AnalyticsUiEffect
+    data object PocketActionFailed : AnalyticsUiEffect
 }
 
 @HiltViewModel
@@ -83,6 +91,7 @@ class AnalyticsViewModel @Inject constructor(
         _selectedPeriodId,
         budgetRepository.getAllCategories().distinctUntilChanged(),
         budgetRepository.getPaidRecurrentOccurrences().distinctUntilChanged(),
+        budgetRepository.getSavingsPockets().distinctUntilChanged(),
     ) { args: Array<Any?> ->
         try {
             val settings = args[0] as BudgetSettings?
@@ -96,6 +105,7 @@ class AnalyticsViewModel @Inject constructor(
             val selectedPeriodId = args[8] as Long?
             val allCategories = args[9] as List<Category>
             val paidOccurrences = args[10] as Set<PaidRecurrentOccurrence>
+            val pockets = args[11] as List<SavingsPocket>
 
             val currentPeriodId = periodBoundary.second
             val liveArchives = archives.map { it.withLiveSpentAmount(transactions, paidOccurrences) }
@@ -140,7 +150,8 @@ class AnalyticsViewModel @Inject constructor(
                 rolloverAmount = rollover.first,
                 rolloverCarryForward = rollover.second,
                 graphGranularity = granularity,
-                displayState = displayState
+                displayState = displayState,
+                pockets = pocketStatuses(pockets, transactions),
             )
         } catch (e: CancellationException) {
             throw e
@@ -274,7 +285,7 @@ class AnalyticsViewModel @Inject constructor(
         )
 
         val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
-            .filter { it.amount > BigDecimal.ZERO }
+            .filter { it.amount > BigDecimal.ZERO && !it.isAdjustment }
         val actualIncomes = (oneTimeSpends + paidRecurring).distinctBy { it.id }
             .filter { it.amount < BigDecimal.ZERO }
         val budgetSettings = archive.toBudgetSettings()
@@ -299,7 +310,7 @@ class AnalyticsViewModel @Inject constructor(
             allTransactions = allTransactions,
             spends = actualSpends,
             incomes = actualIncomes,
-            chartSpends = actualSpends.toChartSpends(),
+            chartSpends = actualSpends,
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
             wholeBudget = archive.totalBudget,
@@ -332,7 +343,9 @@ class AnalyticsViewModel @Inject constructor(
             today = end,
             paidOccurrences = paidOccurrences,
         )
-        return (oneTimeSpends + paidRecurring).distinctBy { it.id }.sumOf { it.amount }
+        return (oneTimeSpends + paidRecurring).distinctBy { it.id }
+            .filterNot { it.isAdjustment }
+            .sumOf { it.amount }
     }
 
     private fun ArchivedBudget.withLiveSpentAmount(
@@ -441,7 +454,7 @@ class AnalyticsViewModel @Inject constructor(
             spends = spends,
             incomes = incomes,
             decreases = decreases,
-            chartSpends = actualTransactions.toChartSpends(),
+            chartSpends = spends,
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
             wholeBudget = displayBudgetState.totalBudget,
@@ -641,10 +654,69 @@ class AnalyticsViewModel @Inject constructor(
         }
     }
 
+    fun onCreatePocket(name: String, target: BigDecimal?) {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty()) return
+        runPocketAction("AnalyticsViewModel.onCreatePocket") {
+            budgetRepository.saveSavingsPocket(
+                SavingsPocket(name = trimmed, target = target?.takeIf { it > BigDecimal.ZERO }),
+            )
+        }
+    }
+
+    fun onPocketDeposit(pocketId: Long, amount: BigDecimal, goalLabel: String = "") =
+        movePocketMoney(pocketId, amount, withdraw = false, goalLabel)
+
+    fun onPocketWithdraw(pocketId: Long, amount: BigDecimal, goalLabel: String = "") =
+        movePocketMoney(pocketId, amount, withdraw = true, goalLabel)
+
+    fun onDeletePocket(pocketId: Long) {
+        runPocketAction("AnalyticsViewModel.onDeletePocket") {
+            if (!budgetRepository.deleteSavingsPocket(pocketId)) {
+                _effects.value = AnalyticsUiEffect.PocketActionFailed
+            }
+        }
+    }
+
+    private fun movePocketMoney(pocketId: Long, amount: BigDecimal, withdraw: Boolean, goalLabel: String) {
+        if (amount <= BigDecimal.ZERO) return
+        runPocketAction("AnalyticsViewModel.movePocketMoney") {
+            val pocket = budgetRepository.getSavingsPockets().first().firstOrNull { it.id == pocketId }
+                ?: return@runPocketAction
+            val entry = pocketEntry(
+                pocket = pocket,
+                amount = amount,
+                withdraw = withdraw,
+                periodId = settingsRepository.getCurrentPeriodId(),
+                date = LocalDateTime.now(),
+                label = pocket.name.ifBlank { goalLabel },
+            )
+            val saved = if (withdraw) {
+                budgetRepository.addPocketWithdrawal(entry)
+            } else {
+                budgetRepository.addPocketDeposit(entry)
+            }
+            if (!saved) {
+                _effects.value = AnalyticsUiEffect.PocketActionFailed
+            }
+        }
+    }
+
+    private fun runPocketAction(source: String, block: suspend () -> Unit) {
+        viewModelScope.launch {
+            try {
+                block()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                errorLogRecorder.record(source, e)
+                _effects.value = AnalyticsUiEffect.PocketActionFailed
+            }
+        }
+    }
+
     fun consumeEffect() {
         _effects.value = null
     }
 }
 
-private fun List<Transaction>.toChartSpends(): List<Transaction> =
-    filter { it.amount > BigDecimal.ZERO }

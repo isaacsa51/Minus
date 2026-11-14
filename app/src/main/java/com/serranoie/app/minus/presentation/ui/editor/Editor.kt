@@ -4,6 +4,10 @@ package com.serranoie.app.minus.presentation.ui.editor
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.material3.Surface
+import androidx.compose.ui.draw.clip
+import androidx.compose.animation.core.EaseInOutQuad
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -41,6 +45,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.EventRepeat
+import androidx.compose.material.icons.rounded.Savings
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import com.serranoie.app.minus.domain.model.SavingsPocket
+import com.serranoie.app.minus.presentation.ui.analytics.pocketDisplayName
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -106,6 +115,7 @@ import com.serranoie.app.minus.presentation.ui.editor.category.CategoryToolbar
 import com.serranoie.app.minus.presentation.ui.editor.category.EditableCategoryTag
 import com.serranoie.app.minus.presentation.ui.editor.category.FocusController
 import com.serranoie.app.minus.presentation.ui.editor.category.NewCategoryTag
+import com.serranoie.app.minus.presentation.ui.editor.category.PocketTag
 import com.serranoie.app.minus.presentation.ui.editor.category.SelectedCategoryLimitCard
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.CreditCutoffDayDialog
 import com.serranoie.app.minus.presentation.ui.editor.dialogs.RecurrentExpenseDialog
@@ -177,6 +187,8 @@ fun Editor(
     onCategoryEditingChanged: (Boolean) -> Unit = {},
     onRecurrentToggle: (Boolean) -> Unit = {},
     onCreditToggle: (Boolean) -> Unit = {},
+    onSetAsideToggle: (Boolean) -> Unit = {},
+    onPocketSelected: (Long) -> Unit = {},
     showCreditQuickToggleFeature: Boolean = false,
     extraNoteEnabled: Boolean = false,
     newCategoryTagEnabled: Boolean = false,
@@ -323,6 +335,16 @@ fun Editor(
                         modifier = Modifier.fillMaxHeight(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        if (uiState.pockets.isNotEmpty()) {
+                            SetAsideToggle(
+                                checked = uiState.isSetAsideEnabled,
+                                onCheckedChange = { checked ->
+                                    performUIHaptic(view)
+                                    onSetAsideToggle(checked)
+                                },
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
                         if (showCreditQuickToggleFeature) {
                             FlowRow(
                                 modifier = Modifier.fillMaxHeight(),
@@ -573,6 +595,11 @@ fun Editor(
                     onDisableCalculationMode = onDisableCalculationMode,
                     onApply = onApply,
                     tutorialBoxState = tutorialBoxState,
+                    pocketPicker = if (uiState.isSetAsideEnabled) {
+                        PocketPicker(uiState.pockets, uiState.selectedPocketId, onPocketSelected)
+                    } else {
+                        null
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -657,6 +684,7 @@ private fun EditingContent(
     onDisableCalculationMode: () -> Unit = {},
     onApply: () -> Unit = {},
     tutorialBoxState: TutorialBoxState? = null,
+    pocketPicker: PocketPicker? = null,
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = symbolOnlyCurrencyFormat(currencyCode)
@@ -967,51 +995,100 @@ private fun EditingContent(
                 }
             }
 
-            if (categoryGridModeEnabled) {
-                var isInlineNoteEditing by remember { mutableStateOf(false) }
-                var isInlineCategoryEditing by remember { mutableStateOf(false) }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 24.dp, end = 24.dp, bottom = 26.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (extraNoteEnabled && !isInlineCategoryEditing) {
-                        EditableNoteTag(
+            var lastPocketPicker by remember { mutableStateOf(pocketPicker) }
+            if (pocketPicker != null) lastPocketPicker = pocketPicker
+            AnimatedContent(
+                targetState = pocketPicker != null,
+                transitionSpec = {
+                    fadeIn(tween(220, easing = EaseInOutQuad)) +
+                        slideInHorizontally(tween(220, easing = EaseInOutQuad)) { it / 4 } togetherWith
+                        fadeOut(tween(150, easing = EaseInOutQuad)) +
+                            slideOutHorizontally(tween(150, easing = EaseInOutQuad)) { it / 4 } using
+                        SizeTransform(clip = false)
+                },
+                contentAlignment = Alignment.BottomEnd,
+                label = "pocketCategorySwap",
+                modifier = Modifier.fillMaxWidth(),
+            ) { showPockets ->
+                val picker = lastPocketPicker
+                if (showPockets && picker != null) {
+                    PocketChips(
+                        picker = picker,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 26.dp),
+                    )
+                } else {
+                    if (categoryGridModeEnabled) {
+                        var isInlineNoteEditing by remember { mutableStateOf(false) }
+                        var isInlineCategoryEditing by remember { mutableStateOf(false) }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 24.dp, end = 24.dp, bottom = 26.dp),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            if (extraNoteEnabled && !isInlineCategoryEditing) {
+                                EditableNoteTag(
+                                    currentNote = currentNote,
+                                    onNoteUpdate = onNoteUpdate,
+                                    editorFocusController = editorFocusController,
+                                    extendWidth = toolbarWidth,
+                                    onlyIcon = false,
+                                    onEdit = { editing ->
+                                        isInlineNoteEditing = editing
+                                        onCategoryEditingChanged(editing || isInlineCategoryEditing)
+                                    },
+                                )
+                            }
+                            if (!isInlineNoteEditing) {
+                                if (extraNoteEnabled && !isInlineCategoryEditing) {
+                                    Spacer(Modifier.width(8.dp))
+                                }
+                                EditableCategoryTag(
+                                    currentComment = currentComment,
+                                    tags = tags,
+                                    onCommentUpdate = onCommentUpdate,
+                                    editorFocusController = editorFocusController,
+                                    modifier = Modifier.let { m ->
+                                        if (tutorialBoxState != null) m.markForTutorial(
+                                            tutorialBoxState,
+                                            index = 3
+                                        ) else m
+                                    },
+                                    extendWidth = toolbarWidth,
+                                    onlyIcon = false,
+                                    onEdit = { editing ->
+                                        isInlineCategoryEditing = editing
+                                        onCategoryEditingChanged(editing || isInlineNoteEditing)
+                                    },
+                                    onDeleteTag = onDeleteTag,
+                                    directCategoryPopupEnabled = directCategoryPopupEnabled,
+                                    categoryGridModeEnabled = categoryGridModeEnabled,
+                                    isCategoryGridVisible = isCategoryGridVisible,
+                                    isCalculation = isCalculation,
+                                    onShowCategoryGrid = onShowCategoryGrid,
+                                    onHideCategoryGrid = onHideCategoryGrid,
+                                    onDisableCalculationMode = onDisableCalculationMode,
+                                    limits = limits,
+                                    splitInput = input,
+                                    currencyCode = currencyCode,
+                                )
+                            }
+                        }
+                    } else {
+                        CategoryToolbar(
+                            tags = tags,
+                            currentComment = currentComment,
+                            stage = EditStage.EDIT_SPENT,
+                            onCommentUpdate = onCommentUpdate,
                             currentNote = currentNote,
                             onNoteUpdate = onNoteUpdate,
-                            editorFocusController = editorFocusController,
-                            extendWidth = toolbarWidth,
-                            onlyIcon = false,
-                            onEdit = { editing ->
-                                isInlineNoteEditing = editing
-                                onCategoryEditingChanged(editing || isInlineCategoryEditing)
-                            },
-                        )
-                    }
-                    if (!isInlineNoteEditing) {
-                        if (extraNoteEnabled && !isInlineCategoryEditing) {
-                            Spacer(Modifier.width(8.dp))
-                        }
-                        EditableCategoryTag(
-                            currentComment = currentComment,
-                            tags = tags,
-                            onCommentUpdate = onCommentUpdate,
-                            editorFocusController = editorFocusController,
-                            modifier = Modifier.let { m ->
-                                if (tutorialBoxState != null) m.markForTutorial(
-                                    tutorialBoxState,
-                                    index = 3
-                                ) else m
-                            },
-                            extendWidth = toolbarWidth,
-                            onlyIcon = false,
-                            onEdit = { editing ->
-                                isInlineCategoryEditing = editing
-                                onCategoryEditingChanged(editing || isInlineNoteEditing)
-                            },
+                            extraNoteEnabled = extraNoteEnabled,
                             onDeleteTag = onDeleteTag,
+                            onEditingChanged = onCategoryEditingChanged,
+                            editorFocusController = editorFocusController,
                             directCategoryPopupEnabled = directCategoryPopupEnabled,
                             categoryGridModeEnabled = categoryGridModeEnabled,
                             isCategoryGridVisible = isCategoryGridVisible,
@@ -1022,43 +1099,63 @@ private fun EditingContent(
                             limits = limits,
                             splitInput = input,
                             currencyCode = currencyCode,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 26.dp)
+                                .let { m ->
+                                    if (tutorialBoxState != null) m.markForTutorial(
+                                        tutorialBoxState,
+                                        index = 3
+                                    ) else m
+                                },
                         )
                     }
                 }
-            } else {
-                CategoryToolbar(
-                    tags = tags,
-                    currentComment = currentComment,
-                    stage = EditStage.EDIT_SPENT,
-                    onCommentUpdate = onCommentUpdate,
-                    currentNote = currentNote,
-                    onNoteUpdate = onNoteUpdate,
-                    extraNoteEnabled = extraNoteEnabled,
-                    onDeleteTag = onDeleteTag,
-                    onEditingChanged = onCategoryEditingChanged,
-                    editorFocusController = editorFocusController,
-                    directCategoryPopupEnabled = directCategoryPopupEnabled,
-                    categoryGridModeEnabled = categoryGridModeEnabled,
-                    isCategoryGridVisible = isCategoryGridVisible,
-                    isCalculation = isCalculation,
-                    onShowCategoryGrid = onShowCategoryGrid,
-                    onHideCategoryGrid = onHideCategoryGrid,
-                    onDisableCalculationMode = onDisableCalculationMode,
-                    limits = limits,
-                    splitInput = input,
-                    currencyCode = currencyCode,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 26.dp)
-                        .let { m ->
-                            if (tutorialBoxState != null) m.markForTutorial(
-                                tutorialBoxState,
-                                index = 3
-                            ) else m
-                        },
-                )
             }
         }
+    }
+}
+
+private class PocketPicker(
+    val pockets: List<SavingsPocket>,
+    val selectedId: Long?,
+    val onSelect: (Long) -> Unit,
+)
+
+@Composable
+private fun PocketChips(picker: PocketPicker, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+    ) {
+        picker.pockets.forEach { pocket ->
+            PocketTag(
+                label = pocketDisplayName(pocket),
+                selected = pocket.id == picker.selectedId,
+                onClick = { picker.onSelect(pocket.id) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SetAsideToggle(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    val description = stringResource(R.string.pockets_set_aside)
+    ToggleButton(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        shapes = ToggleButtonDefaults.shapes(),
+        modifier = Modifier.fillMaxHeight(),
+        colors = ToggleButtonDefaults.toggleButtonColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f),
+            checkedContainerColor = MaterialTheme.colorScheme.tertiary,
+            contentColor = MaterialTheme.colorScheme.tertiary,
+            checkedContentColor = MaterialTheme.colorScheme.onTertiary,
+        ),
+    ) {
+        Icon(imageVector = Icons.Rounded.Savings, contentDescription = description)
     }
 }
 

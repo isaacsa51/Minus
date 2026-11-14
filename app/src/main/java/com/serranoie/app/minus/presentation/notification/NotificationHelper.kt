@@ -14,6 +14,10 @@ import androidx.core.content.ContextCompat
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.presentation.MainActivity
+import com.serranoie.app.minus.presentation.util.font.format.localizedFormatter
+import com.serranoie.app.minus.domain.model.SavingsPocket
+import com.serranoie.app.minus.domain.calculator.encodePendingSetAside
+import com.serranoie.app.minus.domain.calculator.SavingsReminderGoal
 import com.serranoie.app.minus.presentation.notification.scan.ExpenseScanActionReceiver
 import com.serranoie.app.minus.presentation.util.font.format.symbolOnlyCurrencyFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -28,6 +32,8 @@ class NotificationHelper @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) {
     companion object {
+        const val ACTION_SAVINGS_SET_ASIDE = "com.serranoie.app.minus.action.SAVINGS_SET_ASIDE"
+        const val EXTRA_PENDING_SET_ASIDE = "pending_set_aside"
         const val CHANNEL_PERIOD_END = "budget_period_end"
         const val CHANNEL_RECURRENT = "recurrent_expenses"
         const val CHANNEL_CREDIT = "credit_expenses"
@@ -391,25 +397,47 @@ class NotificationHelper @Inject constructor(
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_CREDIT, notification)
     }
 
-    fun showSavingsReminderNotification(amount: String, currency: String) {
+    fun showSavingsReminderNotification(
+        amount: BigDecimal,
+        currency: String,
+        goal: SavingsReminderGoal?,
+        pocket: SavingsPocket?,
+    ) {
         if (!canPostNotifications(CHANNEL_SAVINGS)) return
 
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            if (pocket != null) {
+                action = ACTION_SAVINGS_SET_ASIDE
+                putExtra(EXTRA_PENDING_SET_ASIDE, encodePendingSetAside(pocket.id, amount))
+            }
+        }
         val pendingIntent = PendingIntent.getActivity(
             context,
             4,
-            Intent(context, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            },
+            intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val message = context.getString(
-            R.string.notification_savings_reminder_message,
-            formatAmount(amount, currency)
-        )
+        val formatted = formatAmount(amount.toPlainString(), currency)
+        val pocketName = pocket?.name?.ifBlank { context.getString(R.string.pockets_goal_name) }
+        val title = if (goal != null && pocketName != null) {
+            context.getString(R.string.notification_savings_goal_title, formatted, pocketName)
+        } else {
+            context.getString(R.string.notification_savings_percent_title, formatted)
+        }
+        val message = if (goal != null) {
+            context.getString(
+                R.string.notification_savings_goal_message,
+                formatAmount(goal.remaining.toPlainString(), currency),
+                localizedFormatter("MMMM yyyy")(goal.deadline),
+            )
+        } else {
+            context.getString(R.string.notification_savings_no_goal_message, formatted)
+        }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_SAVINGS)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(context.getString(R.string.notification_savings_reminder_title))
+            .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setContentIntent(pendingIntent)

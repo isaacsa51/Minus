@@ -77,7 +77,10 @@ interface TransactionDao {
     @Query("DELETE FROM transactions")
     suspend fun deleteAll()
 
-    @Query("DELETE FROM transactions WHERE periodId = :periodId AND isRecurrent = 0")
+    @Query("SELECT * FROM transactions WHERE pocketId = :pocketId")
+    suspend fun getByPocketId(pocketId: Long): List<TransactionEntity>
+
+    @Query("DELETE FROM transactions WHERE periodId = :periodId AND isRecurrent = 0 AND pocketId IS NULL")
     suspend fun deleteOneTimeByPeriodId(periodId: Long)
 
     @Query("SELECT * FROM transactions WHERE id = :transactionId LIMIT 1")
@@ -91,6 +94,9 @@ interface TransactionDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM transactions WHERE clientGeneratedId = :clientGeneratedId)")
     suspend fun existsByClientGeneratedId(clientGeneratedId: String): Boolean
+
+    @Query("SELECT * FROM transactions WHERE clientGeneratedId = :clientGeneratedId LIMIT 1")
+    suspend fun getByClientGeneratedId(clientGeneratedId: String): TransactionEntity?
 
     @Query("SELECT * FROM transactions ORDER BY date DESC LIMIT :limit")
     suspend fun getRecentTransactions(limit: Int): List<TransactionEntity>

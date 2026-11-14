@@ -419,7 +419,7 @@ fun Settings(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = savingsPreferencesSummary(savingsPreferences),
+                                    text = savingsPreferencesSummary(savingsPreferences, currencyCode),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

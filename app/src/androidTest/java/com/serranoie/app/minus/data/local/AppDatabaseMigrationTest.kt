@@ -173,4 +173,25 @@ class AppDatabaseMigrationTest {
             assertThat(c.isNull(2)).isTrue()
         }
     }
+
+    @Test
+    fun migrate22To23_addsPocketsTable_andNullPocketIdOnExistingTransactions() {
+        helper.createDatabase(testDb, 22).apply {
+            execSQL(
+                "INSERT INTO transactions (amount, comment, date, createdAt, periodId, isRecurrent, isCredit, isCreditPaid) " +
+                    "VALUES ('12.50', 'Food', 0, 0, 1, 0, 0, 0)",
+            )
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(testDb, 23, true)
+
+        assertThat(db.columnNames("transactions")).contains("pocketId")
+        assertThat(db.columnNames("savings_pockets")).containsAtLeast("name", "targetAmount", "targetEpochDay", "createdAt")
+        db.query("SELECT amount, pocketId FROM transactions").use { c ->
+            assertThat(c.moveToFirst()).isTrue()
+            assertThat(c.getString(0)).isEqualTo("12.50")
+            assertThat(c.isNull(1)).isTrue()
+        }
+    }
 }

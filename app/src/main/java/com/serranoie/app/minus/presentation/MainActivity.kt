@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.animation.PathInterpolator
+import android.widget.Toast
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -52,6 +53,7 @@ import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.notification.PENDING_QUICK_ADD_AMOUNT_KEY_NAME
+import com.serranoie.app.minus.domain.calculator.PENDING_SET_ASIDE_KEY_NAME
 import com.serranoie.app.minus.domain.shortcut.LauncherShortcut
 import com.serranoie.app.minus.domain.shortcut.recentShortcutCategories
 import com.serranoie.app.minus.domain.time.MidnightTransitionManager
@@ -158,6 +160,7 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         handleSyncIntent(intent)
         handleQuickAddIntent(intent)
+        handleSetAsideIntent(intent)
         handleLauncherShortcutIntent(intent)
     }
 
@@ -203,6 +206,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun handleSetAsideIntent(intent: Intent?) {
+        if (intent?.action != NotificationHelper.ACTION_SAVINGS_SET_ASIDE) return
+        val staged = intent.getStringExtra(NotificationHelper.EXTRA_PENDING_SET_ASIDE)
+            ?.takeIf { it.isNotBlank() } ?: return
+        intent.removeExtra(NotificationHelper.EXTRA_PENDING_SET_ASIDE)
+        lifecycleScope.launch {
+            runCatching { settingsRepository.setString(PENDING_SET_ASIDE_KEY_NAME, staged) }
+                .onFailure { logcat { "Could not stage set aside: ${it.asLog()}" } }
+        }
+    }
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -212,6 +226,7 @@ class MainActivity : AppCompatActivity() {
 
         handleSyncIntent(intent)
         handleQuickAddIntent(intent)
+        handleSetAsideIntent(intent)
         if (savedInstanceState == null) handleLauncherShortcutIntent(intent)
         observeLauncherShortcutCategories()
 
@@ -367,6 +382,7 @@ class MainActivity : AppCompatActivity() {
     @Composable
     private fun MidnightRolloverDialogHost(navController: NavHostController) {
         val shouldShowMidnightDialog by midnightTransitionManager.shouldShowTransitionDialog.collectAsStateWithLifecycle()
+        val pockets by budgetRepository.getSavingsPockets().collectAsStateWithLifecycle(initialValue = emptyList())
         val midnightTransitionData by midnightTransitionManager.midnightTransitionData.collectAsStateWithLifecycle()
 
         if (!shouldShowMidnightDialog || midnightTransitionData == null) return
@@ -406,6 +422,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val goalPocketLabel = stringResource(R.string.pockets_goal_name)
         RolloverDialog(
             remainingAmount = data.remainingAmount,
             currencyCode = data.currencyCode,
@@ -418,6 +435,24 @@ class MainActivity : AppCompatActivity() {
                 resolveAndMaybeNavigate(RemainingBudgetStrategy.ADD_TO_FIRST_DAY)
             },
             onDiscardRemaining = { resolveAndMaybeNavigate(null) },
+            pockets = pockets,
+            onSaveToPocket = { pocket ->
+                val label = pocket.name.ifBlank { goalPocketLabel }
+                lifecycleScope.launch {
+                    val saved = runCatching { midnightTransitionManager.sweepSurplusToPocket(pocket, label) }
+                        .onFailure {
+                            logcat { "Could not sweep surplus into pocket: ${it.asLog()}" }
+                            Toast.makeText(this@MainActivity, R.string.pockets_action_failed, Toast.LENGTH_SHORT).show()
+                        }
+                        .isSuccess
+                    if (saved && !data.isPersistedReopen) {
+                        navController.navigate(Screen.Analytics.route) {
+                            popUpTo(Screen.Main.route) { inclusive = false }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            },
             onDismiss = {
                 midnightTransitionManager.onTransitionDialogDismissed()
             },

@@ -6,9 +6,12 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.calculator.pocketStatuses
 import com.serranoie.app.minus.domain.calculator.savingsReminderAmount
+import com.serranoie.app.minus.domain.calculator.savingsReminderGoal
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 import logcat.asLog
 import logcat.logcat
 import java.time.LocalDate
@@ -38,8 +41,16 @@ class SavingsReminderWorker @AssistedInject constructor(
         if (settingsRepository.getString(LAST_SAVINGS_REMINDER_KEY) == periodKey) return
         if (LocalDate.now().isAfter(budget.getPeriodEndDate())) return
         if (!notificationHelper.canPostNotifications(NotificationHelper.CHANNEL_SAVINGS)) return
-        val amount = savingsReminderAmount(settings.savingsPreferences, budget) ?: return
-        notificationHelper.showSavingsReminderNotification(amount.toPlainString(), budget.currencyCode)
+        val pockets = budgetRepository.getSavingsPockets().first()
+        val goalPocket = pockets.firstOrNull { it.isGoalPocket }
+            ?.let { pocketStatuses(listOf(it), budgetRepository.getTransactions().first()).first() }
+        val amount = savingsReminderAmount(settings.savingsPreferences, budget, goalPocket) ?: return
+        notificationHelper.showSavingsReminderNotification(
+            amount = amount,
+            currency = budget.currencyCode,
+            goal = savingsReminderGoal(goalPocket),
+            pocket = goalPocket?.pocket ?: pockets.singleOrNull(),
+        )
         settingsRepository.setString(LAST_SAVINGS_REMINDER_KEY, periodKey)
     }
 

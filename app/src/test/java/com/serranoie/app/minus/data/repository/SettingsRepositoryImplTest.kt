@@ -276,4 +276,36 @@ class SettingsRepositoryImplTest {
 
         assertThat(repo.observeSettings().first().onboardingCompleted).isTrue()
     }
+
+    @Test
+    fun `each unresolved surplus gets its own rollover id that stays stable until cleared`() = runTest {
+        repo.markSurplusUnresolved(BigDecimal("100"))
+        val first = repo.getOrCreatePendingRolloverId()
+
+        assertThat(repo.getOrCreatePendingRolloverId()).isEqualTo(first)
+
+        repo.clearPendingRollover()
+        repo.markSurplusUnresolved(BigDecimal("50"))
+
+        assertThat(repo.getOrCreatePendingRolloverId()).isNotEqualTo(first)
+    }
+
+    @Test
+    fun `a pending surplus stored without an id is given one that stays stable`() = runTest {
+        repo.setPendingRollover(BigDecimal("80"), RemainingBudgetStrategy.SPLIT_EQUALLY)
+
+        val assigned = repo.getOrCreatePendingRolloverId()
+
+        assertThat(assigned).isNotEmpty()
+        assertThat(repo.getOrCreatePendingRolloverId()).isEqualTo(assigned)
+    }
+
+    @Test
+    fun `a queued surplus records the period it came from`() = runTest {
+        repo.setCurrentPeriod(periodId = 9L, startedAt = 1_000L)
+
+        repo.setPendingRollover(BigDecimal("80"), RemainingBudgetStrategy.SPLIT_EQUALLY)
+
+        assertThat(repo.getPendingRolloverPeriodId()).isEqualTo(9L)
+    }
 }
