@@ -156,7 +156,7 @@
     <string name="history_snackbar_delete_recurrent_failed">Δεν ήταν δυνατή η διαγραφή της επαναλαμβανόμενης πληρωμής</string>
     <string name="history_snackbar_mark_paid_failed">Δεν ήταν δυνατή η σήμανση της συναλλαγής ως πληρωμένης</string>
     <string name="history_snackbar_restore_transaction_failed">Δεν ήταν δυνατή η επαναφορά της συναλλαγής</string>
-    <string name="history_search_placeholder">Name, note, date or amount</string>
+    <string name="history_search_placeholder">Όνομα, σημείωση, ημερομηνία ή ποσό</string>
     <string-array name="history_search_examples">
         <item>Range: 19 nov to 30 nov</item>
         <item>Day: Food 12 oct</item>
@@ -168,23 +168,23 @@
         <item>After a date: &gt;10/1</item>
         <item>Text only: \"Tacos\"</item>
     </string-array>
-    <string name="history_search_clear">Clear search</string>
-    <string name="history_search_no_results">No expenses match \"%1$s\"</string>
+    <string name="history_search_clear">Εκκαθάριση αναζήτησης</string>
+    <string name="history_search_no_results">Κανένα έξοδο δεν ταιριάζει με «%1$s»</string>
     <plurals name="history_search_results_summary">
-        <item quantity="one">%1$d match · %2$s spent</item>
-        <item quantity="other">%1$d matches · %2$s spent</item>
+        <item quantity="one">%1$d αποτέλεσμα · %2$s δαπάνες</item>
+        <item quantity="other">%1$d αποτελέσματα · %2$s δαπάνες</item>
     </plurals>
     <string name="expense_queued_for_next_period">Το έξοδο προγραμματίστηκε για την επόμενη περίοδο</string>
-    <string name="split_expense_mismatch">Amounts and categories don\'t match (%1$d vs %2$d)</string>
-    <string name="split_expense_not_recurring">Split expenses can\'t be recurring</string>
-    <string name="split_category_remove">Remove %1$s</string>
+    <string name="split_expense_mismatch">Τα ποσά και οι κατηγορίες δεν ταιριάζουν (%1$d έναντι %2$d)</string>
+    <string name="split_expense_not_recurring">Τα διαχωρισμένα έξοδα δεν μπορούν να είναι επαναλαμβανόμενα</string>
+    <string name="split_category_remove">Αφαίρεση %1$s</string>
     <plurals name="split_expense_saved">
-        <item quantity="one">Saved %d expense</item>
-        <item quantity="other">Saved %d expenses</item>
+        <item quantity="one">Αποθηκεύτηκε %d έξοδο</item>
+        <item quantity="other">Αποθηκεύτηκαν %d έξοδα</item>
     </plurals>
-    <string name="budget_load_failed">Could not load your budget</string>
-    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
-    <string name="budget_load_retry">Retry</string>
+    <string name="budget_load_failed">Δεν ήταν δυνατή η φόρτωση του προϋπολογισμού σας</string>
+    <string name="budget_load_corrupt_data">Ορισμένα αποθηκευμένα δεδομένα προϋπολογισμού δεν ήταν δυνατό να διαβαστούν</string>
+    <string name="budget_load_retry">Επανάληψη</string>
     <string name="add_new_category">Κατηγορία</string>
     <string name="add_new_category_action">Προσθήκη Νέας Κατηγορίας</string>
     <string name="new_category">Νέα κατηγορία</string>
@@ -199,22 +199,22 @@
     <string name="budget_less_than_one_day_validation">Ο προϋπολογισμός πρέπει να είναι τουλάχιστον μία ημέρα</string>
     <!--  Analytics  -->
     <string name="analytics_title">Αναλύσεις</string>
-    <string name="receipt_scan_button">Scan receipt</string>
-    <string name="receipt_scan_failed">Couldn\'t read a total from the receipt</string>
-    <string name="quick_add_amount_label">Amount</string>
-    <string name="quick_add_no_categories">No categories yet. You can save without one.</string>
-    <string name="quick_add_save_failed">Couldn\'t save the expense. Try again.</string>
-    <string name="quick_add_needs_budget">Set up a budget in Minus before adding expenses here.</string>
-    <string name="quick_add_open_app">Open Minus</string>
-    <string name="quick_add_saved">%1$s saved</string>
-    <string name="receipt_camera_point_at_total">Point at the total</string>
-    <string name="receipt_camera_detected">%1$s detected</string>
-    <string name="receipt_camera_retry">No total found, try again</string>
-    <string name="receipt_camera_close">Close camera</string>
-    <string name="receipt_camera_capture">Capture receipt</string>
-    <string name="receipt_camera_gallery">Choose a photo</string>
-    <string name="receipt_camera_switch">Switch camera</string>
-    <string name="receipt_camera_flash">Flash</string>
+    <string name="receipt_scan_button">Σάρωση απόδειξης</string>
+    <string name="receipt_scan_failed">Δεν ήταν δυνατή η ανάγνωση συνόλου από την απόδειξη</string>
+    <string name="quick_add_amount_label">Ποσό</string>
+    <string name="quick_add_no_categories">Δεν υπάρχουν ακόμη κατηγορίες. Μπορείτε να αποθηκεύσετε χωρίς κατηγορία.</string>
+    <string name="quick_add_save_failed">Δεν ήταν δυνατή η αποθήκευση του εξόδου. Δοκιμάστε ξανά.</string>
+    <string name="quick_add_needs_budget">Ορίστε έναν προϋπολογισμό στο Minus πριν προσθέσετε έξοδα εδώ.</string>
+    <string name="quick_add_open_app">Άνοιγμα Minus</string>
+    <string name="quick_add_saved">Αποθηκεύτηκε: %1$s</string>
+    <string name="receipt_camera_point_at_total">Στοχεύστε στο σύνολο</string>
+    <string name="receipt_camera_detected">Εντοπίστηκε: %1$s</string>
+    <string name="receipt_camera_retry">Δεν βρέθηκε σύνολο, δοκιμάστε ξανά</string>
+    <string name="receipt_camera_close">Κλείσιμο κάμερας</string>
+    <string name="receipt_camera_capture">Λήψη απόδειξης</string>
+    <string name="receipt_camera_gallery">Επιλογή φωτογραφίας</string>
+    <string name="receipt_camera_switch">Εναλλαγή κάμερας</string>
+    <string name="receipt_camera_flash">Φλας</string>
     <string name="receipt_scan_hint">Συμβουλή: πατήστε παρατεταμένα το ✓ για σάρωση απόδειξης</string>
     <string name="receipt_scan_hint_action">Δοκιμάστε το</string>
     <plurals name="days">
@@ -697,6 +697,34 @@
     <string name="category_limit_ahead">Πάνω από τον ρυθμό</string>
     <string name="category_limit_on_track">Εντός πλάνου</string>
     <string name="analytics_category_limits_title">Όρια κατηγοριών</string>
+    <string name="pockets_title">Κουμπαράδες αποταμίευσης</string>
+    <string name="pockets_empty">Βάλτε χρήματα στην άκρη για έναν στόχο. Βγαίνουν από τον προϋπολογισμό σας μέχρι να τα αποσύρετε.</string>
+    <string name="pockets_new">Νέος κουμπαράς</string>
+    <string name="pockets_name_label">Όνομα</string>
+    <string name="pockets_target_label">Ποσό στόχου (προαιρετικό)</string>
+    <string name="pockets_amount_label">Ποσό</string>
+    <string name="pockets_add_money">Προσθήκη χρημάτων</string>
+    <string name="pockets_take_out">Ανάληψη</string>
+    <string name="pockets_add_money_title">Προσθήκη σε %1$s</string>
+    <string name="pockets_take_out_title">Ανάληψη από %1$s</string>
+    <string name="pockets_take_out_max">Έως %1$s</string>
+    <string name="pockets_of_target">από %1$s</string>
+    <string name="pockets_of_target_by">από %1$s έως %2$s</string>
+    <string name="pockets_goal_name">Αποταμιεύσεις</string>
+    <string name="pockets_set_aside">Βάλτε στην άκρη</string>
+    <string name="pockets_saved_to">%1$s αποθηκεύτηκαν σε %2$s</string>
+    <string name="pockets_set_aside_pick">Επιλέξτε πρώτα έναν κουμπαρά</string>
+    <string name="pockets_set_aside_single_amount">Εισαγάγετε ένα ποσό για να το βάλετε στην άκρη</string>
+    <string name="pockets_delete">Διαγραφή κουμπαρά</string>
+    <string name="pockets_period_title">Αποταμιεύσεις αυτής της περιόδου</string>
+    <string name="pockets_period_added">Βάλατε στην άκρη %1$s στους κουμπαράδες σας.</string>
+    <string name="pockets_period_withdrawn">Αποσύρατε %1$s από τους κουμπαράδες σας.</string>
+    <string name="pockets_period_added_and_withdrawn">Βάλατε στην άκρη %1$s και αποσύρατε %2$s.</string>
+    <string name="pockets_delete_title">Διαγραφή %1$s;</string>
+    <string name="pockets_delete_desc">Ο κουμπαράς είναι άδειος, οπότε δεν χάνονται χρήματα.</string>
+    <string name="pockets_action_failed">Δεν ήταν δυνατή η ενημέρωση του κουμπαρά. Δοκιμάστε ξανά.</string>
+    <string name="rollover_dialog_save_to_pocket_title">Αποθήκευση σε %1$s</string>
+    <string name="rollover_dialog_save_to_pocket_desc">Βάλτε %1$s στην άκρη σε αυτόν τον κουμπαρά</string>
     <string name="settings_category_limits_title">Όρια κατηγοριών</string>
     <string name="settings_category_limits_subtitle_empty">Βάλτε ανώτατο όριο στα έξοδα μιας κατηγορίας ανά εβδομάδα ή περίοδο</string>
     <string name="settings_category_limits_subtitle_count">%1$d από %2$d κατηγορίες έχουν όριο</string>
@@ -724,6 +752,7 @@
     <string name="settings_savings_dialog_savings_label">Εξοικονόμηση — %1$d%%</string>
     <string name="settings_savings_dialog_goal_section">Στόχος εξοικονόμησης (προαιρετικό)</string>
     <string name="settings_savings_dialog_goal_amount_label">Ποσό στόχου</string>
+    <string name="settings_savings_summary_goal_in">%1$s σε %2$s</string>
     <string name="settings_savings_dialog_goal_months_label">Περίοδος στόχος (μήνες)</string>
     <string name="settings_savings_dialog_goal_hint">Αφήστε κενό για να κρατήσει την προεπιλογή %1$d%% × 6 παράδειγμα.</string>
     <string name="settings_savings_dialog_reset">Επαναφορά στις προεπιλογές</string>
@@ -810,6 +839,10 @@
     <string name="notification_channel_savings_name">Υπενθυμίσεις αποταμίευσης</string>
     <string name="notification_channel_savings_description">Υπενθύμιση να βάλετε χρήματα στην άκρη όταν ξεκινά νέα περίοδος προϋπολογισμού</string>
     <string name="notification_savings_reminder_title">Νέα περίοδος: ώρα για αποταμίευση</string>
+    <string name="notification_savings_goal_title">Βάλτε στην άκρη %1$s για %2$s</string>
+    <string name="notification_savings_goal_message">Απέχετε %1$s από τον στόχο %2$s. Πατήστε για να τα αποταμιεύσετε.</string>
+    <string name="notification_savings_percent_title">Βάλτε στην άκρη %1$s αυτή την περίοδο</string>
+    <string name="notification_savings_no_goal_message">Δεν έχετε ορίσει στόχο αποταμίευσης, αλλά προτείνουμε να αποταμιεύσετε %1$s αυτή την περίοδο.</string>
     <string name="notification_savings_reminder_message">Βάλτε στην άκρη %1$s από αυτή την περίοδο για τις αποταμιεύσεις σας.</string>
     <string name="credit_owed_label">Σύνολο οφειλόμενων</string>
     <string name="debt_adjusted_balance_label">Υπόλοιπο Προσαρμοσμένου Χρέους</string>
@@ -876,17 +909,17 @@
     <string name="unit_millions">M</string>
     <string name="widget_budget_pill_title">Μπάρα προϋπολογισμού</string>
     <string name="widget_budget_pill_description">Το υπόλοιπο για την προβολή που επιλέξατε — ημερήσια, εβδομαδιαία, δεκαπενθήμερη ή μηνιαία — σε μια λεπτή μπάρα</string>
-    <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
-    <string name="island_brief_days_short">%1$dd</string>
-    <string name="island_brief_stale">left in period - open Minus to update</string>
-    <string name="island_page_spent_of">%1$s of %2$s spent</string>
-    <string name="island_page_period_left">Period left</string>
+    <string name="island_provider_description">Δείχνει τι απομένει από τον προϋπολογισμό σας μέσα στο island Brief</string>
+    <string name="island_brief_days_short">%1$d ημ</string>
+    <string name="island_brief_stale">απομένουν στην περίοδο - ανοίξτε το Minus για ενημέρωση</string>
+    <string name="island_page_spent_of">%1$s από %2$s δαπανήθηκαν</string>
+    <string name="island_page_period_left">Υπόλοιπο περιόδου</string>
     <plurals name="island_page_days_left">
-        <item quantity="one">day left</item>
-        <item quantity="other">days left</item>
+        <item quantity="one">ημέρα απομένει</item>
+        <item quantity="other">ημέρες απομένουν</item>
     </plurals>
-    <string name="island_charge_today">%1$s — %2$s due today</string>
-    <string name="island_charge_tomorrow">%1$s — %2$s due tomorrow</string>
-    <string name="island_charge_unnamed">Recurring payment</string>
-    <string name="island_credit_owed">%1$s owed on credit</string>
+    <string name="island_charge_today">%1$s — %2$s λήγει σήμερα</string>
+    <string name="island_charge_tomorrow">%1$s — %2$s λήγει αύριο</string>
+    <string name="island_charge_unnamed">Επαναλαμβανόμενη πληρωμή</string>
+    <string name="island_credit_owed">%1$s οφειλή σε πίστωση</string>
 </resources>
