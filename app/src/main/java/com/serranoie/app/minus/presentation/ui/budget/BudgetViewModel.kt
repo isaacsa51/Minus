@@ -89,6 +89,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.WeekFields
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 private const val TAG = "BudgetViewModel - ISAAC"
@@ -100,7 +101,7 @@ private data class SetAsideState(
     val confirmation: String? = null,
 ) {
     fun selectedPocket(pockets: List<SavingsPocket>): SavingsPocket? =
-        pockets.firstOrNull { it.id == pocketId } ?: pockets.singleOrNull()
+        if (pocketId == null) pockets.singleOrNull() else pockets.firstOrNull { it.id == pocketId }
 }
 
 @HiltViewModel
@@ -148,6 +149,8 @@ class BudgetViewModel @Inject constructor(
     private val retryLoad = MutableStateFlow(0)
 
     private val setAside = MutableStateFlow(SetAsideState())
+
+    private val setAsideSaving = AtomicBoolean(false)
 
     private var lastGoodState = BudgetUiState.INITIAL
 
@@ -681,7 +684,12 @@ class BudgetViewModel @Inject constructor(
     private fun handleApply() {
         viewModelScope.launch {
             if (setAside.value.enabled) {
-                applySetAside()
+                if (!setAsideSaving.compareAndSet(false, true)) return@launch
+                try {
+                    applySetAside()
+                } finally {
+                    setAsideSaving.set(false)
+                }
                 return@launch
             }
             val extraNoteEnabled = settingsRepository.observeSettings().first().extraNoteEnabled

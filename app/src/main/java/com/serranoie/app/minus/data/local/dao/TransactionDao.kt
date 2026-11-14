@@ -77,7 +77,10 @@ interface TransactionDao {
     @Query("DELETE FROM transactions")
     suspend fun deleteAll()
 
-    @Query("DELETE FROM transactions WHERE periodId = :periodId AND isRecurrent = 0")
+    @Query("SELECT * FROM transactions WHERE pocketId = :pocketId")
+    suspend fun getByPocketId(pocketId: Long): List<TransactionEntity>
+
+    @Query("DELETE FROM transactions WHERE periodId = :periodId AND isRecurrent = 0 AND pocketId IS NULL")
     suspend fun deleteOneTimeByPeriodId(periodId: Long)
 
     @Query("SELECT * FROM transactions WHERE id = :transactionId LIMIT 1")

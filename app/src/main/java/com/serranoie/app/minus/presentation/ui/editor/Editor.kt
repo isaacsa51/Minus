@@ -1000,10 +1000,10 @@ private fun EditingContent(
             AnimatedContent(
                 targetState = pocketPicker != null,
                 transitionSpec = {
-                    (fadeIn(tween(220, easing = EaseInOutQuad)) +
-                        slideInHorizontally(tween(220, easing = EaseInOutQuad)) { it / 4 }) togetherWith
-                        (fadeOut(tween(150, easing = EaseInOutQuad)) +
-                            slideOutHorizontally(tween(150, easing = EaseInOutQuad)) { it / 4 }) using
+                    fadeIn(tween(220, easing = EaseInOutQuad)) +
+                        slideInHorizontally(tween(220, easing = EaseInOutQuad)) { it / 4 } togetherWith
+                        fadeOut(tween(150, easing = EaseInOutQuad)) +
+                            slideOutHorizontally(tween(150, easing = EaseInOutQuad)) { it / 4 } using
                         SizeTransform(clip = false)
                 },
                 contentAlignment = Alignment.BottomEnd,

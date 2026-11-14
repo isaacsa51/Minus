@@ -233,7 +233,7 @@ private fun RolloverDialogContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            val segments = 2 + (if (pockets.isNotEmpty()) 1 else 0) + (if (onDiscardRemaining != null) 1 else 0)
+            val segments = 2 + (if (pockets.isNotEmpty()) 1 else 0) + if (onDiscardRemaining != null) 1 else 0
             Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 RolloverActionRow(
                     icon = Icons.AutoMirrored.Rounded.NextPlan,

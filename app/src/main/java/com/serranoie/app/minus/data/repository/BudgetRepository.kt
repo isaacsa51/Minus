@@ -30,6 +30,8 @@ interface BudgetRepository {
 
     suspend fun addTransactionIfAbsent(transaction: Transaction): Boolean
 
+    suspend fun addPocketWithdrawal(transaction: Transaction): Boolean
+
     suspend fun updateTransaction(transaction: Transaction)
 
     suspend fun assignQueuedTransactionsToPeriod(periodId: Long)

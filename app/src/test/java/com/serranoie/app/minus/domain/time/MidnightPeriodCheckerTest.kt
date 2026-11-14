@@ -518,19 +518,64 @@ class MidnightPeriodCheckerTest {
         val endDate = LocalDate.now().minusDays(1)
         stubEndDate(endDate)
         coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { settingsRepository.getPendingRolloverPeriodId() } returns 5L
         coEvery { settingsRepository.getCurrentPeriodId() } returns 7L
         val saved = slot<Transaction>()
-        coEvery { budgetRepository.addTransaction(capture(saved)) } returns 1L
+        coEvery { budgetRepository.addTransactionIfAbsent(capture(saved)) } returns true
 
         checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
 
         assertThat(saved.captured.amount).isEqualToIgnoringScale(BigDecimal("300"))
         assertThat(saved.captured.pocketId).isEqualTo(4L)
         assertThat(saved.captured.isAdjustment).isTrue()
-        assertThat(saved.captured.periodId).isEqualTo(7L)
+        assertThat(saved.captured.periodId).isEqualTo(5L)
+        assertThat(saved.captured.clientGeneratedId).isEqualTo("pocket-sweep-5")
         assertThat(saved.captured.date?.toLocalDate()).isEqualTo(endDate)
         coVerify { settingsRepository.clearPendingRollover() }
+        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
         coVerify(exactly = 0) { budgetRepository.saveBudgetSettings(any()) }
+    }
+
+    @Test
+    fun `sweepSurplusToPocket clears the surplus when the sweep row already exists`() = runTest {
+        stubEndDate(LocalDate.now().minusDays(1))
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { settingsRepository.getPendingRolloverPeriodId() } returns 5L
+        coEvery { budgetRepository.addTransactionIfAbsent(any()) } returns false
+
+        checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
+
+        coVerify { settingsRepository.clearPendingRollover() }
+    }
+
+    @Test
+    fun `sweepSurplusToPocket falls back to the current period when the source period was not stored`() = runTest {
+        stubEndDate(LocalDate.now().minusDays(1))
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { settingsRepository.getPendingRolloverPeriodId() } returns null
+        coEvery { settingsRepository.getCurrentPeriodId() } returns 7L
+        val saved = slot<Transaction>()
+        coEvery { budgetRepository.addTransactionIfAbsent(capture(saved)) } returns true
+
+        checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
+
+        assertThat(saved.captured.periodId).isEqualTo(7L)
+        assertThat(saved.captured.clientGeneratedId).isEqualTo("pocket-sweep-7")
+    }
+
+    @Test
+    fun `a failed sweep keeps the surplus and the dialog and rethrows`() = runTest {
+        stubEndDate(LocalDate.now().minusDays(1))
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { settingsRepository.getPendingRolloverPeriodId() } returns 5L
+        coEvery { budgetRepository.addTransactionIfAbsent(any()) } throws IllegalStateException("disk full")
+        checker.reopenUnresolvedSurplusDialog()
+
+        val error = runCatching { checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip")) }.exceptionOrNull()
+
+        assertThat(error).isInstanceOf(IllegalStateException::class.java)
+        assertThat(checker.shouldShowTransitionDialog.value).isTrue()
+        coVerify(exactly = 0) { settingsRepository.clearPendingRollover() }
     }
 
     @Test
@@ -540,6 +585,6 @@ class MidnightPeriodCheckerTest {
 
         checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
 
-        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+        coVerify(exactly = 0) { budgetRepository.addTransactionIfAbsent(any()) }
     }
 }

@@ -27,6 +27,7 @@ internal fun pocketEntry(
     periodId: Long,
     date: LocalDateTime,
     label: String = pocket.name,
+    clientGeneratedId: String? = null,
 ): Transaction = Transaction(
     amount = if (withdraw) amount.abs().negate() else amount.abs(),
     comment = label,
@@ -34,6 +35,7 @@ internal fun pocketEntry(
     periodId = periodId,
     isAdjustment = true,
     pocketId = pocket.id,
+    clientGeneratedId = clientGeneratedId,
 )
 
 internal fun goalPocketUpdate(
@@ -44,15 +46,15 @@ internal fun goalPocketUpdate(
 ): SavingsPocket? {
     val target = updated.savingsGoalAmount?.takeIf { it.signum() > 0 }
     val deadline = target?.let { updated.savingsGoalMonths?.takeIf { it > 0 } }?.let { today.plusMonths(it.toLong()) }
-    val goalChanged = previous != null && (
-        previous.savingsGoalAmount?.stripTrailingZeros() != updated.savingsGoalAmount?.stripTrailingZeros() ||
-            previous.savingsGoalMonths != updated.savingsGoalMonths
-        )
-    return when {
-        existing == null -> target?.let { SavingsPocket(name = "", target = it, targetDate = deadline) }
-        goalChanged -> existing.copy(target = target, targetDate = deadline).takeIf { it != existing }
-        else -> null
-    }
+    if (existing == null) return target?.let { SavingsPocket(name = "", target = it, targetDate = deadline) }
+    val targetMatches = if (target == null) existing.target == null else existing.target?.compareTo(target) == 0
+    val monthsChanged = previous != null && previous.savingsGoalMonths != updated.savingsGoalMonths
+    val keepDeadline = targetMatches && !monthsChanged && existing.targetDate != null && deadline != null
+    val reconciled = existing.copy(
+        target = if (targetMatches) existing.target else target,
+        targetDate = if (keepDeadline) existing.targetDate else deadline,
+    )
+    return reconciled.takeIf { it != existing }
 }
 
 data class PocketPeriodFlow(val added: BigDecimal, val withdrawn: BigDecimal)

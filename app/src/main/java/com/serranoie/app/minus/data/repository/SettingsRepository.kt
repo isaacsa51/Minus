@@ -124,6 +124,8 @@ interface SettingsRepository {
 
     suspend fun markSurplusUnresolved(amount: BigDecimal)
 
+    suspend fun getPendingRolloverPeriodId(): Long?
+
     suspend fun setLeftoverChoice(date: LocalDate, choice: LeftoverChoice, keepFrom: LocalDate)
 
     suspend fun setSavingsPreferences(prefs: SavingsPreferences)
