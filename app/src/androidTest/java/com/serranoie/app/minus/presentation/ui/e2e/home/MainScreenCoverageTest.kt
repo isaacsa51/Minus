@@ -30,6 +30,7 @@ import com.google.common.truth.Truth
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.BudgetSplitMode
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.FirstLaunchTutorialStage
 import com.serranoie.app.minus.domain.model.Transaction
@@ -233,6 +234,7 @@ class MainScreenCoverageTest {
         viewPeriod: BudgetPeriod = BudgetPeriod.DAILY,
         currencyCode: String = "USD",
         capturedIntents: MutableList<Any> = mutableListOf(),
+        splitMode: BudgetSplitMode = BudgetSplitMode.DYNAMIC,
     ) {
         composeTestRule.setContent {
             MinusTheme {
@@ -245,6 +247,7 @@ class MainScreenCoverageTest {
                         budgetSettings = budgetSettings,
                         viewPeriod = viewPeriod,
                         currencyCode = currencyCode,
+                        splitMode = splitMode,
                         onOpenBudgetSheet = { capturedIntents += "ShowBudgetPeriodSheet" },
                         modifier = Modifier.fillMaxSize(),
                     )
@@ -280,7 +283,7 @@ class MainScreenCoverageTest {
     }
 
     private fun numpadApplyButton(): SemanticsNodeInteraction =
-        composeTestRule.onAllNodesWithContentDescription("Editor action").onLast()
+        composeTestRule.onAllNodesWithContentDescription(composeTestRule.activity.getString(R.string.numpad_action)).onLast()
 
     @Test
     fun when_period_budget_is_exceeded_then_budget_pill_shows_over_budget_label() {
@@ -323,6 +326,7 @@ class MainScreenCoverageTest {
                 period = BudgetPeriod.DAILY,
             ),
             viewPeriod = BudgetPeriod.DAILY,
+            splitMode = BudgetSplitMode.STATIC,
         )
 
         composeTestRule.waitForIdle()
@@ -369,6 +373,7 @@ class MainScreenCoverageTest {
                 period = BudgetPeriod.WEEKLY,
             ),
             viewPeriod = BudgetPeriod.WEEKLY,
+            splitMode = BudgetSplitMode.STATIC,
         )
 
         composeTestRule.waitForIdle()
@@ -433,6 +438,7 @@ class MainScreenCoverageTest {
                 period = BudgetPeriod.BIWEEKLY,
             ),
             viewPeriod = BudgetPeriod.BIWEEKLY,
+            splitMode = BudgetSplitMode.STATIC,
         )
 
         composeTestRule.waitForIdle()
@@ -687,7 +693,7 @@ class MainScreenCoverageTest {
 
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithContentDescription("Editor action").onFirst().performTouchInput { longClick() }
+        composeTestRule.onAllNodesWithContentDescription(composeTestRule.activity.getString(R.string.numpad_action)).onFirst().performTouchInput { longClick() }
         composeTestRule.waitForIdle()
 
         Truth.assertThat(intents).contains("BackspaceLongPress")
@@ -710,7 +716,7 @@ class MainScreenCoverageTest {
 
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithContentDescription("Editor action").onFirst().performClick()
+        composeTestRule.onAllNodesWithContentDescription(composeTestRule.activity.getString(R.string.numpad_action)).onFirst().performClick()
         composeTestRule.waitForIdle()
 
         Truth.assertThat(intents).contains("Backspace")
@@ -819,7 +825,7 @@ class MainScreenCoverageTest {
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(300)
 
-        composeTestRule.onNodeWithContentDescription("Settings").performClick()
+        composeTestRule.onNodeWithContentDescription(composeTestRule.activity.getString(R.string.settings_title)).performClick()
         composeTestRule.waitForIdle()
 
         Truth.assertThat(intents).contains("OpenSettings")
@@ -837,7 +843,7 @@ class MainScreenCoverageTest {
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(300)
 
-        composeTestRule.onNodeWithContentDescription("Analytics").performClick()
+        composeTestRule.onNodeWithContentDescription(composeTestRule.activity.getString(R.string.analytics_title)).performClick()
         composeTestRule.waitForIdle()
 
         Truth.assertThat(intents).contains("OpenAnalytics")
