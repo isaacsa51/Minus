@@ -155,7 +155,7 @@
     <string name="history_snackbar_delete_recurrent_failed">定期的な支払いを削除できませんでした</string>
     <string name="history_snackbar_mark_paid_failed">取引を支払い済みにできませんでした</string>
     <string name="history_snackbar_restore_transaction_failed">取引を復元できませんでした</string>
-    <string name="history_search_placeholder">Name, note, date or amount</string>
+    <string name="history_search_placeholder">名前、メモ、日付、金額</string>
     <string-array name="history_search_examples">
         <item>Range: 19 nov to 30 nov</item>
         <item>Day: Food 12 oct</item>
@@ -167,21 +167,21 @@
         <item>After a date: &gt;10/1</item>
         <item>Text only: \"Tacos\"</item>
     </string-array>
-    <string name="history_search_clear">Clear search</string>
-    <string name="history_search_no_results">No expenses match \"%1$s\"</string>
+    <string name="history_search_clear">検索をクリア</string>
+    <string name="history_search_no_results">「%1$s」に一致する支出はありません</string>
     <plurals name="history_search_results_summary">
-        <item quantity="other">%1$d matches · %2$s spent</item>
+        <item quantity="other">%1$d件一致 · %2$s 支出</item>
     </plurals>
     <string name="expense_queued_for_next_period">支出は次の期間に繰り越されます</string>
-    <string name="split_expense_mismatch">Amounts and categories don\'t match (%1$d vs %2$d)</string>
-    <string name="split_expense_not_recurring">Split expenses can\'t be recurring</string>
-    <string name="split_category_remove">Remove %1$s</string>
+    <string name="split_expense_mismatch">金額とカテゴリの数が一致しません（%1$d 対 %2$d）</string>
+    <string name="split_expense_not_recurring">分割した支出は定期にできません</string>
+    <string name="split_category_remove">%1$s を削除</string>
     <plurals name="split_expense_saved">
-        <item quantity="other">Saved %d expenses</item>
+        <item quantity="other">%d件の支出を保存しました</item>
     </plurals>
-    <string name="budget_load_failed">Could not load your budget</string>
-    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
-    <string name="budget_load_retry">Retry</string>
+    <string name="budget_load_failed">予算を読み込めませんでした</string>
+    <string name="budget_load_corrupt_data">保存された予算データの一部を読み取れませんでした</string>
+    <string name="budget_load_retry">再試行</string>
     <string name="add_new_category">カテゴリ</string>
     <string name="add_new_category_action">新しいカテゴリを追加</string>
     <string name="new_category">新しいカテゴリ</string>
@@ -196,22 +196,22 @@
     <string name="budget_less_than_one_day_validation">予算は少なくとも1日間でなければなりません</string>
     <!--  Analytics  -->
     <string name="analytics_title">分析</string>
-    <string name="receipt_scan_button">Scan receipt</string>
-    <string name="receipt_scan_failed">Couldn\'t read a total from the receipt</string>
-    <string name="quick_add_amount_label">Amount</string>
-    <string name="quick_add_no_categories">No categories yet. You can save without one.</string>
-    <string name="quick_add_save_failed">Couldn\'t save the expense. Try again.</string>
-    <string name="quick_add_needs_budget">Set up a budget in Minus before adding expenses here.</string>
-    <string name="quick_add_open_app">Open Minus</string>
-    <string name="quick_add_saved">%1$s saved</string>
-    <string name="receipt_camera_point_at_total">Point at the total</string>
-    <string name="receipt_camera_detected">%1$s detected</string>
-    <string name="receipt_camera_retry">No total found, try again</string>
-    <string name="receipt_camera_close">Close camera</string>
-    <string name="receipt_camera_capture">Capture receipt</string>
-    <string name="receipt_camera_gallery">Choose a photo</string>
-    <string name="receipt_camera_switch">Switch camera</string>
-    <string name="receipt_camera_flash">Flash</string>
+    <string name="receipt_scan_button">レシートをスキャン</string>
+    <string name="receipt_scan_failed">レシートから合計を読み取れませんでした</string>
+    <string name="quick_add_amount_label">金額</string>
+    <string name="quick_add_no_categories">カテゴリはまだありません。カテゴリなしでも保存できます。</string>
+    <string name="quick_add_save_failed">支出を保存できませんでした。もう一度お試しください。</string>
+    <string name="quick_add_needs_budget">ここで支出を追加する前に、Minus で予算を設定してください。</string>
+    <string name="quick_add_open_app">Minus を開く</string>
+    <string name="quick_add_saved">%1$s を保存しました</string>
+    <string name="receipt_camera_point_at_total">合計に向けてください</string>
+    <string name="receipt_camera_detected">%1$s を検出</string>
+    <string name="receipt_camera_retry">合計が見つかりません。もう一度お試しください</string>
+    <string name="receipt_camera_close">カメラを閉じる</string>
+    <string name="receipt_camera_capture">レシートを撮影</string>
+    <string name="receipt_camera_gallery">写真を選択</string>
+    <string name="receipt_camera_switch">カメラを切り替え</string>
+    <string name="receipt_camera_flash">フラッシュ</string>
     <string name="receipt_scan_hint">ヒント：✓を長押しするとレシートをスキャンできます</string>
     <string name="receipt_scan_hint_action">試す</string>
     <plurals name="days">
@@ -688,6 +688,34 @@
     <string name="category_limit_ahead">ペースが速め</string>
     <string name="category_limit_on_track">順調</string>
     <string name="analytics_category_limits_title">カテゴリの上限</string>
+    <string name="pockets_title">貯金ポケット</string>
+    <string name="pockets_empty">目標のためにお金を取り分けましょう。引き出すまで予算から外れます。</string>
+    <string name="pockets_new">新しいポケット</string>
+    <string name="pockets_name_label">名前</string>
+    <string name="pockets_target_label">目標金額（任意）</string>
+    <string name="pockets_amount_label">金額</string>
+    <string name="pockets_add_money">入金</string>
+    <string name="pockets_take_out">引き出す</string>
+    <string name="pockets_add_money_title">%1$s に入金</string>
+    <string name="pockets_take_out_title">%1$s から引き出す</string>
+    <string name="pockets_take_out_max">最大 %1$s</string>
+    <string name="pockets_of_target">/ %1$s</string>
+    <string name="pockets_of_target_by">/ %1$s（%2$s まで）</string>
+    <string name="pockets_goal_name">貯金</string>
+    <string name="pockets_set_aside">取り分ける</string>
+    <string name="pockets_saved_to">%1$s を %2$s に貯金しました</string>
+    <string name="pockets_set_aside_pick">先にポケットを選んでください</string>
+    <string name="pockets_set_aside_single_amount">取り分ける金額を1つ入力してください</string>
+    <string name="pockets_delete">ポケットを削除</string>
+    <string name="pockets_period_title">今期の貯金</string>
+    <string name="pockets_period_added">ポケットに %1$s を取り分けました。</string>
+    <string name="pockets_period_withdrawn">ポケットから %1$s を引き出しました。</string>
+    <string name="pockets_period_added_and_withdrawn">%1$s を取り分け、%2$s を引き出しました。</string>
+    <string name="pockets_delete_title">%1$s を削除しますか？</string>
+    <string name="pockets_delete_desc">ポケットは空なので、お金は失われません。</string>
+    <string name="pockets_action_failed">ポケットを更新できませんでした。もう一度お試しください。</string>
+    <string name="rollover_dialog_save_to_pocket_title">%1$s に貯金</string>
+    <string name="rollover_dialog_save_to_pocket_desc">このポケットに %1$s を取り分ける</string>
     <string name="settings_category_limits_title">カテゴリの上限</string>
     <string name="settings_category_limits_subtitle_empty">カテゴリごとに週または期間の支出上限を設定します</string>
     <string name="settings_category_limits_subtitle_count">%2$d件中%1$d件のカテゴリに上限があります</string>
@@ -715,6 +743,7 @@
     <string name="settings_savings_dialog_savings_label">節約 — %1$d%%</string>
     <string name="settings_savings_dialog_goal_section">貯蓄目標 (オプション)</string>
     <string name="settings_savings_dialog_goal_amount_label">ターゲット金額</string>
+    <string name="settings_savings_summary_goal_in">%2$sで%1$s</string>
     <string name="settings_savings_dialog_goal_months_label">目標期間 (月)</string>
     <string name="settings_savings_dialog_goal_hint">デフォルトの %1$d%% × 6の例を維持するには、空白のままにします。</string>
     <string name="settings_savings_dialog_reset">既定にリセット</string>
@@ -801,6 +830,10 @@
     <string name="notification_channel_savings_name">貯蓄リマインダー</string>
     <string name="notification_channel_savings_description">新しい予算期間が始まったときに、お金を取り分けるよう通知します</string>
     <string name="notification_savings_reminder_title">新しい期間：貯蓄のタイミングです</string>
+    <string name="notification_savings_goal_title">%2$s のために %1$s を取り分けましょう</string>
+    <string name="notification_savings_goal_message">%2$s の目標まであと %1$s です。タップして貯金しましょう。</string>
+    <string name="notification_savings_percent_title">今期は %1$s を取り分けましょう</string>
+    <string name="notification_savings_no_goal_message">貯金目標は設定されていませんが、今期は %1$s の貯金をおすすめします。</string>
     <string name="notification_savings_reminder_message">この期間から%1$sを貯蓄に回しましょう。</string>
     <string name="credit_owed_label">支払済合計</string>
     <string name="debt_adjusted_balance_label">借金調整残高</string>
@@ -867,16 +900,16 @@
     <string name="unit_millions">M</string>
     <string name="widget_budget_pill_title">予算ピル</string>
     <string name="widget_budget_pill_description">選択した表示モード（日次・週次・隔週・月次）の残額をスリムなバーで表示</string>
-    <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
-    <string name="island_brief_days_short">%1$dd</string>
-    <string name="island_brief_stale">left in period - open Minus to update</string>
-    <string name="island_page_spent_of">%1$s of %2$s spent</string>
-    <string name="island_page_period_left">Period left</string>
+    <string name="island_provider_description">island Brief 内に予算の残りを表示します</string>
+    <string name="island_brief_days_short">%1$d日</string>
+    <string name="island_brief_stale">期間内の残り - Minus を開いて更新</string>
+    <string name="island_page_spent_of">%2$s 中 %1$s 支出</string>
+    <string name="island_page_period_left">期間の残り</string>
     <plurals name="island_page_days_left">
-        <item quantity="other">days left</item>
+        <item quantity="other">日残り</item>
     </plurals>
-    <string name="island_charge_today">%1$s — %2$s due today</string>
-    <string name="island_charge_tomorrow">%1$s — %2$s due tomorrow</string>
-    <string name="island_charge_unnamed">Recurring payment</string>
-    <string name="island_credit_owed">%1$s owed on credit</string>
+    <string name="island_charge_today">%1$s — %2$s 本日期限</string>
+    <string name="island_charge_tomorrow">%1$s — %2$s 明日期限</string>
+    <string name="island_charge_unnamed">定期支払い</string>
+    <string name="island_credit_owed">クレジットの未払い %1$s</string>
 </resources>
