@@ -98,6 +98,7 @@ class BudgetViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         every { budgetRepository.getBudgetSettings() } returns settingsFlow
         every { budgetRepository.getTransactions() } returns transactionsFlow
+        coEvery { budgetRepository.addPocketDeposit(any()) } returns true
         every { budgetRepository.getQueuedTransactions() } returns queuedTransactionsFlow
         every { budgetRepository.getActiveCategories() } returns categoriesFlow
         every { budgetRepository.getPaidRecurrentOccurrences() } returns paidOccurrencesFlow
@@ -742,7 +743,7 @@ class BudgetViewModelTest {
         }
 
         coVerify {
-            budgetRepository.addTransaction(
+            budgetRepository.addPocketDeposit(
                 match { it.pocketId == 1L && it.isAdjustment && it.amount.compareTo(BigDecimal("500")) == 0 },
             )
         }
@@ -767,7 +768,7 @@ class BudgetViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        coVerify { budgetRepository.addTransaction(match { it.pocketId == 2L }) }
+        coVerify { budgetRepository.addPocketDeposit(match { it.pocketId == 2L }) }
     }
 
     @Test
@@ -785,7 +786,7 @@ class BudgetViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+        coVerify(exactly = 0) { budgetRepository.addPocketDeposit(any()) }
         assertThat(viewModel.uiState.value.numpadInput).isEqualTo("80")
     }
 
@@ -806,7 +807,7 @@ class BudgetViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+        coVerify(exactly = 0) { budgetRepository.addPocketDeposit(any()) }
     }
 
     @Test
@@ -868,14 +869,14 @@ class BudgetViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+        coVerify(exactly = 0) { budgetRepository.addPocketDeposit(any()) }
     }
 
     @Test
     fun `a second apply while a set aside is saving is ignored`() = runTest {
         pocketsFlow.value = listOf(trip)
         val release = CompletableDeferred<Unit>()
-        coEvery { budgetRepository.addTransaction(any()) } coAnswers { release.await(); 1L }
+        coEvery { budgetRepository.addPocketDeposit(any()) } coAnswers { release.await(); true }
         val viewModel = newViewModel()
 
         viewModel.uiState.test {
@@ -890,14 +891,14 @@ class BudgetViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        coVerify(exactly = 1) { budgetRepository.addTransaction(any()) }
+        coVerify(exactly = 1) { budgetRepository.addPocketDeposit(any()) }
     }
 
     @Test
     fun `apply is ignored while a set aside save is pending even after set aside is switched off`() = runTest {
         pocketsFlow.value = listOf(trip)
         val release = CompletableDeferred<Unit>()
-        coEvery { budgetRepository.addTransaction(any()) } coAnswers { release.await(); 1L }
+        coEvery { budgetRepository.addPocketDeposit(any()) } coAnswers { release.await(); true }
         val viewModel = newViewModel()
 
         viewModel.uiState.test {
@@ -916,5 +917,24 @@ class BudgetViewModelTest {
         coVerify(exactly = 0) {
             transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
         }
+    }
+
+    @Test
+    fun `a set aside into a pocket deleted meanwhile keeps the amount on the numpad`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        coEvery { budgetRepository.addPocketDeposit(any()) } returns false
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.isNotEmpty() }
+            typeAmount(viewModel, "50")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            awaitCondition { it.isSetAsideEnabled }
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            assertThat(viewModel.uiState.value.numpadInput).isEqualTo("50")
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
     }
 }

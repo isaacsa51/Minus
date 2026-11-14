@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.calculator.SavingsPocketStatus
-import com.serranoie.app.minus.domain.calculator.pocketBalances
 import com.serranoie.app.minus.domain.calculator.pocketEntry
 import com.serranoie.app.minus.domain.calculator.pocketStatuses
 import com.serranoie.app.minus.domain.model.ArchivedBudget
@@ -311,7 +310,7 @@ class AnalyticsViewModel @Inject constructor(
             allTransactions = allTransactions,
             spends = actualSpends,
             incomes = actualIncomes,
-            chartSpends = actualSpends.toChartSpends(),
+            chartSpends = actualSpends,
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
             wholeBudget = archive.totalBudget,
@@ -455,7 +454,7 @@ class AnalyticsViewModel @Inject constructor(
             spends = spends,
             incomes = incomes,
             decreases = decreases,
-            chartSpends = actualTransactions.toChartSpends(),
+            chartSpends = spends,
             recurringInPeriod = (paidRecurring + upcomingRecurring).distinctBy { it.id },
             oneTimeSpends = oneTimeSpends,
             wholeBudget = displayBudgetState.totalBudget,
@@ -673,8 +672,9 @@ class AnalyticsViewModel @Inject constructor(
 
     fun onDeletePocket(pocketId: Long) {
         runPocketAction("AnalyticsViewModel.onDeletePocket") {
-            val balance = pocketBalances(budgetRepository.getTransactions().first())[pocketId] ?: BigDecimal.ZERO
-            if (balance.signum() == 0) budgetRepository.deleteSavingsPocket(pocketId)
+            if (!budgetRepository.deleteSavingsPocket(pocketId)) {
+                _effects.value = AnalyticsUiEffect.PocketActionFailed
+            }
         }
     }
 
@@ -691,9 +691,12 @@ class AnalyticsViewModel @Inject constructor(
                 date = LocalDateTime.now(),
                 label = pocket.name.ifBlank { goalLabel },
             )
-            if (!withdraw) {
-                budgetRepository.addTransaction(entry)
-            } else if (!budgetRepository.addPocketWithdrawal(entry)) {
+            val saved = if (withdraw) {
+                budgetRepository.addPocketWithdrawal(entry)
+            } else {
+                budgetRepository.addPocketDeposit(entry)
+            }
+            if (!saved) {
                 _effects.value = AnalyticsUiEffect.PocketActionFailed
             }
         }
@@ -717,5 +720,3 @@ class AnalyticsViewModel @Inject constructor(
     }
 }
 
-private fun List<Transaction>.toChartSpends(): List<Transaction> =
-    filter { it.amount > BigDecimal.ZERO }

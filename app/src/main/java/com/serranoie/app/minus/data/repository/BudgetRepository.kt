@@ -1,14 +1,13 @@
 package com.serranoie.app.minus.data.repository
 
+import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
-import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.CategoryLimit
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
-import com.serranoie.app.minus.domain.model.ArchivedBudget
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -21,7 +20,6 @@ interface BudgetRepository {
 
     fun getTransactionsForPeriod(start: LocalDate, end: LocalDate): Flow<List<Transaction>>
 
-    /** Inserts [transaction] and returns the id the row was given. */
     suspend fun addTransaction(transaction: Transaction): Long
 
     suspend fun addTransactions(transactions: List<Transaction>): List<Long>
@@ -31,6 +29,8 @@ interface BudgetRepository {
     suspend fun addTransactionIfAbsent(transaction: Transaction): Boolean
 
     suspend fun addPocketWithdrawal(transaction: Transaction): Boolean
+
+    suspend fun addPocketDeposit(transaction: Transaction): Boolean
 
     suspend fun updateTransaction(transaction: Transaction)
 
@@ -111,5 +111,5 @@ interface BudgetRepository {
 
     suspend fun saveSavingsPocket(pocket: SavingsPocket): Long
 
-    suspend fun deleteSavingsPocket(pocketId: Long)
+    suspend fun deleteSavingsPocket(pocketId: Long): Boolean
 }

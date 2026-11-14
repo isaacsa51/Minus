@@ -649,8 +649,8 @@ class BudgetViewModel @Inject constructor(
             return
         }
         val name = pocket.name.ifBlank { context.getString(R.string.pockets_goal_name) }
-        try {
-            budgetRepository.addTransaction(
+        val saved = try {
+            budgetRepository.addPocketDeposit(
                 pocketEntry(
                     pocket = pocket,
                     amount = amount,
@@ -664,6 +664,9 @@ class BudgetViewModel @Inject constructor(
             throw e
         } catch (e: Exception) {
             errorLogRecorder.record("BudgetViewModel.applySetAside", e)
+            false
+        }
+        if (!saved) {
             _effects.emit(BudgetUiEffect.ShowMessage(context.getString(R.string.pockets_action_failed)))
             return
         }
