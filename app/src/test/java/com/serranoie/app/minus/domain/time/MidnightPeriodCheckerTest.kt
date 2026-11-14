@@ -29,6 +29,10 @@ class MidnightPeriodCheckerTest {
     private val settingsRepository: SettingsRepository = mockk(relaxed = true)
     private val checker = MidnightPeriodChecker(budgetRepository, settingsRepository)
 
+    init {
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal.ZERO to null)
+    }
+
     private fun settingsEndingOn(
         endDate: LocalDate,
         strategy: RemainingBudgetStrategy = RemainingBudgetStrategy.ASK_ALWAYS,
@@ -647,5 +651,68 @@ class MidnightPeriodCheckerTest {
         sweep2.join()
         splitFinish.join()
         assertThat(pending).isEqualToIgnoringScale(BigDecimal("80"))
+    }
+
+    @Test
+    fun `a resolve after a sweep already credited the pocket does not add the surplus to the budget`() = runTest {
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns settingsEndingOn(LocalDate.now().plusDays(10))
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { settingsRepository.getOrCreatePendingRolloverId() } returns "r-1"
+        coEvery { budgetRepository.existsTransactionByClientGeneratedId("pocket-sweep-r-1") } returns true
+
+        checker.resolveUnresolvedSurplus(RemainingBudgetStrategy.SPLIT_EQUALLY)
+
+        coVerify(exactly = 0) { budgetRepository.saveBudgetSettings(any()) }
+        coVerify { settingsRepository.clearPendingRollover() }
+        assertThat(checker.shouldShowTransitionDialog.value).isFalse()
+    }
+
+    @Test
+    fun `a new surplus is added to an uncredited one left from an earlier period`() = runTest {
+        val settings = settingsEndingOn(LocalDate.now().plusDays(10))
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { settingsRepository.getPendingRolloverPeriodId() } returns 5L
+        coEvery { settingsRepository.getCurrentPeriodId() } returns 7L
+        coEvery { settingsRepository.getOrCreatePendingRolloverId() } returns "r-1"
+        coEvery { budgetRepository.existsTransactionByClientGeneratedId(any()) } returns false
+
+        checker.handleEarlyFinish(settings, remainingAmount = BigDecimal("120.00"))
+        checker.handleEarlyFinish(
+            settingsEndingOn(LocalDate.now().plusDays(10), RemainingBudgetStrategy.SPLIT_EQUALLY),
+            remainingAmount = BigDecimal("80.00"),
+        )
+
+        coVerify { settingsRepository.markSurplusUnresolved(match { it.compareTo(BigDecimal("420")) == 0 }) }
+        coVerify {
+            settingsRepository.setPendingRollover(
+                match { it.compareTo(BigDecimal("380")) == 0 },
+                RemainingBudgetStrategy.SPLIT_EQUALLY,
+            )
+        }
+    }
+
+    @Test
+    fun `a surplus recomputed for the same period replaces the pending one`() = runTest {
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { settingsRepository.getPendingRolloverPeriodId() } returns 7L
+        coEvery { settingsRepository.getCurrentPeriodId() } returns 7L
+
+        checker.handleEarlyFinish(settingsEndingOn(LocalDate.now().plusDays(10)), remainingAmount = BigDecimal("120.00"))
+
+        coVerify { settingsRepository.markSurplusUnresolved(match { it.compareTo(BigDecimal("120")) == 0 }) }
+    }
+
+    @Test
+    fun `a pending surplus already swept into a pocket is settled before a new one is stored`() = runTest {
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { settingsRepository.getPendingRolloverPeriodId() } returns 5L
+        coEvery { settingsRepository.getCurrentPeriodId() } returns 7L
+        coEvery { settingsRepository.getOrCreatePendingRolloverId() } returns "r-1"
+        coEvery { budgetRepository.existsTransactionByClientGeneratedId("pocket-sweep-r-1") } returns true
+
+        checker.handleEarlyFinish(settingsEndingOn(LocalDate.now().plusDays(10)), remainingAmount = BigDecimal("120.00"))
+
+        coVerify { settingsRepository.clearPendingRollover() }
+        coVerify { settingsRepository.markSurplusUnresolved(match { it.compareTo(BigDecimal("120")) == 0 }) }
     }
 }

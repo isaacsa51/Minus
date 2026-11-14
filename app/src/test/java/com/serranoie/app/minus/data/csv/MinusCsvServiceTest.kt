@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.ArchivedBudget
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.Category
@@ -13,6 +14,7 @@ import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
@@ -48,6 +50,7 @@ class MinusCsvServiceTest {
         coEvery { repository.upsertTransactions(capture(upsertedTransactions)) } just Runs
         coEvery { repository.addTransaction(capture(addedTransactions)) } returns 1L
         coEvery { repository.upsertArchivedBudgets(capture(upsertedArchives)) } just Runs
+        every { repository.getSavingsPockets() } returns flowOf(emptyList())
     }
 
     private fun csvOf(
@@ -55,9 +58,10 @@ class MinusCsvServiceTest {
         archived: List<ArchivedBudget> = emptyList(),
         metadata: CsvBackupMetadata? = null,
         paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
+        pockets: List<SavingsPocket> = emptyList(),
     ): ByteArrayInputStream {
         val out = ByteArrayOutputStream()
-        MinusCsvExporter().export(transactions, archived, metadata, paidOccurrences, out)
+        MinusCsvExporter().export(transactions, archived, metadata, paidOccurrences, out, pockets)
         return ByteArrayInputStream(out.toByteArray())
     }
 
@@ -224,7 +228,7 @@ class MinusCsvServiceTest {
             currentPeriodId = 202L,
         )
         val replaced = slot<List<Transaction>>()
-        coEvery { repository.replaceAllTransactions(capture(replaced), any()) } just Runs
+        coEvery { repository.replaceAllTransactions(capture(replaced), any(), any()) } just Runs
 
         service.importTransactions(
             csvOf(listOf(tx(id = 5L, comment = "Coffee"), tx(id = 0L, comment = "Rent")), metadata = meta)
@@ -240,7 +244,7 @@ class MinusCsvServiceTest {
     fun `a partial import without metadata merges and never wipes`() = runTest {
         service.importTransactions(csvOf(listOf(tx(id = 1L))))
 
-        coVerify(exactly = 0) { repository.replaceAllTransactions(any(), any()) }
+        coVerify(exactly = 0) { repository.replaceAllTransactions(any(), any(), any()) }
     }
 
     @Test
@@ -258,7 +262,7 @@ class MinusCsvServiceTest {
         coVerify(exactly = 1) {
             repository.markRecurrentOccurrencePaid(5L, date.plusMonths(1), RecurrentOccurrenceStatus.SKIPPED)
         }
-        coVerify(exactly = 0) { repository.replaceAllTransactions(any(), any()) }
+        coVerify(exactly = 0) { repository.replaceAllTransactions(any(), any(), any()) }
     }
 
     @Test
@@ -323,5 +327,54 @@ class MinusCsvServiceTest {
 
     private companion object {
         val CATEGORY_IDS = mapOf("Coffee" to 11L, "Rent" to 22L)
+    }
+
+    @Test
+    fun `a full backup restores its pockets and keeps pocket rows linked`() = runTest {
+        val meta = CsvBackupMetadata(
+            budgetSettings = settings(),
+            currentPeriodStartedAtMillis = 1_709_000_000_000L,
+            currentPeriodId = 202L,
+        )
+        val pocket = SavingsPocket(id = 3L, name = "Trip", createdAt = 1L)
+        val replaced = slot<List<Transaction>>()
+        val restoredPockets = slot<List<SavingsPocket>>()
+        coEvery { repository.replaceAllTransactions(capture(replaced), any(), capture(restoredPockets)) } just Runs
+
+        service.importTransactions(
+            csvOf(
+                listOf(tx(id = 5L, amount = "75.00", comment = "Trip").copy(isAdjustment = true, pocketId = 3L)),
+                metadata = meta,
+                pockets = listOf(pocket),
+            ),
+        )
+
+        assertThat(restoredPockets.captured).containsExactly(pocket)
+        assertThat(replaced.captured.single().pocketId).isEqualTo(3L)
+        assertThat(replaced.captured.single().isAdjustment).isTrue()
+    }
+
+    @Test
+    fun `a partial import saves the pockets it carries`() = runTest {
+        val pocket = SavingsPocket(id = 3L, name = "Trip", createdAt = 1L)
+
+        service.importTransactions(csvOf(listOf(tx(id = 5L)), pockets = listOf(pocket)))
+
+        coVerify { repository.saveSavingsPocket(pocket) }
+    }
+
+    @Test
+    fun `exportAllTransactions writes the savings pockets`() = runTest {
+        every { repository.getTransactions() } returns flowOf(emptyList())
+        every { repository.getArchivedBudgets() } returns flowOf(emptyList())
+        every { repository.getPaidRecurrentOccurrences() } returns flowOf(emptySet())
+        every { repository.getSavingsPockets() } returns flowOf(listOf(SavingsPocket(id = 3L, name = "Trip", createdAt = 1L)))
+        coEvery { repository.getBudgetSettingsSync() } returns null
+        val out = ByteArrayOutputStream()
+
+        service.exportAllTransactions(out)
+
+        val parsed = MinusCsvParser().parse(ByteArrayInputStream(out.toByteArray()))
+        assertThat(parsed.pockets.single().name).isEqualTo("Trip")
     }
 }
