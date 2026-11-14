@@ -1,8 +1,10 @@
 package com.serranoie.app.minus.data.csv
 
+import com.serranoie.app.minus.data.csv.MinusCsvContract as C
 import com.serranoie.app.minus.domain.model.ArchivedBudget
-import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
+import com.serranoie.app.minus.domain.model.SavingsPocket
+import com.serranoie.app.minus.domain.model.Transaction
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import java.io.OutputStream
@@ -21,142 +23,97 @@ class MinusCsvExporter {
         metadata: CsvBackupMetadata?,
         paidOccurrences: Set<PaidRecurrentOccurrence>,
         outputStream: OutputStream,
+        pockets: List<SavingsPocket> = emptyList(),
     ) {
         val format = CSVFormat.DEFAULT.builder()
-            .setHeader(*MinusCsvContract.HEADERS)
+            .setHeader(*C.HEADERS)
             .get()
 
         OutputStreamWriter(outputStream, StandardCharsets.UTF_8).use { writer ->
             CSVPrinter(writer, format).use { printer ->
                 metadata?.let { meta ->
                     val s = meta.budgetSettings
-                    printer.printRecord(
-                        MinusCsvContract.MARKER_META,
-                        "", // amount
-                        "", // category
-                        "", // extra_note
-                        "", // is_recurrent
-                        "", // frequency
-                        "", // end_date
-                        "", // sub_day
-                        "", // id
-                        "", // is_credit
-                        "", // is_credit_paid
-                        "", // period_id
-                        "", // created_at
-                        s.totalBudget.toPlainString(),
-                        s.period.name,
-                        s.startDate.format(dateFormatter),
-                        s.getPeriodEndDate().format(dateFormatter),
-                        s.currencyCode,
-                        s.daysInPeriod.toString(),
-                        if (s.rollOverEnabled) "1" else "0",
-                        if (s.rollOverCarryForward) "1" else "0",
-                        s.remainingBudgetStrategy.name,
-                        meta.currentPeriodStartedAtMillis.toString(),
-                        meta.currentPeriodId.toString(),
-                        s.creditCardCutoffDay?.toString().orEmpty(),
-                        s.splitMode.name,
+                    printer.row(
+                        C.COL_DATE to C.MARKER_META,
+                        C.COL_BUDGET_TOTAL to s.totalBudget.toPlainString(),
+                        C.COL_BUDGET_PERIOD to s.period.name,
+                        C.COL_BUDGET_START_DATE to s.startDate.format(dateFormatter),
+                        C.COL_BUDGET_END_DATE to s.getPeriodEndDate().format(dateFormatter),
+                        C.COL_CURRENCY_CODE to s.currencyCode,
+                        C.COL_DAYS_IN_PERIOD to s.daysInPeriod.toString(),
+                        C.COL_ROLLOVER_ENABLED to s.rollOverEnabled.flag(),
+                        C.COL_ROLLOVER_CARRY_FORWARD to s.rollOverCarryForward.flag(),
+                        C.COL_REMAINING_BUDGET_STRATEGY to s.remainingBudgetStrategy.name,
+                        C.COL_CURRENT_PERIOD_STARTED_AT to meta.currentPeriodStartedAtMillis.toString(),
+                        C.COL_CURRENT_PERIOD_ID to meta.currentPeriodId.toString(),
+                        C.COL_CREDIT_CARD_CUTOFF_DAY to s.creditCardCutoffDay?.toString().orEmpty(),
+                        C.COL_SPLIT_MODE to s.splitMode.name,
+                    )
+                }
+
+                pockets.forEach { pocket ->
+                    printer.row(
+                        C.COL_DATE to C.MARKER_POCKET,
+                        C.COL_ID to pocket.id.toString(),
+                        C.COL_CATEGORY to pocket.name,
+                        C.COL_AMOUNT to pocket.target?.toPlainString().orEmpty(),
+                        C.COL_END_DATE to pocket.targetDate?.format(dateFormatter).orEmpty(),
+                        C.COL_CREATED_AT to pocket.createdAt.toString(),
                     )
                 }
 
                 archivedBudgets.forEach { archive ->
-                    printer.printRecord(
-                        MinusCsvContract.MARKER_ARCHIVED,
-                        archive.spentAmount.toPlainString(),
-                        "", // category
-                        "", // extra_note
-                        "", // is_recurrent
-                        "", // frequency
-                        "", // end_date
-                        "", // sub_day
-                        "", // id
-                        "", // is_credit
-                        "", // is_credit_paid
-                        archive.periodId.toString(),
-                        archive.createdAt.toString(),
-                        archive.totalBudget.toPlainString(),
-                        archive.periodType.name,
-                        archive.startDate.format(dateFormatter),
-                        archive.endDate.format(dateFormatter),
-                        archive.currencyCode,
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
+                    printer.row(
+                        C.COL_DATE to C.MARKER_ARCHIVED,
+                        C.COL_AMOUNT to archive.spentAmount.toPlainString(),
+                        C.COL_PERIOD_ID to archive.periodId.toString(),
+                        C.COL_CREATED_AT to archive.createdAt.toString(),
+                        C.COL_BUDGET_TOTAL to archive.totalBudget.toPlainString(),
+                        C.COL_BUDGET_PERIOD to archive.periodType.name,
+                        C.COL_BUDGET_START_DATE to archive.startDate.format(dateFormatter),
+                        C.COL_BUDGET_END_DATE to archive.endDate.format(dateFormatter),
+                        C.COL_CURRENCY_CODE to archive.currencyCode,
                     )
                 }
 
                 paidOccurrences.forEach { occurrence ->
-                    printer.printRecord(
-                        MinusCsvContract.MARKER_PAID_OCCURRENCE,
-                        "", // amount
-                        "", // category
-                        "", // extra_note
-                        "", // is_recurrent
-                        "", // frequency
-                        "", // end_date
-                        "", // sub_day
-                        occurrence.transactionId.toString(), // id
-                        "", // is_credit
-                        "", // is_credit_paid
-                        "", // period_id
-                        "", // created_at
-                        "", // budget_total
-                        occurrence.status.name, // budget_period (reused for status)
-                        occurrence.occurrenceDate.format(dateFormatter), // budget_start_date (reused for date)
-                        "", // budget_end_date
-                        "", // currency_code
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
+                    printer.row(
+                        C.COL_DATE to C.MARKER_PAID_OCCURRENCE,
+                        C.COL_ID to occurrence.transactionId.toString(),
+                        C.COL_BUDGET_PERIOD to occurrence.status.name,
+                        C.COL_BUDGET_START_DATE to occurrence.occurrenceDate.format(dateFormatter),
                     )
                 }
 
                 transactions.forEach { tx ->
                     val txDate = tx.date ?: return@forEach
-                    val frequency = tx.recurrentFrequency?.name.orEmpty()
-                    val endDate = tx.recurrentEndDate?.toLocalDate()?.format(dateFormatter).orEmpty()
-                    val subDay = tx.subscriptionDay?.toString().orEmpty()
-
-                    printer.printRecord(
-                        txDate.format(dateTimeFormatter),
-                        tx.amount.toPlainString(),
-                        tx.comment,
-                        tx.note,
-                        if (tx.isRecurrent) "1" else "0",
-                        frequency,
-                        endDate,
-                        subDay,
-                        tx.id.toString(),
-                        if (tx.isCredit) "1" else "0",
-                        if (tx.isCreditPaid) "1" else "0",
-                        tx.periodId.toString(),
-                        tx.createdAt.toString(),
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
+                    printer.row(
+                        C.COL_DATE to txDate.format(dateTimeFormatter),
+                        C.COL_AMOUNT to tx.amount.toPlainString(),
+                        C.COL_CATEGORY to tx.comment,
+                        C.COL_EXTRA_NOTE to tx.note,
+                        C.COL_IS_RECURRENT to tx.isRecurrent.flag(),
+                        C.COL_FREQUENCY to tx.recurrentFrequency?.name.orEmpty(),
+                        C.COL_END_DATE to tx.recurrentEndDate?.toLocalDate()?.format(dateFormatter).orEmpty(),
+                        C.COL_SUB_DAY to tx.subscriptionDay?.toString().orEmpty(),
+                        C.COL_ID to tx.id.toString(),
+                        C.COL_IS_CREDIT to tx.isCredit.flag(),
+                        C.COL_IS_CREDIT_PAID to tx.isCreditPaid.flag(),
+                        C.COL_PERIOD_ID to tx.periodId.toString(),
+                        C.COL_CREATED_AT to tx.createdAt.toString(),
+                        C.COL_IS_ADJUSTMENT to tx.isAdjustment.flag(),
+                        C.COL_POCKET_ID to tx.pocketId?.toString().orEmpty(),
                     )
                 }
                 printer.flush()
             }
         }
     }
+
+    private fun CSVPrinter.row(vararg values: Pair<String, String>) {
+        val byColumn = values.toMap()
+        printRecord(C.HEADERS.map { byColumn[it].orEmpty() })
+    }
+
+    private fun Boolean.flag() = if (this) "1" else "0"
 }

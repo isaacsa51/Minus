@@ -40,7 +40,8 @@ interface BudgetRepository {
 
     suspend fun replaceAllTransactions(
         transactions: List<Transaction>,
-        paidOccurrences: List<PaidRecurrentOccurrence>
+        paidOccurrences: List<PaidRecurrentOccurrence>,
+        pockets: List<SavingsPocket> = emptyList(),
     )
 
     suspend fun existsTransactionByClientGeneratedId(clientGeneratedId: String): Boolean

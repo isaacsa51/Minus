@@ -4,6 +4,7 @@ import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -22,7 +23,9 @@ data class CsvTransactionRow(
     val isCredit: Boolean,
     val isCreditPaid: Boolean,
     val periodId: Long,
-    val createdAt: Long? = null
+    val createdAt: Long? = null,
+    val isAdjustment: Boolean = false,
+    val pocketId: Long? = null,
 )
 
 data class CsvBackupMetadata(
@@ -37,6 +40,7 @@ data class CsvImportPayload(
     val archivedBudgets: List<ArchivedBudget>,
     val paidOccurrences: List<PaidRecurrentOccurrence>,
     val errors: List<String>,
+    val pockets: List<SavingsPocket> = emptyList(),
 )
 
 data class CsvImportResult(
@@ -61,7 +65,9 @@ fun CsvTransactionRow.toDomainTransaction(categoryId: Long? = null): Transaction
         categoryId = categoryId,
         isCredit = isCredit,
         isCreditPaid = isCreditPaid,
-        createdAt = createdAt ?: System.currentTimeMillis()
+        createdAt = createdAt ?: System.currentTimeMillis(),
+        isAdjustment = isAdjustment,
+        pocketId = pocketId,
     )
 }
 

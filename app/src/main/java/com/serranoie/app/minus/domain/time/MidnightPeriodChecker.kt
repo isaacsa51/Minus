@@ -289,6 +289,11 @@ class MidnightPeriodChecker @Inject constructor(
             onTransitionDialogConfirmed()
             return@withLock
         }
+        if (alreadySwept()) {
+            settingsRepository.clearPendingRollover()
+            onTransitionDialogConfirmed()
+            return@withLock
+        }
 
         val currentSettings = budgetRepository.getBudgetSettingsSync()
         val periodIsActive = currentSettings != null &&
@@ -355,7 +360,7 @@ class MidnightPeriodChecker @Inject constructor(
                     periodId = sourcePeriodId,
                     date = if (periodEnd != null && periodEnd.isBefore(now)) periodEnd else now,
                     label = label,
-                    clientGeneratedId = "pocket-sweep-${settingsRepository.getOrCreatePendingRolloverId()}",
+                    clientGeneratedId = sweepId(),
                 ),
             )
             check(saved) { "Pocket ${pocket.id} no longer exists" }
@@ -398,10 +403,25 @@ class MidnightPeriodChecker @Inject constructor(
         strategy: RemainingBudgetStrategy,
         remainingAmount: BigDecimal,
     ) = settlementLock.withLock {
-        settingsRepository.setPendingRollover(remainingAmount, strategy)
+        settingsRepository.setPendingRollover(uncreditedEarlierSurplus().add(remainingAmount), strategy)
     }
 
     private suspend fun markSurplusUnresolved(amount: BigDecimal) = settlementLock.withLock {
-        settingsRepository.markSurplusUnresolved(amount)
+        settingsRepository.markSurplusUnresolved(uncreditedEarlierSurplus().add(amount))
     }
+
+    private suspend fun uncreditedEarlierSurplus(): BigDecimal {
+        val (pendingAmount, _) = settingsRepository.getPendingRollover()
+        if (pendingAmount <= BigDecimal.ZERO) return BigDecimal.ZERO
+        if (alreadySwept()) {
+            settingsRepository.clearPendingRollover()
+            return BigDecimal.ZERO
+        }
+        val sourcePeriodId = settingsRepository.getPendingRolloverPeriodId() ?: return BigDecimal.ZERO
+        return if (sourcePeriodId != settingsRepository.getCurrentPeriodId()) pendingAmount else BigDecimal.ZERO
+    }
+
+    private suspend fun sweepId() = "pocket-sweep-${settingsRepository.getOrCreatePendingRolloverId()}"
+
+    private suspend fun alreadySwept() = budgetRepository.existsTransactionByClientGeneratedId(sweepId())
 }

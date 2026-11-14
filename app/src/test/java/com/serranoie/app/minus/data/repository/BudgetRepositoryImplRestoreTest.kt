@@ -4,12 +4,15 @@ import androidx.room.withTransaction
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.local.AppDatabase
 import com.serranoie.app.minus.data.local.dao.PaidRecurrentOccurrenceDao
+import com.serranoie.app.minus.data.local.dao.SavingsPocketDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.coVerifyOrder
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
@@ -25,6 +28,7 @@ class BudgetRepositoryImplRestoreTest {
     private val database = mockk<AppDatabase>()
     private val transactionDao = mockk<TransactionDao>(relaxed = true)
     private val occurrenceDao = mockk<PaidRecurrentOccurrenceDao>(relaxed = true)
+    private val pocketDao = mockk<SavingsPocketDao>(relaxed = true)
     private val repository = BudgetRepositoryImpl(
         appDatabase = database,
         transactionDao = transactionDao,
@@ -33,7 +37,7 @@ class BudgetRepositoryImplRestoreTest {
         categoryDao = mockk(),
         queuedTransactionDao = mockk(),
         paidRecurrentOccurrenceDao = occurrenceDao,
-        savingsPocketDao = mockk(),
+        savingsPocketDao = pocketDao,
     )
     private val date = LocalDate.of(2026, 3, 10)
 
@@ -100,4 +104,18 @@ class BudgetRepositoryImplRestoreTest {
         date = LocalDateTime.of(2026, 3, 10, 9, 30),
         isRecurrent = true,
     )
+
+    @Test
+    fun `restore replaces the savings pockets with the backup ones keeping their ids`() = runTest {
+        repository.replaceAllTransactions(
+            listOf(transaction(7L)),
+            emptyList(),
+            listOf(SavingsPocket(id = 3L, name = "Trip", createdAt = 1L)),
+        )
+
+        coVerifyOrder {
+            pocketDao.deleteAll()
+            pocketDao.upsert(match { it.id == 3L && it.name == "Trip" })
+        }
+    }
 }

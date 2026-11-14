@@ -18,6 +18,9 @@ interface SavingsPocketDao {
     @Query("SELECT EXISTS(SELECT 1 FROM savings_pockets WHERE id = :id)")
     suspend fun exists(id: Long): Boolean
 
+    @Query("DELETE FROM savings_pockets")
+    suspend fun deleteAll()
+
     @Query("DELETE FROM savings_pockets WHERE id = :id")
     suspend fun deleteById(id: Long)
 }

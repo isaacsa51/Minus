@@ -299,4 +299,13 @@ class SettingsRepositoryImplTest {
         assertThat(assigned).isNotEmpty()
         assertThat(repo.getOrCreatePendingRolloverId()).isEqualTo(assigned)
     }
+
+    @Test
+    fun `a queued surplus records the period it came from`() = runTest {
+        repo.setCurrentPeriod(periodId = 9L, startedAt = 1_000L)
+
+        repo.setPendingRollover(BigDecimal("80"), RemainingBudgetStrategy.SPLIT_EQUALLY)
+
+        assertThat(repo.getPendingRolloverPeriodId()).isEqualTo(9L)
+    }
 }

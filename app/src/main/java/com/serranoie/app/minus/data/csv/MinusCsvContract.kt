@@ -18,10 +18,13 @@ object MinusCsvContract {
     const val COL_IS_CREDIT_PAID = "is_credit_paid"
     const val COL_PERIOD_ID = "period_id"
     const val COL_CREATED_AT = "created_at"
+    const val COL_IS_ADJUSTMENT = "is_adjustment"
+    const val COL_POCKET_ID = "pocket_id"
 
     const val MARKER_META = "__META__"
     const val MARKER_ARCHIVED = "__ARCHIVED__"
     const val MARKER_PAID_OCCURRENCE = "__PAID_OCCURRENCE__"
+    const val MARKER_POCKET = "__POCKET__"
 
     const val COL_BUDGET_TOTAL = "budget_total"
     const val COL_BUDGET_PERIOD = "budget_period"
@@ -64,5 +67,7 @@ object MinusCsvContract {
         COL_CURRENT_PERIOD_ID,
         COL_CREDIT_CARD_CUTOFF_DAY,
         COL_SPLIT_MODE,
+        COL_IS_ADJUSTMENT,
+        COL_POCKET_ID,
     )
 }

@@ -121,4 +121,32 @@ class BudgetRepositoryImplPocketTest {
         isAdjustment = true,
         pocketId = 3L,
     )
+
+    @Test
+    fun `a repeated sweep into the same pocket counts as saved`() = runTest {
+        val deposit = sweep(pocketId = 3L)
+        coEvery { transactionDao.insertIgnore(any()) } returns -1L
+        coEvery { transactionDao.getByClientGeneratedId("pocket-sweep-r-1") } returns
+            row("75").copy(clientGeneratedId = "pocket-sweep-r-1")
+
+        assertThat(repository.addPocketDeposit(deposit)).isTrue()
+    }
+
+    @Test
+    fun `a repeated sweep aimed at another pocket is not reported as saved`() = runTest {
+        coEvery { savingsPocketDao.exists(4L) } returns true
+        coEvery { transactionDao.insertIgnore(any()) } returns -1L
+        coEvery { transactionDao.getByClientGeneratedId("pocket-sweep-r-1") } returns
+            row("75").copy(clientGeneratedId = "pocket-sweep-r-1")
+
+        assertThat(repository.addPocketDeposit(sweep(pocketId = 4L))).isFalse()
+    }
+
+    private fun sweep(pocketId: Long) = Transaction(
+        amount = BigDecimal("75"),
+        date = LocalDateTime.of(2026, 11, 14, 12, 0),
+        isAdjustment = true,
+        pocketId = pocketId,
+        clientGeneratedId = "pocket-sweep-r-1",
+    )
 }

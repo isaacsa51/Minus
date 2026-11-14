@@ -9,6 +9,7 @@ import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import org.apache.commons.csv.CSVFormat
 import org.junit.Test
@@ -83,7 +84,7 @@ class MinusCsvRoundTripTest {
         CSVFormat.DEFAULT.parse(out.toString(Charsets.UTF_8.name()).reader()).use { csv ->
             val records = csv.records
             assertThat(records[0].size()).isEqualTo(MinusCsvContract.HEADERS.size)
-            assertThat(records[1].size()).isEqualTo(26)
+            assertThat(records[1].size()).isEqualTo(MinusCsvContract.HEADERS.size)
         }
         val parsed = parser.parse(ByteArrayInputStream(out.toByteArray())).paidOccurrences.single()
         assertThat(parsed).isEqualTo(occurrence)
@@ -330,5 +331,42 @@ class MinusCsvRoundTripTest {
         assertThat(payload.archivedBudgets).hasSize(1)
         assertThat(payload.metadata).isNotNull()
         assertThat(payload.errors).isEmpty()
+    }
+
+    @Test
+    fun `pockets and their deposits and withdrawals survive the round trip`() {
+        val pocket = SavingsPocket(
+            id = 3L,
+            name = "Japan trip",
+            target = BigDecimal("1000"),
+            targetDate = LocalDate.of(2027, 1, 1),
+            createdAt = 123L,
+        )
+        val goal = SavingsPocket(id = 4L, name = "", createdAt = 456L)
+        val deposit = tx(id = 10L, amount = "75.00", comment = "Japan trip").copy(isAdjustment = true, pocketId = 3L)
+        val withdrawal = tx(id = 11L, amount = "-25.00", comment = "Japan trip").copy(isAdjustment = true, pocketId = 3L)
+        val out = ByteArrayOutputStream()
+        exporter.export(listOf(deposit, withdrawal, tx(id = 12L)), emptyList(), null, emptySet(), out, listOf(pocket, goal))
+
+        val payload = parser.parse(ByteArrayInputStream(out.toByteArray()))
+
+        assertThat(payload.errors).isEmpty()
+        assertThat(payload.pockets).containsExactly(pocket, goal)
+        val byId = payload.rows.associateBy { it.id }
+        assertThat(byId.getValue(10L).pocketId).isEqualTo(3L)
+        assertThat(byId.getValue(10L).isAdjustment).isTrue()
+        assertThat(byId.getValue(11L).amount).isEqualTo(BigDecimal("-25.00"))
+        assertThat(byId.getValue(11L).toDomainTransaction().pocketId).isEqualTo(3L)
+        assertThat(byId.getValue(11L).toDomainTransaction().isAdjustment).isTrue()
+        assertThat(byId.getValue(12L).pocketId).isNull()
+        assertThat(byId.getValue(12L).isAdjustment).isFalse()
+    }
+
+    @Test
+    fun `a negative row that is not a pocket movement is still discarded`() {
+        val payload = roundTrip(transactions = listOf(tx(id = 5L, amount = "-10.00")))
+
+        assertThat(payload.rows).isEmpty()
+        assertThat(payload.errors).hasSize(1)
     }
 }

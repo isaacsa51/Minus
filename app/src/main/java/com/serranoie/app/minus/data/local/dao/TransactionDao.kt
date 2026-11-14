@@ -95,6 +95,9 @@ interface TransactionDao {
     @Query("SELECT EXISTS(SELECT 1 FROM transactions WHERE clientGeneratedId = :clientGeneratedId)")
     suspend fun existsByClientGeneratedId(clientGeneratedId: String): Boolean
 
+    @Query("SELECT * FROM transactions WHERE clientGeneratedId = :clientGeneratedId LIMIT 1")
+    suspend fun getByClientGeneratedId(clientGeneratedId: String): TransactionEntity?
+
     @Query("SELECT * FROM transactions ORDER BY date DESC LIMIT :limit")
     suspend fun getRecentTransactions(limit: Int): List<TransactionEntity>
 

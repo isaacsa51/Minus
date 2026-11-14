@@ -304,6 +304,7 @@ class SettingsRepositoryImpl @Inject constructor(
         dataStore.edit { preferences ->
             preferences[PENDING_ROLLOVER_AMOUNT] = amount.toPlainString()
             preferences[PENDING_ROLLOVER_STRATEGY] = strategy.name
+            preferences[CURRENT_PERIOD_ID]?.let { preferences[PENDING_ROLLOVER_PERIOD_ID] = it }
         }
     }
 

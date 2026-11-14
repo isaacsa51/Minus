@@ -277,11 +277,13 @@ class BudgetRepositoryImpl @Inject constructor(
     override suspend fun addPocketDeposit(transaction: Transaction): Boolean {
         val pocketId = transaction.pocketId ?: return false
         return appDatabase.withTransaction {
-            if (!savingsPocketDao.exists(pocketId)) {
-                false
-            } else {
-                transactionDao.insertIgnore(transaction.toEntity())
-                true
+            when {
+                !savingsPocketDao.exists(pocketId) -> false
+                transactionDao.insertIgnore(transaction.toEntity()) != -1L -> true
+                else -> transaction.clientGeneratedId
+                    ?.let { transactionDao.getByClientGeneratedId(it) }
+                    ?.let { it.pocketId == pocketId && BigDecimal(it.amount).compareTo(transaction.amount) == 0 }
+                    ?: false
             }
         }
     }
@@ -317,11 +319,14 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun replaceAllTransactions(
         transactions: List<Transaction>,
-        paidOccurrences: List<PaidRecurrentOccurrence>
+        paidOccurrences: List<PaidRecurrentOccurrence>,
+        pockets: List<SavingsPocket>,
     ) {
         appDatabase.withTransaction {
             transactionDao.deleteAll()
             paidRecurrentOccurrenceDao.deleteAll()
+            savingsPocketDao.deleteAll()
+            pockets.forEach { savingsPocketDao.upsert(it.toEntity()) }
             val (fresh, reusable) = transactions.partition { it.id == 0L }
             transactionDao.insertAllOrReplace(reusable.map { it.toEntity() })
             val restoredIds = reusable.associate { it.id to it.id }.toMutableMap()
@@ -554,15 +559,15 @@ class BudgetRepositoryImpl @Inject constructor(
         }
 
     override suspend fun saveSavingsPocket(pocket: SavingsPocket): Long =
-        savingsPocketDao.upsert(
-            SavingsPocketEntity(
-                id = pocket.id,
-                name = pocket.name,
-                targetAmount = pocket.target?.toPlainString(),
-                targetEpochDay = pocket.targetDate?.toEpochDay(),
-                createdAt = pocket.createdAt,
-            ),
-        )
+        savingsPocketDao.upsert(pocket.toEntity())
+
+    private fun SavingsPocket.toEntity() = SavingsPocketEntity(
+        id = id,
+        name = name,
+        targetAmount = target?.toPlainString(),
+        targetEpochDay = targetDate?.toEpochDay(),
+        createdAt = createdAt,
+    )
 
     override suspend fun deleteSavingsPocket(pocketId: Long): Boolean =
         appDatabase.withTransaction {

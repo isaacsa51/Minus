@@ -8,6 +8,7 @@ import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import org.apache.commons.csv.CSVFormat
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -27,6 +28,7 @@ class MinusCsvParser {
         val rows = mutableListOf<CsvTransactionRow>()
         val archivedBudgets = mutableListOf<ArchivedBudget>()
         val paidOccurrences = mutableListOf<PaidRecurrentOccurrence>()
+        val pockets = mutableListOf<SavingsPocket>()
         var metadata: CsvBackupMetadata? = null
 
         val format = CSVFormat.DEFAULT.builder()
@@ -56,6 +58,13 @@ class MinusCsvParser {
                     return@forEachIndexed
                 }
 
+                if (dateRaw == MinusCsvContract.MARKER_POCKET) {
+                    runCatching { parsePocket(raw) }
+                        .onSuccess { pockets.add(it) }
+                        .onFailure { throwable -> errors.add("Line $lineNo savings pocket discarded: ${throwable.message}") }
+                    return@forEachIndexed
+                }
+
                 if (dateRaw == MinusCsvContract.MARKER_PAID_OCCURRENCE) {
                     runCatching { parsePaidOccurrence(raw) }
                         .onSuccess { paidOccurrences.add(it) }
@@ -65,7 +74,7 @@ class MinusCsvParser {
 
                 runCatching {
                     val row = parseRecord(raw)
-                    if (row.amount <= BigDecimal.ZERO) {
+                    if (row.amount <= BigDecimal.ZERO && row.pocketId == null) {
                         errors.add("Line $lineNo discarded: amount must be > 0")
                         null
                     } else {
@@ -84,7 +93,8 @@ class MinusCsvParser {
             metadata = metadata,
             archivedBudgets = archivedBudgets,
             paidOccurrences = paidOccurrences,
-            errors = errors
+            errors = errors,
+            pockets = pockets,
         )
     }
 
@@ -137,8 +147,18 @@ class MinusCsvParser {
             isCreditPaid = isCreditPaid,
             periodId = periodId,
             createdAt = raw.valueOf(MinusCsvContract.COL_CREATED_AT).toLongOrNull(),
+            isAdjustment = raw.valueOf(MinusCsvContract.COL_IS_ADJUSTMENT) == "1",
+            pocketId = raw.valueOf(MinusCsvContract.COL_POCKET_ID).toLongOrNull()?.takeIf { it > 0L },
         )
     }
+
+    private fun parsePocket(raw: Map<String, String>): SavingsPocket = SavingsPocket(
+        id = raw.valueOf(MinusCsvContract.COL_ID).toLong().also { require(it > 0L) { "pocket id must be > 0" } },
+        name = raw.valueOf(MinusCsvContract.COL_CATEGORY),
+        target = raw.valueOf(MinusCsvContract.COL_AMOUNT).takeIf { it.isNotBlank() }?.toBigDecimal(),
+        targetDate = raw.valueOf(MinusCsvContract.COL_END_DATE).takeIf { it.isNotBlank() }?.let { LocalDate.parse(it, dateFormatter) },
+        createdAt = raw.valueOf(MinusCsvContract.COL_CREATED_AT).toLongOrNull() ?: System.currentTimeMillis(),
+    )
 
     private fun parseArchivedBudget(raw: Map<String, String>): ArchivedBudget {
         val spentAmount = raw.valueOf(MinusCsvContract.COL_AMOUNT).toBigDecimal()
