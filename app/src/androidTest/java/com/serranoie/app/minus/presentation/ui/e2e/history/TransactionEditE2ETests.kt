@@ -140,7 +140,7 @@ class TransactionEditE2ETests {
     private fun creditToggleDesc() = composeTestRule.activity.getString(R.string.tutorial_credit_toggle_title)
 
     private fun tapApply() {
-        composeTestRule.onAllNodesWithContentDescription("Editor action").onLast()
+        composeTestRule.onAllNodesWithContentDescription(composeTestRule.activity.getString(R.string.numpad_action)).onLast()
             .performClick()
         composeTestRule.waitForIdle()
     }
@@ -572,12 +572,12 @@ class TransactionEditE2ETests {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithContentDescription("Editor action").onFirst().performClick()
+        composeTestRule.onAllNodesWithContentDescription(composeTestRule.activity.getString(R.string.numpad_action)).onFirst().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(400)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodesWithContentDescription("Editor action").onLast().performClick()
+        composeTestRule.onAllNodesWithContentDescription(composeTestRule.activity.getString(R.string.numpad_action)).onLast().performClick()
         composeTestRule.waitForIdle()
 
         Truth.assertThat(cancelCount).isEqualTo(1)

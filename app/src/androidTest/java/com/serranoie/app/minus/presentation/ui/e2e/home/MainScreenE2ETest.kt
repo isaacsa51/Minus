@@ -324,7 +324,7 @@ class MainScreenE2ETest {
     }
 
     private fun numpadApplyButton(): SemanticsNodeInteraction =
-        composeTestRule.onAllNodesWithContentDescription("Editor action").onLast()
+        composeTestRule.onAllNodesWithContentDescription(composeTestRule.activity.getString(R.string.numpad_action)).onLast()
 
     private fun formatExpected(
         value: BigDecimal,
@@ -405,7 +405,7 @@ class MainScreenE2ETest {
             capturedIntents = intents,
         )
 
-        composeTestRule.onAllNodesWithContentDescription("Editor action").assertCountEquals(2)
+        composeTestRule.onAllNodesWithContentDescription(composeTestRule.activity.getString(R.string.numpad_action)).assertCountEquals(2)
     }
 
     @Test
@@ -677,7 +677,7 @@ class MainScreenE2ETest {
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(300)
 
-        composeTestRule.onNodeWithContentDescription("Analytics").performClick()
+        composeTestRule.onNodeWithContentDescription(composeTestRule.activity.getString(R.string.analytics_title)).performClick()
         composeTestRule.waitForIdle()
 
         Truth.assertThat(intents).contains("OpenAnalytics")
@@ -695,7 +695,7 @@ class MainScreenE2ETest {
         composeTestRule.waitForIdle()
         composeTestRule.mainClock.advanceTimeBy(300)
 
-        composeTestRule.onNodeWithContentDescription("Settings").performClick()
+        composeTestRule.onNodeWithContentDescription(composeTestRule.activity.getString(R.string.settings_title)).performClick()
         composeTestRule.waitForIdle()
 
         Truth.assertThat(intents).contains("OpenSettings")
