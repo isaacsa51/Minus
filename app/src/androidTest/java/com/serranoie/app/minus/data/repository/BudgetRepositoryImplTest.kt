@@ -96,7 +96,7 @@ class BudgetRepositoryImplTest {
     }
 
     @Test
-    fun deletingAnArchivedPeriodKeepsItsPocketRows() = runBlocking {
+    fun deletingAnArchivedPeriodKeepsItsPocketRows(): Unit = runBlocking {
         val day = LocalDate.now().minusMonths(1).atTime(12, 0)
         repository.addTransaction(Transaction(amount = BigDecimal("100"), date = day, periodId = 10L))
         repository.addTransaction(
