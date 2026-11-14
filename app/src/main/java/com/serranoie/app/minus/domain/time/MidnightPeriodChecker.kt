@@ -118,7 +118,7 @@ class MidnightPeriodChecker @Inject constructor(
 
         when (settings.remainingBudgetStrategy) {
             RemainingBudgetStrategy.ASK_ALWAYS -> {
-                settingsRepository.markSurplusUnresolved(endingPeriodState.remainingAmount)
+                markSurplusUnresolved(endingPeriodState.remainingAmount)
                 _midnightTransitionData.value = MidnightTransitionData(
                     periodStartDate = periodStartDate,
                     periodEndDate = lastPeriodEndDate,
@@ -256,7 +256,7 @@ class MidnightPeriodChecker @Inject constructor(
 
         when (settings.remainingBudgetStrategy) {
             RemainingBudgetStrategy.ASK_ALWAYS -> {
-                settingsRepository.markSurplusUnresolved(remainingAmount)
+                markSurplusUnresolved(remainingAmount)
                 _midnightTransitionData.value = MidnightTransitionData(
                     periodStartDate = settings.startDate,
                     periodEndDate = LocalDate.now(),
@@ -347,7 +347,7 @@ class MidnightPeriodChecker @Inject constructor(
             val periodEnd = budgetRepository.getBudgetSettingsSync()?.getPeriodEndDate()?.atTime(LocalTime.of(23, 59))
             val sourcePeriodId = settingsRepository.getPendingRolloverPeriodId()?.takeIf { it > 0L }
                 ?: settingsRepository.getCurrentPeriodId()
-            budgetRepository.addTransactionIfAbsent(
+            val saved = budgetRepository.addPocketDeposit(
                 pocketEntry(
                     pocket = pocket,
                     amount = pendingAmount,
@@ -358,6 +358,7 @@ class MidnightPeriodChecker @Inject constructor(
                     clientGeneratedId = "pocket-sweep-${settingsRepository.getOrCreatePendingRolloverId()}",
                 ),
             )
+            check(saved) { "Pocket ${pocket.id} no longer exists" }
             settingsRepository.clearPendingRollover()
             logcat { "Swept surplus into pocket ${pocket.id}: amount=$pendingAmount" }
         }
@@ -396,7 +397,11 @@ class MidnightPeriodChecker @Inject constructor(
     private suspend fun enqueuePendingRollover(
         strategy: RemainingBudgetStrategy,
         remainingAmount: BigDecimal,
-    ) {
+    ) = settlementLock.withLock {
         settingsRepository.setPendingRollover(remainingAmount, strategy)
+    }
+
+    private suspend fun markSurplusUnresolved(amount: BigDecimal) = settlementLock.withLock {
+        settingsRepository.markSurplusUnresolved(amount)
     }
 }

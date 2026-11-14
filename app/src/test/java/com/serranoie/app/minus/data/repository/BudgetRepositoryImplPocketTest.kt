@@ -3,6 +3,7 @@ package com.serranoie.app.minus.data.repository
 import androidx.room.withTransaction
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.data.local.AppDatabase
+import com.serranoie.app.minus.data.local.dao.SavingsPocketDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
 import com.serranoie.app.minus.domain.model.Transaction
@@ -21,6 +22,7 @@ import java.time.LocalDateTime
 class BudgetRepositoryImplPocketTest {
     private val database = mockk<AppDatabase>()
     private val transactionDao = mockk<TransactionDao>(relaxed = true)
+    private val savingsPocketDao = mockk<SavingsPocketDao>(relaxed = true)
     private val repository = BudgetRepositoryImpl(
         appDatabase = database,
         transactionDao = transactionDao,
@@ -29,7 +31,7 @@ class BudgetRepositoryImplPocketTest {
         categoryDao = mockk(),
         queuedTransactionDao = mockk(),
         paidRecurrentOccurrenceDao = mockk(),
-        savingsPocketDao = mockk(),
+        savingsPocketDao = savingsPocketDao,
     )
 
     @Before
@@ -39,6 +41,7 @@ class BudgetRepositoryImplPocketTest {
             secondArg<suspend () -> Boolean>().invoke()
         }
         coEvery { transactionDao.getByPocketId(3L) } returns listOf(row("500"), row("-100"))
+        coEvery { savingsPocketDao.exists(3L) } returns true
     }
 
     @After
@@ -61,6 +64,47 @@ class BudgetRepositoryImplPocketTest {
 
         assertThat(inserted).isFalse()
         coVerify(exactly = 0) { transactionDao.insert(any()) }
+    }
+
+    @Test
+    fun `a withdrawal from a deleted pocket is rejected`() = runTest {
+        coEvery { savingsPocketDao.exists(3L) } returns false
+
+        assertThat(repository.addPocketWithdrawal(withdrawal("10"))).isFalse()
+        coVerify(exactly = 0) { transactionDao.insert(any()) }
+    }
+
+    @Test
+    fun `a deposit into an existing pocket is inserted inside one transaction`() = runTest {
+        val deposit = withdrawal("75").copy(amount = BigDecimal("75"))
+
+        assertThat(repository.addPocketDeposit(deposit)).isTrue()
+        coVerify { database.withTransaction(any<suspend () -> Boolean>()) }
+        coVerify { transactionDao.insertIgnore(match { it.pocketId == 3L }) }
+    }
+
+    @Test
+    fun `a deposit into a deleted pocket is rejected without inserting`() = runTest {
+        coEvery { savingsPocketDao.exists(3L) } returns false
+
+        assertThat(repository.addPocketDeposit(withdrawal("75").copy(amount = BigDecimal("75")))).isFalse()
+        coVerify(exactly = 0) { transactionDao.insertIgnore(any()) }
+        coVerify(exactly = 0) { transactionDao.insert(any()) }
+    }
+
+    @Test
+    fun `a pocket holding money is not deleted`() = runTest {
+        assertThat(repository.deleteSavingsPocket(3L)).isFalse()
+        coVerify(exactly = 0) { savingsPocketDao.deleteById(any()) }
+    }
+
+    @Test
+    fun `an empty pocket is deleted inside the balance check transaction`() = runTest {
+        coEvery { transactionDao.getByPocketId(3L) } returns listOf(row("75"), row("-75"))
+
+        assertThat(repository.deleteSavingsPocket(3L)).isTrue()
+        coVerify { database.withTransaction(any<suspend () -> Boolean>()) }
+        coVerify { savingsPocketDao.deleteById(3L) }
     }
 
     private fun withdrawal(amount: String) = Transaction(

@@ -265,8 +265,7 @@ class BudgetRepositoryImpl @Inject constructor(
     override suspend fun addPocketWithdrawal(transaction: Transaction): Boolean {
         val pocketId = transaction.pocketId ?: return false
         return appDatabase.withTransaction {
-            val balance = transactionDao.getByPocketId(pocketId).sumOf { BigDecimal(it.amount) }
-            if (transaction.amount.abs() > balance) {
+            if (!savingsPocketDao.exists(pocketId) || transaction.amount.abs() > pocketBalance(pocketId)) {
                 false
             } else {
                 transactionDao.insert(transaction.toEntity())
@@ -274,6 +273,21 @@ class BudgetRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun addPocketDeposit(transaction: Transaction): Boolean {
+        val pocketId = transaction.pocketId ?: return false
+        return appDatabase.withTransaction {
+            if (!savingsPocketDao.exists(pocketId)) {
+                false
+            } else {
+                transactionDao.insertIgnore(transaction.toEntity())
+                true
+            }
+        }
+    }
+
+    private suspend fun pocketBalance(pocketId: Long): BigDecimal =
+        transactionDao.getByPocketId(pocketId).sumOf { BigDecimal(it.amount) }
 
     override suspend fun updateTransaction(transaction: Transaction) {
         transactionDao.update(transaction.toEntity())
@@ -550,7 +564,13 @@ class BudgetRepositoryImpl @Inject constructor(
             ),
         )
 
-    override suspend fun deleteSavingsPocket(pocketId: Long) {
-        savingsPocketDao.deleteById(pocketId)
-    }
+    override suspend fun deleteSavingsPocket(pocketId: Long): Boolean =
+        appDatabase.withTransaction {
+            if (pocketBalance(pocketId).signum() != 0) {
+                false
+            } else {
+                savingsPocketDao.deleteById(pocketId)
+                true
+            }
+        }
 }

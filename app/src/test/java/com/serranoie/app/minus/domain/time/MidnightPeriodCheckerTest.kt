@@ -525,7 +525,7 @@ class MidnightPeriodCheckerTest {
         coEvery { settingsRepository.getCurrentPeriodId() } returns 7L
         coEvery { settingsRepository.getOrCreatePendingRolloverId() } returns "r-1"
         val saved = slot<Transaction>()
-        coEvery { budgetRepository.addTransactionIfAbsent(capture(saved)) } returns true
+        coEvery { budgetRepository.addPocketDeposit(capture(saved)) } returns true
 
         checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
 
@@ -541,15 +541,16 @@ class MidnightPeriodCheckerTest {
     }
 
     @Test
-    fun `sweepSurplusToPocket clears the surplus when the sweep row already exists`() = runTest {
+    fun `a sweep into a pocket deleted meanwhile keeps the surplus and fails`() = runTest {
         stubEndDate(LocalDate.now().minusDays(1))
         coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
         coEvery { settingsRepository.getPendingRolloverPeriodId() } returns 5L
-        coEvery { budgetRepository.addTransactionIfAbsent(any()) } returns false
+        coEvery { budgetRepository.addPocketDeposit(any()) } returns false
 
-        checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
+        val error = runCatching { checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip")) }.exceptionOrNull()
 
-        coVerify { settingsRepository.clearPendingRollover() }
+        assertThat(error).isNotNull()
+        coVerify(exactly = 0) { settingsRepository.clearPendingRollover() }
     }
 
     @Test
@@ -559,7 +560,7 @@ class MidnightPeriodCheckerTest {
         coEvery { settingsRepository.getPendingRolloverPeriodId() } returns null
         coEvery { settingsRepository.getCurrentPeriodId() } returns 7L
         val saved = slot<Transaction>()
-        coEvery { budgetRepository.addTransactionIfAbsent(capture(saved)) } returns true
+        coEvery { budgetRepository.addPocketDeposit(capture(saved)) } returns true
 
         checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
 
@@ -571,7 +572,7 @@ class MidnightPeriodCheckerTest {
         stubEndDate(LocalDate.now().minusDays(1))
         coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
         coEvery { settingsRepository.getPendingRolloverPeriodId() } returns 5L
-        coEvery { budgetRepository.addTransactionIfAbsent(any()) } throws IllegalStateException("disk full")
+        coEvery { budgetRepository.addPocketDeposit(any()) } throws IllegalStateException("disk full")
         checker.reopenUnresolvedSurplusDialog()
 
         val error = runCatching { checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip")) }.exceptionOrNull()
@@ -588,7 +589,7 @@ class MidnightPeriodCheckerTest {
 
         checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
 
-        coVerify(exactly = 0) { budgetRepository.addTransactionIfAbsent(any()) }
+        coVerify(exactly = 0) { budgetRepository.addPocketDeposit(any()) }
     }
 
     @Test
@@ -599,7 +600,7 @@ class MidnightPeriodCheckerTest {
         coEvery { settingsRepository.clearPendingRollover() } answers { pending = BigDecimal.ZERO }
         coEvery { settingsRepository.getOrCreatePendingRolloverId() } returns "r-1"
         val gate = CompletableDeferred<Unit>()
-        coEvery { budgetRepository.addTransactionIfAbsent(any()) } coAnswers { gate.await(); true }
+        coEvery { budgetRepository.addPocketDeposit(any()) } coAnswers { gate.await(); true }
 
         val sweep = launch { checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip")) }
         val resolve = launch { checker.resolveUnresolvedSurplus(RemainingBudgetStrategy.SPLIT_EQUALLY) }
@@ -608,7 +609,43 @@ class MidnightPeriodCheckerTest {
         sweep.join()
         resolve.join()
 
-        coVerify(exactly = 1) { budgetRepository.addTransactionIfAbsent(any()) }
+        coVerify(exactly = 1) { budgetRepository.addPocketDeposit(any()) }
         coVerify(exactly = 0) { budgetRepository.saveBudgetSettings(any()) }
+    }
+
+    @Test
+    fun `a new surplus produced while a sweep is settling is not wiped by that sweep`() = runTest {
+        val settings = settingsEndingOn(LocalDate.now().plusDays(10))
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns settings
+        var pending = BigDecimal("300.00")
+        coEvery { settingsRepository.getPendingRollover() } answers { pending to null }
+        coEvery { settingsRepository.clearPendingRollover() } answers { pending = BigDecimal.ZERO }
+        coEvery { settingsRepository.markSurplusUnresolved(any()) } answers { pending = firstArg() }
+        coEvery { settingsRepository.setPendingRollover(any(), any()) } answers { pending = firstArg() }
+        coEvery { settingsRepository.getOrCreatePendingRolloverId() } returns "r-1"
+        val gate = CompletableDeferred<Unit>()
+        coEvery { budgetRepository.addPocketDeposit(any()) } coAnswers { gate.await(); true }
+
+        val sweep = launch { checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip")) }
+        runCurrent()
+        val askFinish = launch { checker.handleEarlyFinish(settings, remainingAmount = BigDecimal("120.00")) }
+        runCurrent()
+        gate.complete(Unit)
+        sweep.join()
+        askFinish.join()
+        assertThat(pending).isEqualToIgnoringScale(BigDecimal("120"))
+
+        pending = BigDecimal("300.00")
+        val gate2 = CompletableDeferred<Unit>()
+        coEvery { budgetRepository.addPocketDeposit(any()) } coAnswers { gate2.await(); true }
+        val splitSettings = settingsEndingOn(LocalDate.now().plusDays(10), RemainingBudgetStrategy.SPLIT_EQUALLY)
+        val sweep2 = launch { checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip")) }
+        runCurrent()
+        val splitFinish = launch { checker.handleEarlyFinish(splitSettings, remainingAmount = BigDecimal("80.00")) }
+        runCurrent()
+        gate2.complete(Unit)
+        sweep2.join()
+        splitFinish.join()
+        assertThat(pending).isEqualToIgnoringScale(BigDecimal("80"))
     }
 }

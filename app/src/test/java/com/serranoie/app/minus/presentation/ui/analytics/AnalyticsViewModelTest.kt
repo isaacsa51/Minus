@@ -289,7 +289,7 @@ class AnalyticsViewModelTest {
     }
 
     @Test
-    fun `current period spends count every past-due recurring occurrence, not just the template row`() = runTest {
+    fun `current period spends and chart count every past-due recurring occurrence but no pocket deposit`() = runTest {
         val periodStart = LocalDate.now().minusDays(20)
         settingsFlow.value = BudgetSettings(
             totalBudget = BigDecimal("1000"),
@@ -309,6 +309,7 @@ class AnalyticsViewModelTest {
                 periodId = 1L,
             ),
             Transaction(id = 2L, amount = BigDecimal("50.00"), comment = "DoorDash", date = periodStart.plusDays(1).atTime(9, 0), periodId = 1L),
+            Transaction(id = 3L, amount = BigDecimal("75.00"), comment = "Japan trip", date = periodStart.plusDays(2).atTime(9, 0), periodId = 1L, isAdjustment = true, pocketId = 3L),
         )
 
         val viewModel = createViewModel()
@@ -470,7 +471,7 @@ class AnalyticsViewModelTest {
         pocketsFlow.value = listOf(trip)
         coEvery { settingsRepository.getCurrentPeriodId() } returns 12L
         val saved = slot<Transaction>()
-        coEvery { budgetRepository.addTransaction(capture(saved)) } returns 1L
+        coEvery { budgetRepository.addPocketDeposit(capture(saved)) } returns true
         val viewModel = createViewModel()
 
         viewModel.onPocketDeposit(trip.id, BigDecimal("75"))
@@ -512,15 +513,28 @@ class AnalyticsViewModelTest {
     }
 
     @Test
-    fun `a pocket holding money cannot be deleted`() = runTest {
+    fun `a pocket the repository refuses to delete reports a failed action`() = runTest {
         pocketsFlow.value = listOf(trip)
-        transactionsFlow.value = listOf(tripDeposit)
+        coEvery { budgetRepository.deleteSavingsPocket(3L) } returns false
         val viewModel = createViewModel()
 
         viewModel.onDeletePocket(trip.id)
         runCurrent()
 
-        coVerify(exactly = 0) { budgetRepository.deleteSavingsPocket(any()) }
+        assertThat(viewModel.effects.value).isEqualTo(AnalyticsUiEffect.PocketActionFailed)
+    }
+
+    @Test
+    fun `a deposit the repository rejects reports a failed action`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        coEvery { budgetRepository.addPocketDeposit(any()) } returns false
+        val viewModel = createViewModel()
+
+        viewModel.onPocketDeposit(trip.id, BigDecimal("75"))
+        runCurrent()
+
+        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+        assertThat(viewModel.effects.value).isEqualTo(AnalyticsUiEffect.PocketActionFailed)
     }
 
     @Test
@@ -550,7 +564,7 @@ class AnalyticsViewModelTest {
     @Test
     fun `a failed pocket write is logged and surfaced instead of crashing`() = runTest {
         pocketsFlow.value = listOf(trip)
-        coEvery { budgetRepository.addTransaction(any()) } throws IOException("disk")
+        coEvery { budgetRepository.addPocketDeposit(any()) } throws IOException("disk")
         val viewModel = createViewModel()
 
         viewModel.onPocketDeposit(trip.id, BigDecimal("75"))
