@@ -33,6 +33,7 @@ class BudgetRepositoryImplRestoreTest {
         categoryDao = mockk(),
         queuedTransactionDao = mockk(),
         paidRecurrentOccurrenceDao = occurrenceDao,
+        savingsPocketDao = mockk(),
     )
     private val date = LocalDate.of(2026, 3, 10)
 

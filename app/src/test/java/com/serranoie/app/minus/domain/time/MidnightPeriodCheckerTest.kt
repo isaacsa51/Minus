@@ -6,11 +6,13 @@ import com.serranoie.app.minus.data.repository.SettingsRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -510,5 +512,34 @@ class MidnightPeriodCheckerTest {
         assertThat(checker.shouldShowTransitionDialog.value).isFalse()
         assertThat(checker.midnightTransitionData.value).isNull()
         coVerify(exactly = 0) { settingsRepository.setPendingRollover(any(), any()) }
+    }
+    @Test
+    fun `sweepSurplusToPocket saves the pending surplus into the pocket inside the finished period`() = runTest {
+        val endDate = LocalDate.now().minusDays(1)
+        stubEndDate(endDate)
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
+        coEvery { settingsRepository.getCurrentPeriodId() } returns 7L
+        val saved = slot<Transaction>()
+        coEvery { budgetRepository.addTransaction(capture(saved)) } returns 1L
+
+        checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
+
+        assertThat(saved.captured.amount).isEqualToIgnoringScale(BigDecimal("300"))
+        assertThat(saved.captured.pocketId).isEqualTo(4L)
+        assertThat(saved.captured.isAdjustment).isTrue()
+        assertThat(saved.captured.periodId).isEqualTo(7L)
+        assertThat(saved.captured.date?.toLocalDate()).isEqualTo(endDate)
+        coVerify { settingsRepository.clearPendingRollover() }
+        coVerify(exactly = 0) { budgetRepository.saveBudgetSettings(any()) }
+    }
+
+    @Test
+    fun `sweepSurplusToPocket adds nothing when no surplus is pending`() = runTest {
+        stubEndDate(LocalDate.now().minusDays(1))
+        coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal.ZERO to null)
+
+        checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
+
+        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
     }
 }

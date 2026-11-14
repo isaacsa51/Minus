@@ -7,12 +7,14 @@ import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
 import com.serranoie.app.minus.data.local.dao.PaidRecurrentOccurrenceDao
 import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
+import com.serranoie.app.minus.data.local.dao.SavingsPocketDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import com.serranoie.app.minus.data.local.entity.ArchivedBudgetEntity
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
 import com.serranoie.app.minus.data.local.entity.CategoryEntity
 import com.serranoie.app.minus.data.local.entity.PaidRecurrentOccurrenceEntity
 import com.serranoie.app.minus.data.local.entity.QueuedTransactionEntity
+import com.serranoie.app.minus.data.local.entity.SavingsPocketEntity
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import com.serranoie.app.minus.domain.model.BudgetPeriod
@@ -26,6 +28,7 @@ import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -46,6 +49,7 @@ class BudgetRepositoryImpl @Inject constructor(
     private val categoryDao: CategoryDao,
     private val queuedTransactionDao: QueuedTransactionDao,
     private val paidRecurrentOccurrenceDao: PaidRecurrentOccurrenceDao,
+    private val savingsPocketDao: SavingsPocketDao,
 ) : BudgetRepository {
     private fun TransactionEntity.toDomain(): Transaction = Transaction(
         id = this.id,
@@ -72,7 +76,8 @@ class BudgetRepositoryImpl @Inject constructor(
         categoryId = this.categoryId,
         isCredit = this.isCredit,
         isCreditPaid = this.isCreditPaid,
-        isAdjustment = this.isAdjustment
+        isAdjustment = this.isAdjustment,
+        pocketId = this.pocketId,
     )
 
     private fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
@@ -91,7 +96,8 @@ class BudgetRepositoryImpl @Inject constructor(
         categoryId = this.categoryId,
         isCredit = this.isCredit,
         isCreditPaid = this.isCreditPaid,
-        isAdjustment = this.isAdjustment
+        isAdjustment = this.isAdjustment,
+        pocketId = this.pocketId,
     )
 
     private fun QueuedTransactionEntity.toDomain(): Transaction = Transaction(
@@ -505,5 +511,33 @@ class BudgetRepositoryImpl @Inject constructor(
             transactionDao.deleteOneTimeByPeriodId(periodId)
             archivedBudgetDao.deleteById(periodId)
         }
+    }
+
+    override fun getSavingsPockets(): Flow<List<SavingsPocket>> =
+        savingsPocketDao.getAll().map { entities ->
+            entities.map { entity ->
+                SavingsPocket(
+                    id = entity.id,
+                    name = entity.name,
+                    target = entity.targetAmount?.toBigDecimalOrNull(),
+                    targetDate = entity.targetEpochDay?.let(LocalDate::ofEpochDay),
+                    createdAt = entity.createdAt,
+                )
+            }
+        }
+
+    override suspend fun saveSavingsPocket(pocket: SavingsPocket): Long =
+        savingsPocketDao.upsert(
+            SavingsPocketEntity(
+                id = pocket.id,
+                name = pocket.name,
+                targetAmount = pocket.target?.toPlainString(),
+                targetEpochDay = pocket.targetDate?.toEpochDay(),
+                createdAt = pocket.createdAt,
+            ),
+        )
+
+    override suspend fun deleteSavingsPocket(pocketId: Long) {
+        savingsPocketDao.deleteById(pocketId)
     }
 }

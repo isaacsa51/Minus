@@ -2,8 +2,10 @@ package com.serranoie.app.minus.domain.time
 
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
+import com.serranoie.app.minus.domain.calculator.pocketEntry
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +18,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -329,6 +332,27 @@ class MidnightPeriodChecker @Inject constructor(
                 settingsRepository.clearPendingRollover()
                 logcat { "Discarded unresolved surplus: amount=$pendingAmount" }
             }
+        }
+        onTransitionDialogConfirmed()
+    }
+
+    suspend fun sweepSurplusToPocket(pocket: SavingsPocket, label: String = pocket.name) {
+        val (pendingAmount, _) = settingsRepository.getPendingRollover()
+        if (pendingAmount > BigDecimal.ZERO) {
+            val now = LocalDateTime.now()
+            val periodEnd = budgetRepository.getBudgetSettingsSync()?.getPeriodEndDate()?.atTime(LocalTime.of(23, 59))
+            budgetRepository.addTransaction(
+                pocketEntry(
+                    pocket = pocket,
+                    amount = pendingAmount,
+                    withdraw = false,
+                    periodId = settingsRepository.getCurrentPeriodId(),
+                    date = if (periodEnd != null && periodEnd.isBefore(now)) periodEnd else now,
+                    label = label,
+                ),
+            )
+            settingsRepository.clearPendingRollover()
+            logcat { "Swept surplus into pocket ${pocket.id}: amount=$pendingAmount" }
         }
         onTransitionDialogConfirmed()
     }

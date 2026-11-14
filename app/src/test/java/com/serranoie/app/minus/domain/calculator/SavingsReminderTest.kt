@@ -3,6 +3,7 @@ package com.serranoie.app.minus.domain.calculator
 import com.google.common.truth.Truth.assertThat
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.SavingsSplitPreset
 import org.junit.Test
@@ -39,6 +40,73 @@ class SavingsReminderTest {
         val prefs = SavingsPreferences.DEFAULT.copy(savingsGoalAmount = BigDecimal("1200"), savingsGoalMonths = 6)
 
         assertThat(savingsReminderAmount(prefs, budget())).isEqualTo(BigDecimal("200.00"))
+    }
+
+    private val goalPrefs = SavingsPreferences.DEFAULT.copy(savingsGoalAmount = BigDecimal("15000"), savingsGoalMonths = 6)
+    private val today = LocalDate.of(2026, 11, 13)
+
+    private fun goalPocket(saved: String, deadline: LocalDate?) = SavingsPocketStatus(
+        SavingsPocket(id = 1, name = "", target = BigDecimal("15000"), targetDate = deadline),
+        BigDecimal(saved),
+    )
+
+    @Test
+    fun with_a_goal_pocket_the_amount_is_what_is_left_spread_over_the_months_left() {
+        val amount = savingsReminderAmount(goalPrefs, budget(), goalPocket("3000", LocalDate.of(2027, 5, 13)), today)
+
+        assertThat(amount).isEqualTo(BigDecimal("2000.00"))
+    }
+
+    @Test
+    fun a_partial_month_before_the_deadline_counts_as_a_month() {
+        val amount = savingsReminderAmount(goalPrefs, budget(), goalPocket("3000", LocalDate.of(2027, 5, 1)), today)
+
+        assertThat(amount).isEqualTo(BigDecimal("2000.00"))
+    }
+
+    @Test
+    fun a_reached_goal_falls_back_to_the_savings_percentage() {
+        val amount = savingsReminderAmount(goalPrefs, budget(total = "9000"), goalPocket("15000", LocalDate.of(2027, 5, 13)), today)
+
+        assertThat(amount).isEqualTo(BigDecimal("1800.00"))
+    }
+
+    @Test
+    fun a_passed_deadline_asks_for_the_whole_remainder() {
+        val amount = savingsReminderAmount(goalPrefs, budget(), goalPocket("14000", LocalDate.of(2026, 11, 1)), today)
+
+        assertThat(amount).isEqualTo(BigDecimal("1000.00"))
+    }
+
+    @Test
+    fun a_goal_pocket_without_deadline_falls_back_to_the_settings_goal() {
+        val amount = savingsReminderAmount(goalPrefs, budget(), goalPocket("3000", null), today)
+
+        assertThat(amount).isEqualTo(BigDecimal("2500.00"))
+    }
+
+    @Test
+    fun the_goal_line_reports_what_is_left_and_the_deadline() {
+        val goal = savingsReminderGoal(goalPocket("3000", LocalDate.of(2027, 5, 13)))
+
+        assertThat(goal).isEqualTo(SavingsReminderGoal(BigDecimal("12000"), LocalDate.of(2027, 5, 13)))
+    }
+
+    @Test
+    fun no_goal_line_without_deadline_or_once_reached() {
+        assertThat(savingsReminderGoal(goalPocket("3000", null))).isNull()
+        assertThat(savingsReminderGoal(goalPocket("15000", LocalDate.of(2027, 5, 13)))).isNull()
+        assertThat(savingsReminderGoal(null)).isNull()
+    }
+
+    @Test
+    fun pending_set_aside_round_trips_pocket_and_amount() {
+        val raw = encodePendingSetAside(7L, BigDecimal("2000.00"))
+
+        assertThat(raw).isEqualTo("7|2000")
+        assertThat(decodePendingSetAside(raw)).isEqualTo(7L to "2000")
+        assertThat(decodePendingSetAside("")).isNull()
+        assertThat(decodePendingSetAside("x|2000")).isNull()
     }
 
     @Test

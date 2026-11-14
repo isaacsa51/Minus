@@ -11,14 +11,18 @@ import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.UserSettings
+import com.serranoie.app.minus.domain.calculator.pocketEntry
 import com.serranoie.app.minus.domain.usecase.ClearEarlyFinishStateUseCase
 import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCase
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
+import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.slot
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -33,8 +37,10 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AnalyticsViewModelTest {
@@ -53,6 +59,7 @@ class AnalyticsViewModelTest {
     private val allCategoriesFlow = MutableStateFlow<List<Category>>(emptyList())
     private val archivedFlow = MutableStateFlow<List<ArchivedBudget>>(emptyList())
     private val paidOccurrencesFlow = MutableStateFlow<Set<PaidRecurrentOccurrence>>(emptySet())
+    private val pocketsFlow = MutableStateFlow<List<SavingsPocket>>(emptyList())
     private val boundaryFlow = flowOf(0L to 1L)
     private val userSettingsFlow = flowOf(UserSettings())
     private val rolloverFlow = flowOf(BigDecimal.ZERO to false)
@@ -66,6 +73,7 @@ class AnalyticsViewModelTest {
         every { budgetRepository.getAllCategories() } returns allCategoriesFlow
         every { budgetRepository.getArchivedBudgets() } returns archivedFlow
         every { budgetRepository.getPaidRecurrentOccurrences() } returns paidOccurrencesFlow
+        every { budgetRepository.getSavingsPockets() } returns pocketsFlow
         every { observeCurrentPeriodBoundaryUseCase() } returns boundaryFlow
         every { settingsRepository.observeSettings() } returns userSettingsFlow
         every { settingsRepository.observeCurrentPeriodRollover() } returns rolloverFlow
@@ -372,5 +380,115 @@ class AnalyticsViewModelTest {
             
             assertThat(awaitItem()).isEqualTo(AnalyticsUiEffect.NavigateToMainWithWallet)
         }
+    }
+
+    private val trip = SavingsPocket(id = 3, name = "Japan trip", target = BigDecimal("1000"))
+    private val tripDeposit = pocketEntry(trip, BigDecimal("400"), withdraw = false, periodId = 1, date = LocalDateTime.of(2099, 6, 2, 9, 0))
+
+    @Test
+    fun `pockets expose their live balance from tagged transactions`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        transactionsFlow.value = listOf(tripDeposit, tripDeposit.copy(id = 9, amount = BigDecimal("-150")))
+
+        createViewModel().uiState.test {
+            skipItems(1)
+            val state = awaitItem()
+            assertThat(state.pockets.map { it.pocket.id }).containsExactly(3L)
+            assertThat(state.pockets.single().balance).isEqualToIgnoringScale(BigDecimal("250"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `deposit saves a pocket entry in the current period`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        coEvery { settingsRepository.getCurrentPeriodId() } returns 12L
+        val saved = slot<Transaction>()
+        coEvery { budgetRepository.addTransaction(capture(saved)) } returns 1L
+        val viewModel = createViewModel()
+
+        viewModel.onPocketDeposit(trip.id, BigDecimal("75"))
+        runCurrent()
+
+        assertThat(saved.captured.pocketId).isEqualTo(3L)
+        assertThat(saved.captured.amount).isEqualToIgnoringScale(BigDecimal("75"))
+        assertThat(saved.captured.isAdjustment).isTrue()
+        assertThat(saved.captured.periodId).isEqualTo(12L)
+    }
+
+    @Test
+    fun `withdrawing more than the pocket holds saves nothing`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        transactionsFlow.value = listOf(tripDeposit)
+        val viewModel = createViewModel()
+
+        viewModel.onPocketWithdraw(trip.id, BigDecimal("400.01"))
+        runCurrent()
+
+        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+    }
+
+    @Test
+    fun `withdrawing within the balance returns money as income`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        transactionsFlow.value = listOf(tripDeposit)
+        val saved = slot<Transaction>()
+        coEvery { budgetRepository.addTransaction(capture(saved)) } returns 1L
+        val viewModel = createViewModel()
+
+        viewModel.onPocketWithdraw(trip.id, BigDecimal("400"))
+        runCurrent()
+
+        assertThat(saved.captured.amount).isEqualToIgnoringScale(BigDecimal("-400"))
+        assertThat(saved.captured.pocketId).isEqualTo(3L)
+    }
+
+    @Test
+    fun `a pocket holding money cannot be deleted`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        transactionsFlow.value = listOf(tripDeposit)
+        val viewModel = createViewModel()
+
+        viewModel.onDeletePocket(trip.id)
+        runCurrent()
+
+        coVerify(exactly = 0) { budgetRepository.deleteSavingsPocket(any()) }
+    }
+
+    @Test
+    fun `an empty pocket can be deleted`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        val viewModel = createViewModel()
+
+        viewModel.onDeletePocket(trip.id)
+        runCurrent()
+
+        coVerify { budgetRepository.deleteSavingsPocket(3L) }
+    }
+
+    @Test
+    fun `creating a pocket trims the name and keeps the target`() = runTest {
+        val saved = slot<SavingsPocket>()
+        coEvery { budgetRepository.saveSavingsPocket(capture(saved)) } returns 5L
+        val viewModel = createViewModel()
+
+        viewModel.onCreatePocket("  Emergency  ", BigDecimal("2000"))
+        runCurrent()
+
+        assertThat(saved.captured.name).isEqualTo("Emergency")
+        assertThat(saved.captured.target).isEqualToIgnoringScale(BigDecimal("2000"))
+    }
+
+    @Test
+    fun `a failed pocket write is logged and surfaced instead of crashing`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        coEvery { budgetRepository.addTransaction(any()) } throws IOException("disk")
+        val viewModel = createViewModel()
+
+        viewModel.onPocketDeposit(trip.id, BigDecimal("75"))
+        runCurrent()
+
+        assertThat(viewModel.effects.value).isEqualTo(AnalyticsUiEffect.PocketActionFailed)
+        coVerify { errorLogRecorder.record(any(), any()) }
     }
 }

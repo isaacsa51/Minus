@@ -6,6 +6,7 @@ import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.CategoryLimit
 import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.RecurrentOccurrenceStatus
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.model.ArchivedBudget
 import kotlinx.coroutines.flow.Flow
@@ -103,4 +104,10 @@ interface BudgetRepository {
     )
 
     suspend fun deleteArchivedBudget(periodId: Long)
+
+    fun getSavingsPockets(): Flow<List<SavingsPocket>>
+
+    suspend fun saveSavingsPocket(pocket: SavingsPocket): Long
+
+    suspend fun deleteSavingsPocket(pocketId: Long)
 }

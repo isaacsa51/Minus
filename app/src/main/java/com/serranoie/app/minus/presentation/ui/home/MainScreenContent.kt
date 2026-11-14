@@ -1674,6 +1674,20 @@ private fun MainScreenEditorSection(
                 ),
             )
         },
+        onSetAsideToggle = { enabled ->
+            actions.onProcessIntent(
+                MainScreenUiIntent.ProcessBudgetEditorIntent(
+                    BudgetEditorIntent.SetSetAsideEnabled(enabled),
+                ),
+            )
+        },
+        onPocketSelected = { pocketId ->
+            actions.onProcessIntent(
+                MainScreenUiIntent.ProcessBudgetEditorIntent(
+                    BudgetEditorIntent.PocketSelected(pocketId),
+                ),
+            )
+        },
         showCreditQuickToggleFeature = featureFlags.showCreditQuickToggleFeature,
         extraNoteEnabled = featureFlags.extraNoteEnabled,
         newCategoryTagEnabled = featureFlags.newCategoryTagEnabled,

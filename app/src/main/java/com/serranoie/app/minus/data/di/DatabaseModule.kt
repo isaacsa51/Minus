@@ -9,6 +9,7 @@ import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
 import com.serranoie.app.minus.data.local.dao.PaidRecurrentOccurrenceDao
 import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
+import com.serranoie.app.minus.data.local.dao.SavingsPocketDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import dagger.Module
 import dagger.Provides
@@ -73,5 +74,10 @@ object DatabaseModule {
     @Provides
     fun providePaidRecurrentOccurrenceDao(database: AppDatabase): PaidRecurrentOccurrenceDao {
         return database.paidRecurrentOccurrenceDao()
+    }
+
+    @Provides
+    fun provideSavingsPocketDao(database: AppDatabase): SavingsPocketDao {
+        return database.savingsPocketDao()
     }
 }
