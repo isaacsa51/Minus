@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.serranoie.app.minus.domain.model.RemainingBudgetStrategy
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
@@ -58,6 +59,10 @@ class MidnightTransitionManager @Inject constructor(
 
     suspend fun resolveUnresolvedSurplus(strategy: RemainingBudgetStrategy?) {
         midnightPeriodChecker.resolveUnresolvedSurplus(strategy)
+    }
+
+    suspend fun sweepSurplusToPocket(pocket: SavingsPocket, label: String = pocket.name) {
+        midnightPeriodChecker.sweepSurplusToPocket(pocket, label)
     }
 
     suspend fun reopenUnresolvedSurplusDialog() {

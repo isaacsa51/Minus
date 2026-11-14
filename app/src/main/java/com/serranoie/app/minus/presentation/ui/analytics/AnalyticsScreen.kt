@@ -5,8 +5,12 @@ import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import android.widget.Toast
+import com.serranoie.app.minus.R
 
 @Composable
 fun AnalyticsScreen(
@@ -18,6 +22,8 @@ fun AnalyticsScreen(
     viewModel: AnalyticsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val goalPocketLabel = stringResource(R.string.pockets_goal_name)
 
     BackHandler(enabled = isRootDestination || uiState.selectedPeriodId != null) {
         viewModel.onClose()
@@ -34,6 +40,10 @@ fun AnalyticsScreen(
                     viewModel.consumeEffect()
                     onNavigateToMain()
                 }
+                AnalyticsUiEffect.PocketActionFailed -> {
+                    viewModel.consumeEffect()
+                    Toast.makeText(context, R.string.pockets_action_failed, Toast.LENGTH_SHORT).show()
+                }
                 null -> { /* no-op */ }
             }
         }
@@ -43,6 +53,7 @@ fun AnalyticsScreen(
         state = uiState.displayState,
         archivedBudgets = uiState.archivedBudgets,
         categories = uiState.categories,
+        pockets = uiState.pockets,
         actions = AnalyticsActions(
             onCreateNewPeriod = {
                 viewModel.onCreateNewPeriod()
@@ -78,6 +89,10 @@ fun AnalyticsScreen(
             onDeleteArchivedPeriod = { periodId ->
                 viewModel.deleteArchivedPeriod(periodId)
             },
+            onCreatePocket = viewModel::onCreatePocket,
+            onPocketDeposit = { id, amount -> viewModel.onPocketDeposit(id, amount, goalPocketLabel) },
+            onPocketWithdraw = { id, amount -> viewModel.onPocketWithdraw(id, amount, goalPocketLabel) },
+            onDeletePocket = viewModel::onDeletePocket,
         ),
         activityResultRegistryOwner = activityResultRegistryOwner,
     )

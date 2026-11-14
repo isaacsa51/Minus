@@ -22,7 +22,8 @@ data class Transaction(
     val isCredit: Boolean = false,
     val isCreditPaid: Boolean = false,
     val isAdjustment: Boolean = false,
-    val sourceTransactionId: Long? = null
+    val sourceTransactionId: Long? = null,
+    val pocketId: Long? = null,
 ) {
     companion object {
         fun create(

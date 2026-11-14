@@ -8,12 +8,14 @@ import com.serranoie.app.minus.data.local.dao.BudgetSettingsDao
 import com.serranoie.app.minus.data.local.dao.CategoryDao
 import com.serranoie.app.minus.data.local.dao.PaidRecurrentOccurrenceDao
 import com.serranoie.app.minus.data.local.dao.QueuedTransactionDao
+import com.serranoie.app.minus.data.local.dao.SavingsPocketDao
 import com.serranoie.app.minus.data.local.dao.TransactionDao
 import com.serranoie.app.minus.data.local.entity.ArchivedBudgetEntity
 import com.serranoie.app.minus.data.local.entity.BudgetSettingsEntity
 import com.serranoie.app.minus.data.local.entity.CategoryEntity
 import com.serranoie.app.minus.data.local.entity.PaidRecurrentOccurrenceEntity
 import com.serranoie.app.minus.data.local.entity.QueuedTransactionEntity
+import com.serranoie.app.minus.data.local.entity.SavingsPocketEntity
 import com.serranoie.app.minus.data.local.entity.TransactionEntity
 
 @Database(
@@ -23,14 +25,16 @@ import com.serranoie.app.minus.data.local.entity.TransactionEntity
         CategoryEntity::class,
         QueuedTransactionEntity::class,
         ArchivedBudgetEntity::class,
-        PaidRecurrentOccurrenceEntity::class
+        PaidRecurrentOccurrenceEntity::class,
+        SavingsPocketEntity::class,
     ],
-    version = 22,
+    version = 23,
     autoMigrations = [
         AutoMigration(from = 16, to = 17),
         AutoMigration(from = 17, to = 18),
         AutoMigration(from = 18, to = 19),
         AutoMigration(from = 21, to = 22),
+        AutoMigration(from = 22, to = 23),
     ],
     exportSchema = true
 )
@@ -47,6 +51,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun queuedTransactionDao(): QueuedTransactionDao
 
     abstract fun paidRecurrentOccurrenceDao(): PaidRecurrentOccurrenceDao
+
+    abstract fun savingsPocketDao(): SavingsPocketDao
 
     companion object {
         const val DATABASE_NAME = "minus_budget.db"

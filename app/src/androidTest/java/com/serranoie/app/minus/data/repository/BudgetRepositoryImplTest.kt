@@ -47,6 +47,7 @@ class BudgetRepositoryImplTest {
             categoryDao = database.categoryDao(),
             queuedTransactionDao = database.queuedTransactionDao(),
             paidRecurrentOccurrenceDao = database.paidRecurrentOccurrenceDao(),
+            savingsPocketDao = database.savingsPocketDao(),
         )
     }
 

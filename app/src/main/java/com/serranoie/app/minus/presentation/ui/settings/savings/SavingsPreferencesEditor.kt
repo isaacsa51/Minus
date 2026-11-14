@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -38,10 +39,27 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.SavingsSplitPreset
+import com.serranoie.app.minus.presentation.util.font.format.formatCurrencySymbolOnly
 import java.math.BigDecimal
 
 @Composable
-internal fun savingsPreferencesSummary(prefs: SavingsPreferences): String = when (prefs.preset) {
+internal fun savingsPreferencesSummary(prefs: SavingsPreferences, currencyCode: String): String =
+    splitSummary(prefs) + (savingsGoalSummary(prefs, currencyCode)?.let { " — $it" } ?: "")
+
+@Composable
+private fun savingsGoalSummary(prefs: SavingsPreferences, currencyCode: String): String? {
+    val amount = prefs.savingsGoalAmount?.takeIf { it.signum() > 0 } ?: return null
+    val formatted = formatCurrencySymbolOnly(amount, currencyCode)
+    val months = prefs.savingsGoalMonths?.takeIf { it > 0 } ?: return formatted
+    return stringResource(
+        R.string.settings_savings_summary_goal_in,
+        formatted,
+        pluralStringResource(R.plurals.budget_formula_months, months, months),
+    )
+}
+
+@Composable
+private fun splitSummary(prefs: SavingsPreferences): String = when (prefs.preset) {
     SavingsSplitPreset.BALANCED -> stringResource(
         R.string.settings_savings_dialog_split_format,
         prefs.needsPct, prefs.wantsPct, prefs.savingsPct,

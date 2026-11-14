@@ -25,6 +25,8 @@ sealed interface BudgetEditorIntent : BudgetUiIntent {
     data class CreateCategory(val name: String) : BudgetEditorIntent
     data class SetRecurrentEnabled(val enabled: Boolean) : BudgetEditorIntent
     data class SetCreditEnabled(val enabled: Boolean) : BudgetEditorIntent
+    data class SetSetAsideEnabled(val enabled: Boolean) : BudgetEditorIntent
+    data class PocketSelected(val pocketId: Long) : BudgetEditorIntent
     data object DismissRecurrentDialog : BudgetEditorIntent
     data object DismissCreditCutoffDialog : BudgetEditorIntent
     data class RecurrentExpenseApplied(

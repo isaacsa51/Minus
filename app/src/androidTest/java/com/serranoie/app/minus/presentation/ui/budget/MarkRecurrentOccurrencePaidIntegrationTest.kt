@@ -42,6 +42,7 @@ class MarkRecurrentOccurrencePaidIntegrationTest {
             categoryDao = database.categoryDao(),
             queuedTransactionDao = database.queuedTransactionDao(),
             paidRecurrentOccurrenceDao = database.paidRecurrentOccurrenceDao(),
+            savingsPocketDao = database.savingsPocketDao(),
         )
         handler = BudgetTransactionHandler(
             budgetRepository = repository,

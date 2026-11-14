@@ -27,6 +27,7 @@ import com.serranoie.app.minus.domain.model.CategoryLimitUnit
 import com.serranoie.app.minus.domain.model.SavingsPreferences
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
+import com.serranoie.app.minus.domain.usecase.SyncGoalPocketUseCase
 import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
 import com.serranoie.app.minus.presentation.appColorScheme
 import com.serranoie.app.minus.presentation.appContrast
@@ -44,6 +45,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -104,6 +106,7 @@ class SettingsViewModel @Inject constructor(
     private val budgetRepository: BudgetRepository,
     private val updateNotificationTimeUseCase: UpdatePeriodEndNotificationTimeUseCase,
     private val censorManager: CensorManager,
+    private val syncGoalPocket: SyncGoalPocketUseCase,
 ) : ViewModel() {
 
     private val _notificationPermissionGranted = MutableStateFlow(false)
@@ -418,7 +421,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onSavingsPreferencesChange(prefs: SavingsPreferences) {
         viewModelScope.launch {
+            val previous = settingsRepository.observeSettings().first().savingsPreferences
             settingsRepository.setSavingsPreferences(prefs)
+            syncGoalPocket(previous, prefs)
         }
     }
 

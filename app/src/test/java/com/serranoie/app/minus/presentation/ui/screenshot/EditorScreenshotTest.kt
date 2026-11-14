@@ -8,6 +8,7 @@ import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.presentation.ui.budget.BudgetUiState
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.Editor
@@ -75,6 +76,35 @@ class EditorScreenshotTest {
                     onRecurrentToggle = {},
                     onCreditToggle = {},
                     showCreditQuickToggleFeature = true,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+    }
+
+    @Test
+    fun editorSetAsideWithSeveralPockets() {
+        Locale.setDefault(Locale.US)
+
+        paparazzi.snapshot {
+            MinusTheme {
+                Editor(
+                    onSetCategoryLimit = null,
+                    uiState = sampleBudgetUiState().copy(
+                        numpadInput = "500",
+                        isNumpadValid = true,
+                        animState = AnimState.EDITING,
+                        tags = listOf("food", "work"),
+                        pockets = listOf(SavingsPocket(id = 1, name = ""), SavingsPocket(id = 2, name = "Japan trip")),
+                        isSetAsideEnabled = true,
+                        selectedPocketId = 2,
+                    ),
+                    animState = AnimState.EDITING,
+                    onFocus = {},
+                    onOpenHistory = {},
+                    onOpenSettings = {},
+                    onCommentClick = {},
+                    onFinishBudgetEarly = {},
                     modifier = Modifier.fillMaxSize(),
                 )
             }

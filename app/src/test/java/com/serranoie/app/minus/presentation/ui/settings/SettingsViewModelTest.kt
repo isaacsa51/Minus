@@ -17,6 +17,8 @@ import com.serranoie.app.minus.domain.model.PeriodMappingMode
 import com.serranoie.app.minus.domain.model.ThemeMode
 import com.serranoie.app.minus.domain.model.TypographyMode
 import com.serranoie.app.minus.domain.model.UserSettings
+import com.serranoie.app.minus.domain.model.SavingsPreferences
+import com.serranoie.app.minus.domain.usecase.SyncGoalPocketUseCase
 import com.serranoie.app.minus.domain.usecase.UpdatePeriodEndNotificationTimeUseCase
 import com.serranoie.app.minus.presentation.util.CensorManager
 import io.mockk.Runs
@@ -72,6 +74,7 @@ class SettingsViewModelTest {
         budgetRepository = budgetRepository,
         updateNotificationTimeUseCase = updateNotificationTimeUseCase,
         censorManager = censorManager,
+        syncGoalPocket = SyncGoalPocketUseCase(budgetRepository, settingsRepository),
     )
 
     private fun budgetSettings(cutoff: Int? = null) = BudgetSettings(
@@ -216,6 +219,21 @@ class SettingsViewModelTest {
         newViewModel().onCutoffDayChange(12)
 
         coVerify(exactly = 0) { budgetRepository.saveBudgetSettings(any()) }
+    }
+
+    @Test
+    fun `saving a savings goal creates the unnamed goal pocket`() = runTest {
+        every { budgetRepository.getSavingsPockets() } returns flowOf(emptyList())
+        val goal = SavingsPreferences(savingsGoalAmount = BigDecimal("15000"), savingsGoalMonths = 6)
+
+        newViewModel().onSavingsPreferencesChange(goal)
+
+        coVerify { settingsRepository.setSavingsPreferences(goal) }
+        coVerify {
+            budgetRepository.saveSavingsPocket(
+                match { it.isGoalPocket && it.target == BigDecimal("15000") && it.targetDate != null },
+            )
+        }
     }
 
     @Test

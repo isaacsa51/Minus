@@ -76,6 +76,7 @@ class PeriodBoundaryLeakE2ETest {
             categoryDao = database.categoryDao(),
             queuedTransactionDao = database.queuedTransactionDao(),
             paidRecurrentOccurrenceDao = database.paidRecurrentOccurrenceDao(),
+            savingsPocketDao = database.savingsPocketDao(),
         )
         dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         dataStoreFile = File(context.cacheDir, "leak_${System.nanoTime()}.preferences_pb")

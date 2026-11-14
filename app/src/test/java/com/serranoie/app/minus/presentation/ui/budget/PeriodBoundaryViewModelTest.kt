@@ -85,6 +85,7 @@ class PeriodBoundaryViewModelTest {
         every { budgetRepository.getTransactions() } returns transactionsFlow
         every { budgetRepository.getQueuedTransactions() } returns MutableStateFlow(emptyList())
         every { budgetRepository.getActiveCategories() } returns MutableStateFlow(emptyList())
+        every { budgetRepository.getSavingsPockets() } returns MutableStateFlow(emptyList())
         every { budgetRepository.getPaidRecurrentOccurrences() } returns
             MutableStateFlow(emptySet<PaidRecurrentOccurrence>())
         coEvery { budgetRepository.getBudgetSettingsSync() } answers { settingsFlow.value }

@@ -5,6 +5,7 @@ import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
 import com.serranoie.app.minus.domain.model.LeftoverChoice
+import com.serranoie.app.minus.domain.model.SavingsPocket
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.editor.AnimState
 import com.serranoie.app.minus.presentation.ui.editor.EditMode
@@ -48,6 +49,9 @@ data class BudgetUiState(
     val unresolvedSurplusAmount: BigDecimal? = null,
     val lastLeftoverChoice: LeftoverChoice? = null,
     val selectedViewPeriod: BudgetPeriod? = null,
+    val pockets: List<SavingsPocket> = emptyList(),
+    val isSetAsideEnabled: Boolean = false,
+    val selectedPocketId: Long? = null,
 ) {
     sealed interface Error {
         data object LoadFailed : Error
