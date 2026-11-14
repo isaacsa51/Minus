@@ -156,7 +156,7 @@
     <string name="history_snackbar_delete_recurrent_failed">बार-बार होने वाला पेमेंट हटाया नहीं जा सका</string>
     <string name="history_snackbar_mark_paid_failed">लेन-देन को भुगतान किया हुआ चिह्नित नहीं किया जा सका</string>
     <string name="history_snackbar_restore_transaction_failed">लेन-देन को वापस नहीं लाया जा सका</string>
-    <string name="history_search_placeholder">Name, note, date or amount</string>
+    <string name="history_search_placeholder">नाम, नोट, तारीख या रकम</string>
     <string-array name="history_search_examples">
         <item>Range: 19 nov to 30 nov</item>
         <item>Day: Food 12 oct</item>
@@ -168,23 +168,23 @@
         <item>After a date: &gt;10/1</item>
         <item>Text only: \"Tacos\"</item>
     </string-array>
-    <string name="history_search_clear">Clear search</string>
-    <string name="history_search_no_results">No expenses match \"%1$s\"</string>
+    <string name="history_search_clear">खोज साफ़ करें</string>
+    <string name="history_search_no_results">\"%1$s\" से कोई खर्च मेल नहीं खाता</string>
     <plurals name="history_search_results_summary">
-        <item quantity="one">%1$d match · %2$s spent</item>
-        <item quantity="other">%1$d matches · %2$s spent</item>
+        <item quantity="one">%1$d मिलान · %2$s खर्च</item>
+        <item quantity="other">%1$d मिलान · %2$s खर्च</item>
     </plurals>
     <string name="expense_queued_for_next_period">खर्च अगली अवधि के लिए कतार में है</string>
-    <string name="split_expense_mismatch">Amounts and categories don\'t match (%1$d vs %2$d)</string>
-    <string name="split_expense_not_recurring">Split expenses can\'t be recurring</string>
-    <string name="split_category_remove">Remove %1$s</string>
+    <string name="split_expense_mismatch">रकम और श्रेणियाँ मेल नहीं खातीं (%1$d बनाम %2$d)</string>
+    <string name="split_expense_not_recurring">बँटे हुए खर्च आवर्ती नहीं हो सकते</string>
+    <string name="split_category_remove">%1$s हटाएँ</string>
     <plurals name="split_expense_saved">
-        <item quantity="one">Saved %d expense</item>
-        <item quantity="other">Saved %d expenses</item>
+        <item quantity="one">%d खर्च सहेजा गया</item>
+        <item quantity="other">%d खर्च सहेजे गए</item>
     </plurals>
-    <string name="budget_load_failed">Could not load your budget</string>
-    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
-    <string name="budget_load_retry">Retry</string>
+    <string name="budget_load_failed">आपका बजट लोड नहीं हो सका</string>
+    <string name="budget_load_corrupt_data">सहेजा गया कुछ बजट डेटा पढ़ा नहीं जा सका</string>
+    <string name="budget_load_retry">फिर से कोशिश करें</string>
     <string name="add_new_category">कैटेगरी</string>
     <string name="add_new_category_action">नई कैटेगरी जोड़ें</string>
     <string name="new_category">नई कैटेगरी</string>
@@ -199,22 +199,22 @@
     <string name="budget_less_than_one_day_validation">बजट कम से कम एक दिन के लिए होना चाहिए</string>
     <!--  Analytics  -->
     <string name="analytics_title">एनालिटिक्स</string>
-    <string name="receipt_scan_button">Scan receipt</string>
-    <string name="receipt_scan_failed">Couldn\'t read a total from the receipt</string>
-    <string name="quick_add_amount_label">Amount</string>
-    <string name="quick_add_no_categories">No categories yet. You can save without one.</string>
-    <string name="quick_add_save_failed">Couldn\'t save the expense. Try again.</string>
-    <string name="quick_add_needs_budget">Set up a budget in Minus before adding expenses here.</string>
-    <string name="quick_add_open_app">Open Minus</string>
-    <string name="quick_add_saved">%1$s saved</string>
-    <string name="receipt_camera_point_at_total">Point at the total</string>
-    <string name="receipt_camera_detected">%1$s detected</string>
-    <string name="receipt_camera_retry">No total found, try again</string>
-    <string name="receipt_camera_close">Close camera</string>
-    <string name="receipt_camera_capture">Capture receipt</string>
-    <string name="receipt_camera_gallery">Choose a photo</string>
-    <string name="receipt_camera_switch">Switch camera</string>
-    <string name="receipt_camera_flash">Flash</string>
+    <string name="receipt_scan_button">रसीद स्कैन करें</string>
+    <string name="receipt_scan_failed">रसीद से कुल रकम नहीं पढ़ी जा सकी</string>
+    <string name="quick_add_amount_label">रकम</string>
+    <string name="quick_add_no_categories">अभी कोई श्रेणी नहीं है। आप बिना श्रेणी के भी सहेज सकते हैं।</string>
+    <string name="quick_add_save_failed">खर्च सहेजा नहीं जा सका। फिर से कोशिश करें।</string>
+    <string name="quick_add_needs_budget">यहाँ खर्च जोड़ने से पहले Minus में बजट सेट करें।</string>
+    <string name="quick_add_open_app">Minus खोलें</string>
+    <string name="quick_add_saved">%1$s सहेजा गया</string>
+    <string name="receipt_camera_point_at_total">कुल रकम पर कैमरा रखें</string>
+    <string name="receipt_camera_detected">%1$s मिला</string>
+    <string name="receipt_camera_retry">कुल रकम नहीं मिली, फिर से कोशिश करें</string>
+    <string name="receipt_camera_close">कैमरा बंद करें</string>
+    <string name="receipt_camera_capture">रसीद की फ़ोटो लें</string>
+    <string name="receipt_camera_gallery">फ़ोटो चुनें</string>
+    <string name="receipt_camera_switch">कैमरा बदलें</string>
+    <string name="receipt_camera_flash">फ़्लैश</string>
     <string name="receipt_scan_hint">सुझाव: रसीद स्कैन करने के लिए ✓ को दबाकर रखें</string>
     <string name="receipt_scan_hint_action">आज़माएं</string>
     <plurals name="days">
@@ -697,6 +697,34 @@
     <string name="category_limit_ahead">रफ़्तार से आगे</string>
     <string name="category_limit_on_track">सही रास्ते पर</string>
     <string name="analytics_category_limits_title">कैटेगरी सीमाएं</string>
+    <string name="pockets_title">बचत पॉकेट</string>
+    <string name="pockets_empty">किसी लक्ष्य के लिए पैसे अलग रखें। जब तक आप इन्हें निकालते नहीं, ये आपके बजट से बाहर रहते हैं।</string>
+    <string name="pockets_new">नया पॉकेट</string>
+    <string name="pockets_name_label">नाम</string>
+    <string name="pockets_target_label">लक्ष्य रकम (वैकल्पिक)</string>
+    <string name="pockets_amount_label">रकम</string>
+    <string name="pockets_add_money">पैसे जोड़ें</string>
+    <string name="pockets_take_out">निकालें</string>
+    <string name="pockets_add_money_title">%1$s में जोड़ें</string>
+    <string name="pockets_take_out_title">%1$s से निकालें</string>
+    <string name="pockets_take_out_max">%1$s तक</string>
+    <string name="pockets_of_target">/ %1$s</string>
+    <string name="pockets_of_target_by">/ %1$s (%2$s तक)</string>
+    <string name="pockets_goal_name">बचत</string>
+    <string name="pockets_set_aside">अलग रखें</string>
+    <string name="pockets_saved_to">%1$s को %2$s में बचाया गया</string>
+    <string name="pockets_set_aside_pick">पहले एक पॉकेट चुनें</string>
+    <string name="pockets_set_aside_single_amount">अलग रखने के लिए एक ही रकम दर्ज करें</string>
+    <string name="pockets_delete">पॉकेट हटाएँ</string>
+    <string name="pockets_period_title">इस अवधि की बचत</string>
+    <string name="pockets_period_added">आपने अपने पॉकेट में %1$s अलग रखे।</string>
+    <string name="pockets_period_withdrawn">आपने अपने पॉकेट से %1$s निकाले।</string>
+    <string name="pockets_period_added_and_withdrawn">आपने %1$s अलग रखे और %2$s निकाले।</string>
+    <string name="pockets_delete_title">%1$s हटाएँ?</string>
+    <string name="pockets_delete_desc">पॉकेट खाली है, इसलिए कोई पैसा नहीं खोएगा।</string>
+    <string name="pockets_action_failed">पॉकेट अपडेट नहीं हो सका। फिर से कोशिश करें।</string>
+    <string name="rollover_dialog_save_to_pocket_title">%1$s में बचाएँ</string>
+    <string name="rollover_dialog_save_to_pocket_desc">इस पॉकेट में %1$s अलग रखें</string>
     <string name="settings_category_limits_title">कैटेगरी सीमाएं</string>
     <string name="settings_category_limits_subtitle_empty">हर हफ़्ते या अवधि में किसी कैटेगरी पर खर्च की सीमा तय करें</string>
     <string name="settings_category_limits_subtitle_count">%2$d में से %1$d कैटेगरी की सीमा है</string>
@@ -724,6 +752,7 @@
     <string name="settings_savings_dialog_savings_label">बचत — %1$d%%</string>
     <string name="settings_savings_dialog_goal_section">बचत का लक्ष्य (वैकल्पिक)</string>
     <string name="settings_savings_dialog_goal_amount_label">टारगेट राशि</string>
+    <string name="settings_savings_summary_goal_in">%2$s में %1$s</string>
     <string name="settings_savings_dialog_goal_months_label">टारगेट अवधि (महीने)</string>
     <string name="settings_savings_dialog_goal_hint">डिफ़ॉल्ट %1$d%% × 6 उदाहरण रखने के लिए खाली छोड़ें।</string>
     <string name="settings_savings_dialog_reset">डिफ़ॉल्ट पर रीसेट करें</string>
@@ -810,6 +839,10 @@
     <string name="notification_channel_savings_name">बचत रिमाइंडर</string>
     <string name="notification_channel_savings_description">नई बजट अवधि शुरू होने पर पैसे अलग रखने का रिमाइंडर</string>
     <string name="notification_savings_reminder_title">नई अवधि: बचत का समय</string>
+    <string name="notification_savings_goal_title">%2$s के लिए %1$s अलग रखें</string>
+    <string name="notification_savings_goal_message">आप अपने %2$s लक्ष्य से %1$s दूर हैं। बचाने के लिए टैप करें।</string>
+    <string name="notification_savings_percent_title">इस अवधि में %1$s अलग रखें</string>
+    <string name="notification_savings_no_goal_message">आपने कोई बचत लक्ष्य सेट नहीं किया है, लेकिन हम इस अवधि में %1$s बचाने की सलाह देते हैं।</string>
     <string name="notification_savings_reminder_message">अपनी बचत के लिए इस अवधि से %1$s अलग रखें।</string>
     <string name="credit_owed_label">कुल बकाया</string>
     <string name="debt_adjusted_balance_label">कर्ज़-एडजस्टेड बैलेंस</string>
@@ -876,17 +909,17 @@
     <string name="unit_millions">M</string>
     <string name="widget_budget_pill_title">बजट पिल</string>
     <string name="widget_budget_pill_description">आपके चुने गए व्यू मोड — दैनिक, साप्ताहिक, द्वि-साप्ताहिक या मासिक — का शेष एक पतली पट्टी में</string>
-    <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
-    <string name="island_brief_days_short">%1$dd</string>
-    <string name="island_brief_stale">left in period - open Minus to update</string>
-    <string name="island_page_spent_of">%1$s of %2$s spent</string>
-    <string name="island_page_period_left">Period left</string>
+    <string name="island_provider_description">island Brief में दिखाता है कि आपके बजट में कितना बचा है</string>
+    <string name="island_brief_days_short">%1$d दि</string>
+    <string name="island_brief_stale">अवधि में बचा - अपडेट करने के लिए Minus खोलें</string>
+    <string name="island_page_spent_of">%2$s में से %1$s खर्च</string>
+    <string name="island_page_period_left">अवधि शेष</string>
     <plurals name="island_page_days_left">
-        <item quantity="one">day left</item>
-        <item quantity="other">days left</item>
+        <item quantity="one">दिन बाकी</item>
+        <item quantity="other">दिन बाकी</item>
     </plurals>
-    <string name="island_charge_today">%1$s — %2$s due today</string>
-    <string name="island_charge_tomorrow">%1$s — %2$s due tomorrow</string>
-    <string name="island_charge_unnamed">Recurring payment</string>
-    <string name="island_credit_owed">%1$s owed on credit</string>
+    <string name="island_charge_today">%1$s — %2$s आज देय</string>
+    <string name="island_charge_tomorrow">%1$s — %2$s कल देय</string>
+    <string name="island_charge_unnamed">आवर्ती भुगतान</string>
+    <string name="island_credit_owed">क्रेडिट पर %1$s बकाया</string>
 </resources>
