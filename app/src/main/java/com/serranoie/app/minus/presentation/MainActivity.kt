@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.animation.PathInterpolator
+import android.widget.Toast
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -438,9 +439,13 @@ class MainActivity : AppCompatActivity() {
             onSaveToPocket = { pocket ->
                 val label = pocket.name.ifBlank { goalPocketLabel }
                 lifecycleScope.launch {
-                    runCatching { midnightTransitionManager.sweepSurplusToPocket(pocket, label) }
-                        .onFailure { logcat { "Could not sweep surplus into pocket: ${it.asLog()}" } }
-                    if (!data.isPersistedReopen) {
+                    val saved = runCatching { midnightTransitionManager.sweepSurplusToPocket(pocket, label) }
+                        .onFailure {
+                            logcat { "Could not sweep surplus into pocket: ${it.asLog()}" }
+                            Toast.makeText(this@MainActivity, R.string.pockets_action_failed, Toast.LENGTH_SHORT).show()
+                        }
+                        .isSuccess
+                    if (saved && !data.isPersistedReopen) {
                         navController.navigate(Screen.Analytics.route) {
                             popUpTo(Screen.Main.route) { inclusive = false }
                             launchSingleTop = true

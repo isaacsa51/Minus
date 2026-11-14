@@ -849,4 +849,47 @@ class BudgetViewModelTest {
 
         coVerify { settingsRepository.setString(com.serranoie.app.minus.domain.calculator.PENDING_SET_ASIDE_KEY_NAME, "") }
     }
+
+    @Test
+    fun `a staged pocket that no longer exists asks for a pick instead of using another pocket`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        val staged = MutableStateFlow<String?>(null)
+        every { settingsRepository.observeString(com.serranoie.app.minus.domain.calculator.PENDING_SET_ASIDE_KEY_NAME) } returns staged
+        every { context.getString(R.string.pockets_set_aside_pick) } returns "Pick a pocket"
+        val viewModel = newViewModel()
+
+        viewModel.effects.test {
+            viewModel.uiState.first { it.pockets.isNotEmpty() }
+            staged.value = "9|50"
+            viewModel.uiState.first { it.numpadInput == "50" && it.isSetAsideEnabled }
+            assertThat(viewModel.uiState.value.selectedPocketId).isNull()
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            assertThat(awaitItem()).isEqualTo(BudgetUiEffect.ShowMessage("Pick a pocket"))
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+    }
+
+    @Test
+    fun `a second apply while a set aside is saving is ignored`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        val release = CompletableDeferred<Unit>()
+        coEvery { budgetRepository.addTransaction(any()) } coAnswers { release.await(); 1L }
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.isNotEmpty() }
+            typeAmount(viewModel, "50")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            awaitCondition { it.isSetAsideEnabled }
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            release.complete(Unit)
+            awaitCondition { it.numpadInput == "" }
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 1) { budgetRepository.addTransaction(any()) }
+    }
 }

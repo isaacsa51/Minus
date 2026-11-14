@@ -286,7 +286,7 @@ class AnalyticsViewModel @Inject constructor(
         )
 
         val actualSpends = (oneTimeSpends + paidRecurring).distinctBy { it.id }
-            .filter { it.amount > BigDecimal.ZERO }
+            .filter { it.amount > BigDecimal.ZERO && !it.isAdjustment }
         val actualIncomes = (oneTimeSpends + paidRecurring).distinctBy { it.id }
             .filter { it.amount < BigDecimal.ZERO }
         val budgetSettings = archive.toBudgetSettings()
@@ -681,20 +681,15 @@ class AnalyticsViewModel @Inject constructor(
         runPocketAction("AnalyticsViewModel.movePocketMoney") {
             val pocket = budgetRepository.getSavingsPockets().first().firstOrNull { it.id == pocketId }
                 ?: return@runPocketAction
-            if (withdraw) {
-                val balance = pocketBalances(budgetRepository.getTransactions().first())[pocketId] ?: BigDecimal.ZERO
-                if (amount > balance) return@runPocketAction
-            }
-            budgetRepository.addTransaction(
-                pocketEntry(
-                    pocket = pocket,
-                    amount = amount,
-                    withdraw = withdraw,
-                    periodId = settingsRepository.getCurrentPeriodId(),
-                    date = LocalDateTime.now(),
-                    label = pocket.name.ifBlank { goalLabel },
-                ),
+            val entry = pocketEntry(
+                pocket = pocket,
+                amount = amount,
+                withdraw = withdraw,
+                periodId = settingsRepository.getCurrentPeriodId(),
+                date = LocalDateTime.now(),
+                label = pocket.name.ifBlank { goalLabel },
             )
+            if (withdraw) budgetRepository.addPocketWithdrawal(entry) else budgetRepository.addTransaction(entry)
         }
     }
 

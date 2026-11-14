@@ -161,4 +161,39 @@ class SavingsPocketsTest {
 
         assertThat(periodPocketFlow(rows)).isNull()
     }
+
+    @Test
+    fun `a goal pocket whose stored target drifted is reconciled even without a previous value`() {
+        val existing = SavingsPocket(id = 9, name = "", target = BigDecimal("10000"), targetDate = LocalDate.of(2099, 9, 1))
+
+        val result = goalPocketUpdate(existing, previous = null, updated = goal, today = today)
+
+        assertThat(result).isEqualTo(existing.copy(target = BigDecimal("15000"), targetDate = LocalDate.of(2099, 12, 10)))
+    }
+
+    @Test
+    fun `a stored target that differs is reconciled even when previous equals updated`() {
+        val existing = SavingsPocket(id = 9, name = "", target = BigDecimal("10000"), targetDate = LocalDate.of(2099, 9, 1))
+
+        val result = goalPocketUpdate(existing, previous = goal, updated = goal, today = today)
+
+        assertThat(result?.target).isEqualToIgnoringScale(BigDecimal("15000"))
+    }
+
+    @Test
+    fun `a matching stored goal keeps its deadline`() {
+        val existing = SavingsPocket(id = 9, name = "", target = BigDecimal("15000.00"), targetDate = LocalDate.of(2099, 9, 1))
+
+        assertThat(goalPocketUpdate(existing, previous = null, updated = goal, today = today)).isNull()
+        assertThat(goalPocketUpdate(existing, previous = goal, updated = goal, today = today)).isNull()
+    }
+
+    @Test
+    fun `a matching target missing its deadline gets one`() {
+        val existing = SavingsPocket(id = 9, name = "", target = BigDecimal("15000"), targetDate = null)
+
+        val result = goalPocketUpdate(existing, previous = null, updated = goal, today = today)
+
+        assertThat(result).isEqualTo(existing.copy(targetDate = LocalDate.of(2099, 12, 10)))
+    }
 }

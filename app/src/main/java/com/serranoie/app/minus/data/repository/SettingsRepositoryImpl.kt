@@ -129,6 +129,7 @@ private val LAST_PERIOD_END =
 private val REMAINING_FROM_LAST_PERIOD =
     stringPreferencesKey("remaining_from_last_period")
 private val PENDING_ROLLOVER_AMOUNT = stringPreferencesKey(PENDING_ROLLOVER_AMOUNT_KEY_NAME)
+private val PENDING_ROLLOVER_PERIOD_ID = longPreferencesKey("pending_rollover_period_id")
 private val PENDING_ROLLOVER_STRATEGY = stringPreferencesKey(PENDING_ROLLOVER_STRATEGY_KEY_NAME)
 private val LAST_SEEN_VERSION_CODE = longPreferencesKey("changelog_last_seen_version_code")
 private val PERIOD_MAPPING_MODE = stringPreferencesKey("period_mapping_mode")
@@ -308,6 +309,7 @@ class SettingsRepositoryImpl @Inject constructor(
         dataStore.edit { preferences ->
             preferences.remove(PENDING_ROLLOVER_AMOUNT)
             preferences.remove(PENDING_ROLLOVER_STRATEGY)
+            preferences.remove(PENDING_ROLLOVER_PERIOD_ID)
         }
     }
 
@@ -567,8 +569,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun markSurplusUnresolved(amount: BigDecimal) {
         dataStore.edit { preferences ->
             preferences[PENDING_ROLLOVER_AMOUNT] = amount.toPlainString()
+            preferences[CURRENT_PERIOD_ID]?.let { preferences[PENDING_ROLLOVER_PERIOD_ID] = it }
         }
     }
+
+    override suspend fun getPendingRolloverPeriodId(): Long? =
+        dataStore.data.first()[PENDING_ROLLOVER_PERIOD_ID]
 
     override suspend fun setSavingsPreferences(prefs: SavingsPreferences) {
         dataStore.edit { preferences ->

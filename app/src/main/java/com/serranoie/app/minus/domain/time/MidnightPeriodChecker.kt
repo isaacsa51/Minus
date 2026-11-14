@@ -341,14 +341,17 @@ class MidnightPeriodChecker @Inject constructor(
         if (pendingAmount > BigDecimal.ZERO) {
             val now = LocalDateTime.now()
             val periodEnd = budgetRepository.getBudgetSettingsSync()?.getPeriodEndDate()?.atTime(LocalTime.of(23, 59))
-            budgetRepository.addTransaction(
+            val sourcePeriodId = settingsRepository.getPendingRolloverPeriodId()?.takeIf { it > 0L }
+                ?: settingsRepository.getCurrentPeriodId()
+            budgetRepository.addTransactionIfAbsent(
                 pocketEntry(
                     pocket = pocket,
                     amount = pendingAmount,
                     withdraw = false,
-                    periodId = settingsRepository.getCurrentPeriodId(),
+                    periodId = sourcePeriodId,
                     date = if (periodEnd != null && periodEnd.isBefore(now)) periodEnd else now,
                     label = label,
+                    clientGeneratedId = "pocket-sweep-$sourcePeriodId",
                 ),
             )
             settingsRepository.clearPendingRollover()

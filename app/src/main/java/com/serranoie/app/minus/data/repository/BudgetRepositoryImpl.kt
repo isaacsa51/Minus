@@ -262,6 +262,19 @@ class BudgetRepositoryImpl @Inject constructor(
         return rowId != -1L
     }
 
+    override suspend fun addPocketWithdrawal(transaction: Transaction): Boolean {
+        val pocketId = transaction.pocketId ?: return false
+        return appDatabase.withTransaction {
+            val balance = transactionDao.getByPocketId(pocketId).sumOf { BigDecimal(it.amount) }
+            if (transaction.amount.abs() > balance) {
+                false
+            } else {
+                transactionDao.insert(transaction.toEntity())
+                true
+            }
+        }
+    }
+
     override suspend fun updateTransaction(transaction: Transaction) {
         transactionDao.update(transaction.toEntity())
     }

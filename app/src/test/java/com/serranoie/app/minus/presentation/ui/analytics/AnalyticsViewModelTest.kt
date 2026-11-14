@@ -130,6 +130,42 @@ class AnalyticsViewModelTest {
     }
 
     @Test
+    fun `an archived period does not count pocket deposits as spending`() = runTest {
+        val start = LocalDate.now().minusMonths(1)
+        archivedFlow.value = listOf(
+            ArchivedBudget(
+                periodId = 10L,
+                totalBudget = BigDecimal("1000.00"),
+                spentAmount = BigDecimal.ZERO,
+                startDate = start,
+                endDate = LocalDate.now().minusDays(1),
+                currencyCode = "USD",
+                periodType = BudgetPeriod.MONTHLY,
+            ),
+        )
+        val lunch = Transaction(id = 1, amount = BigDecimal("100"), date = start.plusDays(2).atTime(12, 0), periodId = 10L)
+        val deposit = Transaction(
+            id = 2,
+            amount = BigDecimal("500"),
+            date = start.plusDays(3).atTime(12, 0),
+            periodId = 10L,
+            isAdjustment = true,
+            pocketId = 3L,
+        )
+        transactionsFlow.value = listOf(lunch, deposit)
+
+        val viewModel = createViewModel()
+        viewModel.uiState.test {
+            skipItems(2)
+            viewModel.onPeriodSelected(10L)
+
+            val state = awaitItem()
+            assertThat(state.displayState.isHistoricalView).isTrue()
+            assertThat(state.displayState.spends.map { it.id }).containsExactly(1L)
+        }
+    }
+
+    @Test
     fun `closing historical view returns to current`() = runTest {
         val viewModel = createViewModel()
         viewModel.uiState.test {
@@ -422,10 +458,12 @@ class AnalyticsViewModelTest {
         transactionsFlow.value = listOf(tripDeposit)
         val viewModel = createViewModel()
 
+        coEvery { budgetRepository.addPocketWithdrawal(any()) } returns false
         viewModel.onPocketWithdraw(trip.id, BigDecimal("400.01"))
         runCurrent()
 
         coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
+        assertThat(viewModel.effects.value).isNull()
     }
 
     @Test
@@ -433,7 +471,7 @@ class AnalyticsViewModelTest {
         pocketsFlow.value = listOf(trip)
         transactionsFlow.value = listOf(tripDeposit)
         val saved = slot<Transaction>()
-        coEvery { budgetRepository.addTransaction(capture(saved)) } returns 1L
+        coEvery { budgetRepository.addPocketWithdrawal(capture(saved)) } returns true
         val viewModel = createViewModel()
 
         viewModel.onPocketWithdraw(trip.id, BigDecimal("400"))
