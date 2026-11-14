@@ -156,7 +156,7 @@
     <string name="history_snackbar_delete_recurrent_failed">Impossible de supprimer le paiement récurrent</string>
     <string name="history_snackbar_mark_paid_failed">Impossible de marquer la transaction comme payée</string>
     <string name="history_snackbar_restore_transaction_failed">Impossible de restaurer la transaction</string>
-    <string name="history_search_placeholder">Name, note, date or amount</string>
+    <string name="history_search_placeholder">Nom, note, date ou montant</string>
     <string-array name="history_search_examples">
         <item>Range: 19 nov to 30 nov</item>
         <item>Day: Food 12 oct</item>
@@ -168,23 +168,23 @@
         <item>After a date: &gt;10/1</item>
         <item>Text only: \"Tacos\"</item>
     </string-array>
-    <string name="history_search_clear">Clear search</string>
-    <string name="history_search_no_results">No expenses match \"%1$s\"</string>
+    <string name="history_search_clear">Effacer la recherche</string>
+    <string name="history_search_no_results">Aucune dépense ne correspond à \"%1$s\"</string>
     <plurals name="history_search_results_summary">
-        <item quantity="one">%1$d match · %2$s spent</item>
-        <item quantity="other">%1$d matches · %2$s spent</item>
+        <item quantity="one">%1$d résultat · %2$s dépensés</item>
+        <item quantity="other">%1$d résultats · %2$s dépensés</item>
     </plurals>
     <string name="expense_queued_for_next_period">Dépense mise en attente pour la prochaine période</string>
-    <string name="split_expense_mismatch">Amounts and categories don\'t match (%1$d vs %2$d)</string>
-    <string name="split_expense_not_recurring">Split expenses can\'t be recurring</string>
-    <string name="split_category_remove">Remove %1$s</string>
+    <string name="split_expense_mismatch">Les montants et les catégories ne correspondent pas (%1$d contre %2$d)</string>
+    <string name="split_expense_not_recurring">Les dépenses réparties ne peuvent pas être récurrentes</string>
+    <string name="split_category_remove">Retirer %1$s</string>
     <plurals name="split_expense_saved">
-        <item quantity="one">Saved %d expense</item>
-        <item quantity="other">Saved %d expenses</item>
+        <item quantity="one">%d dépense enregistrée</item>
+        <item quantity="other">%d dépenses enregistrées</item>
     </plurals>
-    <string name="budget_load_failed">Could not load your budget</string>
-    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
-    <string name="budget_load_retry">Retry</string>
+    <string name="budget_load_failed">Impossible de charger votre budget</string>
+    <string name="budget_load_corrupt_data">Certaines données de budget enregistrées n\'ont pas pu être lues</string>
+    <string name="budget_load_retry">Réessayer</string>
     <string name="add_new_category">Catégorie</string>
     <string name="add_new_category_action">Ajouter une nouvelle catégorie</string>
     <string name="new_category">Nouvelle catégorie</string>
@@ -199,21 +199,21 @@
     <string name="budget_less_than_one_day_validation">Le budget doit être d\'au moins un jour</string>
     <!--  Analytics  -->
     <string name="analytics_title">Analyses</string>
-    <string name="receipt_scan_button">Scan receipt</string>
-    <string name="receipt_scan_failed">Couldn\'t read a total from the receipt</string>
-    <string name="quick_add_amount_label">Amount</string>
-    <string name="quick_add_no_categories">No categories yet. You can save without one.</string>
-    <string name="quick_add_save_failed">Couldn\'t save the expense. Try again.</string>
-    <string name="quick_add_needs_budget">Set up a budget in Minus before adding expenses here.</string>
-    <string name="quick_add_open_app">Open Minus</string>
-    <string name="quick_add_saved">%1$s saved</string>
-    <string name="receipt_camera_point_at_total">Point at the total</string>
-    <string name="receipt_camera_detected">%1$s detected</string>
-    <string name="receipt_camera_retry">No total found, try again</string>
-    <string name="receipt_camera_close">Close camera</string>
-    <string name="receipt_camera_capture">Capture receipt</string>
-    <string name="receipt_camera_gallery">Choose a photo</string>
-    <string name="receipt_camera_switch">Switch camera</string>
+    <string name="receipt_scan_button">Scanner un reçu</string>
+    <string name="receipt_scan_failed">Impossible de lire un total sur le reçu</string>
+    <string name="quick_add_amount_label">Montant</string>
+    <string name="quick_add_no_categories">Aucune catégorie pour l\'instant. Vous pouvez enregistrer sans catégorie.</string>
+    <string name="quick_add_save_failed">Impossible d\'enregistrer la dépense. Réessayez.</string>
+    <string name="quick_add_needs_budget">Configurez un budget dans Minus avant d\'ajouter des dépenses ici.</string>
+    <string name="quick_add_open_app">Ouvrir Minus</string>
+    <string name="quick_add_saved">%1$s enregistré</string>
+    <string name="receipt_camera_point_at_total">Visez le total</string>
+    <string name="receipt_camera_detected">%1$s détecté</string>
+    <string name="receipt_camera_retry">Aucun total trouvé, réessayez</string>
+    <string name="receipt_camera_close">Fermer l\'appareil photo</string>
+    <string name="receipt_camera_capture">Capturer le reçu</string>
+    <string name="receipt_camera_gallery">Choisir une photo</string>
+    <string name="receipt_camera_switch">Changer de caméra</string>
     <string name="receipt_camera_flash">Flash</string>
     <string name="receipt_scan_hint">Astuce : appuyez longuement sur ✓ pour scanner un ticket</string>
     <string name="receipt_scan_hint_action">Essayer</string>
@@ -697,6 +697,34 @@
     <string name="category_limit_ahead">En avance sur le rythme</string>
     <string name="category_limit_on_track">Dans les clous</string>
     <string name="analytics_category_limits_title">Limites par catégorie</string>
+    <string name="pockets_title">Cagnottes d\'épargne</string>
+    <string name="pockets_empty">Mettez de l\'argent de côté pour un objectif. Il sort de votre budget jusqu\'à ce que vous le retiriez.</string>
+    <string name="pockets_new">Nouvelle cagnotte</string>
+    <string name="pockets_name_label">Nom</string>
+    <string name="pockets_target_label">Montant objectif (facultatif)</string>
+    <string name="pockets_amount_label">Montant</string>
+    <string name="pockets_add_money">Ajouter de l\'argent</string>
+    <string name="pockets_take_out">Retirer</string>
+    <string name="pockets_add_money_title">Ajouter à %1$s</string>
+    <string name="pockets_take_out_title">Retirer de %1$s</string>
+    <string name="pockets_take_out_max">Jusqu\'à %1$s</string>
+    <string name="pockets_of_target">sur %1$s</string>
+    <string name="pockets_of_target_by">sur %1$s d\'ici %2$s</string>
+    <string name="pockets_goal_name">Épargne</string>
+    <string name="pockets_set_aside">Mettre de côté</string>
+    <string name="pockets_saved_to">%1$s épargnés dans %2$s</string>
+    <string name="pockets_set_aside_pick">Choisissez d\'abord une cagnotte</string>
+    <string name="pockets_set_aside_single_amount">Saisissez un seul montant à mettre de côté</string>
+    <string name="pockets_delete">Supprimer la cagnotte</string>
+    <string name="pockets_period_title">Épargne de cette période</string>
+    <string name="pockets_period_added">Vous avez mis %1$s de côté dans vos cagnottes.</string>
+    <string name="pockets_period_withdrawn">Vous avez retiré %1$s de vos cagnottes.</string>
+    <string name="pockets_period_added_and_withdrawn">Vous avez mis %1$s de côté et retiré %2$s.</string>
+    <string name="pockets_delete_title">Supprimer %1$s ?</string>
+    <string name="pockets_delete_desc">La cagnotte est vide, aucun argent n\'est donc perdu.</string>
+    <string name="pockets_action_failed">Impossible de mettre à jour la cagnotte. Réessayez.</string>
+    <string name="rollover_dialog_save_to_pocket_title">Épargner dans %1$s</string>
+    <string name="rollover_dialog_save_to_pocket_desc">Mettre %1$s de côté dans cette cagnotte</string>
     <string name="settings_category_limits_title">Limites par catégorie</string>
     <string name="settings_category_limits_subtitle_empty">Plafonnez vos dépenses dans une catégorie chaque semaine ou période</string>
     <string name="settings_category_limits_subtitle_count">%1$d catégories sur %2$d ont une limite</string>
@@ -724,6 +752,7 @@
     <string name="settings_savings_dialog_savings_label">Épargne · %1$d%%</string>
     <string name="settings_savings_dialog_goal_section">Objectif d\'épargne (facultatif)</string>
     <string name="settings_savings_dialog_goal_amount_label">Montant cible</string>
+    <string name="settings_savings_summary_goal_in">%1$s en %2$s</string>
     <string name="settings_savings_dialog_goal_months_label">Période cible (mois)</string>
     <string name="settings_savings_dialog_goal_hint">Laissez vide pour conserver l\'exemple par défaut %1$d%% × 6.</string>
     <string name="settings_savings_dialog_reset">Réinitialiser les valeurs par défaut</string>
@@ -810,6 +839,10 @@
     <string name="notification_channel_savings_name">Rappels d\'épargne</string>
     <string name="notification_channel_savings_description">Un rappel pour mettre de l\'argent de côté au début d\'une nouvelle période budgétaire</string>
     <string name="notification_savings_reminder_title">Nouvelle période : place à l\'épargne</string>
+    <string name="notification_savings_goal_title">Mettez %1$s de côté pour %2$s</string>
+    <string name="notification_savings_goal_message">Il vous manque %1$s pour atteindre votre objectif %2$s. Appuyez pour l\'épargner.</string>
+    <string name="notification_savings_percent_title">Mettez %1$s de côté cette période</string>
+    <string name="notification_savings_no_goal_message">Vous n\'avez pas d\'objectif d\'épargne, mais nous vous recommandons d\'épargner %1$s cette période.</string>
     <string name="notification_savings_reminder_message">Mettez %1$s de côté sur cette période pour votre épargne.</string>
     <string name="credit_owed_label">Total dû</string>
     <string name="debt_adjusted_balance_label">Solde ajusté de la dette</string>
@@ -876,17 +909,17 @@
     <string name="unit_millions">M</string>
     <string name="widget_budget_pill_title">Pilule de budget</string>
     <string name="widget_budget_pill_description">Le solde du mode d’affichage choisi — quotidien, hebdomadaire, bihebdomadaire ou mensuel — dans une barre fine</string>
-    <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
-    <string name="island_brief_days_short">%1$dd</string>
-    <string name="island_brief_stale">left in period - open Minus to update</string>
-    <string name="island_page_spent_of">%1$s of %2$s spent</string>
-    <string name="island_page_period_left">Period left</string>
+    <string name="island_provider_description">Affiche ce qu\'il reste de votre budget dans island Brief</string>
+    <string name="island_brief_days_short">%1$d j</string>
+    <string name="island_brief_stale">restant sur la période - ouvrez Minus pour actualiser</string>
+    <string name="island_page_spent_of">%1$s dépensés sur %2$s</string>
+    <string name="island_page_period_left">Reste de la période</string>
     <plurals name="island_page_days_left">
-        <item quantity="one">day left</item>
-        <item quantity="other">days left</item>
+        <item quantity="one">jour restant</item>
+        <item quantity="other">jours restants</item>
     </plurals>
-    <string name="island_charge_today">%1$s — %2$s due today</string>
-    <string name="island_charge_tomorrow">%1$s — %2$s due tomorrow</string>
-    <string name="island_charge_unnamed">Recurring payment</string>
-    <string name="island_credit_owed">%1$s owed on credit</string>
+    <string name="island_charge_today">%1$s — %2$s à payer aujourd\'hui</string>
+    <string name="island_charge_tomorrow">%1$s — %2$s à payer demain</string>
+    <string name="island_charge_unnamed">Paiement récurrent</string>
+    <string name="island_credit_owed">%1$s dû sur le crédit</string>
 </resources>
