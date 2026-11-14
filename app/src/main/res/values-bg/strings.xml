@@ -156,7 +156,7 @@
     <string name="history_snackbar_delete_recurrent_failed">Повтарящото се плащане не можа да бъде изтрито</string>
     <string name="history_snackbar_mark_paid_failed">Транзакцията не можа да бъде отбелязана като платена</string>
     <string name="history_snackbar_restore_transaction_failed">Транзакцията не можа да бъде възстановена</string>
-    <string name="history_search_placeholder">Name, note, date or amount</string>
+    <string name="history_search_placeholder">Име, бележка, дата или сума</string>
     <string-array name="history_search_examples">
         <item>Range: 19 nov to 30 nov</item>
         <item>Day: Food 12 oct</item>
@@ -168,23 +168,23 @@
         <item>After a date: &gt;10/1</item>
         <item>Text only: \"Tacos\"</item>
     </string-array>
-    <string name="history_search_clear">Clear search</string>
-    <string name="history_search_no_results">No expenses match \"%1$s\"</string>
+    <string name="history_search_clear">Изчистване на търсенето</string>
+    <string name="history_search_no_results">Няма разходи, отговарящи на „%1$s“</string>
     <plurals name="history_search_results_summary">
-        <item quantity="one">%1$d match · %2$s spent</item>
-        <item quantity="other">%1$d matches · %2$s spent</item>
+        <item quantity="one">%1$d резултат · похарчени %2$s</item>
+        <item quantity="other">%1$d резултата · похарчени %2$s</item>
     </plurals>
     <string name="expense_queued_for_next_period">Разходът е насрочен за следващия период</string>
-    <string name="split_expense_mismatch">Amounts and categories don\'t match (%1$d vs %2$d)</string>
-    <string name="split_expense_not_recurring">Split expenses can\'t be recurring</string>
-    <string name="split_category_remove">Remove %1$s</string>
+    <string name="split_expense_mismatch">Сумите и категориите не съвпадат (%1$d срещу %2$d)</string>
+    <string name="split_expense_not_recurring">Разделените разходи не могат да бъдат повтарящи се</string>
+    <string name="split_category_remove">Премахване на %1$s</string>
     <plurals name="split_expense_saved">
-        <item quantity="one">Saved %d expense</item>
-        <item quantity="other">Saved %d expenses</item>
+        <item quantity="one">Запазен е %d разход</item>
+        <item quantity="other">Запазени са %d разхода</item>
     </plurals>
-    <string name="budget_load_failed">Could not load your budget</string>
-    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
-    <string name="budget_load_retry">Retry</string>
+    <string name="budget_load_failed">Бюджетът ви не можа да се зареди</string>
+    <string name="budget_load_corrupt_data">Някои запазени данни за бюджета не можаха да бъдат прочетени</string>
+    <string name="budget_load_retry">Опитай отново</string>
     <string name="add_new_category">Категория</string>
     <string name="add_new_category_action">Добавяне на нова категория</string>
     <string name="new_category">Нова категория</string>
@@ -199,22 +199,22 @@
     <string name="budget_less_than_one_day_validation">Бюджетът трябва да е за поне един ден</string>
     <!--  Analytics  -->
     <string name="analytics_title">Анализи</string>
-    <string name="receipt_scan_button">Scan receipt</string>
-    <string name="receipt_scan_failed">Couldn\'t read a total from the receipt</string>
-    <string name="quick_add_amount_label">Amount</string>
-    <string name="quick_add_no_categories">No categories yet. You can save without one.</string>
-    <string name="quick_add_save_failed">Couldn\'t save the expense. Try again.</string>
-    <string name="quick_add_needs_budget">Set up a budget in Minus before adding expenses here.</string>
-    <string name="quick_add_open_app">Open Minus</string>
-    <string name="quick_add_saved">%1$s saved</string>
-    <string name="receipt_camera_point_at_total">Point at the total</string>
-    <string name="receipt_camera_detected">%1$s detected</string>
-    <string name="receipt_camera_retry">No total found, try again</string>
-    <string name="receipt_camera_close">Close camera</string>
-    <string name="receipt_camera_capture">Capture receipt</string>
-    <string name="receipt_camera_gallery">Choose a photo</string>
-    <string name="receipt_camera_switch">Switch camera</string>
-    <string name="receipt_camera_flash">Flash</string>
+    <string name="receipt_scan_button">Сканиране на касова бележка</string>
+    <string name="receipt_scan_failed">Не можа да се прочете обща сума от бележката</string>
+    <string name="quick_add_amount_label">Сума</string>
+    <string name="quick_add_no_categories">Все още няма категории. Можете да запазите и без категория.</string>
+    <string name="quick_add_save_failed">Разходът не можа да се запази. Опитайте отново.</string>
+    <string name="quick_add_needs_budget">Настройте бюджет в Minus, преди да добавяте разходи тук.</string>
+    <string name="quick_add_open_app">Отвори Minus</string>
+    <string name="quick_add_saved">Запазено: %1$s</string>
+    <string name="receipt_camera_point_at_total">Насочете към общата сума</string>
+    <string name="receipt_camera_detected">Открито: %1$s</string>
+    <string name="receipt_camera_retry">Не е намерена обща сума, опитайте отново</string>
+    <string name="receipt_camera_close">Затваряне на камерата</string>
+    <string name="receipt_camera_capture">Снимане на бележката</string>
+    <string name="receipt_camera_gallery">Избор на снимка</string>
+    <string name="receipt_camera_switch">Смяна на камерата</string>
+    <string name="receipt_camera_flash">Светкавица</string>
     <string name="receipt_scan_hint">Съвет: задръжте ✓, за да сканирате касова бележка</string>
     <string name="receipt_scan_hint_action">Опитайте</string>
     <plurals name="days">
@@ -697,6 +697,34 @@
     <string name="category_limit_ahead">Пред темпото</string>
     <string name="category_limit_on_track">В рамките</string>
     <string name="analytics_category_limits_title">Лимити по категории</string>
+    <string name="pockets_title">Спестовни касички</string>
+    <string name="pockets_empty">Отделете пари за цел. Те излизат от бюджета ви, докато не ги изтеглите.</string>
+    <string name="pockets_new">Нова касичка</string>
+    <string name="pockets_name_label">Име</string>
+    <string name="pockets_target_label">Целева сума (по избор)</string>
+    <string name="pockets_amount_label">Сума</string>
+    <string name="pockets_add_money">Добавяне на пари</string>
+    <string name="pockets_take_out">Изтегляне</string>
+    <string name="pockets_add_money_title">Добавяне към %1$s</string>
+    <string name="pockets_take_out_title">Изтегляне от %1$s</string>
+    <string name="pockets_take_out_max">До %1$s</string>
+    <string name="pockets_of_target">от %1$s</string>
+    <string name="pockets_of_target_by">от %1$s до %2$s</string>
+    <string name="pockets_goal_name">Спестявания</string>
+    <string name="pockets_set_aside">Отделяне</string>
+    <string name="pockets_saved_to">%1$s спестени в %2$s</string>
+    <string name="pockets_set_aside_pick">Първо изберете касичка</string>
+    <string name="pockets_set_aside_single_amount">Въведете една сума за отделяне</string>
+    <string name="pockets_delete">Изтриване на касичката</string>
+    <string name="pockets_period_title">Спестявания за периода</string>
+    <string name="pockets_period_added">Отделихте %1$s в касичките си.</string>
+    <string name="pockets_period_withdrawn">Изтеглихте %1$s от касичките си.</string>
+    <string name="pockets_period_added_and_withdrawn">Отделихте %1$s и изтеглихте %2$s.</string>
+    <string name="pockets_delete_title">Изтриване на %1$s?</string>
+    <string name="pockets_delete_desc">Касичката е празна, така че не се губят пари.</string>
+    <string name="pockets_action_failed">Касичката не можа да се обнови. Опитайте отново.</string>
+    <string name="rollover_dialog_save_to_pocket_title">Спестяване в %1$s</string>
+    <string name="rollover_dialog_save_to_pocket_desc">Отделете %1$s в тази касичка</string>
     <string name="settings_category_limits_title">Лимити по категории</string>
     <string name="settings_category_limits_subtitle_empty">Ограничете разходите в категория за седмица или период</string>
     <string name="settings_category_limits_subtitle_count">%1$d от %2$d категории имат лимит</string>
@@ -724,6 +752,7 @@
     <string name="settings_savings_dialog_savings_label">Спестявания — %1$d%%</string>
     <string name="settings_savings_dialog_goal_section">Цел за спестяване (незадължително)</string>
     <string name="settings_savings_dialog_goal_amount_label">Целева сума</string>
+    <string name="settings_savings_summary_goal_in">%1$s за %2$s</string>
     <string name="settings_savings_dialog_goal_months_label">Целеви период (месеци)</string>
     <string name="settings_savings_dialog_goal_hint">Оставете празно, за да запазите примера по подразбиране %1$d%% × 6.</string>
     <string name="settings_savings_dialog_reset">Възстановяване по подразбиране</string>
@@ -810,6 +839,10 @@
     <string name="notification_channel_savings_name">Напомняния за спестяване</string>
     <string name="notification_channel_savings_description">Напомняне да отделите пари, когато започне нов бюджетен период</string>
     <string name="notification_savings_reminder_title">Нов период: време е за спестяване</string>
+    <string name="notification_savings_goal_title">Отделете %1$s за %2$s</string>
+    <string name="notification_savings_goal_message">Остават ви %1$s до целта %2$s. Докоснете, за да ги спестите.</string>
+    <string name="notification_savings_percent_title">Отделете %1$s този период</string>
+    <string name="notification_savings_no_goal_message">Нямате зададена цел за спестяване, но препоръчваме да спестите %1$s този период.</string>
     <string name="notification_savings_reminder_message">Отделете %1$s от този период за спестяванията си.</string>
     <string name="credit_owed_label">Общо дължима сума</string>
     <string name="debt_adjusted_balance_label">Баланс, коригиран с дълга</string>
@@ -876,17 +909,17 @@
     <string name="unit_millions">М</string>
     <string name="widget_budget_pill_title">Бюджетна лента</string>
     <string name="widget_budget_pill_description">Остатъкът за избрания изглед — дневен, седмичен, двуседмичен или месечен — в тънка лента</string>
-    <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
-    <string name="island_brief_days_short">%1$dd</string>
-    <string name="island_brief_stale">left in period - open Minus to update</string>
-    <string name="island_page_spent_of">%1$s of %2$s spent</string>
-    <string name="island_page_period_left">Period left</string>
+    <string name="island_provider_description">Показва какво остава от бюджета ви в island Brief</string>
+    <string name="island_brief_days_short">%1$d д</string>
+    <string name="island_brief_stale">остават в периода - отворете Minus за обновяване</string>
+    <string name="island_page_spent_of">Похарчени %1$s от %2$s</string>
+    <string name="island_page_period_left">Оставащ период</string>
     <plurals name="island_page_days_left">
-        <item quantity="one">day left</item>
-        <item quantity="other">days left</item>
+        <item quantity="one">оставащ ден</item>
+        <item quantity="other">оставащи дни</item>
     </plurals>
-    <string name="island_charge_today">%1$s — %2$s due today</string>
-    <string name="island_charge_tomorrow">%1$s — %2$s due tomorrow</string>
-    <string name="island_charge_unnamed">Recurring payment</string>
-    <string name="island_credit_owed">%1$s owed on credit</string>
+    <string name="island_charge_today">%1$s — %2$s дължимо днес</string>
+    <string name="island_charge_tomorrow">%1$s — %2$s дължимо утре</string>
+    <string name="island_charge_unnamed">Повтарящо се плащане</string>
+    <string name="island_credit_owed">%1$s дълг по кредит</string>
 </resources>
