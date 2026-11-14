@@ -892,4 +892,29 @@ class BudgetViewModelTest {
 
         coVerify(exactly = 1) { budgetRepository.addTransaction(any()) }
     }
+
+    @Test
+    fun `apply is ignored while a set aside save is pending even after set aside is switched off`() = runTest {
+        pocketsFlow.value = listOf(trip)
+        val release = CompletableDeferred<Unit>()
+        coEvery { budgetRepository.addTransaction(any()) } coAnswers { release.await(); 1L }
+        val viewModel = newViewModel()
+
+        viewModel.uiState.test {
+            awaitCondition { it.pockets.isNotEmpty() }
+            typeAmount(viewModel, "50")
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(true))
+            awaitCondition { it.isSetAsideEnabled }
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            viewModel.processIntent(BudgetEditorIntent.SetSetAsideEnabled(false))
+            viewModel.processIntent(BudgetNumpadIntent.ApplyTapped)
+            release.complete(Unit)
+            awaitCondition { it.numpadInput == "" }
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        coVerify(exactly = 0) {
+            transactionHandler.applyTransaction(any(), any(), any(), any(), any(), any(), any(), any())
+        }
+    }
 }

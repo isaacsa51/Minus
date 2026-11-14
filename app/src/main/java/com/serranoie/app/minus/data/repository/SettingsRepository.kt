@@ -126,6 +126,8 @@ interface SettingsRepository {
 
     suspend fun getPendingRolloverPeriodId(): Long?
 
+    suspend fun getOrCreatePendingRolloverId(): String
+
     suspend fun setLeftoverChoice(date: LocalDate, choice: LeftoverChoice, keepFrom: LocalDate)
 
     suspend fun setSavingsPreferences(prefs: SavingsPreferences)

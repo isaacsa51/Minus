@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
+import java.util.UUID
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -130,6 +131,7 @@ private val REMAINING_FROM_LAST_PERIOD =
     stringPreferencesKey("remaining_from_last_period")
 private val PENDING_ROLLOVER_AMOUNT = stringPreferencesKey(PENDING_ROLLOVER_AMOUNT_KEY_NAME)
 private val PENDING_ROLLOVER_PERIOD_ID = longPreferencesKey("pending_rollover_period_id")
+private val PENDING_ROLLOVER_ID = stringPreferencesKey("pending_rollover_id")
 private val PENDING_ROLLOVER_STRATEGY = stringPreferencesKey(PENDING_ROLLOVER_STRATEGY_KEY_NAME)
 private val LAST_SEEN_VERSION_CODE = longPreferencesKey("changelog_last_seen_version_code")
 private val PERIOD_MAPPING_MODE = stringPreferencesKey("period_mapping_mode")
@@ -310,6 +312,7 @@ class SettingsRepositoryImpl @Inject constructor(
             preferences.remove(PENDING_ROLLOVER_AMOUNT)
             preferences.remove(PENDING_ROLLOVER_STRATEGY)
             preferences.remove(PENDING_ROLLOVER_PERIOD_ID)
+            preferences.remove(PENDING_ROLLOVER_ID)
         }
     }
 
@@ -570,11 +573,22 @@ class SettingsRepositoryImpl @Inject constructor(
         dataStore.edit { preferences ->
             preferences[PENDING_ROLLOVER_AMOUNT] = amount.toPlainString()
             preferences[CURRENT_PERIOD_ID]?.let { preferences[PENDING_ROLLOVER_PERIOD_ID] = it }
+            preferences[PENDING_ROLLOVER_ID] = UUID.randomUUID().toString()
         }
     }
 
     override suspend fun getPendingRolloverPeriodId(): Long? =
         dataStore.data.first()[PENDING_ROLLOVER_PERIOD_ID]
+
+    override suspend fun getOrCreatePendingRolloverId(): String {
+        var id = ""
+        dataStore.edit { preferences ->
+            id = preferences[PENDING_ROLLOVER_ID] ?: UUID.randomUUID().toString().also {
+                preferences[PENDING_ROLLOVER_ID] = it
+            }
+        }
+        return id
+    }
 
     override suspend fun setSavingsPreferences(prefs: SavingsPreferences) {
         dataStore.edit { preferences ->

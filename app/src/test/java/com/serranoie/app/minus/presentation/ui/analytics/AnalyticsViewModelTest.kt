@@ -166,6 +166,36 @@ class AnalyticsViewModelTest {
     }
 
     @Test
+    fun `an archived period total leaves out pocket deposits and withdrawals`() = runTest {
+        val start = LocalDate.now().minusMonths(1)
+        archivedFlow.value = listOf(
+            ArchivedBudget(
+                periodId = 10L,
+                totalBudget = BigDecimal("1000.00"),
+                spentAmount = BigDecimal.ZERO,
+                startDate = start,
+                endDate = LocalDate.now().minusDays(1),
+                currencyCode = "USD",
+                periodType = BudgetPeriod.MONTHLY,
+            ),
+        )
+        val day = start.plusDays(2).atTime(12, 0)
+        transactionsFlow.value = listOf(
+            Transaction(id = 1, amount = BigDecimal("100"), date = day, periodId = 10L),
+            Transaction(id = 2, amount = BigDecimal("500"), date = day, periodId = 10L, isAdjustment = true, pocketId = 3L),
+            Transaction(id = 3, amount = BigDecimal("-200"), date = day, periodId = 10L, isAdjustment = true, pocketId = 3L),
+        )
+
+        val viewModel = createViewModel()
+        viewModel.uiState.test {
+            val state = awaitItem().takeIf { !it.isLoading } ?: awaitItem()
+            val archive = state.archivedBudgets.single { it.periodId == 10L }
+            assertThat(archive.spentAmount).isEqualToIgnoringScale(BigDecimal("100"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `closing historical view returns to current`() = runTest {
         val viewModel = createViewModel()
         viewModel.uiState.test {
@@ -463,7 +493,7 @@ class AnalyticsViewModelTest {
         runCurrent()
 
         coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
-        assertThat(viewModel.effects.value).isNull()
+        assertThat(viewModel.effects.value).isEqualTo(AnalyticsUiEffect.PocketActionFailed)
     }
 
     @Test
