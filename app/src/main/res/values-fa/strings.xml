@@ -156,7 +156,7 @@
     <string name="history_snackbar_delete_recurrent_failed">حذف پرداخت دوره‌ای با خطا مواجه شد</string>
     <string name="history_snackbar_mark_paid_failed">ثبت تراکنش به‌عنوان پرداخت‌شده با خطا مواجه شد</string>
     <string name="history_snackbar_restore_transaction_failed">تراکنش بازگردانی نشد</string>
-    <string name="history_search_placeholder">Name, note, date or amount</string>
+    <string name="history_search_placeholder">نام، یادداشت، تاریخ یا مبلغ</string>
     <string-array name="history_search_examples">
         <item>Range: 19 nov to 30 nov</item>
         <item>Day: Food 12 oct</item>
@@ -168,23 +168,23 @@
         <item>After a date: &gt;10/1</item>
         <item>Text only: \"Tacos\"</item>
     </string-array>
-    <string name="history_search_clear">Clear search</string>
-    <string name="history_search_no_results">No expenses match \"%1$s\"</string>
+    <string name="history_search_clear">پاک کردن جستجو</string>
+    <string name="history_search_no_results">هیچ هزینه‌ای با «%1$s» مطابقت ندارد</string>
     <plurals name="history_search_results_summary">
-        <item quantity="one">%1$d match · %2$s spent</item>
-        <item quantity="other">%1$d matches · %2$s spent</item>
+        <item quantity="one">%1$d مورد · %2$s خرج شد</item>
+        <item quantity="other">%1$d مورد · %2$s خرج شد</item>
     </plurals>
     <string name="expense_queued_for_next_period">هزینه برای دوره بعدی در صف قرار گرفت</string>
-    <string name="split_expense_mismatch">Amounts and categories don\'t match (%1$d vs %2$d)</string>
-    <string name="split_expense_not_recurring">Split expenses can\'t be recurring</string>
+    <string name="split_expense_mismatch">مبلغ‌ها و دسته‌ها با هم جور نیستند (%1$d در برابر %2$d)</string>
+    <string name="split_expense_not_recurring">هزینه‌های تقسیم‌شده نمی‌توانند تکرارشونده باشند</string>
     <string name="split_category_remove">حذف %1$s</string>
     <plurals name="split_expense_saved">
-        <item quantity="one">Saved %d expense</item>
-        <item quantity="other">Saved %d expenses</item>
+        <item quantity="one">%d هزینه ذخیره شد</item>
+        <item quantity="other">%d هزینه ذخیره شد</item>
     </plurals>
-    <string name="budget_load_failed">Could not load your budget</string>
-    <string name="budget_load_corrupt_data">Some saved budget data could not be read</string>
-    <string name="budget_load_retry">تلاش مجدد</string>
+    <string name="budget_load_failed">بودجه شما بارگیری نشد</string>
+    <string name="budget_load_corrupt_data">برخی از داده‌های ذخیره‌شده بودجه خوانده نشد</string>
+    <string name="budget_load_retry">تلاش دوباره</string>
     <string name="add_new_category">دسته‌بندی</string>
     <string name="add_new_category_action">افزودن دسته‌بندی جدید</string>
     <string name="new_category">دسته‌بندی جدید</string>
@@ -199,22 +199,22 @@
     <string name="budget_less_than_one_day_validation">مدت بودجه باید حداقل یک روز باشد</string>
     <!--  Analytics  -->
     <string name="analytics_title">آمار و ارقام</string>
-    <string name="receipt_scan_button">Scan receipt</string>
-    <string name="receipt_scan_failed">Couldn\'t read a total from the receipt</string>
+    <string name="receipt_scan_button">اسکن رسید</string>
+    <string name="receipt_scan_failed">مبلغ کل از رسید خوانده نشد</string>
     <string name="quick_add_amount_label">مبلغ</string>
-    <string name="quick_add_no_categories">No categories yet. You can save without one.</string>
-    <string name="quick_add_save_failed">Couldn\'t save the expense. Try again.</string>
-    <string name="quick_add_needs_budget">Set up a budget in Minus before adding expenses here.</string>
+    <string name="quick_add_no_categories">هنوز دسته‌ای وجود ندارد. می‌توانید بدون دسته ذخیره کنید.</string>
+    <string name="quick_add_save_failed">هزینه ذخیره نشد. دوباره تلاش کنید.</string>
+    <string name="quick_add_needs_budget">پیش از افزودن هزینه در اینجا، در Minus یک بودجه تنظیم کنید.</string>
     <string name="quick_add_open_app">باز کردن Minus</string>
     <string name="quick_add_saved">%1$s ذخیره شد</string>
-    <string name="receipt_camera_point_at_total">Point at the total</string>
-    <string name="receipt_camera_detected">%1$s تشخیص داده شد</string>
-    <string name="receipt_camera_retry">No total found, try again</string>
+    <string name="receipt_camera_point_at_total">دوربین را روی مبلغ کل بگیرید</string>
+    <string name="receipt_camera_detected">%1$s شناسایی شد</string>
+    <string name="receipt_camera_retry">مبلغ کل پیدا نشد، دوباره تلاش کنید</string>
     <string name="receipt_camera_close">بستن دوربین</string>
-    <string name="receipt_camera_capture">Capture receipt</string>
-    <string name="receipt_camera_gallery">یک عکس انتخاب کنید</string>
-    <string name="receipt_camera_switch">تغییر دوربین</string>
-    <string name="receipt_camera_flash">فلش</string>
+    <string name="receipt_camera_capture">گرفتن عکس رسید</string>
+    <string name="receipt_camera_gallery">انتخاب عکس</string>
+    <string name="receipt_camera_switch">تعویض دوربین</string>
+    <string name="receipt_camera_flash">فلاش</string>
     <string name="receipt_scan_hint">نکته: برای اسکن رسید، ✓ را نگه دارید</string>
     <string name="receipt_scan_hint_action">امتحان کنید</string>
     <plurals name="days">
@@ -307,11 +307,11 @@
     <string name="budget_formula_tip_tap_card">نکته: می‌توانید روی مبلغ محاسبه‌شده در برگه دوره هم بزنید</string>
     <plurals name="budget_formula_weeks">
         <item quantity="one">%d هفته</item>
-        <item quantity="other">%dهفته</item>
+        <item quantity="other">%d هفته</item>
     </plurals>
     <plurals name="budget_formula_biweeks">
-        <item quantity="one">%d دو هفته</item>
-        <item quantity="other">%d دو هفته</item>
+        <item quantity="one">%d دوره دوهفته‌ای</item>
+        <item quantity="other">%d دوره دوهفته‌ای</item>
     </plurals>
     <plurals name="budget_formula_months">
         <item quantity="one">%d ماه</item>
@@ -647,8 +647,8 @@
     <string name="subscriptions_weekly_category_distribution_title">توزیع دسته‌بندی</string>
     <string name="subscriptions_weekly_total_suffix">%s مجموع</string>
     <plurals name="subscriptions_weekly_bills_scheduled">
-        <item quantity="one">%d bill scheduled this week</item>
-        <item quantity="other">%d bills scheduled this week</item>
+        <item quantity="one">%d صورت‌حساب برای این هفته برنامه‌ریزی شده</item>
+        <item quantity="other">%d صورت‌حساب برای این هفته برنامه‌ریزی شده</item>
     </plurals>
     <string name="subscriptions_item_mark_paid_short">پرداخت‌شده</string>
     <string name="subscriptions_item_skip_short">رد کن</string>
@@ -699,6 +699,34 @@
     <string name="category_limit_ahead">جلوتر از برنامه</string>
     <string name="category_limit_on_track">طبق برنامه</string>
     <string name="analytics_category_limits_title">سقف دسته‌بندی‌ها</string>
+    <string name="pockets_title">قلک‌های پس‌انداز</string>
+    <string name="pockets_empty">برای یک هدف پول کنار بگذارید. این پول تا وقتی برداشتش نکنید از بودجه شما خارج می‌شود.</string>
+    <string name="pockets_new">قلک جدید</string>
+    <string name="pockets_name_label">نام</string>
+    <string name="pockets_target_label">مبلغ هدف (اختیاری)</string>
+    <string name="pockets_amount_label">مبلغ</string>
+    <string name="pockets_add_money">افزودن پول</string>
+    <string name="pockets_take_out">برداشت</string>
+    <string name="pockets_add_money_title">افزودن به %1$s</string>
+    <string name="pockets_take_out_title">برداشت از %1$s</string>
+    <string name="pockets_take_out_max">تا %1$s</string>
+    <string name="pockets_of_target">از %1$s</string>
+    <string name="pockets_of_target_by">از %1$s تا %2$s</string>
+    <string name="pockets_goal_name">پس‌انداز</string>
+    <string name="pockets_set_aside">کنار گذاشتن</string>
+    <string name="pockets_saved_to">%1$s در %2$s ذخیره شد</string>
+    <string name="pockets_set_aside_pick">اول یک قلک انتخاب کنید</string>
+    <string name="pockets_set_aside_single_amount">یک مبلغ برای کنار گذاشتن وارد کنید</string>
+    <string name="pockets_delete">حذف قلک</string>
+    <string name="pockets_period_title">پس‌انداز این دوره</string>
+    <string name="pockets_period_added">%1$s در قلک‌هایتان کنار گذاشتید.</string>
+    <string name="pockets_period_withdrawn">%1$s از قلک‌هایتان برداشتید.</string>
+    <string name="pockets_period_added_and_withdrawn">%1$s کنار گذاشتید و %2$s برداشتید.</string>
+    <string name="pockets_delete_title">%1$s حذف شود؟</string>
+    <string name="pockets_delete_desc">قلک خالی است، پس پولی از دست نمی‌رود.</string>
+    <string name="pockets_action_failed">قلک به‌روزرسانی نشد. دوباره تلاش کنید.</string>
+    <string name="rollover_dialog_save_to_pocket_title">ذخیره در %1$s</string>
+    <string name="rollover_dialog_save_to_pocket_desc">%1$s را در این قلک کنار بگذارید</string>
     <string name="settings_category_limits_title">سقف دسته‌بندی‌ها</string>
     <string name="settings_category_limits_subtitle_empty">برای خرج هر دسته‌بندی در هفته یا دوره سقف بگذارید</string>
     <string name="settings_category_limits_subtitle_count">%1$d از %2$d دسته‌بندی سقف دارند</string>
@@ -726,6 +754,7 @@
     <string name="settings_savings_dialog_savings_label">پس‌انداز — %1$d%%</string>
     <string name="settings_savings_dialog_goal_section">هدف پس‌انداز (اختیاری)</string>
     <string name="settings_savings_dialog_goal_amount_label">مبلغ هدف</string>
+    <string name="settings_savings_summary_goal_in">%1$s در %2$s</string>
     <string name="settings_savings_dialog_goal_months_label">دوره هدف (ماه‌ها)</string>
     <string name="settings_savings_dialog_goal_hint">برای حفظ مثال پیش‌فرض %1$d%% × ۶، خالی بگذارید.</string>
     <string name="settings_savings_dialog_reset">بازنشانی به پیش‌فرض</string>
@@ -812,6 +841,10 @@
     <string name="notification_channel_savings_name">یادآورهای پس‌انداز</string>
     <string name="notification_channel_savings_description">یادآوری برای کنار گذاشتن پول هنگام شروع دوره بودجه جدید</string>
     <string name="notification_savings_reminder_title">دوره جدید: وقت پس‌انداز است</string>
+    <string name="notification_savings_goal_title">%1$s برای %2$s کنار بگذارید</string>
+    <string name="notification_savings_goal_message">%1$s تا هدف %2$s فاصله دارید. برای پس‌انداز ضربه بزنید.</string>
+    <string name="notification_savings_percent_title">در این دوره %1$s کنار بگذارید</string>
+    <string name="notification_savings_no_goal_message">هدف پس‌اندازی تنظیم نکرده‌اید، اما پیشنهاد می‌کنیم در این دوره %1$s پس‌انداز کنید.</string>
     <string name="notification_savings_reminder_message">%1$s از این دوره را برای پس‌اندازتان کنار بگذارید.</string>
     <string name="credit_owed_label">مجموع بدهی</string>
     <string name="debt_adjusted_balance_label">موجودی کسر از بدهی</string>
@@ -878,17 +911,17 @@
     <string name="unit_millions">M</string>
     <string name="widget_budget_pill_title">نوار بودجه</string>
     <string name="widget_budget_pill_description">باقی‌مانده برای حالت نمایشی که انتخاب کرده‌اید — روزانه، هفتگی، دوهفتگی یا ماهانه — در یک نوار باریک</string>
-    <string name="island_provider_description">Shows what is left of your budget split inside island Brief</string>
+    <string name="island_provider_description">باقی‌مانده بودجه شما را در island Brief نشان می‌دهد</string>
     <string name="island_brief_days_short">%1$d روز</string>
-    <string name="island_brief_stale">left in period - open Minus to update</string>
-    <string name="island_page_spent_of">%1$s of %2$s spent</string>
-    <string name="island_page_period_left">Period left</string>
+    <string name="island_brief_stale">باقی‌مانده در دوره - برای به‌روزرسانی Minus را باز کنید</string>
+    <string name="island_page_spent_of">%1$s از %2$s خرج شد</string>
+    <string name="island_page_period_left">باقی‌مانده دوره</string>
     <plurals name="island_page_days_left">
-        <item quantity="one">روز باقیمانده</item>
-        <item quantity="other">روز های باقیمانده</item>
+        <item quantity="one">روز مانده</item>
+        <item quantity="other">روز مانده</item>
     </plurals>
-    <string name="island_charge_today">%1$s — %2$s due today</string>
-    <string name="island_charge_tomorrow">%1$s — %2$s due tomorrow</string>
-    <string name="island_charge_unnamed">پرداخت دوره ای</string>
-    <string name="island_credit_owed">%1$s owed on credit</string>
+    <string name="island_charge_today">%1$s — %2$s سررسید امروز</string>
+    <string name="island_charge_tomorrow">%1$s — %2$s سررسید فردا</string>
+    <string name="island_charge_unnamed">پرداخت تکرارشونده</string>
+    <string name="island_credit_owed">%1$s بدهی اعتباری</string>
 </resources>
