@@ -14,6 +14,9 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.math.BigDecimal
@@ -520,6 +523,7 @@ class MidnightPeriodCheckerTest {
         coEvery { settingsRepository.getPendingRollover() } returns (BigDecimal("300.00") to null)
         coEvery { settingsRepository.getPendingRolloverPeriodId() } returns 5L
         coEvery { settingsRepository.getCurrentPeriodId() } returns 7L
+        coEvery { settingsRepository.getOrCreatePendingRolloverId() } returns "r-1"
         val saved = slot<Transaction>()
         coEvery { budgetRepository.addTransactionIfAbsent(capture(saved)) } returns true
 
@@ -529,7 +533,7 @@ class MidnightPeriodCheckerTest {
         assertThat(saved.captured.pocketId).isEqualTo(4L)
         assertThat(saved.captured.isAdjustment).isTrue()
         assertThat(saved.captured.periodId).isEqualTo(5L)
-        assertThat(saved.captured.clientGeneratedId).isEqualTo("pocket-sweep-5")
+        assertThat(saved.captured.clientGeneratedId).isEqualTo("pocket-sweep-r-1")
         assertThat(saved.captured.date?.toLocalDate()).isEqualTo(endDate)
         coVerify { settingsRepository.clearPendingRollover() }
         coVerify(exactly = 0) { budgetRepository.addTransaction(any()) }
@@ -560,7 +564,6 @@ class MidnightPeriodCheckerTest {
         checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
 
         assertThat(saved.captured.periodId).isEqualTo(7L)
-        assertThat(saved.captured.clientGeneratedId).isEqualTo("pocket-sweep-7")
     }
 
     @Test
@@ -586,5 +589,26 @@ class MidnightPeriodCheckerTest {
         checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip"))
 
         coVerify(exactly = 0) { budgetRepository.addTransactionIfAbsent(any()) }
+    }
+
+    @Test
+    fun `a sweep and a resolve racing for the same surplus settle it only once`() = runTest {
+        coEvery { budgetRepository.getBudgetSettingsSync() } returns settingsEndingOn(LocalDate.now().plusDays(10))
+        var pending = BigDecimal("300.00")
+        coEvery { settingsRepository.getPendingRollover() } answers { pending to null }
+        coEvery { settingsRepository.clearPendingRollover() } answers { pending = BigDecimal.ZERO }
+        coEvery { settingsRepository.getOrCreatePendingRolloverId() } returns "r-1"
+        val gate = CompletableDeferred<Unit>()
+        coEvery { budgetRepository.addTransactionIfAbsent(any()) } coAnswers { gate.await(); true }
+
+        val sweep = launch { checker.sweepSurplusToPocket(SavingsPocket(id = 4, name = "Japan trip")) }
+        val resolve = launch { checker.resolveUnresolvedSurplus(RemainingBudgetStrategy.SPLIT_EQUALLY) }
+        runCurrent()
+        gate.complete(Unit)
+        sweep.join()
+        resolve.join()
+
+        coVerify(exactly = 1) { budgetRepository.addTransactionIfAbsent(any()) }
+        coVerify(exactly = 0) { budgetRepository.saveBudgetSettings(any()) }
     }
 }

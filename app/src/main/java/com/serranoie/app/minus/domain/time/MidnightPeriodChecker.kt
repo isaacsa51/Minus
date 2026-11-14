@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.logcat
 import java.math.BigDecimal
 import java.time.Instant
@@ -55,6 +57,8 @@ class MidnightPeriodChecker @Inject constructor(
     val shouldShowTransitionDialog: StateFlow<Boolean> = _shouldShowTransitionDialog.asStateFlow()
 
     private val _needsBudgetSetup = MutableStateFlow(false)
+
+    private val settlementLock = Mutex()
     val needsBudgetSetup: StateFlow<Boolean> = _needsBudgetSetup.asStateFlow()
 
     suspend fun handleEndingPeriod() {
@@ -279,11 +283,11 @@ class MidnightPeriodChecker @Inject constructor(
     val pendingRollover: Flow<Pair<BigDecimal, RemainingBudgetStrategy?>> =
         settingsRepository.observePendingRollover()
 
-    suspend fun resolveUnresolvedSurplus(strategy: RemainingBudgetStrategy?) {
+    suspend fun resolveUnresolvedSurplus(strategy: RemainingBudgetStrategy?) = settlementLock.withLock {
         val (pendingAmount, _) = settingsRepository.getPendingRollover()
         if (pendingAmount <= BigDecimal.ZERO) {
             onTransitionDialogConfirmed()
-            return
+            return@withLock
         }
 
         val currentSettings = budgetRepository.getBudgetSettingsSync()
@@ -336,7 +340,7 @@ class MidnightPeriodChecker @Inject constructor(
         onTransitionDialogConfirmed()
     }
 
-    suspend fun sweepSurplusToPocket(pocket: SavingsPocket, label: String = pocket.name) {
+    suspend fun sweepSurplusToPocket(pocket: SavingsPocket, label: String = pocket.name) = settlementLock.withLock {
         val (pendingAmount, _) = settingsRepository.getPendingRollover()
         if (pendingAmount > BigDecimal.ZERO) {
             val now = LocalDateTime.now()
@@ -351,7 +355,7 @@ class MidnightPeriodChecker @Inject constructor(
                     periodId = sourcePeriodId,
                     date = if (periodEnd != null && periodEnd.isBefore(now)) periodEnd else now,
                     label = label,
-                    clientGeneratedId = "pocket-sweep-$sourcePeriodId",
+                    clientGeneratedId = "pocket-sweep-${settingsRepository.getOrCreatePendingRolloverId()}",
                 ),
             )
             settingsRepository.clearPendingRollover()

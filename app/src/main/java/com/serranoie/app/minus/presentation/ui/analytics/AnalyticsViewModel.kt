@@ -344,7 +344,9 @@ class AnalyticsViewModel @Inject constructor(
             today = end,
             paidOccurrences = paidOccurrences,
         )
-        return (oneTimeSpends + paidRecurring).distinctBy { it.id }.sumOf { it.amount }
+        return (oneTimeSpends + paidRecurring).distinctBy { it.id }
+            .filterNot { it.isAdjustment }
+            .sumOf { it.amount }
     }
 
     private fun ArchivedBudget.withLiveSpentAmount(
@@ -689,7 +691,11 @@ class AnalyticsViewModel @Inject constructor(
                 date = LocalDateTime.now(),
                 label = pocket.name.ifBlank { goalLabel },
             )
-            if (withdraw) budgetRepository.addPocketWithdrawal(entry) else budgetRepository.addTransaction(entry)
+            if (!withdraw) {
+                budgetRepository.addTransaction(entry)
+            } else if (!budgetRepository.addPocketWithdrawal(entry)) {
+                _effects.value = AnalyticsUiEffect.PocketActionFailed
+            }
         }
     }
 

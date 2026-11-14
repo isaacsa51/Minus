@@ -683,6 +683,7 @@ class BudgetViewModel @Inject constructor(
 
     private fun handleApply() {
         viewModelScope.launch {
+            if (setAsideSaving.get()) return@launch
             if (setAside.value.enabled) {
                 if (!setAsideSaving.compareAndSet(false, true)) return@launch
                 try {
