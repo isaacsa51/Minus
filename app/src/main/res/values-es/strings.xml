@@ -349,6 +349,7 @@
     <string name="changelog_release_version">Versión %1$s</string>
     <string name="changelog_release_date">Publicada el %1$s</string>
     <string name="changelog_close">Cerrar</string>
+    <string name="changelog_media_expand">Expand image</string>
     <string name="changelog_previous_versions">Versión anterior</string>
     <string name="changelog_updated_to">Actualizado a: %1$s</string>
     <string name="changelog_see_changes">Minus se ha actualizado.&lt;br&gt;Para más detalles, visita la &lt;a href=\"https://github.com/isaacsa51/Minus/wiki\"&gt;Wiki&lt;/a&gt;.</string>
