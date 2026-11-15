@@ -351,6 +351,7 @@
     <string name="changelog_release_version">نسخه %1$s</string>
     <string name="changelog_release_date">منتشر شده در %1$s</string>
     <string name="changelog_close">بستن</string>
+    <string name="changelog_media_expand">Expand image</string>
     <string name="changelog_previous_versions">نسخه قبلی</string>
     <string name="changelog_updated_to">به‌روزرسانی شده به: %1$s</string>
     <string name="changelog_see_changes">Minus اکنون به‌روزرسانی شده است.&lt;br&gt;برای جزئیات بیشتر، به &lt;a href=https://github.com/isaacsa51/Minus/wiki&gt;ویکی&lt;/a&gt; مراجعه کنید.</string>
