@@ -341,6 +341,7 @@
     <string name="changelog_release_version">버전 %1$s</string>
     <string name="changelog_release_date">%1$s에 출시됨</string>
     <string name="changelog_close">닫기</string>
+    <string name="changelog_media_expand">Expand image</string>
     <string name="changelog_previous_versions">이전 버전</string>
     <string name="changelog_updated_to">업데이트된 내용: %1$s</string>
     <string name="changelog_see_changes">Minus가 업데이트되었습니다.&lt;br&gt;자세한 내용은 &lt;a href=\"https://github.com/isaacsa51/Minus/wiki\"&gt;Wiki&lt;/a&gt;를 참조하세요.</string>
