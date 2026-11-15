@@ -3,6 +3,7 @@ package com.serranoie.app.minus.presentation.ui.changelog.components
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +14,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import com.serranoie.app.minus.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -85,8 +91,11 @@ private fun ChangelogItemMedia(path: String) {
             .build()
     }
 
+    val model = "file:///android_asset/$path"
+    var expanded by remember { mutableStateOf(false) }
+
     AsyncImage(
-        model = "file:///android_asset/$path",
+        model = model,
         imageLoader = imageLoader,
         contentDescription = null,
         contentScale = ContentScale.Fit,
@@ -94,8 +103,13 @@ private fun ChangelogItemMedia(path: String) {
             .fillMaxWidth()
             .heightIn(min = 160.dp, max = 360.dp)
             .clip(MaterialTheme.shapes.large)
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .clickable(onClickLabel = stringResource(R.string.changelog_media_expand)) { expanded = true },
     )
+
+    if (expanded) {
+        ChangelogMediaViewer(model = model, imageLoader = imageLoader, onDismiss = { expanded = false })
+    }
 }
 
 @Composable

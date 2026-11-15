@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.domain.model.changelog
 
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import com.serranoie.app.minus.generated.GeneratedChangelog
 import org.junit.Test
 import java.io.File
@@ -23,7 +24,7 @@ class ChangelogMediaTest {
         val result = release.withMedia(listOf("persian_calendar.webp"))
 
         assertThat(result.items.map { it.media })
-            .containsExactly(null, "changelog/persian_calendar.webp", null)
+            .containsExactly(null, "changelog/11001/persian_calendar.webp", null)
             .inOrder()
     }
 
@@ -32,7 +33,7 @@ class ChangelogMediaTest {
         val result = release.withMedia(listOf("integrate-essentials.gif"))
 
         assertThat(result.items.map { it.media })
-            .containsExactly("changelog/integrate-essentials.gif", null, null)
+            .containsExactly("changelog/11001/integrate-essentials.gif", null, null)
             .inOrder()
     }
 
@@ -46,7 +47,7 @@ class ChangelogMediaTest {
         val result = release.withMedia(listOf("budget.gif"))
 
         assertThat(result.items.map { it.media })
-            .containsExactly("changelog/budget.gif", null, null)
+            .containsExactly("changelog/11001/budget.gif", null, null)
             .inOrder()
     }
 
@@ -56,7 +57,7 @@ class ChangelogMediaTest {
         val result = release.withMedia(files)
 
         assertThat(result.items.map { it.media })
-            .containsExactly("changelog/island_sdk.webp", null, "changelog/render_with.webp")
+            .containsExactly("changelog/11001/island_sdk.webp", null, "changelog/11001/render_with.webp")
             .inOrder()
         assertThat(release.unmatchedMedia(files)).containsExactly("corner_radius.webp")
     }
@@ -69,11 +70,22 @@ class ChangelogMediaTest {
     }
 
     @Test
-    fun `every shipped changelog media file matches an item in the latest release`() {
-        val files = File("src/main/assets/$CHANGELOG_MEDIA_DIR").list().orEmpty().toList()
-        if (files.isEmpty()) return
-        val latest = GeneratedChangelog.releases.first()
+    fun `media paths live in the release version folder`() {
+        assertThat(release.mediaDir()).isEqualTo("changelog/11001")
+    }
 
-        assertThat(latest.unmatchedMedia(files)).isEmpty()
+    @Test
+    fun `every shipped media folder belongs to a release and every file matches one of its items`() {
+        val root = File("src/main/assets/$CHANGELOG_MEDIA_DIR")
+        val entries = root.listFiles().orEmpty().toList()
+        assertThat(entries.filter { it.isFile }.map { it.name }).isEmpty()
+        val releases = GeneratedChangelog.releases.associateBy { it.versionCode.toString() }
+
+        entries.filter { it.isDirectory }.forEach { dir ->
+            val owner = releases[dir.name]
+            assertWithMessage("folder ${dir.name} has no matching release").that(owner).isNotNull()
+            val files = dir.list().orEmpty().toList()
+            assertWithMessage("unmatched media in ${dir.name}").that(owner!!.unmatchedMedia(files)).isEmpty()
+        }
     }
 }
