@@ -20,7 +20,20 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.animation.core.Animatable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +57,10 @@ import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.util.Locale
 
+private const val HIGHLIGHT_FADE_MS = 220
+private val HIGHLIGHT_PADDING = 2.dp
+private val HIGHLIGHT_CORNER = 6.dp
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun ExpenseItem(
@@ -63,7 +80,13 @@ fun ExpenseItem(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     creditCardCutoffDay: Int? = null,
+    highlightRanges: List<IntRange> = emptyList(),
+    highlightAmount: Boolean = false,
 ) {
+    val highlightColor = MaterialTheme.colorScheme.primaryContainer
+    val onHighlightColor = MaterialTheme.colorScheme.onPrimaryContainer
+    val highlightProgress = remember(highlightRanges, highlightAmount) { Animatable(0f) }
+    LaunchedEffect(highlightProgress) { highlightProgress.animateTo(1f, tween(HIGHLIGHT_FADE_MS)) }
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -117,10 +140,19 @@ fun ExpenseItem(
                         val isDecrease = transaction.amount > java.math.BigDecimal.ZERO && transaction.isAdjustment
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
+                                var commentLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
+                                val comment = transaction.comment.ifEmpty {
+                                    stringResource(if (isIncome) R.string.expense_item_unnamed_income else R.string.expense_item_unnamed_expense)
+                                }
+                                val ranges = if (transaction.comment.isEmpty()) emptyList() else highlightRanges
                                 Text(
-                                    text = transaction.comment.ifEmpty {
-                                        stringResource(if (isIncome) R.string.expense_item_unnamed_income else R.string.expense_item_unnamed_expense)
+                                    text = buildAnnotatedString {
+                                        append(comment)
+                                        ranges.forEach {
+                                            addStyle(SpanStyle(color = onHighlightColor), it.first, it.last + 1)
+                                        }
                                     },
+                                    onTextLayout = { commentLayout = it },
                                     style = MaterialTheme.typography.titleMediumCondensed.copy(
                                         fontStyle = if (transaction.isCredit) FontStyle.Italic else FontStyle.Normal
                                     ),
@@ -130,6 +162,23 @@ fun ExpenseItem(
                                     overflow = TextOverflow.Ellipsis,
                                     modifier = Modifier
                                         .weight(1f, fill = false)
+                                        .drawBehind {
+                                            val layout = commentLayout ?: return@drawBehind
+                                            val visibleEnd = layout.getLineEnd(0, visibleEnd = true)
+                                            val pad = HIGHLIGHT_PADDING.toPx()
+                                            ranges.filter { it.first < visibleEnd }.forEach { range ->
+                                                val box = layout.getPathForRange(
+                                                    range.first,
+                                                    minOf(range.last + 1, visibleEnd),
+                                                ).getBounds()
+                                                drawRoundRect(
+                                                    color = highlightColor.copy(alpha = highlightProgress.value),
+                                                    topLeft = Offset(box.left - pad, box.top),
+                                                    size = Size(box.width + pad * 2, box.height),
+                                                    cornerRadius = CornerRadius(HIGHLIGHT_CORNER.toPx()),
+                                                )
+                                            }
+                                        }
                                         .then(
                                             if (sharedTransitionScope != null && animatedVisibilityScope != null) {
                                                 with(sharedTransitionScope) {
@@ -211,6 +260,18 @@ fun ExpenseItem(
                             },
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier
+                                .then(
+                                    if (highlightAmount) {
+                                        Modifier
+                                            .drawBehind {
+                                                drawRoundRect(
+                                                    color = highlightColor.copy(alpha = highlightProgress.value),
+                                                    cornerRadius = CornerRadius(HIGHLIGHT_CORNER.toPx()),
+                                                )
+                                            }
+                                            .padding(horizontal = HIGHLIGHT_PADDING * 2, vertical = HIGHLIGHT_PADDING)
+                                    } else Modifier
+                                )
                                 .censor()
                                 .then(
                                     if (sharedTransitionScope != null && animatedVisibilityScope != null) {

@@ -236,4 +236,22 @@ class HistorySearchTest {
         assertThat(matches("Text only: \"Uber\"", english, uber)).isTrue()
         assertThat(matches("Amount: Taxi", english, uber)).isFalse()
     }
+
+    @Test
+    fun `highlight boxes every text match ignoring case and accents`() {
+        val highlight = historySearchHighlight("eats UBER", english)
+        assertThat(highlight.ranges("Uber Eats uber")).containsExactly(0..3, 5..8, 10..13).inOrder()
+        assertThat(historySearchHighlight("cafe", spanish).ranges("Mi Café")).containsExactly(3..6)
+        assertThat(historySearchHighlight("\"uber eats\"", english).ranges("Uber Eats")).containsExactly(0..8)
+        assertThat(highlight.amount).isFalse()
+    }
+
+    @Test
+    fun `highlight ignores date and amount filters but flags the amount`() {
+        val highlight = historySearchHighlight("Uber >100 12/10 1 oct to 20 oct", spanish)
+        assertThat(highlight.ranges("Uber 100 12/10 oct")).containsExactly(0..3)
+        assertThat(highlight.amount).isTrue()
+        assertThat(historySearchHighlight("$150", english).amount).isTrue()
+        assertThat(historySearchHighlight("", english).ranges("Uber")).isEmpty()
+    }
 }

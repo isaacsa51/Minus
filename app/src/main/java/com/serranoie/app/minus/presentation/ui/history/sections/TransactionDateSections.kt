@@ -6,7 +6,17 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import com.serranoie.app.minus.presentation.ui.history.HistorySearchHighlight
+import kotlinx.coroutines.delay
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -37,6 +47,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import java.math.BigDecimal
 
+private const val SEARCH_REVEAL_STAGGER_MS = 35L
+private const val SEARCH_REVEAL_MAX_STAGGER = 10
+private val SEARCH_REVEAL_OFFSET = 24.dp
+
 @OptIn(ExperimentalSharedTransitionApi::class)
 internal fun LazyListScope.transactionDateSections(
     groupedTransactions: Map<LocalDate?, List<Transaction>>,
@@ -57,8 +71,13 @@ internal fun LazyListScope.transactionDateSections(
     disableAnimations: Boolean = false,
     creditCardCutoffDay: Int? = null,
     firstItemHintModifier: Modifier = Modifier,
+    searchQuery: String = "",
+    searchHighlight: HistorySearchHighlight? = null,
 ) {
+    var revealOrder = 0
     groupedTransactions.entries.forEachIndexed { groupIndex, (date, transactions) ->
+        val firstRevealOrder = revealOrder
+        revealOrder += transactions.size
         val isExpanded = date?.let { expandedDates.contains(it) } ?: false
         val dayTotal = transactions.filter { it.amount > BigDecimal.ZERO }.sumOf { it.amount }
 
@@ -105,10 +124,19 @@ internal fun LazyListScope.transactionDateSections(
                                     ) + fadeOut(animationSpec = tween(durationMillis = 280))
                                 } else ExitTransition.None,
                             ) {
+                                val reveal = rememberSearchReveal(
+                                    query = searchQuery,
+                                    order = firstRevealOrder + index,
+                                    enabled = !disableAnimations,
+                                )
+                                val revealOffset = with(LocalDensity.current) { SEARCH_REVEAL_OFFSET.toPx() }
                                 Box(
-                                    modifier = if (groupIndex == 0 && index == 0) {
-                                        firstItemHintModifier
-                                    } else Modifier,
+                                    modifier = (
+                                        if (groupIndex == 0 && index == 0) firstItemHintModifier else Modifier
+                                    ).graphicsLayer {
+                                        alpha = reveal.value.coerceIn(0f, 1f)
+                                        translationY = (1f - reveal.value) * revealOffset
+                                    },
                                 ) {
                                 SwipeableExpenseItem(
                                     transaction = transaction,
@@ -125,6 +153,8 @@ internal fun LazyListScope.transactionDateSections(
                                     disableAnimations = disableAnimations,
                                     onClick = { onClick(transaction) },
                                     creditCardCutoffDay = creditCardCutoffDay,
+                                    highlightRanges = searchHighlight?.ranges(transaction.comment).orEmpty(),
+                                    highlightAmount = searchHighlight?.amount == true,
                                 )
                                 }
                             }
@@ -149,6 +179,21 @@ internal fun LazyListScope.transactionDateSections(
             }
         }
     }
+}
+
+@Composable
+private fun rememberSearchReveal(query: String, order: Int, enabled: Boolean): Animatable<Float, AnimationVector1D> {
+    val progress = remember(query) { Animatable(if (enabled && query.isNotBlank()) 0f else 1f) }
+    LaunchedEffect(progress) {
+        if (progress.value < 1f) {
+            delay(order.coerceAtMost(SEARCH_REVEAL_MAX_STAGGER) * SEARCH_REVEAL_STAGGER_MS)
+            progress.animateTo(
+                1f,
+                spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow),
+            )
+        }
+    }
+    return progress
 }
 
 @PreviewLightDark

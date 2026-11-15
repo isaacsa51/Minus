@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import java.util.Locale
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -351,6 +352,10 @@ private fun HistoryListContent(
         onDispose { currentOnProcessIntent.value(HistoryUiIntent.SetSearchQuery("")) }
     }
 
+    val searchHighlight = remember(uiState.searchQuery) {
+        uiState.searchQuery.takeIf { it.isNotBlank() }?.let { historySearchHighlight(it, Locale.getDefault()) }
+    }
+
     val currentOnCollapseDragDelta = rememberUpdatedState(onCollapseDragDelta)
     val density = LocalDensity.current
     val threshold = rememberUpdatedState(
@@ -497,6 +502,8 @@ private fun HistoryListContent(
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
+                searchQuery = uiState.searchQuery,
+                searchHighlight = searchHighlight,
             )
 
             futureRecurrentSection(

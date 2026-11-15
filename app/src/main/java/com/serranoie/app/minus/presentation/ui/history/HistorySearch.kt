@@ -103,32 +103,58 @@ private class DateContext(
     val months: List<Pair<Int, List<String>>>,
 )
 
+private class ParsedQuery(
+    val phrases: List<String>,
+    val ranges: List<DateFilter>,
+    val tokens: List<String>,
+    val amountFilters: Map<String, AmountFilter>,
+    val dateCompares: Map<String, DateFilter>,
+    val context: DateContext,
+)
+
+internal class HistorySearchHighlight(
+    private val terms: List<String>,
+    val amount: Boolean,
+    private val locale: Locale,
+) {
+    fun ranges(text: String): List<IntRange> {
+        if (terms.isEmpty()) return emptyList()
+        val normalized = StringBuilder()
+        val origin = mutableListOf<Int>()
+        text.forEachIndexed { index, char ->
+            char.toString().searchNormalized(locale).forEach {
+                normalized.append(it)
+                origin += index
+            }
+        }
+        return terms.flatMap { term ->
+            Regex.fromLiteral(term).findAll(normalized)
+                .map { origin[it.range.first]..origin[it.range.last] }
+                .toList()
+        }.distinct().sortedBy { it.first }
+    }
+}
+
+internal fun historySearchHighlight(query: String, locale: Locale): HistorySearchHighlight {
+    val parsed = parseQuery(query, locale)
+    val terms = parsed.tokens.filterNot {
+        it in parsed.amountFilters || it in parsed.dateCompares || NUMERIC_DATE.matches(it)
+    }
+    return HistorySearchHighlight(parsed.phrases + terms, parsed.amountFilters.isNotEmpty(), locale)
+}
+
 internal fun historySearchMatcher(
     query: String,
     locale: Locale,
     categoryNames: Map<Long, String> = emptyMap(),
 ): (Transaction) -> Boolean {
-    val normalized = query.searchNormalized(locale).replace(EXAMPLE_LABEL, "")
-    val phrases = QUOTED.findAll(normalized).map { it.groupValues[1].trim() }.filter { it.isNotEmpty() }.toList()
-    val allTokens = normalized.replace(QUOTED, " ")
-        .replace(RANGE_DOTS, " $RANGE_DOTS ")
-        .replace(AMOUNT_GLUE, "$1")
-        .split(TOKEN_SEPARATOR)
-        .map { it.trimEnd(',') }
-        .filter { it.isNotEmpty() }
-    val context = DateContext(locale, numericDateOrder(locale), monthLookup(locale))
-    val (ranges, remaining) = extractDateRanges(allTokens, context)
-    val tokens = remaining.filterNot { it in CONNECTOR_WORDS || it == RANGE_DOTS }
-        .ifEmpty { if (ranges.isEmpty() && phrases.isEmpty()) remaining else emptyList() }
-    val fullDateCompares = tokens.filter { FULL_DATE_COMPARE.matches(it) }
-        .mapNotNull { token -> token.toDateCompare(context)?.let { token to it } }
-        .toMap()
-    val amountFilters = tokens.filterNot { it in fullDateCompares }
-        .mapNotNull { token -> token.toAmountFilter()?.let { token to it } }
-        .toMap()
-    val dateCompares = fullDateCompares + tokens.filterNot { it in amountFilters || it in fullDateCompares }
-        .mapNotNull { token -> token.toDateCompare(context)?.let { token to it } }
-        .toMap()
+    val parsed = parseQuery(query, locale)
+    val phrases = parsed.phrases
+    val ranges = parsed.ranges
+    val tokens = parsed.tokens
+    val amountFilters = parsed.amountFilters
+    val dateCompares = parsed.dateCompares
+    val context = parsed.context
     val categories = categoryNames.mapValues { it.value.searchNormalized(locale) }
 
     return { transaction ->
@@ -151,6 +177,31 @@ internal fun historySearchMatcher(
                 }
             }
     }
+}
+
+private fun parseQuery(query: String, locale: Locale): ParsedQuery {
+    val normalized = query.searchNormalized(locale).replace(EXAMPLE_LABEL, "")
+    val phrases = QUOTED.findAll(normalized).map { it.groupValues[1].trim() }.filter { it.isNotEmpty() }.toList()
+    val allTokens = normalized.replace(QUOTED, " ")
+        .replace(RANGE_DOTS, " $RANGE_DOTS ")
+        .replace(AMOUNT_GLUE, "$1")
+        .split(TOKEN_SEPARATOR)
+        .map { it.trimEnd(',') }
+        .filter { it.isNotEmpty() }
+    val context = DateContext(locale, numericDateOrder(locale), monthLookup(locale))
+    val (ranges, remaining) = extractDateRanges(allTokens, context)
+    val tokens = remaining.filterNot { it in CONNECTOR_WORDS || it == RANGE_DOTS }
+        .ifEmpty { if (ranges.isEmpty() && phrases.isEmpty()) remaining else emptyList() }
+    val fullDateCompares = tokens.filter { FULL_DATE_COMPARE.matches(it) }
+        .mapNotNull { token -> token.toDateCompare(context)?.let { token to it } }
+        .toMap()
+    val amountFilters = tokens.filterNot { it in fullDateCompares }
+        .mapNotNull { token -> token.toAmountFilter()?.let { token to it } }
+        .toMap()
+    val dateCompares = fullDateCompares + tokens.filterNot { it in amountFilters || it in fullDateCompares }
+        .mapNotNull { token -> token.toDateCompare(context)?.let { token to it } }
+        .toMap()
+    return ParsedQuery(phrases, ranges, tokens, amountFilters, dateCompares, context)
 }
 
 private fun extractDateRanges(tokens: List<String>, context: DateContext): Pair<List<DateFilter>, List<String>> {
