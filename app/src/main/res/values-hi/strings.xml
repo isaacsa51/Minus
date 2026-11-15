@@ -349,6 +349,7 @@
     <string name="changelog_release_version">वर्शन %1$s</string>
     <string name="changelog_release_date">%1$s को रिलीज़ हुआ</string>
     <string name="changelog_close">बंद करें</string>
+    <string name="changelog_media_expand">Expand image</string>
     <string name="changelog_previous_versions">पिछला वर्शन</string>
     <string name="changelog_updated_to">इस वर्शन पर अपडेट किया गया: %1$s</string>
     <string name="changelog_see_changes">Minus अब अपडेट हो गया है।&lt;br&gt;अधिक जानकारी के लिए, &lt;a href=\"https://github.com/isaacsa51/Minus/wiki\"&gt;Wiki&lt;/a&gt; देखें।</string>
