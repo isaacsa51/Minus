@@ -341,6 +341,7 @@
     <string name="changelog_release_version">バージョン %1$s</string>
     <string name="changelog_release_date">%1$sが解放されました</string>
     <string name="changelog_close">閉じる</string>
+    <string name="changelog_media_expand">Expand image</string>
     <string name="changelog_previous_versions">以前のバージョン</string>
     <string name="changelog_updated_to">更新先: %1$s</string>
     <string name="changelog_see_changes">Minusがアップデートされました。&lt;br&gt;詳細については、&lt;a href=\"https://github.com/isaacsa51/Minus/wiki\"&gt;Wiki&lt;/a&gt;をご覧ください。</string>
