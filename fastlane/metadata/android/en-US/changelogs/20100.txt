@@ -1,0 +1,5 @@
+- feat: add interactive changelog media viewer
+- chore: add localized string resources across multiple languages
+- feat: add savings pockets support
+- feat: add support for planned one-off expenses
+- feat: transaction search with date ranges, categories, notes & amounts

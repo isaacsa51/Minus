@@ -165,6 +165,7 @@ fun SettingsToggleItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMediumEmphasized,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             if (label != null) {
                 Text(
