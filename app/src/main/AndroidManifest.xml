@@ -129,7 +129,18 @@
             <meta-data
                 android:name="com.sameerasw.island.provider.description"
                 android:value="@string/island_provider_description" />
+            <meta-data
+                android:name="com.sameerasw.island.provider.priority"
+                android:value="70" />
+            <meta-data
+                android:name="com.sameerasw.island.provider.settings"
+                android:value="com.serranoie.app.minus.presentation.IslandSettingsActivity" />
         </service>
+
+        <activity-alias
+            android:name=".presentation.IslandSettingsActivity"
+            android:exported="true"
+            android:targetActivity=".presentation.MainActivity" />
 
         <activity
             android:name=".presentation.ui.quickadd.QuickExpenseActivity"

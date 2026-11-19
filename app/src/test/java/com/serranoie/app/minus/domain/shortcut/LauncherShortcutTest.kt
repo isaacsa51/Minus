@@ -25,6 +25,17 @@ class LauncherShortcutTest {
     }
 
     @Test
+    fun `island settings alias opens Settings`() {
+        assertThat(LauncherShortcut.from(null, null, LauncherShortcut.ISLAND_SETTINGS_COMPONENT))
+            .isEqualTo(LauncherShortcut.Settings)
+    }
+
+    @Test
+    fun `main activity component is not a shortcut`() {
+        assertThat(LauncherShortcut.from(null, null, "com.serranoie.app.minus.presentation.MainActivity")).isNull()
+    }
+
+    @Test
     fun `other actions are ignored`() {
         assertThat(LauncherShortcut.from("android.intent.action.MAIN", "Groceries")).isNull()
         assertThat(LauncherShortcut.from(null, null)).isNull()

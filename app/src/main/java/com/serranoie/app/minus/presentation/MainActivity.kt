@@ -174,6 +174,7 @@ class MainActivity : AppCompatActivity() {
         val shortcut = LauncherShortcut.from(
             action = intent?.action,
             category = intent?.getStringExtra(LauncherShortcut.EXTRA_CATEGORY),
+            component = intent?.component?.className,
         ) ?: return
         pendingShortcut.value = shortcut
     }

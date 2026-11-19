@@ -10,7 +10,13 @@ object IslandSchema {
     const val META_SETTINGS_ACTIVITY = "com.sameerasw.island.provider.settings"
 
     const val DEFAULT_HOST_PACKAGE = "com.sameerasw.essentials"
-    val TRUSTED_HOST_FINGERPRINTS = mapOf(DEFAULT_HOST_PACKAGE to "85aa83a986206e5ba82d2f765c27cb1d14eb754b2150476fa4282aa15a0a1cea")
+    val TRUSTED_HOST_FINGERPRINTS = mapOf(
+        DEFAULT_HOST_PACKAGE to setOf(
+            "85aa83a986206e5ba82d2f765c27cb1d14eb754b2150476fa4282aa15a0a1cea",
+            "d12baa8855dd7c54044d720d6692ce4a1d1d958a0ca9648be100335b8def4a58",
+            "cdee67de78f75fdb9d93e559922451a4b4c81b3e1d464da966e2a1a9258d472e",
+        ),
+    )
     val ALLOWED_HOSTS = TRUSTED_HOST_FINGERPRINTS.keys
 }
 

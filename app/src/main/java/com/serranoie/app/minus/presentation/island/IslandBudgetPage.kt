@@ -58,7 +58,9 @@ import java.time.LocalDate
 
 private const val STATUS_CHROMA = 2f
 private const val STATUS_FILL_TONE = 70.0
-private const val STATUS_TRACK_TONE = 24.0
+private const val TRACK_ALPHA = 0.28f
+private const val TILE_ALPHA = 0.14f
+private const val FOOTER_TILE_ALPHA = 0.08f
 private val GroupOuterCorner = 28.dp
 private val GroupInnerCorner = 6.dp
 private val GroupGap = 2.dp
@@ -75,7 +77,9 @@ fun IslandBudgetPage(
     fun px(value: Int?) = with(density) { (value ?: 0).toDp() }
     val sidePadding = px((info?.outsetPx ?: 0) + (info?.expandedPaddingPx ?: 0))
 
-    MinusTheme(darkTheme = true) {
+    val tileTint = info?.let { Color(it.accent) } ?: Color.White
+
+    MinusTheme(darkTheme = info?.darkTheme ?: true) {
         val progress = if (snapshot.isAlert) 1f else snapshot.spendProgress.coerceIn(0f, 1f)
         val good = MinusTheme.budgetStatus.good
         val notGood = MinusTheme.budgetStatus.notGood
@@ -85,7 +89,7 @@ fun IslandBudgetPage(
             harmonizeWithColor(combineColors(listOf(good, notGood, bad), progress), primary, STATUS_CHROMA)
         }
         val statusColor = remember(seed) { seed.withTone(STATUS_FILL_TONE) }
-        val trackColor = remember(seed) { seed.withTone(STATUS_TRACK_TONE) }
+        val trackColor = statusColor.copy(alpha = TRACK_ALPHA)
         val quiet = MaterialTheme.colorScheme.onSurfaceVariant
 
         val inspection = LocalInspectionMode.current
@@ -101,7 +105,6 @@ fun IslandBudgetPage(
                 .wrapContentHeight(align = Alignment.Top, unbounded = true)
                 .then(modifier)
                 .clip(RoundedCornerShape(px(info?.cornerPx)))
-                .background(Color.Black)
                 .clickable(
                     onClickLabel = stringResource(R.string.quick_add_open_app),
                     role = Role.Button,
@@ -115,7 +118,7 @@ fun IslandBudgetPage(
             ) {
                 Spacer(Modifier.height(px(info?.cameraClearancePx) - GroupGap))
                 val cardColors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    containerColor = tileTint.copy(alpha = TILE_ALPHA),
                     contentColor = MaterialTheme.colorScheme.onSurface,
                 )
                 Card(shape = groupShape(top = true, bottom = false), colors = cardColors) {
@@ -136,6 +139,7 @@ fun IslandBudgetPage(
                             modifier = Modifier.fillMaxWidth(),
                             color = statusColor,
                             trackColor = trackColor,
+                            waveSpeed = 0.dp,
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
@@ -167,7 +171,7 @@ fun IslandBudgetPage(
                     Card(
                         shape = groupShape(top = false, bottom = true),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            containerColor = tileTint.copy(alpha = FOOTER_TILE_ALPHA),
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         ),
                     ) {

@@ -8,16 +8,19 @@ private const val MAX_QUICK_ADD_CATEGORIES = 10
 sealed interface LauncherShortcut {
     data object ScanReceipt : LauncherShortcut
     data class Category(val name: String) : LauncherShortcut
+    data object Settings : LauncherShortcut
 
     companion object {
         const val ACTION_ADD_EXPENSE = "com.serranoie.app.minus.action.ADD_EXPENSE"
         const val ACTION_SCAN_RECEIPT = "com.serranoie.app.minus.action.SCAN_RECEIPT"
         const val ACTION_CATEGORY = "com.serranoie.app.minus.action.CATEGORY"
         const val EXTRA_CATEGORY = "shortcut_category"
+        const val ISLAND_SETTINGS_COMPONENT = "com.serranoie.app.minus.presentation.IslandSettingsActivity"
 
-        fun from(action: String?, category: String?): LauncherShortcut? = when (action) {
-            ACTION_SCAN_RECEIPT -> ScanReceipt
-            ACTION_CATEGORY -> category?.takeIf { it.isNotBlank() }?.let(::Category)
+        fun from(action: String?, category: String?, component: String? = null): LauncherShortcut? = when {
+            component == ISLAND_SETTINGS_COMPONENT -> Settings
+            action == ACTION_SCAN_RECEIPT -> ScanReceipt
+            action == ACTION_CATEGORY -> category?.takeIf { it.isNotBlank() }?.let(::Category)
             else -> null
         }
     }

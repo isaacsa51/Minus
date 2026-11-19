@@ -75,6 +75,7 @@ fun MainScreen(
             is LauncherShortcut.Category -> budgetViewModel.processIntent(
                 BudgetEditorIntent.CommentUpdated(shortcut.name),
             )
+            LauncherShortcut.Settings -> onNavigateToSettings()
         }
         onShortcutHandled()
     }
