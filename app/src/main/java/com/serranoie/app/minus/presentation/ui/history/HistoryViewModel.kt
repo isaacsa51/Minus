@@ -63,6 +63,7 @@ class HistoryViewModel @Inject constructor(
     private val _expandedTransactionId = MutableStateFlow<Long?>(null)
     private val _pendingRemovedTransactions = MutableStateFlow(emptyMap<Long, Transaction>())
     private val _searchQuery = MutableStateFlow("")
+    private val _searchFilter = MutableStateFlow(HistorySearchFilter())
 
     @OptIn(FlowPreview::class)
     private val appliedSearchQuery = _searchQuery
@@ -88,6 +89,8 @@ class HistoryViewModel @Inject constructor(
             _expandedTransactionId,
             _pendingRemovedTransactions,
             appliedSearchQuery,
+            _searchQuery,
+            _searchFilter,
         )
     ) { array ->
         UIInputs(
@@ -103,6 +106,8 @@ class HistoryViewModel @Inject constructor(
             expandedTransactionId = array[9] as Long?,
             pendingRemovedTransactions = array[10] as Map<Long, Transaction>,
             searchQuery = array[11] as String,
+            typedSearchQuery = array[12] as String,
+            searchFilter = array[13] as HistorySearchFilter,
         )
     }
 
@@ -172,6 +177,7 @@ class HistoryViewModel @Inject constructor(
             is HistoryUiIntent.ToggleExpandedTransaction -> toggleExpandedTransaction(intent.transactionId)
             is HistoryUiIntent.UpdateCreditCutoffDay -> updateCreditCutoffDay(intent.day)
             is HistoryUiIntent.SetSearchQuery -> _searchQuery.value = intent.query
+            is HistoryUiIntent.SetSearchFilter -> _searchFilter.value = intent.filter
         }
     }
 
@@ -260,7 +266,7 @@ class HistoryViewModel @Inject constructor(
     }
 
     private fun toggleExpandedDate(date: LocalDate) {
-        if (uiState.value.searchQuery.isNotBlank()) return
+        if (uiState.value.searchQuery.isNotBlank() || uiState.value.searchFilter.isActive) return
         _expandedDates.update { expanded ->
             val base = expanded ?: uiState.value.expandedDates
             if (base.contains(date)) base - date else base + date
@@ -338,12 +344,21 @@ class HistoryViewModel @Inject constructor(
             ?: groupedCurrent.keys.filterNotNull().sortedDescending().take(1).toSet()
 
         val query = inputs.searchQuery.trim()
-        val searchResults = query.takeIf { it.isNotEmpty() }?.let { q ->
-            groupTransactionsByDate(
-                (groupedCurrent.values.flatten() + groupedPast.values.flatten()).filter(
-                    historySearchMatcher(q, Locale.getDefault(), allCategories.associate { it.id to it.name })
-                )
+        val filter = inputs.searchFilter
+        val searchResults = if (query.isNotEmpty() || filter.isActive) {
+            val matcher = historySearchMatcher(
+                query = query,
+                locale = Locale.getDefault(),
+                categoryNames = allCategories.associate { it.id to it.name },
+                searchDescriptions = filter.searchDescriptions,
+                searchCategoryNames = filter.searchCategoryNames,
             )
+            groupTransactionsByDate(
+                (groupedCurrent.values.flatten() + groupedPast.values.flatten())
+                    .filter { filter.matches(it) && (query.isEmpty() || matcher(it)) }
+            )
+        } else {
+            null
         }
 
         return HistoryUiState(
@@ -372,6 +387,9 @@ class HistoryViewModel @Inject constructor(
             showUpcomingRecurrentInPeriod = inputs.showUpcomingRecurrentInPeriod,
             lockSwipeable = inputs.lockSwipeable,
             searchQuery = inputs.searchQuery,
+            searchFilter = filter,
+            searchFilterCategories = categories,
+            isSearchPending = inputs.typedSearchQuery.isNotBlank() && inputs.typedSearchQuery.trim() != query,
             searchResultCount = searchResults?.values?.sumOf { it.size } ?: 0,
             searchResultTotal = searchResults?.values?.flatten().orEmpty()
                 .filter { it.amount > BigDecimal.ZERO }
@@ -399,6 +417,8 @@ class HistoryViewModel @Inject constructor(
         val expandedTransactionId: Long?,
         val pendingRemovedTransactions: Map<Long, Transaction>,
         val searchQuery: String,
+        val typedSearchQuery: String,
+        val searchFilter: HistorySearchFilter,
     )
 
     companion object {

@@ -147,6 +147,8 @@ internal fun historySearchMatcher(
     query: String,
     locale: Locale,
     categoryNames: Map<Long, String> = emptyMap(),
+    searchDescriptions: Boolean = true,
+    searchCategoryNames: Boolean = true,
 ): (Transaction) -> Boolean {
     val parsed = parseQuery(query, locale)
     val phrases = parsed.phrases
@@ -158,8 +160,9 @@ internal fun historySearchMatcher(
     val categories = categoryNames.mapValues { it.value.searchNormalized(locale) }
 
     return { transaction ->
-        val category = transaction.categoryId?.let(categories::get).orEmpty()
-        val text = "${transaction.comment} ${transaction.note}".searchNormalized(locale) + " " + category
+        val category = if (searchCategoryNames) transaction.categoryId?.let(categories::get).orEmpty() else ""
+        val description = if (searchDescriptions) "${transaction.comment} ${transaction.note}".searchNormalized(locale) else ""
+        val text = "$description $category"
         val date by lazy { transaction.date?.toLocalDate()?.let { searchDate(it, locale) } }
         phrases.all { text.contains(it) } &&
             ranges.all { range -> date?.let(range::matches) == true } &&
@@ -177,6 +180,23 @@ internal fun historySearchMatcher(
                 }
             }
     }
+}
+
+internal fun HistorySearchFilter.matches(transaction: Transaction): Boolean {
+    val amount = transaction.amount
+    val date = transaction.date?.toLocalDate()
+    return (categoryIds.isEmpty() || transaction.categoryId in categoryIds) &&
+        when (kind) {
+            HistoryTransactionKind.ALL -> true
+            HistoryTransactionKind.EXPENSE -> amount.signum() > 0
+            HistoryTransactionKind.INCOME -> amount.signum() < 0
+        } &&
+        (minAmount == null || amount.abs() >= minAmount) &&
+        (maxAmount == null || amount.abs() <= maxAmount) &&
+        (startDate == null || date != null && !date.isBefore(startDate)) &&
+        (endDate == null || date != null && !date.isAfter(endDate)) &&
+        (!recurringOnly || transaction.isRecurrent || transaction.sourceTransactionId != null) &&
+        (!creditOnly || transaction.isCredit)
 }
 
 private fun parseQuery(query: String, locale: Locale): ParsedQuery {

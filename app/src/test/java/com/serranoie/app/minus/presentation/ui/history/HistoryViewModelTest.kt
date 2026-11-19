@@ -596,4 +596,144 @@ class HistoryViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    private fun filterFixture() = searchFixture().map { if (it.id == 2L) it.copy(categoryId = 9L) else it } + listOf(
+        Transaction(
+            id = 7L,
+            amount = BigDecimal("-100.00"),
+            comment = "Coffee refund",
+            date = LocalDateTime.of(2026, 1, 11, 9, 0),
+            isAdjustment = true,
+        ),
+        Transaction(
+            id = 8L,
+            amount = BigDecimal("30.00"),
+            comment = "Coffee plan",
+            date = LocalDateTime.of(2026, 1, 3, 8, 0),
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.ONCE,
+            isCredit = true,
+        ),
+    )
+
+    private suspend fun filteredIds(
+        query: String,
+        filter: HistorySearchFilter,
+    ): List<Long> {
+        every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT.copy(showPastTransactions = true))
+        every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
+        every { budgetRepository.getAllCategories() } returns flowOf(listOf(Category(id = 9L, name = "Dining")))
+        every { budgetRepository.getTransactions() } returns flowOf(filterFixture())
+        val vm = newViewModel()
+        var ids = emptyList<Long>()
+        vm.uiState.test {
+            awaitCondition { it.budgetSettings != null }
+            vm.processIntent(HistoryUiIntent.SetSearchFilter(filter))
+            vm.processIntent(HistoryUiIntent.SetSearchQuery(query))
+            val state = awaitCondition { it.searchQuery == query && it.searchFilter == filter && !it.isSearchPending }
+            ids = state.groupedCurrentTransactions.values.flatten().map { it.sourceTransactionId ?: it.id }
+            cancelAndIgnoreRemainingEvents()
+        }
+        return ids
+    }
+
+    @Test
+    fun `a filter with no query narrows the list to income only`() = runTest {
+        assertThat(filteredIds("", HistorySearchFilter(kind = HistoryTransactionKind.INCOME)))
+            .containsExactly(7L)
+    }
+
+    @Test
+    fun `the expense filter leaves out income that matches the query`() = runTest {
+        assertThat(filteredIds("coffee", HistorySearchFilter(kind = HistoryTransactionKind.EXPENSE)))
+            .containsExactly(1L, 2L, 4L, 8L)
+    }
+
+    @Test
+    fun `amount bounds keep only expenses between the minimum and maximum`() = runTest {
+        val filter = HistorySearchFilter(minAmount = BigDecimal("5"), maxAmount = BigDecimal("30"))
+        assertThat(filteredIds("coffee", filter)).containsExactly(2L, 4L, 8L)
+    }
+
+    @Test
+    fun `a date range keeps only expenses inside it, both ends included`() = runTest {
+        val filter = HistorySearchFilter(startDate = LocalDate.of(2026, 1, 10), endDate = LocalDate.of(2026, 1, 11))
+        assertThat(filteredIds("", filter)).containsExactly(1L, 7L)
+    }
+
+    @Test
+    fun `picking categories keeps only expenses in those categories`() = runTest {
+        assertThat(filteredIds("", HistorySearchFilter(categoryIds = setOf(9L)))).containsExactly(2L)
+    }
+
+    @Test
+    fun `turning off category names stops the query from matching them`() = runTest {
+        assertThat(filteredIds("dining", HistorySearchFilter())).containsExactly(2L)
+        assertThat(filteredIds("dining", HistorySearchFilter(searchCategoryNames = false))).isEmpty()
+    }
+
+    @Test
+    fun `turning off descriptions and notes matches the query against category names only`() = runTest {
+        assertThat(filteredIds("coffee", HistorySearchFilter(searchDescriptions = false))).isEmpty()
+    }
+
+    @Test
+    fun `recurring and credit filters keep only those expenses`() = runTest {
+        assertThat(filteredIds("", HistorySearchFilter(recurringOnly = true))).containsExactly(8L)
+        assertThat(filteredIds("", HistorySearchFilter(creditOnly = true))).containsExactly(8L)
+    }
+
+    @Test
+    fun `resetting the filter restores the normal list`() = runTest {
+        every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT.copy(showPastTransactions = true))
+        every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
+        every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
+        val vm = newViewModel()
+
+        vm.uiState.test {
+            vm.processIntent(HistoryUiIntent.SetSearchFilter(HistorySearchFilter(creditOnly = true)))
+            val filtered = awaitCondition { it.searchFilter.isActive && it.budgetSettings != null }
+            assertThat(filtered.groupedCurrentTransactions).isEmpty()
+            assertThat(filtered.searchResultCount).isEqualTo(0)
+
+            vm.processIntent(HistoryUiIntent.SetSearchFilter(HistorySearchFilter()))
+            val state = awaitCondition { !it.searchFilter.isActive && it.groupedCurrentTransactions.isNotEmpty() }
+            assertThat(state.groupedCurrentTransactions.values.flatten().map { it.id }).containsExactly(1L, 2L, 3L)
+            assertThat(state.groupedPastTransactions.values.flatten().map { it.id }).containsExactly(4L)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `the filter sheet offers the active categories`() = runTest {
+        every { budgetRepository.getActiveCategories() } returns flowOf(listOf(Category(id = 9L, name = "Dining")))
+        val vm = newViewModel()
+
+        vm.uiState.test {
+            val state = awaitCondition { it.searchFilterCategories.isNotEmpty() }
+            assertThat(state.searchFilterCategories.map { it.id }).containsExactly(9L)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `search is pending while typing and settles once the debounce applies the query`() = runTest {
+        every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
+        every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
+        val vm = newViewModel()
+
+        vm.uiState.test {
+            awaitCondition { it.groupedCurrentTransactions.isNotEmpty() }
+            assertThat(vm.uiState.value.isSearchPending).isFalse()
+
+            vm.processIntent(HistoryUiIntent.SetSearchQuery("coffee"))
+            runCurrent()
+            assertThat(vm.uiState.value.isSearchPending).isTrue()
+
+            advanceTimeBy(226.milliseconds)
+            assertThat(vm.uiState.value.isSearchPending).isFalse()
+            assertThat(vm.uiState.value.searchQuery).isEqualTo("coffee")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }

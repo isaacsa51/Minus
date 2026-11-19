@@ -2,6 +2,7 @@ package com.serranoie.app.minus.presentation.ui.history
 
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.ui.theme.component.expense.UpcomingRecurrentItem
 import java.math.BigDecimal
@@ -28,6 +29,24 @@ sealed interface HistoryUiIntent {
     data class UpdateCreditCutoffDay(val day: Int) : HistoryUiIntent
 
     data class SetSearchQuery(val query: String) : HistoryUiIntent
+    data class SetSearchFilter(val filter: HistorySearchFilter) : HistoryUiIntent
+}
+
+enum class HistoryTransactionKind { ALL, EXPENSE, INCOME }
+
+data class HistorySearchFilter(
+    val searchDescriptions: Boolean = true,
+    val searchCategoryNames: Boolean = true,
+    val categoryIds: Set<Long> = emptySet(),
+    val kind: HistoryTransactionKind = HistoryTransactionKind.ALL,
+    val minAmount: BigDecimal? = null,
+    val maxAmount: BigDecimal? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val recurringOnly: Boolean = false,
+    val creditOnly: Boolean = false,
+) {
+    val isActive: Boolean get() = this != HistorySearchFilter()
 }
 
 sealed interface HistoryUiEffect {
@@ -65,6 +84,9 @@ data class HistoryUiState(
     val searchQuery: String = "",
     val searchResultCount: Int = 0,
     val searchResultTotal: BigDecimal = BigDecimal.ZERO,
+    val searchFilter: HistorySearchFilter = HistorySearchFilter(),
+    val searchFilterCategories: List<Category> = emptyList(),
+    val isSearchPending: Boolean = false,
 
     val displayTransactions: List<Transaction> = emptyList(),
     val groupedCurrentTransactions: Map<LocalDate?, List<Transaction>> = emptyMap(),

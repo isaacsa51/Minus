@@ -106,6 +106,7 @@ android {
     productFlavors {
         create("foss") {
             dimension = "distribution"
+            ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
         }
         create("wear") {
             dimension = "distribution"
@@ -178,28 +179,16 @@ android {
         buildConfig = true
     }
 
-    splits {
-        abi {
-            isEnable = gradle.startParameter.taskNames.any {
-                it.contains("assemble", ignoreCase = true) && it.contains("Release", ignoreCase = true)
-            }
-            reset()
-            include("arm64-v8a", "armeabi-v7a", "x86_64")
-            isUniversalApk = true
-        }
-    }
-
     applicationVariants.all {
         val versionLabel = appVersionName + (buildType.versionNameSuffix ?: "")
         outputs.all {
             val output = this as? BaseVariantOutputImpl
             if (output != null) {
                 val flavorName = name.replaceFirstChar { it.titlecase() }
-                val abiSuffix = output.getFilter("ABI")?.let { "-$it" }.orEmpty()
                 output.outputFileName = if (flavorName.contains("wear", ignoreCase = true)) {
-                    "Minus-WearOS-v$versionLabel$abiSuffix.apk"
+                    "Minus-WearOS-v$versionLabel.apk"
                 } else {
-                    "Minus-v$versionLabel$abiSuffix.apk"
+                    "Minus-v$versionLabel.apk"
                 }
             }
         }
@@ -215,6 +204,7 @@ android {
     }
 
     packaging {
+        jniLibs.useLegacyPackaging = true
         resources.excludes += "/META-INF/AL2.0"
         resources.excludes += "/META-INF/LGPL2.1"
         resources.excludes += "/META-INF/LICENSE.md"

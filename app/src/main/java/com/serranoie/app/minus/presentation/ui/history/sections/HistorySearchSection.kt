@@ -1,6 +1,9 @@
 package com.serranoie.app.minus.presentation.ui.history.sections
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.tooling.preview.Preview
+import com.serranoie.app.minus.presentation.ui.theme.MinusTheme
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -18,6 +21,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.FilterList
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.Alignment
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,24 +66,37 @@ internal fun LazyListScope.historySearchSection(
     appliedQuery: String,
     resultCount: Int,
     resultTotal: String,
+    filterActive: Boolean,
+    pending: Boolean,
     onQueryChange: (String) -> Unit,
+    onFilterClick: () -> Unit,
 ) {
     item("history-search") {
         HistorySearchField(
             query = query,
             onQueryChange = onQueryChange,
+            filterActive = filterActive,
+            onFilterClick = onFilterClick,
             modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
         )
     }
-    if (appliedQuery.isNotBlank() && resultCount > 0) {
+    val searching = appliedQuery.isNotBlank() || filterActive
+    if (pending) {
+        item("history-search-skeleton") {
+            HistorySearchSkeleton(modifier = Modifier.padding(vertical = 8.dp))
+        }
+    } else if (searching && resultCount > 0) {
         item("history-search-summary") {
             HistorySearchSummary(count = resultCount, total = resultTotal)
         }
-    }
-    if (appliedQuery.isNotBlank() && resultCount == 0) {
+    } else if (searching) {
         item("history-search-empty") {
             Text(
-                text = stringResource(R.string.history_search_no_results, appliedQuery.trim()),
+                text = if (appliedQuery.isNotBlank()) {
+                    stringResource(R.string.history_search_no_results, appliedQuery.trim())
+                } else {
+                    stringResource(R.string.history_search_no_results_filtered)
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 24.dp),
@@ -88,8 +110,16 @@ internal fun HistorySearchField(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    filterActive: Boolean = false,
+    onFilterClick: (() -> Unit)? = null,
 ) {
-    SearchFieldLayout(query = query, onQueryChange = onQueryChange, modifier = modifier) {
+    SearchFieldLayout(
+        query = query,
+        onQueryChange = onQueryChange,
+        modifier = modifier,
+        filterActive = filterActive,
+        onFilterClick = onFilterClick,
+    ) {
         RotatingSearchPlaceholder()
     }
 }
@@ -109,6 +139,8 @@ private fun SearchFieldLayout(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier,
+    filterActive: Boolean = false,
+    onFilterClick: (() -> Unit)? = null,
     placeholder: @Composable () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -124,16 +156,23 @@ private fun SearchFieldLayout(
         shape = CircleShape,
         placeholder = placeholder,
         leadingIcon = { Icon(imageVector = Icons.Rounded.Search, contentDescription = null) },
-        trailingIcon = if (query.isNotEmpty()) {
+        trailingIcon = if (query.isNotEmpty() || onFilterClick != null) {
             {
-                IconButton(onClick = {
-                    onQueryChange("")
-                    focusManager.clearFocus()
-                }) {
-                    Icon(
-                        imageVector = Icons.Rounded.Close,
-                        contentDescription = stringResource(R.string.history_search_clear),
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (query.isNotEmpty()) {
+                        IconButton(onClick = {
+                            onQueryChange("")
+                            focusManager.clearFocus()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Close,
+                                contentDescription = stringResource(R.string.history_search_clear),
+                            )
+                        }
+                    }
+                    if (onFilterClick != null) {
+                        SearchFilterButton(active = filterActive, onClick = onFilterClick)
+                    }
                 }
             }
         } else {
@@ -148,6 +187,21 @@ private fun SearchFieldLayout(
         ),
         modifier = modifier.fillMaxWidth(),
     )
+}
+
+@Composable
+private fun SearchFilterButton(active: Boolean, onClick: () -> Unit) {
+    val description = stringResource(if (active) R.string.history_filter_open_active else R.string.history_filter_open)
+    val colors = if (active) {
+        IconButtonDefaults.filledTonalIconButtonColors()
+    } else {
+        IconButtonDefaults.iconButtonColors()
+    }
+    IconButton(onClick = onClick, colors = colors, modifier = Modifier.padding(end = 4.dp)) {
+        BadgedBox(badge = { if (active) Badge() }) {
+            Icon(imageVector = Icons.Rounded.FilterList, contentDescription = description)
+        }
+    }
 }
 
 @Composable
@@ -202,4 +256,26 @@ internal fun HistorySearchSummary(
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .censor(),
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HistorySearchFieldPreview() {
+    MinusTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            HistorySearchField(
+                query = "",
+                onQueryChange = {},
+            )
+            HistorySearchField(
+                query = "coffee",
+                onQueryChange = {},
+                modifier = Modifier.padding(top = 16.dp),
+            )
+        }
+    }
 }
