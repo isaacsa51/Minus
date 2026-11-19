@@ -56,6 +56,7 @@ import com.serranoie.app.minus.presentation.ui.history.edit.TransactionEditScree
 import com.serranoie.app.minus.presentation.ui.history.sections.budgetDisplaySection
 import com.serranoie.app.minus.presentation.ui.history.sections.currentPeriodRecurrentSection
 import com.serranoie.app.minus.presentation.ui.history.sections.futureRecurrentSection
+import com.serranoie.app.minus.presentation.ui.history.sections.HistoryFilterSheet
 import com.serranoie.app.minus.presentation.ui.history.sections.historySearchSection
 import com.serranoie.app.minus.presentation.ui.history.sections.pastPeriodToggleSection
 import com.serranoie.app.minus.presentation.ui.history.sections.pastTransactionDateSections
@@ -352,6 +353,8 @@ private fun HistoryListContent(
         onDispose { currentOnProcessIntent.value(HistoryUiIntent.SetSearchQuery("")) }
     }
 
+    var showFilterSheet by rememberSaveable { mutableStateOf(false) }
+
     val searchHighlight = remember(uiState.searchQuery) {
         uiState.searchQuery.takeIf { it.isNotBlank() }?.let { historySearchHighlight(it, Locale.getDefault()) }
     }
@@ -413,10 +416,13 @@ private fun HistoryListContent(
                     appliedQuery = uiState.searchQuery,
                     resultCount = uiState.searchResultCount,
                     resultTotal = currencyFormat.format(uiState.searchResultTotal),
+                    filterActive = uiState.searchFilter.isActive,
+                    pending = uiState.isSearchPending,
                     onQueryChange = {
                         searchText = it
                         onProcessIntent(HistoryUiIntent.SetSearchQuery(it))
                     },
+                    onFilterClick = { showFilterSheet = true },
                 )
             }
 
@@ -464,7 +470,7 @@ private fun HistoryListContent(
             )
 
             transactionDateSections(
-                groupedTransactions = uiState.groupedCurrentTransactions,
+                groupedTransactions = if (uiState.isSearchPending) emptyMap() else uiState.groupedCurrentTransactions,
                 expandedDates = uiState.expandedDates,
                 expandedTransactionId = uiState.expandedTransactionId,
                 deletingTransactionIds = uiState.pendingRemovedTransactions.keys,
@@ -592,6 +598,15 @@ private fun HistoryListContent(
             item("spacer-bottom") {
                 Spacer(modifier = Modifier.height(32.dp))
             }
+        }
+
+        if (showFilterSheet) {
+            HistoryFilterSheet(
+                filter = uiState.searchFilter,
+                categories = uiState.searchFilterCategories,
+                onFilterChange = { onProcessIntent(HistoryUiIntent.SetSearchFilter(it)) },
+                onDismiss = { showFilterSheet = false },
+            )
         }
 
         if (uiState.transactions.isEmpty()) {
