@@ -13,6 +13,7 @@ import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.Category
 import com.serranoie.app.minus.presentation.ui.history.HistorySearchFilter
 import com.serranoie.app.minus.presentation.ui.history.HistoryTransactionKind
+import com.serranoie.app.minus.presentation.ui.history.toQueryText
 import com.serranoie.app.minus.presentation.ui.history.sections.HistoryFilterSheetContent
 import com.serranoie.app.minus.presentation.ui.history.sections.HistorySearchField
 import com.serranoie.app.minus.presentation.ui.history.sections.HistorySearchSkeleton
@@ -51,6 +52,41 @@ class HistoryFilterScreenshotTest {
                             query = "coffee",
                             onQueryChange = {},
                             filterActive = true,
+                            onFilterClick = {},
+                            modifier = Modifier.padding(top = 16.dp),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun historySearchFieldWithFilterText() {
+        Locale.setDefault(Locale.US)
+        val (filterText, rest) = HistorySearchFilter(
+            categoryIds = setOf(1L),
+            kind = HistoryTransactionKind.EXPENSE,
+            minAmount = BigDecimal("50"),
+            startDate = LocalDate.of(2030, 10, 1),
+            endDate = LocalDate.of(2030, 10, 15),
+        ).toQueryText(categories.associate { it.id to it.name }, Locale.US)
+
+        paparazzi.snapshot {
+            MinusTheme {
+                Surface {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                        HistorySearchField(
+                            query = "coffee $filterText",
+                            onQueryChange = {},
+                            filterActive = rest.isActive,
+                            onFilterClick = {},
+                        )
+                        HistorySearchField(
+                            query = HistorySearchFilter(minAmount = BigDecimal("50"))
+                                .toQueryText(emptyMap(), Locale.US).first,
+                            onQueryChange = {},
+                            filterActive = false,
                             onFilterClick = {},
                             modifier = Modifier.padding(top = 16.dp),
                         )

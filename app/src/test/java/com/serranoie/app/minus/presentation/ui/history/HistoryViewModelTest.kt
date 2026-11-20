@@ -18,10 +18,12 @@ import com.serranoie.app.minus.domain.usecase.ObserveCurrentPeriodBoundaryUseCas
 import com.serranoie.app.minus.domain.usecase.PersistBudgetSettingsUseCase
 import com.serranoie.app.minus.presentation.ui.budget.BudgetStateCalculator
 import com.serranoie.app.minus.presentation.ui.budget.BudgetTransactionHandler
+import io.mockk.clearMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -372,18 +374,23 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `search leaves out past periods when they are hidden`() = runTest {
+    fun `search covers past periods even when they are hidden from the list`() = runTest {
         every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
         every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT.copy(showPastTransactions = false))
         every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
         val vm = newViewModel()
 
         vm.uiState.test {
+            val list = awaitCondition { it.budgetSettings != null && it.groupedCurrentTransactions.isNotEmpty() }
+            assertThat(list.groupedCurrentTransactions.values.flatten().map { it.id }).containsExactly(1L, 2L, 3L)
+            assertThat(list.groupedPastTransactions).isEmpty()
+
             vm.processIntent(HistoryUiIntent.SetSearchQuery("coffee"))
             val state = awaitCondition { it.searchQuery == "coffee" && it.budgetSettings != null }
 
-            assertThat(state.groupedCurrentTransactions.values.flatten().map { it.id }).containsExactly(1L, 2L)
-            assertThat(state.searchResultCount).isEqualTo(2)
+            assertThat(state.groupedCurrentTransactions.values.flatten().map { it.id }).containsExactly(1L, 2L, 4L)
+            assertThat(state.searchResultCount).isEqualTo(3)
+            assertThat(state.groupedPastTransactions).isEmpty()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -535,6 +542,31 @@ class HistoryViewModelTest {
             assertThat(vm.uiState.value.searchQuery).isEqualTo("coffee")
             assertThat(vm.uiState.value.groupedCurrentTransactions.values.flatten().map { it.id })
                 .containsExactly(1L, 2L, 4L)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `typing marks the search pending without recalculating the history until the debounce fires`() = runTest {
+        every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
+        every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
+        val vm = newViewModel()
+
+        vm.uiState.test {
+            awaitCondition { it.budgetSettings != null && it.groupedCurrentTransactions.isNotEmpty() }
+            clearMocks(budgetStateCalculator, answers = false)
+
+            vm.processIntent(HistoryUiIntent.SetSearchQuery("c"))
+            vm.processIntent(HistoryUiIntent.SetSearchQuery("co"))
+            vm.processIntent(HistoryUiIntent.SetSearchQuery("cof"))
+            runCurrent()
+            assertThat(vm.uiState.value.isSearchPending).isTrue()
+            verify(exactly = 0) { budgetStateCalculator.filterPeriodTransactions(any(), any(), any(), any()) }
+
+            advanceTimeBy(226.milliseconds)
+            assertThat(vm.uiState.value.isSearchPending).isFalse()
+            assertThat(vm.uiState.value.searchQuery).isEqualTo("cof")
+            verify(exactly = 1) { budgetStateCalculator.filterPeriodTransactions(any(), any(), any(), any()) }
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -733,6 +765,61 @@ class HistoryViewModelTest {
             advanceTimeBy(226.milliseconds)
             assertThat(vm.uiState.value.isSearchPending).isFalse()
             assertThat(vm.uiState.value.searchQuery).isEqualTo("coffee")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `leaving search clears the query and the filters and restores the normal list`() = runTest {
+        every { settingsRepository.observeSettings() } returns flowOf(UserSettings.DEFAULT.copy(showPastTransactions = true))
+        every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
+        every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
+        val vm = newViewModel()
+
+        vm.uiState.test {
+            vm.processIntent(HistoryUiIntent.SetSearchFilter(HistorySearchFilter(minAmount = BigDecimal("10"))))
+            vm.processIntent(HistoryUiIntent.SetSearchQuery("coffee"))
+            awaitCondition { it.searchQuery == "coffee" && it.searchFilter.isActive && it.budgetSettings != null }
+
+            vm.processIntent(HistoryUiIntent.ClearSearch)
+            runCurrent()
+            val state = vm.uiState.value
+
+            assertThat(state.searchQuery).isEmpty()
+            assertThat(state.searchFilter).isEqualTo(HistorySearchFilter())
+            assertThat(state.isSearchPending).isFalse()
+            assertThat(state.groupedCurrentTransactions.values.flatten().map { it.id }).containsExactly(1L, 2L, 3L)
+            assertThat(state.groupedPastTransactions.values.flatten().map { it.id }).containsExactly(4L)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `the list reveal key counts only switches from search results back to the list`() = runTest {
+        every { budgetRepository.getBudgetSettings() } returns flowOf(budgetSettings())
+        every { budgetRepository.getTransactions() } returns flowOf(searchFixture())
+        val vm = newViewModel()
+
+        vm.uiState.test {
+            assertThat(awaitCondition { it.budgetSettings != null }.listRevealKey).isEqualTo(0)
+
+            vm.processIntent(HistoryUiIntent.SetSearchQuery("cof"))
+            advanceTimeBy(300.milliseconds)
+            vm.processIntent(HistoryUiIntent.SetSearchQuery("coffee"))
+            advanceTimeBy(300.milliseconds)
+            assertThat(vm.uiState.value.searchQuery).isEqualTo("coffee")
+            assertThat(vm.uiState.value.listRevealKey).isEqualTo(0)
+
+            vm.processIntent(HistoryUiIntent.ClearSearch)
+            runCurrent()
+            assertThat(vm.uiState.value.listRevealKey).isEqualTo(1)
+
+            vm.processIntent(HistoryUiIntent.SetSearchFilter(HistorySearchFilter(creditOnly = true)))
+            runCurrent()
+            assertThat(vm.uiState.value.listRevealKey).isEqualTo(1)
+            vm.processIntent(HistoryUiIntent.SetSearchFilter(HistorySearchFilter()))
+            runCurrent()
+            assertThat(vm.uiState.value.listRevealKey).isEqualTo(2)
             cancelAndIgnoreRemainingEvents()
         }
     }

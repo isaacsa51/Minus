@@ -70,6 +70,7 @@ internal fun LazyListScope.historySearchSection(
     pending: Boolean,
     onQueryChange: (String) -> Unit,
     onFilterClick: () -> Unit,
+    onClear: () -> Unit,
 ) {
     item("history-search") {
         HistorySearchField(
@@ -77,6 +78,7 @@ internal fun LazyListScope.historySearchSection(
             onQueryChange = onQueryChange,
             filterActive = filterActive,
             onFilterClick = onFilterClick,
+            onClear = onClear,
             modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
         )
     }
@@ -112,6 +114,7 @@ internal fun HistorySearchField(
     modifier: Modifier = Modifier,
     filterActive: Boolean = false,
     onFilterClick: (() -> Unit)? = null,
+    onClear: () -> Unit = { onQueryChange("") },
 ) {
     SearchFieldLayout(
         query = query,
@@ -119,6 +122,7 @@ internal fun HistorySearchField(
         modifier = modifier,
         filterActive = filterActive,
         onFilterClick = onFilterClick,
+        onClear = onClear,
     ) {
         RotatingSearchPlaceholder()
     }
@@ -141,11 +145,12 @@ private fun SearchFieldLayout(
     modifier: Modifier,
     filterActive: Boolean = false,
     onFilterClick: (() -> Unit)? = null,
+    onClear: () -> Unit = { onQueryChange("") },
     placeholder: @Composable () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    BackHandler(enabled = query.isNotEmpty()) {
-        onQueryChange("")
+    BackHandler(enabled = query.isNotEmpty() || filterActive) {
+        onClear()
         focusManager.clearFocus()
     }
 
@@ -161,7 +166,7 @@ private fun SearchFieldLayout(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (query.isNotEmpty()) {
                         IconButton(onClick = {
-                            onQueryChange("")
+                            onClear()
                             focusManager.clearFocus()
                         }) {
                             Icon(

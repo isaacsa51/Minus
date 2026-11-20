@@ -199,6 +199,38 @@ internal fun HistorySearchFilter.matches(transaction: Transaction): Boolean {
         (!creditOnly || transaction.isCredit)
 }
 
+internal fun HistorySearchFilter.toQueryText(
+    categoryNames: Map<Long, String>,
+    locale: Locale,
+): Pair<String, HistorySearchFilter> {
+    val category = categoryIds.singleOrNull()?.takeIf { searchCategoryNames }?.let(categoryNames::get)
+    val start = startDate?.toSearchToken(locale)
+    val end = endDate?.toSearchToken(locale)
+    val dates = when {
+        start != null && end != null -> if (start == end) start else "$start $RANGE_DOTS $end"
+        start != null -> ">=$start"
+        end != null -> "<=$end"
+        else -> null
+    }
+    val text = listOfNotNull(
+        category?.let { if (it.any(Char::isWhitespace)) "\"$it\"" else it },
+        minAmount?.let { ">=${it.stripTrailingZeros().toPlainString()}" },
+        maxAmount?.let { "<=${it.stripTrailingZeros().toPlainString()}" },
+        dates,
+    ).joinToString(" ")
+    val rest = copy(
+        categoryIds = if (category != null) emptySet() else categoryIds,
+        minAmount = null,
+        maxAmount = null,
+        startDate = null,
+        endDate = null,
+    )
+    return text to rest
+}
+
+private fun LocalDate.toSearchToken(locale: Locale): String =
+    numericDateOrder(locale).joinToString("/") { formatLocalized(it.toString(), locale) }
+
 private fun parseQuery(query: String, locale: Locale): ParsedQuery {
     val normalized = query.searchNormalized(locale).replace(EXAMPLE_LABEL, "")
     val phrases = QUOTED.findAll(normalized).map { it.groupValues[1].trim() }.filter { it.isNotEmpty() }.toList()
