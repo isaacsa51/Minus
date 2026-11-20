@@ -169,6 +169,29 @@
     </string-array>
     <string name="history_search_clear">검색 지우기</string>
     <string name="history_search_no_results">\"%1$s\"와(과) 일치하는 지출이 없습니다</string>
+    <string name="history_search_no_results_filtered">이 필터와 일치하는 지출이 없습니다</string>
+    <string name="history_filter_open">필터</string>
+    <string name="history_filter_open_active">필터 사용 중</string>
+    <string name="history_filter_title">필터</string>
+    <string name="history_filter_reset">초기화</string>
+    <string name="history_filter_search_in">검색 대상</string>
+    <string name="history_filter_descriptions">이름 및 메모</string>
+    <string name="history_filter_category_names">카테고리 이름</string>
+    <string name="history_filter_type">유형</string>
+    <string name="history_filter_type_all">전체</string>
+    <string name="history_filter_type_expenses">지출</string>
+    <string name="history_filter_type_income">수입</string>
+    <string name="history_filter_amount">금액</string>
+    <string name="history_filter_amount_min">최소</string>
+    <string name="history_filter_amount_max">최대</string>
+    <string name="history_filter_dates">날짜</string>
+    <string name="history_filter_any_date">모든 날짜</string>
+    <string name="history_filter_date_range">%1$s – %2$s</string>
+    <string name="history_filter_clear_dates">날짜 지우기</string>
+    <string name="history_filter_only">표시 항목</string>
+    <string name="history_filter_recurring">반복 및 예정</string>
+    <string name="history_filter_credit">신용</string>
+    <string name="history_filter_categories">카테고리</string>
     <plurals name="history_search_results_summary">
         <item quantity="other">%1$d건 일치 · %2$s 지출</item>
     </plurals>
