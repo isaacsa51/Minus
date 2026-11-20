@@ -315,9 +315,11 @@ private fun AmountField(
         onValueChange = { input ->
             val cleaned = input.filter { it.isDigit() || it == '.' || it == ',' }
             text = cleaned
-            onValueChange(cleaned.toFilterAmount())
+            val bound = filterAmountEdit(cleaned, value)
+            if (bound != value) onValueChange(bound)
         },
         label = { Text(label, maxLines = 1) },
+        isError = text.isNotEmpty() && text.toFilterAmount() == null,
         singleLine = true,
         shape = MaterialTheme.shapes.large,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -326,6 +328,9 @@ private fun AmountField(
 }
 
 private fun String.toFilterAmount(): BigDecimal? = replace(',', '.').toBigDecimalOrNull()
+
+internal fun filterAmountEdit(text: String, current: BigDecimal?): BigDecimal? =
+    if (text.isEmpty()) null else text.toFilterAmount() ?: current
 
 @Composable
 private fun dateRangeLabel(start: LocalDate?, end: LocalDate?): String {
