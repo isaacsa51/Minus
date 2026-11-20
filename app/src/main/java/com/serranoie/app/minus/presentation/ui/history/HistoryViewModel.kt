@@ -74,6 +74,8 @@ class HistoryViewModel @Inject constructor(
     val effects: SharedFlow<HistoryUiEffect> = _effects.asSharedFlow()
 
     private val deleteJobs = mutableMapOf<Long, Job>()
+    private var wasSearching = false
+    private var listReveals = 0
 
     private val uiInputs = combine(
         listOf(
@@ -89,7 +91,6 @@ class HistoryViewModel @Inject constructor(
             _expandedTransactionId,
             _pendingRemovedTransactions,
             appliedSearchQuery,
-            _searchQuery,
             _searchFilter,
         )
     ) { array ->
@@ -106,8 +107,7 @@ class HistoryViewModel @Inject constructor(
             expandedTransactionId = array[9] as Long?,
             pendingRemovedTransactions = array[10] as Map<Long, Transaction>,
             searchQuery = array[11] as String,
-            typedSearchQuery = array[12] as String,
-            searchFilter = array[13] as HistorySearchFilter,
+            searchFilter = array[12] as HistorySearchFilter,
         )
     }
 
@@ -145,6 +145,8 @@ class HistoryViewModel @Inject constructor(
             paidOccurrences = paidOccurrences,
             inputs = inputs
         )
+    }.combine(_searchQuery) { state, typed ->
+        state.copy(isSearchPending = typed.isNotBlank() && typed.trim() != state.searchQuery.trim())
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000L),
@@ -178,6 +180,10 @@ class HistoryViewModel @Inject constructor(
             is HistoryUiIntent.UpdateCreditCutoffDay -> updateCreditCutoffDay(intent.day)
             is HistoryUiIntent.SetSearchQuery -> _searchQuery.value = intent.query
             is HistoryUiIntent.SetSearchFilter -> _searchFilter.value = intent.filter
+            is HistoryUiIntent.ClearSearch -> {
+                _searchQuery.value = ""
+                _searchFilter.value = HistorySearchFilter()
+            }
         }
     }
 
@@ -329,11 +335,8 @@ class HistoryViewModel @Inject constructor(
             paidOccurrences = paidOccurrences,
         )
 
-        val groupedPast = if (userSettings?.showPastTransactions == false) {
-            emptyMap()
-        } else {
-            groupTransactionsByDate(pastPeriodTx)
-        }
+        val allGroupedPast = groupTransactionsByDate(pastPeriodTx)
+        val groupedPast = if (userSettings?.showPastTransactions == false) emptyMap() else allGroupedPast
 
         val creditOwed = transactions.filter { it.isCredit && !it.isDeleted && !it.isCreditPaid }
             .sumOf { it.amount }
@@ -354,12 +357,16 @@ class HistoryViewModel @Inject constructor(
                 searchCategoryNames = filter.searchCategoryNames,
             )
             groupTransactionsByDate(
-                (groupedCurrent.values.flatten() + groupedPast.values.flatten())
+                (groupedCurrent.values.flatten() + allGroupedPast.values.flatten())
                     .filter { filter.matches(it) && (query.isEmpty() || matcher(it)) }
             )
         } else {
             null
         }
+
+        val searching = searchResults != null
+        if (wasSearching && !searching) listReveals++
+        wasSearching = searching
 
         return HistoryUiState(
             budgetSettings = budgetSettings,
@@ -388,8 +395,8 @@ class HistoryViewModel @Inject constructor(
             lockSwipeable = inputs.lockSwipeable,
             searchQuery = inputs.searchQuery,
             searchFilter = filter,
+            listRevealKey = listReveals,
             searchFilterCategories = categories,
-            isSearchPending = inputs.typedSearchQuery.isNotBlank() && inputs.typedSearchQuery.trim() != query,
             searchResultCount = searchResults?.values?.sumOf { it.size } ?: 0,
             searchResultTotal = searchResults?.values?.flatten().orEmpty()
                 .filter { it.amount > BigDecimal.ZERO }
@@ -417,7 +424,6 @@ class HistoryViewModel @Inject constructor(
         val expandedTransactionId: Long?,
         val pendingRemovedTransactions: Map<Long, Transaction>,
         val searchQuery: String,
-        val typedSearchQuery: String,
         val searchFilter: HistorySearchFilter,
     )
 

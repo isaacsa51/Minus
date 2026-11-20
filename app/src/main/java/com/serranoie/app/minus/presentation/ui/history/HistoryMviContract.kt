@@ -30,6 +30,7 @@ sealed interface HistoryUiIntent {
 
     data class SetSearchQuery(val query: String) : HistoryUiIntent
     data class SetSearchFilter(val filter: HistorySearchFilter) : HistoryUiIntent
+    data object ClearSearch : HistoryUiIntent
 }
 
 enum class HistoryTransactionKind { ALL, EXPENSE, INCOME }
@@ -87,6 +88,7 @@ data class HistoryUiState(
     val searchFilter: HistorySearchFilter = HistorySearchFilter(),
     val searchFilterCategories: List<Category> = emptyList(),
     val isSearchPending: Boolean = false,
+    val listRevealKey: Int = 0,
 
     val displayTransactions: List<Transaction> = emptyList(),
     val groupedCurrentTransactions: Map<LocalDate?, List<Transaction>> = emptyMap(),

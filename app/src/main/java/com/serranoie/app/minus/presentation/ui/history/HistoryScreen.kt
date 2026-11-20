@@ -350,7 +350,7 @@ private fun HistoryListContent(
     }
     val currentOnProcessIntent = rememberUpdatedState(onProcessIntent)
     DisposableEffect(Unit) {
-        onDispose { currentOnProcessIntent.value(HistoryUiIntent.SetSearchQuery("")) }
+        onDispose { currentOnProcessIntent.value(HistoryUiIntent.ClearSearch) }
     }
 
     var showFilterSheet by rememberSaveable { mutableStateOf(false) }
@@ -423,6 +423,10 @@ private fun HistoryListContent(
                         onProcessIntent(HistoryUiIntent.SetSearchQuery(it))
                     },
                     onFilterClick = { showFilterSheet = true },
+                    onClear = {
+                        searchText = ""
+                        onProcessIntent(HistoryUiIntent.ClearSearch)
+                    },
                 )
             }
 
@@ -508,7 +512,12 @@ private fun HistoryListContent(
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope,
                 creditCardCutoffDay = uiState.budgetSettings?.creditCardCutoffDay,
-                searchQuery = uiState.searchQuery,
+                revealKey = when {
+                    uiState.searchQuery.isNotBlank() || uiState.searchFilter.isActive ->
+                        uiState.searchQuery to uiState.searchFilter
+                    uiState.listRevealKey > 0 -> uiState.listRevealKey
+                    else -> null
+                },
                 searchHighlight = searchHighlight,
             )
 
@@ -605,7 +614,18 @@ private fun HistoryListContent(
                 filter = uiState.searchFilter,
                 categories = uiState.searchFilterCategories,
                 onFilterChange = { onProcessIntent(HistoryUiIntent.SetSearchFilter(it)) },
-                onDismiss = { showFilterSheet = false },
+                onDismiss = {
+                    showFilterSheet = false
+                    val (filterText, rest) = uiState.searchFilter.toQueryText(
+                        uiState.searchFilterCategories.associate { it.id to it.name },
+                        Locale.getDefault(),
+                    )
+                    if (filterText.isNotEmpty()) {
+                        searchText = listOf(searchText.trim(), filterText).filter { it.isNotEmpty() }.joinToString(" ")
+                        onProcessIntent(HistoryUiIntent.SetSearchFilter(rest))
+                        onProcessIntent(HistoryUiIntent.SetSearchQuery(searchText))
+                    }
+                },
             )
         }
 

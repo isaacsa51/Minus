@@ -254,4 +254,70 @@ class HistorySearchTest {
         assertThat(historySearchHighlight("$150", english).amount).isTrue()
         assertThat(historySearchHighlight("", english).ranges("Uber")).isEmpty()
     }
+
+    private val octoberFilter = HistorySearchFilter(
+        categoryIds = setOf(9L),
+        kind = HistoryTransactionKind.EXPENSE,
+        minAmount = BigDecimal("50"),
+        maxAmount = BigDecimal("200.50"),
+        startDate = java.time.LocalDate.of(2026, 10, 1),
+        endDate = java.time.LocalDate.of(2026, 10, 15),
+    )
+
+    @Test
+    fun `a default filter writes no query text`() {
+        assertThat(HistorySearchFilter().toQueryText(emptyMap(), english))
+            .isEqualTo("" to HistorySearchFilter())
+    }
+
+    @Test
+    fun `amounts, dates and one category move into the query and the rest stays in the filter`() {
+        val (text, rest) = octoberFilter.toQueryText(mapOf(9L to "Food"), english)
+        assertThat(text).isEqualTo("Food >=50 <=200.5 10/1/2026 .. 10/15/2026")
+        assertThat(rest).isEqualTo(HistorySearchFilter(kind = HistoryTransactionKind.EXPENSE))
+        assertThat(octoberFilter.toQueryText(mapOf(9L to "Food"), spanish).first)
+            .isEqualTo("Food >=50 <=200.5 1/10/2026 .. 15/10/2026")
+    }
+
+    @Test
+    fun `a single date bound writes a comparison`() {
+        val from = HistorySearchFilter(startDate = java.time.LocalDate.of(2026, 10, 1))
+        val until = HistorySearchFilter(endDate = java.time.LocalDate.of(2026, 10, 15))
+        assertThat(from.toQueryText(emptyMap(), english).first).isEqualTo(">=10/1/2026")
+        assertThat(until.toQueryText(emptyMap(), english).first).isEqualTo("<=10/15/2026")
+    }
+
+    @Test
+    fun `categories stay in the filter when several are picked or category names are not searched`() {
+        val several = HistorySearchFilter(categoryIds = setOf(1L, 2L))
+        assertThat(several.toQueryText(mapOf(1L to "Food", 2L to "Uber"), english)).isEqualTo("" to several)
+        val scoped = HistorySearchFilter(categoryIds = setOf(1L), searchCategoryNames = false)
+        assertThat(scoped.toQueryText(mapOf(1L to "Food"), english)).isEqualTo("" to scoped)
+    }
+
+    @Test
+    fun `a category name with spaces is quoted`() {
+        val filter = HistorySearchFilter(categoryIds = setOf(1L))
+        assertThat(filter.toQueryText(mapOf(1L to "Dining out"), english).first).isEqualTo("\"Dining out\"")
+    }
+
+    @Test
+    fun `the written query finds the same expenses the filter did`() {
+        val categories = mapOf(9L to "Food")
+        val rows = listOf(
+            txn("Tacos", amount = "50", categoryId = 9L, date = LocalDateTime.of(2026, 10, 1, 9, 0)),
+            txn("Tacos", amount = "200.50", categoryId = 9L, date = LocalDateTime.of(2026, 10, 15, 21, 0)),
+            txn("Tacos", amount = "49.99", categoryId = 9L, date = LocalDateTime.of(2026, 10, 5, 9, 0)),
+            txn("Tacos", amount = "201", categoryId = 9L, date = LocalDateTime.of(2026, 10, 5, 9, 0)),
+            txn("Tacos", amount = "80", categoryId = 9L, date = LocalDateTime.of(2026, 9, 30, 9, 0)),
+            txn("Tacos", amount = "80", categoryId = 9L, date = LocalDateTime.of(2026, 10, 16, 9, 0)),
+            txn("Tacos", amount = "80", categoryId = 3L, date = LocalDateTime.of(2026, 10, 5, 9, 0)),
+        )
+        listOf(english, spanish).forEach { locale ->
+            val (text, rest) = octoberFilter.toQueryText(categories, locale)
+            val matcher = historySearchMatcher(text, locale, categories)
+            assertThat(rows.map { matcher(it) && rest.matches(it) }).isEqualTo(rows.map { octoberFilter.matches(it) })
+        }
+        assertThat(rows.map { octoberFilter.matches(it) }).containsExactly(true, true, false, false, false, false, false).inOrder()
+    }
 }

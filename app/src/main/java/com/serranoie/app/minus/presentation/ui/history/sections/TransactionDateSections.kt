@@ -71,7 +71,7 @@ internal fun LazyListScope.transactionDateSections(
     disableAnimations: Boolean = false,
     creditCardCutoffDay: Int? = null,
     firstItemHintModifier: Modifier = Modifier,
-    searchQuery: String = "",
+    revealKey: Any? = null,
     searchHighlight: HistorySearchHighlight? = null,
 ) {
     var revealOrder = 0
@@ -125,7 +125,7 @@ internal fun LazyListScope.transactionDateSections(
                                 } else ExitTransition.None,
                             ) {
                                 val reveal = rememberSearchReveal(
-                                    query = searchQuery,
+                                    revealKey = revealKey,
                                     order = firstRevealOrder + index,
                                     enabled = !disableAnimations,
                                 )
@@ -182,8 +182,8 @@ internal fun LazyListScope.transactionDateSections(
 }
 
 @Composable
-private fun rememberSearchReveal(query: String, order: Int, enabled: Boolean): Animatable<Float, AnimationVector1D> {
-    val progress = remember(query) { Animatable(if (enabled && query.isNotBlank()) 0f else 1f) }
+private fun rememberSearchReveal(revealKey: Any?, order: Int, enabled: Boolean): Animatable<Float, AnimationVector1D> {
+    val progress = remember(revealKey) { Animatable(if (enabled && revealKey != null) 0f else 1f) }
     LaunchedEffect(progress) {
         if (progress.value < 1f) {
             delay(order.coerceAtMost(SEARCH_REVEAL_MAX_STAGGER) * SEARCH_REVEAL_STAGGER_MS)

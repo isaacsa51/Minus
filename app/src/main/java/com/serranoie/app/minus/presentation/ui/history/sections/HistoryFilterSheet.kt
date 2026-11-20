@@ -49,6 +49,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -76,6 +77,12 @@ private const val SKELETON_ROWS = 4
 private const val SKELETON_PULSE_MILLIS = 700
 private const val SKELETON_MIN_ALPHA = 0.45f
 
+@Composable
+internal fun rememberLatestDismiss(onDismiss: () -> Unit): () -> Unit {
+    val latest by rememberUpdatedState(onDismiss)
+    return remember { { latest() } }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HistoryFilterSheet(
@@ -86,7 +93,7 @@ internal fun HistoryFilterSheet(
 ) {
     var pickingDates by rememberSaveable { mutableStateOf(false) }
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = rememberLatestDismiss(onDismiss),
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
         HistoryFilterSheetContent(
