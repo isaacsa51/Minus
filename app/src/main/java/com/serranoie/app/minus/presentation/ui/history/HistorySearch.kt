@@ -23,6 +23,7 @@ private val EXAMPLE_LABEL = Regex("^[^:：\"“”„«»]{1,24}[:：]\\s+")
 private val NUMERIC_DATE_SEPARATOR = Regex("[/.-]")
 private val QUOTED = Regex("[\"“”„«»]([^\"“”„«»]*)[\"“”„«»]")
 private val DATE_COMPARE = Regex("^([<>]=?)(.+)$")
+private val CATEGORY = Regex("#(?:[\"“”„«»]([^\"“”„«»]*)[\"“”„«»]|([^\\s\"“”„«»]+))")
 private const val RANGE_DOTS = ".."
 private const val MIN_MONTH_PREFIX = 3
 private const val THOUSANDS_GROUP = 3
@@ -104,6 +105,7 @@ private class DateContext(
 )
 
 private class ParsedQuery(
+    val categories: List<String>,
     val phrases: List<String>,
     val ranges: List<DateFilter>,
     val tokens: List<String>,
@@ -151,6 +153,7 @@ internal fun historySearchMatcher(
     searchCategoryNames: Boolean = true,
 ): (Transaction) -> Boolean {
     val parsed = parseQuery(query, locale)
+    val exactCategories = parsed.categories
     val phrases = parsed.phrases
     val ranges = parsed.ranges
     val tokens = parsed.tokens
@@ -164,7 +167,8 @@ internal fun historySearchMatcher(
         val description = if (searchDescriptions) "${transaction.comment} ${transaction.note}".searchNormalized(locale) else ""
         val text = "$description $category"
         val date by lazy { transaction.date?.toLocalDate()?.let { searchDate(it, locale) } }
-        phrases.all { text.contains(it) } &&
+        exactCategories.all { it == transaction.categoryId?.let(categories::get) } &&
+            phrases.all { text.contains(it) } &&
             ranges.all { range -> date?.let(range::matches) == true } &&
             tokens.all { token ->
                 val amountFilter = amountFilters[token]
@@ -203,7 +207,7 @@ internal fun HistorySearchFilter.toQueryText(
     categoryNames: Map<Long, String>,
     locale: Locale,
 ): Pair<String, HistorySearchFilter> {
-    val category = categoryIds.singleOrNull()?.takeIf { searchCategoryNames }?.let(categoryNames::get)
+    val category = categoryIds.singleOrNull()?.let(categoryNames::get)
     val start = startDate?.toSearchToken(locale)
     val end = endDate?.toSearchToken(locale)
     val dates = when {
@@ -213,7 +217,7 @@ internal fun HistorySearchFilter.toQueryText(
         else -> null
     }
     val text = listOfNotNull(
-        category?.let { if (it.any(Char::isWhitespace)) "\"$it\"" else it },
+        category?.let { if (it.any(Char::isWhitespace)) "#\"$it\"" else "#$it" },
         minAmount?.let { ">=${it.stripTrailingZeros().toPlainString()}" },
         maxAmount?.let { "<=${it.stripTrailingZeros().toPlainString()}" },
         dates,
@@ -232,7 +236,12 @@ private fun LocalDate.toSearchToken(locale: Locale): String =
     numericDateOrder(locale).joinToString("/") { formatLocalized(it.toString(), locale) }
 
 private fun parseQuery(query: String, locale: Locale): ParsedQuery {
-    val normalized = query.searchNormalized(locale).replace(EXAMPLE_LABEL, "")
+    val labeled = query.searchNormalized(locale).replace(EXAMPLE_LABEL, "")
+    val categories = CATEGORY.findAll(labeled)
+        .map { it.groupValues[1].ifEmpty { it.groupValues[2] }.trim() }
+        .filter { it.isNotEmpty() }
+        .toList()
+    val normalized = labeled.replace(CATEGORY, " ")
     val phrases = QUOTED.findAll(normalized).map { it.groupValues[1].trim() }.filter { it.isNotEmpty() }.toList()
     val allTokens = normalized.replace(QUOTED, " ")
         .replace(RANGE_DOTS, " $RANGE_DOTS ")
@@ -253,7 +262,7 @@ private fun parseQuery(query: String, locale: Locale): ParsedQuery {
     val dateCompares = fullDateCompares + tokens.filterNot { it in amountFilters || it in fullDateCompares }
         .mapNotNull { token -> token.toDateCompare(context)?.let { token to it } }
         .toMap()
-    return ParsedQuery(phrases, ranges, tokens, amountFilters, dateCompares, context)
+    return ParsedQuery(categories, phrases, ranges, tokens, amountFilters, dateCompares, context)
 }
 
 private fun extractDateRanges(tokens: List<String>, context: DateContext): Pair<List<DateFilter>, List<String>> {
