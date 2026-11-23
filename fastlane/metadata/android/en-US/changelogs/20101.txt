@@ -1,0 +1,6 @@
+- feat: add CSV import preview and improve recurring transaction analytics
+- feat: add text auto-sizing support to StatCard
+- feat: add category hash prefix to history search and improve filter amount validation
+- feat: enhance history search with filter-to-query integration and improved state management
+- feat: add search filters to transaction history
+- feat: support Island settings shortcut and dynamic theme styling
