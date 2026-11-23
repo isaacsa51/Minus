@@ -74,7 +74,7 @@ class MinusCsvParser {
 
                 runCatching {
                     val row = parseRecord(raw)
-                    if (row.amount <= BigDecimal.ZERO && row.pocketId == null) {
+                    if (row.amount <= BigDecimal.ZERO && row.pocketId == null && !row.isAdjustment) {
                         errors.add("Line $lineNo discarded: amount must be > 0")
                         null
                     } else {

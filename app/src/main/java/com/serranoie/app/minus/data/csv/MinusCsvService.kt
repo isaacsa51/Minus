@@ -51,6 +51,8 @@ class MinusCsvService @Inject constructor(
         exporter.export(transactions, archivedBudgets, metadata, paidOccurrences, outputStream, pockets)
     }
 
+    fun previewImport(inputStream: InputStream): CsvImportPreview = parser.parse(inputStream).toPreview()
+
     suspend fun hasNoLocalData(): Boolean {
         return repository.getBudgetSettingsSync() == null &&
                 repository.getRecentTransactions(1).isEmpty()

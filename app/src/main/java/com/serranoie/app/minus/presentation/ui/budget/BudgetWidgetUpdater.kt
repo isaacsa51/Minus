@@ -3,11 +3,13 @@ package com.serranoie.app.minus.presentation.ui.budget
 import android.content.Context
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.domain.model.BudgetPeriod
+import com.serranoie.app.minus.domain.model.PaidRecurrentOccurrence
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.domain.time.CalendarSystem
 import com.serranoie.app.minus.presentation.island.IslandBudgetSnapshot
 import com.serranoie.app.minus.presentation.island.IslandBudgetStore
 import com.serranoie.app.minus.presentation.island.nextIslandCharge
+import com.serranoie.app.minus.presentation.ui.history.splitRecurringAndOneTime
 import com.serranoie.app.minus.presentation.ui.theme.component.budget.pill.calculateBudgetMetrics
 import com.serranoie.app.minus.presentation.widget.DailySpending
 import com.serranoie.app.minus.presentation.widget.MonthHeatmapData
@@ -189,12 +191,19 @@ class BudgetWidgetUpdater @Inject constructor(
         val currentMonthTotalSpent: Int,
     )
 
-    private fun buildHeatmapData(baseState: BudgetUiState): WidgetHeatmapData {
+    private suspend fun buildHeatmapData(baseState: BudgetUiState): WidgetHeatmapData {
+        val paidOccurrences = runCatching { budgetRepository.getPaidRecurrentOccurrences().first() }
+            .onFailure {
+                if (it is CancellationException) throw it
+                logcat { "Heatmap could not read paid occurrences: ${it.asLog()}" }
+            }
+            .getOrDefault(emptySet())
         val monthHeatmapData = buildHeatmapMonths(
             transactions = baseState.transactions,
             now = LocalDate.now(),
             budget = baseState.budgetSettings?.totalBudget ?: BigDecimal.ONE,
             calendar = CalendarSystem.current(),
+            paidOccurrences = paidOccurrences,
         )
         val currentMonthHeatmap = monthHeatmapData.last()
         return WidgetHeatmapData(
@@ -210,11 +219,23 @@ internal fun buildHeatmapMonths(
     now: LocalDate,
     budget: BigDecimal,
     calendar: CalendarSystem,
+    paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
 ): List<MonthHeatmapData> {
-    val groupedByDate = transactions
-        .filter { !it.isDeleted && it.date != null }
-        .groupBy { it.date!!.toLocalDate() }
     val currentMonthStart = calendar.firstDayOfMonth(now)
+    val windowStart = calendar.plusMonths(currentMonthStart, -3)
+    val windowEnd = calendar.plusMonths(currentMonthStart, 1).minusDays(1)
+    val (recurringCharges, _, oneTimeSpends) = splitRecurringAndOneTime(
+        allTransactions = transactions,
+        filteredTransactions = transactions,
+        periodStart = windowStart,
+        periodEnd = windowEnd,
+        today = now,
+        paidOccurrences = paidOccurrences,
+        calendar = calendar,
+    )
+    val groupedByDate = (oneTimeSpends + recurringCharges)
+        .filter { it.date != null && it.amount > BigDecimal.ZERO && !it.isAdjustment }
+        .groupBy { it.date!!.toLocalDate() }
     return (3L downTo 0L).map { monthsBack ->
         val monthStart = calendar.plusMonths(currentMonthStart, -monthsBack)
         val days = (1..calendar.lengthOfMonth(monthStart)).map { dayOfMonth ->

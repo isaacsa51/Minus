@@ -110,4 +110,19 @@ class MinusCsvParserTest {
         assertEquals(1, rows.size)
         assertEquals("ONCE", rows[0].frequency?.name)
     }
+
+    @Test
+    fun parse_negativeAdjustmentRow_isKept() {
+        val csv = """
+            date,amount,category,extra_note,is_recurrent,frequency,end_date,sub_day,id,is_credit,is_credit_paid,period_id,created_at,is_adjustment,pocket_id
+            2026-11-13 17:58,-40,foodie,,0,,,,1261,0,0,7,1794563924909,1,
+        """.trimIndent()
+
+        val payload = parser.parse(ByteArrayInputStream(csv.toByteArray(StandardCharsets.UTF_8)))
+
+        assertEquals(emptyList<String>(), payload.errors)
+        assertEquals(1, payload.rows.size)
+        assertEquals(BigDecimal("-40"), payload.rows[0].amount)
+        assertTrue(payload.rows[0].isAdjustment)
+    }
 }

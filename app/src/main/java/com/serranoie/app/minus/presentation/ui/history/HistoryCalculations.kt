@@ -233,6 +233,7 @@ internal fun splitRecurringAndOneTime(
     today: LocalDate,
     paidOccurrences: Set<PaidRecurrentOccurrence> = emptySet(),
     billedThrough: LocalDateTime? = null,
+    calendar: CalendarSystem = CalendarSystem.current(),
 ): Triple<List<Transaction>, List<Transaction>, List<Transaction>> {
     val oneTimeSpends =
         filteredTransactions.filterNot { it.isDeleted }.filterNot { it.isRecurrent }
@@ -245,7 +246,7 @@ internal fun splitRecurringAndOneTime(
 
     val paidCharges = recurringParents.flatMap { parent ->
         getRecurringChargesInPeriod(
-            parent, periodStart, periodEnd, today, paidOccurrences, billedThrough,
+            parent, periodStart, periodEnd, today, paidOccurrences, billedThrough, calendar,
         )
     }
 

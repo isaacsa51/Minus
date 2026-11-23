@@ -71,3 +71,35 @@ fun CsvTransactionRow.toDomainTransaction(categoryId: Long? = null): Transaction
     )
 }
 
+
+data class CsvImportPreview(
+    val currentPeriodTransactions: Int,
+    val budgetTotal: BigDecimal?,
+    val currencyCode: String,
+    val periodStart: LocalDate?,
+    val periodEnd: LocalDate?,
+    val completedPeriods: Int,
+    val recurringPayments: Int,
+    val discarded: Int,
+    val replacesAllData: Boolean,
+) {
+    val blocked: Boolean get() = replacesAllData && discarded > 0
+}
+
+fun CsvImportPayload.toPreview(): CsvImportPreview {
+    val settings = metadata?.budgetSettings
+    val oneOffs = rows.filterNot { it.isRecurrent }
+    return CsvImportPreview(
+        currentPeriodTransactions = metadata
+            ?.let { meta -> oneOffs.count { it.periodId == meta.currentPeriodId } }
+            ?: oneOffs.size,
+        budgetTotal = settings?.totalBudget,
+        currencyCode = settings?.currencyCode ?: "USD",
+        periodStart = settings?.startDate,
+        periodEnd = settings?.getPeriodEndDate(),
+        completedPeriods = archivedBudgets.size,
+        recurringPayments = rows.count { it.isRecurrent },
+        discarded = errors.size,
+        replacesAllData = metadata != null,
+    )
+}

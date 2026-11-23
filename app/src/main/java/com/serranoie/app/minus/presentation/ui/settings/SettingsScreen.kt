@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.serranoie.app.minus.presentation.ui.settings.csv.CsvImportPreviewDialog
 import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 
@@ -25,6 +26,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val importDialog by viewModel.importDialog.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -72,6 +74,12 @@ fun SettingsScreen(
             }
         }
     }
+
+    CsvImportPreviewDialog(
+        dialog = importDialog,
+        onConfirm = viewModel::onConfirmImport,
+        onDismiss = viewModel::onDismissImport,
+    )
 
     Settings(
         isCensored = uiState.isCensored,

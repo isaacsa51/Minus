@@ -9,11 +9,13 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.serranoie.app.minus.data.csv.CsvImportPreview
 import com.serranoie.app.minus.data.csv.CsvImportWorker
 import com.serranoie.app.minus.data.csv.MinusCsvService
 import com.serranoie.app.minus.presentation.util.ErrorLogRecorder
@@ -110,6 +112,12 @@ class CsvTransferManager @Inject constructor(
             errorLogRecorder.record("CsvTransferManager.saveCsvToDownloads", e)
         }
         null
+    }
+
+    suspend fun previewImport(uriString: String): CsvImportPreview = withContext(Dispatchers.IO) {
+        val stream = context.contentResolver.openInputStream(uriString.toUri())
+            ?: error("Unable to open CSV stream")
+        stream.use { csvService.previewImport(it) }
     }
 
     fun enqueueImport(uriString: String) {

@@ -14,6 +14,7 @@ import com.android.ide.common.rendering.api.SessionParams
 import com.serranoie.app.minus.domain.model.BudgetPeriod
 import com.serranoie.app.minus.domain.model.BudgetSettings
 import com.serranoie.app.minus.domain.model.BudgetState
+import com.serranoie.app.minus.domain.model.RecurrentFrequency
 import com.serranoie.app.minus.domain.model.Transaction
 import com.serranoie.app.minus.presentation.LocalWindowInsets
 import com.serranoie.app.minus.presentation.LocalWindowSize
@@ -44,6 +45,27 @@ class AnalyticsScreenshotTest {
         paparazzi.snapshot {
             AnalyticsPreview(
                 state = sampleActivePeriodState(),
+            )
+        }
+    }
+
+    @Test
+    fun analyticsHeatmapSkipsPaidPlannedCharge() {
+        Locale.setDefault(Locale.US)
+        val base = sampleActivePeriodState()
+        val plannedOneOff = Transaction(
+            id = 200L,
+            amount = BigDecimal("400.00"),
+            comment = "Medical",
+            date = LocalDate.of(2026, 1, 16).atTime(10, 0),
+            periodId = 7L,
+            isRecurrent = true,
+            recurrentFrequency = RecurrentFrequency.ONCE,
+        )
+
+        paparazzi.snapshot {
+            AnalyticsPreview(
+                state = base.copy(transactions = base.transactions + plannedOneOff),
             )
         }
     }
@@ -173,6 +195,7 @@ private fun sampleActivePeriodState(): AnalyticsState {
         periodFinished = false,
         transactions = transactions,
         spends = transactions,
+        chartSpends = transactions,
         wholeBudget = BigDecimal("900.00"),
         currencyCode = "USD",
         budgetSettingsForDisplay = settings,

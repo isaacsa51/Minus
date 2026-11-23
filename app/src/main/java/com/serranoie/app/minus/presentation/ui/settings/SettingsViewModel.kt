@@ -15,6 +15,7 @@ import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.app.minus.data.csv.CsvImportPreview
 import com.serranoie.app.minus.data.csv.CsvSyncWorker
 import com.serranoie.app.minus.data.repository.BudgetRepository
 import com.serranoie.app.minus.data.repository.SettingsRepository
@@ -93,6 +94,11 @@ data class SyncStatus(
     val atMillis: Long,
     val detail: String,
 )
+
+sealed interface CsvImportDialog {
+    data class Preview(val uri: String, val summary: CsvImportPreview) : CsvImportDialog
+    data object Unreadable : CsvImportDialog
+}
 
 sealed interface SettingsUiEffect {
     data object NavigateToBugReport : SettingsUiEffect
@@ -183,6 +189,9 @@ class SettingsViewModel @Inject constructor(
 
     private val _effects = MutableStateFlow<SettingsUiEffect?>(null)
     val effects: StateFlow<SettingsUiEffect?> = _effects.asStateFlow()
+
+    private val _importDialog = MutableStateFlow<CsvImportDialog?>(null)
+    val importDialog: StateFlow<CsvImportDialog?> = _importDialog.asStateFlow()
 
     private var csvTransferManager: CsvTransferManager? = null
     private var importLauncher: ActivityResultLauncher<Array<String>>? = null
@@ -489,8 +498,24 @@ class SettingsViewModel @Inject constructor(
                     Intent.FLAG_GRANT_READ_URI_PERMISSION,
                 )
             }
-            csvTransferManager?.enqueueImport(uri.toString())
+            val manager = csvTransferManager ?: return@launch
+            val uriString = uri.toString()
+            _importDialog.value = runCatching { manager.previewImport(uriString) }
+                .fold(
+                    onSuccess = { CsvImportDialog.Preview(uriString, it) },
+                    onFailure = { CsvImportDialog.Unreadable },
+                )
         }
+    }
+
+    fun onConfirmImport() {
+        val preview = _importDialog.value as? CsvImportDialog.Preview ?: return
+        _importDialog.value = null
+        if (!preview.summary.blocked) csvTransferManager?.enqueueImport(preview.uri)
+    }
+
+    fun onDismissImport() {
+        _importDialog.value = null
     }
 
     fun onResetTutorial() {

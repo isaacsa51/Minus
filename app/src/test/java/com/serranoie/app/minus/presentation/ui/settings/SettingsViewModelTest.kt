@@ -2,6 +2,11 @@ package com.serranoie.app.minus.presentation.ui.settings
 
 import android.app.AlarmManager
 import android.content.Context
+import android.net.Uri
+import com.serranoie.app.minus.data.csv.CsvImportPreview
+import com.serranoie.app.minus.presentation.ui.settings.csv.CsvTransferManager
+import io.mockk.coEvery
+import io.mockk.verify
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -311,5 +316,65 @@ class SettingsViewModelTest {
         newViewModel().onSetCategoryLimit("Coffee", null, CategoryLimitUnit.PERIOD)
 
         coVerify { budgetRepository.setCategoryLimit("Coffee", null) }
+    }
+
+    private val importPreview = CsvImportPreview(
+        currentPeriodTransactions = 27,
+        budgetTotal = BigDecimal("3773.00"),
+        currencyCode = "HKD",
+        periodStart = java.time.LocalDate.of(2026, 10, 27),
+        periodEnd = java.time.LocalDate.of(2026, 11, 26),
+        completedPeriods = 0,
+        recurringPayments = 2,
+        discarded = 0,
+        replacesAllData = true,
+    )
+
+    private fun importUri(): Uri = mockk(relaxed = true) { every { this@mockk.toString() } returns "content://backup.csv" }
+
+    @Test
+    fun `picking a csv shows its preview and confirming enqueues the import`() = runTest {
+        val manager: CsvTransferManager = mockk(relaxed = true)
+        coEvery { manager.previewImport("content://backup.csv") } returns importPreview
+        val vm = newViewModel().apply { setCsvTransferManager(manager) }
+
+        vm.importDialog.test {
+            assertThat(awaitItem()).isNull()
+            vm.onImportResult(importUri())
+            assertThat(awaitItem()).isEqualTo(CsvImportDialog.Preview("content://backup.csv", importPreview))
+            vm.onConfirmImport()
+            assertThat(awaitItem()).isNull()
+        }
+        verify(exactly = 1) { manager.enqueueImport("content://backup.csv") }
+    }
+
+    @Test
+    fun `dismissing the preview does not import`() = runTest {
+        val manager: CsvTransferManager = mockk(relaxed = true)
+        coEvery { manager.previewImport(any()) } returns importPreview
+        val vm = newViewModel().apply { setCsvTransferManager(manager) }
+
+        vm.importDialog.test {
+            assertThat(awaitItem()).isNull()
+            vm.onImportResult(importUri())
+            assertThat(awaitItem()).isInstanceOf(CsvImportDialog.Preview::class.java)
+            vm.onDismissImport()
+            assertThat(awaitItem()).isNull()
+        }
+        verify(exactly = 0) { manager.enqueueImport(any()) }
+    }
+
+    @Test
+    fun `unreadable csv shows the failure dialog`() = runTest {
+        val manager: CsvTransferManager = mockk(relaxed = true)
+        coEvery { manager.previewImport(any()) } throws java.io.IOException("boom")
+        val vm = newViewModel().apply { setCsvTransferManager(manager) }
+
+        vm.importDialog.test {
+            assertThat(awaitItem()).isNull()
+            vm.onImportResult(importUri())
+            assertThat(awaitItem()).isEqualTo(CsvImportDialog.Unreadable)
+        }
+        verify(exactly = 0) { manager.enqueueImport(any()) }
     }
 }

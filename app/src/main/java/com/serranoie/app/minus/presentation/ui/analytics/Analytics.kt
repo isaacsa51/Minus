@@ -1080,7 +1080,7 @@ private fun AnalyticsCompactLayout(
         ) {
             if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
                 CalendarHeatmap(
-                    transactions = state.transactions,
+                    transactions = state.chartSpends,
                     budget = state.wholeBudget,
                     startDate = state.startPeriodDate,
                     finishDate = state.finishPeriodDate,
@@ -1264,7 +1264,7 @@ private fun AnalyticsTabletLayout(
             ) {
                 if (state.finishPeriodDate != null && state.transactions.isNotEmpty()) {
                     CalendarHeatmap(
-                        transactions = state.transactions,
+                        transactions = state.chartSpends,
                         budget = state.wholeBudget,
                         startDate = state.startPeriodDate,
                         finishDate = state.finishPeriodDate,
