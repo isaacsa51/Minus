@@ -1,6 +1,7 @@
 package com.serranoie.app.minus.presentation.ui.theme.component.budget
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.serranoie.app.minus.R
 import com.serranoie.app.minus.domain.model.SupportedCurrency
 import com.serranoie.app.minus.domain.model.Transaction
@@ -99,6 +101,10 @@ fun AverageSpendCard(
         modifier = modifier,
         value = formattedAverage ?: emptyLabel,
         valueFontStyle = MaterialTheme.typography.labelSmallEmphasized,
+        valueAutoSize = TextAutoSize.StepBased(
+            minFontSize = 12.sp,
+            maxFontSize = MaterialTheme.typography.titleLargeEmphasized.fontSize,
+        ),
         annotatedValue = annotatedAverage,
         colors = CardDefaults.cardColors(
             containerColor = combineColors(
@@ -108,7 +114,7 @@ fun AverageSpendCard(
             ),
         ),
         label = stringResource(R.string.daily_average),
-        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 32.dp),
+        contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     )
 }

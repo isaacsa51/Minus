@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -52,6 +53,7 @@ fun StatCard(
     ),
     valueFontSize: TextUnit = MaterialTheme.typography.titleLargeEmphasized.fontSize,
     valueFontStyle: TextStyle = MaterialTheme.typography.displayMediumCondensed.copy(fontWeight = FontWeight.Light),
+    valueAutoSize: TextAutoSize? = null,
     crossedValue: String? = null,
     crossedValueColor: Color? = null,
     isWavyCross: Boolean = false,
@@ -131,9 +133,10 @@ fun StatCard(
                                 } else Modifier
                             )
                             .then(
-                                if (isCensored) Modifier else Modifier.basicMarquee()
+                                if (isCensored || valueAutoSize != null) Modifier else Modifier.basicMarquee()
                             )
                             .censor(),
+                        autoSize = valueAutoSize,
                         style = valueFontStyle,
                         fontWeight = FontWeight.Medium,
                         fontSize = valueFontSize,

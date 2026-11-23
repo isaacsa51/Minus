@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
@@ -45,6 +46,28 @@ class AverageSpendCardScreenshotTest {
                             .fillMaxWidth()
                             .height(100.dp),
                         spends = sampleTransactions(),
+                        startDate = null,
+                        finishDate = null,
+                        currency = "MXN"
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun averageSpendCardHalfWidthLargeAmount() {
+        Locale.setDefault(Locale.US)
+        paparazzi.snapshot {
+            MinusTheme {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    AverageSpendCard(
+                        modifier = Modifier
+                            .width(180.dp)
+                            .height(100.dp),
+                        spends = listOf(
+                            Transaction(id = 1L, amount = BigDecimal("12345.67"), comment = "Rent", date = LocalDateTime.of(2026, 1, 15, 12, 30), periodId = 7L),
+                        ),
                         startDate = null,
                         finishDate = null,
                         currency = "MXN"
